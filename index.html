@@ -1695,6 +1695,10 @@ footer {
     }
 }
 
+/* CENTER HERO ON INITIAL LOAD */
+html{scroll-padding-top:72px}
+body{overflow-anchor:none}
+
 /* INVITING HOMEPAGE POLISH */
 .hero-card {
     padding-bottom: 48px;
@@ -1816,6 +1820,10 @@ footer {
     }
 }
 
+/* MODERN COMMUNITY GAMES SLIDER */
+.community-slider-shell{position:relative;display:flex;align-items:center;gap:10px}.community-slider-arrow{flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(129,140,248,.28);border-radius:14px;color:#fff;background:linear-gradient(145deg,rgba(99,102,241,.22),rgba(168,85,247,.16));box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.06);cursor:pointer;font-size:27px;line-height:1;transition:.2s}.community-slider-arrow:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(168,85,247,.55);background:linear-gradient(145deg,rgba(99,102,241,.34),rgba(168,85,247,.27))}.community-slider-arrow:disabled{opacity:.28;cursor:default}.community-games{flex:1 1 auto;min-width:0;scroll-padding-inline:8px;padding:6px 4px 17px}.community-games::-webkit-scrollbar{height:10px}.community-games::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.04);border-radius:999px}.community-games::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#6366f1,#a855f7);border:2px solid rgba(2,4,10,.35);border-radius:999px}.community-games::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#818cf8,#c084fc)}.community-card{flex-basis:min(330px,42vw)}@media(max-width:700px){.community-slider-arrow{flex-basis:36px;width:36px;height:36px;font-size:23px}.community-card{flex-basis:78vw}}
+.game-card-wide{grid-column:span 2}@media(max-width:900px){.game-card-wide{grid-column:span 1}}
+.community-popularity{margin-top:12px;color:#a5b4fc;font-size:12px;font-weight:800}
 </style>
 </head>
 
@@ -2778,8 +2786,17 @@ async function loadCommunityGames() {
         return;
     }
 
-    communityGames =
-        data || [];
+    communityGames = data || [];
+
+    /* COMMUNITY GAMES SORTED BY POPULARITY */
+    if (communityGames.length) {
+        const ids = communityGames.map(game => game.id);
+        const { data: sessions } = await supabaseClient.from("game_play_sessions").select("game_id").in("game_id", ids);
+        const playCounts = {};
+        (sessions || []).forEach(session => { playCounts[session.game_id] = (playCounts[session.game_id] || 0) + 1; });
+        communityGames.forEach(game => { game.playCount = playCounts[game.id] || 0; });
+        communityGames.sort((a,b) => (b.playCount-a.playCount) || (new Date(b.created_at||0)-new Date(a.created_at||0)));
+    }
 
     renderCommunityGames();
 
@@ -2791,6 +2808,8 @@ async function loadCommunityGames() {
 /* =========================================
    RENDER COMMUNITY GAMES
 ========================================= */
+
+function setupCommunitySlider(){const container=document.getElementById("communityGames");const shell=container?.parentElement;if(!container||!shell)return;const left=shell.querySelector(".community-slider-arrow.left");const right=shell.querySelector(".community-slider-arrow.right");const update=()=>{const max=container.scrollWidth-container.clientWidth;if(left)left.disabled=container.scrollLeft<=2;if(right)right.disabled=container.scrollLeft>=max-2};if(left)left.onclick=()=>container.scrollBy({left:-Math.max(container.clientWidth*.82,280),behavior:"smooth"});if(right)right.onclick=()=>container.scrollBy({left:Math.max(container.clientWidth*.82,280),behavior:"smooth"});container.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);requestAnimationFrame(update)}
 
 function renderCommunityGames() {
 
@@ -2888,6 +2907,10 @@ function renderCommunityGames() {
                                     "A community-created game."
                                 )}
                             </p>
+
+                            <div class="community-popularity">
+                                🔥 ${Number(game.playCount || 0).toLocaleString()} plays
+                            </div>
 
                             <div
                                 class="community-author"
@@ -3433,8 +3456,11 @@ function escapeHtml(value) {
    START
 ========================================= */
 
+window.addEventListener("load",function(){const hero=document.querySelector(".hero-card");if(!hero)return;const header=document.querySelector("header");const headerHeight=header?header.offsetHeight:0;const rect=hero.getBoundingClientRect();const target=window.scrollY+rect.top-Math.max(0,(window.innerHeight-headerHeight-rect.height)/2)-headerHeight/2;window.scrollTo({top:Math.max(0,target),behavior:"instant"});});
+
 loadAccount();
 loadCommunityGames();
+setupCommunitySlider();
 loadUserCount();
 updateFeedbackCount();
 
