@@ -900,6 +900,7 @@ async function renderMessages(
     message => {
 
       const mine =
+        !!currentUser &&
         message.user_id ===
         currentUser.id;
 
@@ -1136,8 +1137,9 @@ async function sendMessage() {
 
   if (!currentUser) {
 
-    window.location.href =
-      "log-in.html?redirect=chat.html";
+    showError(
+      "You're browsing as a guest. Create a free DougHub account to send messages — you can keep reading the chat without signing up."
+    );
 
     return;
 
@@ -1259,8 +1261,15 @@ async function loadAccount() {
 
   if (!session) {
 
-    window.location.href =
-      "log-in.html?redirect=chat.html";
+    currentUser = null;
+    currentUsername = "Guest";
+    currentAvatarUrl = "";
+
+    currentUsernameEl.textContent =
+      "Guest";
+
+    await loadMessages();
+    startChatRefresh();
 
     return;
 
@@ -1362,12 +1371,15 @@ function startChatRefresh() {
 supabaseClient.auth.onAuthStateChange(
   (event, session) => {
 
-    if (!session) {
+    currentUser = session?.user || null;
 
-      window.location.href =
-        "log-in.html?redirect=chat.html";
+  if (!currentUser) {
 
-    }
+    currentUsername = "Guest";
+    currentAvatarUrl = "";
+    currentUsernameEl.textContent = "Guest";
+
+  }
 
   }
 );
