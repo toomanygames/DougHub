@@ -1694,6 +1694,128 @@ footer {
             100%;
     }
 }
+
+/* INVITING HOMEPAGE POLISH */
+.hero-card {
+    padding-bottom: 48px;
+}
+.hero-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 12% -90px;
+    height: 170px;
+    background: radial-gradient(ellipse, rgba(99,102,241,.18), transparent 70%);
+    filter: blur(24px);
+    pointer-events: none;
+}
+.hero-actions {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    z-index: 1;
+}
+.hero-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 155px;
+    padding: 13px 19px;
+    border-radius: 13px;
+    font-size: 14px;
+    font-weight: 800;
+    border: 1px solid rgba(255,255,255,.1);
+    transition: transform .2s, box-shadow .2s, background .2s, border-color .2s;
+}
+.hero-action.primary {
+    color: white;
+    background: linear-gradient(135deg,#6366f1,#a855f7);
+    box-shadow: 0 12px 30px rgba(99,102,241,.25);
+}
+.hero-action.secondary {
+    color: #e8e7f5;
+    background: rgba(255,255,255,.055);
+    backdrop-filter: blur(10px);
+}
+.hero-action:hover {
+    transform: translateY(-3px);
+}
+.hero-action.primary:hover {
+    box-shadow: 0 16px 38px rgba(99,102,241,.36);
+}
+.hero-action.secondary:hover {
+    background: rgba(255,255,255,.09);
+    border-color: rgba(129,140,248,.3);
+}
+.welcome-strip {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 14px;
+    margin-top: 8px;
+}
+.welcome-card {
+    padding: 19px 20px;
+    border-radius: 18px;
+    background: rgba(13,17,39,.62);
+    border: 1px solid rgba(255,255,255,.075);
+    transition: transform .2s, border-color .2s, background .2s;
+}
+.welcome-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(129,140,248,.28);
+    background: rgba(18,22,49,.78);
+}
+.welcome-icon {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    margin-bottom: 11px;
+    background: rgba(99,102,241,.13);
+    border: 1px solid rgba(129,140,248,.18);
+    font-size: 18px;
+}
+.welcome-card h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+}
+.welcome-card p {
+    margin: 0;
+    color: #858494;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.section-heading-welcome {
+    margin-bottom: 17px;
+}
+.section-heading-welcome h2 {
+    margin: 0;
+    font-size: 25px;
+}
+.section-heading-welcome p {
+    margin: 6px 0 0;
+    color: #858494;
+    font-size: 14px;
+}
+@media (max-width: 800px) {
+    .welcome-strip {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 600px) {
+    .hero-actions {
+        flex-direction: column;
+    }
+    .hero-action {
+        width: min(100%, 300px);
+    }
+}
+
 </style>
 </head>
 
@@ -1878,6 +2000,30 @@ footer {
 
     </section>
 
+
+    <section class="section" aria-labelledby="welcomeTitle">
+        <div class="section-heading-welcome">
+            <h2 id="welcomeTitle">Start exploring</h2>
+            <p>There’s always something to play, watch, build, or talk about.</p>
+        </div>
+        <div class="welcome-strip">
+            <a class="welcome-card" href="douggames.html">
+                <div class="welcome-icon">🎮</div>
+                <h3>Play</h3>
+                <p>Jump into DougGames and try the games already on DougHub.</p>
+            </a>
+            <a class="welcome-card" href="DougTube.html">
+                <div class="welcome-icon">▶</div>
+                <h3>Watch</h3>
+                <p>See what people are sharing on DougTube.</p>
+            </a>
+            <a class="welcome-card" href="chat.html">
+                <div class="welcome-icon">💬</div>
+                <h3>Connect</h3>
+                <p>Drop into Community Chat and join the conversation.</p>
+            </a>
+        </div>
+    </section>
     <section class="section" aria-labelledby="featureOverviewTitle">
 
         <div class="overview-section">
