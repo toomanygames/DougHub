@@ -1705,6 +1705,11 @@ body{overflow-anchor:none}
     margin-top: 14px;
     color: #858ca1;
     font-size: 13px;
+    transition: opacity .2s, transform .2s;
+}
+
+.guest-friendly-note.hidden {
+    display: none;
 }
 
 /* INVITING HOMEPAGE POLISH */
@@ -2388,6 +2393,11 @@ async function loadAccount() {
 
     currentUser =
         session.user;
+
+    const guestNote = document.querySelector(".guest-friendly-note");
+    if (guestNote) {
+        guestNote.classList.add("hidden");
+    }
 
     const {
         data: profile,
