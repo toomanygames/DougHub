@@ -1837,6 +1837,90 @@ body{overflow-anchor:none}
 .community-slider-shell{position:relative;display:flex;align-items:center;gap:10px}.community-slider-arrow{flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(129,140,248,.28);border-radius:14px;color:#fff;background:linear-gradient(145deg,rgba(99,102,241,.22),rgba(168,85,247,.16));box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.06);cursor:pointer;font-size:27px;line-height:1;transition:.2s}.community-slider-arrow:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(168,85,247,.55);background:linear-gradient(145deg,rgba(99,102,241,.34),rgba(168,85,247,.27))}.community-slider-arrow:disabled{opacity:.28;cursor:default}.community-games{flex:1 1 auto;min-width:0;scroll-padding-inline:8px;padding:6px 4px 17px}.community-games::-webkit-scrollbar{height:10px}.community-games::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.04);border-radius:999px}.community-games::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#6366f1,#a855f7);border:2px solid rgba(2,4,10,.35);border-radius:999px}.community-games::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#818cf8,#c084fc)}.community-card{flex-basis:min(330px,42vw)}@media(max-width:700px){.community-slider-arrow{flex-basis:36px;width:36px;height:36px;font-size:23px}.community-card{flex-basis:78vw}}
 .game-card-wide{grid-column:span 2}@media(max-width:900px){.game-card-wide{grid-column:span 1}}
 .community-popularity{margin-top:12px;color:#a5b4fc;font-size:12px;font-weight:800}
+
+/* MODE SWITCH */
+.mode-switch-wrap{
+    position:relative;
+    z-index:5;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:9px;
+    margin:0 auto 26px;
+}
+.mode-switch-label{
+    color:#858ca1;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+.mode-switch{
+    display:inline-flex;
+    align-items:center;
+    padding:4px;
+    gap:4px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:999px;
+    background:rgba(4,5,15,.58);
+    box-shadow:0 12px 35px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(18px);
+}
+.mode-option{
+    border:0;
+    border-radius:999px;
+    padding:10px 16px;
+    color:#9b9aad;
+    background:transparent;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:800;
+    transition:.2s;
+}
+.mode-option:hover{color:#fff;background:rgba(255,255,255,.06)}
+.mode-option.active{
+    color:#fff;
+    background:linear-gradient(135deg,rgba(99,102,241,.95),rgba(168,85,247,.95));
+    box-shadow:0 7px 22px rgba(99,102,241,.25);
+}
+.game-mode-loading{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(2,4,10,.88);
+    backdrop-filter:blur(14px);
+}
+.game-mode-loading.show{display:flex;animation:modeFadeIn .16s ease-out}
+.game-mode-loading-card{
+    width:min(360px,calc(100% - 40px));
+    padding:30px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:24px;
+    background:linear-gradient(145deg,rgba(20,24,54,.95),rgba(10,12,28,.95));
+    box-shadow:0 25px 90px rgba(0,0,0,.5);
+}
+.loading-spinner{
+    width:42px;
+    height:42px;
+    margin:0 auto 18px;
+    border:3px solid rgba(255,255,255,.1);
+    border-top-color:#818cf8;
+    border-right-color:#c084fc;
+    border-radius:50%;
+    animation:modeSpin .7s linear infinite;
+}
+.loading-title{font-size:19px;font-weight:900}
+.loading-subtitle{margin-top:7px;color:#858ca1;font-size:13px}
+@keyframes modeSpin{to{transform:rotate(360deg)}}
+@keyframes modeFadeIn{from{opacity:0}to{opacity:1}}
+@media(max-width:600px){
+    .mode-option{padding:9px 12px;font-size:12px}
+}
+
 </style>
 </head>
 
@@ -1974,6 +2058,24 @@ body{overflow-anchor:none}
             <div class="hero-badge">
                 The DougHub Platform
             </div>
+
+
+<div class="mode-switch-wrap" aria-label="DougHub mode">
+    <div class="mode-switch-label">Choose your experience</div>
+    <div class="mode-switch">
+        <button type="button" class="mode-option" id="normalModeButton">Normal Mode</button>
+        <button type="button" class="mode-option game-mode-option" id="gameModeButton">🎮 Game Mode</button>
+    </div>
+</div>
+
+<div class="game-mode-loading" id="gameModeLoading" aria-hidden="true">
+    <div class="game-mode-loading-card">
+        <div class="loading-spinner"></div>
+        <div class="loading-title">Entering Game Mode</div>
+        <div class="loading-subtitle">Loading your games...</div>
+    </div>
+</div>
+
 
             <h1>
                 Welcome to <span>DougHub</span>
@@ -3482,6 +3584,47 @@ window.addEventListener("load",function(){const hero=document.querySelector(".he
 
 loadAccount();
 loadCommunityGames();
+
+/* =========================================
+   DOUGHUB MODE SWITCH
+========================================= */
+(function setupDougHubMode(){
+    const normalButton = document.getElementById("normalModeButton");
+    const gameButton = document.getElementById("gameModeButton");
+    const loading = document.getElementById("gameModeLoading");
+    const MODE_KEY = "doughub_mode";
+
+    if (!normalButton || !gameButton) return;
+
+    function updateModeUI(){
+        const gameMode = localStorage.getItem(MODE_KEY) === "game";
+        normalButton.classList.toggle("active", !gameMode);
+        gameButton.classList.toggle("active", gameMode);
+    }
+
+    normalButton.addEventListener("click", function(){
+        localStorage.setItem(MODE_KEY, "normal");
+        updateModeUI();
+    });
+
+    gameButton.addEventListener("click", function(){
+        localStorage.setItem(MODE_KEY, "game");
+        updateModeUI();
+        if (loading) {
+            loading.classList.add("show");
+            loading.setAttribute("aria-hidden","false");
+        }
+        setTimeout(function(){
+            window.location.href = "gamemode.html";
+        }, 650);
+    });
+
+    if (!localStorage.getItem(MODE_KEY)) {
+        localStorage.setItem(MODE_KEY, "normal");
+    }
+    updateModeUI();
+})();
+
 setupCommunitySlider();
 loadUserCount();
 updateFeedbackCount();
