@@ -1,486 +1,206 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Drive PIG</title>
-  <style>
-    :root { --ink: #15213b; --paper: #fff6df; --pink: #f4518d; --pink-dark: #bd235d; --sun: #ffc83d; --sky: #63c5e8; }
-    * { box-sizing: border-box; }
-    body { margin: 0; overflow: hidden; background: var(--ink); color: var(--ink); font-family: "Trebuchet MS", sans-serif; user-select: none; }
-    canvas { display: block; width: 100vw; height: 100vh; }
-    #topbar { position: fixed; top: 12px; left: 12px; right: 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; pointer-events: none; }
-    .panel { background: rgba(255, 246, 223, .92); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); padding: 8px 11px; }
-    #level { font-size: clamp(14px, 2.2vw, 21px); font-weight: 900; letter-spacing: 0; }
-    #countdown { color: #b33555; font-size: 12px; font-weight: 800; margin-top: 2px; }
-    #controls { font-size: 12px; font-weight: bold; text-align: right; }
-    #overlay { position: fixed; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(21, 33, 59, .38); }
-    #card { width: min(570px, 100%); background: var(--paper); border: 4px solid var(--ink); box-shadow: 9px 9px 0 var(--ink); padding: clamp(20px, 5vw, 38px); text-align: center; }
-    h1 { color: var(--pink-dark); font-size: clamp(34px, 7vw, 62px); line-height: .88; margin: 0; letter-spacing: 0; text-transform: uppercase; }
-    #message { margin: 18px 0; font-weight: bold; line-height: 1.35; }
-    #world-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 12px 0 4px; }
-    #world-buttons button { font-size: 12px; }
-    #level-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 16px 0; }
-    button { border: 3px solid var(--ink); background: white; color: var(--ink); cursor: pointer; font: 800 15px "Trebuchet MS", sans-serif; min-height: 38px; padding: 7px 11px; box-shadow: 3px 3px 0 var(--ink); }
-    button:disabled { cursor: not-allowed; opacity: .42; box-shadow: 1px 1px 0 var(--ink); }
-    button:hover, button:focus-visible { background: var(--sun); outline: none; transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); }
-    .daily { background: var(--pink); color: white; }
-    #play { background: var(--sun); min-width: 170px; margin-top: 7px; }
-    .hidden { display: none !important; }
-    @media (max-width: 500px) { #controls { display: none; } #topbar { top: 8px; left: 8px; right: 8px; } .panel { padding: 6px 8px; } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Drive PIG 3D</title>
+<style>
+:root{--ink:#17213a;--pink:#c36c82;--pink2:#f2a7b5;--grass:#39d25b;--sky:#61d0ef;--cream:#fff7e9;--yellow:#ffd72e}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#62cfee;font-family:Trebuchet MS,Arial,sans-serif;color:var(--ink);user-select:none}
+#game{position:fixed;inset:0}canvas{display:block}
+.ui{position:fixed;inset:0;pointer-events:none}.top{position:absolute;left:18px;right:18px;top:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.badge{background:rgba(255,247,233,.94);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:9px 13px;font-weight:900}.small{font-size:12px}
+#menu{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(rgba(31,61,92,.18),rgba(31,61,92,.36));z-index:5}
+.card{width:min(820px,94vw);max-height:92vh;overflow:auto;background:var(--cream);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:24px}
+h1{font-size:clamp(42px,8vw,78px);line-height:.8;margin:0;color:#bd486a;letter-spacing:-3px;text-transform:uppercase}
+.sub{margin:12px 0 18px;font-weight:800}.select{display:grid;grid-template-columns:120px 1fr 120px;gap:18px;align-items:center}
+.leverbox{display:grid;place-items:center;height:230px;background:#e9d7c1;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);position:relative;overflow:hidden}
+.leverbase{width:54px;height:78px;border-radius:18px 18px 8px 8px;background:#5e5360;border:4px solid var(--ink);position:absolute;bottom:24px}
+.leverrod{width:18px;height:112px;background:#7b6a70;border:4px solid var(--ink);position:absolute;bottom:72px;transform-origin:bottom center;transition:transform .18s}
+.leverhandle{width:48px;height:48px;border-radius:50%;background:#e95c72;border:4px solid var(--ink);position:absolute;top:-22px;left:50%;transform:translateX(-50%);box-shadow:3px 3px 0 #8e3249}
+.levelcard{text-align:center;background:#d8f1c8;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:18px}
+.levelnum{font-size:60px;font-weight:1000;line-height:1}.world{font-size:15px;font-weight:900;margin-top:5px}.desc{min-height:38px;font-weight:700;margin:10px 0}
+.arrow{border:4px solid var(--ink);background:white;font-size:42px;line-height:1;min-height:92px;box-shadow:5px 5px 0 var(--ink);cursor:pointer}.arrow:hover{background:var(--yellow);transform:translate(1px,1px)}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+button{font:900 15px Trebuchet MS,Arial,sans-serif;border:3px solid var(--ink);background:#fff;color:var(--ink);padding:10px 15px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}button:hover{background:var(--yellow);transform:translate(1px,1px)}
+.primary{background:var(--yellow);font-size:20px;padding:12px 28px}.muted{opacity:.65;font-size:12px;text-align:center;margin-top:12px}
+#finish{position:fixed;inset:0;display:none;place-items:center;background:rgba(20,32,55,.35);z-index:6}.finishcard{background:var(--cream);border:4px solid var(--ink);box-shadow:9px 9px 0 var(--ink);padding:28px;text-align:center;width:min(480px,92vw)}
+.finishcard h2{font-size:42px;margin:0 0 8px;color:#b94669}
+#touch{position:fixed;bottom:18px;left:0;right:0;display:none;justify-content:space-between;padding:0 18px;z-index:4;pointer-events:none}.touchgroup{display:flex;gap:10px;pointer-events:auto}.touchbtn{width:66px;height:66px;border-radius:16px;background:rgba(255,247,233,.9);font-size:24px}
+@media(max-width:650px){.select{grid-template-columns:72px 1fr 72px;gap:9px}.leverbox{height:185px}.arrow{font-size:30px;min-height:76px}.card{padding:17px}.leverrod{height:86px}.leverbase{bottom:18px}.top{left:8px;right:8px;top:8px}.badge{padding:7px 9px}#touch{display:flex}}
+</style>
 </head>
 <body>
-  <canvas id="game" aria-label="Drive Mad Pig driving game"></canvas>
-  <div id="topbar" class="hidden">
-    <div class="panel"><div id="level"></div><div id="countdown"></div></div>
-    <div id="controls" class="panel">RIGHT / D: GO<br>LEFT / A: BRAKE &amp; FLIP<br>SPACE: JUMP &nbsp; DOWN / S: SQUAT<br>R: RESTART</div>
+<div id="game"></div>
+<div class="ui">
+ <div class="top">
+  <div class="badge" id="hudLevel">DRIVE PIG 3D</div>
+  <div class="badge small" id="hudControls">D / → GAS &nbsp; A / ← BRAKE &nbsp; SPACE JUMP &nbsp; R RESTART</div>
+ </div>
+</div>
+<div id="menu">
+ <div class="card">
+  <h1>Drive Pig</h1>
+  <div class="sub">3D PIG EDITION — roll, flip, survive and reach the flag.</div>
+  <div class="select">
+   <button class="arrow" id="prev">‹</button>
+   <div class="levelcard">
+    <div class="levelnum" id="levelNum">01</div>
+    <div class="world" id="worldName">GRASSLAND</div>
+    <div class="desc" id="levelDesc">Easy rolling start.</div>
+    <div>BEST: <b id="best">—</b></div>
+   </div>
+   <button class="arrow" id="next">›</button>
   </div>
-  <div id="overlay">
-    <main id="card">
-      <h1>Drive Mad<br>Pig Edition</h1>
-      <p id="message">Five worlds. Twenty-five harder courses. Dodge themed hazards, jump with SPACE, and squat with DOWN / S.</p>
-      <div id="world-buttons"></div>
-      <div id="level-buttons"></div>
-      <button id="daily" class="daily">Daily Challenge</button>
-      <br><button id="play">Choose a level</button>
-    </main>
+  <div class="row">
+   <button id="jump10">JUMP 10 LEVELS</button>
+   <button id="reset">RESET PROGRESS</button>
   </div>
-  <script>
-    "use strict";
-    const canvas = document.querySelector("#game");
-    const context = canvas.getContext("2d");
-    const overlay = document.querySelector("#overlay");
-    const topbar = document.querySelector("#topbar");
-    const levelLabel = document.querySelector("#level");
-    const countdown = document.querySelector("#countdown");
-    const message = document.querySelector("#message");
-    const worldButtons = document.querySelector("#world-buttons");
-    const levelButtons = document.querySelector("#level-buttons");
-    const play = document.querySelector("#play");
-    const daily = document.querySelector("#daily");
-    const keys = new Set();
-    const segment = 72;
-    let width = 0, height = 0, selectedLevel = 1, selectedWorld = 0, playing = false, isDaily = false;
-    let unlockedLevel = Math.max(1, Math.min(25, Number(localStorage.getItem("drive-pig-unlocked-level") || 1)));
-    let terrain = [], hazards = [], finish = 0, car, courseName = "", cameraX = 0, jumpQueued = false, bossTimer = 0;
-    let particles = [], skidMarks = [], shake = 0, lastTime = performance.now();
+  <div class="row"><button class="primary" id="play">PLAY LEVEL</button></div>
+  <div class="muted">60 levels • lever-style level select • progress saves automatically</div>
+ </div>
+</div>
+<div id="finish"><div class="finishcard">
+ <h2 id="finishTitle">LEVEL CLEARED!</h2><p id="finishText"></p>
+ <div class="row"><button id="again">RETRY</button><button class="primary" id="nextLevel">NEXT LEVEL</button><button id="levels">LEVEL SELECT</button></div>
+</div></div>
+<div id="touch">
+ <div class="touchgroup"><button class="touchbtn" data-key="left">◀</button><button class="touchbtn" data-key="jump">▲</button></div>
+ <div class="touchgroup"><button class="touchbtn" data-key="right">▶</button></div>
+</div>
 
-    function resize() { width = canvas.width = innerWidth * devicePixelRatio; height = canvas.height = innerHeight * devicePixelRatio; context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); }
-    addEventListener("resize", resize); resize();
+<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
+<script>
+"use strict";
+const LEVELS=60, STORE="drive-pig-3d-unlocked", BEST="drive-pig-3d-best";
+let unlocked=Math.max(1,Math.min(LEVELS,Number(localStorage.getItem(STORE)||1)));
+let level=1,playing=false,won=false,dead=false,keys=new Set(),jumpQueued=false,last=performance.now();
+let scene,camera,renderer,car,carGroup,trackGroup,hazardGroup,finishGroup;
+let track=[],hazards=[],finishX=0,carX=0,carY=2,velX=0,velY=0,angle=0,spin=0,grounded=false,camX=0;
+const menu=document.querySelector("#menu"), finish=document.querySelector("#finish"), levelNum=document.querySelector("#levelNum"), worldName=document.querySelector("#worldName"), levelDesc=document.querySelector("#levelDesc"), best=document.querySelector("#best"), hud=document.querySelector("#hudLevel"), hudControls=document.querySelector("#hudControls");
+const worlds=[
+ ["GREEN HILLS","Grass ramps and chunky bridges","#3bd35a"],
+ ["PINK BRIDGES","High platforms and gaps","#c76f86"],
+ ["SKY JUMPS","Huge jumps above the clouds","#5aaef2"],
+ ["PIG FACTORY","Conveyor blocks and crushers","#9b7a72"],
+ ["MOUNTAIN","Steep peaks and descents","#6e8fbd"],
+ ["NEON FARM","Wild late-game obstacle courses","#9b70e7"]
+];
+const descriptions=["Easy rolling start","Tiny ramp warm-up","First real gap","Bumpy bridge","Short hill climb","Double bump","Low bridge","Little launcher","Pink platform","First big jump","Cloud hop","Long sky bridge","Falling platform","Triple ramp","Skyline gap","Factory floor","Crusher alley","Conveyor chaos","Moving block","Factory finale","Mountain road","Steep climb","Sharp descent","Peak-to-peak","Mountain finale","Neon hills","Speed tunnel","Floating blocks","Flip challenge","Big staircase","Broken road","Twin ramps","Narrow bridge","Giant gap","Hammer road","Drop zone","Wobble bridge","Mega jump","Last stand","Nightmare bridge","Pig panic","Double crusher","Sky factory","Long launch","Triple gap","Floating road","Crazy downhill","Loop-ish ramps","Final climb","Finale warmup","Super jump","Pink chaos","Mountain maze","Speed peak","Factory storm","Neon gauntlet","Ultimate bridge","Mega finale","THE PIG GRAND PRIX","THE LAST PIG RIDE"];
+const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.05});
+const box=(w,h,d,c)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));
+const cyl=(r,h,c,seg=16)=>new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg),mat(c));
 
-    function localDayKey() { const now = new Date(); return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`; }
-    function seedForToday() { return [...localDayKey()].reduce((seed, character) => ((seed * 31) + character.charCodeAt(0)) >>> 0, 2166136261); }
-    function seededRandom(seed) { return () => { seed = (seed + 0x6D2B79F5) | 0; let value = Math.imul(seed ^ (seed >>> 15), 1 | seed); value ^= value + Math.imul(value ^ (value >>> 7), 61 | value); return ((value ^ (value >>> 14)) >>> 0) / 4294967296; }; }
-    function secondsUntilTomorrow() { const now = new Date(), tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1); return Math.max(0, Math.floor((tomorrow - now) / 1000)); }
-    function updateCountdown() { const seconds = secondsUntilTomorrow(), hours = String(Math.floor(seconds / 3600)).padStart(2, "0"), minutes = String(Math.floor(seconds % 3600 / 60)).padStart(2, "0"), secs = String(seconds % 60).padStart(2, "0"); countdown.textContent = isDaily ? `NEW COURSE IN ${hours}:${minutes}:${secs}` : ""; }
-    setInterval(updateCountdown, 1000);
-
-    function addPoint(x, y) { terrain.push({ x, y }); return x; }
-    function flat(x, y, amount = 1) { for (let index = 0; index < amount; index++) x = addPoint(x + segment, y); return x; }
-    function pattern(x, base, values, hazard = "") { values.forEach(value => { x = addPoint(x + segment, base - value); }); if (hazard) hazards.push({ x: x - values.length * segment / 2, type: hazard }); return x; }
-    const patterns = [
-      (x, y) => pattern(x, y, [0, 25, 52, 20, 0], "bump"),
-      (x, y) => pattern(x, y, [0, 30, 65, 95, 95, 65, 30, 0], "stairs"),
-      (x, y) => pattern(x, y, [0, -30, -78, -78, -38, 5, 0], "pit"),
-      (x, y) => pattern(x, y, [0, 40, 0, 55, 0, 42, 0], "hills"),
-      (x, y) => pattern(x, y, [0, 68, 0, 82, 0, 64, 0], "teeth"),
-      (x, y) => pattern(x, y, [0, 38, 80, 132, 172, 110, 40, 0], "peak"),
-      (x, y) => pattern(x, y, [0, 20, 50, 90, 140, 76, 16, 0], "ramp"),
-      (x, y) => pattern(x, y, [0, -34, -75, -44, 18, 48, 12, 0], "dip"),
-      (x, y) => pattern(x, y, [0, 42, 13, 72, 20, 100, 26, 76, 0], "chaos")
-    ];
-    const worlds = [
-      { name: "FREEZER", color: "#bdefff", accent: "#3f8ec4", hazard: "icicle", levels: ["Cold Start", "Slippery Shift", "Icicle Alley", "Whiteout Run", "Frozen Finale"] },
-      { name: "STOVE", color: "#ffd39a", accent: "#d96c21", hazard: "butter", levels: ["Warm Up", "Butter Gap", "Pan Panic", "Kitchen Climb", "Boiling Point"] },
-      { name: "FIRE", color: "#ffb36b", accent: "#d43820", hazard: "fireball", levels: ["Spark Sprint", "Ember Road", "Flame Flight", "Inferno Hills", "Firestorm"] },
-      { name: "SMOKEHOUSE", color: "#b8b0a8", accent: "#5f5148", hazard: "smoke", levels: ["Smolder Start", "Haze Maze", "Low Smoke", "Choking Point", "Smokehouse Finale"] },
-      { name: "HUMAN", color: "#ffd0b8", accent: "#9f3d43", hazard: "hand", levels: ["Kitchen Table", "Human Steps", "Palm Pressure", "Panic Underfoot", "THE GIANT HAND"] }
-    ];
-
-    function worldForLevel(level) { return Math.floor((level - 1) / 5); }
-    function levelInWorld(level) { return ((level - 1) % 5) + 1; }
-    const levelSignatures = [
-      "snowdrift", "icepatch", "icicle", "whiteout", "crystal",
-      "flame", "butter", "pan", "steam", "water",
-      "spark", "ember", "flame", "lava", "firestorm",
-      "coal", "smokering", "lowSmoke", "smokepillar", "smokefinale",
-      "plate", "foot", "palm", "stomp", "hand"
-    ];
-    const obstacleProfiles = [
-      [1.65, 1.45], [0.78, 0.72], [1.3, 1.1], [0.7, 0.68], [1.5, 1.35],
-      [0.82, 0.76], [1.45, 1.2], [0.72, 0.7], [1.2, 1.05], [0.62, 1.75],
-      [1.55, 1.4], [0.8, 0.72], [1.25, 1.08], [0.68, 0.62], [1.45, 1.25],
-      [0.86, 0.78], [1.35, 1.15], [0.74, 0.68], [1.15, 1.0], [0.6, 0.55],
-      [1.6, 1.4], [0.8, 0.7], [1.25, 1.05], [0.7, 0.62], [1.35, 1.15]
-    ];
-    function signatureForLevel(level) { return levelSignatures[level - 1]; }
-    function obstacleProfileForLevel(level) { return obstacleProfiles[level - 1] || [1, 1]; }
-    function renderLevelLocks() {
-      [...levelButtons.querySelectorAll("button")].forEach((button, index) => {
-        const level = index + 1;
-        button.hidden = worldForLevel(level) !== selectedWorld;
-        button.disabled = level > unlockedLevel;
-        button.title = button.disabled ? "Finish the previous level to unlock this course." : "Play this course";
-      });
-    }
-    function unlockNextLevel() {
-      if (!isDaily && selectedLevel === unlockedLevel && unlockedLevel < worlds.length * 5) {
-        unlockedLevel += 1;
-        localStorage.setItem("drive-pig-unlocked-level", String(unlockedLevel));
-        renderLevelLocks();
-      }
-    }
-    function addWorldHazards(worldIndex, level, ground, end) {
-      const world = worlds[worldIndex];
-      const difficulty = levelInWorld(level);
-      const [sharedMultiplier, signatureMultiplier] = obstacleProfileForLevel(level);
-      if (world.hazard !== "hand") {
-        const spacing = Math.max(segment * 2.4, segment * (4.2 - difficulty * .18) * sharedMultiplier);
-        let icicleIndex = 0;
-        for (let x = segment * 12; x < end - segment * 4; x += spacing) {
-          const hazard = { x, type: world.hazard, phase: (x / segment) % 2, difficulty };
-          if (world.hazard === "icicle") hazard.requiresSquat = icicleIndex++ % 2 === 1;
-          if (world.hazard === "butter" && difficulty !== 3 && difficulty !== 5) hazard.gap = terrainAt(x) - 220;
-          if (world.hazard === "fireball") hazard.y = ground - 85 - ((x / segment) % 3) * 38;
-          if (world.hazard === "scythe") hazard.y = terrainAt(x) - 78;
-          if (world.hazard === "smoke") hazard.y = ground - 10;
-          if (world.hazard !== "butter" || (difficulty !== 3 && difficulty !== 5)) hazards.push(hazard);
-          if (world.hazard === "butter") hazards.push({ x: x + spacing * .5, type: "vent", phase: (x / segment) % 3, difficulty });
-        }
-      }
-      const signature = signatureForLevel(level);
-      const signatureSpacing = Math.max(segment * 3.2, segment * (5.6 - difficulty * .25) * signatureMultiplier);
-      for (let x = segment * 15; x < end - segment * 3; x += signatureSpacing) {
-        hazards.push({ x, type: "signature", signature, phase: (x / segment) % 4, difficulty });
-      }
-    }
-
-    function buildCourse(level, dailyMode) {
-      const worldIndex = worldForLevel(level), world = worlds[worldIndex];
-      const ground = Math.round(innerHeight * .72), random = dailyMode ? seededRandom(seedForToday()) : null;
-      terrain = [{ x: 0, y: ground }]; hazards = []; let x = 0;
-      x = flat(x, ground, 8);
-      const count = dailyMode ? 11 : level === 1 ? 5 : 5 + levelInWorld(level) * 2 + worldIndex;
-      for (let index = 0; index < count; index++) {
-        const patternIndex = dailyMode
-          ? Math.floor(random() * patterns.length)
-          : level === 1 ? (index % 2 === 0 ? 0 : 3) : (level + index * 2) % patterns.length;
-        x = patterns[patternIndex](x, ground);
-        x = flat(x, ground, dailyMode ? 1 : 2);
-      }
-      x = flat(x, ground, 9); finish = x - segment * 3;
-      addWorldHazards(worldIndex, level, ground, finish);
-      courseName = dailyMode ? `DAILY CHALLENGE: ${localDayKey()}` : `${world.name} ${levelInWorld(level)}: ${world.levels[levelInWorld(level) - 1]}`;
-      car = { x: segment * 3, y: ground - 26, vx: 0, vy: 0, angle: 0, spin: 0, squat: false, grounded: true, crashed: false, won: false, wheelSpin: 0, airtime: 0 };
-      cameraX = 0;
-      jumpQueued = false;
-      bossTimer = 0;
-      particles = []; skidMarks = []; shake = 0;
-    }
-
-    function terrainAt(x) {
-      if (x <= terrain[0].x) return terrain[0].y;
-      for (let index = 0; index < terrain.length - 1; index++) { const first = terrain[index], second = terrain[index + 1]; if (x <= second.x) { const amount = (x - first.x) / (second.x - first.x); return first.y + (second.y - first.y) * amount; } }
-      return terrain[terrain.length - 1].y;
-    }
-    function normalizeAngle(angle) { return Math.atan2(Math.sin(angle), Math.cos(angle)); }
-    function slopeAt(x) { return Math.atan2(terrainAt(x + 22) - terrainAt(x - 22), 44); }
-    function particleBurst(x, y, count, type = "dust") {
-      for (let i = 0; i < count; i++) {
-        const a = Math.random() * Math.PI * 2, s = Math.random() * 3 + 1;
-        particles.push({x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s-1.5, life: 1, size: Math.random()*5+2, type});
-      }
-    }
-    function updateEffects() {
-      particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .12; p.vx *= .98; p.life -= .035; });
-      particles = particles.filter(p => p.life > 0);
-      skidMarks = skidMarks.filter(m => m.life-- > 0);
-      shake *= .88;
-    }
-    function startGame() {
-      if (!isDaily && selectedLevel > unlockedLevel) {
-        message.textContent = "Finish the previous level to unlock this course.";
-        return;
-      }
-      buildCourse(selectedLevel, isDaily); playing = true; overlay.classList.add("hidden"); topbar.classList.remove("hidden"); levelLabel.textContent = courseName; updateCountdown();
-    }
-    function showMenu(text) { playing = false; topbar.classList.add("hidden"); overlay.classList.remove("hidden"); message.textContent = text; play.textContent = "Play selected level"; }
-
-    function crash(text) {
-      if (car.crashed || car.won) return;
-      car.crashed = true;
-      shake = 16;
-      particleBurst(car.x, car.y, 28, "impact");
-      setTimeout(() => showMenu(text), 850);
-    }
-
-    function checkHazards(view) {
-      const world = worlds[worldForLevel(selectedLevel)];
-      const carScreenX = car.x - view;
-      for (const hazard of hazards) {
-        if (hazard.type === "icicle") {
-          const icicleTip = terrainAt(hazard.x) - 80;
-          const carTop = car.y - 25, carBottom = car.y + 25;
-          const touchesIcicle = Math.abs(car.x - hazard.x) < 30 && carTop < icicleTip && carBottom > 0;
-          if (touchesIcicle && (!hazard.requiresSquat || !car.squat)) crash(hazard.requiresSquat ? "Squat under this icicle!" : "The icicles got the pig car. Pick a course and try again.");
-        } else if (hazard.type === "butter") {
-          const localGround = terrainAt(hazard.x), upperBottom = hazard.gap + 16, lowerTop = hazard.gap + 204;
-          const hitsUpperColumn = car.y - 18 < upperBottom;
-          const hasLowerColumn = lowerTop < localGround - 24;
-          const hitsLowerColumn = hasLowerColumn && car.y + 18 > lowerTop;
-          if (Math.abs(car.x - hazard.x) < 18 && (hitsUpperColumn || hitsLowerColumn)) crash("Splat. The butter columns closed the gap.");
-        } else if (hazard.type === "fireball") {
-          const y = hazard.y + Math.sin((performance.now() / 240) + hazard.phase) * 14;
-          if (Math.hypot(car.x - hazard.x, car.y - y) < 34) crash("A fireball hit the pig car. Pick a course and try again.");
-        } else if (hazard.type === "scythe") {
-          const y = terrainAt(hazard.x) - 78;
-          if (Math.hypot(car.x - hazard.x, car.y - y) < 48) crash("The reaper's scythe caught the pig car.");
-        } else if (hazard.type === "smoke") {
-          const y = terrainAt(hazard.x) - 12;
-          if (Math.abs(car.x - hazard.x) < 52 && car.y + 20 > y) crash("The smoke pit swallowed the pig car.");
-        } else if (hazard.type === "signature") {
-          const signatureHeights = { snowdrift: 24, icepatch: 8, whiteout: 58, crystal: 72, flame: 48, pan: 42, steam: 52, water: 18, spark: 34, ember: 24, lava: 38, firestorm: 62, coal: 22, smokering: 48, lowSmoke: 28, smokepillar: 64, smokefinale: 44, plate: 30, foot: 70, palm: 58, stomp: 42, hand: 90 };
-          const obstacleHeight = signatureHeights[hazard.signature] || 30;
-          const obstacleY = terrainAt(hazard.x) - obstacleHeight;
-          const requiresSquat = hazard.signature === "whiteout" || hazard.signature === "smokepillar";
-          let touches;
-          if (hazard.signature === "water") {
-            const poolAngle = slopeAt(hazard.x), dx = car.x - hazard.x, dy = car.y - (terrainAt(hazard.x) - 10);
-            const localX = dx * Math.cos(poolAngle) + dy * Math.sin(poolAngle);
-            const localY = -dx * Math.sin(poolAngle) + dy * Math.cos(poolAngle);
-            touches = Math.abs(localX) < 42 && Math.abs(localY) < 18;
-          } else {
-            touches = Math.abs(car.x - hazard.x) < 26 && car.y + 20 > obstacleY && car.y - 20 < terrainAt(hazard.x);
-          }
-          if (touches && (!requiresSquat || !car.squat)) crash("The " + hazard.signature + " obstacle caught the pig car.");
-        }
-      }
-      if (world.hazard === "hand" && levelInWorld(selectedLevel) === 5) {
-        const cycle = 240, phase = bossTimer % cycle, side = Math.floor(bossTimer / cycle) % 2;
-        const handX = side === 0 ? 86 : innerWidth - 86;
-        const slamY = phase < 48 ? -170 + phase / 48 * (innerHeight * .62) : phase < 84 ? innerHeight * .62 : -170;
-        if (phase < 84 && Math.abs(carScreenX - handX) < 105 && car.y < slamY + 150) crash("The giant hand slammed the pig car.");
-      }
-    }
-
-    function update() {
-      if (!playing || car.crashed || car.won) return;
-      const forward = keys.has("ArrowRight") || keys.has("KeyD"), backward = keys.has("ArrowLeft") || keys.has("KeyA");
-      const squat = keys.has("ArrowDown") || keys.has("KeyS");
-      const groundBeforeMove = terrainAt(car.x) - 13;
-      const touchingGround = car.grounded || car.y >= groundBeforeMove - 12;
-      if (jumpQueued && touchingGround) {
-        car.vy = -8.9 - Math.min(1.2, Math.max(0, car.vx) * .035);
-        car.grounded = false; car.airtime = 0;
-        particleBurst(car.x - 15, car.y + 20, 8);
-      }
-      jumpQueued = false;
-      car.squat = squat;
-      if (forward) car.vx += car.grounded ? .20 : .075;
-      if (backward) car.vx -= car.grounded ? .13 : .045;
-      car.vx *= car.grounded ? .991 : .997;
-      car.vx = Math.max(-4.5, Math.min(11, car.vx));
-      car.wheelSpin += car.vx * .14;
-      car.vy += .28; car.x += car.vx; car.y += car.vy;
-      const front = terrainAt(car.x + 22) - 13, rear = terrainAt(car.x - 22) - 13, ground = (front + rear) / 2;
-      if (car.y >= ground) {
-        const target = Math.atan2(front - rear, 44);
-        const landingTilt = Math.abs(normalizeAngle(car.angle - target));
-        if (landingTilt > 2.35) crash("The pig car landed off its wheels. Try another flip.");
-        if (!car.grounded && Math.abs(car.vy) > 2.5) {
-          particleBurst(car.x, ground, 9);
-          if (car.airtime > 35) shake = Math.min(8, Math.abs(car.vy) * 1.4);
-        }
-        car.y = ground; car.vy = 0; car.angle = target; car.spin = 0; car.grounded = true; car.airtime = 0;
-      }
-      else {
-        car.grounded = false; car.airtime += 1;
-        if (forward) car.spin += .022;
-        if (backward) car.spin -= .022;
-        car.spin *= .995;
-        car.spin = Math.max(-.20, Math.min(.20, car.spin));
-        car.angle += car.spin;
-      }
-      cameraX += (Math.max(0, car.x - innerWidth * .31) - cameraX) * .09;
-      if (car.grounded && Math.abs(car.vx) > 7 && Math.random() < .25) particleBurst(car.x - 28, car.y + 20, 1);
-      bossTimer += worlds[worldForLevel(selectedLevel)].hazard === "hand" ? 1 : 0;
-      checkHazards(cameraX);
-      if (car.y > innerHeight + 200 || car.x < 20) crash("That landing scrambled the pig car. Pick a course and try again.");
-      if (car.x >= finish) { car.won = true; particleBurst(car.x, car.y, 55, "win"); shake = 5; unlockNextLevel(); setTimeout(() => showMenu(isDaily ? "Daily challenge cleared. Come back tomorrow for a new course." : unlockedLevel > selectedLevel ? "Level cleared. The next course is unlocked." : "Level cleared. Choose another course, or take on today’s challenge."), 700); }
-    }
-
-    function draw() {
-      if (shake > .2) { context.save(); context.translate((Math.random()-.5)*shake, (Math.random()-.5)*shake); }
-      const world = worlds[worldForLevel(selectedLevel)], view = cameraX, ground = Math.round(innerHeight * .72);
-      const sky = context.createLinearGradient(0, 0, 0, innerHeight);
-      if (world.hazard === "icicle") { sky.addColorStop(0, "#5d9bd1"); sky.addColorStop(.7, "#dff7ff"); }
-      else if (world.hazard === "butter") { sky.addColorStop(0, "#e98643"); sky.addColorStop(.7, "#ffe4a8"); }
-      else if (world.hazard === "fireball") { sky.addColorStop(0, "#080910"); sky.addColorStop(.7, "#241014"); }
-      else if (world.hazard === "scythe") { sky.addColorStop(0, "#171329"); sky.addColorStop(.7, "#74658d"); }
-      else if (world.hazard === "smoke") { sky.addColorStop(0, "#403b3a"); sky.addColorStop(.7, "#b8aaa0"); }
-      else { sky.addColorStop(0, "#d8927b"); sky.addColorStop(.7, "#ffe0b8"); }
-      context.fillStyle = sky; context.fillRect(0, 0, innerWidth, innerHeight);
-      if (world.hazard !== "fireball") {
-        context.fillStyle = world.hazard === "scythe" ? "#d7c6ff" : world.hazard === "smoke" ? "#d2c5bc" : "#fff0a6";
-        context.beginPath(); context.arc(innerWidth * .78, innerHeight * .18, 48, 0, Math.PI * 2); context.fill();
-      } else {
-        const meteorTime = performance.now() / 1000;
-        for (let meteor = 0; meteor < 6; meteor++) {
-          const cycle = (meteorTime * (.35 + meteor * .04) + meteor * 1.7) % 5;
-          const meteorX = innerWidth * (.1 + ((meteor * .19 + cycle * .11) % .82));
-          const meteorY = 70 + ((cycle * 110 + meteor * 47) % (innerHeight * .42));
-          context.strokeStyle = "rgba(255, 120, 45, .65)"; context.lineWidth = 4;
-          context.beginPath(); context.moveTo(meteorX - 34, meteorY - 28); context.lineTo(meteorX, meteorY); context.stroke();
-          context.fillStyle = "#ffcf58"; context.beginPath(); context.arc(meteorX, meteorY, 7, 0, Math.PI * 2); context.fill();
-          if (cycle > 4.25) {
-            context.strokeStyle = "rgba(255, 80, 20, .75)"; context.lineWidth = 3;
-            context.beginPath(); context.arc(meteorX, meteorY, (cycle - 4.25) * 70, 0, Math.PI * 2); context.stroke();
-          }
-        }
-      }
-      if (world.hazard === "icicle") {
-        context.fillStyle = "rgba(255, 255, 255, .9)";
-        context.beginPath();
-        context.ellipse(innerWidth * .7, innerHeight * .16, 92, 25, 0, 0, Math.PI * 2);
-        context.ellipse(innerWidth * .8, innerHeight * .13, 78, 22, 0, 0, Math.PI * 2);
-        context.ellipse(innerWidth * .87, innerHeight * .19, 68, 20, 0, 0, Math.PI * 2);
-        context.fill();
-      }
-      if (!car) { if (shake > .2) context.restore(); return; }
-      const groundFill = world.hazard === "icicle" ? "#ffffff" : world.hazard === "butter" ? "#202020" : world.hazard === "fireball" ? "#b93621" : "#56a848";
-      const groundEdge = world.hazard === "icicle" ? "#b9e5f5" : world.hazard === "butter" ? "#050505" : world.hazard === "fireball" ? "#ff6a24" : "#2b6836";
-      context.beginPath(); terrain.forEach((point, index) => { const screenX = point.x - view; index ? context.lineTo(screenX, point.y) : context.moveTo(screenX, point.y); }); context.lineTo(innerWidth + 80, innerHeight + 80); context.lineTo(-80, innerHeight + 80); context.closePath(); context.fillStyle = groundFill; context.fill();
-      context.beginPath(); terrain.forEach((point, index) => { const screenX = point.x - view; index ? context.lineTo(screenX, point.y) : context.moveTo(screenX, point.y); }); context.strokeStyle = groundEdge; context.lineWidth = 7; context.stroke();
-      hazards.forEach(hazard => {
-        const x = hazard.x - view, y = terrainAt(hazard.x);
-        if (x < -100 || x > innerWidth + 100) return;
-        if (hazard.type === "icicle") {
-          context.fillStyle = "#eaffff"; context.strokeStyle = "#3f8ec4"; context.lineWidth = 3;
-          context.beginPath(); context.moveTo(x - 18, 0); context.lineTo(x + 18, 0); context.lineTo(x, y - 80); context.closePath(); context.fill(); context.stroke();
-        } else if (hazard.type === "butter") {
-          const gapBottom = hazard.gap + 220;
-          context.fillStyle = "#ffe36e"; context.fillRect(x - 24, 0, 48, hazard.gap); context.fillRect(x - 24, gapBottom, 48, Math.max(0, y - gapBottom));
-          context.strokeStyle = "#c78623"; context.strokeRect(x - 24, 0, 48, hazard.gap); if (gapBottom < y) context.strokeRect(x - 24, gapBottom, 48, y - gapBottom);
-        } else if (hazard.type === "vent") {
-          const ventY = y - 8, pulse = 1 + Math.sin(performance.now() / 130 + hazard.phase) * .18;
-          context.fillStyle = "#6f3d24"; context.fillRect(x - 30, ventY - 8, 60, 14);
-          context.strokeStyle = "#ffd166"; context.lineWidth = 3; context.strokeRect(x - 30, ventY - 8, 60, 14);
-          context.strokeStyle = "rgba(255, 246, 210, .8)"; context.lineWidth = 2;
-          for (let gust = -1; gust <= 1; gust++) { context.beginPath(); context.moveTo(x + gust * 12, ventY - 12); context.lineTo(x + gust * 12 - gust * 16 * pulse, ventY - 42 - Math.abs(gust) * 8); context.stroke(); }
-        } else if (hazard.type === "fireball") {
-          const fireY = hazard.y + Math.sin((performance.now() / 240) + hazard.phase) * 14;
-          context.fillStyle = "#ffdf4f"; context.beginPath(); context.arc(x, fireY, 17, 0, Math.PI * 2); context.fill(); context.fillStyle = "#ef3b22"; context.beginPath(); context.arc(x, fireY, 9, 0, Math.PI * 2); context.fill();
-        } else if (hazard.type === "scythe") {
-          const scytheY = y - 78; context.save(); context.translate(x, scytheY); context.rotate(performance.now() / 260); context.strokeStyle = "#d9d4e8"; context.lineWidth = 8; context.beginPath(); context.arc(0, 0, 33, -.75, 1.3); context.stroke(); context.strokeStyle = "#5c3d78"; context.lineWidth = 5; context.beginPath(); context.moveTo(-6, 4); context.lineTo(30, 40); context.stroke(); context.restore();
-        } else if (hazard.type === "smoke") {
-          const smokeY = y - 12 + Math.sin(performance.now() / 360 + hazard.phase) * 4;
-          context.fillStyle = "rgba(67, 58, 55, .82)";
-          context.beginPath(); context.ellipse(x, smokeY, 52, 15, 0, 0, Math.PI * 2); context.fill();
-          context.fillStyle = "rgba(104, 94, 88, .58)";
-          context.beginPath(); context.arc(x - 22, smokeY - 14, 18, 0, Math.PI * 2); context.arc(x + 4, smokeY - 18, 24, 0, Math.PI * 2); context.arc(x + 28, smokeY - 11, 17, 0, Math.PI * 2); context.fill();
-        } else if (hazard.type === "signature") {
-          const pulse = Math.sin(performance.now() / 220 + hazard.phase) * 4;
-          const obstacleY = y - 30;
-          context.save(); context.translate(x, obstacleY);
-          if (hazard.signature === "snowdrift") { context.fillStyle = "#f8fdff"; context.beginPath(); context.ellipse(0, 25, 38, 25, 0, 0, Math.PI * 2); context.fill(); }
-          else if (hazard.signature === "icepatch") { context.fillStyle = "#9ce9ff"; context.beginPath(); context.ellipse(0, 27, 46, 9, 0, 0, Math.PI * 2); context.fill(); }
-          else if (hazard.signature === "whiteout") { context.fillStyle = "rgba(255,255,255,.8)"; context.beginPath(); context.ellipse(0, 0 + pulse, 54, 25, 0, 0, Math.PI * 2); context.fill(); }
-          else if (hazard.signature === "crystal") { context.fillStyle = "#b8f3ff"; context.beginPath(); context.moveTo(-24, 30); context.lineTo(-10, -45); context.lineTo(4, 30); context.lineTo(19, -62); context.lineTo(34, 30); context.closePath(); context.fill(); }
-          else if (["flame", "spark", "ember", "firestorm"].includes(hazard.signature)) { context.fillStyle = hazard.signature === "spark" ? "#ffe45c" : "#ff542e"; context.beginPath(); context.moveTo(-22, 30); context.quadraticCurveTo(-12, -8, 0, 8); context.quadraticCurveTo(2, -24, 16, -38); context.quadraticCurveTo(17, 3, 28, 30); context.closePath(); context.fill(); }
-          else if (hazard.signature === "pan") { context.fillStyle = "#343434"; context.fillRect(-28, -12, 56, 38); context.fillRect(28, -5, 28, 12); context.strokeStyle = "#d5d5d5"; context.strokeRect(-28, -12, 56, 38); }
-          else if (hazard.signature === "steam") { context.strokeStyle = "rgba(255,255,255,.8)"; context.lineWidth = 6; context.beginPath(); context.arc(-16, 0, 15, Math.PI, 0); context.arc(12, -10, 18, Math.PI, 0); context.stroke(); }
-          else if (hazard.signature === "water") { context.rotate(slopeAt(hazard.x)); context.translate(0, 10); context.fillStyle = "#58d6ef"; context.beginPath(); context.ellipse(0, 18, 45, 12, 0, 0, Math.PI * 2); context.fill(); context.fillStyle = "#fff0a6"; context.beginPath(); context.arc(0, 8 + pulse, 5, 0, Math.PI * 2); context.arc(18, 2 + pulse, 4, 0, Math.PI * 2); context.fill(); }
-          else if (hazard.signature === "lava") { context.fillStyle = "#ff3c1f"; context.beginPath(); context.ellipse(0, 28, 48, 13, 0, 0, Math.PI * 2); context.fill(); context.fillStyle = "#ffc247"; context.beginPath(); context.ellipse(0, 26, 22, 5, 0, 0, Math.PI * 2); context.fill(); }
-          else if (["coal", "lowSmoke", "smokering", "smokepillar", "smokefinale"].includes(hazard.signature)) { context.fillStyle = hazard.signature === "coal" ? "#302522" : "rgba(76,70,68,.72)"; context.beginPath(); context.ellipse(0, 24, 43, hazard.signature === "lowSmoke" ? 10 : 22, 0, 0, Math.PI * 2); context.fill(); if (hazard.signature === "smokering") { context.strokeStyle = "#c1b5ae"; context.lineWidth = 5; context.beginPath(); context.arc(0, -10 + pulse, 22, 0, Math.PI * 2); context.stroke(); } }
-          else if (hazard.signature === "plate") { context.fillStyle = "#f2f2f2"; context.beginPath(); context.ellipse(0, 27, 43, 10, 0, 0, Math.PI * 2); context.fill(); context.fillStyle = "#d95b58"; context.beginPath(); context.arc(0, 25, 16, 0, Math.PI * 2); context.fill(); }
-          else if (hazard.signature === "foot" || hazard.signature === "stomp") { context.fillStyle = "#9f3d43"; context.beginPath(); context.ellipse(0, 10, 25, 48, 0, 0, Math.PI * 2); context.arc(-16, -36, 10, 0, Math.PI * 2); context.arc(0, -43, 10, 0, Math.PI * 2); context.arc(16, -36, 10, 0, Math.PI * 2); context.fill(); }
-          else if (hazard.signature === "palm" || hazard.signature === "hand") { context.fillStyle = "#df8d73"; context.beginPath(); context.roundRect(-25, -45, 50, 78, 18); context.fill(); for (let finger = -22; finger <= 22; finger += 15) context.fillRect(finger - 5, -75, 10, 40); }
-          context.restore();
-        } else {
-          context.fillStyle = hazard.type === "teeth" ? "#f6f2df" : "#ffbd3b"; context.beginPath(); context.moveTo(x - 20, y); context.lineTo(x, y - 36); context.lineTo(x + 20, y); context.fill();
-        }
-      });
-      if (world.hazard === "hand" && levelInWorld(selectedLevel) === 5) {
-        const cycle = 240, phase = bossTimer % cycle, side = Math.floor(bossTimer / cycle) % 2;
-        const handX = side === 0 ? 86 : innerWidth - 86;
-        const handY = phase < 48 ? -170 + phase / 48 * (innerHeight * .62) : phase < 84 ? innerHeight * .62 : -170;
-        context.save(); context.translate(handX, handY); context.fillStyle = "#e99a79"; context.strokeStyle = "#7b303b"; context.lineWidth = 5;
-        context.beginPath(); context.roundRect(-58, -28, 116, 170, 30); context.fill(); context.stroke();
-        context.fillStyle = "#f3b092"; for (let finger = -42; finger <= 42; finger += 28) context.fillRect(finger - 10, 105, 20, 62); context.restore();
-      }
-      particles.forEach(p => {
-        const px = p.x - view;
-        if (px < -20 || px > innerWidth + 20) return;
-        context.globalAlpha = p.life;
-        context.fillStyle = p.type === "impact" ? "#ff5f7d" : p.type === "win" ? "#ffc83d" : "#fff0a6";
-        context.beginPath(); context.arc(px, p.y, p.size * p.life, 0, Math.PI*2); context.fill();
-      });
-      context.globalAlpha = 1;
-      const finishX = finish - view, finishY = terrainAt(finish); context.fillStyle = "#fff6df"; context.fillRect(finishX, finishY - 105, 8, 105); context.fillStyle = "#f4518d"; context.fillRect(finishX + 8, finishY - 105, 42, 28); context.fillStyle = "#15213b"; context.font = "bold 13px Trebuchet MS"; context.fillText("FINISH", finishX + 11, finishY - 86);
-      const x = car.x - view, y = car.y; context.save(); context.translate(x, y); context.rotate(car.angle); context.scale(1, car.squat ? .68 : 1);
-      const wheelColors = world.hazard === "icicle" ? ["#dffaff", "#71b8d1"] : world.hazard === "butter" ? ["#111111", "#f0a12b"] : world.hazard === "fireball" ? ["#35151a", "#ff6a24"] : world.hazard === "smoke" ? ["#302c2b", "#8d8178"] : ["#252334", "#e08d68"];
-      context.fillStyle = wheelColors[0]; context.beginPath(); context.arc(-20, 18, 13, 0, Math.PI * 2); context.arc(22, 18, 13, 0, Math.PI * 2); context.fill();
-      context.strokeStyle = wheelColors[1]; context.lineWidth = 2;
-      for (const wheelX of [-20,22]) {
-        context.save(); context.translate(wheelX,18); context.rotate(car.wheelSpin);
-        context.beginPath(); context.moveTo(-6,0); context.lineTo(6,0); context.moveTo(0,-6); context.lineTo(0,6); context.stroke(); context.restore();
-      }
-      context.fillStyle = wheelColors[1]; context.beginPath(); context.arc(-20, 18, 5, 0, Math.PI * 2); context.arc(22, 18, 5, 0, Math.PI * 2); context.fill();
-      context.fillStyle = "#ff8db6"; context.fillRect(-33, -22, 66, 33); context.fillStyle = "#ffb8cf"; context.fillRect(21, -36, 27, 28); context.fillStyle = "#bd235d"; context.fillRect(43, -25, 12, 10); context.fillRect(24, -47, 8, 14); context.fillRect(40, -47, 8, 14); context.fillStyle = "#15213b"; context.fillRect(41, -36, 4, 4);
-      context.fillStyle = "#fff"; context.fillRect(37, -33, 8, 8);
-      context.fillStyle = "#15213b"; context.fillRect(40, -31, 3, 3);
-      context.fillStyle = "#bd235d"; context.beginPath(); context.ellipse(51,-19,7,4,0,0,Math.PI*2); context.fill();
-      context.restore();
-      if (shake > .2) context.restore();
-    }
-    let previousTime = performance.now(), physicsTime = 0;
-    function loop(currentTime) {
-      physicsTime += Math.min(100, currentTime - previousTime);
-      previousTime = currentTime;
-      while (physicsTime >= 1000 / 60) { update(); physicsTime -= 1000 / 60; }
-      updateEffects();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    worlds.forEach((world, worldIndex) => {
-      const button = document.createElement("button");
-      button.textContent = `${worldIndex + 1}. ${world.name}`;
-      button.style.borderColor = world.accent;
-      button.addEventListener("click", () => {
-        if (worldIndex * 5 + 1 > unlockedLevel) {
-          message.textContent = "Finish the previous level to unlock this world.";
-          return;
-        }
-        selectedWorld = worldIndex;
-        selectedLevel = worldIndex * 5 + 1;
-        isDaily = false;
-        renderLevelLocks();
-        message.textContent = `${world.name}: choose one of five harder courses.`;
-      });
-      worldButtons.append(button);
-    });
-    for (let level = 1; level <= worlds.length * 5; level++) {
-      const button = document.createElement("button");
-      button.textContent = `${worldForLevel(level) + 1}-${levelInWorld(level)}`;
-      button.disabled = level > unlockedLevel;
-      button.addEventListener("click", () => {
-        selectedLevel = level;
-        selectedWorld = worldForLevel(level);
-        isDaily = false;
-        renderLevelLocks();
-        const world = worlds[selectedWorld];
-        message.textContent = `${world.name} ${levelInWorld(level)}: ${world.levels[levelInWorld(level) - 1]}. Watch for ${world.hazard} hazards.`;
-      });
-      levelButtons.append(button);
-    }
-    daily.addEventListener("click", () => { isDaily = true; message.textContent = `Today’s course is generated from ${localDayKey()}. Everyone gets the same challenge until midnight.`; });
-    play.addEventListener("click", startGame);
-    addEventListener("keydown", event => { keys.add(event.code); if (event.code === "Space" && !event.repeat) jumpQueued = true; if (event.code === "KeyR" && playing) startGame(); if (["ArrowLeft", "ArrowRight", "ArrowDown", "Space"].includes(event.code)) event.preventDefault(); });
-    addEventListener("keyup", event => keys.delete(event.code));
-    renderLevelLocks();
-    buildCourse(1, false); requestAnimationFrame(loop);
-  </script>
+function init(){
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.querySelector("#game").appendChild(renderer.domElement);
+ scene=new THREE.Scene();scene.background=new THREE.Color("#62cfee");scene.fog=new THREE.Fog("#62cfee",90,420);
+ camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1000);camera.position.set(12,8,28);
+ scene.add(new THREE.HemisphereLight("#ffffff","#55705a",2.4));
+ const sun=new THREE.DirectionalLight("#fff8dc",3);sun.position.set(-20,35,25);sun.castShadow=true;scene.add(sun);
+ trackGroup=new THREE.Group();hazardGroup=new THREE.Group();finishGroup=new THREE.Group();scene.add(trackGroup,hazardGroup,finishGroup);
+ buildMenu();
+ loadLevel(1); requestAnimationFrame(loop);
+}
+function buildMenu(){updateMenu();document.querySelector("#prev").onclick=()=>select(level-1);document.querySelector("#next").onclick=()=>select(level+1);
+ document.querySelector("#play").onclick=start;document.querySelector("#again").onclick=()=>{finish.style.display="none";start()};
+ document.querySelector("#nextLevel").onclick=()=>{finish.style.display="none";select(Math.min(LEVELS,level+1));start()};
+ document.querySelector("#levels").onclick=()=>{finish.style.display="none";menu.style.display="grid";playing=false};
+ document.querySelector("#reset").onclick=()=>{unlocked=1;localStorage.setItem(STORE,"1");select(1)};
+ document.querySelector("#jump10").onclick=()=>select(Math.min(unlocked+10,LEVELS));
+ addEventListener("keydown",e=>{keys.add(e.code);if(e.code==="Space"&&!e.repeat)jumpQueued=true;if(e.code==="KeyR"&&playing)start();if(["ArrowLeft","ArrowRight","ArrowDown","Space"].includes(e.code))e.preventDefault()});
+ addEventListener("keyup",e=>keys.delete(e.code));addEventListener("resize",resize);
+ document.querySelectorAll("[data-key]").forEach(b=>{const k=b.dataset.key;b.addEventListener("pointerdown",e=>{e.preventDefault();if(k==="jump")jumpQueued=true;else keys.add(k)});b.addEventListener("pointerup",()=>keys.delete(k));b.addEventListener("pointercancel",()=>keys.delete(k));});
+}
+function select(n){level=Math.max(1,Math.min(unlocked,n));updateMenu()}
+function updateMenu(){
+ const w=worlds[Math.floor((level-1)/10)], idx=(level-1)%10;levelNum.textContent=String(level).padStart(2,"0");worldName.textContent=w[0]+" • "+(idx+1)+"/10";levelDesc.textContent=descriptions[level-1];best.textContent=localStorage.getItem(BEST+"-"+level)||"—";
+ const rod=document.querySelector(".leverrod");rod.style.transform="rotate("+((level%10)-5)*5+"deg)";
+ document.body.style.setProperty("--pink",w[2]);
+}
+function rng(seed){return()=>{seed|=0;seed=(seed*1664525+1013904223)|0;return (seed>>>0)/4294967296}}
+function clearGroup(g){while(g.children.length)g.remove(g.children[0])}
+function addPlatform(x,y,len,angleZ=0,color="#39d25b"){const m=box(len,1.2,8,color);m.position.set(x+len/2,y,0);m.rotation.z=angleZ;m.castShadow=true;m.receiveShadow=true;trackGroup.add(m);return {x:x+len/2,y,len,angle:angleZ}}
+function makeTrack(n){
+ clearGroup(trackGroup);clearGroup(hazardGroup);clearGroup(finishGroup);track=[];hazards=[];
+ const r=rng(9000+n*7919), world=Math.floor((n-1)/10), diff=n;
+ let x=0,y=0;
+ track.push({x,y,len:28,angle:0});addPlatform(x,y,28,0,world===1?"#45cf63":"#39d25b");x+=28;
+ const pieces=16+Math.floor(n*.55);
+ for(let i=0;i<pieces;i++){
+   const type=(i+n*3)%9;let len=12+r()*18,dy=0,ang=0;
+   if(type===0){dy=2+r()*4}
+   if(type===1){dy=-2-r()*3}
+   if(type===2){len=8+r()*8;dy=5+r()*7}
+   if(type===3){len=8+r()*7;dy=-5-r()*6}
+   if(type===4){len=18+r()*16;dy=(r()-.5)*5}
+   if(type===5){len=7+r()*7;dy=(r()-.5)*9}
+   if(type===6){len=14+r()*10;ang=(r()-.5)*.28}
+   if(type===7){len=10+r()*8;dy=4;hazards.push({type:"block",x:x+len*.45,y:y+dy+1.8})}
+   if(type===8&&n>10){len=8+r()*7;dy=0;hazards.push({type:"spinner",x:x+len*.5,y:y+2.4,phase:r()*6.28})}
+   const gap=(n>3&&r()<Math.min(.48,n/170))?6+r()*10:0;
+   x+=gap;y+=dy;
+   const p=addPlatform(x,y,len,ang,world===1?"#c36d83":world===2?"#58aef0":world===3?"#a98176":world===4?"#6689b6":"#42cf61");track.push({...p,x:x+len/2});x+=len;
+   if(n>7&&r()<.17)hazards.push({type:"spike",x:x-len*.45,y:y+1});
+   if(n>14&&r()<.14)hazards.push({type:"hammer",x:x-len*.2,y:y+7,phase:r()*6.28});
+ }
+ const end=x+35;addPlatform(x,y,35,0,"#39d25b");finishX=end-10;makeFinish(finishX,y); 
+ if(n>=20){for(let i=0;i<Math.floor(n/15);i++)hazards.push({type:"crate",x:70+i*120+(r()*45),y:0})}
+ for(const h of hazards){if(h.y===0)h.y=heightAt(h.x)+1.5;makeHazard(h)}
+}
+function heightAt(x){let bestY=-8;for(const p of track){if(x>=p.x-p.len/2&&x<=p.x+p.len/2)bestY=p.y;};return bestY}
+function makeFinish(x,y){const post=box(.8,8,.8,"#b85d76");post.position.set(x,y+4,0);finishGroup.add(post);const flag=box(5,2.5,.35,"#fff");flag.position.set(x+2.3,y+6.4,0);finishGroup.add(flag);const text=box(3.8,1.4,.4,"#f36d82");text.position.set(x+2.3,y+6.4,.2);finishGroup.add(text)}
+function makeHazard(h){
+ let m;
+ if(h.type==="spike"){m=new THREE.Mesh(new THREE.ConeGeometry(1.3,3.4,4),mat("#f4e9d7"));m.position.set(h.x,h.y+1.2,0)}
+ if(h.type==="block"){m=box(4,4,7,"#e7a0a8");m.position.set(h.x,h.y+2,0)}
+ if(h.type==="crate"){m=box(5,5,7,"#b97858");m.position.set(h.x,h.y+2.5,0)}
+ if(h.type==="spinner"){m=new THREE.Group();const bar=box(10,.7,.7,"#b94669");bar.rotation.z=h.phase;m.add(bar);const hub=cyl(1.1,1,"#f4d35e");hub.rotation.x=Math.PI/2;m.add(hub);m.position.set(h.x,h.y,0)}
+ if(h.type==="hammer"){m=new THREE.Group();const arm=box(1,9,1,"#735761");arm.position.y=3.5;m.add(arm);const head=box(5,2.5,4,"#d95f75");head.position.y=-1.5;m.add(head);m.position.set(h.x,h.y+7,0)}
+ if(!m)return;m.castShadow=true;m.receiveShadow=true;m.userData=h;hazardGroup.add(m);h.mesh=m
+}
+function makeCar(){
+ if(carGroup)scene.remove(carGroup);carGroup=new THREE.Group();carGroup.position.set(0,4,0);scene.add(carGroup);
+ const body=box(7,2.5,4,"#ffd326");body.position.y=1;body.castShadow=true;carGroup.add(body);
+ const cab=box(3.6,2.5,3.7,"#fff0cf");cab.position.set(-.8,2.8,0);cab.castShadow=true;carGroup.add(cab);
+ const windowM=mat("#546b83");const win=box(2.5,1.15,3.82,"#536d83");win.position.set(-.75,3,0);carGroup.add(win);
+ const nose=box(1.1,1.4,3.9,"#f5c41e");nose.position.set(2.8,1.6,0);carGroup.add(nose);
+ const pink=mat("#f3a1b1");
+ const snout=cyl(.85,.9,"#e8899e",18);snout.rotation.x=Math.PI/2;snout.position.set(4.1,2.05,0);carGroup.add(snout);
+ const ear1=cyl(.55,.35,"#e8899e",12);ear1.rotation.x=Math.PI/2;ear1.position.set(-1.9,4.2,-1.25);carGroup.add(ear1);
+ const ear2=ear1.clone();ear2.position.z=1.25;carGroup.add(ear2);
+ for(const z of [-2.05,2.05]){const w=cyl(1.35,.7,"#252b3a",20);w.rotation.x=Math.PI/2;w.position.set(-1.9,0,z);w.castShadow=true;carGroup.add(w)}
+ const eye=cyl(.18,.2,"#17213a",12);eye.rotation.x=Math.PI/2;eye.position.set(2.9,2.65,-2.0);carGroup.add(eye);const eye2=eye.clone();eye2.position.z=2;carGroup.add(eye2);
+ car={x:0,y:4,vx:0,vy:0,angle:0,ground:false};
+}
+function loadLevel(n){level=n;makeTrack(n);makeCar();car.x=10;car.y=heightAt(car.x)+2.5;velX=0;velY=0;angle=0;spin=0;grounded=true;camX=0;hud.textContent="LEVEL "+String(n).padStart(2,"0")+" • "+worlds[Math.floor((n-1)/10)][0];updateMenu()}
+function start(){if(level>unlocked)return;menu.style.display="none";finish.style.display="none";playing=true;won=false;dead=false;loadLevel(level)}
+function crash(){if(dead||won)return;dead=true;playing=false;setTimeout(()=>{finish.style.display="grid";document.querySelector("#finishTitle").textContent="PIG DOWN!";document.querySelector("#finishText").textContent="The pig car didn't make it. Flip carefully and try again."},450)}
+function win(){if(won)return;won=true;playing=false;const old=Number(localStorage.getItem(BEST+"-"+level)||999999);const time=((performance.now()-startTime)/1000);if(time<old)localStorage.setItem(BEST+"-"+level,time.toFixed(2)+"s");if(level===unlocked&&unlocked<LEVELS){unlocked++;localStorage.setItem(STORE,String(unlocked))}setTimeout(()=>{finish.style.display="grid";document.querySelector("#finishTitle").textContent="LEVEL CLEARED!";document.querySelector("#finishText").textContent=level<LEVELS?"Next level unlocked. The lever is ready.":"You beat all 60 Drive Pig levels!";updateMenu()},450)}
+let startTime=performance.now();
+function surface(x){let p=null;for(const q of track)if(x>=q.x-q.len/2&&x<=q.x+q.len/2)p=q;return p}
+function update(dt){
+ if(!playing)return;const gas=keys.has("ArrowRight")||keys.has("KeyD"),brake=keys.has("ArrowLeft")||keys.has("KeyA");
+ const s=surface(car.x);const groundY=s?s.y+1.8:-20;const onGround=car.y<=groundY+1&&velY<=1;
+ if(jumpQueued&&onGround){velY=9.8;jumpQueued=false;grounded=false}else jumpQueued=false;
+ velX+=(gas?14:0)*dt;velX-=(brake?9:0)*dt;velX*=Math.pow(.985,dt*60);velX=Math.max(-7,Math.min(18,velX));
+ velY-=25*dt;car.x+=velX*dt;car.y+=velY*dt;
+ const newS=surface(car.x),gy=newS?newS.y+2:-30;
+ if(car.y<=gy){if(Math.abs(angle)>2.35&&Math.abs(velY)>3)crash();car.y=gy;velY=0;grounded=true;const a=Math.atan2((surface(car.x+3)?.y||newS.y)-(surface(car.x-3)?.y||newS.y),6);angle+=(a-angle)*Math.min(1,dt*9);spin*=.4}else{grounded=false;spin+=(gas?.035:-.012);angle+=spin;spin*=.995}
+ if(car.y<-18)crash();
+ carGroup.position.set(car.x,car.y,0);carGroup.rotation.z=angle;
+ camX+=(Math.max(0,car.x-18)-camX)*Math.min(1,dt*5);camera.position.x=camX+13;camera.position.y=7.5;camera.lookAt(camX+18,3,0);
+ hazards.forEach(h=>{if(h.mesh&&h.type==="spinner"){h.mesh.rotation.z+=dt*2.5;const dx=Math.abs(car.x-h.x),dy=Math.abs(car.y-h.y);if(dx<5.5&&dy<2.5)crash()}
+  if(h.mesh&&h.type==="hammer"){h.mesh.rotation.z=Math.sin(performance.now()/450+h.phase)*.75;if(Math.abs(car.x-h.x)<4&&car.y<h.y+4)crash()}
+  if(Math.abs(car.x-h.x)<3.5&&Math.abs(car.y-h.y)<3.2&&(h.type==="spike"||h.type==="block"||h.type==="crate"))crash();
+ });
+ if(car.x>finishX)win();
+}
+function drawBackground(){
+ const w=worlds[Math.floor((level-1)/10)];scene.background=new THREE.Color(w[2]==="#39d25b"?"#62d3ef":w[2]==="#c76f86"?"#67c9e8":"#65c9ee");
+}
+function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt);drawBackground();renderer.render(scene,camera);requestAnimationFrame(loop)}
+function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+init();
+</script>
 </body>
 </html>
