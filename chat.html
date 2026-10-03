@@ -860,7 +860,8 @@ async function loadProfiles(
 ========================================= */
 
 async function renderMessages(
-  messages
+  messages,
+  shouldScrollBottom = false
 ) {
 
   if (!messages.length) {
@@ -1011,9 +1012,9 @@ async function renderMessages(
     }
   );
 
-  messagesEl.scrollTop =
-    messagesEl.scrollHeight;
-
+  if (shouldScrollBottom) {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
 }
 
 
@@ -1115,8 +1116,20 @@ async function loadMessages() {
 
   hideError();
 
+  // Only follow the newest message if the user was already near the bottom.
+  // If they are reading older messages, refreshing chat must not move them.
+  const distanceFromBottom =
+    messagesEl.scrollHeight -
+    messagesEl.scrollTop -
+    messagesEl.clientHeight;
+
+  const shouldScrollBottom =
+    messagesEl.children.length === 0 ||
+    distanceFromBottom < 80;
+
   await renderMessages(
-    data || []
+    data || [],
+    shouldScrollBottom
   );
 
 }
