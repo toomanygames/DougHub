@@ -3147,6 +3147,22 @@ function escapeHtml(value) {
 
 
 /* =========================================
+   CENTER BIG HEADER ON OPEN
+========================================= */
+function centerDougHubHero(){
+ const hero=document.querySelector(".hero-card");
+ if(!hero)return;
+ const header=document.querySelector("header");
+ const headerHeight=header?header.offsetHeight:0;
+ const rect=hero.getBoundingClientRect();
+ const visibleHeight=Math.max(0,window.innerHeight-headerHeight);
+ const target=window.scrollY+rect.top-((visibleHeight-rect.height)/2)-headerHeight;
+ window.scrollTo({top:Math.max(0,target),behavior:"instant"});
+}
+window.addEventListener("load",function(){requestAnimationFrame(centerDougHubHero);});
+window.addEventListener("pageshow",function(){requestAnimationFrame(centerDougHubHero);});
+
+/* =========================================
    START
 ========================================= */
 
