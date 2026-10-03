@@ -143,46 +143,43 @@ function buildLevel(n){
  const r=rand(1000+n*9187);
  platforms=[];hazards=[];
  theme=themes[Math.floor((n-1)/10)];
- levelWidth=1200;
- let y=410;
- addPlatform(30,y,145);
- let x=175;
- const difficulty=(n-1)/59;
- const sections=5;
- const sectionW=190;
- for(let s=0;s<sections;s++){
-   const gap=Math.min(18+Math.floor(difficulty*62),78);
-   x+=gap;
-   let width=Math.max(95,sectionW-gap);
-   let dy=0;
-   if(n>=6)dy=(r()>.5?1:-1)*Math.min(45,8+n*.65);
-   if(n>=16&&s%2===0)dy=35;
-   if(n>=31)dy=(r()-.5)*90;
-   y=Math.max(245,Math.min(450,y+dy));
-   addPlatform(x,y,width);
-   const center=x+width*.55;
-   if(n>=7+s*2)addSpike(center,y);
-   if(n>=17+s*2&&r()>.3)addBox(x+width*.72,y);
-   if(n>=27+s*2&&r()>.35)addSaw(x+width*.42,y-35,20+Math.min(13,n/6));
-   if(n>=41&&s%2===1)addSpike(x+width*.78,y);
-   x+=width;
+ const d=(n-1)/59;
+ levelWidth=1240;
+ let x=30,y=410;
+ addPlatform(x,y,145);x+=145;
+ const count=5+Math.floor(n/12);
+ const gapBase=18+Math.floor(d*48);
+ for(let i=0;i<count;i++){
+  const gap=Math.min(70,gapBase+Math.floor(r()*22));
+  x+=gap;
+  const width=Math.max(82,145-Math.floor(d*48)-Math.floor(r()*18));
+  let dy=(i%2===0?1:-1)*(n>=4?10+Math.floor(r()*Math.min(55,n)):0);
+  if(n>=25)dy+=(r()-.5)*45;
+  if(n>=45)dy+=(r()-.5)*65;
+  y=Math.max(255,Math.min(455,y+dy));
+  addPlatform(x,y,width);
+  const p=(n+i*3)%7;
+  if(p===0||n>=8)addSpike(x+width*.48,y);
+  if(p===1||(n>=15&&r()>.25))addBox(x+width*.68,y);
+  if(p===2||(n>=22&&r()>.35))addSaw(x+width*.50,y-42,20+Math.min(14,n*.18));
+  if(n>=30&&i%3===1)addSpike(x+width*.78,y);
+  if(n>=38&&i%3===0)addSaw(x+width*.30,y-43,24+Math.min(12,n*.15));
+  if(n>=50&&i%2===0)addBox(x+width*.25,y);
+  if(n>=56&&i>=2){addSpike(x+width*.30,y);addSpike(x+width*.72,y);}
+  x+=width;
  }
- addPlatform(x+22,y,145);
- finishX=x+130;
- levelWidth=finishX+30;
- if(n>=11){addSpike(250,410);}
- if(n>=21){addSaw(520,platformYNear(520)-42,22);}
- if(n>=31){addBox(760,platformYNear(760));}
- if(n>=41){addSaw(920,platformYNear(920)-42,28);}
- if(n>=51){addSpike(1010,platformYNear(1010));}
- if(n>=56){addSaw(1080,platformYNear(1080)-42,31);}
- if(n>=59){
-   addSpike(330,platformYNear(330));addSpike(350,platformYNear(350));
-   addSaw(690,platformYNear(690)-45,32);addBox(850,platformYNear(850));
-   addSpike(960,platformYNear(960));addSaw(1040,platformYNear(1040)-44,34);
- }
+ addPlatform(x+gapBase,y,155);x+=gapBase;
+ if(n>=12)addSpike(x+38,y);
+ if(n>=20)addBox(x+82,y);
+ if(n>=28)addSaw(x+125,y-43,24+Math.min(12,n*.12));
+ if(n>=40)addSpike(x+105,y);
+ if(n>=52)addSaw(x+55,y-44,30);
+ if(n>=58){addSpike(x+28,y);addSpike(x+125,y);}
+ finishX=x+145;levelWidth=finishX+45;
+ if(n%10===0&&n>0){addSaw(350,platformYNear(350)-43,27);addSaw(720,platformYNear(720)-43,29);}
+ if(n%10===1&&n>1){addBox(390,platformYNear(390));addSpike(760,platformYNear(760));}
+ if(n%10===2&&n>2){addSpike(300,platformYNear(300));addSaw(900,platformYNear(900)-43,26);}
 }
-
 function platformYNear(px){
  for(const p of platforms)if(px>=p.x-5&&px<=p.x+p.w+5)return p.y;
  return 410;
@@ -192,7 +189,7 @@ function surfaceAt(px){
  return null;
 }
 function resetPig(){
- pig.x=85;pig.y=surfaceAt(pig.x)-45;pig.vx=0;pig.vy=0;pig.angle=0;pig.ground=true;
+ pig.x=85;pig.y=surfaceAt(pig.x)-45;pig.vx=0;pig.vy=0;pig.angle=0;pig.spin=0;pig.ground=true;
 }
 function selectLevel(n){
  selected=Math.max(1,Math.min(unlocked,n));
@@ -250,22 +247,22 @@ function update(dt){
  const right=keys.has("ArrowRight")||keys.has("KeyD"),left=keys.has("ArrowLeft")||keys.has("KeyA");
  if(right)pig.vx+=760*dt;
  if(left)pig.vx-=600*dt;
- pig.vx*=Math.pow(.985,dt*60);
- pig.vx=Math.max(-180,Math.min(470,pig.vx));
- if(jumpQueued&&pig.ground){pig.vy=-650;pig.ground=false;}
+ pig.vx*=Math.pow(.985,dt*60);pig.vx=Math.max(-180,Math.min(470,pig.vx));
+ if(jumpQueued&&pig.ground){pig.vy=-650;pig.ground=false;pig.spin=(pig.vx>=0?1:-1)*2.8;}
  jumpQueued=false;
  pig.vy+=1500*dt;pig.x+=pig.vx*dt;pig.y+=pig.vy*dt;
  const s=surfaceAt(pig.x);
  if(s!==null&&pig.y>=s-45&&pig.vy>=0){
-   pig.y=s-45;pig.vy=0;pig.ground=true;
-   const a=Math.atan2((surfaceAt(pig.x+18)??s)-(surfaceAt(pig.x-18)??s),36);
-   pig.angle+=(a-pig.angle)*Math.min(1,dt*9);
- }else pig.ground=false;
- if(pig.y>560)crash();
+  pig.y=s-45;pig.vy=0;pig.ground=true;
+  const a=Math.atan2((surfaceAt(pig.x+18)??s)-(surfaceAt(pig.x-18)??s),36);
+  pig.angle+=(a-pig.angle)*Math.min(1,dt*9);pig.spin*=.65;
+ }else{pig.ground=false;pig.angle+=pig.spin*dt;pig.spin*=Math.pow(.995,dt*60);}
+ if(Math.abs(pig.angle)>Math.PI/2){crash();return;}
+ if(pig.y>600){crash();return;}
  for(const h of hazards){
-  if(h.type==="spike"&&Math.abs(pig.x-h.x)<24&&Math.abs((pig.y+38)-h.y)<42)crash();
-  if(h.type==="box"&&Math.abs(pig.x-h.x)<38&&Math.abs((pig.y+20)-(h.y-25))<43)crash();
-  if(h.type==="saw"&&Math.hypot(pig.x-h.x,pig.y+20-(h.y))<h.r+27)crash();
+  if(h.type==="spike"&&Math.abs(pig.x-h.x)<27&&Math.abs((pig.y+38)-h.y)<50){crash();return;}
+  if(h.type==="box"&&Math.abs(pig.x-h.x)<42&&Math.abs((pig.y+20)-(h.y-25))<48){crash();return;}
+  if(h.type==="saw"&&Math.hypot(pig.x-h.x,pig.y+20-h.y)<h.r+29){crash();return;}
  }
  if(pig.x>finishX)win();
  hudTime.textContent="TIME "+((performance.now()-startTime)/1000).toFixed(2);
