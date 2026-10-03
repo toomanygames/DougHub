@@ -10,7 +10,7 @@
 #game{position:fixed;inset:0}canvas{display:block}
 .ui{position:fixed;inset:0;pointer-events:none}.top{position:absolute;left:18px;right:18px;top:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .badge{background:rgba(255,247,233,.94);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:9px 13px;font-weight:900}.small{font-size:12px}
-#menu{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(rgba(31,61,92,.18),rgba(31,61,92,.36));z-index:5}
+#menu{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(rgba(31,61,92,.18),rgba(31,61,92,.36));z-index:50;pointer-events:auto}#menu button,#finish button{pointer-events:auto;touch-action:manipulation}
 .card{width:min(820px,94vw);max-height:92vh;overflow:auto;background:var(--cream);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:24px}
 h1{font-size:clamp(42px,8vw,78px);line-height:.8;margin:0;color:#bd486a;letter-spacing:-3px;text-transform:uppercase}
 .sub{margin:12px 0 18px;font-weight:800}.select{display:grid;grid-template-columns:120px 1fr 120px;gap:18px;align-items:center}
@@ -79,7 +79,7 @@ button{font:900 15px Trebuchet MS,Arial,sans-serif;border:3px solid var(--ink);b
 const LEVELS=60, STORE="drive-pig-3d-unlocked", BEST="drive-pig-3d-best";
 let unlocked=Math.max(1,Math.min(LEVELS,Number(localStorage.getItem(STORE)||1)));
 let level=1,playing=false,won=false,dead=false,keys=new Set(),jumpQueued=false,last=performance.now();
-let scene,camera,renderer,car,carGroup,trackGroup,hazardGroup,finishGroup;
+let scene,camera,renderer,car,carGroup,trackGroup,hazardGroup,finishGroup,threeReady=false;
 let track=[],hazards=[],finishX=0,carX=0,carY=2,velX=0,velY=0,angle=0,spin=0,grounded=false,camX=0;
 const menu=document.querySelector("#menu"), finish=document.querySelector("#finish"), levelNum=document.querySelector("#levelNum"), worldName=document.querySelector("#worldName"), levelDesc=document.querySelector("#levelDesc"), best=document.querySelector("#best"), hud=document.querySelector("#hudLevel"), hudControls=document.querySelector("#hudControls");
 const worlds=[
@@ -96,14 +96,47 @@ const box=(w,h,d,c)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));
 const cyl=(r,h,c,seg=16)=>new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg),mat(c));
 
 function init(){
- renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.querySelector("#game").appendChild(renderer.domElement);
- scene=new THREE.Scene();scene.background=new THREE.Color("#62cfee");scene.fog=new THREE.Fog("#62cfee",90,420);
- camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1000);camera.position.set(12,8,28);
- scene.add(new THREE.HemisphereLight("#ffffff","#55705a",2.4));
- const sun=new THREE.DirectionalLight("#fff8dc",3);sun.position.set(-20,35,25);sun.castShadow=true;scene.add(sun);
- trackGroup=new THREE.Group();hazardGroup=new THREE.Group();finishGroup=new THREE.Group();scene.add(trackGroup,hazardGroup,finishGroup);
  buildMenu();
- loadLevel(1); requestAnimationFrame(loop);
+ if(typeof THREE==="undefined"){
+  showGameError("The 3D engine could not load. Please refresh DougHub and try again.");
+  return;
+ }
+ try{
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  document.querySelector("#game").appendChild(renderer.domElement);
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color("#62cfee");
+  scene.fog=new THREE.Fog("#62cfee",90,420);
+  camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1000);
+  camera.position.set(12,8,28);
+  scene.add(new THREE.HemisphereLight("#ffffff","#55705a",2.4));
+  const sun=new THREE.DirectionalLight("#fff8dc",3);
+  sun.position.set(-20,35,25);
+  sun.castShadow=true;
+  scene.add(sun);
+  trackGroup=new THREE.Group();
+  hazardGroup=new THREE.Group();
+  finishGroup=new THREE.Group();
+  scene.add(trackGroup,hazardGroup,finishGroup);
+  threeReady=true;
+  loadLevel(1);
+  requestAnimationFrame(loop);
+ }catch(error){
+  console.error("Drive Pig 3D initialization failed:",error);
+  showGameError("The 3D game could not start in this browser. Please refresh and try again.");
+ }
+}
+function showGameError(message){
+ const old=document.querySelector("#gameError");
+ if(old)old.remove();
+ const box=document.createElement("div");
+ box.id="gameError";
+ box.style.cssText="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:100;color:#17213a;background:#fff7e9;border:3px solid #17213a;box-shadow:5px 5px 0 #17213a;padding:12px 16px;font:900 14px Trebuchet MS,Arial,sans-serif;text-align:center;max-width:min(90vw,560px)";
+ box.textContent=message;
+ document.body.appendChild(box);
 }
 function buildMenu(){updateMenu();document.querySelector("#prev").onclick=()=>select(level-1);document.querySelector("#next").onclick=()=>select(level+1);
  document.querySelector("#play").onclick=start;document.querySelector("#again").onclick=()=>{finish.style.display="none";start()};
@@ -186,6 +219,10 @@ function makeCar(){
 }
 function loadLevel(n){level=n;makeTrack(n);makeCar();car.x=10;car.y=heightAt(car.x)+2.5;velX=0;velY=0;angle=0;spin=0;grounded=true;camX=0;hud.textContent="LEVEL "+String(n).padStart(2,"0")+" • "+worlds[Math.floor((n-1)/10)][0];updateMenu()}
 function start(){
+ if(!threeReady){
+  showGameError("Drive Pig is still starting. If this message stays, refresh the page.");
+  return;
+ }
  if(level>unlocked)return;
  menu.style.display="none";
  finish.style.display="none";
