@@ -272,7 +272,10 @@ function update(dt){
  progressBar.style.width=Math.min(100,Math.max(0,(pig.x/finishX)*100))+"%";
 }
 function fit(){
- return Math.min((W-60)/levelWidth,(H*.62)/500);
+ const usableW=Math.max(320,W-70);
+ const usableH=Math.max(280,H-150);
+ const worldHeight=520;
+ return Math.min(usableW/levelWidth,usableH/worldHeight);
 }
 function drawBackground(){
  ctx.fillStyle=theme.sky;ctx.fillRect(0,0,W,H);
@@ -283,7 +286,7 @@ function drawBackground(){
 }
 function draw(){
  if(!theme)return;drawBackground();
- const s=fit(),ox=(W-levelWidth*s)/2,base=H*.62;
+ const s=fit(),ox=(W-levelWidth*s)/2,base=Math.max(125,(H+520*s)/2-55*s);
  ctx.save();ctx.translate(ox,base);ctx.scale(s,s);
  for(const p of platforms){
   ctx.fillStyle=theme.ground;ctx.fillRect(p.x,p.y,p.w,p.h);
