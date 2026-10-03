@@ -1,264 +1,35 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Drive PIG 3D</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Drive Pig</title>
 <style>
-:root{--ink:#17213a;--pink:#c36c82;--pink2:#f2a7b5;--grass:#39d25b;--sky:#61d0ef;--cream:#fff7e9;--yellow:#ffd72e}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#62cfee;font-family:Trebuchet MS,Arial,sans-serif;color:var(--ink);user-select:none}
-#game{position:fixed;inset:0}canvas{display:block}
-.ui{position:fixed;inset:0;pointer-events:none}.top{position:absolute;left:18px;right:18px;top:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.badge{background:rgba(255,247,233,.94);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:9px 13px;font-weight:900}.small{font-size:12px}
-#menu{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(rgba(31,61,92,.18),rgba(31,61,92,.36));z-index:50;pointer-events:auto}#menu button,#finish button{pointer-events:auto;touch-action:manipulation}
-.card{width:min(820px,94vw);max-height:92vh;overflow:auto;background:var(--cream);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:24px}
-h1{font-size:clamp(42px,8vw,78px);line-height:.8;margin:0;color:#bd486a;letter-spacing:-3px;text-transform:uppercase}
-.sub{margin:12px 0 18px;font-weight:800}.select{display:grid;grid-template-columns:120px 1fr 120px;gap:18px;align-items:center}
-.leverbox{display:grid;place-items:center;height:230px;background:#e9d7c1;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);position:relative;overflow:hidden}
-.leverbase{width:54px;height:78px;border-radius:18px 18px 8px 8px;background:#5e5360;border:4px solid var(--ink);position:absolute;bottom:24px}
-.leverrod{width:18px;height:112px;background:#7b6a70;border:4px solid var(--ink);position:absolute;bottom:72px;transform-origin:bottom center;transition:transform .18s}
-.leverhandle{width:48px;height:48px;border-radius:50%;background:#e95c72;border:4px solid var(--ink);position:absolute;top:-22px;left:50%;transform:translateX(-50%);box-shadow:3px 3px 0 #8e3249}
-.levelcard{text-align:center;background:#d8f1c8;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:18px}
-.levelnum{font-size:60px;font-weight:1000;line-height:1}.world{font-size:15px;font-weight:900;margin-top:5px}.desc{min-height:38px;font-weight:700;margin:10px 0}
-.arrow{border:4px solid var(--ink);background:white;font-size:42px;line-height:1;min-height:92px;box-shadow:5px 5px 0 var(--ink);cursor:pointer}.arrow:hover{background:var(--yellow);transform:translate(1px,1px)}
-.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
-button{font:900 15px Trebuchet MS,Arial,sans-serif;border:3px solid var(--ink);background:#fff;color:var(--ink);padding:10px 15px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}button:hover{background:var(--yellow);transform:translate(1px,1px)}
-.primary{background:var(--yellow);font-size:20px;padding:12px 28px}.muted{opacity:.65;font-size:12px;text-align:center;margin-top:12px}
-#finish{position:fixed;inset:0;display:none;place-items:center;background:rgba(20,32,55,.35);z-index:6}.finishcard{background:var(--cream);border:4px solid var(--ink);box-shadow:9px 9px 0 var(--ink);padding:28px;text-align:center;width:min(480px,92vw)}
-.finishcard h2{font-size:42px;margin:0 0 8px;color:#b94669}
-#touch{position:fixed;bottom:18px;left:0;right:0;display:none;justify-content:space-between;padding:0 18px;z-index:4;pointer-events:none}.touchgroup{display:flex;gap:10px;pointer-events:auto}.touchbtn{width:66px;height:66px;border-radius:16px;background:rgba(255,247,233,.9);font-size:24px}
-@media(max-width:650px){.select{grid-template-columns:72px 1fr 72px;gap:9px}.leverbox{height:185px}.arrow{font-size:30px;min-height:76px}.card{padding:17px}.leverrod{height:86px}.leverbase{bottom:18px}.top{left:8px;right:8px;top:8px}.badge{padding:7px 9px}#touch{display:flex}}
-</style>
-</head>
-<body>
-<div id="game"></div>
-<div class="ui">
- <div class="top">
-  <div class="badge" id="hudLevel">DRIVE PIG 3D</div>
-  <div class="badge small" id="hudControls">D / → GAS &nbsp; A / ← BRAKE &nbsp; SPACE JUMP &nbsp; R RESTART</div>
- </div>
-</div>
-<div id="menu">
- <div class="card">
-  <h1>Drive Pig</h1>
-  <div class="sub">3D PIG EDITION — roll, flip, survive and reach the flag.</div>
-  <div class="select">
-   <button class="arrow" id="prev">‹</button>
-   <div class="levelcard">
-    <div class="leverbox" aria-label="Level selector lever">
-     <div class="leverbase"></div>
-     <div class="leverrod"><div class="leverhandle"></div></div>
-    </div>
-    <div class="levelnum" id="levelNum">01</div>
-    <div class="world" id="worldName">GRASSLAND</div>
-    <div class="desc" id="levelDesc">Easy rolling start.</div>
-    <div>BEST: <b id="best">—</b></div>
-   </div>
-   <button class="arrow" id="next">›</button>
-  </div>
-  <div class="row">
-   <button id="jump10">JUMP 10 LEVELS</button>
-   <button id="reset">RESET PROGRESS</button>
-  </div>
-  <div class="row"><button class="primary" id="play">PLAY LEVEL</button></div>
-  <div class="muted">60 levels • lever-style level select • progress saves automatically</div>
- </div>
-</div>
-<div id="finish"><div class="finishcard">
- <h2 id="finishTitle">LEVEL CLEARED!</h2><p id="finishText"></p>
- <div class="row"><button id="again">RETRY</button><button class="primary" id="nextLevel">NEXT LEVEL</button><button id="levels">LEVEL SELECT</button></div>
-</div></div>
-<div id="touch">
- <div class="touchgroup"><button class="touchbtn" data-key="left">◀</button><button class="touchbtn" data-key="jump">▲</button></div>
- <div class="touchgroup"><button class="touchbtn" data-key="right">▶</button></div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#62cfee;color:#17213a}canvas{position:fixed;inset:0;width:100%;height:100%}
+#menu,#finish{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#18304a44}.card{background:#fff7e9;border:4px solid #17213a;box-shadow:9px 9px #17213a;width:min(720px,92vw);padding:24px;text-align:center}.card h1{font-size:clamp(48px,9vw,82px);margin:0;color:#c74869;line-height:.9}.card h2{font-size:40px;margin:0;color:#c74869}.sub{font-weight:800;margin:15px}.sel{display:grid;grid-template-columns:70px 1fr 70px;gap:12px;align-items:center}.levelbox{background:#d8f1c8;border:4px solid #17213a;box-shadow:5px 5px #17213a;padding:14px}.level{font-size:60px;font-weight:900}.desc{min-height:38px;font-weight:700}.row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:17px}button{font:900 16px Arial;border:3px solid #17213a;background:white;padding:11px 16px;box-shadow:4px 4px #17213a;cursor:pointer;touch-action:manipulation}button:hover{background:#ffd52e}.primary{background:#ffd52e;font-size:19px}.arrow{font-size:38px;min-height:80px}.muted{font-size:12px;opacity:.7;margin-top:12px}#finish{display:none}.hud{position:fixed;z-index:4;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}.badge{background:#fff7e9dd;border:3px solid #17213a;box-shadow:4px 4px #17213a;padding:8px 12px;font-weight:900}.touch{display:none;position:fixed;z-index:6;bottom:14px;left:14px;right:14px;justify-content:space-between}.touch div{display:flex;gap:8px}.touch button{width:65px;height:65px;font-size:24px;border-radius:14px}@media(max-width:700px){.touch{display:flex}.card{padding:17px}.sel{grid-template-columns:55px 1fr 55px}.arrow{min-height:65px;font-size:30px}.level{font-size:48px}}
+</style></head><body>
+<canvas id="c"></canvas><div class="hud"><div class="badge" id="hud">DRIVE PIG</div><div class="badge" id="time">TIME 0.00</div></div>
+<div id="menu"><div class="card"><h1>DRIVE PIG</h1><div class="sub">Drive the pig car through 60 levels and reach the flag!</div><div class="sel"><button class="arrow" id="prev">‹</button><div class="levelbox"><div class="level" id="num">01</div><b id="world"></b><div class="desc" id="desc"></div>BEST: <b id="best">—</b></div><button class="arrow" id="next">›</button></div><div class="row"><button id="jump">JUMP 10 LEVELS</button><button id="reset">RESET PROGRESS</button></div><div class="row"><button class="primary" id="play">PLAY LEVEL</button></div><div class="muted">D / → drive • A / ← brake • SPACE jump • R restart</div></div></div>
+<div id="finish"><div class="card"><h2 id="ft">LEVEL CLEARED!</h2><p id="fx"></p><div class="row"><button id="retry">RETRY</button><button class="primary" id="nextlevel">NEXT LEVEL</button><button id="levels">LEVEL SELECT</button></div></div></div>
+<div class="touch"><div><button data-k="left">◀</button><button data-k="jump">▲</button></div><div><button data-k="right">▶</button></div></div>
 <script>
 "use strict";
-const LEVELS=60, STORE="drive-pig-3d-unlocked", BEST="drive-pig-3d-best";
-let unlocked=Math.max(1,Math.min(LEVELS,Number(localStorage.getItem(STORE)||1)));
-let level=1,playing=false,won=false,dead=false,keys=new Set(),jumpQueued=false,last=performance.now();
-let scene,camera,renderer,car,carGroup,trackGroup,hazardGroup,finishGroup,threeReady=false;
-let track=[],hazards=[],finishX=0,carX=0,carY=2,velX=0,velY=0,angle=0,spin=0,grounded=false,camX=0;
-const menu=document.querySelector("#menu"), finish=document.querySelector("#finish"), levelNum=document.querySelector("#levelNum"), worldName=document.querySelector("#worldName"), levelDesc=document.querySelector("#levelDesc"), best=document.querySelector("#best"), hud=document.querySelector("#hudLevel"), hudControls=document.querySelector("#hudControls");
-const worlds=[
- ["GREEN HILLS","Grass ramps and chunky bridges","#3bd35a"],
- ["PINK BRIDGES","High platforms and gaps","#c76f86"],
- ["SKY JUMPS","Huge jumps above the clouds","#5aaef2"],
- ["PIG FACTORY","Conveyor blocks and crushers","#9b7a72"],
- ["MOUNTAIN","Steep peaks and descents","#6e8fbd"],
- ["NEON FARM","Wild late-game obstacle courses","#9b70e7"]
-];
-const descriptions=["Easy rolling start","Tiny ramp warm-up","First real gap","Bumpy bridge","Short hill climb","Double bump","Low bridge","Little launcher","Pink platform","First big jump","Cloud hop","Long sky bridge","Falling platform","Triple ramp","Skyline gap","Factory floor","Crusher alley","Conveyor chaos","Moving block","Factory finale","Mountain road","Steep climb","Sharp descent","Peak-to-peak","Mountain finale","Neon hills","Speed tunnel","Floating blocks","Flip challenge","Big staircase","Broken road","Twin ramps","Narrow bridge","Giant gap","Hammer road","Drop zone","Wobble bridge","Mega jump","Last stand","Nightmare bridge","Pig panic","Double crusher","Sky factory","Long launch","Triple gap","Floating road","Crazy downhill","Loop-ish ramps","Final climb","Finale warmup","Super jump","Pink chaos","Mountain maze","Speed peak","Factory storm","Neon gauntlet","Ultimate bridge","Mega finale","THE PIG GRAND PRIX","THE LAST PIG RIDE"];
-const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.05});
-const box=(w,h,d,c)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));
-const cyl=(r,h,c,seg=16)=>new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg),mat(c));
-
-function init(){
- buildMenu();
- if(typeof THREE==="undefined"){
-  showGameError("The 3D engine could not load. Please refresh DougHub and try again.");
-  return;
- }
- try{
-  renderer=new THREE.WebGLRenderer({antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setSize(innerWidth,innerHeight);
-  renderer.shadowMap.enabled=true;
-  document.querySelector("#game").appendChild(renderer.domElement);
-  scene=new THREE.Scene();
-  scene.background=new THREE.Color("#62cfee");
-  scene.fog=new THREE.Fog("#62cfee",90,420);
-  camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1000);
-  camera.position.set(12,8,28);
-  scene.add(new THREE.HemisphereLight("#ffffff","#55705a",2.4));
-  const sun=new THREE.DirectionalLight("#fff8dc",3);
-  sun.position.set(-20,35,25);
-  sun.castShadow=true;
-  scene.add(sun);
-  trackGroup=new THREE.Group();
-  hazardGroup=new THREE.Group();
-  finishGroup=new THREE.Group();
-  scene.add(trackGroup,hazardGroup,finishGroup);
-  threeReady=true;
-  loadLevel(1);
-  requestAnimationFrame(loop);
- }catch(error){
-  console.error("Drive Pig 3D initialization failed:",error);
-  showGameError("The 3D game could not start in this browser. Please refresh and try again.");
- }
-}
-function showGameError(message){
- const old=document.querySelector("#gameError");
- if(old)old.remove();
- const box=document.createElement("div");
- box.id="gameError";
- box.style.cssText="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:100;color:#17213a;background:#fff7e9;border:3px solid #17213a;box-shadow:5px 5px 0 #17213a;padding:12px 16px;font:900 14px Trebuchet MS,Arial,sans-serif;text-align:center;max-width:min(90vw,560px)";
- box.textContent=message;
- document.body.appendChild(box);
-}
-function buildMenu(){updateMenu();document.querySelector("#prev").onclick=()=>select(level-1);document.querySelector("#next").onclick=()=>select(level+1);
- document.querySelector("#play").onclick=start;document.querySelector("#again").onclick=()=>{finish.style.display="none";start()};
- document.querySelector("#nextLevel").onclick=()=>{finish.style.display="none";select(Math.min(LEVELS,level+1));start()};
- document.querySelector("#levels").onclick=()=>{finish.style.display="none";menu.style.display="grid";playing=false};
- document.querySelector("#reset").onclick=()=>{
- unlocked=1;
- localStorage.setItem(STORE,"1");
- select(1);
-};
- document.querySelector("#jump10").onclick=()=>select(Math.min(unlocked+10,LEVELS));
- addEventListener("keydown",e=>{keys.add(e.code);if(e.code==="Space"&&!e.repeat)jumpQueued=true;if(e.code==="KeyR"&&playing)start();if(["ArrowLeft","ArrowRight","ArrowDown","Space"].includes(e.code))e.preventDefault()});
- addEventListener("keyup",e=>keys.delete(e.code));addEventListener("resize",resize);
- document.querySelectorAll("[data-key]").forEach(b=>{const k=b.dataset.key;b.addEventListener("pointerdown",e=>{e.preventDefault();if(k==="jump")jumpQueued=true;else keys.add(k)});b.addEventListener("pointerup",()=>keys.delete(k));b.addEventListener("pointercancel",()=>keys.delete(k));});
-}
-function select(n){level=Math.max(1,Math.min(unlocked,n));updateMenu()}
-function updateMenu(){
- const w=worlds[Math.floor((level-1)/10)], idx=(level-1)%10;levelNum.textContent=String(level).padStart(2,"0");worldName.textContent=w[0]+" • "+(idx+1)+"/10";levelDesc.textContent=descriptions[level-1];best.textContent=localStorage.getItem(BEST+"-"+level)||"—";
- const rod=document.querySelector(".leverrod");rod.style.transform="rotate("+((level%10)-5)*5+"deg)";
- document.body.style.setProperty("--pink",w[2]);
-}
-function rng(seed){return()=>{seed|=0;seed=(seed*1664525+1013904223)|0;return (seed>>>0)/4294967296}}
-function clearGroup(g){while(g.children.length)g.remove(g.children[0])}
-function addPlatform(x,y,len,angleZ=0,color="#39d25b"){const m=box(len,1.2,8,color);m.position.set(x+len/2,y,0);m.rotation.z=angleZ;m.castShadow=true;m.receiveShadow=true;trackGroup.add(m);return {x:x+len/2,y,len,angle:angleZ}}
-function makeTrack(n){
- clearGroup(trackGroup);clearGroup(hazardGroup);clearGroup(finishGroup);track=[];hazards=[];
- const r=rng(9000+n*7919), world=Math.floor((n-1)/10), diff=n;
- let x=0,y=0;
- track.push({x,y,len:28,angle:0});addPlatform(x,y,28,0,world===1?"#45cf63":"#39d25b");x+=28;
- const pieces=16+Math.floor(n*.55);
- for(let i=0;i<pieces;i++){
-   const type=(i+n*3)%9;let len=12+r()*18,dy=0,ang=0;
-   if(type===0){dy=2+r()*4}
-   if(type===1){dy=-2-r()*3}
-   if(type===2){len=8+r()*8;dy=5+r()*7}
-   if(type===3){len=8+r()*7;dy=-5-r()*6}
-   if(type===4){len=18+r()*16;dy=(r()-.5)*5}
-   if(type===5){len=7+r()*7;dy=(r()-.5)*9}
-   if(type===6){len=14+r()*10;ang=(r()-.5)*.28}
-   if(type===7){len=10+r()*8;dy=4;hazards.push({type:"block",x:x+len*.45,y:y+dy+1.8})}
-   if(type===8&&n>10){len=8+r()*7;dy=0;hazards.push({type:"spinner",x:x+len*.5,y:y+2.4,phase:r()*6.28})}
-   const gap=(n>3&&r()<Math.min(.48,n/170))?6+r()*10:0;
-   x+=gap;y+=dy;
-   const p=addPlatform(x,y,len,ang,world===1?"#c36d83":world===2?"#58aef0":world===3?"#a98176":world===4?"#6689b6":"#42cf61");track.push({...p,x:x+len/2});x+=len;
-   if(n>7&&r()<.17)hazards.push({type:"spike",x:x-len*.45,y:y+1});
-   if(n>14&&r()<.14)hazards.push({type:"hammer",x:x-len*.2,y:y+7,phase:r()*6.28});
- }
- const end=x+35;
- const finalPlatform=addPlatform(x,y,35,0,"#39d25b");
- track.push(finalPlatform);
- finishX=end-10;
- makeFinish(finishX,y); 
- if(n>=20){for(let i=0;i<Math.floor(n/15);i++)hazards.push({type:"crate",x:70+i*120+(r()*45),y:0})}
- for(const h of hazards){if(h.y===0)h.y=heightAt(h.x)+1.5;makeHazard(h)}
-}
-function heightAt(x){let bestY=-8;for(const p of track){if(x>=p.x-p.len/2&&x<=p.x+p.len/2)bestY=p.y;};return bestY}
-function makeFinish(x,y){const post=box(.8,8,.8,"#b85d76");post.position.set(x,y+4,0);finishGroup.add(post);const flag=box(5,2.5,.35,"#fff");flag.position.set(x+2.3,y+6.4,0);finishGroup.add(flag);const text=box(3.8,1.4,.4,"#f36d82");text.position.set(x+2.3,y+6.4,.2);finishGroup.add(text)}
-function makeHazard(h){
- let m;
- if(h.type==="spike"){m=new THREE.Mesh(new THREE.ConeGeometry(1.3,3.4,4),mat("#f4e9d7"));m.position.set(h.x,h.y+1.2,0)}
- if(h.type==="block"){m=box(4,4,7,"#e7a0a8");m.position.set(h.x,h.y+2,0)}
- if(h.type==="crate"){m=box(5,5,7,"#b97858");m.position.set(h.x,h.y+2.5,0)}
- if(h.type==="spinner"){m=new THREE.Group();const bar=box(10,.7,.7,"#b94669");bar.rotation.z=h.phase;m.add(bar);const hub=cyl(1.1,1,"#f4d35e");hub.rotation.x=Math.PI/2;m.add(hub);m.position.set(h.x,h.y,0)}
- if(h.type==="hammer"){m=new THREE.Group();const arm=box(1,9,1,"#735761");arm.position.y=3.5;m.add(arm);const head=box(5,2.5,4,"#d95f75");head.position.y=-1.5;m.add(head);m.position.set(h.x,h.y+7,0)}
- if(!m)return;m.castShadow=true;m.receiveShadow=true;m.userData=h;hazardGroup.add(m);h.mesh=m
-}
-function makeCar(){
- if(carGroup)scene.remove(carGroup);carGroup=new THREE.Group();carGroup.position.set(0,4,0);scene.add(carGroup);
- const body=box(7,2.5,4,"#ffd326");body.position.y=1;body.castShadow=true;carGroup.add(body);
- const cab=box(3.6,2.5,3.7,"#fff0cf");cab.position.set(-.8,2.8,0);cab.castShadow=true;carGroup.add(cab);
- const windowM=mat("#546b83");const win=box(2.5,1.15,3.82,"#536d83");win.position.set(-.75,3,0);carGroup.add(win);
- const nose=box(1.1,1.4,3.9,"#f5c41e");nose.position.set(2.8,1.6,0);carGroup.add(nose);
- const pink=mat("#f3a1b1");
- const snout=cyl(.85,.9,"#e8899e",18);snout.rotation.x=Math.PI/2;snout.position.set(4.1,2.05,0);carGroup.add(snout);
- const ear1=cyl(.55,.35,"#e8899e",12);ear1.rotation.x=Math.PI/2;ear1.position.set(-1.9,4.2,-1.25);carGroup.add(ear1);
- const ear2=ear1.clone();ear2.position.z=1.25;carGroup.add(ear2);
- for(const z of [-2.05,2.05]){const w=cyl(1.35,.7,"#252b3a",20);w.rotation.x=Math.PI/2;w.position.set(-1.9,0,z);w.castShadow=true;carGroup.add(w)}
- const eye=cyl(.18,.2,"#17213a",12);eye.rotation.x=Math.PI/2;eye.position.set(2.9,2.65,-2.0);carGroup.add(eye);const eye2=eye.clone();eye2.position.z=2;carGroup.add(eye2);
- car={x:0,y:4,vx:0,vy:0,angle:0,ground:false};
-}
-function loadLevel(n){level=n;makeTrack(n);makeCar();car.x=10;car.y=heightAt(car.x)+2.5;velX=0;velY=0;angle=0;spin=0;grounded=true;camX=0;hud.textContent="LEVEL "+String(n).padStart(2,"0")+" • "+worlds[Math.floor((n-1)/10)][0];updateMenu()}
-function start(){
- if(!threeReady){
-  showGameError("Drive Pig is still starting. If this message stays, refresh the page.");
-  return;
- }
- if(level>unlocked)return;
- menu.style.display="none";
- finish.style.display="none";
- playing=true;
- won=false;
- dead=false;
- startTime=performance.now();
- loadLevel(level);
-}
-function crash(){if(dead||won)return;dead=true;playing=false;setTimeout(()=>{finish.style.display="grid";document.querySelector("#finishTitle").textContent="PIG DOWN!";document.querySelector("#finishText").textContent="The pig car didn't make it. Flip carefully and try again."},450)}
-function win(){if(won)return;won=true;playing=false;const old=Number(localStorage.getItem(BEST+"-"+level)||999999);const time=((performance.now()-startTime)/1000);if(time<old)localStorage.setItem(BEST+"-"+level,time.toFixed(2)+"s");if(level===unlocked&&unlocked<LEVELS){unlocked++;localStorage.setItem(STORE,String(unlocked))}setTimeout(()=>{finish.style.display="grid";document.querySelector("#finishTitle").textContent="LEVEL CLEARED!";document.querySelector("#finishText").textContent=level<LEVELS?"Next level unlocked. The lever is ready.":"You beat all 60 Drive Pig levels!";updateMenu()},450)}
-let startTime=performance.now();
-function surface(x){let p=null;for(const q of track)if(x>=q.x-q.len/2&&x<=q.x+q.len/2)p=q;return p}
-function update(dt){
- if(!playing)return;const gas=keys.has("ArrowRight")||keys.has("KeyD"),brake=keys.has("ArrowLeft")||keys.has("KeyA");
- const s=surface(car.x);const groundY=s?s.y+1.8:-20;const onGround=car.y<=groundY+1&&velY<=1;
- if(jumpQueued&&onGround){velY=9.8;jumpQueued=false;grounded=false}else jumpQueued=false;
- velX+=(gas?14:0)*dt;velX-=(brake?9:0)*dt;velX*=Math.pow(.985,dt*60);velX=Math.max(-7,Math.min(18,velX));
- velY-=25*dt;car.x+=velX*dt;car.y+=velY*dt;
- const newS=surface(car.x),gy=newS?newS.y+2:-30;
- if(car.y<=gy){if(Math.abs(angle)>2.35&&Math.abs(velY)>3)crash();car.y=gy;velY=0;grounded=true;const a=Math.atan2((surface(car.x+3)?.y||newS.y)-(surface(car.x-3)?.y||newS.y),6);angle+=(a-angle)*Math.min(1,dt*9);spin*=.4}else{grounded=false;spin+=(gas?.035:-.012);angle+=spin;spin*=.995}
- if(car.y<-18)crash();
- carGroup.position.set(car.x,car.y,0);carGroup.rotation.z=angle;
- camX+=(Math.max(0,car.x-18)-camX)*Math.min(1,dt*5);camera.position.x=camX+13;camera.position.y=7.5;camera.lookAt(camX+18,3,0);
- hazards.forEach(h=>{if(h.mesh&&h.type==="spinner"){h.mesh.rotation.z+=dt*2.5;const dx=Math.abs(car.x-h.x),dy=Math.abs(car.y-h.y);if(dx<5.5&&dy<2.5)crash()}
-  if(h.mesh&&h.type==="hammer"){h.mesh.rotation.z=Math.sin(performance.now()/450+h.phase)*.75;if(Math.abs(car.x-h.x)<4&&car.y<h.y+4)crash()}
-  if(Math.abs(car.x-h.x)<3.5&&Math.abs(car.y-h.y)<3.2&&(h.type==="spike"||h.type==="block"||h.type==="crate"))crash();
- });
- if(car.x>finishX)win();
-}
-function drawBackground(){
- const w=worlds[Math.floor((level-1)/10)];scene.background=new THREE.Color(w[2]==="#39d25b"?"#62d3ef":w[2]==="#c76f86"?"#67c9e8":"#65c9ee");
-}
-function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt);drawBackground();renderer.render(scene,camera);requestAnimationFrame(loop)}
-function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
-init();
-</script>
-</body>
-</html>
+const C=document.getElementById("c"),X=C.getContext("2d"),LEVELS=60,STORE="drivepig-unlocked-v3",BEST="drivepig-best-v3-";let W=innerWidth,H=innerHeight,level=1,unlocked=Math.max(1,Math.min(LEVELS,+localStorage.getItem(STORE)||1)),playing=false,dead=false,won=false,last=0,startTime=0,jump=false,keys=new Set(),plats=[],haz=[],finish=0,worldW=0;
+const worlds=[["GREEN HILLS","#55c96b","#62cfee"],["PINK BRIDGES","#d26c8a","#6ccce8"],["SKY JUMPS","#65a9ef","#73d4f2"],["PIG FACTORY","#a98273","#9bd0dc"],["MOUNTAIN","#6c8db9","#86cde2"],["NEON FARM","#8d70df","#72d0e5"]];
+const names=["Easy rolling start","Tiny ramp warm-up","First real gap","Bumpy bridge","Short hill climb","Double bump","Low bridge","Little launcher","Pink platform","First big jump","Cloud hop","Long sky bridge","Falling platform","Triple ramp","Skyline gap","Factory floor","Crusher alley","Conveyor chaos","Moving block","Factory finale","Mountain road","Steep climb","Sharp descent","Peak-to-peak","Mountain finale","Neon hills","Speed tunnel","Floating blocks","Flip challenge","Big staircase","Broken road","Twin ramps","Narrow bridge","Giant gap","Hammer road","Drop zone","Wobble bridge","Mega jump","Last stand","Nightmare bridge","Pig panic","Double crusher","Sky factory","Long launch","Triple gap","Floating road","Crazy downhill","Loop-ish ramps","Final climb","Finale warmup","Super jump","Pink chaos","Mountain maze","Speed peak","Factory storm","Neon gauntlet","Ultimate bridge","Mega finale","THE PIG GRAND PRIX","THE LAST PIG RIDE"];
+const pig={x:80,y:0,vx:0,vy:0,ground:false,a:0};
+function resize(){W=innerWidth;H=innerHeight;C.width=W*devicePixelRatio;C.height=H*devicePixelRatio;X.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}addEventListener("resize",resize);resize();
+function rng(s){return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+function ground(x){for(const p of plats)if(x>=p.x&&x<=p.x+p.w)return p.y;return null}
+function make(n){const r=rng(9001+n*7919);plats=[];haz=[];let x=0,y=0;plats.push({x:0,y:0,w:500});x=500;for(let i=0;i<14+Math.floor(n*.4);i++){if(n>3&&r()<Math.min(.4,n/180))x+=45+r()*80;let w=110+r()*190;let dy=(r()-.5)*(n>15?130:70);if(i%7===0)dy=40+r()*55;if(i%7===1)dy=-40-r()*50;y=Math.max(-30,Math.min(210,y+dy));plats.push({x,y,w});if(n>7&&r()<.18)haz.push({t:"spike",x:x+w*.5,y});if(n>15&&r()<.14)haz.push({t:"block",x:x+w*.7,y});if(n>25&&r()<.12)haz.push({t:"spin",x:x+w*.5,y:y-25,a:r()*7});x+=w}plats.push({x:x+30,y,w:430});finish=x+330;worldW=finish+500}
+function select(n){level=Math.max(1,Math.min(unlocked,n));menu()}
+function menu(){let w=worlds[Math.floor((level-1)/10)];document.getElementById("num").textContent=String(level).padStart(2,"0");document.getElementById("world").textContent=w[0]+" • "+((level-1)%10+1)+"/10";document.getElementById("desc").textContent=names[level-1];document.getElementById("best").textContent=localStorage.getItem(BEST+level)||"—"}
+function reset(){pig.x=80;pig.y=(ground(80)||0)-42;pig.vx=0;pig.vy=0;pig.ground=true;pig.a=0}
+function start(){make(level);reset();playing=true;dead=false;won=false;startTime=performance.now();last=startTime;document.getElementById("menu").style.display="none";document.getElementById("finish").style.display="none";document.getElementById("hud").textContent="LEVEL "+String(level).padStart(2,"0")+" • "+worlds[Math.floor((level-1)/10)][0]}
+function crash(){if(dead||won)return;dead=true;playing=false;setTimeout(()=>{document.getElementById("ft").textContent="PIG DOWN!";document.getElementById("fx").textContent="The pig crashed. Try again!";document.getElementById("nextlevel").style.display="none";document.getElementById("finish").style.display="grid"},250)}
+function win(){if(won)return;won=true;playing=false;let t=(performance.now()-startTime)/1000,old=+(localStorage.getItem(BEST+level)||999999);if(t<old)localStorage.setItem(BEST+level,t.toFixed(2)+"s");if(level===unlocked&&unlocked<LEVELS){unlocked++;localStorage.setItem(STORE,unlocked)}document.getElementById("ft").textContent="LEVEL CLEARED!";document.getElementById("fx").textContent=level<LEVELS?"Next level unlocked! Time: "+t.toFixed(2)+" seconds":"YOU BEAT ALL 60 LEVELS!";document.getElementById("nextlevel").style.display=level<LEVELS?"inline-block":"none";document.getElementById("finish").style.display="grid";menu()}
+function update(dt){if(!playing)return;let r=keys.has("ArrowRight")||keys.has("KeyD"),l=keys.has("ArrowLeft")||keys.has("KeyA");if(r)pig.vx+=850*dt;if(l)pig.vx-=550*dt;pig.vx*=Math.pow(.985,dt*60);pig.vx=Math.max(-220,Math.min(500,pig.vx));if(jump&&pig.ground){pig.vy=-650;pig.ground=false}jump=false;pig.vy+=1450*dt;pig.x+=pig.vx*dt;pig.y+=pig.vy*dt;let g=ground(pig.x);if(g!==null&&pig.y>=g-42&&pig.vy>=0){pig.y=g-42;pig.vy=0;pig.ground=true;let a=Math.atan2((ground(pig.x+20)??g)-(ground(pig.x-20)??g),40);pig.a+=(a-pig.a)*Math.min(1,dt*8)}else pig.ground=false;if(pig.y>H*.62+300)crash();for(const h of haz){if(h.t==="spike"&&Math.abs(pig.x-h.x)<28&&Math.abs(pig.y-h.y+25)<35)crash();if(h.t==="block"&&Math.abs(pig.x-h.x)<38&&Math.abs(pig.y-h.y+35)<45)crash();if(h.t==="spin"&&Math.abs(pig.x-h.x)<65&&Math.abs(pig.y-h.y+20)<45)crash()}if(pig.x>finish)win();document.getElementById("time").textContent="TIME "+((performance.now()-startTime)/1000).toFixed(2)}
+function cam(){return Math.max(0,Math.min(worldW-W,pig.x-W*.32))}
+function draw(){let w=worlds[Math.floor((level-1)/10)],camx=cam();X.clearRect(0,0,W,H);X.fillStyle=w[2];X.fillRect(0,0,W,H);X.save();X.translate(-camx,H*.62);for(const p of plats){X.fillStyle=w[1];X.fillRect(p.x,p.y,p.w,30);X.fillStyle="#ffffff44";X.fillRect(p.x,p.y,p.w,7)}for(const h of haz){if(h.t==="spike"){X.fillStyle="#fff3d4";X.beginPath();X.moveTo(h.x-20,h.y);X.lineTo(h.x,h.y-48);X.lineTo(h.x+20,h.y);X.closePath();X.fill();X.strokeStyle="#17213a";X.lineWidth=4;X.stroke()}if(h.t==="block"){X.fillStyle="#d66b65";X.fillRect(h.x-30,h.y-65,60,65)}if(h.t==="spin"){X.save();X.translate(h.x,h.y-20);X.rotate(performance.now()/450+h.a);X.fillStyle="#c44869";X.fillRect(-65,-7,130,14);X.restore()}}let fy=plats[plats.length-1].y;X.fillStyle="#17213a";X.fillRect(finish,fy-170,7,170);X.fillStyle="#fff";X.fillRect(finish+7,fy-165,80,48);X.fillStyle="#e75b78";X.fillRect(finish+7,fy-165,80,22);drawPig();X.restore()}
+function drawPig(){X.save();X.translate(pig.x,pig.y);X.rotate(pig.a);X.fillStyle="#ffd52e";X.fillRect(-42,-27,84,40);X.fillStyle="#fff0cf";X.fillRect(-10,-50,48,30);X.fillStyle="#f39aad";X.beginPath();X.arc(40,-12,17,0,7);X.fill();X.fillStyle="#17213a";X.beginPath();X.arc(45,-17,3,0,7);X.arc(45,-7,3,0,7);X.fill();X.fillStyle="#f39aad";X.beginPath();X.arc(-25,-50,10,0,7);X.arc(8,-50,10,0,7);X.fill();X.fillStyle="#252b3a";for(const q of[-27,25]){X.beginPath();X.arc(q,16,15,0,7);X.fill()}X.restore()}
+function loop(t){let dt=Math.min(.032,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}
+prev.onclick=()=>select(level-1);next.onclick=()=>select(level+1);play.onclick=start;retry.onclick=start;levels.onclick=()=>{finish.style.display="none";menu.style.display="grid";menu()};nextlevel.onclick=()=>{finish.style.display="none";select(level+1);start()};reset.onclick=()=>{unlocked=1;localStorage.setItem(STORE,1);select(1)};jump.onclick=()=>select(Math.min(LEVELS,unlocked+10));
+addEventListener("keydown",e=>{keys.add(e.code);if(e.code==="Space"&&!e.repeat)jump=true;if(e.code==="KeyR"&&playing)start();if(["ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault()});addEventListener("keyup",e=>keys.delete(e.code));
+document.querySelectorAll("[data-k]").forEach(b=>{let k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();if(k==="jump")jump=true;else keys.add(k==="left"?"ArrowLeft":"ArrowRight")};b.onpointerup=()=>keys.delete(k==="left"?"ArrowLeft":"ArrowRight");b.onpointercancel=b.onpointerup});
+make(1);reset();menu();requestAnimationFrame(loop);
+</script></body></html>
