@@ -45,6 +45,10 @@ button{font:900 15px Trebuchet MS,Arial,sans-serif;border:3px solid var(--ink);b
   <div class="select">
    <button class="arrow" id="prev">‹</button>
    <div class="levelcard">
+    <div class="leverbox" aria-label="Level selector lever">
+     <div class="leverbase"></div>
+     <div class="leverrod"><div class="leverhandle"></div></div>
+    </div>
     <div class="levelnum" id="levelNum">01</div>
     <div class="world" id="worldName">GRASSLAND</div>
     <div class="desc" id="levelDesc">Easy rolling start.</div>
@@ -105,7 +109,11 @@ function buildMenu(){updateMenu();document.querySelector("#prev").onclick=()=>se
  document.querySelector("#play").onclick=start;document.querySelector("#again").onclick=()=>{finish.style.display="none";start()};
  document.querySelector("#nextLevel").onclick=()=>{finish.style.display="none";select(Math.min(LEVELS,level+1));start()};
  document.querySelector("#levels").onclick=()=>{finish.style.display="none";menu.style.display="grid";playing=false};
- document.querySelector("#reset").onclick=()=>{unlocked=1;localStorage.setItem(STORE,"1");select(1)};
+ document.querySelector("#reset").onclick=()=>{
+ unlocked=1;
+ localStorage.setItem(STORE,"1");
+ select(1);
+};
  document.querySelector("#jump10").onclick=()=>select(Math.min(unlocked+10,LEVELS));
  addEventListener("keydown",e=>{keys.add(e.code);if(e.code==="Space"&&!e.repeat)jumpQueued=true;if(e.code==="KeyR"&&playing)start();if(["ArrowLeft","ArrowRight","ArrowDown","Space"].includes(e.code))e.preventDefault()});
  addEventListener("keyup",e=>keys.delete(e.code));addEventListener("resize",resize);
@@ -143,7 +151,11 @@ function makeTrack(n){
    if(n>7&&r()<.17)hazards.push({type:"spike",x:x-len*.45,y:y+1});
    if(n>14&&r()<.14)hazards.push({type:"hammer",x:x-len*.2,y:y+7,phase:r()*6.28});
  }
- const end=x+35;addPlatform(x,y,35,0,"#39d25b");finishX=end-10;makeFinish(finishX,y); 
+ const end=x+35;
+ const finalPlatform=addPlatform(x,y,35,0,"#39d25b");
+ track.push(finalPlatform);
+ finishX=end-10;
+ makeFinish(finishX,y); 
  if(n>=20){for(let i=0;i<Math.floor(n/15);i++)hazards.push({type:"crate",x:70+i*120+(r()*45),y:0})}
  for(const h of hazards){if(h.y===0)h.y=heightAt(h.x)+1.5;makeHazard(h)}
 }
@@ -173,7 +185,16 @@ function makeCar(){
  car={x:0,y:4,vx:0,vy:0,angle:0,ground:false};
 }
 function loadLevel(n){level=n;makeTrack(n);makeCar();car.x=10;car.y=heightAt(car.x)+2.5;velX=0;velY=0;angle=0;spin=0;grounded=true;camX=0;hud.textContent="LEVEL "+String(n).padStart(2,"0")+" • "+worlds[Math.floor((n-1)/10)][0];updateMenu()}
-function start(){if(level>unlocked)return;menu.style.display="none";finish.style.display="none";playing=true;won=false;dead=false;loadLevel(level)}
+function start(){
+ if(level>unlocked)return;
+ menu.style.display="none";
+ finish.style.display="none";
+ playing=true;
+ won=false;
+ dead=false;
+ startTime=performance.now();
+ loadLevel(level);
+}
 function crash(){if(dead||won)return;dead=true;playing=false;setTimeout(()=>{finish.style.display="grid";document.querySelector("#finishTitle").textContent="PIG DOWN!";document.querySelector("#finishText").textContent="The pig car didn't make it. Flip carefully and try again."},450)}
 function win(){if(won)return;won=true;playing=false;const old=Number(localStorage.getItem(BEST+"-"+level)||999999);const time=((performance.now()-startTime)/1000);if(time<old)localStorage.setItem(BEST+"-"+level,time.toFixed(2)+"s");if(level===unlocked&&unlocked<LEVELS){unlocked++;localStorage.setItem(STORE,String(unlocked))}setTimeout(()=>{finish.style.display="grid";document.querySelector("#finishTitle").textContent="LEVEL CLEARED!";document.querySelector("#finishText").textContent=level<LEVELS?"Next level unlocked. The lever is ready.":"You beat all 60 Drive Pig levels!";updateMenu()},450)}
 let startTime=performance.now();
