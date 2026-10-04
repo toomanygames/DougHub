@@ -749,6 +749,43 @@ button:disabled {
 
         <div class="field">
 
+            <label for="banType">
+                Type
+            </label>
+
+            <select id="banType">
+                <option value="ban">Ban</option>
+                <option value="suspend">Suspend</option>
+            </select>
+
+        </div>
+
+        <div class="field" id="suspendDurationField" style="display:none;">
+
+            <label for="suspendDuration">
+                Suspension Length
+            </label>
+
+            <div style="display:flex;gap:8px;">
+                <input
+                    id="suspendDuration"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value="1"
+                    placeholder="Amount"
+                >
+                <select id="suspendUnit" style="max-width:180px;">
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days" selected>Days</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="field">
+
             <label for="banReason">
                 Ban Reason
             </label>
@@ -887,6 +924,18 @@ const banUser =
 const banReason =
     document.getElementById("banReason");
 
+const banType =
+    document.getElementById("banType");
+
+const suspendDurationField =
+    document.getElementById("suspendDurationField");
+
+const suspendDuration =
+    document.getElementById("suspendDuration");
+
+const suspendUnit =
+    document.getElementById("suspendUnit");
+
 const banAccountButton =
     document.getElementById("banAccountButton");
 
@@ -1017,7 +1066,7 @@ async function loadUsers() {
         await supabaseClient
             .from("profiles")
             .select(
-                "id,username,is_admin,is_banned,ban_reason,banned_at"
+                "id,username,is_admin,is_banned,ban_reason,banned_at,ban_type,suspended_until"
             )
             .order(
                 "username",
@@ -1100,7 +1149,11 @@ function populateUserSelects() {
             username +
             (
                 user.is_banned
-                    ? " — BANNED"
+                    ? (
+                    user.ban_type === "suspend"
+                        ? " — SUSPENDED"
+                        : " — BANNED"
+                )
                     : ""
             );
 
@@ -1180,8 +1233,19 @@ function renderUsers() {
 
         if (user.is_banned) {
 
-            info.innerHTML =
-                '<span class="user-banned">🚫 BANNED</span>';
+            if (
+                user.ban_type === "suspend" &&
+                user.suspended_until &&
+                new Date(user.suspended_until).getTime() > Date.now()
+            ) {
+                info.innerHTML =
+                    '<span class="user-banned">⏸️ SUSPENDED until ' +
+                    escapeHtml(new Date(user.suspended_until).toLocaleString()) +
+                    '</span>';
+            } else {
+                info.innerHTML =
+                    '<span class="user-banned">🚫 BANNED</span>';
+            }
 
         } else {
 
@@ -1618,130 +1682,106 @@ async function sendWarning() {
 
 async function banAccount() {
 
-    const userId =
-        banUser.value;
+    const userId = banUser.value;
+    const type = banType.value;
+    const reason = banReason.value.trim();
 
-    const reason =
-        banReason.value.trim();
-
-    banResult.style.display =
-        "none";
+    banResult.style.display = "none";
 
     if (!userId) {
-
-        alert(
-            "Please select a user."
-        );
-
+        alert("Please select a user.");
         return;
     }
 
     if (!reason) {
-
-        alert(
-            "Please enter a ban reason."
-        );
-
+        alert("Please enter a reason.");
         return;
     }
 
-    const selectedUser =
-        allUsers.find(
-            user =>
-                user.id === userId
-        );
+    const selectedUser = allUsers.find(user => user.id === userId);
 
     if (!selectedUser) {
-
-        alert(
-            "Could not find that user."
-        );
-
+        alert("Could not find that user.");
         return;
     }
 
-    if (
-        selectedUser.id ===
-        currentAdminUser.id
-    ) {
-
-        alert(
-            "You cannot ban your own admin account."
-        );
-
+    if (selectedUser.id === currentAdminUser.id) {
+        alert("You cannot ban or suspend your own admin account.");
         return;
     }
+
+    let suspendedUntil = null;
+
+    if (type === "suspend") {
+        const amount = Number(suspendDuration.value);
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            alert("Please enter a valid suspension length.");
+            return;
+        }
+
+        const multipliers = {
+            minutes: 60 * 1000,
+            hours: 60 * 60 * 1000,
+            days: 24 * 60 * 60 * 1000
+        };
+
+        suspendedUntil = new Date(
+            Date.now() + amount * multipliers[suspendUnit.value]
+        ).toISOString();
+    }
+
+    const actionName = type === "suspend" ? "suspend" : "ban";
 
     if (!confirm(
-        "Are you sure you want to ban @" +
+        "Are you sure you want to " +
+        actionName +
+        " @" +
         (selectedUser.username || "User") +
-        "?"
+        (type === "suspend"
+            ? " for " + suspendDuration.value + " " + suspendUnit.value + "?"
+            : "?")
     )) {
-
         return;
     }
 
-    banAccountButton.disabled =
-        true;
-
+    banAccountButton.disabled = true;
     banAccountButton.textContent =
-        "Banning...";
+        type === "suspend" ? "Suspending..." : "Banning...";
 
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("profiles")
-            .update({
-                is_banned:
-                    true,
-                ban_reason:
-                    reason,
-                banned_at:
-                    new Date().toISOString()
-            })
-            .eq(
-                "id",
-                userId
-            );
+    const { error } = await supabaseClient
+        .from("profiles")
+        .update({
+            is_banned: true,
+            ban_reason: reason,
+            banned_at: new Date().toISOString(),
+            ban_type: type,
+            suspended_until: suspendedUntil
+        })
+        .eq("id", userId);
 
-    banAccountButton.disabled =
-        false;
-
-    banAccountButton.textContent =
-        "🚫 Ban Account";
+    banAccountButton.disabled = false;
+    updateBanButton();
 
     if (error) {
-
         console.error(error);
-
-        banResult.className =
-            "error";
-
+        banResult.className = "error";
         banResult.textContent =
-            "Could not ban account: " +
-            error.message;
-
-        banResult.style.display =
-            "block";
-
+            "Could not " + actionName + " account: " + error.message;
+        banResult.style.display = "block";
         return;
     }
 
-    banReason.value =
-        "";
+    banReason.value = "";
+    banUser.value = "";
 
-    banUser.value =
-        "";
-
-    banResult.className =
-        "success";
-
+    banResult.className = "success";
     banResult.textContent =
-        "Account banned successfully.";
-
-    banResult.style.display =
-        "block";
+        type === "suspend"
+            ? "Account suspended successfully until " +
+              new Date(suspendedUntil).toLocaleString() + "."
+            : "Account banned successfully.";
+    banResult.style.display = "block";
 
     await loadUsers();
 }
@@ -1779,6 +1819,10 @@ async function unbanAccount(userId) {
                 ban_reason:
                     null,
                 banned_at:
+                    null,
+                ban_type:
+                    null,
+                suspended_until:
                     null
             })
             .eq(
@@ -3351,6 +3395,22 @@ function escapeHtml(value) {
 /* =========================================
    BUTTONS
 ========================================= */
+
+function updateBanButton() {
+
+    const isSuspend = banType.value === "suspend";
+
+    suspendDurationField.style.display =
+        isSuspend ? "block" : "none";
+
+    banAccountButton.textContent =
+        isSuspend
+            ? "⏸️ Suspend Account"
+            : "🚫 Ban Account";
+}
+
+banType.addEventListener("change", updateBanButton);
+updateBanButton();
 
 sendWarningButton.addEventListener(
     "click",
