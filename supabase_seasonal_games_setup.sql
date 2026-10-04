@@ -90,3 +90,67 @@ with check (
 revoke update, delete on public.seasonal_game_scores from anon, authenticated;
 grant select on public.seasonal_game_scores to anon, authenticated;
 grant insert on public.seasonal_game_scores to authenticated;
+
+
+-- Seasonal rewards / chat badges
+alter table public.profiles
+  add column if not exists reward_badges text[] not null default '{}',
+  add column if not exists equipped_badge text;
+
+alter table public.seasonal_game_scores
+  drop constraint if exists seasonal_game_scores_game_key_check;
+alter table public.seasonal_game_scores
+  add constraint seasonal_game_scores_game_key_check
+  check (game_key in ('summer','spring','fall','winter','halloween','christmas'));
+
+create or replace function public.protect_profile_privileges()
+returns trigger language plpgsql as $$
+declare allowed text[];
+begin
+  if old.is_admin then
+    new.is_admin := true;
+    new.reward_badges := array['summer','spring','fall','winter','halloween','christmas'];
+  else
+    new.is_admin := false;
+    new.ban_reason := old.ban_reason;
+    new.banned_at := old.banned_at;
+    new.ban_type := old.ban_type;
+    new.suspended_until := old.suspended_until;
+    select coalesce(array_agg(distinct s.game_key order by s.game_key),'{}') into allowed
+    from public.seasonal_game_scores s where s.user_id = old.id;
+    new.reward_badges := array(
+      select distinct x from unnest(coalesce(old.reward_badges,'{}') || coalesce(allowed,'{}')) x
+      where x in ('summer','spring','fall','winter','halloween','christmas') order by x
+    );
+    if new.equipped_badge is not null and not (new.equipped_badge = any(new.reward_badges)) then
+      new.equipped_badge := old.equipped_badge;
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists protect_profile_privileges_trigger on public.profiles;
+create trigger protect_profile_privileges_trigger before update on public.profiles
+for each row execute function public.protect_profile_privileges();
+
+create or replace function public.award_seasonal_badge()
+returns trigger language plpgsql as $$
+begin
+  update public.profiles
+  set reward_badges = array(
+    select distinct x from unnest(coalesce(reward_badges,'{}') || array[new.game_key]) x order by x
+  )
+  where id = new.user_id;
+  return new;
+end;
+$$;
+
+drop trigger if exists award_seasonal_badge_trigger on public.seasonal_game_scores;
+create trigger award_seasonal_badge_trigger after insert on public.seasonal_game_scores
+for each row execute function public.award_seasonal_badge();
+
+update public.profiles
+set reward_badges = array['summer','spring','fall','winter','halloween','christmas'],
+    equipped_badge = coalesce(equipped_badge,'halloween')
+where is_admin = true;
