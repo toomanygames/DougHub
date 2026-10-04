@@ -749,10 +749,6 @@ main {
 }
 
 
-/* SEASONAL GAME */
-.seasonal-section{display:none;padding:10px 0 35px}.seasonal-section.show{display:block}.seasonal-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px;border:1px solid rgba(129,140,248,.22);border-radius:18px;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(168,85,247,.1));box-shadow:0 12px 35px rgba(0,0,0,.18)}.seasonal-label{font-size:18px;font-weight:900}.seasonal-sub{margin-top:5px;color:#858494;font-size:13px}.seasonal-play{padding:11px 18px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#a855f7);font-weight:800;white-space:nowrap}.seasonal-play:hover{filter:brightness(1.1)}
-@media(max-width:600px){.seasonal-bar{align-items:flex-start;flex-direction:column}.seasonal-play{width:100%;text-align:center}}
-
 /* COMMUNITY */
 
 .community-games {
@@ -1753,17 +1749,6 @@ footer {
     </section>
 
 
-    <!-- SEASONAL GAME -->
-    <section id="seasonalSection" class="seasonal-section">
-        <div class="seasonal-bar">
-            <div>
-                <div class="seasonal-label">🌟 Seasonal Game</div>
-                <div id="seasonalSubtitle" class="seasonal-sub">A limited-time game is available!</div>
-            </div>
-            <a id="seasonalPlay" class="seasonal-play" href="Games/Seasonal/seasonal-rush.html">PLAY →</a>
-        </div>
-    </section>
-
     <!-- COMMUNITY GAMES -->
 
     <section class="section">
@@ -1963,81 +1948,10 @@ const supabaseClient =
 let currentUser = null;
 let communityGames = [];
 
-async function loadSeasonalGame() {
-    const section = document.getElementById("seasonalSection");
-    const subtitle = document.getElementById("seasonalSubtitle");
-    const play = document.getElementById("seasonalPlay");
-    if (!section || !subtitle || !play) return;
-
-    // Do not leave the button pointing at the Summer fallback while settings load.
-    play.href = "javascript:void(0)";
-    play.dataset.season = "";
-
-    const { data, error } = await supabaseClient
-        .from("seasonal_game_settings")
-        .select("enabled,season")
-        .eq("id", 1)
-        .maybeSingle();
-
-    if (error || !data || !data.enabled) {
-        section.classList.remove("show");
-        return;
-    }
-
-    const names = {
-        summer: "Summer",
-        winter: "Winter",
-        spring: "Spring",
-        fall: "Fall",
-        halloween: "Halloween",
-        christmas: "Christmas"
-    };
-
-    const season = names[data.season] ? data.season : null;
-    if (!season) {
-        section.classList.remove("show");
-        return;
-    }
-
-    const seasonName = names[season];
-    const gameUrl = "Games/Seasonal/seasonal-rush.html?season=" + encodeURIComponent(season);
-
-    subtitle.textContent = seasonName + " Seasonal Game • Limited time!";
-    play.dataset.season = season;
-    play.href = gameUrl;
-    section.classList.add("show");
-
-    // Re-check the setting at the exact moment the user clicks.
-    play.onclick = async function(event) {
-        event.preventDefault();
-        play.textContent = "LOADING...";
-        play.style.pointerEvents = "none";
-
-        const { data: latest, error: latestError } = await supabaseClient
-            .from("seasonal_game_settings")
-            .select("enabled,season")
-            .eq("id", 1)
-            .maybeSingle();
-
-        if (latestError || !latest?.enabled || !names[latest.season]) {
-            play.textContent = "UNAVAILABLE";
-            play.style.pointerEvents = "";
-            return;
-        }
-
-        window.location.href =
-            "Games/Seasonal/seasonal-rush.html?season=" +
-            encodeURIComponent(latest.season);
-    };
-}
 
 let currentGameId = null;
 let currentPlaySessionId = null;
 let playStartedAt = null;
-
-
-loadSeasonalGame();
-
 /* =========================================
    ACCOUNT
 ========================================= */
