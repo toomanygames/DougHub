@@ -919,22 +919,6 @@ async function renderMessages(
         profile?.avatar_url ||
         "";
 
-      // Hide the original message from banned/suspended accounts.
-      // Expired suspensions are treated as active accounts here.
-      const isCurrentlyBanned =
-        !!profile?.is_banned &&
-        (
-          profile?.ban_type !== "suspend" ||
-          !profile?.suspended_until ||
-          new Date(profile.suspended_until) > new Date()
-        );
-
-      const isCurrentlySuspended =
-        !!profile?.is_banned &&
-        profile?.ban_type === "suspend" &&
-        !!profile?.suspended_until &&
-        new Date(profile.suspended_until) > new Date();
-
       const row =
         document.createElement(
           "div"
@@ -988,17 +972,8 @@ async function renderMessages(
       bubble.className =
         "message-bubble";
 
-      if (isCurrentlyBanned || isCurrentlySuspended) {
-        bubble.classList.add("banned-message");
-
-        bubble.textContent =
-          isCurrentlySuspended
-            ? "Message unavailable — user suspended."
-            : "Message unavailable — user banned.";
-      } else {
-        bubble.textContent =
-          message.message;
-      }
+      bubble.textContent =
+        message.message;
 
       content.appendChild(
         header
