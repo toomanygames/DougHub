@@ -533,6 +533,8 @@ main {
   overflow-y: scroll !important;
   overflow-x: hidden !important;
 }
+
+.message-badge{display:inline-flex;align-items:center;gap:3px;margin-left:4px;padding:2px 6px;border-radius:999px;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.2);font-size:10px;font-weight:800;color:#ddd6fe}.message-row.mine .message-badge{margin-left:0;margin-right:4px}
 </style>
 </head>
 
@@ -819,7 +821,7 @@ async function loadProfiles(
     await supabaseClient
       .from("profiles")
       .select(
-        "id, username, avatar_url, is_banned, ban_type, suspended_until"
+        "id, username, avatar_url, is_banned, ban_type, suspended_until, reward_badges, equipped_badge"
       )
       .in(
         "id",
@@ -954,11 +956,14 @@ async function renderMessages(
       header.className =
         "message-header";
 
+      const badgeInfo = {summer:["🏖️","Summer"],spring:["🌸","Spring"],fall:["🍂","Fall"],winter:["❄️","Winter"],halloween:["🎃","Halloween"],christmas:["🎄","Christmas"]};
+      const equipped = profile?.equipped_badge;
+      const badge = equipped && (profile?.reward_badges || []).includes(equipped) ? badgeInfo[equipped] : null;
       header.innerHTML = `
         <span class="message-username">
           @${escapeHtml(username)}
         </span>
-
+        ${badge ? '<span class="message-badge" title="'+escapeHtml(badge[1])+' Badge">'+badge[0]+' '+escapeHtml(badge[1])+'</span>' : ''}
         <span class="message-time">
           ${formatTime(message.created_at)}
         </span>
@@ -1298,7 +1303,7 @@ async function loadAccount() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url"
+        "username, avatar_url, reward_badges, equipped_badge"
       )
       .eq(
         "id",
