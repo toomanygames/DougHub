@@ -248,7 +248,7 @@ function update(dt){
  if(right)pig.vx+=760*dt;
  if(left)pig.vx-=600*dt;
  pig.vx*=Math.pow(.985,dt*60);pig.vx=Math.max(-180,Math.min(470,pig.vx));
- if(jumpQueued&&pig.ground){pig.vy=-650;pig.ground=false;pig.spin=(pig.vx>=0?1:-1)*2.8;}
+ if(jumpQueued&&pig.ground){pig.vy=-650;pig.ground=false;pig.spin=0;}
  jumpQueued=false;
  pig.vy+=1500*dt;pig.x+=pig.vx*dt;pig.y+=pig.vy*dt;
  const s=surfaceAt(pig.x);
@@ -256,7 +256,7 @@ function update(dt){
   pig.y=s-45;pig.vy=0;pig.ground=true;
   const a=Math.atan2((surfaceAt(pig.x+18)??s)-(surfaceAt(pig.x-18)??s),36);
   pig.angle+=(a-pig.angle)*Math.min(1,dt*9);pig.spin*=.65;
- }else{pig.ground=false;pig.angle+=pig.spin*dt;pig.spin*=Math.pow(.995,dt*60);}
+ }else{\n  pig.ground=false;\n  if(keys.has("ArrowRight")||keys.has("KeyD"))pig.spin+=4.2*dt;\n  if(keys.has("ArrowLeft")||keys.has("KeyA"))pig.spin-=4.2*dt;\n  pig.spin*=Math.pow(.985,dt*60);\n  pig.angle+=pig.spin*dt;\n}
  if(!pig.ground && Math.abs(pig.angle)>Math.PI*0.9 && Math.abs(pig.vx)>260){crash();return;}
  if(pig.y>600){crash();return;}
  for(const h of hazards){
