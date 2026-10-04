@@ -863,11 +863,11 @@ button:disabled {
     <div class="status" id="seasonalStatus">Loading seasonal game settings...</div>
     <div class="ban-form">
         <div class="field">
-            <label for="seasonalEnabled">Seasonal Game</label>
-            <select id="seasonalEnabled">
-                <option value="off">Off</option>
-                <option value="on">On</option>
-            </select>
+            <label>Seasonal Game</label>
+            <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                <input id="seasonalEnabled" type="checkbox" style="width:20px;height:20px;accent-color:#6366f1;">
+                <span>Enable Seasonal Game</span>
+            </label>
         </div>
         <div class="field">
             <label for="seasonalSeason">Season</label>
@@ -2898,7 +2898,7 @@ async function loadSeasonalSettings() {
         return;
     }
 
-    seasonalEnabled.value = data?.enabled ? "on" : "off";
+    seasonalEnabled.checked = !!data?.enabled;
     seasonalSeason.value = data?.season || "summer";
     seasonalStatus.textContent = data?.enabled
         ? "Seasonal Game is ON • " + seasonalSeason.value
@@ -2912,7 +2912,7 @@ async function saveSeasonalSettings() {
     const { error } = await supabaseClient
         .from("seasonal_game_settings")
         .update({
-            enabled: seasonalEnabled.value === "on",
+            enabled: seasonalEnabled.checked,
             season: seasonalSeason.value,
             updated_at: new Date().toISOString()
         })
@@ -2928,7 +2928,7 @@ async function saveSeasonalSettings() {
         return;
     }
 
-    seasonalStatus.textContent = seasonalEnabled.value === "on"
+    seasonalStatus.textContent = seasonalEnabled.checked
         ? "Seasonal Game is ON • " + seasonalSeason.value
         : "Seasonal Game is OFF";
 }
