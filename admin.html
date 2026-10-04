@@ -857,6 +857,35 @@ button:disabled {
 
 </div>
 
+
+<div class="card">
+    <h2>🌟 Seasonal Game</h2>
+    <div class="status" id="seasonalStatus">Loading seasonal game settings...</div>
+    <div class="ban-form">
+        <div class="field">
+            <label for="seasonalEnabled">Seasonal Game</label>
+            <select id="seasonalEnabled">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="seasonalSeason">Season</label>
+            <select id="seasonalSeason">
+                <option value="summer">☀️ Summer</option>
+                <option value="spring">🌸 Spring</option>
+                <option value="fall">🍂 Fall</option>
+                <option value="winter">❄️ Winter</option>
+                <option value="halloween">🎃 Halloween</option>
+                <option value="christmas">🎄 Christmas</option>
+            </select>
+        </div>
+        <div class="buttons">
+            <button id="saveSeasonalButton" class="save-button" type="button">💾 Save Seasonal Game</button>
+        </div>
+    </div>
+</div>
+
 <!-- DOUGTUBE MODERATION -->
 
 <div class="card">
@@ -974,6 +1003,18 @@ const dougTubeVideos =
 
 const videoModerationStatus =
     document.getElementById("videoModerationStatus");
+const seasonalEnabled =
+    document.getElementById("seasonalEnabled");
+
+const seasonalSeason =
+    document.getElementById("seasonalSeason");
+
+const saveSeasonalButton =
+    document.getElementById("saveSeasonalButton");
+
+const seasonalStatus =
+    document.getElementById("seasonalStatus");
+
 
 let currentAdminUser = null;
 let allUsers = [];
@@ -2841,6 +2882,59 @@ async function deleteGame(id) {
 }
 
 
+
+async function loadSeasonalSettings() {
+    seasonalStatus.textContent = "Loading seasonal game settings...";
+
+    const { data, error } = await supabaseClient
+        .from("seasonal_game_settings")
+        .select("enabled,season")
+        .eq("id", 1)
+        .maybeSingle();
+
+    if (error) {
+        seasonalStatus.textContent = "Could not load seasonal settings. Run the seasonal SQL setup first.";
+        console.error(error);
+        return;
+    }
+
+    seasonalEnabled.value = data?.enabled ? "on" : "off";
+    seasonalSeason.value = data?.season || "summer";
+    seasonalStatus.textContent = data?.enabled
+        ? "Seasonal Game is ON • " + seasonalSeason.value
+        : "Seasonal Game is OFF";
+}
+
+async function saveSeasonalSettings() {
+    saveSeasonalButton.disabled = true;
+    saveSeasonalButton.textContent = "Saving...";
+
+    const { error } = await supabaseClient
+        .from("seasonal_game_settings")
+        .update({
+            enabled: seasonalEnabled.value === "on",
+            season: seasonalSeason.value,
+            updated_at: new Date().toISOString()
+        })
+        .eq("id", 1);
+
+    saveSeasonalButton.disabled = false;
+    saveSeasonalButton.textContent = "💾 Save Seasonal Game";
+
+    if (error) {
+        seasonalStatus.textContent = "Could not save seasonal settings."; 
+        console.error(error);
+        alert("Could not save the seasonal game settings:\n\n" + error.message);
+        return;
+    }
+
+    seasonalStatus.textContent = seasonalEnabled.value === "on"
+        ? "Seasonal Game is ON • " + seasonalSeason.value
+        : "Seasonal Game is OFF";
+}
+
+saveSeasonalButton.addEventListener("click", saveSeasonalSettings);
+
 /* =========================================
    DOUGTUBE MODERATION
 ========================================= */
@@ -3442,7 +3536,8 @@ async function startAdminPanel() {
         loadChatMessages(),
         loadGames(),
         loadUserActivity(),
-        loadDougTubeVideos()
+        loadDougTubeVideos(),
+        loadSeasonalSettings()
     ]);
 
     setInterval(
