@@ -419,6 +419,8 @@ main {
     width: 100%;
   }
 }
+
+.reward-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.reward-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.045)}.reward-card.locked{opacity:.4}.reward-icon{font-size:27px}.reward-name{margin-top:6px;font-weight:800}.reward-help{margin-top:4px;color:#777d95;font-size:12px}.reward-select{width:100%;height:44px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.06);color:white;padding:0 13px;font:inherit}.reward-note{margin-top:9px;color:#777d95;font-size:12px}
 </style>
 </head>
 
@@ -537,6 +539,21 @@ main {
         </div>
 
       </div>
+
+    </section>
+
+    <section class="settings-section">
+
+      <h2 class="section-title">Rewards & Badges</h2>
+      <p class="section-description">Earn seasonal badges by playing the seasonal games. Choose which earned badge appears beside your name in Chat.</p>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-label">Chat Badge</div><div class="setting-help">Admins automatically have every badge.</div></div>
+        <div class="setting-control" style="display:block">
+          <select id="badgeSelect" class="reward-select"><option value="">No badge</option></select>
+          <div id="badgeNote" class="reward-note">Loading your rewards...</div>
+        </div>
+      </div>
+      <div id="rewardGrid" class="reward-grid"></div>
 
     </section>
 
@@ -1140,7 +1157,7 @@ async function loadSettings() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url, is_admin, username_changed_at"
+        "username, avatar_url, is_admin, username_changed_at, reward_badges, equipped_badge"
       )
       .eq(
         "id",
@@ -1188,6 +1205,7 @@ async function loadSettings() {
 
 
   updateUsernameCooldown();
+  renderRewards();
 
 }
 
@@ -1779,6 +1797,18 @@ profilePictureInput.addEventListener(
   }
 );
 
+
+/* =========================================
+   REWARDS
+========================================= */
+const rewardInfo={summer:["🏖️","Summer Badge"],spring:["🌸","Spring Badge"],fall:["🍂","Fall Badge"],winter:["❄️","Winter Badge"],halloween:["🎃","Halloween Badge"],christmas:["🎄","Christmas Badge"]};
+function renderRewards(){
+  const badges=currentProfile?.reward_badges||[]; const select=document.getElementById("badgeSelect"); const grid=document.getElementById("rewardGrid");
+  select.innerHTML='<option value="">No badge</option>';
+  Object.entries(rewardInfo).forEach(([key,[icon,name]])=>{const option=document.createElement("option");option.value=key;option.textContent=icon+" "+name;option.disabled=!badges.includes(key)&&!currentProfile?.is_admin;select.appendChild(option);const card=document.createElement("div");card.className="reward-card"+(badges.includes(key)||currentProfile?.is_admin?"":" locked");card.innerHTML='<div class="reward-icon">'+icon+'</div><div class="reward-name">'+name+'</div><div class="reward-help">'+(badges.includes(key)||currentProfile?.is_admin?"Unlocked":"Play this seasonal game")+"</div>";grid.appendChild(card);});
+  select.value=currentProfile?.equipped_badge||""; document.getElementById("badgeNote").textContent=currentProfile?.is_admin?"Admin: all seasonal badges are unlocked.":(badges.length?badges.length+" badge"+(badges.length===1?"":"s")+" earned.":"No badges yet — play a seasonal game!");
+}
+document.getElementById("badgeSelect").addEventListener("change",async()=>{if(!currentUser||!currentProfile)return;const value=document.getElementById("badgeSelect").value||null;const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);if(error){showStatus("Could not update your badge.","error");return}currentProfile.equipped_badge=value;showStatus(value?"Chat badge updated!":"Chat badge removed.","success");});
 
 /* =========================================
    LOGOUT
