@@ -3,70 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Seasonal Rush • DougHub</title>
+<title>Seasonal Game • DougHub</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:#fff;background:radial-gradient(circle at top,#2d205d,transparent 45%),#02040a;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{width:min(760px,100%);padding:30px;border:1px solid rgba(255,255,255,.1);border-radius:26px;background:rgba(13,17,39,.8);box-shadow:0 25px 80px #0008;text-align:center}
-h1{margin:0 0 8px;font-size:clamp(34px,7vw,58px)}p{color:#a7a9bb}.game{margin:25px 0;padding:30px;border-radius:20px;background:rgba(255,255,255,.05)}
-#target{font-size:80px;cursor:pointer;user-select:none;transition:transform .08s}#target:active{transform:scale(.9)}
-button{border:0;border-radius:12px;padding:11px 18px;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);font-weight:800;cursor:pointer}
-button:disabled{opacity:.5;cursor:not-allowed}.stats{display:flex;justify-content:center;gap:25px;flex-wrap:wrap}.stat b{display:block;font-size:28px}.stat span{color:#858ba3;font-size:12px}
-.leaderboard{text-align:left;margin-top:25px;padding:20px;border-radius:18px;background:rgba(255,255,255,.04)}.leaderboard h2{margin-top:0}.row{display:grid;grid-template-columns:42px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}.row:last-child{border:0}.muted{color:#858ba3}.links{margin-top:18px}.links a{color:#a5b4fc;text-decoration:none;margin:0 8px}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;color:#fff;background:radial-gradient(circle at top,#2d205d,transparent 45%),#02040a;display:flex;align-items:center;justify-content:center;padding:18px}.card{width:min(820px,100%);padding:26px;border:1px solid rgba(255,255,255,.1);border-radius:26px;background:rgba(13,17,39,.86);box-shadow:0 25px 80px #0008;text-align:center}h1{margin:0 0 7px;font-size:clamp(32px,7vw,56px)}p{color:#a7a9bb}.game{margin:22px 0;padding:20px;border-radius:20px;background:rgba(255,255,255,.045)}.stats{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-bottom:14px}.stat b{display:block;font-size:27px}.stat span{color:#858ba3;font-size:11px;font-weight:800}.arena{position:relative;width:100%;height:340px;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,#15203b,#0a1021);border:1px solid rgba(255,255,255,.08);touch-action:none}.target{position:absolute;width:62px;height:62px;border:0;border-radius:50%;font-size:33px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;box-shadow:0 8px 24px #0005;transition:transform .08s}.target:active{transform:scale(.86)}.hazard{position:absolute;pointer-events:none;font-size:30px;transition:none}.tip{font-size:13px;color:#858ba3;min-height:20px;margin:10px}.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}button{border:0;border-radius:12px;padding:11px 18px;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);font-weight:800;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.leaderboard{text-align:left;margin-top:20px;padding:18px;border-radius:18px;background:rgba(255,255,255,.04)}.leaderboard h2{margin-top:0}.row{display:grid;grid-template-columns:42px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}.row:last-child{border:0}.muted{color:#858ba3}.reward{margin:10px 0;padding:10px;border-radius:12px;background:rgba(99,102,241,.1);color:#c4b5fd;font-weight:800}.links{margin-top:16px}.links a{color:#a5b4fc;text-decoration:none;margin:0 8px}
 </style>
 </head>
 <body>
 <div class="card">
-<h1 id="title">🌞 Summer Rush</h1>
-<p id="subtitle">Click the seasonal target as many times as you can in 20 seconds!</p>
+<h1 id="title">🌞 Summer Splash</h1>
+<p id="subtitle">Hit the seasonal targets before time runs out. Every completed game unlocks that season's badge.</p>
 <div class="game">
-<div class="stats"><div class="stat"><b id="score">0</b><span>SCORE</span></div><div class="stat"><b id="time">20</b><span>SECONDS</span></div></div>
-<div id="target" title="Click!">☀️</div>
-<button id="start">Start Game</button>
+<div class="stats"><div class="stat"><b id="score">0</b><span>SCORE</span></div><div class="stat"><b id="time">30</b><span>SECONDS</span></div><div class="stat"><b id="combo">x1</b><span>COMBO</span></div></div>
+<div id="arena" class="arena"></div>
+<div id="tip" class="tip">Press Start, then hit the moving target!</div>
+<div class="actions"><button id="start">Start Game</button></div>
+<div id="reward" class="reward" style="display:none"></div>
 </div>
-<div class="leaderboard"><h2>🏆 Leaderboard</h2><div id="board" class="muted">Loading...</div></div>
+<div class="leaderboard"><h2>🏆 <span id="boardTitle">Season Leaderboard</span></h2><div id="board" class="muted">Loading...</div></div>
 <div class="links"><a href="../../douggames.html">← Doug Games</a><a href="../../index.html">DougHub</a></div>
 </div>
 <script>
 const URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
 const KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const db=supabase.createClient(URL,KEY);
-const themes={
- summer:{title:"🌞 Summer Rush",icon:"☀️",desc:"Click the sun as many times as you can in 20 seconds!"},
- winter:{title:"❄️ Winter Rush",icon:"❄️",desc:"Click the snowflake as many times as you can in 20 seconds!"},
- spring:{title:"🌸 Spring Rush",icon:"🌸",desc:"Click the blossom as many times as you can in 20 seconds!"},
- fall:{title:"🍂 Fall Rush",icon:"🍂",desc:"Click the leaf as many times as you can in 20 seconds!"},
- halloween:{title:"🎃 Halloween Rush",icon:"🎃",desc:"Click the pumpkin as many times as you can in 20 seconds!"},
- christmas:{title:"🎄 Christmas Rush",icon:"🎄",desc:"Click the tree as many times as you can in 20 seconds!"}
+const games={
+ summer:{title:"🌞 Summer Splash",icon:"🏖️",desc:"Catch beach balls before they bounce away!",tip:"Hit the beach ball. Keep the combo alive!",color:"rgba(245,158,11,.25)",hazard:"🌊",reward:"🏖️ Summer Badge"},
+ spring:{title:"🌸 Spring Garden",icon:"🌸",desc:"Catch butterflies and blossoms in the spring garden!",tip:"Hit the butterfly. Misses break your combo.",color:"rgba(34,197,94,.22)",hazard:"🌧️",reward:"🌸 Spring Badge"},
+ fall:{title:"🍂 Leaf Dash",icon:"🍂",desc:"Catch falling leaves while gusts blow across the arena!",tip:"Catch leaves quickly. Falling leaves are worth more!",color:"rgba(249,115,22,.24)",hazard:"💨",reward:"🍂 Fall Badge"},
+ winter:{title:"❄️ Snowball Frenzy",icon:"❄️",desc:"Smash snowballs before they pile up!",tip:"Keep clicking the snowballs. Watch for icy hazards!",color:"rgba(56,189,248,.22)",hazard:"🧊",reward:"❄️ Winter Badge"},
+ halloween:{title:"🎃 Pumpkin Panic",icon:"🎃",desc:"Grab pumpkins while dodging spooky ghosts!",tip:"Pumpkins score points. Ghosts cost points.",color:"rgba(249,115,22,.24)",hazard:"👻",reward:"🎃 Halloween Badge"},
+ christmas:{title:"🎄 Gift Grab",icon:"🎄",desc:"Catch falling presents before Christmas time runs out!",tip:"Catch gifts for points. Golden gifts are worth extra!",color:"rgba(239,68,68,.22)",hazard:"✨",reward:"🎄 Christmas Badge"}
 };
-let season="summer",score=0,time=20,running=false,timer=null;
-const target=document.getElementById("target"),start=document.getElementById("start");
-async function loadSeason(){
- const {data,error}=await db.from("seasonal_game_settings").select("enabled,season").eq("id",1).maybeSingle();
- if(error||!data||!data.enabled){document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";return}
- season=themes[data.season]?data.season:"summer";
- const t=themes[season];document.getElementById("title").textContent=t.title;document.getElementById("subtitle").textContent=t.desc;target.textContent=t.icon;
- loadBoard();
-}
-async function loadBoard(){
- const {data,error}=await db.from("seasonal_game_scores").select("username,score,created_at").eq("game_key",season).order("score",{ascending:false}).order("created_at",{ascending:true}).limit(10);
- if(error){document.getElementById("board").textContent="Leaderboard unavailable.";return}
- document.getElementById("board").innerHTML=data.length?data.map((x,i)=>'<div class="row"><b>#'+(i+1)+'</b><span>@'+escapeHtml(x.username)+'</span><strong>'+x.score+'</strong></div>').join(""):"No scores yet — be the first!";
-}
+let season="summer",score=0,time=30,combo=1,running=false,timer=null,spawnTimer=null,gameObjects=[],lastHit=0;
+const arena=document.getElementById("arena"),start=document.getElementById("start");
 function escapeHtml(x){return String(x??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-start.onclick=()=>{
- if(running)return;score=0;time=20;running=true;document.getElementById("score").textContent=0;document.getElementById("time").textContent=20;start.disabled=true;
- timer=setInterval(async()=>{time--;document.getElementById("time").textContent=time;if(time<=0){clearInterval(timer);running=false;start.disabled=false;await submitScore()}},1000)
-};
-target.onclick=()=>{if(running){score++;document.getElementById("score").textContent=score}};
-async function submitScore(){
- const {data:{session}}=await db.auth.getSession();
- if(!session){alert("Log in to save your score to the leaderboard.");return}
- const {data:profile}=await db.from("profiles").select("username").eq("id",session.user.id).maybeSingle();
- const username=profile?.username||session.user.email?.split("@")[0]||"Player";
- const {error}=await db.from("seasonal_game_scores").insert({game_key:season,user_id:session.user.id,username,score});
- if(error)alert("Your score could not be saved.");else loadBoard();
-}
+function applyTheme(){const g=games[season]||games.summer;document.getElementById("title").textContent=g.title;document.getElementById("subtitle").textContent=g.desc;document.getElementById("tip").textContent=g.tip;document.getElementById("boardTitle").textContent=g.title.replace(/^\S+\s*/,"")+" Leaderboard";arena.style.background="linear-gradient(180deg,"+g.color+",#0a1021 75%)"}
+function clearArena(){gameObjects.forEach(o=>o.el.remove());gameObjects=[]}
+function randomPos(size=62){return {x:Math.random()*Math.max(1,arena.clientWidth-size),y:Math.random()*Math.max(1,arena.clientHeight-size)}}
+function spawnTarget(){if(!running)return;const g=games[season]||games.summer;const el=document.createElement("button");el.className="target";el.textContent=g.icon;el.style.background=g.color;const p=randomPos();el.style.left=p.x+"px";el.style.top=p.y+"px";const life=season==="halloween"?1150:1450;const obj={el,x:p.x,y:p.y,expires:setTimeout(()=>{if(!running)return;el.remove();gameObjects=gameObjects.filter(x=>x!==obj);combo=1;updateStats()},life)};el.onclick=()=>hitTarget(obj);arena.appendChild(el);gameObjects.push(obj)}
+function spawnHazard(){if(!running||season!=="halloween")return;const el=document.createElement("div");el.className="hazard";el.textContent="👻";const p=randomPos(35);el.style.left=p.x+"px";el.style.top=p.y+"px";arena.appendChild(el);const obj={el,expires:setTimeout(()=>{el.remove()},1700)};setInterval(()=>{},0);setTimeout(()=>el.remove(),1700)}
+function hitTarget(obj){if(!running)return;clearTimeout(obj.expires);const now=Date.now();combo=now-lastHit<1200?Math.min(combo+1,8):1;lastHit=now;let points=combo;if(season==="halloween")points+=2; if(season==="christmas"&&Math.random()<.25)points+=4;score+=points;obj.el.remove();gameObjects=gameObjects.filter(x=>x!==obj);updateStats();spawnTarget()}
+function updateStats(){document.getElementById("score").textContent=score;document.getElementById("time").textContent=time;document.getElementById("combo").textContent="x"+combo}
+function stopGame(){running=false;clearInterval(timer);clearInterval(spawnTimer);timer=null;spawnTimer=null;gameObjects.forEach(o=>clearTimeout(o.expires));clearArena();start.disabled=false}
+async function startGame(){if(running)return;score=0;time=30;combo=1;lastHit=0;running=true;document.getElementById("reward").style.display="none";start.disabled=true;clearArena();updateStats();spawnTarget();if(season==="halloween")spawnTimer=setInterval(spawnHazard,1800);timer=setInterval(async()=>{time--;updateStats();if(time<=0){stopGame();await finishGame()}},1000)}
+async function finishGame(){const {data:{session}}=await db.auth.getSession();if(!session){document.getElementById("tip").textContent="Game over! Log in to save your score and unlock the badge.";return}const {data:profile}=await db.from("profiles").select("username").eq("id",session.user.id).maybeSingle();const username=profile?.username||session.user.email?.split("@")[0]||"Player";const {error}=await db.from("seasonal_game_scores").insert({game_key:season,user_id:session.user.id,username,score});if(error){document.getElementById("tip").textContent="Game over — score saving failed.";return}const reward=document.getElementById("reward");reward.textContent="🏆 You earned the "+games[season].reward+"! Manage it in Settings → Rewards.";reward.style.display="block";document.getElementById("tip").textContent="Great run! Your score and reward are saved.";loadBoard()}
+async function loadBoard(){const {data,error}=await db.from("seasonal_game_scores").select("username,score,created_at").eq("game_key",season).order("score",{ascending:false}).order("created_at",{ascending:true}).limit(10);if(error){document.getElementById("board").textContent="Leaderboard unavailable.";return}document.getElementById("board").innerHTML=data?.length?data.map((x,i)=>'<div class="row"><b>#'+(i+1)+'</b><span>@'+escapeHtml(x.username)+'</span><strong>'+x.score+'</strong></div>').join(""):"No scores yet — be the first!"}
+async function loadSeason(){const {data,error}=await db.from("seasonal_game_settings").select("enabled,season").eq("id",1).maybeSingle();if(error||!data||!data.enabled){document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";return}season=games[data.season]?data.season:"summer";applyTheme();loadBoard()}
+start.addEventListener("click",startGame);
 loadSeason();
 </script>
 </body>
