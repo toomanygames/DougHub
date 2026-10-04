@@ -257,7 +257,7 @@ function update(dt){
   const a=Math.atan2((surfaceAt(pig.x+18)??s)-(surfaceAt(pig.x-18)??s),36);
   pig.angle+=(a-pig.angle)*Math.min(1,dt*9);pig.spin*=.65;
  }else{pig.ground=false;pig.angle+=pig.spin*dt;pig.spin*=Math.pow(.995,dt*60);}
- if(Math.abs(pig.angle)>Math.PI*0.85){crash();return;}
+ if(!pig.ground && Math.abs(pig.angle)>Math.PI*0.9 && Math.abs(pig.vx)>260){crash();return;}
  if(pig.y>600){crash();return;}
  for(const h of hazards){
   if(h.type==="spike"&&Math.abs(pig.x-h.x)<27&&Math.abs((pig.y+38)-h.y)<50){crash();return;}
