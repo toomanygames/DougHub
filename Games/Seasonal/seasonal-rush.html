@@ -115,11 +115,29 @@ async function loadBoard(){
  document.getElementById("board").innerHTML=error?"Leaderboard unavailable.":(data?.length?data.map((x,i)=>'<div class="row"><b>#'+(i+1)+'</b><span>@'+escapeHtml(x.username)+'</span><strong>'+x.score+'</strong></div>').join(""):"No scores yet — be the first!");
 }
 async function loadSeason(){
- const params=new URLSearchParams(location.search);const requested=params.get("season");
+ const params=new URLSearchParams(location.search);
+ const requested=params.get("season");
+ const validRequested=requested && Object.prototype.hasOwnProperty.call(games,requested);
+
+ // The URL-selected season is authoritative. If there is no valid URL season,
+ // use the live admin setting. Never silently fall back to Summer.
  const {data,error}=await db.from("seasonal_game_settings").select("enabled,season").eq("id",1).maybeSingle();
- if(error||!data||!data.enabled){document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";return}
- season=games[requested]?requested:(games[data.season]?data.season:"summer");
- applyTheme();loadBoard();
+
+ if(error||!data||!data.enabled){
+   document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";
+   return;
+ }
+
+ const liveSeason=games[data.season]?data.season:null;
+ season=validRequested?requested:liveSeason;
+
+ if(!season){
+   document.querySelector(".game").innerHTML="<h2>Seasonal Game configuration is invalid.</h2><p>An admin needs to select a valid season.</p>";
+   return;
+ }
+
+ applyTheme();
+ loadBoard();
 }
 window.addEventListener("keydown",e=>{keys.add(e.code);if(["ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault()});
 window.addEventListener("keyup",e=>keys.delete(e.code));
