@@ -819,7 +819,7 @@ async function loadProfiles(
     await supabaseClient
       .from("profiles")
       .select(
-        "id, username, avatar_url"
+        "id, username, avatar_url, is_banned, ban_type, suspended_until"
       )
       .in(
         "id",
@@ -919,6 +919,22 @@ async function renderMessages(
         profile?.avatar_url ||
         "";
 
+      // Hide the original message from banned/suspended accounts.
+      // Expired suspensions are treated as active accounts here.
+      const isCurrentlyBanned =
+        !!profile?.is_banned &&
+        (
+          profile?.ban_type !== "suspend" ||
+          !profile?.suspended_until ||
+          new Date(profile.suspended_until) > new Date()
+        );
+
+      const isCurrentlySuspended =
+        !!profile?.is_banned &&
+        profile?.ban_type === "suspend" &&
+        !!profile?.suspended_until &&
+        new Date(profile.suspended_until) > new Date();
+
       const row =
         document.createElement(
           "div"
@@ -972,8 +988,17 @@ async function renderMessages(
       bubble.className =
         "message-bubble";
 
-      bubble.textContent =
-        message.message;
+      if (isCurrentlyBanned || isCurrentlySuspended) {
+        bubble.classList.add("banned-message");
+
+        bubble.textContent =
+          isCurrentlySuspended
+            ? "This user's message is unavailable because their account is temporarily suspended."
+            : "This user's message is unavailable because their account has been banned.";
+      } else {
+        bubble.textContent =
+          message.message;
+      }
 
       content.appendChild(
         header
