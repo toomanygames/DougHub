@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seasonal Rush • DougHub</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:#fff;background:radial-gradient(circle at top,#2d205d,transparent 45%),#02040a;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:min(760px,100%);padding:30px;border:1px solid rgba(255,255,255,.1);border-radius:26px;background:rgba(13,17,39,.8);box-shadow:0 25px 80px #0008;text-align:center}
+h1{margin:0 0 8px;font-size:clamp(34px,7vw,58px)}p{color:#a7a9bb}.game{margin:25px 0;padding:30px;border-radius:20px;background:rgba(255,255,255,.05)}
+#target{font-size:80px;cursor:pointer;user-select:none;transition:transform .08s}#target:active{transform:scale(.9)}
+button{border:0;border-radius:12px;padding:11px 18px;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);font-weight:800;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}.stats{display:flex;justify-content:center;gap:25px;flex-wrap:wrap}.stat b{display:block;font-size:28px}.stat span{color:#858ba3;font-size:12px}
+.leaderboard{text-align:left;margin-top:25px;padding:20px;border-radius:18px;background:rgba(255,255,255,.04)}.leaderboard h2{margin-top:0}.row{display:grid;grid-template-columns:42px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}.row:last-child{border:0}.muted{color:#858ba3}.links{margin-top:18px}.links a{color:#a5b4fc;text-decoration:none;margin:0 8px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1 id="title">🌞 Summer Rush</h1>
+<p id="subtitle">Click the seasonal target as many times as you can in 20 seconds!</p>
+<div class="game">
+<div class="stats"><div class="stat"><b id="score">0</b><span>SCORE</span></div><div class="stat"><b id="time">20</b><span>SECONDS</span></div></div>
+<div id="target" title="Click!">☀️</div>
+<button id="start">Start Game</button>
+</div>
+<div class="leaderboard"><h2>🏆 Leaderboard</h2><div id="board" class="muted">Loading...</div></div>
+<div class="links"><a href="../../douggames.html">← Doug Games</a><a href="../../index.html">DougHub</a></div>
+</div>
+<script>
+const URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const db=supabase.createClient(URL,KEY);
+const themes={
+ summer:{title:"🌞 Summer Rush",icon:"☀️",desc:"Click the sun as many times as you can in 20 seconds!"},
+ winter:{title:"❄️ Winter Rush",icon:"❄️",desc:"Click the snowflake as many times as you can in 20 seconds!"},
+ spring:{title:"🌸 Spring Rush",icon:"🌸",desc:"Click the blossom as many times as you can in 20 seconds!"},
+ fall:{title:"🍂 Fall Rush",icon:"🍂",desc:"Click the leaf as many times as you can in 20 seconds!"},
+ halloween:{title:"🎃 Halloween Rush",icon:"🎃",desc:"Click the pumpkin as many times as you can in 20 seconds!"},
+ christmas:{title:"🎄 Christmas Rush",icon:"🎄",desc:"Click the tree as many times as you can in 20 seconds!"}
+};
+let season="summer",score=0,time=20,running=false,timer=null;
+const target=document.getElementById("target"),start=document.getElementById("start");
+async function loadSeason(){
+ const {data,error}=await db.from("seasonal_game_settings").select("enabled,season").eq("id",1).maybeSingle();
+ if(error||!data||!data.enabled){document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";return}
+ season=themes[data.season]?data.season:"summer";
+ const t=themes[season];document.getElementById("title").textContent=t.title;document.getElementById("subtitle").textContent=t.desc;target.textContent=t.icon;
+ loadBoard();
+}
+async function loadBoard(){
+ const {data,error}=await db.from("seasonal_game_scores").select("username,score,created_at").eq("game_key",season).order("score",{ascending:false}).order("created_at",{ascending:true}).limit(10);
+ if(error){document.getElementById("board").textContent="Leaderboard unavailable.";return}
+ document.getElementById("board").innerHTML=data.length?data.map((x,i)=>'<div class="row"><b>#'+(i+1)+'</b><span>@'+escapeHtml(x.username)+'</span><strong>'+x.score+'</strong></div>').join(""):"No scores yet — be the first!";
+}
+function escapeHtml(x){return String(x??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+start.onclick=()=>{
+ if(running)return;score=0;time=20;running=true;document.getElementById("score").textContent=0;document.getElementById("time").textContent=20;start.disabled=true;
+ timer=setInterval(async()=>{time--;document.getElementById("time").textContent=time;if(time<=0){clearInterval(timer);running=false;start.disabled=false;await submitScore()}},1000)
+};
+target.onclick=()=>{if(running){score++;document.getElementById("score").textContent=score}};
+async function submitScore(){
+ const {data:{session}}=await db.auth.getSession();
+ if(!session){alert("Log in to save your score to the leaderboard.");return}
+ const {data:profile}=await db.from("profiles").select("username").eq("id",session.user.id).maybeSingle();
+ const username=profile?.username||session.user.email?.split("@")[0]||"Player";
+ const {error}=await db.from("seasonal_game_scores").insert({game_key:season,user_id:session.user.id,username,score});
+ if(error)alert("Your score could not be saved.");else loadBoard();
+}
+loadSeason();
+</script>
+</body>
+</html>
