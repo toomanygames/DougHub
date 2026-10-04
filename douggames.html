@@ -1989,9 +1989,10 @@ async function loadSeasonalGame() {
         christmas: "Christmas"
     };
 
-    const seasonName = names[data.season] || "Seasonal";
-    subtitle.textContent = seasonName + " Seasonal Rush • Limited time!";
-    play.href = "Games/Seasonal/seasonal-rush.html";
+    const season = names[data.season] ? data.season : "summer";
+    const seasonName = names[season] || "Seasonal";
+    subtitle.textContent = seasonName + " Seasonal Game • Limited time!";
+    play.href = "Games/Seasonal/seasonal-rush.html?season=" + encodeURIComponent(season);
     section.classList.add("show");
 }
 
