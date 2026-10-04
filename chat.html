@@ -993,8 +993,8 @@ async function renderMessages(
 
         bubble.textContent =
           isCurrentlySuspended
-            ? "This user's message is unavailable because their account is temporarily suspended."
-            : "This user's message is unavailable because their account has been banned.";
+            ? "Message unavailable — user suspended."
+            : "Message unavailable — user banned.";
       } else {
         bubble.textContent =
           message.message;
