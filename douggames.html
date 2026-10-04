@@ -1967,7 +1967,11 @@ async function loadSeasonalGame() {
     const section = document.getElementById("seasonalSection");
     const subtitle = document.getElementById("seasonalSubtitle");
     const play = document.getElementById("seasonalPlay");
-    if (!section) return;
+    if (!section || !subtitle || !play) return;
+
+    // Do not leave the button pointing at the Summer fallback while settings load.
+    play.href = "javascript:void(0)";
+    play.dataset.season = "";
 
     const { data, error } = await supabaseClient
         .from("seasonal_game_settings")
@@ -1989,11 +1993,42 @@ async function loadSeasonalGame() {
         christmas: "Christmas"
     };
 
-    const season = names[data.season] ? data.season : "summer";
-    const seasonName = names[season] || "Seasonal";
+    const season = names[data.season] ? data.season : null;
+    if (!season) {
+        section.classList.remove("show");
+        return;
+    }
+
+    const seasonName = names[season];
+    const gameUrl = "Games/Seasonal/seasonal-rush.html?season=" + encodeURIComponent(season);
+
     subtitle.textContent = seasonName + " Seasonal Game • Limited time!";
-    play.href = "Games/Seasonal/seasonal-rush.html?season=" + encodeURIComponent(season);
+    play.dataset.season = season;
+    play.href = gameUrl;
     section.classList.add("show");
+
+    // Re-check the setting at the exact moment the user clicks.
+    play.onclick = async function(event) {
+        event.preventDefault();
+        play.textContent = "LOADING...";
+        play.style.pointerEvents = "none";
+
+        const { data: latest, error: latestError } = await supabaseClient
+            .from("seasonal_game_settings")
+            .select("enabled,season")
+            .eq("id", 1)
+            .maybeSingle();
+
+        if (latestError || !latest?.enabled || !names[latest.season]) {
+            play.textContent = "UNAVAILABLE";
+            play.style.pointerEvents = "";
+            return;
+        }
+
+        window.location.href =
+            "Games/Seasonal/seasonal-rush.html?season=" +
+            encodeURIComponent(latest.season);
+    };
 }
 
 let currentGameId = null;
