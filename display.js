@@ -449,7 +449,7 @@
        BAN DISPLAY
     ========================================= */
 
-    function showBan(reason) {
+    function showBan(reason, suspendedUntil, isSuspension) {
 
         if (banned) {
             return;
@@ -487,7 +487,7 @@
             "dougHubDisplayTitle";
 
         title.textContent =
-            "DougHub Ban";
+            isSuspension ? "DougHub Suspension" : "DougHub Ban";
 
 
         const message =
@@ -497,7 +497,9 @@
             "dougHubDisplayMessage";
 
         message.textContent =
-            "Your DougHub account has been banned.";
+            isSuspension
+                ? "Your DougHub account has been temporarily suspended."
+                : "Your DougHub account has been banned.";
 
 
         const reasonBox =
@@ -521,7 +523,10 @@
             "dougHubDisplayDate";
 
         date.textContent =
-            "If you believe this is a mistake, contact a DougHub administrator.";
+            isSuspension && suspendedUntil
+                ? "Suspended until " + new Date(suspendedUntil).toLocaleString() +
+                  ". If you believe this is a mistake, contact a DougHub administrator."
+                : "If you believe this is a mistake, contact a DougHub administrator.";
 
 
         box.appendChild(
@@ -705,7 +710,7 @@
             await supabaseClient
                 .from("profiles")
                 .select(
-                    "is_banned, ban_reason"
+                    "is_banned, ban_reason, ban_type, suspended_until"
                 )
                 .eq(
                     "id",
@@ -734,13 +739,43 @@
             profile.is_banned === true
         ) {
 
-            stopPresenceTracking();
+            if (
+                profile.ban_type === "suspend" &&
+                profile.suspended_until
+            ) {
+                const until = new Date(profile.suspended_until).getTime();
 
-            showBan(
-                profile.ban_reason
-            );
+                if (Number.isFinite(until) && until <= Date.now()) {
+                    await supabaseClient
+                        .from("profiles")
+                        .update({
+                            is_banned: false,
+                            ban_reason: null,
+                            banned_at: null,
+                            ban_type: null,
+                            suspended_until: null
+                        })
+                        .eq("id", currentUser.id);
 
-            return;
+                    profile.is_banned = false;
+                } else {
+                    stopPresenceTracking();
+                    showBan(
+                        profile.ban_reason,
+                        profile.suspended_until,
+                        true
+                    );
+                    return;
+                }
+            } else {
+                stopPresenceTracking();
+                showBan(
+                    profile.ban_reason,
+                    null,
+                    false
+                );
+                return;
+            }
         }
 
 
