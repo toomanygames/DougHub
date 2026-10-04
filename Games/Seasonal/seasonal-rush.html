@@ -27,29 +27,102 @@
 const URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
 const KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const db=supabase.createClient(URL,KEY);
+
 const games={
- summer:{title:"🌞 Summer Splash",icon:"🏖️",desc:"Catch beach balls before they bounce away!",tip:"Hit the beach ball. Keep the combo alive!",color:"rgba(245,158,11,.25)",hazard:"🌊",reward:"🏖️ Summer Badge"},
- spring:{title:"🌸 Spring Garden",icon:"🌸",desc:"Catch butterflies and blossoms in the spring garden!",tip:"Hit the butterfly. Misses break your combo.",color:"rgba(34,197,94,.22)",hazard:"🌧️",reward:"🌸 Spring Badge"},
- fall:{title:"🍂 Leaf Dash",icon:"🍂",desc:"Catch falling leaves while gusts blow across the arena!",tip:"Catch leaves quickly. Falling leaves are worth more!",color:"rgba(249,115,22,.24)",hazard:"💨",reward:"🍂 Fall Badge"},
- winter:{title:"❄️ Snowball Frenzy",icon:"❄️",desc:"Smash snowballs before they pile up!",tip:"Keep clicking the snowballs. Watch for icy hazards!",color:"rgba(56,189,248,.22)",hazard:"🧊",reward:"❄️ Winter Badge"},
- halloween:{title:"🎃 Pumpkin Panic",icon:"🎃",desc:"Grab pumpkins while dodging spooky ghosts!",tip:"Pumpkins score points. Ghosts cost points.",color:"rgba(249,115,22,.24)",hazard:"👻",reward:"🎃 Halloween Badge"},
- christmas:{title:"🎄 Gift Grab",icon:"🎄",desc:"Catch falling presents before Christmas time runs out!",tip:"Catch gifts for points. Golden gifts are worth extra!",color:"rgba(239,68,68,.22)",hazard:"✨",reward:"🎄 Christmas Badge"}
+ summer:{title:"🌞 Summer Splash",desc:"Catch beach balls before they bounce away!",tip:"Click the beach balls as fast as you can!",icon:"🏖️",reward:"🏖️ Summer Badge",mode:"click"},
+ spring:{title:"🌸 Spring Garden",desc:"Catch butterflies and blossoms in a blooming garden!",tip:"Catch butterflies for bigger combos!",icon:"🦋",reward:"🌸 Spring Badge",mode:"click"},
+ fall:{title:"🍂 Leaf Dash",desc:"Catch falling leaves before the wind carries them away!",tip:"Leaves disappear quickly — keep your combo going!",icon:"🍂",reward:"🍂 Fall Badge",mode:"click"},
+ winter:{title:"❄️ Snowball Frenzy",desc:"Smash snowballs before they pile up!",tip:"Snowballs get faster as your score rises!",icon:"☃️",reward:"❄️ Winter Badge",mode:"click"},
+ halloween:{title:"🎃 Pumpkin Panic",desc:"Collect pumpkins and dodge the ghosts!",tip:"Pumpkins give points. Clicking a ghost costs points!",icon:"🎃",reward:"🎃 Halloween Badge",mode:"halloween"},
+ christmas:{title:"🎅 Santa's Sleigh Race",desc:"Race Santa's sleigh through the snowy sky and beat the clock!",tip:"Use ← → or A/D to steer. Collect presents for bonus points!",icon:"🎁",reward:"🎄 Christmas Badge",mode:"race"}
 };
-let season="summer",score=0,time=30,combo=1,running=false,timer=null,spawnTimer=null,gameObjects=[],lastHit=0;
+
+let season="summer",score=0,time=30,combo=1,running=false,timer=null,spawnTimer=null,objects=[],lastHit=0,keys=new Set(),raceX=50,raceSpeed=0,raceBonus=0;
 const arena=document.getElementById("arena"),start=document.getElementById("start");
+
 function escapeHtml(x){return String(x??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-function applyTheme(){const g=games[season]||games.summer;document.getElementById("title").textContent=g.title;document.getElementById("subtitle").textContent=g.desc;document.getElementById("tip").textContent=g.tip;document.getElementById("boardTitle").textContent=g.title.replace(/^\S+\s*/,"")+" Leaderboard";arena.style.background="linear-gradient(180deg,"+g.color+",#0a1021 75%)"}
-function clearArena(){gameObjects.forEach(o=>o.el.remove());gameObjects=[]}
-function randomPos(size=62){return {x:Math.random()*Math.max(1,arena.clientWidth-size),y:Math.random()*Math.max(1,arena.clientHeight-size)}}
-function spawnTarget(){if(!running)return;const g=games[season]||games.summer;const el=document.createElement("button");el.className="target";el.textContent=g.icon;el.style.background=g.color;const p=randomPos();el.style.left=p.x+"px";el.style.top=p.y+"px";const life=season==="halloween"?1150:1450;const obj={el,x:p.x,y:p.y,expires:setTimeout(()=>{if(!running)return;el.remove();gameObjects=gameObjects.filter(x=>x!==obj);combo=1;updateStats()},life)};el.onclick=()=>hitTarget(obj);arena.appendChild(el);gameObjects.push(obj)}
-function spawnHazard(){if(!running||season!=="halloween")return;const el=document.createElement("div");el.className="hazard";el.textContent="👻";const p=randomPos(35);el.style.left=p.x+"px";el.style.top=p.y+"px";arena.appendChild(el);el.onclick=()=>{if(!running)return;score=Math.max(0,score-3);combo=1;updateStats();el.remove()};setTimeout(()=>el.remove(),1700)}
-function hitTarget(obj){if(!running)return;clearTimeout(obj.expires);const now=Date.now();combo=now-lastHit<1200?Math.min(combo+1,8):1;lastHit=now;let points=combo;if(season==="halloween")points+=2; if(season==="christmas"&&Math.random()<.25)points+=4;score+=points;obj.el.remove();gameObjects=gameObjects.filter(x=>x!==obj);updateStats();spawnTarget()}
-function updateStats(){document.getElementById("score").textContent=score;document.getElementById("time").textContent=time;document.getElementById("combo").textContent="x"+combo}
-function stopGame(){running=false;clearInterval(timer);clearInterval(spawnTimer);timer=null;spawnTimer=null;gameObjects.forEach(o=>clearTimeout(o.expires));clearArena();start.disabled=false}
-async function startGame(){if(running)return;score=0;time=30;combo=1;lastHit=0;running=true;document.getElementById("reward").style.display="none";start.disabled=true;clearArena();updateStats();spawnTarget();if(season==="halloween")spawnTimer=setInterval(spawnHazard,1800);timer=setInterval(async()=>{time--;updateStats();if(time<=0){stopGame();await finishGame()}},1000)}
-async function finishGame(){const {data:{session}}=await db.auth.getSession();if(!session){document.getElementById("tip").textContent="Game over! Log in to save your score and unlock the badge.";return}const {data:profile}=await db.from("profiles").select("username").eq("id",session.user.id).maybeSingle();const username=profile?.username||session.user.email?.split("@")[0]||"Player";const {error}=await db.from("seasonal_game_scores").insert({game_key:season,user_id:session.user.id,username,score});if(error){document.getElementById("tip").textContent="Game over — score saving failed.";return}const reward=document.getElementById("reward");reward.textContent="🏆 You earned the "+games[season].reward+"! Manage it in Settings → Rewards.";reward.style.display="block";document.getElementById("tip").textContent="Great run! Your score and reward are saved.";loadBoard()}
-async function loadBoard(){const {data,error}=await db.from("seasonal_game_scores").select("username,score,created_at").eq("game_key",season).order("score",{ascending:false}).order("created_at",{ascending:true}).limit(10);if(error){document.getElementById("board").textContent="Leaderboard unavailable.";return}document.getElementById("board").innerHTML=data?.length?data.map((x,i)=>'<div class="row"><b>#'+(i+1)+'</b><span>@'+escapeHtml(x.username)+'</span><strong>'+x.score+'</strong></div>').join(""):"No scores yet — be the first!"}
-async function loadSeason(){const {data,error}=await db.from("seasonal_game_settings").select("enabled,season").eq("id",1).maybeSingle();if(error||!data||!data.enabled){document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";return}season=games[data.season]?data.season:"summer";applyTheme();loadBoard()}
+function applyTheme(){
+ const g=games[season]||games.summer;
+ document.getElementById("title").textContent=g.title;
+ document.getElementById("subtitle").textContent=g.desc;
+ document.getElementById("tip").textContent=g.tip;
+ document.getElementById("boardTitle").textContent=(g.title.replace(/^\S+\s*/,""))+" Leaderboard";
+ document.getElementById("score").textContent="0"; document.getElementById("time").textContent="30"; document.getElementById("combo").textContent="x1";
+ arena.innerHTML="";
+ if(g.mode==="race"){arena.style.background="linear-gradient(#13264b,#06101e)"; document.getElementById("combo").parentElement.querySelector("span").textContent="BONUS";document.getElementById("combo").textContent="0";document.getElementById("tip").textContent="← → / A D to steer • collect 🎁 • avoid ❄️";start.textContent="Start Race";}
+ else {arena.style.background="linear-gradient(180deg,rgba(99,102,241,.18),#0a1021 75%)";document.getElementById("combo").parentElement.querySelector("span").textContent="COMBO";start.textContent="Start Game";}
+}
+
+function clearObjects(){objects.forEach(o=>{clearTimeout(o.timer);o.el?.remove()});objects=[]}
+function randomPos(size=62){return{x:Math.random()*Math.max(1,arena.clientWidth-size),y:Math.random()*Math.max(1,arena.clientHeight-size)}}
+function updateStats(){document.getElementById("score").textContent=score;document.getElementById("time").textContent=time;document.getElementById("combo").textContent=season==="christmas"?raceBonus:"x"+combo}
+
+function spawnClickTarget(){
+ if(!running)return;
+ const g=games[season],el=document.createElement("button");el.className="target";el.textContent=g.icon;
+ const p=randomPos();el.style.left=p.x+"px";el.style.top=p.y+"px";el.style.background="rgba(99,102,241,.22)";
+ const lifetime=season==="winter"?1000:season==="halloween"?1300:1450;
+ const obj={el,timer:setTimeout(()=>{if(running){el.remove();objects=objects.filter(x=>x!==obj);combo=1;updateStats()}},lifetime)};
+ el.onclick=()=>{if(!running)return;clearTimeout(obj.timer);const now=Date.now();combo=now-lastHit<1200?Math.min(8,combo+1):1;lastHit=now;let pts=combo;if(season==="halloween")pts+=2;if(season==="winter")pts+=Math.max(0,Math.floor(score/25));score+=pts;el.remove();objects=objects.filter(x=>x!==obj);updateStats();spawnClickTarget()};
+ arena.appendChild(el);objects.push(obj);
+}
+
+function spawnGhost(){
+ if(!running||season!=="halloween")return;
+ const el=document.createElement("div");el.className="hazard";el.textContent="👻";const p=randomPos(35);el.style.left=p.x+"px";el.style.top=p.y+"px";
+ el.onclick=()=>{score=Math.max(0,score-5);combo=1;updateStats();el.remove()};arena.appendChild(el);setTimeout(()=>el.remove(),1700);
+}
+
+function startRace(){
+ arena.innerHTML='<div id="track" style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 48px,rgba(255,255,255,.07) 49px 51px);overflow:hidden"><div id="sleigh" style="position:absolute;left:50%;bottom:28px;transform:translateX(-50%);font-size:48px;transition:none">🛷</div><div id="raceRoad" style="position:absolute;left:15%;right:15%;top:0;bottom:0;border-left:3px dashed rgba(255,255,255,.15);border-right:3px dashed rgba(255,255,255,.15)"></div></div>';
+ raceX=50;raceSpeed=0;raceBonus=0;score=0;updateStats();
+}
+function spawnRaceObject(){
+ if(!running||season!=="christmas")return;
+ const good=Math.random()<.62,el=document.createElement("div");el.textContent=good?"🎁":"❄️";el.style.cssText="position:absolute;font-size:34px;left:"+((Math.random()*60)+20)+"%;top:-45px;z-index:3;cursor:pointer";
+ arena.appendChild(el);
+ const obj={el,y:-45,x:parseFloat(el.style.left),good};objects.push(obj);
+}
+function raceLoop(){
+ if(!running||season!=="christmas")return;
+ const sleigh=document.getElementById("sleigh"); if(!sleigh)return;
+ if(keys.has("ArrowLeft")||keys.has("KeyA"))raceX-=0.9;
+ if(keys.has("ArrowRight")||keys.has("KeyD"))raceX+=0.9;
+ raceX=Math.max(17,Math.min(83,raceX));sleigh.style.left=raceX+"%";
+ objects.forEach(o=>{if(!o.el)return;o.y+=2.7;o.el.style.top=o.y+"px";const hit=o.y>arena.clientHeight-105&&o.y<arena.clientHeight-35&&Math.abs(o.x-raceX)<7;if(hit){if(o.good){score+=5;raceBonus++;}else{score=Math.max(0,score-3);raceBonus=Math.max(0,raceBonus-1)}o.el.remove();o.el=null}});
+ objects=objects.filter(o=>o.el&&o.y<arena.clientHeight+50);updateStats();requestAnimationFrame(raceLoop);
+}
+function stopGame(){running=false;clearInterval(timer);clearInterval(spawnTimer);timer=null;spawnTimer=null;clearObjects();start.disabled=false}
+async function startGame(){
+ if(running)return;
+ score=0;time=30;combo=1;lastHit=0;running=true;start.disabled=true;document.getElementById("reward").style.display="none";clearObjects();applyTheme();updateStats();
+ if(season==="christmas"){startRace();spawnTimer=setInterval(spawnRaceObject,650);requestAnimationFrame(raceLoop)}
+ else {spawnClickTarget();if(season==="halloween")spawnTimer=setInterval(spawnGhost,1400)}
+ timer=setInterval(async()=>{time--;updateStats();if(time<=0){stopGame();await finishGame()}},1000);
+}
+async function finishGame(){
+ const {data:{session}}=await db.auth.getSession();
+ if(!session){document.getElementById("tip").textContent="Game over! Log in to save your score and earn the badge.";return}
+ const {data:profile}=await db.from("profiles").select("username").eq("id",session.user.id).maybeSingle();
+ const username=profile?.username||session.user.email?.split("@")[0]||"Player";
+ const {error}=await db.from("seasonal_game_scores").insert({game_key:season,user_id:session.user.id,username,score});
+ if(error){console.error(error);document.getElementById("tip").textContent="Game over — score saving failed.";return}
+ document.getElementById("reward").textContent="🏆 You earned the "+games[season].reward+"! Manage it in Settings → Rewards.";
+ document.getElementById("reward").style.display="block";document.getElementById("tip").textContent="Great run! Your score and reward are saved.";loadBoard();
+}
+async function loadBoard(){
+ const {data,error}=await db.from("seasonal_game_scores").select("username,score,created_at").eq("game_key",season).order("score",{ascending:false}).order("created_at",{ascending:true}).limit(10);
+ document.getElementById("board").innerHTML=error?"Leaderboard unavailable.":(data?.length?data.map((x,i)=>'<div class="row"><b>#'+(i+1)+'</b><span>@'+escapeHtml(x.username)+'</span><strong>'+x.score+'</strong></div>').join(""):"No scores yet — be the first!");
+}
+async function loadSeason(){
+ const params=new URLSearchParams(location.search);const requested=params.get("season");
+ const {data,error}=await db.from("seasonal_game_settings").select("enabled,season").eq("id",1).maybeSingle();
+ if(error||!data||!data.enabled){document.querySelector(".game").innerHTML="<h2>Seasonal Game is currently offline.</h2><p>Check back later!</p>";return}
+ season=games[requested]?requested:(games[data.season]?data.season:"summer");
+ applyTheme();loadBoard();
+}
+window.addEventListener("keydown",e=>{keys.add(e.code);if(["ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault()});
+window.addEventListener("keyup",e=>keys.delete(e.code));
 start.addEventListener("click",startGame);
 loadSeason();
 </script>
