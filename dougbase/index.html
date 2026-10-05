@@ -167,6 +167,11 @@ async function claimAdmin(){
   m.textContent="Checking…";
   const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html?redirect=dougbase/index.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"claim-admin"})}); const j=await r.json(); const data=j.data,error=j.error?{message:j.error}:null;
   m.textContent=error?error.message:(data?.message||"Done");
+  if(!error && data?.admin===true){
+    window.DougBaseIsAdmin=true;
+    document.querySelector("#adminDatabasesBtn").classList.remove("access-hidden");
+    document.querySelector("#adminDatabasesBtn").click();
+  }
 }
 async function adminDatabases(){
   const u=await user(); if(!u)return;
@@ -212,7 +217,7 @@ async function overview(){
     <div class="card"><span class="muted">Auth</span><div class="value">Active</div></div>
     <div class="card"><span class="muted">Signed in as</span><div class="value" style="font-size:15px;overflow:hidden;text-overflow:ellipsis">${esc(u.email||"User")}</div></div>
   </div>
-  <div class="card section"><h2>DougBase setup</h2><p class="muted">The first DougBase account can initialize itself as the administrator.</p><div class="toolbar"><button class="primary" id="claimAdmin">Initialize this account as Admin</button><span id="adminMsg" class="muted"></span></div></div>
+  <div class="card section"><h2>DougBase setup</h2><p class="muted">DougHub administrators are automatically recognized as DougBase administrators. The button below refreshes that status and opens All Databases.</p><div class="toolbar"><button class="primary" id="claimAdmin">Initialize / Recognize Admin</button><span id="adminMsg" class="muted"></span></div></div>
   <div class="card section"><h2>How DougBase works</h2><p class="muted">Your website connects to this separate Supabase PostgreSQL project. Supabase Auth and Row Level Security protect the data.</p><pre>YOUR WEBSITE
   ↓
 DOUGBASE / SUPABASE API
