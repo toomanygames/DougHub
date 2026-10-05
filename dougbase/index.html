@@ -11,7 +11,7 @@
 
 #accessBlock{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 0,#171944 0,#070812 60%);backdrop-filter:blur(20px)}
 .access-card{width:min(560px,100%);padding:34px;border:1px solid #2b3260;border-radius:24px;background:rgba(13,17,39,.96);box-shadow:0 30px 100px #0008;text-align:center}
-.access-card h1{margin:0 0 10px;font-size:30px}.access-card p{color:var(--muted);line-height:1.6}.access-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}.access-card input,.access-card textarea{width:100%;margin-top:8px}.access-card textarea{min-height:120px;resize:vertical}.access-form{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:rgba(2,4,10,.78);backdrop-filter:blur(12px)}.access-form:before{content:"";position:absolute;width:min(570px,calc(100% - 40px));height:min(620px,calc(100% - 40px));background:#0d1127;border:1px solid #2b3260;border-radius:24px;box-shadow:0 30px 100px #0008;z-index:-1}.access-form label,.access-form .access-actions,.access-form .access-msg{width:min(500px,100%);position:relative}.access-form label{display:block;margin-top:12px;color:#cbd1ec;font-weight:700}.access-msg{margin-top:12px;min-height:20px}.access-hidden{display:none!important}
+.access-card h1{margin:0 0 10px;font-size:30px}.access-account{margin:22px 0 10px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#080b19;text-align:left}.access-account span{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.access-account strong{font-size:17px}.access-card p{color:var(--muted);line-height:1.6}.access-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}.access-card input,.access-card textarea{width:100%;margin-top:8px}.access-card textarea{min-height:120px;resize:vertical}.access-form{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:rgba(2,4,10,.78);backdrop-filter:blur(12px)}.access-form:before{content:"";position:absolute;width:min(570px,calc(100% - 40px));height:min(620px,calc(100% - 40px));background:#0d1127;border:1px solid #2b3260;border-radius:24px;box-shadow:0 30px 100px #0008;z-index:-1}.access-form label,.access-form .access-actions,.access-form .access-msg{width:min(500px,100%);position:relative}.access-form label{display:block;margin-top:12px;color:#cbd1ec;font-weight:700}.access-msg{margin-top:12px;min-height:20px}.access-hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -27,11 +27,9 @@
   </div>
 </div>
 <div id="accessForm" class="access-form access-hidden">
-  <label>Email
-    <input id="accessEmail" type="email" maxlength="320" placeholder="you@example.com" autocomplete="email">
-  </label>
+  <div class="access-account"><span>Account</span><strong id="accessAccount">Loading account…</strong></div>
   <label>Why do you need DougBase?
-    <textarea id="accessReason" maxlength="2000" placeholder="Tell the DougHub administrator why you want access..."></textarea>
+    <textarea id="accessReason" maxlength="2000" placeholder="Explain what you want to build with DougBase, what you need it for, or why you think you should have access."></textarea>
   </label>
   <div class="access-actions">
     <button id="sendAccessRequest" class="primary">Send Request</button>
@@ -60,7 +58,7 @@
 <script>
 const accessBlock=document.querySelector("#accessBlock");
 const accessForm=document.querySelector("#accessForm");
-const accessEmail=document.querySelector("#accessEmail");
+const accessAccount=document.querySelector("#accessAccount");
 const accessReason=document.querySelector("#accessReason");
 const accessMsg=document.querySelector("#accessMsg");
 const requestAccessBtn=document.querySelector("#requestAccessBtn");
@@ -81,7 +79,7 @@ async function checkDougBaseAccess(){
     const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers,body:JSON.stringify({action:"access-status"})});
     const j=await r.json();
     if(j.data?.authorized){accessBlock.classList.add("access-hidden");return true;}
-    if(j.data?.email&&!accessEmail.value)accessEmail.value=j.data.email;
+    if(j.data?.accountName)accessAccount.textContent=j.data.accountName;
   }catch(e){}
   document.querySelector(".layout").classList.add("access-hidden");
   accessBlock.classList.remove("access-hidden");
@@ -91,12 +89,12 @@ requestAccessBtn.onclick=()=>{accessForm.classList.remove("access-hidden");reque
 cancelAccessRequest.onclick=()=>{accessForm.classList.add("access-hidden");requestAccessBtn.classList.remove("access-hidden");};
 backAccessBtn.onclick=()=>history.length>1?history.back():location.href="../index.html";
 sendAccessRequest.onclick=async()=>{
-  const email=accessEmail.value.trim(),reason=accessReason.value.trim();
+  const reason=accessReason.value.trim();
   accessMsg.textContent="Sending…";sendAccessRequest.disabled=true;
   try{
-    const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"request-access",email,reason})});
+    const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"request-access",reason})});
     const j=await r.json();accessMsg.textContent=j.error||"Request sent! A DougHub administrator can now review it.";
-    if(!j.error){accessReason.value="";requestAccessBtn.classList.add("access-hidden");}else sendAccessRequest.disabled=false;
+    if(!j.error){accessReason.value="";accessMsg.textContent="Request sent! An admin can review it in DougHub Admin.";requestAccessBtn.classList.add("access-hidden");}else sendAccessRequest.disabled=false;
   }catch(e){accessMsg.textContent="Could not send the request. Please try again.";sendAccessRequest.disabled=false;}
 };
 
