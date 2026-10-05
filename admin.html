@@ -3506,7 +3506,7 @@ async function loadDougBaseAccessRequests() {
 
         const title = document.createElement("div");
         title.className = "username";
-        title.textContent = request.email;
+        title.textContent = request.account_name || "Unknown account";
 
         const status = document.createElement("div");
         status.className = "time";
