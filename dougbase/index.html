@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DougBase — Supabase Database</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#070812;--panel:#0d1127;--panel2:#11162f;--line:#252b4b;--text:#f5f7ff;--muted:#98a1c2;--blue:#6366f1;--purple:#a855f7;--green:#34d399}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#171944 0,#070812 42%);font:14px Inter,system-ui,Segoe UI,sans-serif;color:var(--text);min-height:100vh}.layout{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{border-right:1px solid var(--line);background:rgba(8,10,24,.86);padding:22px 14px;backdrop-filter:blur(18px)}.logo{font-size:24px;font-weight:850;padding:8px 12px 24px}.logo span{color:#8b8ff8}.project{padding:12px;border:1px solid var(--line);border-radius:12px;background:#0b0f22;margin-bottom:20px}.project small{display:block;color:var(--muted);margin-top:3px}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#cbd1ec;text-align:left;padding:11px 12px;border-radius:10px;cursor:pointer;font:inherit}.nav button:hover,.nav button.active{background:#191e3c;color:white}.bottom{position:fixed;bottom:16px;width:220px}.main{padding:28px;max-width:1400px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.top h1{margin:0;font-size:28px}.muted{color:var(--muted)}button{font:inherit;cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:10px 13px;color:white;background:#171c38}button.primary{background:linear-gradient(135deg,var(--blue),var(--purple));border:0;font-weight:750}button:hover{filter:brightness(1.1)}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:rgba(13,17,39,.88);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 18px 55px #0004}.card .value{font-size:22px;font-weight:800;margin-top:7px}.section{margin-top:16px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}.toolbar input,.toolbar select{flex:1;min-width:200px}input,select{background:#080b19;color:white;border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit}.tablebox{overflow:auto;border:1px solid var(--line);border-radius:13px}table{border-collapse:collapse;width:100%;min-width:650px}th,td{padding:11px 13px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{font-size:11px;color:#aeb6d7;text-transform:uppercase;background:#0b0f22}tr:last-child td{border-bottom:0}.status{display:inline-flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}pre{background:#070a16;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;color:#d9def7;line-height:1.5}.pill{display:inline-block;padding:5px 8px;border-radius:999px;background:#171c38;color:#bfc7e8;font-size:12px}.error{color:#fda4af}.empty{padding:30px;text-align:center;color:var(--muted)}@media(max-width:850px){.layout{grid-template-columns:1fr}.side{position:relative;border-right:0;border-bottom:1px solid var(--line)}.bottom{position:static;width:auto;margin-top:20px}.cards{grid-template-columns:1fr 1fr}.main{padding:18px}}@media(max-width:520px){.cards{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+  <div class="logo">Doug<span>Base</span></div>
+  <div class="project"><b>DougHub</b><small>Supabase project</small><small>agsqdqcsmsppcdqxlppj</small></div>
+  <nav class="nav">
+    <button class="active" data-page="overview">⌂ Overview</button>
+    <button data-page="tables">▦ Table Editor</button>
+    <button data-page="api">⌘ API</button>
+    <button data-page="auth">♙ Authentication</button>
+  </nav>
+  <div class="bottom"><button id="logout" style="width:100%">Log out</button></div>
+</aside>
+<main class="main">
+  <div class="top"><div><h1 id="title">Overview</h1><div class="muted" id="subtitle">Your DougBase database, powered by Supabase.</div></div><span class="pill status"><span class="dot"></span> Connected</span></div>
+  <div id="content"></div>
+</main>
+</div>
+<script>
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const TABLES=["profiles","community_games","chat_messages","game_play_sessions","user_warnings","feedback","direct_messages","user_presence","dougtube_videos","dougtube_likes","dougtube_comments","dougtube_media","dougtube_media_likes","dougtube_media_comments","seasonal_game_settings","seasonal_game_scores"];
+const content=document.querySelector("#content");
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function user(){const {data,error}=await db.auth.getUser();if(error||!data.user){location.href="../log-in.html?next="+encodeURIComponent("dougbase/");return null}return data.user}
+async function overview(){const u=await user();if(!u)return;content.innerHTML='<div class="cards"><div class="card"><span class="muted">Database</span><div class="value">Online</div></div><div class="card"><span class="muted">Tables</span><div class="value">'+TABLES.length+'</div></div><div class="card"><span class="muted">Auth</span><div class="value">Active</div></div><div class="card"><span class="muted">Signed in as</span><div class="value" style="font-size:15px;overflow:hidden;text-overflow:ellipsis">'+esc(u.email||"User")+'</div></div></div><div class="card section"><h2>How DougBase works</h2><p class="muted">Your website uses the Supabase client or the DougBase API endpoint. Supabase authenticates the request, applies Row Level Security, and then PostgreSQL stores or returns the data.</p><pre>YOUR WEBSITE
+      ↓
+DougBase / Supabase API
+      ↓
+Supabase Auth + RLS
+      ↓
+PostgreSQL database</pre></div>'}
+async function tables(){await user();content.innerHTML='<div class="card"><h2>Table Editor</h2><p class="muted">Browse the tables already used by DougHub. RLS still applies to your signed-in account.</p><div class="toolbar"><select id="table">'+TABLES.map(t=>'<option>'+t+'</option>').join("")+'</select><button class="primary" id="load">Load rows</button></div><div id="rows" class="tablebox"><div class="empty">Choose a table and load it.</div></div></div>';document.querySelector("#load").onclick=load}
+async function load(){const n=document.querySelector("#table").value,out=document.querySelector("#rows");out.innerHTML='<div class="empty">Loading…</div>';const {data,error}=await db.from(n).select("*").limit(100);if(error){out.innerHTML='<div class="empty error">'+esc(error.message)+'</div>';return}if(!data?.length){out.innerHTML='<div class="empty">No rows visible to this account.</div>';return}const cols=Object.keys(data[0]);out.innerHTML='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join("")+'</tr></thead><tbody>'+data.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(typeof r[c]==="object"?JSON.stringify(r[c]):r[c]))+'</td>').join("")+'</tr>').join("")+'</tbody></table>'}
+async function api(){await user();const endpoint=SUPABASE_URL+"/functions/v1/dougbase-api";content.innerHTML='<div class="card"><h2>Your API</h2><p class="muted">Use this endpoint when you want your site to call DougBase first, with DougBase forwarding the authenticated request into Supabase.</p><div class="toolbar"><input readonly value="'+endpoint+'"><button id="copy">Copy URL</button></div><h3>Browser example</h3><pre>const { data: { session } } = await supabase.auth.getSession();
+
+const response = await fetch("'+endpoint+'/table/profiles", {
+  headers: {
+    Authorization: "Bearer " + session.access_token
+  }
+});
+
+const rows = await response.json();</pre><p class="muted">The API requires a signed-in Supabase user and only exposes approved DougBase tables. No service-role key is placed in your website.</p></div>';document.querySelector("#copy").onclick=()=>navigator.clipboard.writeText(endpoint)}
+async function auth(){const u=await user();if(!u)return;content.innerHTML='<div class="card"><h2>Authentication</h2><p class="muted">DougBase uses the same Supabase Auth session as DougHub.</p><div class="cards"><div class="card"><span class="muted">Email</span><div class="value" style="font-size:16px">'+esc(u.email)+'</div></div><div class="card"><span class="muted">User ID</span><div class="value" style="font-size:12px;word-break:break-all">'+esc(u.id)+'</div></div></div></div>'}
+const pages={overview, tables, api, auth};document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]()});document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="../log-in.html"};overview();
+</script>
+</body>
+</html>
