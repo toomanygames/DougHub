@@ -149,8 +149,8 @@ async function auth(){
 }
 const pages={overview,tables,sql,api,auth,project:projectSettings};
 document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]();});
-document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="../log-in.html";};
-const savedProject=localStorage.getItem("dougbase_project_name");if(savedProject)document.querySelector("#projectNameSide").textContent=savedProject;overview();
+document.querySelector("#logout").onclick=()=>history.length>1?history.back():location.href="../index.html";
+const savedProject=localStorage.getItem("dougbase_project_name");if(savedProject)document.querySelector("#projectNameSide").textContent=savedProject;checkDougBaseAccess().then(ok=>{if(ok)overview();});
 </script>
 </body>
 </html>
