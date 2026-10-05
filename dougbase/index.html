@@ -41,7 +41,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 
 async function user(){
   const {data,error}=await db.auth.getUser();
-  if(error||!data.user){ location.href="login.html"; return null; }
+  if(error||!data.user){ location.href="../log-in.html?redirect=dougbase/index.html"; return null; }
   return data.user;
 }
 async function refreshTables(){
@@ -53,7 +53,7 @@ async function refreshTables(){
 async function claimAdmin(){
   const m=document.querySelector("#adminMsg");
   m.textContent="Checking…";
-  const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"claim-admin"})}); const j=await r.json(); const data=j.data,error=j.error?{message:j.error}:null;
+  const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html?redirect=dougbase/index.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"claim-admin"})}); const j=await r.json(); const data=j.data,error=j.error?{message:j.error}:null;
   m.textContent=error?error.message:(data?.message||"Done");
 }
 async function projectSettings(){
