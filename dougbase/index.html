@@ -67,11 +67,39 @@ const requestAccessBtn=document.querySelector("#requestAccessBtn");
 const backAccessBtn=document.querySelector("#backAccessBtn");
 const cancelAccessRequest=document.querySelector("#cancelAccessRequest");
 const sendAccessRequest=document.querySelector("#sendAccessRequest");
-"https://tolvtmuolnzhkegphevw.supabase.co";
+const SUPABASE_URL="https://tolvtmuolnzhkegphevw.supabase.co";
 const SUPABASE_KEY="sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3";
 const DOUGHUB_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
 const DOUGHUB_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const db=supabase.createClient(DOUGHUB_URL,DOUGHUB_KEY);
+
+async function checkDougBaseAccess(){
+  try{
+    const {data:{session}}=await db.auth.getSession();
+    const headers={"Content-Type":"application/json"};
+    if(session) headers.Authorization="Bearer "+session.access_token;
+    const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers,body:JSON.stringify({action:"access-status"})});
+    const j=await r.json();
+    if(j.data?.authorized){accessBlock.classList.add("access-hidden");return true;}
+    if(j.data?.email&&!accessEmail.value)accessEmail.value=j.data.email;
+  }catch(e){}
+  document.querySelector(".layout").classList.add("access-hidden");
+  accessBlock.classList.remove("access-hidden");
+  return false;
+}
+requestAccessBtn.onclick=()=>{accessForm.classList.remove("access-hidden");requestAccessBtn.classList.add("access-hidden");accessMsg.textContent="";};
+cancelAccessRequest.onclick=()=>{accessForm.classList.add("access-hidden");requestAccessBtn.classList.remove("access-hidden");};
+backAccessBtn.onclick=()=>history.length>1?history.back():location.href="../index.html";
+sendAccessRequest.onclick=async()=>{
+  const email=accessEmail.value.trim(),reason=accessReason.value.trim();
+  accessMsg.textContent="Sending…";sendAccessRequest.disabled=true;
+  try{
+    const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"request-access",email,reason})});
+    const j=await r.json();accessMsg.textContent=j.error||"Request sent! A DougHub administrator can now review it.";
+    if(!j.error){accessReason.value="";requestAccessBtn.classList.add("access-hidden");}else sendAccessRequest.disabled=false;
+  }catch(e){accessMsg.textContent="Could not send the request. Please try again.";sendAccessRequest.disabled=false;}
+};
+
 let TABLES=[];
 const content=document.querySelector("#content");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
