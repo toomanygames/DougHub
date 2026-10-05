@@ -74,7 +74,7 @@ POSTGRESQL</pre></div>`;
 async function tables(){
   const u=await user(); if(!u)return;
   await refreshTables();
-  const options=TABLES.length?TABLES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""):"<option value="">No tables yet</option>";
+  const options=TABLES.length?TABLES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""):'<option value="">No tables yet</option>';
   content.innerHTML=`<div class="card"><h2>Table Editor</h2><p class="muted">Browse the real tables in DougBase. Create new tables from SQL Editor.</p>
   <div class="toolbar"><select id="table">${options}</select><button class="primary" id="load" ${TABLES.length?"":"disabled"}>Load rows</button><button id="makeTable">Create a table</button></div>
   <div id="rows" class="tablebox"><div class="empty">Choose a table and load it.</div></div></div>`;
