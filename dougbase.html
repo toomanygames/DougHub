@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DougBase — Database</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050611;--card:#0d1127;--line:#24294a;--text:#f5f7ff;--muted:#9aa3c7;--accent:#6366f1;--accent2:#a855f7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#15183b 0,#050611 48%);font:15px system-ui,Segoe UI,sans-serif;color:var(--text);min-height:100vh}.wrap{max-width:1200px;margin:auto;padding:32px 20px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}.brand{font-size:32px;font-weight:800}.brand span{color:#8b8ff8}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:260px 1fr;gap:18px}.card{background:rgba(13,17,39,.86);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 15px 50px #0005;backdrop-filter:blur(14px)}button,input,select{font:inherit}button{border:0;border-radius:11px;padding:10px 13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-weight:700;cursor:pointer}button.secondary{background:#191e3b;border:1px solid var(--line)}button.danger{background:#7f1d3a}input,select{width:100%;background:#080b19;border:1px solid var(--line);color:white;border-radius:10px;padding:11px;margin:7px 0 12px}.nav button{width:100%;text-align:left;margin-bottom:8px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{padding:14px;background:#080b19;border:1px solid var(--line);border-radius:13px}.stat b{display:block;font-size:23px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar input{flex:1;min-width:180px;margin:0}.tablewrap{overflow:auto;margin-top:15px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:#b9c0e2;font-size:12px;text-transform:uppercase}pre{white-space:pre-wrap;word-break:break-word;color:#cbd2f5}@media(max-width:750px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.hero{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero"><div><div class="brand">Doug<span>Base</span></div><div class="muted">A simple Supabase database dashboard for DougHub.</div></div><button id="logout" class="secondary">Log out</button></header>
+<div class="grid">
+<aside class="card nav">
+<button data-view="overview">Overview</button><button data-view="tables">Tables</button><button data-view="sql">SQL</button>
+</aside>
+<main id="app" class="card"></main>
+</div>
+</div>
+<script>
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const app=document.querySelector("#app");
+async function requireUser(){const {data,error}=await db.auth.getUser();if(error||!data.user){location.href="log-in.html?next="+encodeURIComponent("dougbase.html");return null}return data.user}
+async function render(view="overview"){
+ const user=await requireUser();if(!user)return;
+ if(view==="overview"){app.innerHTML='<h2>Welcome to DougBase</h2><p class="muted">You are signed in and connected to Supabase.</p><div class="stats"><div class="stat"><span class="muted">User</span><b>'+escapeHtml(user.email||"Account")+'</b></div><div class="stat"><span class="muted">Auth</span><b>Active</b></div><div class="stat"><span class="muted">Database</span><b>Online</b></div></div><h3>Quick start</h3><p class="muted">Use Tables to inspect app data. SQL is for read-only queries from this browser dashboard.</p>';return}
+ if(view==="tables"){app.innerHTML='<h2>Tables</h2><div class="toolbar"><input id="table" placeholder="Table name, e.g. profiles"><button id="load">Load</button></div><div id="results" class="tablewrap muted">Enter a table name to load rows.</div>';document.querySelector("#load").onclick=loadTable;return}
+ app.innerHTML='<h2>SQL</h2><p class="muted">For safety, this browser dashboard does not execute arbitrary SQL. Run schema changes and privileged SQL in the Supabase SQL Editor.</p><pre>select * from profiles limit 20;</pre><button onclick="navigator.clipboard.writeText(document.querySelector('pre').textContent)">Copy example</button>';
+}
+async function loadTable(){const name=document.querySelector("#table").value.trim();const out=document.querySelector("#results");if(!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)){out.textContent="Enter a valid table name.";return}out.textContent="Loading…";const {data,error}=await db.from(name).select("*").limit(100);if(error){out.textContent="Could not load table: "+error.message;return}if(!data.length){out.textContent="No rows found.";return}const cols=Object.keys(data[0]);out.innerHTML='<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c)+'</th>').join("")+'</tr></thead><tbody>'+data.map(row=>'<tr>'+cols.map(c=>'<td>'+escapeHtml(typeof row[c]==="object"?JSON.stringify(row[c]):String(row[c]??""))+'</td>').join("")+'</tr>').join("")+'</tbody></table>'}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="log-in.html"};
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>render(b.dataset.view));
+render();
+</script>
+</body>
+</html>
