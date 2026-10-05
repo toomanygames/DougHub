@@ -204,7 +204,7 @@ async function api(){
   content.innerHTML=`<div class="card"><h2>Your API</h2><p class="muted">Authenticated websites can call this DougBase API.</p>
   <div class="toolbar"><input readonly value="${endpoint}"><button id="copy">Copy URL</button></div>
   <h3>Endpoint</h3><pre>${endpoint}/table/my_table</pre>
-  <p class="muted">Requests require a valid DougBase Supabase access token. Table reads still follow Row Level Security.</p></div>`;
+  <p class="muted">Requests require a valid approved DougHub session. Table reads are restricted to tables you own.</p></div>`;
   document.querySelector("#copy").onclick=()=>navigator.clipboard.writeText(endpoint);
 }
 async function auth(){
