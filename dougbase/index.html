@@ -35,7 +35,7 @@
   </label>
   <div class="access-actions">
     <button id="sendAccessRequest" class="primary">Send Request</button>
-    <button id="cancelAccessRequest" class="access-close-bottom">Cancel</button>
+    <button type="button" class="access-close-bottom" onclick="document.querySelector('#cancelAccessRequest').click()">Cancel</button>
   </div>
   <div id="accessMsg" class="access-msg muted"></div>
 </div>
