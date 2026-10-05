@@ -36,17 +36,98 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let TABLES=[];
 const content=document.querySelector("#content");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-async function user(){const {data,error}=await db.auth.getUser();if(error||!data.user){location.href="login.html";return null}return data.user}
-async function overview(){const u=await user();if(!u)return;content.innerHTML='<div class="cards"><div class="card"><span class="muted">Database</span><div class="value">Online</div></div><div class="card"><span class="muted">Tables</span><div class="value">'+TABLES.length+'</div></div><div class="card"><span class="muted">Auth</span><div class="value">Active</div></div><div class="card"><span class="muted">Signed in as</span><div class="value" style="font-size:15px;overflow:hidden;text-overflow:ellipsis">'+esc(u.email||"User")+'</div></div></div><div class="card section"><h2>DougBase setup</h2><p class="muted">The first DougBase account can initialize itself as the administrator.</p><div class="toolbar"><button class="primary" id="claimAdmin">Initialize this account as Admin</button><span id="adminMsg" class="muted"></span></div></div><div class="card section"><h2>How DougBase works</h2><p class="muted">Your website uses the Supabase client or the DougBase API endpoint. Supabase authenticates the request, applies Row Level Security, and then PostgreSQL stores or returns the data.</p><pre>YOUR WEBSITE &darr; DougBase / Supabase API &darr; Supabase Auth + RLS &darr; PostgreSQL database</pre></div>'}
-async function tables(){await user(); await refreshTables(); content.innerHTML='<div class="card"><h2>Table Editor</h2><p class="muted">Browse the real tables in your separate DougBase PostgreSQL project. Create new tables from SQL Editor.</p><div class="toolbar"><select id="table">'+TABLES.map(t=>'<option>'+t+'</option>').join("")+'</select><button class="primary" id="load">Load rows</button></div><button id="makeTable">Create a table</button><div id="rows" class="tablebox"><div class="empty">Choose a table and load it.</div></div></div>';document.querySelector("#load").onclick=load;document.querySelector("#makeTable").onclick=()=>{document.querySelector("[data-page=\"sql\"]").click();setTimeout(()=>{document.querySelector("#sql").value="CREATE TABLE my_table (id bigint generated always as identity primary key, name text not null, created_at timestamptz not null default now());";},0)}
-async function claimAdmin(){const m=document.querySelector("#adminMsg");m.textContent="Checking…";const {data,error}=await db.rpc("dougbase_claim_admin");m.textContent=error?error.message:(data?.message||"Done");}
-async function refreshTables(){const {data,error}=await db.rpc("dougbase_list_tables");if(!error&&Array.isArray(data))TABLES=data.map(x=>x.table_name);else TABLES=[];}
-async function load(){const n=document.querySelector("#table").value,out=document.querySelector("#rows");out.innerHTML='<div class="empty">Loading…</div>';const {data,error}=await db.from(n).select("*").limit(100);if(error){out.innerHTML='<div class="empty error">'+esc(error.message)+'</div>';return}if(!data?.length){out.innerHTML='<div class="empty">No rows visible to this account.</div>';return}const cols=Object.keys(data[0]);out.innerHTML='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join("")+'</tr></thead><tbody>'+data.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(typeof r[c]==="object"?JSON.stringify(r[c]):r[c]))+'</td>').join("")+'</tr>').join("")+'</tbody></table>'}
-async function api(){await user();const endpoint=SUPABASE_URL+"/functions/v1/dougbase-api";content.innerHTML='<div class="card"><h2>Your API</h2><p class="muted">Use this endpoint when you want your site to call DougBase first, with DougBase forwarding the authenticated request into Supabase.</p><div class="toolbar"><input readonly value="'+endpoint+'"><button id="copy">Copy URL</button></div><h3>Browser example</h3><pre>const { data: { session } } = await supabase.auth.getSession(); &nbsp; const response = await fetch("'+endpoint+'/table/my_table", { headers: { Authorization: "Bearer " + session.access_token } }); &nbsp; const rows = await response.json();</pre><p class="muted">The API requires a signed-in Supabase user and only exposes approved DougBase tables. No service-role key is placed in your website.</p></div>';document.querySelector("#copy").onclick=()=>navigator.clipboard.writeText(endpoint)}
-async function sql(){await user();content.innerHTML='<div class="card"><h2>SQL Editor</h2><p class="muted">Run SQL against the separate DougBase PostgreSQL project. DDL and data changes are executed through a protected Edge Function.</p><textarea id="sql" style="width:100%;min-height:300px;background:#070a16;color:white;border:1px solid var(--line);border-radius:12px;padding:15px;font:13px ui-monospace,monospace" placeholder="CREATE TABLE example (id bigint generated always as identity primary key, name text not null);"></textarea><div class="toolbar"><button class="primary" id="run">Run SQL</button><span id="sqlmsg" class="muted"></span></div></div>';document.querySelector("#run").onclick=runSql}
-async function runSql(){const q=document.querySelector("#sql").value.trim(),m=document.querySelector("#sqlmsg");if(!q){m.textContent="Enter SQL first.";return}m.textContent="Running…";const {data:{session}}=await db.auth.getSession();const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({sql:q})});const j=await r.json();m.textContent=j.error||("Done"+(j.message?": "+j.message:""));if(!j.error){await refreshTables();}}
-async function auth(){const u=await user();if(!u)return;content.innerHTML='<div class="card"><h2>Authentication</h2><p class="muted">DougBase has its own Supabase Auth project, separate from DougHub.</p><div class="cards"><div class="card"><span class="muted">Email</span><div class="value" style="font-size:16px">'+esc(u.email)+'</div></div><div class="card"><span class="muted">User ID</span><div class="value" style="font-size:12px;word-break:break-all">'+esc(u.id)+'</div></div></div></div>'}
-const pages={overview, tables, sql, api, auth};document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]()});document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="login.html"};overview();
+
+async function user(){
+  const {data,error}=await db.auth.getUser();
+  if(error||!data.user){ location.href="login.html"; return null; }
+  return data.user;
+}
+async function refreshTables(){
+  const {data,error}=await db.rpc("dougbase_list_tables");
+  TABLES=!error&&Array.isArray(data)?data.map(x=>x.table_name):[];
+}
+async function claimAdmin(){
+  const m=document.querySelector("#adminMsg");
+  m.textContent="Checking…";
+  const {data,error}=await db.rpc("dougbase_claim_admin");
+  m.textContent=error?error.message:(data?.message||"Done");
+}
+async function overview(){
+  const u=await user(); if(!u)return;
+  await refreshTables();
+  content.innerHTML=`<div class="cards">
+    <div class="card"><span class="muted">Database</span><div class="value">Online</div></div>
+    <div class="card"><span class="muted">Tables</span><div class="value">${TABLES.length}</div></div>
+    <div class="card"><span class="muted">Auth</span><div class="value">Active</div></div>
+    <div class="card"><span class="muted">Signed in as</span><div class="value" style="font-size:15px;overflow:hidden;text-overflow:ellipsis">${esc(u.email||"User")}</div></div>
+  </div>
+  <div class="card section"><h2>DougBase setup</h2><p class="muted">The first DougBase account can initialize itself as the administrator.</p><div class="toolbar"><button class="primary" id="claimAdmin">Initialize this account as Admin</button><span id="adminMsg" class="muted"></span></div></div>
+  <div class="card section"><h2>How DougBase works</h2><p class="muted">Your website connects to this separate Supabase PostgreSQL project. Supabase Auth and Row Level Security protect the data.</p><pre>YOUR WEBSITE
+  ↓
+DOUGBASE / SUPABASE API
+  ↓
+AUTH + RLS
+  ↓
+POSTGRESQL</pre></div>`;
+  document.querySelector("#claimAdmin").onclick=claimAdmin;
+}
+async function tables(){
+  const u=await user(); if(!u)return;
+  await refreshTables();
+  const options=TABLES.length?TABLES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""):"<option value="">No tables yet</option>";
+  content.innerHTML=`<div class="card"><h2>Table Editor</h2><p class="muted">Browse the real tables in DougBase. Create new tables from SQL Editor.</p>
+  <div class="toolbar"><select id="table">${options}</select><button class="primary" id="load" ${TABLES.length?"":"disabled"}>Load rows</button><button id="makeTable">Create a table</button></div>
+  <div id="rows" class="tablebox"><div class="empty">Choose a table and load it.</div></div></div>`;
+  if(TABLES.length)document.querySelector("#load").onclick=load;
+  document.querySelector("#makeTable").onclick=()=>{document.querySelector('[data-page="sql"]').click();setTimeout(()=>{document.querySelector("#sql").value="CREATE TABLE my_table (id bigint generated always as identity primary key, name text not null, created_at timestamptz not null default now());";},0);};
+}
+async function load(){
+  const n=document.querySelector("#table").value,out=document.querySelector("#rows");
+  if(!n)return;
+  out.innerHTML='<div class="empty">Loading…</div>';
+  const {data,error}=await db.from(n).select("*").limit(100);
+  if(error){out.innerHTML=`<div class="empty error">${esc(error.message)}</div>`;return;}
+  if(!data?.length){out.innerHTML='<div class="empty">No rows visible to this account.</div>';return;}
+  const cols=Object.keys(data[0]);
+  out.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${data.map(r=>`<tr>${cols.map(c=>`<td>${esc(typeof r[c]==="object"?JSON.stringify(r[c]):r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+async function sql(){
+  const u=await user(); if(!u)return;
+  content.innerHTML=`<div class="card"><h2>SQL Editor</h2><p class="muted">Run SQL against the separate DougBase PostgreSQL project. SQL is sent to a protected server-side function.</p>
+  <textarea id="sql" style="width:100%;min-height:300px;background:#070a16;color:white;border:1px solid var(--line);border-radius:12px;padding:15px;font:13px ui-monospace,monospace" placeholder="CREATE TABLE example (id bigint generated always as identity primary key, name text not null);"></textarea>
+  <div class="toolbar"><button class="primary" id="run">Run SQL</button><span id="sqlmsg" class="muted"></span></div></div>`;
+  document.querySelector("#run").onclick=runSql;
+}
+async function runSql(){
+  const q=document.querySelector("#sql").value.trim(),m=document.querySelector("#sqlmsg");
+  if(!q){m.textContent="Enter SQL first.";return;}
+  m.textContent="Running…";
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){location.href="login.html";return;}
+  const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({sql:q})});
+  const j=await r.json();
+  m.textContent=j.error||j.data?.message||"SQL executed successfully.";
+  if(!j.error)await refreshTables();
+}
+async function api(){
+  const u=await user(); if(!u)return;
+  const endpoint=SUPABASE_URL+"/functions/v1/dougbase-api";
+  content.innerHTML=`<div class="card"><h2>Your API</h2><p class="muted">Authenticated websites can call this DougBase API.</p>
+  <div class="toolbar"><input readonly value="${endpoint}"><button id="copy">Copy URL</button></div>
+  <h3>Endpoint</h3><pre>${endpoint}/table/my_table</pre>
+  <p class="muted">Requests require a valid DougBase Supabase access token. Table reads still follow Row Level Security.</p></div>`;
+  document.querySelector("#copy").onclick=()=>navigator.clipboard.writeText(endpoint);
+}
+async function auth(){
+  const u=await user(); if(!u)return;
+  content.innerHTML=`<div class="card"><h2>Authentication</h2><p class="muted">DougBase has its own Supabase Auth project, separate from DougHub.</p>
+  <div class="cards"><div class="card"><span class="muted">Email</span><div class="value" style="font-size:16px">${esc(u.email)}</div></div>
+  <div class="card"><span class="muted">User ID</span><div class="value" style="font-size:12px;word-break:break-all">${esc(u.id)}</div></div></div></div>`;
+}
+const pages={overview,tables,sql,api,auth};
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]();});
+document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="login.html";};
+overview();
 </script>
 </body>
 </html>
