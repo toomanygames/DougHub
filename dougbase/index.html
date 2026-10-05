@@ -98,7 +98,7 @@ async function checkDougBaseAccess(){
     if(!profileError&&profile?.username)accessAccount.textContent=profile.username;
     const directAdmin=!profileError&&profile?.is_admin===true;
     if(directAdmin){
-      window.DougBaseIsAdmin=false;
+      window.DougBaseIsAdmin=true;
       
       accessBlock.classList.add("access-hidden");
       accessBlock.style.display="none";
@@ -112,7 +112,7 @@ async function checkDougBaseAccess(){
     if(j.data?.accountName)accessAccount.textContent=j.data.accountName;
     const isAdmin=j.data?.isAdmin===true;
     window.DougBaseIsAdmin=isAdmin;
-    if(isAdmin)document.querySelector("#adminDatabasesBtn").classList.remove("access-hidden");
+    
 
     if(j.data?.authorized||isAdmin){
       accessBlock.classList.add("access-hidden");
