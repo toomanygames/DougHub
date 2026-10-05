@@ -98,8 +98,8 @@ async function checkDougBaseAccess(){
     if(!profileError&&profile?.username)accessAccount.textContent=profile.username;
     const directAdmin=!profileError&&profile?.is_admin===true;
     if(directAdmin){
-      window.DougBaseIsAdmin=true;
-      document.querySelector("#adminDatabasesBtn").classList.remove("access-hidden");
+      window.DougBaseIsAdmin=false;
+      
       accessBlock.classList.add("access-hidden");
       accessBlock.style.display="none";
       document.querySelector(".layout").classList.remove("access-hidden");
