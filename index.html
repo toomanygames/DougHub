@@ -1837,6 +1837,9 @@ body{overflow-anchor:none}
 .game-card-wide{grid-column:span 2}@media(max-width:900px){.game-card-wide{grid-column:span 1}}
 .community-popularity{margin-top:12px;color:#a5b4fc;font-size:12px;font-weight:800}
 
+
+.special-services{padding:10px 0 28px}.special-services-card{position:relative;overflow:hidden;padding:25px;border-radius:22px;border:1px solid rgba(129,140,248,.18);background:linear-gradient(145deg,rgba(99,102,241,.10),rgba(13,17,39,.72));box-shadow:0 18px 45px rgba(0,0,0,.18)}.special-services-card:before{content:"";position:absolute;width:220px;height:220px;right:-90px;top:-110px;border-radius:50%;background:rgba(168,85,247,.16);filter:blur(45px);pointer-events:none}.special-services-heading{position:relative;z-index:1;margin-bottom:15px}.special-services-heading h2{margin:0;font-size:24px}.special-services-heading p{margin:6px 0 0;color:#858494;font-size:14px}.special-services-list{position:relative;z-index:1;display:grid;gap:10px}.special-service-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 17px;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:rgba(8,10,24,.5)}.special-service-title{display:flex;align-items:center;gap:11px}.special-service-icon{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.2)}.special-service-row h3{margin:0;font-size:16px}.special-service-row p{margin:3px 0 0;color:#777687;font-size:13px}.special-service-button{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:1px solid rgba(129,140,248,.3);background:rgba(99,102,241,.15);font-size:13px;font-weight:800}.special-service-button:hover{background:rgba(99,102,241,.28);transform:translateY(-1px)}@media(max-width:600px){.special-service-row{align-items:stretch;flex-direction:column}.special-service-button{width:100%}}
+
 </style>
 </head>
 
@@ -2118,6 +2121,31 @@ body{overflow-anchor:none}
 
         </div>
 
+    </section>
+
+    <section class="special-services" aria-labelledby="specialServicesTitle">
+        <div class="special-services-card">
+            <div class="special-services-heading">
+                <h2 id="specialServicesTitle">✨ Special Services</h2>
+                <p>Extra DougHub services and tools.</p>
+            </div>
+            <div class="special-services-list">
+                <div class="special-service-row">
+                    <div class="special-service-title">
+                        <div class="special-service-icon">🗄️</div>
+                        <div><h3>DougBase</h3><p>Build and manage your own database-powered projects.</p></div>
+                    </div>
+                    <a href="dougbase/index.html" class="special-service-button">Open DougBase →</a>
+                </div>
+                <div class="special-service-row">
+                    <div class="special-service-title">
+                        <div class="special-service-icon">＋</div>
+                        <div><h3>More coming soon</h3><p>More special DougHub services are on the way.</p></div>
+                    </div>
+                    <span class="special-service-button" style="opacity:.55;cursor:default">Coming Soon</span>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- FEEDBACK -->
