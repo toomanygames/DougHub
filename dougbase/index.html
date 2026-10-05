@@ -14,13 +14,13 @@
 <div class="layout">
 <aside class="side">
   <div class="logo">Doug<span>Base</span></div>
-  <div class="project"><b>DougBase</b><small>Supabase project</small><small>tolvtmuolnzhkegphevw</small></div>
+  <div class="project"><b id="projectNameSide">DougBase</b><small>Supabase project</small><small>tolvtmuolnzhkegphevw</small></div>
   <nav class="nav">
     <button class="active" data-page="overview">⌂ Overview</button>
     <button data-page="tables">▦ Table Editor</button>
     <button data-page="sql">⌘ SQL Editor</button>
     <button data-page="api">⌘ API</button>
-    <button data-page="auth">♙ Authentication</button>
+    <button data-page="auth">♙ Authentication</button><button data-page="project">⚙ Project Settings</button>
   </nav>
   <div class="bottom"><button id="logout" style="width:100%">Log out</button></div>
 </aside>
@@ -55,6 +55,13 @@ async function claimAdmin(){
   m.textContent="Checking…";
   const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"claim-admin"})}); const j=await r.json(); const data=j.data,error=j.error?{message:j.error}:null;
   m.textContent=error?error.message:(data?.message||"Done");
+}
+async function projectSettings(){
+  const u=await user(); if(!u)return;
+  const {data,error}=await db.from("dougbase_projects").select("name").eq("owner_id",u.id).maybeSingle();
+  const current=data?.name||"DougBase";
+  content.innerHTML=`<div class="card"><h2>Project Settings</h2><p class="muted">Choose the name shown for your DougBase project.</p><div class="toolbar"><input id="projectName" maxlength="50" value="${esc(current)}" placeholder="My Project"><button class="primary" id="saveProject">Save Project Name</button></div><div id="projectMsg" class="muted"></div></div>`;
+  document.querySelector("#saveProject").onclick=async()=>{const name=document.querySelector("#projectName").value.trim();const m=document.querySelector("#projectMsg");if(!name){m.textContent="Enter a project name.";return;}const {error}=await db.from("dougbase_projects").upsert({owner_id:u.id,name},{onConflict:"owner_id"});m.textContent=error?error.message:"Project name saved!";if(!error){document.querySelector("#projectNameSide").textContent=name;localStorage.setItem("dougbase_project_name",name);}};
 }
 async function overview(){
   const u=await user(); if(!u)return;
@@ -128,10 +135,10 @@ async function auth(){
   <div class="cards"><div class="card"><span class="muted">Email</span><div class="value" style="font-size:16px">${esc(u.email)}</div></div>
   <div class="card"><span class="muted">User ID</span><div class="value" style="font-size:12px;word-break:break-all">${esc(u.id)}</div></div></div></div>`;
 }
-const pages={overview,tables,sql,api,auth};
+const pages={overview,tables,sql,api,auth,project:projectSettings};
 document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]();});
 document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="../log-in.html";};
-overview();
+const savedProject=localStorage.getItem("dougbase_project_name");if(savedProject)document.querySelector("#projectNameSide").textContent=savedProject;overview();
 </script>
 </body>
 </html>
