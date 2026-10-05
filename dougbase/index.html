@@ -16,13 +16,13 @@
 </style>
 </head>
 <body>
-<div id="accessBlock">
-  <div class="access-card">
-    <div style="font-size:48px">🔒</div>
-    <h1>DougBase Access Blocked</h1>
-    <p>DougBase is private. You need approval from a DougHub administrator before you can access it.</p>
+<div id="accessBlock" class="access-hidden" style="display:flex!important">
+  <div class="access-card" id="accessCard">
+    <div id="accessIcon" style="font-size:48px">⏳</div>
+    <h1 id="accessTitle">Checking DougBase access…</h1>
+    <p id="accessDescription">Checking your DougHub account before showing the access screen.</p>
     <div class="access-actions">
-      <button id="requestAccessBtn" class="primary">Request Access</button>
+      <button id="requestAccessBtn" class="primary access-hidden">Request Access</button>
       <button id="backAccessBtn">← Go back</button>
     </div>
   </div>
@@ -51,6 +51,7 @@
     <button data-page="sql">⌘ SQL Editor</button>
     <button data-page="api">⌘ API</button>
     <button data-page="auth">♙ Authentication</button><button data-page="project">⚙ Project Settings</button>
+    <button id="adminDatabasesBtn" data-page="admin-databases" class="access-hidden">🛡️ All Databases</button>
   </nav>
   <div class="bottom"><button id="logout" style="width:100%">← Go back</button></div>
 </aside>
@@ -81,6 +82,11 @@ async function checkDougBaseAccess(){
     if(userError||!loggedInUser){
       document.querySelector(".layout").classList.add("access-hidden");
       accessBlock.classList.remove("access-hidden");
+      accessBlock.style.display="flex";
+      document.querySelector("#accessIcon").textContent="🔒";
+      document.querySelector("#accessTitle").textContent="DougBase Access Blocked";
+      document.querySelector("#accessDescription").textContent="DougBase is private. You need approval from a DougHub administrator before you can access it.";
+      requestAccessBtn.classList.remove("access-hidden");
       return false;
     }
     const {data:{session},error:sessionError}=await db.auth.getSession();
@@ -88,14 +94,36 @@ async function checkDougBaseAccess(){
     const headers={"Content-Type":"application/json","Authorization":"Bearer "+session.access_token};
     const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers,body:JSON.stringify({action:"access-status"})});
     const j=await r.json();
+    if(!r.ok) throw new Error(j.error||"Access check failed.");
     if(j.data?.accountName)accessAccount.textContent=j.data.accountName;
-    if(j.data?.authorized){accessBlock.classList.add("access-hidden");document.querySelector(".layout").classList.remove("access-hidden");return true;}
-    document.querySelector(".layout").classList.add("access-hidden");
+
+    // Admin status is returned by the access endpoint below without granting ordinary users access.
+    const isAdmin=j.data?.isAdmin===true;
+    window.DougBaseIsAdmin=isAdmin;
+    if(isAdmin)document.querySelector("#adminDatabasesBtn").classList.remove("access-hidden");
+
+    if(j.data?.authorized||isAdmin){
+      accessBlock.classList.add("access-hidden");
+      accessBlock.style.display="none";
+      document.querySelector(".layout").classList.remove("access-hidden");
+      return true;
+    }
+
+    document.querySelector("#accessIcon").textContent="🔒";
+    document.querySelector("#accessTitle").textContent="DougBase Access Blocked";
+    document.querySelector("#accessDescription").textContent="DougBase is private. You need approval from a DougHub administrator before you can access it.";
+    requestAccessBtn.classList.remove("access-hidden");
     accessBlock.classList.remove("access-hidden");
+    accessBlock.style.display="flex";
   }catch(e){
     console.error("DougBase access check failed:",e);
+    document.querySelector("#accessIcon").textContent="⚠️";
+    document.querySelector("#accessTitle").textContent="Could not check access";
+    document.querySelector("#accessDescription").textContent="DougBase could not verify your account right now. Please refresh and try again.";
+    requestAccessBtn.classList.add("access-hidden");
     document.querySelector(".layout").classList.add("access-hidden");
     accessBlock.classList.remove("access-hidden");
+    accessBlock.style.display="flex";
   }
   return false;
 }
@@ -139,6 +167,30 @@ async function claimAdmin(){
   m.textContent="Checking…";
   const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html?redirect=dougbase/index.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"claim-admin"})}); const j=await r.json(); const data=j.data,error=j.error?{message:j.error}:null;
   m.textContent=error?error.message:(data?.message||"Done");
+}
+async function adminDatabases(){
+  const u=await user(); if(!u)return;
+  if(window.DougBaseIsAdmin!==true){content.innerHTML='<div class="card"><h2>Admin access required</h2><p class="muted">Only DougHub admin accounts can view other users’ databases.</p></div>';return;}
+  const {data:{session}}=await db.auth.getSession();
+  if(!session)return;
+  const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"tables"})});
+  const j=await r.json();
+  if(!r.ok){content.innerHTML='<div class="card"><div class="error">'+esc(j.error||"Could not load databases.")+'</div></div>';return;}
+  const rows=j.data||[];
+  content.innerHTML=`<div class="card"><h2>All Databases</h2><p class="muted">Admin-only view. You can open and edit any registered DougBase table.</p>
+    <div class="toolbar"><select id="adminTable">${rows.length?rows.map(x=>`<option value="${esc(x.table_name)}">${esc(x.table_name)} — ${esc(x.owner_id)}</option>`).join(""):'<option>No registered tables</option>'}</select><button class="primary" id="adminLoad" ${rows.length?"":"disabled"}>Open Database</button></div>
+    <div id="adminRows" class="tablebox"><div class="empty">Choose a database and open it.</div></div></div>`;
+  document.querySelector("#adminLoad").onclick=async()=>{
+    const table=document.querySelector("#adminTable").value;
+    const out=document.querySelector("#adminRows");
+    out.innerHTML='<div class="empty">Loading…</div>';
+    const rr=await fetch(SUPABASE_URL+"/functions/v1/dougbase-api/table/"+encodeURIComponent(table)+"?limit=100",{headers:{"Authorization":"Bearer "+session.access_token}});
+    const data=await rr.json();
+    if(!rr.ok){out.innerHTML='<div class="empty error">'+esc(data.error||"Could not load table.")+'</div>';return;}
+    if(!data?.length){out.innerHTML='<div class="empty">No rows in this database.</div>';return;}
+    const cols=Object.keys(data[0]);
+    out.innerHTML='<table><thead><tr>'+cols.map(x=>'<th>'+esc(x)+'</th>').join("")+'</tr></thead><tbody>'+data.map(row=>'<tr>'+cols.map(x=>'<td>'+esc(typeof row[x]==="object"?JSON.stringify(row[x]):row[x])+'</td>').join("")+'</tr>').join("")+'</tbody></table>';
+  };
 }
 async function projectSettings(){
   const u=await user(); if(!u)return;
@@ -231,7 +283,7 @@ async function auth(){
   <div class="cards"><div class="card"><span class="muted">Email</span><div class="value" style="font-size:16px">${esc(u.email)}</div></div>
   <div class="card"><span class="muted">User ID</span><div class="value" style="font-size:12px;word-break:break-all">${esc(u.id)}</div></div></div></div>`;
 }
-const pages={overview,tables,sql,api,auth,project:projectSettings};
+const pages={overview,tables,sql,api,auth,project:projectSettings,'admin-databases':adminDatabases};
 document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]();});
 document.querySelector("#logout").onclick=()=>history.length>1?history.back():location.href="../index.html";
 const savedProject=localStorage.getItem("dougbase_project_name");if(savedProject)document.querySelector("#projectNameSide").textContent=savedProject;checkDougBaseAccess().then(ok=>{if(ok)overview();});
