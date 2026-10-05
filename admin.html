@@ -836,6 +836,18 @@ button:disabled {
 
 <div class="card">
 
+    <h2>🔐 DougBase Access Requests</h2>
+
+    <div class="status" id="dougBaseAccessStatus">
+        Loading access requests...
+    </div>
+
+    <div id="dougBaseAccessRequests" class="admin-scroll-area"></div>
+
+</div>
+
+<div class="card">
+
     <h2>💬 Chat Messages</h2>
 
     <div class="status" id="chatStatus">
@@ -3423,6 +3435,148 @@ banAccountButton.addEventListener(
 );
 
 
+
+
+
+/* =========================================
+   DOUGBASE ACCESS REQUESTS
+========================================= */
+
+const dougBaseAccessStatus = document.getElementById("dougBaseAccessStatus");
+const dougBaseAccessRequests = document.getElementById("dougBaseAccessRequests");
+
+async function dougBaseAction(action, id) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+        return { error: "Your session has expired." };
+    }
+
+    const response = await fetch(
+        "https://tolvtmuolnzhkegphevw.supabase.co/functions/v1/dougbase-sql",
+        {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + session.access_token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: action,
+                id: id
+            })
+        }
+    );
+
+    return await response.json();
+}
+
+async function loadDougBaseAccessRequests() {
+    dougBaseAccessStatus.textContent = "Loading access requests...";
+    dougBaseAccessRequests.innerHTML = "";
+
+    const result = await dougBaseAction("list-access-requests");
+
+    if (result.error) {
+        dougBaseAccessStatus.textContent = result.error;
+        dougBaseAccessRequests.innerHTML =
+            '<div class="error">' + escapeHtml(result.error) + '</div>';
+        return;
+    }
+
+    const requests = result.data || [];
+
+    if (!requests.length) {
+        dougBaseAccessStatus.textContent = "No access requests.";
+        dougBaseAccessRequests.innerHTML =
+            '<div class="empty">No DougBase access requests yet.</div>';
+        return;
+    }
+
+    dougBaseAccessStatus.textContent =
+        requests.filter(request => request.status === "pending").length +
+        " pending request" +
+        (requests.filter(request => request.status === "pending").length === 1 ? "" : "s");
+
+    requests.forEach(request => {
+        const item = document.createElement("div");
+        item.className = "message";
+
+        const top = document.createElement("div");
+        top.className = "top-row";
+
+        const title = document.createElement("div");
+        title.className = "username";
+        title.textContent = request.email;
+
+        const status = document.createElement("div");
+        status.className = "time";
+        status.textContent =
+            request.status.toUpperCase() + " • " +
+            new Date(request.created_at).toLocaleString();
+
+        top.appendChild(title);
+        top.appendChild(status);
+
+        const reason = document.createElement("div");
+        reason.className = "message-text";
+        reason.textContent = "Reason: " + request.reason;
+
+        item.appendChild(top);
+        item.appendChild(reason);
+
+        const buttons = document.createElement("div");
+        buttons.className = "buttons";
+
+        if (request.status === "pending") {
+            const allow = document.createElement("button");
+            allow.className = "unban-button";
+            allow.type = "button";
+            allow.textContent = "✓ Allow";
+
+            const deny = document.createElement("button");
+            deny.className = "delete-button";
+            deny.type = "button";
+            deny.textContent = "Deny";
+
+            allow.onclick = async () => {
+                allow.disabled = true;
+                deny.disabled = true;
+                allow.textContent = "Allowing...";
+                const result = await dougBaseAction("allow-access", request.id);
+                if (result.error) {
+                    alert(result.error);
+                    allow.disabled = false;
+                    deny.disabled = false;
+                    allow.textContent = "✓ Allow";
+                    return;
+                }
+                await loadDougBaseAccessRequests();
+            };
+
+            deny.onclick = async () => {
+                if (!confirm("Deny this DougBase access request?")) return;
+                allow.disabled = true;
+                deny.disabled = true;
+                const result = await dougBaseAction("deny-access", request.id);
+                if (result.error) {
+                    alert(result.error);
+                    allow.disabled = false;
+                    deny.disabled = false;
+                    return;
+                }
+                await loadDougBaseAccessRequests();
+            };
+
+            buttons.appendChild(allow);
+            buttons.appendChild(deny);
+        }
+
+        item.appendChild(buttons);
+        dougBaseAccessRequests.appendChild(item);
+    });
+}
+
+
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -3443,6 +3597,7 @@ async function startAdminPanel() {
         loadGames(),
         loadUserActivity(),
         loadDougTubeVideos(),
+        loadDougBaseAccessRequests(),
     ]);
 
     setInterval(
