@@ -112,7 +112,7 @@ input:focus {
 }
 
 #usernameBox {
-  display: none;
+  display: block;
 }
 
 .action {
@@ -300,29 +300,18 @@ input:focus {
     <div id="usernameBox">
 
       <label for="username">
-        Username
+        Name
       </label>
 
       <input
         id="username"
         type="text"
-        placeholder="Choose a username"
+        placeholder="Your username"
         maxlength="20"
         autocomplete="username"
       >
 
     </div>
-
-    <label for="email">
-      Email
-    </label>
-
-    <input
-      id="email"
-      type="email"
-      placeholder="you@example.com"
-      autocomplete="email"
-    >
 
     <label for="password">
       Password
@@ -475,14 +464,11 @@ const safeRedirect = /^[A-Za-z0-9_./-]+\.html$/.test(redirectAfterLogin) ? redir
 /* LOGIN MODE */
 
 function showLogin() {
-
   signupMode = false;
 
-  document.getElementById("usernameBox").style.display =
-    "none";
+  document.getElementById("usernameBox").style.display = "block";
 
   document.getElementById("loginTab").classList.add("active");
-
   document.getElementById("signupTab").classList.remove("active");
 
   document.getElementById("subtitle").textContent =
@@ -491,6 +477,12 @@ function showLogin() {
   document.getElementById("actionButton").textContent =
     "Log In";
 
+  document.getElementById("username").placeholder =
+    "Your username";
+
+  document.getElementById("username").autocomplete =
+    "username";
+
   document.getElementById("password").autocomplete =
     "current-password";
 
@@ -498,24 +490,25 @@ function showLogin() {
 }
 
 
-/* SIGNUP MODE */
-
 function showSignup() {
-
   signupMode = true;
 
-  document.getElementById("usernameBox").style.display =
-    "block";
+  document.getElementById("usernameBox").style.display = "block";
 
   document.getElementById("loginTab").classList.remove("active");
-
   document.getElementById("signupTab").classList.add("active");
 
   document.getElementById("subtitle").textContent =
-    "Do Not Use Your School Email to Sign Up";
+    "Create your DougHub account";
 
   document.getElementById("actionButton").textContent =
     "Create Account";
+
+  document.getElementById("username").placeholder =
+    "Choose a username";
+
+  document.getElementById("username").autocomplete =
+    "username";
 
   document.getElementById("password").autocomplete =
     "new-password";
@@ -524,143 +517,95 @@ function showSignup() {
 }
 
 
-/* MESSAGE */
-
 function showMessage(text) {
-
-  document.getElementById("message").textContent =
-    text;
+  document.getElementById("message").textContent = text;
 }
 
 
 function clearMessage() {
-
-  document.getElementById("message").textContent =
-    "";
+  document.getElementById("message").textContent = "";
 }
 
 
-/* SUBMIT */
+async function finishAuth(session) {
+  if (!session?.access_token || !session?.refresh_token) {
+    throw new Error("Login did not return a valid session.");
+  }
+
+  const { error } = await supabaseClient.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  window.location.replace(safeRedirect);
+}
+
 
 async function submitForm() {
-
-  const button =
-    document.getElementById("actionButton");
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  const username =
-    document.getElementById("username").value.trim();
+  const button = document.getElementById("actionButton");
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
 
   clearMessage();
 
-  if (!email || !password) {
-
-    showMessage(
-      "Please enter your email and password."
-    );
-
+  if (!username || !password) {
+    showMessage("Please enter your username and password.");
     return;
   }
 
-  if (signupMode && !username) {
-
-    showMessage(
-      "Please choose a username."
-    );
-
+  if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) {
+    showMessage("Username must be 3–20 characters and use only letters, numbers, or underscores.");
     return;
   }
 
-  if (signupMode && username.length < 3) {
-
-    showMessage(
-      "Username must be at least 3 characters."
-    );
-
+  if (password.length < 6) {
+    showMessage("Password must be at least 6 characters.");
     return;
   }
 
   button.disabled = true;
+  button.textContent = signupMode ? "Creating..." : "Logging in...";
 
   try {
-
-    if (signupMode) {
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.auth.signUp({
-
-          email: email,
-
-          password: password,
-
-          options: {
-            data: {
-              username: username
-            }
-          }
-
-        });
-
-      if (error) {
-        throw error;
+    const response = await fetch(
+      SUPABASE_URL + "/functions/v1/doughub-login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY
+        },
+        body: JSON.stringify({
+          action: signupMode ? "signup" : "login",
+          username,
+          password
+        })
       }
-
-      if (data.session) {
-
-        window.location.href =
-          safeRedirect;
-
-      } else {
-
-        showMessage(
-          "Account created! Check your email to confirm your account."
-        );
-
-      }
-
-    } else {
-
-      const {
-        error
-      } =
-        await supabaseClient.auth.signInWithPassword({
-
-          email: email,
-
-          password: password
-
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      window.location.href =
-        safeRedirect;
-
-    }
-
-  } catch (error) {
-
-    showMessage(
-      error.message ||
-      "Something went wrong."
     );
 
-  } finally {
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      throw new Error("Login service returned an invalid response.");
+    }
 
+    if (!response.ok) {
+      throw new Error(result?.error || "Could not complete login.");
+    }
+
+    await finishAuth(result.session);
+
+  } catch (error) {
+    console.error("DougHub login error:", error);
+    showMessage(error.message || "Something went wrong.");
     button.disabled = false;
-
+    button.textContent = signupMode ? "Create Account" : "Log In";
   }
-
 }
 
 
@@ -734,18 +679,11 @@ document
 
 /* ALREADY LOGGED IN */
 
-supabaseClient.auth.getSession().then(
-  function({ data }) {
-
-    if (data.session) {
-
-      window.location.href =
-        safeRedirect;
-
-    }
-
+supabaseClient.auth.getSession().then(({ data }) => {
+  if (data?.session) {
+    window.location.replace(safeRedirect);
   }
-);
+});
 
 </script>
 
