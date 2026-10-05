@@ -32,7 +32,9 @@
 <script>
 const SUPABASE_URL="https://tolvtmuolnzhkegphevw.supabase.co";
 const SUPABASE_KEY="sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const DOUGHUB_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const DOUGHUB_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const db=supabase.createClient(DOUGHUB_URL,DOUGHUB_KEY);
 let TABLES=[];
 const content=document.querySelector("#content");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -43,13 +45,15 @@ async function user(){
   return data.user;
 }
 async function refreshTables(){
-  const {data,error}=await db.rpc("dougbase_list_tables");
-  TABLES=!error&&Array.isArray(data)?data.map(x=>x.table_name):[];
+  const {data:{session}}=await db.auth.getSession();
+  if(!session)return;
+  const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"tables"})});
+  const j=await r.json(); TABLES=Array.isArray(j.data)?j.data.map(x=>x.table_name):[];
 }
 async function claimAdmin(){
   const m=document.querySelector("#adminMsg");
   m.textContent="Checking…";
-  const {data,error}=await db.rpc("dougbase_claim_admin");
+  const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"claim-admin"})}); const j=await r.json(); const data=j.data,error=j.error?{message:j.error}:null;
   m.textContent=error?error.message:(data?.message||"Done");
 }
 async function overview(){
@@ -85,7 +89,7 @@ async function load(){
   const n=document.querySelector("#table").value,out=document.querySelector("#rows");
   if(!n)return;
   out.innerHTML='<div class="empty">Loading…</div>';
-  const {data,error}=await db.from(n).select("*").limit(100);
+  const {data:{session}}=await db.auth.getSession(); if(!session){location.href="../log-in.html";return;} const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-api/table/"+encodeURIComponent(n)+"?limit=100",{headers:{"Authorization":"Bearer "+session.access_token}}); const data=await r.json(); const error=r.ok?null:{message:data.error};
   if(error){out.innerHTML=`<div class="empty error">${esc(error.message)}</div>`;return;}
   if(!data?.length){out.innerHTML='<div class="empty">No rows visible to this account.</div>';return;}
   const cols=Object.keys(data[0]);
@@ -103,7 +107,7 @@ async function runSql(){
   if(!q){m.textContent="Enter SQL first.";return;}
   m.textContent="Running…";
   const {data:{session}}=await db.auth.getSession();
-  if(!session){location.href="login.html";return;}
+  if(!session){location.href="../log-in.html";return;}
   const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({sql:q})});
   const j=await r.json();
   m.textContent=j.error||j.data?.message||"SQL executed successfully.";
@@ -126,7 +130,7 @@ async function auth(){
 }
 const pages={overview,tables,sql,api,auth};
 document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#title").textContent=b.textContent.trim().replace(/^\S+\s/,"");pages[b.dataset.page]();});
-document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="login.html";};
+document.querySelector("#logout").onclick=async()=>{await db.auth.signOut();location.href="../log-in.html";};
 overview();
 </script>
 </body>
