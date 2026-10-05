@@ -147,7 +147,7 @@ sendAccessRequest.onclick=async()=>{
   }catch(e){accessMsg.textContent="Could not send the request. Please try again.";sendAccessRequest.disabled=false;}
 };
 
-let TABLES=[];
+let TABLES=[];let adminSelectedTable="";
 const content=document.querySelector("#content");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -178,8 +178,12 @@ async function adminDatabases(){
   if(!r.ok){content.innerHTML='<div class="card"><div class="error">'+esc(j.error||"Could not load databases.")+'</div></div>';return;}
   const rows=j.data||[];
   content.innerHTML=`<div class="card"><h2>All Databases</h2><p class="muted">Admin-only view. You can open and edit any registered DougBase table.</p>
-    <div class="toolbar"><select id="adminTable">${rows.length?rows.map(x=>`<option value="${esc(x.table_name)}">${esc(x.table_name)} — ${esc(x.owner_id)}</option>`).join(""):'<option>No registered tables</option>'}</select><button class="primary" id="adminLoad" ${rows.length?"":"disabled"}>Open Database</button></div>
+    <div class="toolbar"><select id="adminTable">${rows.length?rows.map(x=>`<option value="${esc(x.table_name)}">${esc(x.table_name)} — ${esc(x.owner_id)}</option>`).join(""):'<option>No registered tables</option>'}</select><button class="primary" id="adminLoad" ${rows.length?"":"disabled"}>Open Database</button><button id="adminEdit" ${rows.length?"":"disabled"}>✎ Edit Database</button></div>
     <div id="adminRows" class="tablebox"><div class="empty">Choose a database and open it.</div></div></div>`;
+  document.querySelector("#adminEdit").onclick=async()=>{
+    adminSelectedTable=document.querySelector("#adminTable").value;
+    document.querySelector('[data-page="tables"]').click();
+  };
   document.querySelector("#adminLoad").onclick=async()=>{
     const table=document.querySelector("#adminTable").value;
     const out=document.querySelector("#adminRows");
@@ -221,7 +225,8 @@ POSTGRESQL</pre></div>`;
 async function tables(){
   const u=await user(); if(!u)return;
   await refreshTables();
-  const options=TABLES.length?TABLES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""):'<option value="">No tables yet</option>';
+  const options=TABLES.length?TABLES.map(t=>`<option value="${esc(t)}" ${t===adminSelectedTable?"selected":""}>${esc(t)}</option>`).join(""):'<option value="">No tables yet</option>';
+  adminSelectedTable="";
   content.innerHTML=`<div class="card"><h2>Table Editor</h2><p class="muted">Browse the real tables in DougBase. Create new tables from SQL Editor.</p>
   <div class="toolbar"><select id="table">${options}</select><button class="primary" id="load" ${TABLES.length?"":"disabled"}>Load rows</button><button id="makeTable">＋ Create table</button><button id="addColumn" ${TABLES.length?"":"disabled"}>＋ Add column</button><button id="renameTable" ${TABLES.length?"":"disabled"}>✎ Rename table</button><button id="insertRow" ${TABLES.length?"":"disabled"}>＋ Add row</button></div>
   <div id="tableForm"></div>
