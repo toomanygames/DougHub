@@ -12,6 +12,9 @@
 #accessBlock{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 0,#171944 0,#070812 60%);backdrop-filter:blur(20px)}
 .access-card{width:min(560px,100%);padding:34px;border:1px solid #2b3260;border-radius:24px;background:rgba(13,17,39,.96);box-shadow:0 30px 100px #0008;text-align:center}
 .access-card h1{margin:0 0 10px;font-size:30px}.access-account{margin:22px 0 10px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#080b19;text-align:left}.access-account span{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.access-account strong{font-size:17px}.access-card p{color:var(--muted);line-height:1.6}.access-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}.access-card input,.access-card textarea{width:100%;margin-top:8px}.access-card textarea{min-height:120px;resize:vertical}.access-modal-card{width:min(560px,100%);padding:28px;border:1px solid #2b3260;border-radius:24px;background:#0d1127;box-shadow:0 30px 100px #0008}.access-form-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.access-form-head h2{margin:3px 0 4px;font-size:26px}.access-form-head p{margin:0;color:var(--muted);line-height:1.5}.access-kicker{font-size:11px;letter-spacing:.14em;color:#9da5ff;font-weight:800}.access-close{border:0;background:transparent;font-size:28px;padding:2px 8px;color:#9ba4c8}.access-close-bottom{background:#171c38}.access-form{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:rgba(2,4,10,.78);backdrop-filter:blur(12px)}.access-form label,.access-form .access-actions,.access-form .access-msg{width:100%;position:relative}.access-form label{display:block;margin-top:12px;color:#cbd1ec;font-weight:700}.access-msg{margin-top:12px;min-height:20px}.access-hidden{display:none!important}
+
+.special-services{padding:10px 0 28px}.special-services-card{position:relative;overflow:hidden;padding:25px;border-radius:22px;border:1px solid rgba(129,140,248,.18);background:linear-gradient(145deg,rgba(99,102,241,.10),rgba(13,17,39,.72));box-shadow:0 18px 45px rgba(0,0,0,.18)}.special-services-card:before{content:"";position:absolute;width:220px;height:220px;right:-90px;top:-110px;border-radius:50%;background:rgba(168,85,247,.16);filter:blur(45px);pointer-events:none}.special-services-heading{position:relative;z-index:1;margin-bottom:15px}.special-services-heading h2{margin:0;font-size:24px}.special-services-heading p{margin:6px 0 0;color:#858494;font-size:14px}.special-services-list{position:relative;z-index:1;display:grid;gap:10px}.special-service-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 17px;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:rgba(8,10,24,.5)}.special-service-title{display:flex;align-items:center;gap:11px}.special-service-icon{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.2)}.special-service-row h3{margin:0;font-size:16px}.special-service-row p{margin:3px 0 0;color:#777687;font-size:13px}.special-service-button{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:1px solid rgba(129,140,248,.3);background:rgba(99,102,241,.15);font-size:13px;font-weight:800}.special-service-button:hover{background:rgba(99,102,241,.28);transform:translateY(-1px)}@media(max-width:600px){.special-service-row{align-items:stretch;flex-direction:column}.special-service-button{width:100%}}
+
 </style>
 </head>
 <body>
@@ -76,16 +79,26 @@ const db=supabase.createClient(DOUGHUB_URL,DOUGHUB_KEY);
 
 async function checkDougBaseAccess(){
   try{
-    const {data:{session}}=await db.auth.getSession();
-    const headers={"Content-Type":"application/json"};
-    if(session) headers.Authorization="Bearer "+session.access_token;
+    const {data:{user:loggedInUser},error:userError}=await db.auth.getUser();
+    if(userError||!loggedInUser){
+      document.querySelector(".layout").classList.add("access-hidden");
+      accessBlock.classList.remove("access-hidden");
+      return false;
+    }
+    const {data:{session},error:sessionError}=await db.auth.getSession();
+    if(sessionError||!session?.access_token) throw new Error("No active session token.");
+    const headers={"Content-Type":"application/json","Authorization":"Bearer "+session.access_token};
     const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers,body:JSON.stringify({action:"access-status"})});
     const j=await r.json();
-    if(j.data?.authorized){accessBlock.classList.add("access-hidden");return true;}
     if(j.data?.accountName)accessAccount.textContent=j.data.accountName;
-  }catch(e){}
-  document.querySelector(".layout").classList.add("access-hidden");
-  accessBlock.classList.remove("access-hidden");
+    if(j.data?.authorized){accessBlock.classList.add("access-hidden");document.querySelector(".layout").classList.remove("access-hidden");return true;}
+    document.querySelector(".layout").classList.add("access-hidden");
+    accessBlock.classList.remove("access-hidden");
+  }catch(e){
+    console.error("DougBase access check failed:",e);
+    document.querySelector(".layout").classList.add("access-hidden");
+    accessBlock.classList.remove("access-hidden");
+  }
   return false;
 }
 requestAccessBtn.onclick=()=>{accessForm.classList.remove("access-hidden");requestAccessBtn.classList.add("access-hidden");accessMsg.textContent="";};
@@ -95,7 +108,14 @@ sendAccessRequest.onclick=async()=>{
   const reason=accessReason.value.trim();
   accessMsg.textContent="Sending…";sendAccessRequest.disabled=true;
   try{
-    const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"request-access",reason})});
+    const {data:{user:loggedInUser}}=await db.auth.getUser();
+    const {data:{session}}=await db.auth.getSession();
+    if(!loggedInUser||!session?.access_token){
+      accessMsg.textContent="Your DougHub session could not be found. Please go back and log in again.";
+      sendAccessRequest.disabled=false;
+      return;
+    }
+    const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({action:"request-access",reason})});
     const j=await r.json();accessMsg.textContent=j.error||"Request sent! A DougHub administrator can now review it.";
     if(!j.error){accessReason.value="";accessMsg.textContent="Request sent! An admin can review it in DougHub Admin.";requestAccessBtn.classList.add("access-hidden");}else sendAccessRequest.disabled=false;
   }catch(e){accessMsg.textContent="Could not send the request. Please try again.";sendAccessRequest.disabled=false;}
