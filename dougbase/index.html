@@ -287,7 +287,14 @@ async function runSql(){
   const r=await fetch(SUPABASE_URL+"/functions/v1/dougbase-sql",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({sql:q})});
   const j=await r.json();
   m.textContent=j.error||j.data?.message||"SQL executed successfully.";
-  if(!j.error)await refreshTables();
+  if(!j.error){
+    await refreshTables();
+    // DougBase tracks table ownership server-side. Refresh the Table Editor immediately
+    // so newly created tables from this account appear without a manual page refresh.
+    if(/^create\s+table\b/i.test(q)){
+      document.querySelector('[data-page="tables"]').click();
+    }
+  }
 }
 async function api(){
   const u=await user(); if(!u)return;
