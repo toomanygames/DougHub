@@ -11,8 +11,11 @@ import urllib.request
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-SUPABASE_URL = "https://tolvtmuolnzhkegphevw.supabase.co"
-SUPABASE_KEY = "sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3"
+# DougHub is the account/login system. DougBase remains the private storage backend.
+HUB_URL = "https://agsqdqcsmsppcdqxlppj.supabase.co"
+HUB_KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"
+DRIVE_URL = "https://tolvtmuolnzhkegphevw.supabase.co"
+DRIVE_KEY = "sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3"
 BUCKET = "dougdrive"
 APP_DIR = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "DougDrive")
 CONFIG_FILE = os.path.join(APP_DIR, "config.json")
@@ -23,8 +26,8 @@ SYNC_INTERVAL = 5
 os.makedirs(APP_DIR, exist_ok=True)
 
 def api(path, method="GET", data=None, token=None, content_type="application/json", raw=False):
-    url = SUPABASE_URL + path
-    headers = {"apikey": SUPABASE_KEY}
+    url = DRIVE_URL + path
+    headers = {"apikey": DRIVE_KEY}
     if token:
         headers["Authorization"] = "Bearer " + token
     if data is not None:
@@ -50,15 +53,29 @@ def api(path, method="GET", data=None, token=None, content_type="application/jso
         except Exception: detail = {"message": raw}
         raise RuntimeError(detail.get("msg") or detail.get("message") or detail.get("error_description") or raw or f"HTTP {e.code}")
 
+def hub_auth(path, data):
+    url = HUB_URL + path
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(data).encode(),
+        headers={"apikey": HUB_KEY, "Content-Type": "application/json"},
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            body = r.read()
+            return json.loads(body.decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        raw = e.read().decode(errors="replace")
+        try: detail = json.loads(raw)
+        except Exception: detail = {"message": raw}
+        raise RuntimeError(detail.get("msg") or detail.get("message") or detail.get("error_description") or raw or f"HTTP {e.code}")
+
 def auth_login(email, password):
-    status, data = api("/auth/v1/token?grant_type=password", "POST",
-                       {"email": email, "password": password})
-    return data
+    return hub_auth("/auth/v1/token?grant_type=password", {"email": email, "password": password})
 
 def auth_refresh(refresh_token):
-    _, data = api("/auth/v1/token?grant_type=refresh_token", "POST",
-                  {"refresh_token": refresh_token})
-    return data
+    return hub_auth("/auth/v1/token?grant_type=refresh_token", {"refresh_token": refresh_token})
 
 def remote_list(token):
     # List recursively using the Storage list endpoint.
