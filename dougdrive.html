@@ -36,6 +36,10 @@ function clearSession() {
 }
 
 async function getSession() {
+  if (typeof sb !== "undefined") {
+    const { data } = await sb.auth.getSession();
+    if (data && data.session) return data.session;
+  }
   if (sessionState) {
     if (sessionState.expires_at && sessionState.expires_at > Math.floor(Date.now() / 1000) + 30) {
       return sessionState;
