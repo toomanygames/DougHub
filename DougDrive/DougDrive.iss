@@ -1,5 +1,5 @@
 [Setup]
-AppId={{8D0A9D47-3A9B-4C6E-9D53-20261006}}
+AppId={{8D0A9D47-3A9B-4C6E-9D53-202610060001}}
 AppName=DougDrive
 AppVersion=1.0.0
 AppPublisher=DougHub
@@ -21,6 +21,7 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; Flags: unchecked
 Source: "dist\DougDrive.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
+Name: "{%USERPROFILE}\DougDrive"
 Name: "{userstartup}"
 
 [Icons]
