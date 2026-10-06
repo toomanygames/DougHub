@@ -22,7 +22,7 @@ SYNC_INTERVAL = 5
 
 os.makedirs(APP_DIR, exist_ok=True)
 
-def api(path, method="GET", data=None, token=None, content_type="application/json"):
+def api(path, method="GET", data=None, token=None, content_type="application/json", raw=False):
     url = SUPABASE_URL + path
     headers = {"apikey": SUPABASE_KEY}
     if token:
@@ -36,7 +36,7 @@ def api(path, method="GET", data=None, token=None, content_type="application/jso
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             raw = r.read()
-            return r.status, json.loads(raw.decode()) if raw else {}
+            return r.status, (raw if raw else (json.loads(raw.decode()) if raw else {}))
     except urllib.error.HTTPError as e:
         raw = e.read().decode(errors="replace")
         try: detail = json.loads(raw)
