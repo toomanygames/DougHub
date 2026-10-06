@@ -16,8 +16,8 @@
 <div id="app"></div>
 </div>
 <script>
-const SUPABASE_URL="https://tolvtmuolnzhkegphevw.supabase.co",KEY="sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3",BUCKET="dougdrive",LIMIT=5*1024*1024*1024;
-const sb=supabase.createClient(SUPABASE_URL,KEY);let currentFolder="",allRows=[];
+const HUB_URL="https://agsqdqcsmsppcdqxlppj.supabase.co",HUB_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52",DRIVE_FN="https://tolvtmuolnzhkegphevw.supabase.co/functions/v1/dougdrive",LIMIT=5*1024*1024*1024;
+const sb=supabase.createClient(HUB_URL,HUB_KEY);let currentFolder="",allRows=[];
 const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 function fmt(n){if(!n)return"0 B";if(n<1024)return n+" B";let u=["KB","MB","GB","TB"],i=0,x=n/1024;while(x>=1024&&i<u.length-1){x/=1024;i++}return x.toFixed(x>=100?0:x>=10?1:2)+" "+u[i]}
 function icon(name,folder=false){if(folder)return"📁";let e=name.split(".").pop().toLowerCase();return["png","jpg","jpeg","gif","webp","svg"].includes(e)?"🖼️":["mp4","mov","webm"].includes(e)?"🎬":["mp3","wav","ogg"].includes(e)?"🎵":["zip","rar","7z"].includes(e)?"🗜️":["pdf"].includes(e)?"📕":["doc","docx","txt"].includes(e)?"📄":"📦"}
