@@ -484,35 +484,13 @@ async function loadDashboard() {
 }
 
 function installDougDrive() {
-  async function downloadInstaller(){
-  const button = $("downloadInstaller");
-  const oldText = button.innerHTML;
-  button.disabled = true;
-  button.innerHTML = "Preparing download…";
-  try {
-    const response = await fetch("https://github.com/toomanygames/DougHub/releases/download/dougdrive-latest/DougDrive.Setup.exe", {cache:"no-store"});
-    if (!response.ok) throw new Error("Installer not found on DougHub.");
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "DougDrive Setup.exe";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-    button.innerHTML = "✓ Download started";
-  } catch (error) {
-    console.error(error);
-    button.innerHTML = "Installer unavailable";
-    alert("The DougDrive installer is not published yet. The download will work once DougDrive Setup.exe is added to the DougDrive folder.");
-  } finally {
-    setTimeout(() => {
-      button.disabled = false;
-      button.innerHTML = oldText;
-    }, 2500);
-  }
-}
+  const link = document.createElement("a");
+  link.href = "https://github.com/toomanygames/DougHub/releases/download/dougdrive-latest/DougDrive.Setup.exe";
+  link.download = "DougDrive Setup.exe";
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 
 loadDashboard();
