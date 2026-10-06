@@ -5,6 +5,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Build DougDrive Windows"]
+    types: [completed]
 
 permissions:
   contents: read
@@ -17,6 +20,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -27,6 +31,13 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
+      - name: Add DougDrive installer
+        shell: bash
+        run: |
+          mkdir -p "DougDrive"
+          curl -fL --retry 3 "https://github.com/toomanygames/DougHub/releases/latest/download/DougDrive%20Setup.exe" -o "DougDrive/DougDrive Setup.exe"
+          test -s "DougDrive/DougDrive Setup.exe"
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
