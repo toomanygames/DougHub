@@ -16,27 +16,396 @@
 <div id="app"></div>
 </div>
 <script>
-const HUB_URL="https://agsqdqcsmsppcdqxlppj.supabase.co",HUB_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52",DRIVE_FN="https://tolvtmuolnzhkegphevw.supabase.co/functions/v1/dougdrive",LIMIT=5*1024*1024*1024;
-const sb=supabase.createClient(HUB_URL,HUB_KEY);let currentFolder="",allRows=[];
-const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-function fmt(n){if(!n)return"0 B";if(n<1024)return n+" B";let u=["KB","MB","GB","TB"],i=0,x=n/1024;while(x>=1024&&i<u.length-1){x/=1024;i++}return x.toFixed(x>=100?0:x>=10?1:2)+" "+u[i]}
-function icon(name,folder=false){if(folder)return"📁";let e=name.split(".").pop().toLowerCase();return["png","jpg","jpeg","gif","webp","svg"].includes(e)?"🖼️":["mp4","mov","webm"].includes(e)?"🎬":["mp3","wav","ogg"].includes(e)?"🎵":["zip","rar","7z"].includes(e)?"🗜️":["pdf"].includes(e)?"📕":["doc","docx","txt"].includes(e)?"📄":"📦"}
-async function driveApi(action,path="",options={}){const s=await session();if(!s)throw new Error("Not signed in");const q=new URLSearchParams({action});if(path)q.set("path",path);const headers={Authorization:"Bearer "+s.access_token};let body; if(options.body!==undefined){body=options.body; if(options.contentType)headers["Content-Type"]=options.contentType}const r=await fetch(DRIVE_FN+"?"+q.toString(),{method:body!==undefined?"POST":"GET",headers,body});let data;if((r.headers.get("content-type")||"").includes("application/json"))data=await r.json();else data=await r.blob();if(!r.ok)throw new Error(data?.error||"DougDrive request failed");return data}
-function login(){app.innerHTML='<div class="card login"><div class="eyebrow">DougHub Tool</div><h1><span>DougDrive</span></h1><p class="muted">Your private cloud drive, connected to DougBase.</p><input id="email" type="email" placeholder="DougHub email"><input id="pw" type="password" placeholder="Password"><button id="signin">Sign in to DougDrive</button><div id="msg" class="status"></div></div>';signin.onclick=async()=>{msg.textContent="Signing in…";const {error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:pw.value});if(error){msg.textContent=error.message;return}load()}}
-async function session(){const {data}=await sb.auth.getSession();return data.session}
-async function load(){const s=await session();if(!s){login();return}app.innerHTML='<section class="hero"><div class="hero-grid"><div><div class="eyebrow">DougHub Cloud Storage</div><h1>Welcome to <span>DougDrive.</span></h1><p>One place for your files, folders, and backups. Upload from the web or keep your Windows DougDrive folder synchronized automatically.</p><button class="install-drive" type="button" onclick="installDougDrive()"><span class="install-icon">⬇</span><span><b>Install DougDrive for Windows</b><small>Download the latest Windows installer</small></span><span class="install-arrow">→</span></button><div class="quick"><button onclick="document.getElementById('uploadBtn').click()"><b>⬆ Upload</b><span>Add files to your drive</span></button><button onclick="createFolder()"><b>📁 New folder</b><span>Organize your files</span></button><button onclick="refresh()"><b>🔄 Refresh</b><span>Check for new files</span></button><button onclick="document.getElementById('search').focus()"><b>🔍 Search</b><span>Find something quickly</span></button></div></div><div class="hero-art"><div class="cloud">☁️</div><strong>Your private cloud</strong><small>Files are stored in your DougBase DougDrive space.</small></div></div></section><div class="layout"><main><div class="card"><div class="toolbar"><div><h2>My DougDrive</h2><div id="count" class="muted">Loading…</div></div><div class="actions"><input id="search" class="search" placeholder="🔍 Search files"><button id="newFolder" class="btn">📁 New folder</button><button id="uploadBtn" class="primary">⬆ Upload</button><input id="fileInput" class="hidden" type="file" multiple></div></div><div id="crumbs" class="crumbs"></div><div id="drop" class="drop">Drop files anywhere here to upload</div><div id="files" class="files"></div><div id="status" class="status"></div></div><div class="card recent"><h2>How DougDrive works</h2><div class="feature-list"><div class="feature"><b>☁️ Cloud storage</b><span>Your files live in your private DougDrive storage instead of being visible to other users.</span></div><div class="feature"><b>🖥️ Windows sync</b><span>The DougDrive desktop app can keep a Windows folder synchronized with your cloud files.</span></div><div class="feature"><b>🔒 Private by account</b><span>Storage access is restricted to the signed-in DougDrive account.</span></div></div></div></main><aside><div class="card"><div class="side-title"><h2>Storage</h2><span>5 GB</span></div><div class="stat" id="used">—</div><div class="muted">currently used</div><div class="usage"><div id="bar" class="bar"></div></div><div class="usage-row"><span id="usage">Checking…</span><span>5 GB included</span></div><div class="syncbox"><b><span class="dot"></span>Windows Sync</b><div class="muted" style="margin-top:7px">Ready to sync. The desktop app checks for changes every 5 seconds.</div></div><div class="feature-list"><div class="feature"><b>📁 Folders</b><span>Keep projects, games, school files, and more organized.</span></div><div class="feature"><b>⬇ Downloads</b><span>Download your files back to any device.</span></div><div class="feature"><b>🗑️ File management</b><span>Delete and replace files whenever you need to.</span></div></div><button id="signout" class="btn" style="width:100%;margin-top:14px">Sign out</button></div></aside></div>';bind();await refresh()}
-function bind(){uploadBtn.onclick=()=>fileInput.click();fileInput.onchange=()=>uploadFiles([...fileInput.files]);newFolder.onclick=createFolder;signout.onclick=()=>sb.auth.signOut();search.oninput=render;drop.ondragover=e=>{e.preventDefault();drop.style.borderColor="#a855f7"};drop.ondragleave=()=>drop.style.borderColor="";drop.ondrop=e=>{e.preventDefault();drop.style.borderColor="";uploadFiles([...e.dataTransfer.files])}}
-function pathPrefix(){return currentFolder?currentFolder+"/":""}
-function renderCrumbs(){let parts=currentFolder?currentFolder.split("/"):[];crumbs.innerHTML='<span class="crumb" onclick="goFolder(\'\')">DougDrive</span>'+parts.map((p,i)=>' <span>/</span> <span class="crumb" onclick="goFolder(\''+esc(parts.slice(0,i+1).join("/"))+'\')">'+esc(p)+'</span>').join("")}
-function goFolder(p){currentFolder=p;render();renderCrumbs()}
-function render(){const q=(search?.value||"").toLowerCase(),prefix=pathPrefix(),rows=allRows.filter(x=>x.path.startsWith(prefix)),direct=rows.map(x=>{let rest=x.path.slice(prefix.length),slash=rest.indexOf("/");return slash<0?{...x,display:rest}:null}).filter(Boolean),seen=new Set(),folders=[];rows.forEach(x=>{let rest=x.path.slice(prefix.length),slash=rest.indexOf("/");if(slash>0&&!seen.has(rest.slice(0,slash))){seen.add(rest.slice(0,slash));folders.push(rest.slice(0,slash))}});let items=[...folders.map(name=>({folder:true,name,display:name})),...direct].filter(x=>(x.display||"").toLowerCase().includes(q));count.textContent=items.length+" item"+(items.length===1?"":"s")+" · "+allRows.length+" total";files.innerHTML=items.length?items.map(x=>x.folder?'<div class="file"><div class="file-icon">📁</div><div><div class="file-name">'+esc(x.name)+'</div><div class="file-meta">Folder</div></div><div class="file-actions"><button class="iconbtn" onclick="goFolder(\''+esc(pathPrefix()+x.name)+'\')">Open</button></div></div>':fileHtml(x)).join(""):'<div class="empty">This folder is empty.<br>Upload a file or create a folder to get started.</div>'}
-function fileHtml(x){return'<div class="file"><div class="file-icon">'+icon(x.name)+'</div><div><div class="file-name">'+esc(x.name)+'</div><div class="file-meta">'+fmt(Number(x.metadata?.size||x.metadata?.contentLength||0))+' · '+esc(x.updated_at?new Date(x.updated_at).toLocaleString():"Stored in DougDrive")+'</div></div><div class="file-actions"><button class="iconbtn" onclick="downloadFile(\''+esc(x.path)+'\')">⬇</button><button class="iconbtn" onclick="deleteFile(\''+esc(x.path)+'\')">🗑</button></div></div>'}
-async function refresh(){const s=await session();if(!s)return login();status.textContent="Loading your files…";try{const data=await driveApi("list","");allRows=(data.items||[]);let total=allRows.reduce((a,x)=>a+Number(x.metadata?.size||x.metadata?.contentLength||0),0);used.textContent=fmt(total);usage.textContent=fmt(total)+" used";bar.style.width=Math.min(100,total/LIMIT*100)+"%";renderCrumbs();render();status.textContent=allRows.length?"DougDrive is ready":"DougDrive is ready — upload your first file above."}catch(e){status.textContent=e.message}}
-async function uploadFiles(files){for(const f of files){status.textContent="Uploading "+f.name+"…";try{await driveApi("upload",pathPrefix()+f.name,{body:f,contentType:f.type||"application/octet-stream"})}catch(e){status.textContent=e.message;return}}status.textContent="Upload complete";await refresh()}
-async function downloadFile(path){status.textContent="Downloading…";try{const blob=await driveApi("download",path);const objectUrl=window.URL.createObjectURL(blob),a=document.createElement("a");a.href=objectUrl;a.download=path.split("/").pop();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>window.URL.revokeObjectURL(objectUrl),1000);status.textContent="Download started"}catch(e){status.textContent=e.message}}
-async function deleteFile(path){if(!confirm("Delete this file from DougDrive?"))return;try{await driveApi("delete",path);await refresh()}catch(e){status.textContent=e.message}}
-async function createFolder(){const name=prompt("Folder name");if(!name)return;if(/[\\/]/.test(name)||name==="."||name===".."){alert("Please use a simple folder name.");return}try{await driveApi("folder",pathPrefix()+name);await refresh();status.textContent="Folder created"}catch(e){status.textContent=e.message}}
-sb.auth.onAuthStateChange(()=>setTimeout(load,0));load();
-function installDougDrive(){const url="https://github.com/toomanygames/DougHub/releases/download/dougdrive-latest/DougDrive%20Setup.exe";const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove();document.getElementById("status")?.textContent="Starting DougDrive download…"}</script>
+const HUB_URL = "https://agsqdqcsmsppcdqxlppj.supabase.co";
+const HUB_KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const DRIVE_FN = "https://tolvtmuolnzhkegphevw.supabase.co/functions/v1/dougdrive";
+const LIMIT = 5 * 1024 * 1024 * 1024;
+const sb = supabase.createClient(HUB_URL, HUB_KEY);
+let currentFolder = "";
+let allRows = [];
+
+const $ = id => document.getElementById(id);
+
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[ch]));
+}
+
+function fmt(n) {
+  n = Number(n) || 0;
+  if (!n) return "0 B";
+  const units = ["B","KB","MB","GB","TB"];
+  let i = 0;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + " " + units[i];
+}
+
+async function getSession() {
+  const { data } = await sb.auth.getSession();
+  return data.session;
+}
+
+async function driveApi(action, path = "", body = null, contentType = "") {
+  const session = await getSession();
+  if (!session) throw new Error("Please sign in with your DougHub account.");
+  const q = new URLSearchParams({ action });
+  if (path) q.set("path", path);
+
+  const headers = { Authorization: "Bearer " + session.access_token };
+  if (contentType) headers["Content-Type"] = contentType;
+
+  const response = await fetch(DRIVE_FN + "?" + q.toString(), {
+    method: body === null ? "GET" : "POST",
+    headers,
+    body
+  });
+
+  const type = response.headers.get("content-type") || "";
+  const result = type.includes("application/json") ? await response.json() : await response.blob();
+
+  if (!response.ok) throw new Error(result?.error || "DougDrive request failed.");
+  return result;
+}
+
+function fileIcon(name, folder = false) {
+  if (folder) return "📁";
+  const ext = name.split(".").pop().toLowerCase();
+  if (["png","jpg","jpeg","gif","webp","svg"].includes(ext)) return "🖼️";
+  if (["mp4","mov","webm"].includes(ext)) return "🎬";
+  if (["mp3","wav","ogg"].includes(ext)) return "🎵";
+  if (["zip","rar","7z"].includes(ext)) return "🗜️";
+  if (ext === "pdf") return "📕";
+  if (["doc","docx","txt"].includes(ext)) return "📄";
+  return "📦";
+}
+
+function folderPath() {
+  return currentFolder ? currentFolder + "/" : "";
+}
+
+function renderBreadcrumbs() {
+  const box = $("crumbs");
+  if (!box) return;
+
+  const parts = currentFolder ? currentFolder.split("/") : [];
+  let html = '<span class="crumb" data-folder="">DougDrive</span>';
+
+  parts.forEach((part, index) => {
+    const path = parts.slice(0, index + 1).join("/");
+    html += ' <span>/</span> <span class="crumb" data-folder="' + esc(path) + '">' + esc(part) + "</span>";
+  });
+
+  box.innerHTML = html;
+  box.querySelectorAll(".crumb").forEach(el => {
+    el.onclick = () => {
+      currentFolder = el.dataset.folder || "";
+      render();
+      renderBreadcrumbs();
+    };
+  });
+}
+
+function render() {
+  const box = $("files");
+  if (!box) return;
+
+  const query = ($("search")?.value || "").toLowerCase();
+  const prefix = folderPath();
+  const visible = allRows.filter(x => x.path.startsWith(prefix));
+
+  const folders = new Set();
+  const directFiles = [];
+
+  for (const item of visible) {
+    const rest = item.path.slice(prefix.length);
+    const slash = rest.indexOf("/");
+
+    if (slash >= 0) folders.add(rest.slice(0, slash));
+    else if (rest && rest.toLowerCase().includes(query)) directFiles.push(item);
+  }
+
+  const folderItems = [...folders]
+    .filter(name => name.toLowerCase().includes(query))
+    .map(name => ({
+      folder: true,
+      name,
+      display: name
+    }));
+
+  const items = [...folderItems, ...directFiles];
+
+  $("count").textContent = items.length + " item" + (items.length === 1 ? "" : "s") + " · " + allRows.length + " total";
+
+  if (!items.length) {
+    box.innerHTML = '<div class="empty">This folder is empty.<br>Upload a file or create a folder to get started.</div>';
+    return;
+  }
+
+  box.innerHTML = items.map(item => {
+    if (item.folder) {
+      return '<div class="file"><div class="file-icon">📁</div><div><div class="file-name">' +
+        esc(item.name) + '</div><div class="file-meta">Folder</div></div><div class="file-actions">' +
+        '<button class="iconbtn open-folder" data-name="' + esc(item.name) + '">Open</button></div></div>';
+    }
+
+    const size = item.metadata?.size || item.metadata?.contentLength || 0;
+    return '<div class="file"><div class="file-icon">' + fileIcon(item.name) +
+      '</div><div><div class="file-name">' + esc(item.name) + '</div><div class="file-meta">' +
+      fmt(size) + " · " + esc(item.updated_at ? new Date(item.updated_at).toLocaleString() : "Stored in DougDrive") +
+      '</div></div><div class="file-actions">' +
+      '<button class="iconbtn download-file" data-path="' + esc(item.path) + '">⬇</button>' +
+      '<button class="iconbtn delete-file" data-path="' + esc(item.path) + '">🗑</button>' +
+      '</div></div>';
+  }).join("");
+
+  box.querySelectorAll(".open-folder").forEach(btn => {
+    btn.onclick = () => {
+      currentFolder = folderPath() + btn.dataset.name;
+      renderBreadcrumbs();
+      render();
+    };
+  });
+
+  box.querySelectorAll(".download-file").forEach(btn => {
+    btn.onclick = () => downloadFile(btn.dataset.path);
+  });
+
+  box.querySelectorAll(".delete-file").forEach(btn => {
+    btn.onclick = () => deleteFile(btn.dataset.path);
+  });
+}
+
+async function refresh() {
+  const session = await getSession();
+  if (!session) return showLogin();
+
+  $("status").textContent = "Loading your files…";
+
+  try {
+    const data = await driveApi("list");
+    allRows = data.items || [];
+
+    const usedBytes = allRows.reduce((total, item) =>
+      total + Number(item.metadata?.size || item.metadata?.contentLength || 0), 0);
+
+    $("used").textContent = fmt(usedBytes);
+    $("usage").textContent = fmt(usedBytes) + " used";
+    $("bar").style.width = Math.min(100, usedBytes / LIMIT * 100) + "%";
+
+    renderBreadcrumbs();
+    render();
+    $("status").textContent = allRows.length
+      ? "DougDrive is ready."
+      : "DougDrive is ready — upload your first file above.";
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
+
+async function uploadFiles(files) {
+  for (const file of files) {
+    $("status").textContent = "Uploading " + file.name + "…";
+    try {
+      await driveApi("upload", folderPath() + file.name, file, file.type || "application/octet-stream");
+    } catch (error) {
+      $("status").textContent = error.message;
+      return;
+    }
+  }
+
+  $("status").textContent = "Upload complete.";
+  await refresh();
+}
+
+async function downloadFile(path) {
+  $("status").textContent = "Downloading…";
+
+  try {
+    const blob = await driveApi("download", path);
+    const objectUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = objectUrl;
+    link.download = path.split("/").pop();
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000);
+    $("status").textContent = "Download started.";
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
+
+async function deleteFile(path) {
+  if (!confirm("Delete this file from DougDrive?")) return;
+
+  try {
+    await driveApi("delete", path);
+    await refresh();
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
+
+async function createFolder() {
+  const name = prompt("Folder name");
+  if (!name) return;
+
+  if (/[\\/]/.test(name) || name === "." || name === "..") {
+    alert("Please use a simple folder name.");
+    return;
+  }
+
+  try {
+    await driveApi("folder", folderPath() + name);
+    await refresh();
+    $("status").textContent = "Folder created.";
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
+
+function bindDashboard() {
+  $("uploadBtn").onclick = () => $("fileInput").click();
+  $("fileInput").onchange = () => uploadFiles([...$("fileInput").files]);
+  $("newFolder").onclick = createFolder;
+  $("signout").onclick = async () => {
+    await sb.auth.signOut();
+    showLogin();
+  };
+  $("search").oninput = render;
+
+  const drop = $("drop");
+  drop.ondragover = event => {
+    event.preventDefault();
+    drop.style.borderColor = "#a855f7";
+  };
+  drop.ondragleave = () => drop.style.borderColor = "";
+  drop.ondrop = event => {
+    event.preventDefault();
+    drop.style.borderColor = "";
+    uploadFiles([...event.dataTransfer.files]);
+  };
+}
+
+function showLogin() {
+  $("app").innerHTML = `
+    <div class="card login">
+      <div class="eyebrow">DougHub Tool</div>
+      <h1><span>DougDrive</span></h1>
+      <p class="muted">Your private cloud drive, connected to DougBase.</p>
+      <input id="email" type="email" placeholder="DougHub email" autocomplete="email">
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+      <button id="signin">Sign in to DougDrive</button>
+      <div id="loginMsg" class="status"></div>
+    </div>`;
+
+  $("signin").onclick = async () => {
+    $("loginMsg").textContent = "Signing in…";
+
+    const { error } = await sb.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("pw").value
+    });
+
+    if (error) {
+      $("loginMsg").textContent = error.message;
+      return;
+    }
+
+    await loadDashboard();
+  };
+}
+
+async function loadDashboard() {
+  const session = await getSession();
+  if (!session) {
+    showLogin();
+    return;
+  }
+
+  $("app").innerHTML = `
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">DougHub Cloud Storage</div>
+          <h1>Welcome to <span>DougDrive.</span></h1>
+          <p>One place for your files, folders, and backups. Upload from the web or keep your Windows DougDrive folder synchronized automatically.</p>
+          <button class="install-drive" type="button" onclick="installDougDrive()">
+            <span class="install-icon">⬇</span>
+            <span><b>Install DougDrive for Windows</b><small>Download the latest Windows installer</small></span>
+            <span class="install-arrow">→</span>
+          </button>
+          <div class="quick">
+            <button onclick="document.getElementById('uploadBtn').click()"><b>⬆ Upload</b><span>Add files to your drive</span></button>
+            <button onclick="createFolder()"><b>📁 New folder</b><span>Organize your files</span></button>
+            <button onclick="refresh()"><b>🔄 Refresh</b><span>Check for new files</span></button>
+            <button onclick="document.getElementById('search').focus()"><b>🔍 Search</b><span>Find something quickly</span></button>
+          </div>
+        </div>
+        <div class="hero-art">
+          <div class="cloud">☁️</div>
+          <strong>Your private cloud</strong>
+          <small>Files are stored in your private DougBase DougDrive space.</small>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <main>
+        <div class="card">
+          <div class="toolbar">
+            <div><h2>My DougDrive</h2><div id="count" class="muted">Loading…</div></div>
+            <div class="actions">
+              <input id="search" class="search" placeholder="🔍 Search files">
+              <button id="newFolder" class="btn">📁 New folder</button>
+              <button id="uploadBtn" class="primary">⬆ Upload</button>
+              <input id="fileInput" class="hidden" type="file" multiple>
+            </div>
+          </div>
+          <div id="crumbs" class="crumbs"></div>
+          <div id="drop" class="drop">Drop files anywhere here to upload</div>
+          <div id="files" class="files"></div>
+          <div id="status" class="status"></div>
+        </div>
+
+        <div class="card recent">
+          <h2>How DougDrive works</h2>
+          <div class="feature-list">
+            <div class="feature"><b>☁️ Cloud storage</b><span>Your files live in your private DougDrive storage instead of being visible to other users.</span></div>
+            <div class="feature"><b>🖥️ Windows sync</b><span>The DougDrive desktop app can keep a Windows folder synchronized with your cloud files.</span></div>
+            <div class="feature"><b>🔒 Private by account</b><span>Storage access is restricted to the signed-in DougHub account.</span></div>
+          </div>
+        </div>
+      </main>
+
+      <aside>
+        <div class="card">
+          <div class="side-title"><h2>Storage</h2><span>5 GB</span></div>
+          <div class="stat" id="used">—</div>
+          <div class="muted">currently used</div>
+          <div class="usage"><div id="bar" class="bar"></div></div>
+          <div class="usage-row"><span id="usage">Checking…</span><span>5 GB included</span></div>
+          <div class="syncbox"><b><span class="dot"></span>Windows Sync</b><div class="muted" style="margin-top:7px">Ready to sync. The desktop app checks for changes every 5 seconds.</div></div>
+          <button id="signout" class="btn" style="width:100%;margin-top:14px">Sign out</button>
+        </div>
+      </aside>
+    </div>`;
+
+  bindDashboard();
+  await refresh();
+}
+
+function installDougDrive() {
+  const url = "https://github.com/toomanygames/DougHub/releases/download/dougdrive-latest/DougDrive%20Setup.exe";
+  window.location.href = url;
+}
+
+sb.auth.onAuthStateChange(() => setTimeout(loadDashboard, 0));
+loadDashboard();
+</script>
 </body>
 </html>
