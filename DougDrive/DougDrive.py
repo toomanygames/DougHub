@@ -2,6 +2,7 @@ import base64
 import hashlib
 import json
 import os
+import sys
 import queue
 import threading
 import time
@@ -382,8 +383,22 @@ class App:
                 req=urllib.request.Request(GITHUB_RELEASE_API,headers={"Accept":"application/vnd.github+json","User-Agent":"DougDrive"})
                 with urllib.request.urlopen(req,timeout=15) as r:
                     release=json.loads(r.read().decode("utf-8"))
-                installer=next((a for a in release.get("assets",[]) if a.get("name","").lower() in ("dougdrive.setup.exe","dougdrive setup.exe")),None)
+                assets=release.get("assets",[])
+                installer=next((a for a in assets if a.get("name","").lower() in ("dougdrive.setup.exe","dougdrive setup.exe")),None)
+                portable=next((a for a in assets if a.get("name","").lower()=="dougdrive.exe"),None)
                 if not installer: raise RuntimeError("The latest DougDrive installer was not found.")
+                current_hash=None
+                if getattr(sys,"frozen",False):
+                    h=hashlib.sha256()
+                    with open(sys.executable,"rb") as fh:
+                        for chunk in iter(lambda: fh.read(1024*1024), b""): h.update(chunk)
+                    current_hash=h.hexdigest()
+                remote_digest=(portable or {}).get("digest","")
+                remote_hash=remote_digest.split(":",1)[1] if remote_digest.startswith("sha256:") else None
+                if current_hash and remote_hash and current_hash.lower()==remote_hash.lower():
+                    self.root.after(0,lambda:self.status_var.set("Up to date"))
+                    self.root.after(0,lambda:messagebox.showinfo("DougDrive Update","DougDrive is already up to date."))
+                    return
                 self.root.after(0,lambda:self._offer_update(release.get("tag_name","latest"),installer.get("browser_download_url",GITHUB_INSTALLER)))
             except Exception as ex:
                 self.root.after(0,lambda:(self.status_var.set("Update check failed"),messagebox.showerror("DougDrive Update",str(ex))))
