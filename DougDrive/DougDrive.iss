@@ -18,7 +18,7 @@ Name: "startup"; Description: "Start DougDrive when Windows starts"; Flags: unch
 Name: "desktopicon"; Description: "Create a desktop shortcut"; Flags: unchecked
 
 [Files]
-Source: "dist\DougDrive.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\DougDrive.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 Name: "{%USERPROFILE}\DougDrive"
