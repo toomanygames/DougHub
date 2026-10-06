@@ -490,7 +490,7 @@ function installDougDrive() {
   button.disabled = true;
   button.innerHTML = "Preparing download…";
   try {
-    const response = await fetch("/DougDrive/DougDrive%20Setup.exe", {cache:"no-store"});
+    const response = await fetch("https://github.com/toomanygames/DougHub/releases/download/dougdrive-latest/DougDrive.Setup.exe", {cache:"no-store"});
     if (!response.ok) throw new Error("Installer not found on DougHub.");
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
