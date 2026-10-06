@@ -407,84 +407,157 @@ class App:
 
     def update_app(self):
         self.status_var.set("Checking for updates…")
+
         def work():
             try:
                 req = urllib.request.Request(
                     GITHUB_RELEASE_API,
-                    headers={"Accept":"application/vnd.github+json","User-Agent":"DougDrive-Updater","X-GitHub-Api-Version":"2026-03-10"}
+                    headers={
+                        "Accept": "application/vnd.github+json",
+                        "User-Agent": "DougDrive-Updater",
+                        "X-GitHub-Api-Version": "2026-03-10"
+                    }
                 )
                 with urllib.request.urlopen(req, timeout=20) as r:
                     release = json.loads(r.read().decode("utf-8"))
+
                 if release.get("draft") or release.get("prerelease"):
                     raise RuntimeError("The latest DougDrive release is not published yet.")
+
                 assets = release.get("assets", [])
-                installer = next((a for a in assets if a.get("name","").lower() in ("dougdrive.setup.exe","dougdrive setup.exe")), None)
-                portable = next((a for a in assets if a.get("name","").lower() == "dougdrive.exe"), None)
-                if not installer:
-                    raise RuntimeError("The latest DougDrive installer was not found on GitHub.")
-                current_hash = file_hash(sys.executable) if getattr(sys,"frozen",False) and os.path.isfile(sys.executable) else None
-                remote_digest = (portable or {}).get("digest","") or ""
-                remote_hash = remote_digest.split(":",1)[1] if remote_digest.startswith("sha256:") else None
+                portable = next(
+                    (a for a in assets if a.get("name", "").lower() == "dougdrive.exe"),
+                    None
+                )
+                if not portable:
+                    raise RuntimeError("The latest DougDrive EXE was not found on GitHub.")
+
+                current_exe = os.path.abspath(sys.executable)
+                current_hash = file_hash(current_exe) if getattr(sys, "frozen", False) and os.path.isfile(current_exe) else None
+                remote_digest = portable.get("digest", "") or ""
+                remote_hash = remote_digest.split(":", 1)[1] if remote_digest.startswith("sha256:") else None
+
                 if current_hash and remote_hash and current_hash.lower() == remote_hash.lower():
                     self.root.after(0, lambda: self.status_var.set("Up to date"))
-                    self.root.after(0, lambda: messagebox.showinfo("DougDrive Update","DougDrive is already up to date."))
+                    self.root.after(0, lambda: messagebox.showinfo(
+                        "DougDrive Update", "DougDrive is already up to date."
+                    ))
                     return
+
                 version = release.get("name") or release.get("tag_name") or "latest"
-                url = installer.get("browser_download_url") or GITHUB_INSTALLER
-                self.root.after(0, lambda: self._offer_update(version,url,installer.get("digest",""),installer.get("size")))
+                url = portable.get("browser_download_url")
+                if not url:
+                    raise RuntimeError("The DougDrive EXE download URL is missing.")
+
+                self.root.after(0, lambda: self._offer_update(
+                    version, url, remote_digest, portable.get("size")
+                ))
+
             except Exception as ex:
-                self.root.after(0, lambda: (self.status_var.set("Update check failed"),messagebox.showerror("DougDrive Update",str(ex))))
+                self.root.after(0, lambda: (
+                    self.status_var.set("Update check failed"),
+                    messagebox.showerror("DougDrive Update", str(ex))
+                ))
+
         threading.Thread(target=work, daemon=True).start()
 
     def _offer_update(self, version, url, expected_digest="", expected_size=None):
         self.status_var.set("Update available")
-        if not messagebox.askyesno("DougDrive Update",f"A DougDrive update is available ({version}).\n\nUpdate now?"):
+
+        if not messagebox.askyesno(
+            "DougDrive Update",
+            f"A DougDrive update is available ({version}).\n\n"
+            "DougDrive will close, replace its old EXE with the new one, and reopen automatically.\n\n"
+            "Update now?"
+        ):
             self.status_var.set("Running")
             return
+
         self.status_var.set("Downloading update…")
+
         def download():
-            temp_target = os.path.join(APP_DIR,"DougDrive Setup.exe.download")
+            temp_target = os.path.join(APP_DIR, "DougDrive.new.exe")
             try:
-                target = os.path.join(APP_DIR,"DougDrive Setup.exe")
-                req = urllib.request.Request(url,headers={"User-Agent":"DougDrive-Updater"})
-                with urllib.request.urlopen(req,timeout=300) as r, open(temp_target,"wb") as out:
+                req = urllib.request.Request(
+                    url,
+                    headers={"User-Agent": "DougDrive-Updater"}
+                )
+                with urllib.request.urlopen(req, timeout=300) as r, open(temp_target, "wb") as out:
                     while True:
-                        chunk = r.read(1024*1024)
-                        if not chunk: break
+                        chunk = r.read(1024 * 1024)
+                        if not chunk:
+                            break
                         out.write(chunk)
+
                 if not os.path.isfile(temp_target) or os.path.getsize(temp_target) == 0:
                     raise RuntimeError("The update download was empty.")
+
                 if expected_size is not None and os.path.getsize(temp_target) != int(expected_size):
-                    raise RuntimeError("The downloaded installer size does not match GitHub.")
+                    raise RuntimeError("The downloaded EXE size does not match GitHub.")
+
                 if expected_digest and expected_digest.startswith("sha256:"):
-                    if file_hash(temp_target).lower() != expected_digest.split(":",1)[1].lower():
-                        raise RuntimeError("The downloaded installer failed its SHA-256 check.")
-                os.replace(temp_target,target)
-                app_exe = os.path.abspath(sys.executable)
-                bat = os.path.join(APP_DIR,"update-dougdrive.cmd")
+                    if file_hash(temp_target).lower() != expected_digest.split(":", 1)[1].lower():
+                        raise RuntimeError("The downloaded EXE failed its SHA-256 check.")
+
+                if not getattr(sys, "frozen", False):
+                    raise RuntimeError("In-app replacement is only available in the installed Windows version.")
+
+                installed_exe = os.path.abspath(sys.executable)
+                backup_exe = installed_exe + ".old"
+                updater_cmd = os.path.join(APP_DIR, "update-dougdrive.cmd")
+
                 lines = [
-                    "@echo off","setlocal","timeout /t 3 /nobreak >nul",
-                    f'start "" /wait "{target}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS',
-                    "timeout /t 2 /nobreak >nul",f'start "" "{app_exe}"','del "%~f0"',"endlocal"
+                    "@echo off",
+                    "setlocal",
+                    "timeout /t 3 /nobreak >nul",
+                    f'del /f /q "{backup_exe}" >nul 2>&1',
+                    f'move /y "{installed_exe}" "{backup_exe}" >nul 2>&1',
+                    ":retry",
+                    f'copy /y "{temp_target}" "{installed_exe}" >nul 2>&1',
+                    f'if not exist "{installed_exe}" goto retry',
+                    f'del /f /q "{backup_exe}" >nul 2>&1',
+                    f'del /f /q "{temp_target}" >nul 2>&1',
+                    f'start "" "{installed_exe}"',
+                    'del "%~f0"',
+                    "endlocal"
                 ]
-                with open(bat,"w",encoding="utf-8",newline="") as fh:
-                    fh.write("\r\n".join(lines)+"\r\n")
-                self.root.after(0,lambda:self._launch_update(bat))
+
+                with open(updater_cmd, "w", encoding="utf-8", newline="") as fh:
+                    fh.write("\r\n".join(lines) + "\r\n")
+
+                self.root.after(0, lambda: self._launch_update(updater_cmd))
+
             except Exception as ex:
                 try:
-                    if os.path.exists(temp_target): os.remove(temp_target)
-                except Exception: pass
-                self.root.after(0,lambda:(self.status_var.set("Update failed"),messagebox.showerror("DougDrive Update",str(ex))))
-        threading.Thread(target=download,daemon=True).start()
+                    if os.path.exists(temp_target):
+                        os.remove(temp_target)
+                except Exception:
+                    pass
+                self.root.after(0, lambda: (
+                    self.status_var.set("Update failed"),
+                    messagebox.showerror("DougDrive Update", str(ex))
+                ))
 
-    def _launch_update(self, bat):
+        threading.Thread(target=download, daemon=True).start()
+
+    def _launch_update(self, updater_cmd):
         self.drive.stop_event.set()
-        creationflags = getattr(subprocess,"CREATE_NEW_PROCESS_GROUP",0) | getattr(subprocess,"DETACHED_PROCESS",0)
+
+        creationflags = (
+            getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+            | getattr(subprocess, "DETACHED_PROCESS", 0)
+        )
+
         try:
-            subprocess.Popen(["cmd.exe","/c",bat],creationflags=creationflags,close_fds=True)
+            subprocess.Popen(
+                ["cmd.exe", "/c", updater_cmd],
+                creationflags=creationflags,
+                close_fds=True
+            )
         except Exception as ex:
-            messagebox.showerror("DougDrive Update",f"Could not start the updater: {ex}")
+            messagebox.showerror("DougDrive Update", f"Could not start the updater: {ex}")
             return
+
         self.root.destroy()
 
     def close(self):
