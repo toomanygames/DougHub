@@ -13,31 +13,52 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Install PyInstaller
         run: python -m pip install --upgrade pip pyinstaller
+
       - name: Build DougDrive EXE
-        run: pyinstaller --noconfirm --clean --onefile --windowed --name DougDrive DougDrive/DougDrive.py
+        shell: pwsh
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name DougDrive DougDrive/DougDrive.py
+          if (-not (Test-Path "dist/DougDrive.exe")) {
+            throw "DougDrive.exe was not created."
+          }
+
       - name: Install Inno Setup
         shell: pwsh
         run: choco install innosetup --no-progress -y
-      - name: Build DougDrive Setup
+
+      - name: Build DougDrive Installer
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path release | Out-Null
-          & "C:Program Files (x86)Inno Setup 6ISCC.exe" DougDriveDougDrive.iss
-          Copy-Item distDougDrive.exe releaseDougDrive.exe
-          Copy-Item DougDriveun-dougdrive.bat releaseun-dougdrive.bat
+          & "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" "DougDrive/DougDrive.iss"
+          if (-not (Test-Path "release/DougDrive Setup.exe")) {
+            throw "DougDrive Setup.exe was not created."
+          }
+          Copy-Item "dist/DougDrive.exe" "release/DougDrive.exe"
+          Copy-Item "DougDrive/run-dougdrive.bat" "release/run-dougdrive.bat"
+
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: DougDrive-Windows-Installer
           path: "release/DougDrive Setup.exe"
-      - name: Upload portable files
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload portable EXE
         uses: actions/upload-artifact@v4
         with:
           name: DougDrive-Windows-Portable
-          path: release/
+          path: |
+            release/DougDrive.exe
+            release/run-dougdrive.bat
+          if-no-files-found: error
+          retention-days: 30
