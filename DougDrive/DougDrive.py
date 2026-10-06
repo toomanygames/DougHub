@@ -35,8 +35,15 @@ def api(path, method="GET", data=None, token=None, content_type="application/jso
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            raw = r.read()
-            return r.status, (raw if raw else (json.loads(raw.decode()) if raw else {}))
+            body = r.read()
+            if raw:
+                return r.status, body
+            if not body:
+                return r.status, {}
+            try:
+                return r.status, json.loads(body.decode("utf-8"))
+            except Exception:
+                return r.status, body
     except urllib.error.HTTPError as e:
         raw = e.read().decode(errors="replace")
         try: detail = json.loads(raw)
@@ -73,7 +80,7 @@ def remote_list(token):
 
 def remote_download(token, path):
     encoded = "/".join(urllib.parse.quote(x, safe="") for x in path.split("/"))
-    _, data = api(f"/storage/v1/object/authenticated/{BUCKET}/{encoded}", "GET", token=token)
+    _, data = api(f"/storage/v1/object/authenticated/{BUCKET}/{encoded}", "GET", token=token, raw=True)
     return data
 
 def remote_upload(token, path, data):
