@@ -1,8 +1,5 @@
 name: Build DougDrive Windows
 
-permissions:
-  contents: write
-
 on:
   push:
     paths:
@@ -66,12 +63,16 @@ jobs:
           retention-days: 30
 
       - name: Publish latest Windows download
-        shell: pwsh
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dougdrive-latest
+          name: DougDrive Latest
+          body: Latest Windows build of DougDrive.
+          target_commitish: ${{ github.sha }}
+          files: |
+            release/DougDrive Setup.exe
+            release/DougDrive.exe
+            release/run-dougdrive.bat
+          overwrite_files: true
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release view dougdrive-latest 2>$null
-          if ($LASTEXITCODE -ne 0) {
-            gh release create dougdrive-latest --title "DougDrive Latest" --notes "Latest Windows build of DougDrive." --target "${{ github.sha }}"
-          }
-          gh release upload dougdrive-latest "release/DougDrive Setup.exe" "release/DougDrive.exe" "release/run-dougdrive.bat" --clobber
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
