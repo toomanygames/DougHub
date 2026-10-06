@@ -247,45 +247,85 @@ class DougDrive:
                 l = local.get(rel)
                 r = remote.get(rel)
                 old = self.state.get(rel, {})
-                local_changed = l is not None and (old.get("local_mtime") != l["mtime"] or old.get("local_size") != l["size"])
+
+                # Deletion-aware sync:
+                # - If a file existed at the last sync and is now missing locally, delete the cloud copy.
+                # - If it existed remotely and is now missing remotely, delete the local copy.
+                if not l and r and old:
+                    try:
+                        remote_delete(self.token, rel)
+                        changed += 1
+                        self.log("☁ deleted: " + rel)
+                    except Exception as e:
+                        self.log("ERROR deleting cloud file " + rel + ": " + str(e))
+                    continue
+
+                if l and not r and old:
+                    try:
+                        os.remove(lp)
+                        changed += 1
+                        self.log("deleted locally: " + rel)
+                    except OSError as e:
+                        self.log("ERROR deleting local file " + rel + ": " + str(e))
+                    continue
+
+                local_changed = l is not None and (
+                    old.get("local_mtime") != l["mtime"] or
+                    old.get("local_size") != l["size"]
+                )
                 remote_updated = (r or {}).get("updated_at", "")
-                remote_changed = r is not None and (old.get("remote_updated") != remote_updated or old.get("remote_size") != (r.get("metadata") or {}).get("size"))
+                remote_changed = r is not None and (
+                    old.get("remote_updated") != remote_updated or
+                    old.get("remote_size") != (r.get("metadata") or {}).get("size")
+                )
+
                 if l and not r:
-                    with open(lp, "rb") as f: data = f.read()
+                    with open(lp, "rb") as f:
+                        data = f.read()
                     remote_upload(self.token, rel, data)
                     changed += 1
                     self.log("↑ " + rel)
                     continue
+
                 if r and not l:
                     os.makedirs(os.path.dirname(lp), exist_ok=True)
                     data = remote_download(self.token, rel)
-                    with open(lp, "wb") as f: f.write(data)
+                    with open(lp, "wb") as f:
+                        f.write(data)
                     changed += 1
                     self.log("↓ " + rel)
                     continue
-                if not l or not r: continue
+
+                if not l or not r:
+                    continue
+
                 if not local_changed and not remote_changed:
                     continue
+
                 if remote_changed and not local_changed:
                     os.makedirs(os.path.dirname(lp), exist_ok=True)
-                    data = remote_download(self.token, prefix + rel)
-                    with open(lp, "wb") as f: f.write(data)
+                    data = remote_download(self.token, rel)
+                    with open(lp, "wb") as f:
+                        f.write(data)
                     changed += 1
                     self.log("↓ " + rel)
                 elif local_changed and not remote_changed:
-                    with open(lp, "rb") as f: data = f.read()
-                    remote_upload(self.token, prefix + rel, data)
+                    with open(lp, "rb") as f:
+                        data = f.read()
+                    remote_upload(self.token, rel, data)
                     changed += 1
                     self.log("↑ " + rel)
                 else:
                     # Both changed since the last sync. Newer local modification wins.
-                    if l["mtime"] >= time.time() - 2 or l["mtime"] >= old.get("local_mtime", 0):
-                        with open(lp, "rb") as f: data = f.read()
-                        remote_upload(self.token, prefix + rel, data)
+                    if l["mtime"] >= old.get("local_mtime", 0):
+                        with open(lp, "rb") as f:
+                            data = f.read()
+                        remote_upload(self.token, rel, data)
                         self.log("↑ conflict → local wins: " + rel)
                     else:
-                        data = remote_download(self.token, prefix + rel)
-                        with open(lp, "wb") as f: f.write(data)
+                        data = remote_download(self.token, rel)
+                        with open(lp, "wb") as f:
+                            f.write(data)
                         self.log("↓ conflict → cloud wins: " + rel)
                     changed += 1
             local = self.scan_local()
@@ -512,14 +552,29 @@ class App:
                     "timeout /t 3 /nobreak >nul",
                     f'del /f /q "{backup_exe}" >nul 2>&1',
                     f'move /y "{installed_exe}" "{backup_exe}" >nul 2>&1',
+                    "set /a tries=0",
                     ":retry",
                     f'copy /y "{temp_target}" "{installed_exe}" >nul 2>&1',
-                    f'if not exist "{installed_exe}" goto retry',
+                    f'if exist "{installed_exe}" goto success',
+                    "set /a tries+=1",
+                    "if %tries% GEQ 20 goto failed",
+                    "timeout /t 1 /nobreak >nul",
+                    "goto retry",
+                    ":success",
                     f'del /f /q "{backup_exe}" >nul 2>&1',
                     f'del /f /q "{temp_target}" >nul 2>&1',
                     f'start "" "{installed_exe}"',
                     'del "%~f0"',
-                    "endlocal"
+                    "endlocal",
+                    "exit /b 0",
+                    ":failed",
+                    f'del /f /q "{installed_exe}" >nul 2>&1',
+                    f'move /y "{backup_exe}" "{installed_exe}" >nul 2>&1',
+                    f'del /f /q "{temp_target}" >nul 2>&1',
+                    'msg * "DougDrive could not replace the old EXE. The previous version was restored."',
+                    'del "%~f0"',
+                    "endlocal",
+                    "exit /b 1"
                 ]
 
                 with open(updater_cmd, "w", encoding="utf-8", newline="") as fh:
