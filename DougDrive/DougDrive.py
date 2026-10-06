@@ -71,6 +71,8 @@ def remote_list(token):
                       token)
         for row in rows:
             name = row.get("name", "")
+            if name == ".dougdrive":
+                continue
             full = prefix + name
             if row.get("id") is None:
                 folders.append(full.rstrip("/") + "/")
@@ -85,7 +87,7 @@ def remote_download(token, path):
 
 def remote_upload(token, path, data):
     encoded = "/".join(urllib.parse.quote(x, safe="") for x in path.split("/"))
-    api(f"/storage/v1/object/{BUCKET}/{encoded}", "POST", data=data, token=token,
+    api(f"/storage/v1/object/{BUCKET}/{encoded}?upsert=true", "POST", data=data, token=token,
         content_type="application/octet-stream")
 
 def remote_delete(token, path):
