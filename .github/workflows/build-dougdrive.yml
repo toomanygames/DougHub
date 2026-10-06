@@ -44,7 +44,6 @@ jobs:
           }
           Copy-Item "dist/DougDrive.exe" "release/DougDrive.exe"
           Copy-Item "DougDrive/run-dougdrive.bat" "release/run-dougdrive.bat"
-
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
@@ -62,3 +61,14 @@ jobs:
             release/run-dougdrive.bat
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish latest Windows download
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view dougdrive-latest 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create dougdrive-latest --title "DougDrive Latest" --notes "Latest Windows build of DougDrive." --target "${{ github.sha }}"
+          }
+          gh release upload dougdrive-latest "release/DougDrive Setup.exe" "release/DougDrive.exe" "release/run-dougdrive.bat" --clobber
