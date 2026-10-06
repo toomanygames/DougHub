@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DougBase — Supabase Database</title>
+<title>DougBase — Database</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#070812;--panel:#0d1127;--panel2:#11162f;--line:#252b4b;--text:#f5f7ff;--muted:#98a1c2;--blue:#6366f1;--purple:#a855f7;--green:#34d399}
@@ -44,7 +44,7 @@
 <div class="layout">
 <aside class="side">
   <div class="logo">Doug<span>Base</span></div>
-  <div class="project"><b id="projectNameSide">DougBase</b><small>Supabase project</small><small>tolvtmuolnzhkegphevw</small></div>
+  <div class="project"><b id="projectNameSide">DougBase</b><small>DougBase project</small><small>DougBase Database</small></div>
   <nav class="nav">
     <button class="active" data-page="overview">⌂ Overview</button>
     <button data-page="tables">▦ Table Editor</button>
@@ -56,7 +56,7 @@
   <div class="bottom"><button id="logout" style="width:100%">← Go back</button></div>
 </aside>
 <main class="main">
-  <div class="top"><div><h1 id="title">Overview</h1><div class="muted" id="subtitle">Your DougBase database, powered by Supabase PostgreSQL.</div></div><span class="pill status"><span class="dot"></span> Connected</span></div>
+  <div class="top"><div><h1 id="title">Overview</h1><div class="muted" id="subtitle">Your DougBase database, securely managed by DougBase.</div></div><span class="pill status"><span class="dot"></span> Connected</span></div>
   <div id="content"></div>
 </main>
 </div>
@@ -229,7 +229,7 @@ async function overview(){
     <div class="card"><span class="muted">Signed in as</span><div class="value" style="font-size:15px;overflow:hidden;text-overflow:ellipsis">${esc(u.email||"User")}</div></div>
   </div>
   <div class="card section"><h2>DougBase setup</h2><p class="muted">DougHub administrators are automatically recognized as DougBase administrators. The button below refreshes that status and opens All Databases.</p><div class="toolbar"><button class="primary" id="claimAdmin">Initialize / Recognize Admin</button><span id="adminMsg" class="muted"></span></div></div>
-  <div class="card section"><h2>How DougBase works</h2><p class="muted">Your website connects to this separate Supabase PostgreSQL project. Supabase Auth and Row Level Security protect the data.</p><pre>YOUR WEBSITE
+  <div class="card section"><h2>How DougBase works</h2><p class="muted">Your website connects to your DougBase database. Authentication and Row Level Security protect your data.</p><pre>YOUR WEBSITE
   ↓
 DOUGBASE / SUPABASE API
   ↓
@@ -273,7 +273,7 @@ async function load(){
 }
 async function sql(){
   const u=await user(); if(!u)return;
-  content.innerHTML=`<div class="card"><h2>SQL Editor</h2><p class="muted">Run SQL against the separate DougBase PostgreSQL project. SQL is sent to a protected server-side function.</p>
+  content.innerHTML=`<div class="card"><h2>SQL Editor</h2><p class="muted">Run SQL against your DougBase database. SQL is sent through a protected server-side function.</p>
   <textarea id="sql" style="width:100%;min-height:300px;background:#070a16;color:white;border:1px solid var(--line);border-radius:12px;padding:15px;font:13px ui-monospace,monospace" placeholder="CREATE TABLE example (id bigint generated always as identity primary key, name text not null);"></textarea>
   <div class="toolbar"><button class="primary" id="run">Run SQL</button><span id="sqlmsg" class="muted"></span></div></div>`;
   document.querySelector("#run").onclick=runSql;
@@ -307,7 +307,7 @@ async function api(){
 }
 async function auth(){
   const u=await user(); if(!u)return;
-  content.innerHTML=`<div class="card"><h2>Authentication</h2><p class="muted">DougBase has its own Supabase Auth project, separate from DougHub.</p>
+  content.innerHTML=`<div class="card"><h2>Authentication</h2><p class="muted">DougBase uses a separate account system from DougHub.</p>
   <div class="cards"><div class="card"><span class="muted">Email</span><div class="value" style="font-size:16px">${esc(u.email)}</div></div>
   <div class="card"><span class="muted">User ID</span><div class="value" style="font-size:12px;word-break:break-all">${esc(u.id)}</div></div></div></div>`;
 }
