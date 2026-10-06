@@ -485,9 +485,8 @@ async function loadDashboard() {
 
 function installDougDrive() {
   const link = document.createElement("a");
-  link.href = "https://github.com/toomanygames/DougHub/releases/download/dougdrive-latest/DougDrive.Setup.exe";
+  link.href = "./DougDrive/DougDrive%20Setup.exe";
   link.download = "DougDrive Setup.exe";
-  link.style.display = "none";
   document.body.appendChild(link);
   link.click();
   link.remove();
