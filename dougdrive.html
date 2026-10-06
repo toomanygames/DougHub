@@ -97,8 +97,43 @@ function fmt(n) {
 }
 
 async function getSession() {
-  const { data } = await sb.auth.getSession();
-  return data.session;
+  if (sessionState && sessionState.access_token) return sessionState;
+
+  const raw = localStorage.getItem(SESSION_KEY);
+  if (!raw) return null;
+
+  try {
+    const saved = JSON.parse(raw);
+    if (!saved || !saved.access_token) return null;
+
+    if (saved.expires_at && saved.expires_at * 1000 > Date.now() + 60000) {
+      sessionState = saved;
+      return saved;
+    }
+
+    if (saved.refresh_token) {
+      const res = await fetch(HUB_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: {
+          "apikey": HUB_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ refresh_token: saved.refresh_token })
+      });
+      if (res.ok) {
+        const fresh = await res.json();
+        if (fresh && fresh.access_token) {
+          saveSession(fresh);
+          return fresh;
+        }
+      }
+    }
+  } catch (e) {
+    console.error("DougDrive session error:", e);
+  }
+
+  clearSession();
+  return null;
 }
 
 async function driveApi(action, path = "", body = null, contentType = "") {
