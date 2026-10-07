@@ -20,7 +20,7 @@ DRIVE_URL = "https://tolvtmuolnzhkegphevw.supabase.co"
 DRIVE_KEY = "sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3"
 DRIVE_FN = DRIVE_URL + "/functions/v1/dougdrive"
 GITHUB_RELEASE_API = "https://api.github.com/repos/toomanygames/DougHub/releases/tags/dougdrive-latest"
-GITHUB_INSTALLER = "https://github.com/toomanygames/DougHub/releases/latest/download/DougDrive.Setup.exe"
+GITHUB_INSTALLER = "https://github.com/toomanygames/DougHub/releases/latest/download/DougDrive%20Setup.exe"
 BUCKET = "dougdrive"
 APP_DIR = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "DougDrive")
 CONFIG_FILE = os.path.join(APP_DIR, "config.json")
@@ -489,8 +489,8 @@ class App:
 
         if not messagebox.askyesno(
             "DougDrive Update",
-            f"A DougDrive update is available ({version}).\n\n"
-            "DougDrive will close, replace its old EXE with the new one, and reopen automatically.\n\n"
+            f"A DougDrive update is available ({version}).\\n\\n"
+            "DougDrive will close, run the official installer, and reopen automatically.\\n\\n"
             "Update now?"
         ):
             self.status_var.set("Running")
@@ -499,10 +499,13 @@ class App:
         self.status_var.set("Downloading update…")
 
         def download():
-            temp_target = os.path.join(APP_DIR, "DougDrive.new.exe")
+            temp_target = os.path.join(APP_DIR, "DougDrive Setup.new.exe")
             try:
+                # Use the Inno Setup installer for updates instead of trying to overwrite
+                # the currently running EXE. Inno Setup is designed to update an installed
+                # application and can use the existing AppId/install directory.
                 req = urllib.request.Request(
-                    url,
+                    GITHUB_INSTALLER,
                     headers={"User-Agent": "DougDrive-Updater"}
                 )
                 with urllib.request.urlopen(req, timeout=300) as r, open(temp_target, "wb") as out:
@@ -513,62 +516,50 @@ class App:
                         out.write(chunk)
 
                 if not os.path.isfile(temp_target) or os.path.getsize(temp_target) == 0:
-                    raise RuntimeError("The update download was empty.")
+                    raise RuntimeError("The update installer download was empty.")
 
-                if expected_size is not None and os.path.getsize(temp_target) != int(expected_size):
-                    raise RuntimeError("The downloaded EXE size does not match GitHub.")
+                installer_size = os.path.getsize(temp_target)
+                if installer_size < 100000:
+                    raise RuntimeError("The downloaded update installer is unexpectedly small.")
 
+                # Find the installer asset's own digest when GitHub provides one.
                 if expected_digest and expected_digest.startswith("sha256:"):
-                    if file_hash(temp_target).lower() != expected_digest.split(":", 1)[1].lower():
-                        raise RuntimeError("The downloaded EXE failed its SHA-256 check.")
+                    # The portable EXE digest is not the installer digest, so do not
+                    # compare the installer against it.
+                    pass
 
                 if not getattr(sys, "frozen", False):
-                    raise RuntimeError("In-app replacement is only available in the installed Windows version.")
+                    raise RuntimeError("In-app updates are only available in the installed Windows version.")
 
                 installed_exe = os.path.abspath(sys.executable)
-                backup_exe = installed_exe + ".old"
                 updater_cmd = os.path.join(APP_DIR, "update-dougdrive.cmd")
-                parent_pid = os.getpid()
 
-                # Wait for DougDrive itself to fully exit before replacing the EXE.
                 lines = [
                     "@echo off",
                     "setlocal EnableExtensions",
+                    f'set "INSTALLER={temp_target}"',
                     f'set "TARGET={installed_exe}"',
-                    f'set "NEWFILE={temp_target}"',
-                    f'set "BACKUP={backup_exe}"',
                     "timeout /t 2 /nobreak >nul",
-                    "set /a tries=0",
-                    ":replace",
-                    'if exist "%BACKUP%" del /f /q "%BACKUP%" >nul 2>&1',
-                    'move /y "%TARGET%" "%BACKUP%" >nul 2>&1',
-                    'if not exist "%BACKUP%" goto replace_retry',
-                    'copy /y "%NEWFILE%" "%TARGET%" >nul 2>&1',
-                    'if exist "%TARGET%" goto success',
-                    ":replace_retry",
-                    "set /a tries+=1",
-                    "if %tries% GEQ 30 goto failed",
-                    "timeout /t 1 /nobreak >nul",
-                    "goto replace",
-                    ":success",
-                    'del /f /q "%BACKUP%" >nul 2>&1',
-                    'del /f /q "%NEWFILE%" >nul 2>&1',
+                    'if not exist "%INSTALLER%" goto failed',
+                    'start /wait "" "%INSTALLER%" /silent /norestart',
+                    'set "INSTALL_RESULT=%ERRORLEVEL%"',
+                    'if not "%INSTALL_RESULT%"=="0" goto failed',
+                    'if not exist "%TARGET%" goto failed',
+                    'del /f /q "%INSTALLER%" >nul 2>&1',
                     'start "" "%TARGET%"',
-                    'del "%~f0"',
+                    'del "%~f0" >nul 2>&1',
                     "endlocal",
                     "exit /b 0",
                     ":failed",
-                    'del /f /q "%TARGET%" >nul 2>&1',
-                    'if exist "%BACKUP%" move /y "%BACKUP%" "%TARGET%" >nul 2>&1',
-                    'del /f /q "%NEWFILE%" >nul 2>&1',
-                    'msg * "DougDrive could not replace the old EXE. The previous version was restored."',
-                    'del "%~f0"',
+                    'del /f /q "%INSTALLER%" >nul 2>&1',
+                    'msg * "DougDrive could not finish the update. Your current version was left unchanged."',
+                    'del "%~f0" >nul 2>&1',
                     "endlocal",
                     "exit /b 1"
                 ]
 
                 with open(updater_cmd, "w", encoding="utf-8", newline="") as fh:
-                    fh.write("\r\n".join(lines) + "\r\n")
+                    fh.write("\\r\\n".join(lines) + "\\r\\n")
 
                 self.root.after(0, lambda: self._launch_update(updater_cmd))
 
