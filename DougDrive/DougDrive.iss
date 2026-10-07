@@ -11,6 +11,8 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
+CloseApplications=force
+RestartApplications=yes
 UninstallDisplayIcon={app}\DougDrive.exe
 
 [Tasks]
@@ -18,7 +20,7 @@ Name: "startup"; Description: "Start DougDrive when Windows starts"; Flags: unch
 Name: "desktopicon"; Description: "Create a desktop shortcut"; Flags: unchecked
 
 [Files]
-Source: "..\dist\DougDrive.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\DougDrive.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace
 
 [Dirs]
 Name: "{%USERPROFILE}\DougDrive"
