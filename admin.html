@@ -888,6 +888,12 @@ button:disabled {
 
 </div>
 
+
+<div class="card">
+<h2>💻 DougHub Code Projects</h2>
+<div class="status" id="codeProjectStatus">Loading code projects...</div>
+<div id="codeProjects" class="admin-scroll-area"></div>
+</div>
 </div>
 </div>
 
@@ -3577,6 +3583,34 @@ async function loadDougBaseAccessRequests() {
 }
 
 
+
+/* DOUGHUB CODE PROJECT MODERATION */
+const codeProjectStatus=document.getElementById("codeProjectStatus");
+const codeProjects=document.getElementById("codeProjects");
+async function loadCodeProjects(){
+  codeProjectStatus.textContent="Loading code projects..."; codeProjects.innerHTML="";
+  const {data,error}=await supabaseClient.from("code_projects").select("id,owner_id,title,description,visibility,allow_copy,allow_download,created_at,updated_at").order("updated_at",{ascending:false});
+  if(error){codeProjectStatus.textContent="Could not load code projects.";codeProjects.innerHTML='<div class="error">'+escapeHtml(error.message)+'</div>';return;}
+  codeProjectStatus.textContent=data.length+" project"+(data.length===1?"":"s")+" — admins can see public and private projects.";
+  if(!data.length){codeProjects.innerHTML='<div class="empty">No DougHub Code projects.</div>';return;}
+  const ids=[...new Set(data.map(p=>p.owner_id))];
+  const {data:profiles}=await supabaseClient.from("profiles").select("id,username").in("id",ids);
+  const names=new Map((profiles||[]).map(p=>[p.id,p.username||"User"]));
+  data.forEach(p=>{
+    const item=document.createElement("div");item.className="message";
+    const top=document.createElement("div");top.className="top-row";
+    const title=document.createElement("div");title.className="game-title";title.textContent=p.title;
+    const meta=document.createElement("div");meta.className="game-info";meta.textContent="@"+(names.get(p.owner_id)||"User")+" • "+(p.visibility==="private"?"PRIVATE":"PUBLIC")+" • "+new Date(p.updated_at).toLocaleString();
+    top.appendChild(title);top.appendChild(meta);item.appendChild(top);
+    const desc=document.createElement("div");desc.className="game-description";desc.textContent=p.description||"No description.";item.appendChild(desc);
+    const info=document.createElement("div");info.className="game-info";info.textContent="Copy: "+(p.allow_copy?"Allowed":"Blocked")+" • Download: "+(p.allow_download?"Allowed":"Blocked");item.appendChild(info);
+    const buttons=document.createElement("div");buttons.className="buttons";
+    const open=document.createElement("button");open.textContent="Open";open.onclick=()=>location.href="dougcode.html#project="+p.id;
+    const del=document.createElement("button");del.className="delete-button";del.textContent="Delete";del.onclick=async()=>{if(!confirm("Delete this DougHub Code project?"))return;const r=await supabaseClient.from("code_projects").delete().eq("id",p.id);if(r.error)alert(r.error.message);else loadCodeProjects();};
+    buttons.appendChild(open);buttons.appendChild(del);item.appendChild(buttons);codeProjects.appendChild(item);
+  });
+}
+
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -3598,6 +3632,7 @@ async function startAdminPanel() {
         loadUserActivity(),
         loadDougTubeVideos(),
         loadDougBaseAccessRequests(),
+        loadCodeProjects(),
     ]);
 
     setInterval(
