@@ -545,32 +545,55 @@ class App:
                 installed_exe = os.path.abspath(sys.executable)
                 backup_exe = installed_exe + ".old"
                 updater_cmd = os.path.join(APP_DIR, "update-dougdrive.cmd")
+                parent_pid = os.getpid()
 
+                # Wait for DougDrive itself to fully exit before replacing the EXE.
                 lines = [
                     "@echo off",
-                    "setlocal",
-                    "timeout /t 3 /nobreak >nul",
-                    f'del /f /q "{backup_exe}" >nul 2>&1',
-                    f'move /y "{installed_exe}" "{backup_exe}" >nul 2>&1',
-                    "set /a tries=0",
-                    ":retry",
-                    f'copy /y "{temp_target}" "{installed_exe}" >nul 2>&1',
-                    f'if exist "{installed_exe}" goto success',
-                    "set /a tries+=1",
-                    "if %tries% GEQ 20 goto failed",
+                    "setlocal EnableExtensions",
+                    f'set "TARGET={installed_exe}"',
+                    f'set "NEWFILE={temp_target}"',
+                    f'set "BACKUP={backup_exe}"',
+                    f'set "PID={parent_pid}"',
+                    "set /a waittries=0",
+                    ":wait_for_app",
+                    'tasklist /FI "PID eq %PID%" 2>nul | findstr /R /C:"%PID%" >nul',
+                    "if errorlevel 1 goto app_closed",
+                    "set /a waittries+=1",
+                    "if %waittries% GEQ 60 goto wait_failed",
                     "timeout /t 1 /nobreak >nul",
-                    "goto retry",
+                    "goto wait_for_app",
+                    ":app_closed",
+                    "timeout /t 1 /nobreak >nul",
+                    "set /a tries=0",
+                    ":replace",
+                    'if exist "%BACKUP%" del /f /q "%BACKUP%" >nul 2>&1',
+                    'move /y "%TARGET%" "%BACKUP%" >nul 2>&1',
+                    'if not exist "%BACKUP%" goto replace_retry',
+                    'copy /y "%NEWFILE%" "%TARGET%" >nul 2>&1',
+                    'if exist "%TARGET%" goto success',
+                    ":replace_retry",
+                    "set /a tries+=1",
+                    "if %tries% GEQ 30 goto failed",
+                    "timeout /t 1 /nobreak >nul",
+                    "goto replace",
                     ":success",
-                    f'del /f /q "{backup_exe}" >nul 2>&1',
-                    f'del /f /q "{temp_target}" >nul 2>&1',
-                    f'start "" "{installed_exe}"',
+                    'del /f /q "%BACKUP%" >nul 2>&1',
+                    'del /f /q "%NEWFILE%" >nul 2>&1',
+                    'start "" "%TARGET%"',
                     'del "%~f0"',
                     "endlocal",
                     "exit /b 0",
+                    ":wait_failed",
+                    'msg * "DougDrive could not close cleanly for the update. The old version was left untouched."',
+                    'del /f /q "%NEWFILE%" >nul 2>&1',
+                    'del "%~f0"',
+                    "endlocal",
+                    "exit /b 1",
                     ":failed",
-                    f'del /f /q "{installed_exe}" >nul 2>&1',
-                    f'move /y "{backup_exe}" "{installed_exe}" >nul 2>&1',
-                    f'del /f /q "{temp_target}" >nul 2>&1',
+                    'del /f /q "%TARGET%" >nul 2>&1',
+                    'if exist "%BACKUP%" move /y "%BACKUP%" "%TARGET%" >nul 2>&1',
+                    'del /f /q "%NEWFILE%" >nul 2>&1',
                     'msg * "DougDrive could not replace the old EXE. The previous version was restored."',
                     'del "%~f0"',
                     "endlocal",
@@ -610,14 +633,16 @@ class App:
                 close_fds=True
             )
         except Exception as ex:
+            self.status_var.set("Update failed")
             messagebox.showerror("DougDrive Update", f"Could not start the updater: {ex}")
             return
 
-        self.root.destroy()
+        # Let the updater detect our PID disappearing before it replaces the EXE.
+        self.root.after(150, self.root.destroy)
 
     def close(self):
         self.drive.stop_event.set()
-        self.root.destroy()
+        self.root.after(50, self.root.destroy)
 
 if __name__=="__main__":
     root=tk.Tk()
