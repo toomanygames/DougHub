@@ -532,17 +532,7 @@ class App:
                     f'set "TARGET={installed_exe}"',
                     f'set "NEWFILE={temp_target}"',
                     f'set "BACKUP={backup_exe}"',
-                    f'set "PID={parent_pid}"',
-                    "set /a waittries=0",
-                    ":wait_for_app",
-                    'tasklist /FI "PID eq %PID%" /FO CSV /NH >nul 2>&1',
-                    "if errorlevel 1 goto app_closed",
-                    "set /a waittries+=1",
-                    "if %waittries% GEQ 60 goto wait_failed",
-                    "timeout /t 1 /nobreak >nul",
-                    "goto wait_for_app",
-                    ":app_closed",
-                    "timeout /t 1 /nobreak >nul",
+                    "timeout /t 2 /nobreak >nul",
                     "set /a tries=0",
                     ":replace",
                     'if exist "%BACKUP%" del /f /q "%BACKUP%" >nul 2>&1',
@@ -562,12 +552,6 @@ class App:
                     'del "%~f0"',
                     "endlocal",
                     "exit /b 0",
-                    ":wait_failed",
-                    'msg * "DougDrive could not close cleanly for the update. The old version was left untouched."',
-                    'del /f /q "%NEWFILE%" >nul 2>&1',
-                    'del "%~f0"',
-                    "endlocal",
-                    "exit /b 1",
                     ":failed",
                     'del /f /q "%TARGET%" >nul 2>&1',
                     'if exist "%BACKUP%" move /y "%BACKUP%" "%TARGET%" >nul 2>&1',
@@ -600,8 +584,8 @@ class App:
         self.drive.stop_event.set()
 
         creationflags = (
-            getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
-            | getattr(subprocess, "DETACHED_PROCESS", 0)
+            getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
         )
 
         try:
