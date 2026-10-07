@@ -535,7 +535,7 @@ class App:
                     f'set "PID={parent_pid}"',
                     "set /a waittries=0",
                     ":wait_for_app",
-                    'tasklist /FI "PID eq %PID%" 2>nul | findstr /R /C:"%PID%" >nul',
+                    'tasklist /FI "PID eq %PID%" /FO CSV /NH >nul 2>&1',
                     "if errorlevel 1 goto app_closed",
                     "set /a waittries+=1",
                     "if %waittries% GEQ 60 goto wait_failed",
