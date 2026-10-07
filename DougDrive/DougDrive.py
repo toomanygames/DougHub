@@ -25,7 +25,8 @@ BUCKET = "dougdrive"
 APP_DIR = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "DougDrive")
 CONFIG_FILE = os.path.join(APP_DIR, "config.json")
 STATE_FILE = os.path.join(APP_DIR, "state.json")
-DEFAULT_FOLDER = os.path.join(os.path.expanduser("~"), "DougDrive")
+DESKTOP_FOLDER_NAME = "DougDrive"
+DEFAULT_FOLDER = os.path.join(os.path.join(os.path.expanduser("~"), "Desktop"), DESKTOP_FOLDER_NAME)
 SYNC_INTERVAL = 5
 
 os.makedirs(APP_DIR, exist_ok=True)
