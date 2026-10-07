@@ -1865,9 +1865,21 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#6366f1,#a855f7);border-radius:999px;border:2px solid rgba(2,4,10,.55)}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#818cf8,#c084fc)}
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
+</style><style id="dh-tutorial-style">
+.dh-tutorial{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.dh-tutorial.show{display:flex}.dh-tutorial-backdrop{position:absolute;inset:0;background:rgba(1,2,8,.76);backdrop-filter:blur(14px)}.dh-tutorial-card{position:relative;width:min(520px,100%);padding:30px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:radial-gradient(circle at 85% 5%,rgba(168,85,247,.22),transparent 32%),radial-gradient(circle at 10% 90%,rgba(99,102,241,.2),transparent 38%),rgba(13,17,39,.94);box-shadow:0 35px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07);animation:dhTutorialIn .25s ease}.dh-tutorial-top{display:flex;align-items:center;justify-content:space-between;color:#777b94;font-size:12px;font-weight:800}.dh-tutorial-badge{color:#aaa9ff;letter-spacing:.1em}.dh-tutorial-icon{width:72px;height:72px;display:grid;place-items:center;margin:28px 0 18px;border-radius:22px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.25);font-size:34px;box-shadow:0 12px 35px rgba(99,102,241,.12)}.dh-tutorial-card h2{margin:0;font-size:30px;letter-spacing:-1px}.dh-tutorial-card p{margin:10px 0 0;color:#a7a8b8;font-size:15px;line-height:1.65}.dh-tutorial-dots{display:flex;gap:7px;margin:25px 0}.dh-tutorial-dot{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.16);transition:.2s}.dh-tutorial-dot.active{width:24px;background:linear-gradient(90deg,#6366f1,#a855f7)}.dh-tutorial-actions{display:flex;justify-content:space-between;gap:10px}.dh-tutorial-skip,.dh-tutorial-next{padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.dh-tutorial-skip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#a4a5b5}.dh-tutorial-next{border:0;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px rgba(99,102,241,.2)}@keyframes dhTutorialIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}@media(max-width:560px){.dh-tutorial-card{padding:24px;border-radius:22px}.dh-tutorial-card h2{font-size:25px}}
 </style></head>
 
-<body>
+<body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
+  <div class="dh-tutorial-backdrop"></div>
+  <section class="dh-tutorial-card" role="dialog" aria-modal="true" aria-labelledby="dhTutorialTitle">
+    <div class="dh-tutorial-top"><span class="dh-tutorial-badge">✨ WELCOME TO DOUGHUB</span><span id="dhTutorialStep">1 / 5</span></div>
+    <div id="dhTutorialIcon" class="dh-tutorial-icon">👋</div>
+    <h2 id="dhTutorialTitle">Welcome to DougHub!</h2>
+    <p id="dhTutorialText">Your new account is ready. Let’s take a quick tour so you know where everything is.</p>
+    <div class="dh-tutorial-dots" id="dhTutorialDots"></div>
+    <div class="dh-tutorial-actions"><button id="dhTutorialSkip" class="dh-tutorial-skip">Skip</button><button id="dhTutorialNext" class="dh-tutorial-next">Next →</button></div>
+  </section>
+</div>
 
 <header>
 
@@ -2482,7 +2494,7 @@ async function loadAccount() {
         await supabaseClient
             .from("profiles")
             .select(
-                "username, avatar_url, is_admin"
+                "username, avatar_url, is_admin, tutorial_completed"
             )
             .eq(
                 "id",
@@ -2562,6 +2574,10 @@ async function loadAccount() {
     }
 
     await loadDMailCount();
+
+    if (profile?.tutorial_completed !== true) {
+        showDougHubTutorial();
+    }
 
 }
 
@@ -3583,5 +3599,45 @@ setInterval(
 
 </script>
 
-</body>
+<script>
+const DOUGHUB_TUTORIAL_STEPS = [
+  {icon:"👋",title:"Welcome to DougHub!",text:"Your new account is ready. Let’s take a quick tour so you know where everything is."},
+  {icon:"🎮",title:"Play games",text:"Open Games to play DougHub games and discover community-made games."},
+  {icon:"🛠️",title:"DougHub Work",text:"The small tool icon in the big homepage header opens DougHub Work, where your work tools live."},
+  {icon:"💬",title:"Connect",text:"Use Community Chat and DMail to keep up with the DougHub community."},
+  {icon:"🚀",title:"You’re ready!",text:"That’s the basics. You can always explore the homepage and come back to your tools whenever you want."}
+];
+let dhTutorialIndex=0;
+function showDougHubTutorial(){
+  const modal=document.getElementById("dhTutorial");
+  if(!modal||!currentUser)return;
+  dhTutorialIndex=0;
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+  renderDougHubTutorial();
+}
+function renderDougHubTutorial(){
+  const s=DOUGHUB_TUTORIAL_STEPS[dhTutorialIndex];
+  document.getElementById("dhTutorialIcon").textContent=s.icon;
+  document.getElementById("dhTutorialTitle").textContent=s.title;
+  document.getElementById("dhTutorialText").textContent=s.text;
+  document.getElementById("dhTutorialStep").textContent=(dhTutorialIndex+1)+" / "+DOUGHUB_TUTORIAL_STEPS.length;
+  document.getElementById("dhTutorialNext").textContent=dhTutorialIndex===DOUGHUB_TUTORIAL_STEPS.length-1?"Finish ✓":"Next →";
+  document.getElementById("dhTutorialDots").innerHTML=DOUGHUB_TUTORIAL_STEPS.map((_,i)=>'<span class="dh-tutorial-dot '+(i===dhTutorialIndex?"active":"")+'"></span>').join("");
+}
+async function finishDougHubTutorial(){
+  const modal=document.getElementById("dhTutorial");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden","true");
+  if(currentUser){
+    const {error}=await supabaseClient.from("profiles").update({tutorial_completed:true}).eq("id",currentUser.id);
+    if(error) console.error("Could not save tutorial status:",error);
+  }
+}
+document.getElementById("dhTutorialNext")?.addEventListener("click",()=>{
+  if(dhTutorialIndex<DOUGHUB_TUTORIAL_STEPS.length-1){dhTutorialIndex++;renderDougHubTutorial();}else{finishDougHubTutorial();}
+});
+document.getElementById("dhTutorialSkip")?.addEventListener("click",finishDougHubTutorial);
+document.querySelector(".dh-tutorial-backdrop")?.addEventListener("click",finishDougHubTutorial);
+</script></body>
 </html>
