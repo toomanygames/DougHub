@@ -33,6 +33,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Add DougDrive installer
+        if: github.event_name == 'workflow_run'
         shell: bash
         run: |
           mkdir -p "DougDrive"
