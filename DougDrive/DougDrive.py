@@ -184,40 +184,15 @@ class DougDrive:
                 self.user_id = get_hub_user(self.token).get("id")
             except Exception:
                 self.user_id = None
+        # Keep email/folder for convenience, but never persist a session token.
+        # DougDrive requires a fresh sign-in every time it starts.
         cfg = load_json(CONFIG_FILE, {})
-        cfg.update({"email": email, "folder": self.folder, "refresh_token": self.refresh_token})
+        cfg.pop("refresh_token", None)
+        cfg.update({"email": email, "folder": self.folder})
         save_json(CONFIG_FILE, cfg)
         self.log("Signed in successfully.")
         self.status("Connected")
         return True
-
-    def try_saved_login(self):
-        cfg = load_json(CONFIG_FILE, {})
-        rt = cfg.get("refresh_token")
-        if not rt: return False
-        try:
-            data = auth_refresh(rt)
-            self.token = data["access_token"]
-            self.refresh_token = data.get("refresh_token", rt)
-            try:
-                payload = self.token.split(".")[1]
-                payload += "=" * (-len(payload) % 4)
-                self.user_id = json.loads(base64.urlsafe_b64decode(payload)).get("sub")
-            except Exception:
-                self.user_id = None
-            if not self.user_id:
-                self.user_id = (data.get("user") or {}).get("id")
-            if not self.user_id:
-                try:
-                    self.user_id = get_hub_user(self.token).get("id")
-                except Exception:
-                    self.user_id = None
-            cfg["refresh_token"] = self.refresh_token
-            save_json(CONFIG_FILE, cfg)
-            self.status("Connected")
-            return True
-        except Exception:
-            return False
 
     def scan_local(self):
         out = {}
@@ -353,7 +328,7 @@ class DougDrive:
                         self.token = data["access_token"]
                         self.refresh_token = data.get("refresh_token", self.refresh_token)
                         cfg = load_json(CONFIG_FILE, {})
-                        cfg["refresh_token"] = self.refresh_token
+                        cfg.pop("refresh_token", None)
                         save_json(CONFIG_FILE, cfg)
                 except Exception: pass
         finally:
@@ -373,10 +348,11 @@ class App:
         root.minsize(560, 420)
         self.drive = DougDrive(self.log, self.status)
         self.build()
-        if self.drive.try_saved_login():
-            self.login_frame.pack_forget()
-            self.drive_frame.pack(fill="both", expand=True)
-            self.start_sync()
+        # Always show the sign-in screen on startup.
+        # The updater reopens the new EXE normally, so it will require sign-in too.
+        saved_email = load_json(CONFIG_FILE, {}).get("email", "")
+        if saved_email:
+            self.email.insert(0, saved_email)
         root.protocol("WM_DELETE_WINDOW", self.close)
 
     def build(self):
