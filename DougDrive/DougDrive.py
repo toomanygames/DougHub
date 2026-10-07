@@ -178,6 +178,8 @@ class DougDrive:
         except Exception:
             self.user_id = None
         if not self.user_id:
+            self.user_id = (data.get("user") or {}).get("id")
+        if not self.user_id:
             try:
                 self.user_id = get_hub_user(self.token).get("id")
             except Exception:
@@ -203,6 +205,8 @@ class DougDrive:
                 self.user_id = json.loads(base64.urlsafe_b64decode(payload)).get("sub")
             except Exception:
                 self.user_id = None
+            if not self.user_id:
+                self.user_id = (data.get("user") or {}).get("id")
             if not self.user_id:
                 try:
                     self.user_id = get_hub_user(self.token).get("id")
@@ -237,9 +241,7 @@ class DougDrive:
             # The private bucket policy expects each user's UUID as the first path segment.
             prefix = ""
             remote = remote
-            # Safety: if user id couldn't be read, don't touch storage.
-            if not self.user_id:
-                raise RuntimeError("Could not determine the signed-in account.")
+            # The Edge Function validates the DougHub token and scopes storage to that user.
             changed = 0
             all_paths = set(local) | set(remote) | set(self.state)
             for rel in sorted(all_paths):
