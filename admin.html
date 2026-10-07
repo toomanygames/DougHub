@@ -1786,16 +1786,35 @@ async function banAccount() {
     banAccountButton.textContent =
         type === "suspend" ? "Suspending..." : "Banning...";
 
-    const { error } = await supabaseClient
-        .from("profiles")
-        .update({
-            is_banned: true,
-            ban_reason: reason,
-            banned_at: new Date().toISOString(),
-            ban_type: type,
-            suspended_until: suspendedUntil
-        })
-        .eq("id", userId);
+    let error = null;
+
+    if (type === "ban") {
+        /*
+         * Permanent bans remove the account from Supabase Auth and
+         * cascade-delete its profile and other user-owned rows.
+         * The privileged Auth deletion happens in the protected
+         * DougHub Edge Function, never in the browser.
+         */
+        const result = await supabaseClient.functions.invoke(
+            "doughub-admin-delete-user",
+            {
+                body: { user_id: userId }
+            }
+        );
+        error = result.error || (result.data?.error ? new Error(result.data.error) : null);
+    } else {
+        const result = await supabaseClient
+            .from("profiles")
+            .update({
+                is_banned: true,
+                ban_reason: reason,
+                banned_at: new Date().toISOString(),
+                ban_type: type,
+                suspended_until: suspendedUntil
+            })
+            .eq("id", userId);
+        error = result.error;
+    }
 
     banAccountButton.disabled = false;
     updateBanButton();
