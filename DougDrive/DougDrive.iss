@@ -23,7 +23,7 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; Flags: unchecked
 Source: "..\dist\DougDrive.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace
 
 [Dirs]
-Name: "{%USERPROFILE}\DougDrive"
+Name: "{userprofile}\DougDrive"
 Name: "{userstartup}"
 
 [Icons]
