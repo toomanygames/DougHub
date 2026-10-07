@@ -1866,7 +1866,7 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#818cf8,#c084fc)}
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
 </style><style id="dh-tutorial-style">
-.dh-tutorial{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.dh-tutorial.show{display:flex}.dh-tutorial-backdrop{position:absolute;inset:0;background:rgba(1,2,8,.76);backdrop-filter:blur(14px)}.dh-tutorial-card{position:relative;width:min(520px,100%);padding:30px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:radial-gradient(circle at 85% 5%,rgba(168,85,247,.22),transparent 32%),radial-gradient(circle at 10% 90%,rgba(99,102,241,.2),transparent 38%),rgba(13,17,39,.94);box-shadow:0 35px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07);animation:dhTutorialIn .25s ease}.dh-tutorial-top{display:flex;align-items:center;justify-content:space-between;color:#777b94;font-size:12px;font-weight:800}.dh-tutorial-badge{color:#aaa9ff;letter-spacing:.1em}.dh-tutorial-icon{width:72px;height:72px;display:grid;place-items:center;margin:28px 0 18px;border-radius:22px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.25);font-size:34px;box-shadow:0 12px 35px rgba(99,102,241,.12)}.dh-tutorial-card h2{margin:0;font-size:30px;letter-spacing:-1px}.dh-tutorial-card p{margin:10px 0 0;color:#a7a8b8;font-size:15px;line-height:1.65}.dh-tutorial-dots{display:flex;gap:7px;margin:25px 0}.dh-tutorial-dot{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.16);transition:.2s}.dh-tutorial-dot.active{width:24px;background:linear-gradient(90deg,#6366f1,#a855f7)}.dh-tutorial-actions{display:flex;justify-content:space-between;gap:10px}.dh-tutorial-skip,.dh-tutorial-next{padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.dh-tutorial-skip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#a4a5b5}.dh-tutorial-next{border:0;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px rgba(99,102,241,.2)}@keyframes dhTutorialIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}@media(max-width:560px){.dh-tutorial-card{padding:24px;border-radius:22px}.dh-tutorial-card h2{font-size:25px}}
+.dh-tutorial-highlight{position:relative!important;z-index:100001!important;box-shadow:0 0 0 4px rgba(129,140,248,.75),0 0 35px rgba(129,140,248,.55)!important;border-color:rgba(196,181,253,.9)!important;animation:dhTutorialPulse 1.2s ease-in-out infinite}.dh-tutorial-highlight:after{content:"";position:absolute;inset:-7px;border:2px solid rgba(196,181,253,.5);border-radius:inherit;pointer-events:none}@keyframes dhTutorialPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.22)}}.dh-tutorial{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.dh-tutorial.show{display:flex}.dh-tutorial-backdrop{position:absolute;inset:0;background:rgba(1,2,8,.76);backdrop-filter:blur(14px)}.dh-tutorial-card{position:relative;width:min(520px,100%);padding:30px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:radial-gradient(circle at 85% 5%,rgba(168,85,247,.22),transparent 32%),radial-gradient(circle at 10% 90%,rgba(99,102,241,.2),transparent 38%),rgba(13,17,39,.94);box-shadow:0 35px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07);animation:dhTutorialIn .25s ease}.dh-tutorial-top{display:flex;align-items:center;justify-content:space-between;color:#777b94;font-size:12px;font-weight:800}.dh-tutorial-badge{color:#aaa9ff;letter-spacing:.1em}.dh-tutorial-icon{width:72px;height:72px;display:grid;place-items:center;margin:28px 0 18px;border-radius:22px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.25);font-size:34px;box-shadow:0 12px 35px rgba(99,102,241,.12)}.dh-tutorial-card h2{margin:0;font-size:30px;letter-spacing:-1px}.dh-tutorial-card p{margin:10px 0 0;color:#a7a8b8;font-size:15px;line-height:1.65}.dh-tutorial-dots{display:flex;gap:7px;margin:25px 0}.dh-tutorial-dot{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.16);transition:.2s}.dh-tutorial-dot.active{width:24px;background:linear-gradient(90deg,#6366f1,#a855f7)}.dh-tutorial-actions{display:flex;justify-content:space-between;gap:10px}.dh-tutorial-skip,.dh-tutorial-next{padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.dh-tutorial-skip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#a4a5b5}.dh-tutorial-next{border:0;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px rgba(99,102,241,.2)}@keyframes dhTutorialIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}@media(max-width:560px){.dh-tutorial-card{padding:24px;border-radius:22px}.dh-tutorial-card h2{font-size:25px}}
 </style></head>
 
 <body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
@@ -1902,20 +1902,6 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
             class="nav-link"
         >
             Games
-        </a>
-
-        <a
-            href="work.html"
-            class="nav-link"
-        >
-            Work
-        </a>
-
-        <a
-            href="dougcode.html"
-            class="nav-link"
-        >
-            Code
         </a>
 
         <a
@@ -3601,11 +3587,12 @@ setInterval(
 
 <script>
 const DOUGHUB_TUTORIAL_STEPS = [
-  {icon:"👋",title:"Welcome to DougHub!",text:"Your new account is ready. Let’s take a quick tour so you know where everything is."},
-  {icon:"🎮",title:"Play games",text:"Open Games to play DougHub games and discover community-made games."},
-  {icon:"🛠️",title:"DougHub Work",text:"The small tool icon in the big homepage header opens DougHub Work, where your work tools live."},
-  {icon:"💬",title:"Connect",text:"Use Community Chat and DMail to keep up with the DougHub community."},
-  {icon:"🚀",title:"You’re ready!",text:"That’s the basics. You can always explore the homepage and come back to your tools whenever you want."}
+  {icon:"👋",title:"Welcome to DougHub!",text:"Your new account is ready. I’ll show you exactly where to click to get around DougHub.",target:null},
+  {icon:"🎮",title:"Games",text:"Click Games in the top navigation to open DougHub Games and play available games.",target:"a[href="douggames.html"]"},
+  {icon:"🛠️",title:"DougHub Work",text:"Click the 🛠️ tool icon in the top-left of this big header to open DougHub Work.",target:".work-hero-icon"},
+  {icon:"⚙️",title:"Your account settings",text:"Click your account button in the top-right, then choose Settings. You can change your account details and preferences there.",target:"#accountButton"},
+  {icon:"💬",title:"Community",text:"Use Chat and DMail in the top navigation to connect with the DougHub community.",target:"#communityChatLink"},
+  {icon:"🚀",title:"You’re ready!",text:"That’s the basics! You now know where the main buttons are and where to manage your account.",target:null}
 ];
 let dhTutorialIndex=0;
 function showDougHubTutorial(){
@@ -3624,6 +3611,11 @@ function renderDougHubTutorial(){
   document.getElementById("dhTutorialStep").textContent=(dhTutorialIndex+1)+" / "+DOUGHUB_TUTORIAL_STEPS.length;
   document.getElementById("dhTutorialNext").textContent=dhTutorialIndex===DOUGHUB_TUTORIAL_STEPS.length-1?"Finish ✓":"Next →";
   document.getElementById("dhTutorialDots").innerHTML=DOUGHUB_TUTORIAL_STEPS.map((_,i)=>'<span class="dh-tutorial-dot '+(i===dhTutorialIndex?"active":"")+'"></span>').join("");
+  document.querySelectorAll(".dh-tutorial-highlight").forEach(el=>el.classList.remove("dh-tutorial-highlight"));
+  if(s.target){
+    const target=document.querySelector(s.target);
+    if(target) target.classList.add("dh-tutorial-highlight");
+  }
 }
 async function finishDougHubTutorial(){
   const modal=document.getElementById("dhTutorial");
