@@ -376,6 +376,16 @@ class App:
         self.login_msg = ttk.Label(form,text=""); self.login_msg.grid(row=5,column=0,pady=10)
         self.login_frame.pack(fill="both",expand=True)
 
+        # Tell users exactly where the sync folder belongs.
+        ttk.Label(
+            self.login_frame,
+            text="Before signing in, create a folder named DougDrive on your Desktop.\n"
+                 "Anything you put in that folder will sync with the DougDrive website.",
+            justify="center",
+            wraplength=520,
+            font=("Segoe UI", 10)
+        ).pack(pady=(0, 15))
+
         self.drive_frame = ttk.Frame(self.root,padding=20)
         top=ttk.Frame(self.drive_frame); top.pack(fill="x")
         ttk.Label(top,text="DougDrive",font=("Segoe UI",24,"bold")).pack(side="left")
