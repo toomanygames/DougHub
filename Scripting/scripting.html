@@ -1079,5 +1079,16 @@ checkLogin();
 <script src="scripting.js?v=2"></script>
 
 
-</body>
+<script>
+(function(){
+  const fromWork=new URLSearchParams(location.search).get("from")==="work";
+  if(!fromWork)return;
+  document.querySelectorAll('a[href]').forEach(function(a){
+    const href=a.getAttribute("href")||"";
+    if(href==="index.html"||href==="../index.html"||href==="index.html#home"||href==="../index.html#home"){
+      a.setAttribute("href","../work.html");
+    }
+  });
+})();
+</script></body>
 </html>
