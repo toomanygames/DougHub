@@ -162,9 +162,13 @@ class DougDrive:
         self.token = None
         self.refresh_token = None
         self.user_id = None
-        self.folder = load_json(CONFIG_FILE, {}).get("folder", DEFAULT_FOLDER)
-        self.state = load_json(STATE_FILE, {})
+        self.folder = DEFAULT_FOLDER
         os.makedirs(self.folder, exist_ok=True)
+        cfg = load_json(CONFIG_FILE, {})
+        if cfg.get("folder") != self.folder:
+            cfg["folder"] = self.folder
+            save_json(CONFIG_FILE, cfg)
+        self.state = load_json(STATE_FILE, {})
 
     def login(self, email, password):
         data = auth_login(email, password)
