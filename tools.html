@@ -23,7 +23,7 @@ h1{font-size:clamp(38px,6vw,66px);letter-spacing:-2px;margin:18px 0 12px}h1 span
 .search-wrap{display:flex;gap:10px;margin:22px auto 0;max-width:520px}
 input,textarea,select{width:100%;padding:11px 12px;color:#fff;background:#050713;border:1px solid var(--line);border-radius:10px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:#818cf8}
-.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}.tool-card:nth-child(-n+6){min-height:500px}
+.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
 .tool-card{min-width:0;padding:21px;border:1px solid var(--line);border-radius:19px;background:var(--panel);box-shadow:0 12px 36px #0002}
 .tool-heading{display:flex;align-items:center;gap:12px;margin-bottom:15px}.tool-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid #818cf833;border-radius:14px;background:#6366f120;font-size:23px}
 h2{margin:0;font-size:18px}.description{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
@@ -40,7 +40,7 @@ textarea{resize:vertical;min-height:94px;line-height:1.5}.output{margin-top:10px
 footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);color:#77768b;font-size:13px}
 .notice{margin:20px 0 0;color:#88879d;font-size:12px;text-align:center;line-height:1.6}
 @media(max-width:900px){.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr))}header{padding:14px 18px}nav{gap:12px}}
-@media(max-width:600px){.tools-grid{grid-template-columns:1fr}.tool-card:nth-child(-n+6){min-height:0}header{align-items:flex-start;flex-direction:column;gap:12px}nav{width:100%;justify-content:space-between;gap:9px}nav a{font-size:12px}.hero{padding-top:24px}.hero-card{padding:32px 18px}.tools-grid{grid-template-columns:1fr}.tool-card{padding:18px}.search-wrap{flex-direction:column}}
+@media(max-width:600px){.tools-grid{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column;gap:12px}nav{width:100%;justify-content:space-between;gap:9px}nav a{font-size:12px}.hero{padding-top:24px}.hero-card{padding:32px 18px}.tools-grid{grid-template-columns:1fr}.tool-card{padding:18px}.search-wrap{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -106,7 +106,7 @@ footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);colo
       <div class="row"><div><label for="randomMin">Minimum</label><input id="randomMin" type="number" value="1" step="1"></div><div><label for="randomMax">Maximum</label><input id="randomMax" type="number" value="100" step="1"></div></div>
       <button type="button" id="generateRandom" style="width:100%;margin-top:12px">Generate number</button>
       <div id="randomResult" class="timer-display" aria-live="polite">—</div><div id="randomStatus" class="status"></div>
-
+    </article>
     <article class="tool-card" data-search="password generator random secure passphrase">
       <div class="tool-heading"><div class="tool-icon">🔐</div><div><h2>Password Generator</h2><p class="description">Generate a random password locally in your browser.</p></div></div>
       <label for="pwLength">Password length</label><input id="pwLength" type="number" min="8" max="128" value="20">
@@ -208,7 +208,6 @@ footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);colo
       <div class="row"><button id="cleanSpaces" type="button">Clean spaces</button><button id="cleanBlank" type="button">Remove blank lines</button></div>
       <label for="cleanOutput">Cleaned text</label><textarea id="cleanOutput"></textarea>
       <button id="copyClean" class="secondary" type="button" style="margin-top:8px;width:100%">Copy result</button><div id="cleanStatus" class="status"></div>
-    </article>
     </article>
   </section>
   <p class="notice" id="noTools" hidden>No tools match your search. Try another word.</p>
