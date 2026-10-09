@@ -30,7 +30,9 @@
   function protect(input) {
     if (!looksLikeSearch(input)) return;
 
-    input.setAttribute("autocomplete", "off");
+    // Chromium browsers sometimes ignore autocomplete="off" and still offer saved usernames.
+    // "new-password" is a stronger autofill hint for non-credential search fields.
+    input.setAttribute("autocomplete", "new-password");
     input.setAttribute("autocorrect", "off");
     input.setAttribute("autocapitalize", "off");
     input.setAttribute("spellcheck", "false");
@@ -41,7 +43,7 @@
 
     // Password managers often use name/id heuristics even when autocomplete is off.
     // Give search fields a neutral name rather than anything resembling a username.
-    if (/user|login|account|email|credential/i.test(input.name)) {
+    if (input.name !== AUTOFILL_NAME) {
       input.name = AUTOFILL_NAME;
     }
     if (/user(name)?|login|account|email|credential/i.test(input.id)) {
