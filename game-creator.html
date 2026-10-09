@@ -9,6 +9,71 @@
 <script src="display.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#050611;--panel:#10142b;--line:#ffffff17;--muted:#a4abc3;--accent:#8b5cf6}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;color:#f7f7ff;background:radial-gradient(circle at 10% 0%,#21164b 0,transparent 34%),radial-gradient(circle at 90% 10%,#301047 0,transparent 30%),var(--bg)}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}.top{height:66px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#050611e8;backdrop-filter:blur(18px);position:sticky;top:0;z-index:20}.brand{font-weight:900;font-size:19px;display:flex;gap:10px;align-items:center}.mark{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#a855f7)}.top-actions,.toolbar,.tabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#ffffff0a;color:#e7e8f5;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:750}.btn:hover{background:#ffffff14}.btn.primary{border:0;background:linear-gradient(135deg,#6366f1,#a855f7);color:white}.btn:disabled{opacity:.5;cursor:not-allowed}.wrap{width:min(1500px,calc(100% - 24px));margin:22px auto 50px}.heading{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:17px}.heading h1{font-size:clamp(27px,4vw,40px);margin:5px 0}.eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a5b4fc;font-weight:900}.muted{color:var(--muted);line-height:1.5}.workbench{display:grid;grid-template-columns:235px minmax(300px,1fr) minmax(280px,34%);gap:12px;align-items:stretch}.panel{min-width:0;border:1px solid var(--line);border-radius:16px;background:#0d1127e8;box-shadow:0 16px 45px #0003;overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 14px;border-bottom:1px solid var(--line);font-weight:850}.panel-body{padding:13px}.project-fields{display:grid;gap:9px}.field{display:grid;gap:6px}.field label{font-size:12px;color:#b9bfd6;font-weight:800}.field input,.field select,.field textarea,.codearea{width:100%;border:1px solid var(--line);background:#060817;color:#f7f7ff;padding:10px;border-radius:9px;outline:none}.field input:focus,.field textarea:focus,.field select:focus,.codearea:focus{border-color:#8b5cf6}.small{font-size:12px;color:#858da8;line-height:1.5}.tabs{padding:9px;border-bottom:1px solid var(--line);gap:6px}.tab{border:1px solid transparent;border-radius:8px;background:transparent;color:#a9aec5;padding:8px 10px;cursor:pointer;font-size:12px;font-weight:800}.tab.active{background:#8b5cf620;border-color:#8b5cf655;color:#ddd6fe}.workspace{padding:13px;min-height:550px}.pane{display:none}.pane.active{display:block}.section-title{font-size:17px;font-weight:900;margin:0 0 5px}.toolgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:13px}.tool{border:1px solid var(--line);background:#ffffff06;border-radius:11px;padding:11px;text-align:left;color:#f1f2ff;cursor:pointer;min-height:68px}.tool:hover{border-color:#8b5cf6;background:#8b5cf614}.tool b{display:block;font-size:13px;margin-bottom:5px}.tool span{font-size:11px;color:#969db7;line-height:1.4}.filetree{display:grid;gap:5px;margin-top:10px}.treeitem{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;color:#c4c8dc;font-size:12px;cursor:pointer;min-width:0}.treeitem:hover,.treeitem.active{background:#8b5cf61c;color:white}.treeitem .filename{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.treeitem button{border:0;background:transparent;color:#8e95b0;cursor:pointer}.treebar{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.treebar .btn{font-size:11px;padding:7px 8px}.codearea{font-family:Consolas,Monaco,monospace;font-size:13px;line-height:1.55;min-height:330px;resize:vertical;tab-size:2;white-space:pre;overflow:auto}.codearea.java{min-height:370px}.editor-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:8px 0 0}.block-list{display:grid;gap:8px;margin-top:12px}.block{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;background:#26215b;border:1px solid #8b5cf655;font-size:12px}.block select,.block input{max-width:135px;min-width:0;border:1px solid #ffffff24;background:#080a1a;color:#fff;border-radius:7px;padding:6px}.block button{margin-left:auto;border:0;background:transparent;color:#ffc5d5;cursor:pointer}.sprite-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.sprite-canvas{width:100%;max-width:480px;aspect-ratio:1;display:block;background-color:#080a18;background-image:linear-gradient(45deg,#161a32 25%,transparent 25%),linear-gradient(-45deg,#161a32 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#161a32 75%),linear-gradient(-45deg,transparent 75%,#161a32 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border:1px solid var(--line);border-radius:12px;touch-action:none}.preview-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}.preview-frame{width:100%;height:520px;border:0;background:#fff;display:block}.status{margin-top:12px;padding:11px 12px;border-radius:10px;background:#ffffff08;border:1px solid var(--line);color:#c6cbe0;font-size:12px;line-height:1.5;white-space:pre-wrap}.status.error{background:#ef444418;color:#fecaca}.saved-list{display:grid;gap:7px;margin-top:10px}.saved-item{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;padding:8px;font-size:12px}.saved-item span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.pill{display:inline-block;border-radius:99px;padding:4px 7px;background:#8b5cf620;color:#c4b5fd;font-size:10px;font-weight:900}.callout{padding:10px;border-radius:10px;background:#ffffff06;color:#9fa6c0;font-size:11px;line-height:1.5;margin-top:10px}#runStatus{min-height:16px}@media(max-width:1050px){.workbench{grid-template-columns:220px minmax(0,1fr)}.preview-panel{grid-column:1/-1}.preview-frame{height:430px}}@media(max-width:680px){.wrap{width:calc(100% - 16px);margin-top:12px}.top{padding:0 10px}.brand{font-size:16px}.top-actions .btn{padding:8px;font-size:11px}.workbench{grid-template-columns:1fr}.workspace{min-height:0}.preview-panel{grid-column:auto}.preview-frame{height:390px}.left-panel{order:0}.center-panel{order:1}.preview-panel{order:2}.codearea{min-height:270px}.heading{align-items:flex-start}}
+
+/* Scratch-inspired studio layout */
+:root{--bg:#eaf1fb;--panel:#ffffff;--line:#d3dced;--muted:#5b6a83;--accent:#7655d9;color-scheme:light}
+body{background:#eaf1fb;color:#202943;font-family:Inter,"Trebuchet MS",Arial,sans-serif}
+.top{height:60px;background:#7655d9;color:white;border-bottom:0;box-shadow:0 3px 0 #6342c4;padding:0 16px}
+.mark{background:#fff;color:#7655d9;border-radius:50%;font-weight:1000}
+.top .btn{color:white;background:#6545c5;border-color:#ffffff35;border-radius:22px}
+.top .btn.primary{background:#ffab19;color:#382600;border:0}
+.wrap{width:calc(100% - 20px);max-width:1800px;margin:12px auto 24px}
+.heading{margin:0 0 10px;align-items:center}
+.heading h1{font-size:24px;margin:3px 0;color:#252d46}
+.heading .muted{font-size:13px;color:#65718a}
+.eyebrow{color:#7655d9;letter-spacing:1.3px}
+.workbench{grid-template-columns:255px minmax(370px,1fr) minmax(300px,32%);gap:8px;align-items:start}
+.panel{background:#fff;border:1px solid #cbd6e7;border-radius:10px;box-shadow:0 2px 5px #1f355515;overflow:hidden}
+.panel-head{padding:11px 12px;border-bottom:1px solid #e1e7f1;color:#313c58;background:#f8faff}
+.panel-body{padding:10px}
+.field label{color:#5a6680}
+.field input,.field select,.field textarea,.codearea{background:#f8faff;color:#202943;border-color:#d3dced;border-radius:7px}
+.field input:focus,.field textarea:focus,.field select:focus,.codearea:focus{border-color:#7655d9}
+.tabs{background:#f8faff;border-bottom:1px solid #d3dced;padding:7px;gap:5px}
+.tab{border-radius:7px;color:#5b6780;border:1px solid #d7deeb;background:#fff}
+.tab.active{background:#7655d9;color:white;border-color:#7655d9}
+.workspace{padding:11px;min-height:580px}
+.small{color:#6b7890}
+.section-title{color:#29334d}
+.toolgrid{grid-template-columns:1fr;gap:6px;margin-top:9px}
+.tool{display:flex;align-items:center;gap:9px;min-height:42px;padding:8px 10px;text-align:left;border:1px solid #d8e0ed;border-radius:8px;background:#fff;color:#303b56}
+.tool:hover{border-color:#7655d9;background:#f2edff}
+.tool b{margin:0;min-width:90px;font-size:12px}
+.tool span{font-size:11px;color:#68758c}
+.toolbox-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:10px}
+.toolbox-category{border:0;border-radius:7px;color:white;padding:8px 3px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:inset 0 -2px #0002}
+.toolbox-category.active{outline:3px solid #303b56;outline-offset:1px}
+.toolbox-category[data-category="all"]{background:#68758c}
+.toolbox-category[data-category="events"]{background:#ffbf00;color:#443300}
+.toolbox-category[data-category="motion"]{background:#4c97ff}
+.toolbox-category[data-category="looks"]{background:#9966ff}
+.toolbox-category[data-category="game"]{background:#59c059;color:#143b14}
+.toolbox-category[data-category="sound"]{background:#cf63cf}
+.toolbox-category[data-category="code"]{background:#ff8c1a;color:#542c00}
+.treeitem{color:#44516b;border-radius:6px}
+.treeitem:hover,.treeitem.active{background:#eee8ff;color:#5d3cc4}
+.treebar .btn,.btn{border-radius:8px}
+.btn{background:#f5f7fc;color:#34415d;border-color:#d5deeb}
+.btn:hover{background:#edf1fa}
+.btn.primary{background:#7655d9;color:white}
+.pill{background:#eee8ff;color:#6946ca}
+.callout{background:#f6f8fd;border:1px solid #e1e7f1;color:#64718a}
+.block-list{background:#f5f7fc;border:1px dashed #c9d4e7;border-radius:10px;padding:10px;min-height:120px}
+.block{border-radius:7px;background:#4c97ff;border:0;color:white;box-shadow:0 2px 0 #3276cc;font-weight:800;width:max-content;max-width:100%;flex-wrap:wrap}
+.block select,.block input{background:#fff;color:#26334c;border-color:#d6e0ef}
+.block button{color:white}
+.codearea{font-family:Consolas,Monaco,monospace;min-height:370px;background:#f8faff}
+.preview-head{background:#f8faff;border-bottom:1px solid #d3dced;color:#303b56}
+.preview-frame{height:470px;background:#fff}
+.status{background:#f6f8fd;border-color:#dbe3ef;color:#596781}
+.status.error{background:#fff0f0;color:#a32e36}
+.saved-item{border-color:#d8e0ed;color:#38445f}
+.sprite-canvas{background-color:#fff;border-color:#d3dced}
+#projectName{font-weight:800}
+@media(min-width:1051px){.left-panel{position:sticky;top:72px;max-height:calc(100vh - 84px);overflow:auto}.preview-panel{position:sticky;top:72px}.center-panel{min-height:680px}}
+@media(max-width:1050px){.workbench{grid-template-columns:220px minmax(0,1fr)}.left-panel{position:static;max-height:none}.preview-panel{position:static}}
+@media(max-width:680px){.workbench{grid-template-columns:minmax(0,1fr)}.toolgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.tool{display:block}.tool b{display:block;margin-bottom:4px}.preview-frame{height:380px}.top{height:auto;min-height:60px;gap:8px;flex-wrap:wrap;padding:8px}.heading h1{font-size:22px}}
+
 </style>
 </head>
 <body>
@@ -22,17 +87,18 @@
 <div class="field"><label for="projectName">Project name</label><input id="projectName" maxlength="80" value="My First Game"></div>
 <div class="field"><label for="projectDescription">Community description</label><textarea id="projectDescription" rows="2" maxlength="220" placeholder="Describe your game..."></textarea></div>
 <div class="field"><label for="toolSearch">Find a tool</label><input id="toolSearch" placeholder="Search tools..."></div>
+<div class="toolbox-categories" id="toolCategories"><button class="toolbox-category active" data-category="all">All</button><button class="toolbox-category" data-category="motion">Motion</button><button class="toolbox-category" data-category="looks">Looks</button><button class="toolbox-category" data-category="events">Events</button><button class="toolbox-category" data-category="game">Game</button><button class="toolbox-category" data-category="sound">Sound</button></div>
 <div class="toolgrid" id="toolGrid">
-<button class="tool" data-insert="button"><b>🔘 Button</b><span>Add a clickable button</span></button>
-<button class="tool" data-insert="score"><b>🏆 Score</b><span>Add score tracking</span></button>
-<button class="tool" data-insert="timer"><b>⏱ Timer</b><span>Simple countdown starter</span></button>
-<button class="tool" data-insert="movement"><b>🕹 Movement</b><span>Keyboard movement helper</span></button>
-<button class="tool" data-insert="enemy"><b>👾 Enemy</b><span>Enemy object starter</span></button>
-<button class="tool" data-insert="sound"><b>🔊 Sound</b><span>Beep sound helper</span></button>
-<button class="tool" data-insert="random"><b>🎲 Random</b><span>Random number helper</span></button>
-<button class="tool" data-insert="comment"><b>💬 Comment</b><span>Explain your code</span></button>
-<button class="tool" data-insert="html"><b>🧱 HTML panel</b><span>Game UI element</span></button>
-<button class="tool" data-insert="css"><b>🎨 CSS style</b><span>Style helper</span></button>
+<button class="tool" data-insert="button" data-category="events"><b>🔘 Button</b><span>Add a clickable button</span></button>
+<button class="tool" data-insert="score" data-category="game"><b>🏆 Score</b><span>Add score tracking</span></button>
+<button class="tool" data-insert="timer" data-category="events"><b>⏱ Timer</b><span>Simple countdown starter</span></button>
+<button class="tool" data-insert="movement" data-category="motion"><b>🕹 Movement</b><span>Keyboard movement helper</span></button>
+<button class="tool" data-insert="enemy" data-category="game"><b>👾 Enemy</b><span>Enemy object starter</span></button>
+<button class="tool" data-insert="sound" data-category="sound"><b>🔊 Sound</b><span>Beep sound helper</span></button>
+<button class="tool" data-insert="random" data-category="game"><b>🎲 Random</b><span>Random number helper</span></button>
+<button class="tool" data-insert="comment" data-category="code"><b>💬 Comment</b><span>Explain your code</span></button>
+<button class="tool" data-insert="html" data-category="looks"><b>🧱 HTML panel</b><span>Game UI element</span></button>
+<button class="tool" data-insert="css" data-category="looks"><b>🎨 CSS style</b><span>Style helper</span></button>
 </div>
 <div class="callout">Click a toolbox item to insert starter code. Switch to Sprite Lab to draw a sprite, or Block Coding to build JavaScript from blocks.</div>
 </div>
@@ -142,7 +208,10 @@ document.querySelectorAll("[data-block]").forEach(b=>b.onclick=()=>{const t=b.da
 $("generateBlocks").onclick=()=>{if(!tree["main.js"])tree["main.js"]=STARTER;activePath="main.js";const statements=blocks.map(blockToJS).filter(Boolean).join("\n  ");setCurrentCode('let score = 0;\ndocument.getElementById("playButton").addEventListener("click", async () => {\n  '+statements.replace(/\n/g,"\n  ")+'\n});');setMode("code");$("codeEditor").value=currentCode();$("activeFileTitle").textContent=activePath;renderTree();runPreview();status("Blocks converted into main.js. You can now edit the generated JavaScript.")};
 $("clearBlocks").onclick=()=>{blocks=[];renderBlocks()};
 $("toolGrid").addEventListener("click",e=>{const b=e.target.closest("[data-insert]");if(!b)return;const type=b.dataset.insert;saveEditor();if(type==="html"){if(!activePath.endsWith(".html")){status("Create or select an .html file to use the HTML panel snippet.");return}setCurrentCode(currentCode()+"\n"+SNIPPETS.html)}else if(type==="css"){if(!activePath.endsWith(".css")){status("Create or select a .css file before inserting CSS.");return}setCurrentCode(currentCode()+"\n"+SNIPPETS.css)}else{if(activePath.endsWith(".java")){status("Switch to a JavaScript file before inserting web-game tools.");return}setCurrentCode(currentCode()+"\n\n"+SNIPPETS[type])}setMode("code");$("codeEditor").value=currentCode();renderTree();status("Inserted "+type+" starter code into "+activePath)});
-$("toolSearch").oninput=()=>{const q=$("toolSearch").value.toLowerCase();document.querySelectorAll(".tool").forEach(b=>b.style.display=b.textContent.toLowerCase().includes(q)?"":"none")};
+$("toolSearch").oninput=()=>{const q=$("toolSearch").value.toLowerCase();const category=document.querySelector(".toolbox-category.active")?.dataset.category||"all";document.querySelectorAll(".tool[data-insert]").forEach(b=>b.style.display=(category==="all"||b.dataset.category===category)&&b.textContent.toLowerCase().includes(q)?"":"none")};
+
+$("toolCategories").addEventListener("click",e=>{const b=e.target.closest("[data-category]");if(!b)return;document.querySelectorAll(".toolbox-category").forEach(x=>x.classList.toggle("active",x===b));const category=b.dataset.category;const q=$("toolSearch").value.toLowerCase();document.querySelectorAll(".tool[data-insert]").forEach(t=>{t.style.display=(category==="all"||t.dataset.category===category)&&t.textContent.toLowerCase().includes(q)?"":"none"})});
+
 $("addFile").onclick=()=>{const name=safeName(prompt("New file name (for example: level.js or art.css)"));if(!name)return;const path=(selectedFolder?selectedFolder+"/":"")+name;if(tree[path]!==undefined){status("A file with that name already exists.",true);return}tree[path]=name.endsWith(".java")?JAVA_STARTER:name.endsWith(".html")?"<!doctype html>\n<html><body><h1>My game</h1></body></html>":name.endsWith(".css")?"body { font-family: Arial; }":'console.log("Hello from DougHub!");';activePath=path;if(name.endsWith(".java")){setMode("java");$("javaEditor").value=tree[path]}else{setMode("code");$("codeEditor").value=tree[path]}$("activeFileTitle").textContent=path;renderTree();status("Created "+path)};
 $("addFolder").onclick=()=>{const name=safeName(prompt("New folder name"));if(!name)return;const path=(selectedFolder?selectedFolder+"/":"")+name;if(folders.includes(path)){status("That folder already exists.",true);return}folders.push(path);selectedFolder=path;renderTree();status("Created folder "+path+". Select it before creating files inside it.")};
 $("renameItem").onclick=()=>{if(!activePath){status("Select a file in the Explorer before renaming.",true);return}const name=safeName(prompt("Rename file",activePath.split("/").pop()));if(!name)return;const parent=activePath.includes("/")?activePath.split("/").slice(0,-1).join("/")+"/":"";const next=parent+name;if(tree[next]!==undefined){status("A file with that name already exists.",true);return}tree[next]=tree[activePath];delete tree[activePath];activePath=next;$("activeFileTitle").textContent=next;renderTree();status("Renamed file to "+next)};
