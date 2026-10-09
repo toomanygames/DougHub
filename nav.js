@@ -78,16 +78,42 @@
   }
   function applyFlags(flags) {
     if (!flags) return;
-    document.querySelectorAll('header .nav > a[href], header nav > a[href], nav[aria-label="Main navigation"] > a[href]').forEach(a => {
+
+    // Mark navigation links for accessibility, but enforce the setting globally.
+    // This catches homepage cards/buttons and other page links as well as the header.
+    document.querySelectorAll('a[href]').forEach(a => {
       const feature = featureForHref(a.getAttribute("href"));
       if (feature && flags[feature] === false) {
-        a.addEventListener("click", function (event) {
-          event.preventDefault();
-          location.href = disabledUrl(feature);
-        });
         a.setAttribute("aria-label", (labels[feature] || feature) + " (currently unavailable)");
+        a.setAttribute("data-dh-disabled-feature", feature);
       }
     });
+
+    // Capture phase runs before page-specific click handlers, including handlers
+    // on cards and buttons that contain links. It blocks clicks only; direct URLs
+    // and bookmarks remain accessible as requested.
+    if (!document.documentElement.dataset.dhFeatureGuardInstalled) {
+      document.documentElement.dataset.dhFeatureGuardInstalled = "true";
+      document.addEventListener("click", function (event) {
+        const target = event.target && event.target.closest
+          ? event.target.closest('a[href], [data-href], [data-feature-href]')
+          : null;
+        if (!target) return;
+
+        const href = target.matches('a[href]')
+          ? target.getAttribute("href")
+          : (target.getAttribute("data-href") || target.getAttribute("data-feature-href"));
+        if (!href) return;
+
+        const feature = featureForHref(href);
+        if (feature && flags[feature] === false) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+          location.href = disabledUrl(feature);
+        }
+      }, true);
+    }
   }
   function removeRetiredNavLinks() {
     document.querySelectorAll("header .nav > a[href], header nav > a[href], nav[aria-label='Main navigation'] > a[href]").forEach(a => {
