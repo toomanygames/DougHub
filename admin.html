@@ -652,6 +652,15 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 
 <div id="adminArea" style="display:none;">
 
+<div class="card" id="siteFeatureCard">
+    <h2>⚙️ Site Features</h2>
+    <div class="status" id="siteFeatureStatus">Loading feature settings...</div>
+    <p style="color:#a7aec9;font-size:13px;line-height:1.6;margin:0 0 15px">
+        Turn DougHub sections on or off. Disabled features show a friendly unavailable page when someone opens them directly or clicks their navigation link. DMail and DougTube stay off the main navigation.
+    </p>
+    <div id="siteFeatureList"></div>
+</div>
+
 <div class="card">
 
     <h2>👥 Users</h2>
@@ -3648,6 +3657,76 @@ async function loadCodeProjects(){
   });
 }
 
+
+/* =========================================
+   ADMIN SITE FEATURE TOGGLES
+========================================= */
+async function loadSiteFeatures() {
+    const status = document.getElementById("siteFeatureStatus");
+    const list = document.getElementById("siteFeatureList");
+    if (!status || !list) return;
+    status.textContent = "Loading feature settings...";
+    list.innerHTML = "";
+    const { data, error } = await supabaseClient
+        .from("site_feature_flags")
+        .select("feature_key,display_name,description,enabled")
+        .order("display_name", { ascending: true });
+    if (error) {
+        status.textContent = "Could not load feature settings: " + error.message;
+        return;
+    }
+    if (!data || !data.length) {
+        status.textContent = "No feature settings found.";
+        return;
+    }
+    status.textContent = "Changes save immediately and apply site-wide.";
+    data.forEach(feature => {
+        const row = document.createElement("div");
+        row.className = "message";
+        row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap";
+        const info = document.createElement("div");
+        info.style.cssText = "flex:1;min-width:180px";
+        const title = document.createElement("div");
+        title.className = "username";
+        title.textContent = feature.display_name;
+        const desc = document.createElement("div");
+        desc.className = "game-info";
+        desc.style.cssText = "margin-top:5px;line-height:1.5";
+        desc.textContent = feature.description || feature.feature_key;
+        info.append(title, desc);
+        const control = document.createElement("label");
+        control.style.cssText = "display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = feature.enabled;
+        checkbox.setAttribute("aria-label", "Enable " + feature.display_name);
+        checkbox.style.cssText = "width:18px;height:18px;accent-color:#8b5cf6;cursor:pointer";
+        const label = document.createElement("span");
+        label.textContent = feature.enabled ? "On" : "Off";
+        control.append(checkbox, label);
+        checkbox.addEventListener("change", async () => {
+            checkbox.disabled = true;
+            label.textContent = "Saving…";
+            const { error: updateError } = await supabaseClient
+                .from("site_feature_flags")
+                .update({ enabled: checkbox.checked, updated_at: new Date().toISOString(), updated_by: currentAdminUser ? currentAdminUser.id : null })
+                .eq("feature_key", feature.feature_key);
+            if (updateError) {
+                checkbox.checked = feature.enabled;
+                label.textContent = feature.enabled ? "On" : "Off";
+                status.textContent = "Could not save " + feature.display_name + ": " + updateError.message;
+            } else {
+                feature.enabled = checkbox.checked;
+                label.textContent = feature.enabled ? "On" : "Off";
+                status.textContent = feature.display_name + " is now " + (feature.enabled ? "on." : "off.") + " Changes apply as pages reload.";
+            }
+            checkbox.disabled = false;
+        });
+        row.append(info, control);
+        list.appendChild(row);
+    });
+}
+
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -3670,6 +3749,7 @@ async function startAdminPanel() {
         loadDougTubeVideos(),
         loadDougBaseAccessRequests(),
         loadCodeProjects(),
+        loadSiteFeatures(),
     ]);
 
     setInterval(
