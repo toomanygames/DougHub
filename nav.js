@@ -78,12 +78,7 @@
   }
   function applyFlags(flags) {
     if (!flags) return;
-    const current = pathMap[pathKey()];
-    if (current && flags[current] === false && !pathKey().includes("feature-disabled.html")) {
-      location.replace(disabledUrl(current));
-      return;
-    }
-    document.querySelectorAll("a[href]").forEach(a => {
+    document.querySelectorAll('header .nav > a[href], header nav > a[href], nav[aria-label="Main navigation"] > a[href]').forEach(a => {
       const feature = featureForHref(a.getAttribute("href"));
       if (feature && flags[feature] === false) {
         a.addEventListener("click", function (event) {
