@@ -469,6 +469,23 @@ const supabaseClient =
   );
 
 let signupMode = false;
+
+async function recordAuthAudit(userId, eventType, action, details = {}) {
+  try {
+    if (!userId) return;
+    const { error } = await supabaseClient.from("admin_audit_logs").insert({
+      actor_id: userId,
+      event_type: eventType,
+      category: "authentication",
+      action,
+      page: location.pathname,
+      details
+    });
+    if (error) console.warn("Authentication audit event could not be saved:", error.message);
+  } catch (auditError) {
+    console.warn("Authentication audit event could not be saved:", auditError);
+  }
+}
 const redirectAfterLogin = new URLSearchParams(window.location.search).get("redirect") || "index.html";
 const safeRedirect = /^[A-Za-z0-9_./-]+\.html$/.test(redirectAfterLogin) ? redirectAfterLogin : "index.html";
 
@@ -615,7 +632,7 @@ async function submitForm() {
       }
 
       if (data.session) {
-
+        await recordAuthAudit(data.user.id, "signup", "Account created and signed in", { method: "email_password" });
         window.location.href =
           safeRedirect;
 
@@ -630,6 +647,7 @@ async function submitForm() {
     } else {
 
       const {
+        data: signInData,
         error
       } =
         await supabaseClient.auth.signInWithPassword({
@@ -642,6 +660,10 @@ async function submitForm() {
 
       if (error) {
         throw error;
+      }
+
+      if (signInData && signInData.user) {
+        await recordAuthAudit(signInData.user.id, "login", "Successful sign-in", { method: "email_password" });
       }
 
       window.location.href =
