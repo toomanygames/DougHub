@@ -23,7 +23,7 @@ h1{font-size:clamp(38px,6vw,66px);letter-spacing:-2px;margin:18px 0 12px}h1 span
 .search-wrap{display:flex;gap:10px;margin:22px auto 0;max-width:520px}
 input,textarea,select{width:100%;padding:11px 12px;color:#fff;background:#050713;border:1px solid var(--line);border-radius:10px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:#818cf8}
-.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}.tool-card:nth-child(-n+6){min-height:500px}
 .tool-card{min-width:0;padding:21px;border:1px solid var(--line);border-radius:19px;background:var(--panel);box-shadow:0 12px 36px #0002}
 .tool-heading{display:flex;align-items:center;gap:12px;margin-bottom:15px}.tool-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid #818cf833;border-radius:14px;background:#6366f120;font-size:23px}
 h2{margin:0;font-size:18px}.description{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
@@ -39,8 +39,8 @@ textarea{resize:vertical;min-height:94px;line-height:1.5}.output{margin-top:10px
 .tool-card[hidden]{display:none}
 footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);color:#77768b;font-size:13px}
 .notice{margin:20px 0 0;color:#88879d;font-size:12px;text-align:center;line-height:1.6}
-@media(max-width:900px){.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}header{padding:14px 18px}nav{gap:12px}}
-@media(max-width:600px){header{align-items:flex-start;flex-direction:column;gap:12px}nav{width:100%;justify-content:space-between;gap:9px}nav a{font-size:12px}.hero{padding-top:24px}.hero-card{padding:32px 18px}.tools-grid{grid-template-columns:1fr}.tool-card{padding:18px}.search-wrap{flex-direction:column}}
+@media(max-width:900px){.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr))}header{padding:14px 18px}nav{gap:12px}}
+@media(max-width:600px){.tools-grid{grid-template-columns:1fr}.tool-card:nth-child(-n+6){min-height:0}header{align-items:flex-start;flex-direction:column;gap:12px}nav{width:100%;justify-content:space-between;gap:9px}nav a{font-size:12px}.hero{padding-top:24px}.hero-card{padding:32px 18px}.tools-grid{grid-template-columns:1fr}.tool-card{padding:18px}.search-wrap{flex-direction:column}}
 </style>
 </head>
 <body>
