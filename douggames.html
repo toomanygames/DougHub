@@ -1488,11 +1488,7 @@ footer {
             <span>DMail</span>
             
         </a>
-
-        <a href="quests.html" class="nav-link">Quests</a>
-        <a href="game-creator.html" class="nav-link">Studio</a>
-
-        <a
+<a
             href="chat.html"
             class="nav-link"
         >
@@ -1618,18 +1614,13 @@ footer {
 
             </div>
 
-            <a
-                href="Scripting/scripting.html"
+            <button
+                type="button"
+                id="openGameCreatorChooser"
                 class="hero-create-button"
             >
-                + Create a Game
-            </a>
-            <a
-                href="game-creator.html"
-                class="hero-create-button"
-            >
-                🛠️ Mini Game Studio
-            </a>
+                + Make a Game
+            </button>
 
         </div>
 
@@ -3183,6 +3174,37 @@ loadUserCount();
 updateFeedbackCount();
 
 </script>
+
+
+    <dialog id="gameCreatorChooser" aria-labelledby="gameCreatorChooserTitle" style="width:min(560px,calc(100% - 28px));padding:0;border:1px solid #ffffff25;border-radius:22px;background:#0d1127;color:#fff;box-shadow:0 28px 90px #000b;">
+        <div style="padding:24px;background:radial-gradient(circle at top right,#8b5cf633,transparent 55%);">
+            <button type="button" id="closeGameCreatorChooser" aria-label="Close" style="float:right;border:1px solid #ffffff22;border-radius:10px;background:#ffffff0d;color:#fff;padding:8px 12px;cursor:pointer;">✕</button>
+            <div style="color:#a5b4fc;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:900;">DougHub Creator</div>
+            <h2 id="gameCreatorChooserTitle" style="font-size:28px;margin:10px 0;">How do you want to make your game?</h2>
+            <p style="color:#a6abc1;line-height:1.6;margin-bottom:20px;">Choose a visual studio or write your own code.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;">
+                <a href="game-creator.html" style="display:block;text-decoration:none;color:#fff;padding:18px;border:1px solid #8b5cf655;border-radius:16px;background:#8b5cf615;">
+                    <div style="font-size:28px;">🛠️</div><h3 style="margin:10px 0 6px;">Mini Game Studio</h3><p style="color:#a6abc1;font-size:14px;line-height:1.5;margin:0;">Build from templates, customize, preview, and publish without coding.</p>
+                </a>
+                <a href="Scripting/scripting.html" style="display:block;text-decoration:none;color:#fff;padding:18px;border:1px solid #ffffff20;border-radius:16px;background:#ffffff06;">
+                    <div style="font-size:28px;">💻</div><h3 style="margin:10px 0 6px;">Coding Editor</h3><p style="color:#a6abc1;font-size:14px;line-height:1.5;margin:0;">Open the existing code-based game creator.</p>
+                </a>
+            </div>
+        </div>
+    </dialog>
+    <script>
+    (() => {
+      const dialog = document.getElementById("gameCreatorChooser");
+      const openButton = document.getElementById("openGameCreatorChooser");
+      const closeButton = document.getElementById("closeGameCreatorChooser");
+      if (!dialog || !openButton || !closeButton) return;
+      openButton.addEventListener("click", () => dialog.showModal());
+      closeButton.addEventListener("click", () => dialog.close());
+      dialog.addEventListener("click", event => {
+        if (event.target === dialog) dialog.close();
+      });
+    })();
+    </script>
 
 </body>
 </html>
