@@ -1,0 +1,88 @@
+/* DougHub shared visual system — October 2026
+   Visual-only layer: keeps each page's existing markup and behavior intact. */
+:root {
+  --dh-bg: #050611;
+  --dh-panel: rgba(14, 18, 41, .78);
+  --dh-panel-solid: #10142b;
+  --dh-border: rgba(177, 184, 255, .14);
+  --dh-border-hot: rgba(139, 126, 255, .42);
+  --dh-text: #f5f6ff;
+  --dh-muted: #a4abc7;
+  --dh-purple: #a855f7;
+  --dh-indigo: #6366f1;
+  --dh-cyan: #67e8f9;
+  --dh-shadow: 0 18px 55px rgba(0, 0, 0, .22);
+}
+html { scroll-behavior: smooth; }
+body {
+  color: var(--dh-text);
+  background-color: var(--dh-bg);
+  background-image:
+    radial-gradient(ellipse at 12% -8%, rgba(99,102,241,.22), transparent 36%),
+    radial-gradient(ellipse at 92% 2%, rgba(168,85,247,.17), transparent 31%),
+    radial-gradient(ellipse at 50% 105%, rgba(34,211,238,.055), transparent 38%);
+  accent-color: var(--dh-indigo);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { color: #fff; background: rgba(124, 92, 255, .48); }
+:focus-visible { outline: 2px solid #a5b4fc !important; outline-offset: 3px; }
+a { text-underline-offset: 4px; transition: color .18s ease, opacity .18s ease; }
+button, input, textarea, select { transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+button { -webkit-tap-highlight-color: transparent; }
+button:hover:not(:disabled) { filter: brightness(1.09); }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { cursor: not-allowed; opacity: .55; }
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+textarea, select {
+  border-color: var(--dh-border);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus,
+textarea:focus, select:focus {
+  border-color: rgba(129,140,248,.8) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.13);
+  outline: none;
+}
+img { max-width: 100%; }
+hr { border: 0; border-top: 1px solid var(--dh-border); }
+header, .top, .topbar, .top-bar, .topbar, .topbar-wrap, .navbar, .app-header {
+  border-color: var(--dh-border);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+header a, .nav a, .top a, .topbar a, .navbar a { text-decoration: none; }
+header a:hover, .nav a:hover, .top a:hover, .topbar a:hover, .navbar a:hover { color: #c4b5fd; }
+.logo-mark, .logo-icon, .brand-icon, .brand-i, .mark, .icon, .brand-mark, .brand-logo {
+  box-shadow: 0 8px 28px rgba(99,102,241,.23);
+}
+.card, .panel, .tool-card, .game-card, .feature-card, .stat-card, .settings-card,
+.section-card, .content-card, .auth-card, .modal-content, .dialog, .empty-state,
+.project, .file-card, .video-card, .post-card, .message-card, .setting-card,
+.dashboard-card, .workspace-card, .editor-panel, .sidebar-card {
+  border-color: var(--dh-border);
+}
+.card, .panel, .tool-card, .feature-card, .stat-card, .settings-card,
+.section-card, .content-card, .auth-card, .modal-content, .dialog,
+.project, .file-card, .video-card, .post-card, .setting-card,
+.dashboard-card, .workspace-card, .sidebar-card {
+  box-shadow: var(--dh-shadow);
+}
+h1, h2, h3 { letter-spacing: -.035em; text-wrap: balance; }
+p, .subtitle, .description, .muted, small { text-wrap: pretty; }
+.badge, .pill, .tag, .status, .chip {
+  border-color: var(--dh-border);
+}
+table { border-color: var(--dh-border); }
+th { color: #c5c9e8; }
+td, th { border-color: var(--dh-border); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(4,5,16,.55); }
+::-webkit-scrollbar-thumb { background: rgba(129,140,248,.28); border: 2px solid rgba(4,5,16,.55); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(168,85,247,.52); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@media (max-width: 700px) {
+  header, .top, .topbar, .top-bar, .navbar, .app-header { max-width: 100%; }
+  button, input, textarea, select { max-width: 100%; }
+}
