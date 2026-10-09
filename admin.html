@@ -624,6 +624,27 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#6366f1,#a855f7);border-radius:999px;border:2px solid rgba(2,4,10,.55)}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#818cf8,#c084fc)}
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
+
+.audit-card{border-color:#34d39940;background:linear-gradient(145deg,#050f19f5,#090d1ff5);box-shadow:0 0 0 1px #34d39909,0 20px 55px #0005}
+.audit-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.audit-heading h2{font:800 18px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.09em;color:#a7f3d0;margin:0 0 6px}
+.audit-subtitle,.audit-footer{font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:#7f9caa}
+.audit-live{font:700 10px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#6ee7b7;border:1px solid #34d39955;background:#34d3990d;padding:8px 10px;border-radius:7px;white-space:nowrap}
+.audit-live span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;margin-right:6px}
+.audit-filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto auto;gap:8px;margin:0 0 12px}
+.audit-filters input,.audit-filters select{min-width:0;width:100%;padding:10px 9px;border-radius:8px;border:1px solid #263b4b;background:#07111b;color:#d5e7f0;font-size:12px}
+.audit-filters button{padding:10px 11px;border:1px solid #23614e;border-radius:8px;background:#0b2b25;color:#a7f3d0;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.audit-status{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;color:#80a0ad;padding:10px 0}
+.audit-table-wrap{max-height:560px;overflow:auto;border:1px solid #203442;border-radius:10px;background:#030a10}
+.audit-table{width:100%;border-collapse:collapse;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+.audit-table th{position:sticky;top:0;z-index:1;background:#0b1b27;color:#83a5b5;text-align:left;font-size:10px;letter-spacing:.08em;padding:11px 10px;border-bottom:1px solid #294151}
+.audit-table td{padding:11px 10px;border-bottom:1px solid #142631;color:#c5d8e2;vertical-align:top;overflow-wrap:anywhere}
+.audit-table tr:hover td{background:#10202b}.audit-table .audit-time{white-space:nowrap;color:#7dd3fc}.audit-table .audit-actor{color:#c4b5fd;font-weight:700}.audit-table .audit-action{color:#e2edf2;min-width:200px}
+.audit-table .audit-meta{display:block;color:#6f8997;font-size:10px;margin-top:3px}.audit-pill{display:inline-block;padding:3px 6px;border-radius:5px;background:#16352d;color:#86efac;font-size:10px;white-space:nowrap}
+.audit-pill.warn{background:#3c2b14;color:#fcd34d}.audit-pill.auth{background:#142d47;color:#7dd3fc}
+.audit-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:11px;font-size:10px;letter-spacing:.04em}
+@media(max-width:900px){.audit-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.audit-filters input[type=search]{grid-column:1/-1}.audit-table{min-width:700px}}
+@media(max-width:520px){body{padding:12px}.audit-filters{grid-template-columns:1fr 1fr}.audit-heading h2{font-size:15px}}
 </style>  <script src="nav.js" defer></script>
 </head>
 
@@ -660,6 +681,20 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
         Turn DougHub sections on or off. Disabled features show a friendly unavailable page when someone opens them directly or clicks their navigation link. DMail and DougTube stay off the main navigation.
     </p>
     <div id="siteFeatureList"></div>
+</div>
+
+<div class="card audit-card" id="auditLogCard">
+    <div class="audit-heading"><div><h2>▣ SYSTEM ACTIVITY LOG</h2><div class="audit-subtitle">Admin actions and successful sign-ins · Washington / Pacific Time</div></div><div class="audit-live"><span></span> AUDIT STREAM</div></div>
+    <div class="audit-filters">
+        <input id="auditSearch" type="search" placeholder="Search user, action, page…" aria-label="Search audit log">
+        <select id="auditType" aria-label="Filter event type"><option value="">All event types</option><option value="login">Sign-ins</option><option value="admin_session">Admin sessions</option><option value="admin_action">Admin actions</option><option value="feature_toggle">Feature toggles</option></select>
+        <select id="auditCategory" aria-label="Filter category"><option value="">All categories</option><option value="authentication">Authentication</option><option value="users">Users</option><option value="moderation">Moderation</option><option value="features">Site features</option><option value="navigation">Navigation</option><option value="projects">Projects</option><option value="chat">Chat</option><option value="videos">Videos</option><option value="general">General</option></select>
+        <input id="auditFrom" type="date" aria-label="Start date"><input id="auditTo" type="date" aria-label="End date">
+        <button id="auditRefresh" type="button">↻ Refresh</button><button id="auditExport" type="button">↓ Export CSV</button>
+    </div>
+    <div class="audit-status" id="auditStatus">Connecting to audit stream…</div>
+    <div class="audit-table-wrap"><table class="audit-table"><thead><tr><th>TIME · WA</th><th>LEVEL</th><th>ACTOR</th><th>EVENT</th><th>LOCATION</th></tr></thead><tbody id="auditRows"><tr><td colspan="5">Awaiting log records…</td></tr></tbody></table></div>
+    <div class="audit-footer"><span>TIMEZONE: America/Los_Angeles</span><span>Newest first · up to 1,000 recent events</span></div>
 </div>
 
 <div class="card">
@@ -3718,6 +3753,7 @@ async function loadSiteFeatures() {
                 status.textContent = "Could not save " + feature.display_name + ": " + updateError.message;
             } else {
                 feature.enabled = checkbox.checked;
+                await writeAuditLog("feature_toggle", "features", "Set " + feature.display_name + " to " + (feature.enabled ? "ON" : "OFF"), { featureKey: feature.feature_key, enabled: feature.enabled });
                 label.textContent = feature.enabled ? "On" : "Off";
                 status.textContent = feature.display_name + " is now " + (feature.enabled ? "on." : "off.") + " Changes apply as pages reload.";
             }
@@ -3726,6 +3762,127 @@ async function loadSiteFeatures() {
         row.append(info, control);
         list.appendChild(row);
     });
+}
+
+/* =========================================
+   ADMIN AUDIT LOG
+========================================= */
+const auditState = { rows: [], usernames: {} };
+function auditEscape(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function auditPacificTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "Unknown time";
+    return new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true,timeZoneName:"short"}).format(date);
+}
+function auditCategoryFor(target, action) {
+    const text = ((target && (target.innerText || target.getAttribute("aria-label") || target.title || target.id)) || "") + " " + action;
+    if (/feature|toggle|enable|disable/i.test(text)) return "features";
+    if (/ban|suspend|warning|moderation/i.test(text)) return "moderation";
+    if (/user|account|profile/i.test(text)) return "users";
+    if (/chat|message/i.test(text)) return "chat";
+    if (/tube|video|upload/i.test(text)) return "videos";
+    if (/project|code/i.test(text)) return "projects";
+    if (/nav|open|back/i.test(text)) return "navigation";
+    return "general";
+}
+async function writeAuditLog(eventType, category, action, details = {}) {
+    try {
+        if (!currentAdminUser || !supabaseClient) return;
+        const { error } = await supabaseClient.from("admin_audit_logs").insert({
+            actor_id:currentAdminUser.id,event_type:eventType,category:category||"general",
+            action:String(action||"Admin event").slice(0,500),page:location.pathname.slice(0,300),
+            details:details&&typeof details==="object"?details:{}
+        });
+        if (error) console.warn("Audit event could not be saved:",error.message);
+    } catch (error) { console.warn("Audit event could not be saved:",error); }
+}
+function auditTargetLabel(target) {
+    if (!target) return "Unknown control";
+    const label=target.closest("button,a,[role='button'],label");
+    let text=label?(label.innerText||label.getAttribute("aria-label")||label.title||""):"";
+    text=text.replace(/\s+/g," ").trim().slice(0,160);
+    if(!text&&target.id)text=target.id;
+    if(!text&&target.name)text=target.name;
+    return text||target.tagName.toLowerCase()+" interaction";
+}
+function setupAdminAuditTracking() {
+    if(adminArea.dataset.auditTracking==="on")return;
+    adminArea.dataset.auditTracking="on";
+    adminArea.addEventListener("click",event=>{
+        const target=event.target instanceof Element?event.target:null;
+        if(!target||target.closest("#auditLogCard"))return;
+        const control=target.closest("button,a,[role='button']");
+        if(!control)return;
+        const action="Clicked: "+auditTargetLabel(control);
+        writeAuditLog("admin_action",auditCategoryFor(control,action),action,{control:control.id||control.getAttribute("aria-label")||control.tagName.toLowerCase()});
+    });
+    adminArea.addEventListener("change",event=>{
+        const target=event.target;
+        if(!(target instanceof HTMLInputElement||target instanceof HTMLSelectElement||target instanceof HTMLTextAreaElement)||target.closest("#auditLogCard"))return;
+        const action=(target.type==="checkbox"?"Changed toggle: ":"Changed setting: ")+auditTargetLabel(target);
+        writeAuditLog("admin_action",auditCategoryFor(target,action),action,{control:target.id||target.name||target.tagName.toLowerCase(),inputType:target.type||target.tagName.toLowerCase()});
+    });
+    adminArea.addEventListener("submit",event=>{
+        const form=event.target;
+        if(!(form instanceof HTMLFormElement))return;
+        const action="Submitted admin form: "+auditTargetLabel(form);
+        writeAuditLog("admin_action",auditCategoryFor(form,action),action,{form:form.id||form.getAttribute("name")||"unnamed"});
+    });
+}
+function renderAuditRows() {
+    const tbody=document.getElementById("auditRows"),status=document.getElementById("auditStatus");
+    if(!tbody||!status)return;
+    const search=(document.getElementById("auditSearch").value||"").trim().toLowerCase();
+    const type=document.getElementById("auditType").value,category=document.getElementById("auditCategory").value;
+    const from=document.getElementById("auditFrom").value,to=document.getElementById("auditTo").value;
+    const filtered=auditState.rows.filter(row=>{
+        if(type&&row.event_type!==type)return false;
+        if(category&&row.category!==category)return false;
+        const localDate=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(row.created_at));
+        if(from&&localDate<from)return false;if(to&&localDate>to)return false;
+        const actor=auditState.usernames[row.actor_id]||row.actor_id||"Unknown";
+        return !search||[actor,row.action,row.category,row.event_type,row.page,JSON.stringify(row.details||{})].join(" ").toLowerCase().includes(search);
+    });
+    status.textContent="STREAM READY // "+filtered.length+" MATCHING EVENTS // "+auditState.rows.length+" LOADED";
+    if(!filtered.length){tbody.innerHTML='<tr><td colspan="5">No events match these filters.</td></tr>';return;}
+    tbody.innerHTML=filtered.map(row=>{
+        const isLogin=row.event_type==="login",isToggle=row.event_type==="feature_toggle";
+        const actor=auditState.usernames[row.actor_id]||(row.actor_id?row.actor_id.slice(0,8)+"…":"Unknown user");
+        const level=isToggle?"CONFIG":isLogin?"AUTH":row.event_type==="admin_session"?"SESSION":"EVENT";
+        const levelClass=isLogin||row.event_type==="admin_session"?"auth":isToggle?"warn":"";
+        return '<tr><td class="audit-time">'+auditEscape(auditPacificTime(row.created_at))+'</td>'+
+        '<td><span class="audit-pill '+levelClass+'">'+level+'</span><span class="audit-meta">'+auditEscape(row.category||"general")+'</span></td>'+
+        '<td class="audit-actor">'+auditEscape(actor)+'<span class="audit-meta">'+auditEscape(row.actor_id||"")+'</span></td>'+
+        '<td class="audit-action">'+auditEscape(row.action)+'<span class="audit-meta">'+auditEscape(row.event_type)+'</span></td>'+
+        '<td>'+auditEscape(row.page||"—")+(row.details&&Object.keys(row.details).length?'<span class="audit-meta">'+auditEscape(JSON.stringify(row.details).slice(0,180))+'</span>':"")+'</td></tr>';
+    }).join("");
+}
+async function loadAuditLogs() {
+    const status=document.getElementById("auditStatus"),tbody=document.getElementById("auditRows");
+    if(!status||!tbody)return;
+    status.textContent="QUERYING DATABASE // PLEASE WAIT";
+    const {data,error}=await supabaseClient.from("admin_audit_logs").select("id,created_at,actor_id,event_type,category,action,page,details").order("created_at",{ascending:false}).limit(1000);
+    if(error){status.textContent="AUDIT STREAM ERROR // "+error.message;tbody.innerHTML='<tr><td colspan="5">Could not load audit records. Check database migration and admin permissions.</td></tr>';return;}
+    auditState.rows=data||[];
+    const ids=[...new Set(auditState.rows.map(row=>row.actor_id).filter(Boolean))];
+    if(ids.length){const {data:profiles}=await supabaseClient.from("profiles").select("id,username").in("id",ids);(profiles||[]).forEach(p=>auditState.usernames[p.id]=p.username||p.id.slice(0,8));}
+    renderAuditRows();
+}
+function exportAuditCsv() {
+    const header=["Time (Washington, USA)","Actor","Actor ID","Event Type","Category","Action","Page","Details"];
+    const rows=[header,...auditState.rows.map(row=>[auditPacificTime(row.created_at),auditState.usernames[row.actor_id]||"",row.actor_id||"",row.event_type||"",row.category||"",row.action||"",row.page||"",JSON.stringify(row.details||{})])];
+    const csv=rows.map(row=>row.map(value=>'"'+String(value??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
+    const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="doughub-audit-log.csv";a.click();URL.revokeObjectURL(url);
+}
+function setupAuditFilters() {
+    ["auditSearch","auditType","auditCategory","auditFrom","auditTo"].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.addEventListener(id==="auditSearch"?"input":"change",renderAuditRows);
+    });
+    document.getElementById("auditRefresh")?.addEventListener("click",loadAuditLogs);
+    document.getElementById("auditExport")?.addEventListener("click",exportAuditCsv);
 }
 
 /* =========================================
@@ -3740,6 +3897,11 @@ async function startAdminPanel() {
     if (!allowed) {
         return;
     }
+
+    setupAdminAuditTracking();
+    setupAuditFilters();
+    await writeAuditLog("admin_session", "authentication", "Admin panel opened");
+    await loadAuditLogs();
 
     await Promise.all([
         loadUsers(),
