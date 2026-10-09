@@ -103,7 +103,7 @@
   function markActiveLinks() {
     const current = pathKey();
     document.querySelectorAll("header .nav > a[href], header nav > a[href], nav[aria-label='Main navigation'] > a[href]").forEach(a => {
-      const target = new URL(a.getAttribute("href"), location.href).pathname.replace(/^\\/+/, "").toLowerCase();
+      const target = new URL(a.getAttribute("href"), location.href).pathname.split("/").filter(Boolean).join("/").toLowerCase();
       const isHome = (current === "" || current === "index.html") && (target === "" || target === "index.html");
       const active = isHome || target === current;
       a.classList.toggle("active", active);
