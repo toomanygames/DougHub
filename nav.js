@@ -62,7 +62,7 @@
   }
   async function loadFlags() {
     try {
-      const r = await fetch(API, { headers: { apikey: KEY } });
+      const r = await fetch(API, { headers: { apikey: KEY, Authorization: "Bearer " + KEY, Accept: "application/json" }, cache: "no-store" });
       if (!r.ok) throw new Error("Feature flags unavailable");
       const rows = await r.json();
       const flags = {};
