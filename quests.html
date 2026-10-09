@@ -68,8 +68,8 @@ function renderProgress(){
 async function load(){
  const {data:{user:u},error}=await db.auth.getUser();
  if(error)throw error;
- if(!u){status("Please sign in to save XP and claim rewards. You can browse DougHub, but rewards are tied to your account.",true);document.querySelectorAll("[data-challenge]").forEach(b=>b.disabled=true);return}
  user=u;
+ if(!u){status("Please sign in to save XP and claim rewards. You can browse DougHub, but rewards are tied to your account.",true);document.querySelectorAll("[data-challenge]").forEach(b=>b.disabled=true);return}
  const [p,c,g]=await Promise.all([
   db.from("player_progress").select("xp").eq("user_id",u.id).maybeSingle(),
   db.from("daily_challenge_completions").select("challenge_date,challenge_id,xp_awarded").eq("user_id",u.id),
