@@ -100,9 +100,21 @@
       if (href === "dmail.html" || href === "dougtube.html") a.remove();
     });
   }
+  function markActiveLinks() {
+    const current = pathKey();
+    document.querySelectorAll("header .nav > a[href], header nav > a[href], nav[aria-label='Main navigation'] > a[href]").forEach(a => {
+      const target = new URL(a.getAttribute("href"), location.href).pathname.replace(/^\\/+/, "").toLowerCase();
+      const isHome = (current === "" || current === "index.html") && (target === "" || target === "index.html");
+      const active = isHome || target === current;
+      a.classList.toggle("active", active);
+      if (active) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+  }
   function start() {
     addNavStyle();
     removeRetiredNavLinks();
+    markActiveLinks();
     loadFlags().then(applyFlags);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
