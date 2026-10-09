@@ -62,7 +62,7 @@ $("template").addEventListener("change",updatePreview);
 $("accent").addEventListener("input",()=>{$("colorText").textContent=$("accent").value});
 $("downloadBtn").addEventListener("click",()=>{if(!currentHTML)updatePreview();const blob=new Blob([currentHTML],{type:"text/html"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=(($("gameTitle").value.trim()||"dougHub-mini-game").replace(/[^a-z0-9-_]+/gi,"-"))+".html";a.click();URL.revokeObjectURL(url);});
 $("publishBtn").addEventListener("click",async()=>{
- const title=$("gameTitle").value.trim(),description=$("description").value.trim();
+ const title=$("gameTitle").value.trim().replace(/[<>]/g,""),description=$("description").value.trim().replace(/[<>]/g,"");
  if(!signedInUser){setStatus("Please sign in to publish a game. Your preview and HTML download still work.",true);return}
  if(title.length<3){setStatus("Please enter a game name with at least 3 characters.",true);return}
  if(!description){setStatus("Please add a short description.",true);return}
