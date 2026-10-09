@@ -1922,6 +1922,75 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 @media(prefers-reduced-motion:reduce){.tool-tile,.directory-filter,.directory-all-link{transition:none}.tool-tile:hover,.directory-all-link:hover{transform:none}}
 </style>
 
+
+<style id="dh-index-premium-redesign">
+/* Premium workspace homepage */
+body{background:#070812;color:#f6f6ff;background-image:radial-gradient(ellipse at 12% 0%,#39216b40,transparent 36%),radial-gradient(ellipse at 94% 12%,#203e7730,transparent 30%)}
+main{width:min(1180px,calc(100% - 64px));margin:0 auto}
+.hero-v2{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(310px,.88fr);align-items:center;gap:24px;min-height:450px;margin:30px 0 38px;padding:48px 48px 40px;border:1px solid #b3a7ff20;border-radius:30px;overflow:hidden;background:linear-gradient(115deg,#13152a 0%,#111326 48%,#101b2d 100%);box-shadow:0 30px 90px #0004}
+.hero-v2:before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(#ffffff04 1px,transparent 1px),linear-gradient(90deg,#ffffff04 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(90deg,#000,transparent 85%);pointer-events:none}
+.hero-orb{position:absolute;z-index:-1;border-radius:50%;filter:blur(3px);pointer-events:none}.hero-orb-one{width:400px;height:400px;right:3%;top:-250px;background:#7c3aed1b}.hero-orb-two{width:270px;height:270px;right:14%;bottom:-210px;background:#0ea5e91a}
+.hero-card-v2{position:relative;z-index:2;max-width:650px;padding:0;background:none;border:0;box-shadow:none;text-align:left}
+.hero-topline{display:flex;align-items:center;gap:9px;margin-bottom:22px;color:#b6b7d3;font-size:10px;font-weight:900;letter-spacing:.15em}
+.hero-live-dot{width:7px;height:7px;border-radius:50%;background:#70e3b0;box-shadow:0 0 12px #70e3b080}
+.hero-card-v2 h1{margin:0;color:#fbfaff;font-size:clamp(42px,5.2vw,68px);line-height:1.02;letter-spacing:-.065em;font-weight:850}
+.hero-card-v2 h1 span{color:transparent;background:linear-gradient(95deg,#b9a8ff 0%,#8ba8ff 48%,#70dfd0 100%);background-clip:text;-webkit-background-clip:text}
+.hero-v2-copy{max-width:500px;margin:20px 0 25px;color:#b2b4cc;font-size:15px;line-height:1.8}
+.hero-v2-search{display:flex;align-items:center;gap:12px;width:min(100%,510px);height:58px;padding:0 15px;border:1px solid #b1b3ff36;border-radius:14px;background:#080a17b8;box-shadow:0 10px 35px #0002;transition:border-color .2s,box-shadow .2s}
+.hero-v2-search:focus-within{border-color:#a7a0ffb0;box-shadow:0 0 0 4px #8b7bff14,0 10px 35px #0002}
+.hero-v2-search-icon{color:#b8b1ff;font-size:26px;line-height:1}
+#toolDirectorySearch{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;font-size:14px}
+#toolDirectorySearch::placeholder{color:#777b99}
+.hero-v2-search kbd{padding:5px 7px;border:1px solid #ffffff16;border-radius:6px;color:#777b99;font-size:9px;font-weight:900;letter-spacing:.12em}
+.hero-v2-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:20px}
+.hero-card-v2 .guest-friendly-note{margin:0;color:#8588a7;font-size:11px}
+.hero-user-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #ffffff12;border-radius:999px;background:#ffffff06;color:#9699b7;font-size:11px}
+.hero-user-pill strong{color:#e8e7ff}.hero-user-icon{color:#80dfc0}
+.hero-side-visual{position:relative;display:flex;align-items:center;justify-content:center;min-height:330px;isolation:isolate}
+.orbit{position:absolute;border:1px solid #9f9bff1f;border-radius:50%;transform:rotate(-25deg)}
+.orbit-large{width:300px;height:300px}.orbit-small{width:220px;height:220px;border-style:dashed;border-color:#70dfd025;transform:rotate(28deg)}
+.visual-core{position:relative;display:grid;place-items:center;width:146px;height:146px;border:1px solid #bcb4ff58;border-radius:42px;background:linear-gradient(145deg,#7770e52e,#121b32);box-shadow:0 0 0 12px #8b7bff08,0 0 70px #8373ff26;transform:rotate(-7deg)}
+.visual-core:before{content:"";position:absolute;inset:10px;border:1px solid #ffffff13;border-radius:32px}
+.visual-core-inner{font-size:47px;font-weight:950;letter-spacing:-.12em;color:#f5f1ff;transform:rotate(7deg)}.visual-core-inner span{color:#8cdece}
+.float-chip{position:absolute;display:flex;align-items:center;gap:9px;padding:11px 13px;border:1px solid #b1b4ff27;border-radius:12px;background:#101327eF;box-shadow:0 15px 35px #0004;color:#dedfff;font-size:11px;font-weight:750;white-space:nowrap;backdrop-filter:blur(12px)}
+.float-chip>span{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#8b7bff20;color:#c2baff;font-size:15px}.float-chip i{margin-left:8px;color:#7e82a2;font-style:normal}
+.chip-tools{top:38px;right:0;transform:rotate(3deg)}.chip-work{left:-2px;top:145px;transform:rotate(-4deg)}.chip-build{right:12px;bottom:35px;transform:rotate(2deg)}
+.visual-caption{position:absolute;bottom:0;left:50%;transform:translateX(-50%);color:#777b9c;font-size:9px;font-weight:900;letter-spacing:.16em;white-space:nowrap}.visual-caption span{margin-right:9px;color:#9e97ff}
+.directory-v2{padding:20px 0 35px}
+.directory-heading-v2{align-items:flex-end;margin-bottom:25px}
+.directory-heading-v2 h2{margin:0;color:#f7f6ff;font-size:clamp(30px,3vw,40px);letter-spacing:-.055em}
+.directory-heading-v2 .directory-description{max-width:590px;margin-top:10px;color:#9396b1;font-size:13px}
+.directory-total{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:0 0 auto}.directory-total strong{color:#c4baff;font-size:30px;letter-spacing:-.05em}.directory-total span{color:#777b99;font-size:10px;text-transform:uppercase;letter-spacing:.12em}
+.directory-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 17px}
+.directory-filter{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid #ffffff13;border-radius:10px;background:#ffffff04;color:#a1a3be;font-size:11px;font-weight:800;cursor:pointer;transition:.18s}
+.directory-filter:hover{border-color:#a6a0ff5c;color:#f5f4ff}.directory-filter.active{border-color:#a6a0ff65;background:linear-gradient(120deg,#8b7bff25,#6ddcc815);color:#f5f2ff}.directory-filter span{color:#8d8db2;font-size:9px}
+.tool-grid-v2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.tool-tile-v2{position:relative;display:flex;min-height:238px;flex-direction:column;align-items:stretch;padding:20px 21px;border:1px solid #ffffff12;border-radius:18px;background:linear-gradient(145deg,#131526,#0c0e1a);overflow:hidden;transition:transform .22s,border-color .22s,box-shadow .22s}
+.tool-tile-v2:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 100% 0,var(--tile-glow,#7770e51b),transparent 52%);opacity:.9;pointer-events:none}
+.tool-tile-v2>*{position:relative}.tool-tile-v2:hover{transform:translateY(-4px);border-color:#a5a2ff58;box-shadow:0 20px 45px #0003}
+.tool-card-tools{--tile-glow:#648bff25}.tool-card-work{--tile-glow:#52d8cb1c}.tool-card-nova{--tile-glow:#ce72ff24}.tool-card-base{--tile-glow:#55dba91a}.tool-card-drive{--tile-glow:#8874ff22}.tool-card-code{--tile-glow:#ffad5c1c}
+.tool-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.tool-tile-v2 .tool-tile-icon{display:grid;place-items:center;width:43px;height:43px;margin:0;border:1px solid #ffffff13;border-radius:13px;font-size:21px}
+.tool-tile-v2 .tool-tile-arrow{position:static;color:#747895;font-size:18px;transition:transform .2s}.tool-tile-v2:hover .tool-tile-arrow{transform:translate(3px,-3px);color:#d6d3ff}
+.tool-tile-v2 .tool-tile-label{margin:0 0 8px;color:#9b9fc0;font-size:9px;font-weight:900;letter-spacing:.15em}
+.tool-tile-v2 h3{margin:0 0 8px;color:#f3f2ff;font-size:19px;font-weight:800;letter-spacing:-.04em}
+.tool-tile-v2 p{max-width:330px;margin:0;color:#9698b1;font-size:12px;line-height:1.75}
+.tool-tile-v2 .tool-tile-open{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:22px;color:#c0bcff;font-size:11px;font-weight:850}.tool-tile-v2 .tool-tile-open b{font-size:17px;font-weight:500;transition:transform .2s}.tool-tile-v2:hover .tool-tile-open b{transform:translateX(4px)}
+.tool-tile-v2[hidden]{display:none!important}
+.directory-empty{padding:42px 20px;text-align:center;border:1px dashed #ffffff20;border-radius:18px;color:#a0a2bb}.directory-empty[hidden]{display:none}.directory-empty>span{font-size:30px;color:#b8adff}.directory-empty h3{margin:10px 0 5px;color:#f2f2ff}.directory-empty p{margin:0 0 17px;font-size:13px}#toolDirectoryReset{padding:10px 13px;border:1px solid #a6a0ff55;border-radius:10px;background:#7770e51c;color:#e5e5ff;font-weight:800;cursor:pointer}
+.home-lower-v2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px 0 40px}
+.home-promo-v2{min-height:265px;padding:25px;border:1px solid #ffffff12;border-radius:20px;background:linear-gradient(140deg,#15162a,#0c0e1a)}
+.home-promo-v2 .promo-index{margin-bottom:22px;color:#8185a5;font-size:9px;font-weight:900;letter-spacing:.16em}
+.home-promo-v2 .home-promo-icon{width:39px;height:39px;margin-bottom:15px;border:1px solid #a9a1ff21;background:#9182ff14;color:#c5bcff}
+.home-promo-v2 h2{margin:0;color:#f5f3ff;font-size:25px;line-height:1.12;letter-spacing:-.05em}
+.home-promo-v2>p:not(.directory-eyebrow){max-width:410px;margin:12px 0 20px;color:#9698b1;font-size:12px;line-height:1.8}
+.home-promo-v2>a{display:inline-flex;align-items:center;gap:10px;color:#bdb9ff;font-size:11px;font-weight:900}
+.promo-feedback{background:radial-gradient(circle at 100% 0,#1a526122,transparent 55%),linear-gradient(140deg,#121a27,#0c0e1a)}
+@media(max-width:900px){main{width:min(100% - 36px,720px)}.hero-v2{grid-template-columns:1fr;padding:38px 34px 30px}.hero-side-visual{min-height:260px;margin-top:5px}.orbit-large{width:235px;height:235px}.orbit-small{width:180px;height:180px}.visual-core{width:115px;height:115px;border-radius:34px}.visual-core-inner{font-size:38px}.chip-tools{right:10%}.chip-work{left:7%}.chip-build{right:13%}.tool-grid-v2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){main{width:calc(100% - 24px)}.hero-v2{min-height:auto;margin:14px 0 28px;padding:30px 20px 20px;border-radius:22px;gap:10px}.hero-topline{font-size:8px;letter-spacing:.1em;margin-bottom:20px}.hero-card-v2 h1{font-size:clamp(40px,11vw,55px)}.hero-v2-copy{font-size:13px;line-height:1.75;margin:17px 0 21px}.hero-v2-search{height:53px;padding:0 12px}.hero-v2-search kbd{display:none}.hero-v2-bottom{align-items:flex-start;flex-direction:column;gap:11px}.hero-side-visual{min-height:225px}.orbit-large{width:205px;height:205px}.orbit-small{width:155px;height:155px}.visual-core{width:96px;height:96px;border-radius:29px}.visual-core-inner{font-size:32px}.float-chip{padding:8px 9px;font-size:9px;gap:6px}.float-chip>span{width:21px;height:21px;font-size:12px}.float-chip i{margin-left:2px}.chip-tools{top:20px;right:0}.chip-work{left:0;top:100px}.chip-build{right:0;bottom:23px}.visual-caption{font-size:7px;letter-spacing:.1em}.directory-heading-v2{align-items:flex-start;gap:10px}.directory-heading-v2 h2{font-size:32px}.directory-heading-v2 .directory-description{font-size:12px}.directory-total strong{font-size:24px}.directory-total span{font-size:8px;white-space:nowrap}.directory-filters{gap:6px}.directory-filter{padding:9px 10px;font-size:10px;gap:7px}.tool-grid-v2{grid-template-columns:1fr;gap:10px}.tool-tile-v2{min-height:215px;padding:18px}.tool-card-top{margin-bottom:17px}.tool-tile-v2 h3{font-size:18px}.home-lower-v2{grid-template-columns:1fr;gap:10px}.home-promo-v2{min-height:245px;padding:21px}}
+@media(prefers-reduced-motion:reduce){.tool-tile-v2,.tool-tile-v2 .tool-tile-open b,.tool-tile-v2 .tool-tile-arrow{transition:none}.tool-tile-v2:hover{transform:none}}
+</style>
+
 <script src="nav.js" defer></script>
 </head>
 
@@ -2064,221 +2133,112 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 
     <!-- BIG TOP SECTION -->
 
-    <section class="hero">
-
-        <div class="hero-card">
-
-            <a href="work.html" class="work-hero-icon" aria-label="Open DougHub Work" title="DougHub Work">🛠️</a>
-
-            <div class="hero-badge">
-                The DougHub Platform
+    <section class="hero hero-v2">
+        <div class="hero-orb hero-orb-one"></div><div class="hero-orb hero-orb-two"></div>
+        <div class="hero-card hero-card-v2">
+            <div class="hero-topline"><span class="hero-live-dot"></span> THE DIGITAL WORKSPACE THAT KEEPS GROWING</div>
+            <h1>Make room for<br><span>what's next.</span></h1>
+            <p class="hero-v2-copy">Your tools, ideas, and projects — all in one focused place. Find what you need and get straight to work.</p>
+            <div class="hero-v2-search">
+                <span class="hero-v2-search-icon" aria-hidden="true">⌕</span>
+                <input id="toolDirectorySearch" type="search" autocomplete="off" placeholder="Search DougHub tools..." aria-label="Search DougHub tools">
+                <kbd>SEARCH</kbd>
             </div>
-
-
-<h1>
-                Welcome to <span>DougHub</span>
-            </h1>
-
-            <p>
-                Play games made by Doug and the community, chat with others, send direct messages to friends, post and watch vidios on DougTube, and much more! All on DougHub.
-            </p>
-
-            <div class="hero-stats">
-
-                <div class="hero-stat">
-
-                    <div
-                        id="userCount"
-                        class="hero-stat-number"
-                    >
-                        —
-                    </div>
-
-                    <div class="hero-stat-label">
-                        👥 Users
-                    </div>
-
-                </div>
-
-                <div class="hero-stat">
-
-                    <div
-                        id="gameCount"
-                        class="hero-stat-number"
-                    >
-                        6
-                    </div>
-
-                    <div class="hero-stat-label">
-                        🎮 Games
-                    </div>
-
-                </div>
-
+            <div class="hero-v2-bottom">
+                <span class="guest-friendly-note">✦ Explore freely. Sign in when you need an account.</span>
+                <span class="hero-user-pill"><span class="hero-user-icon">◉</span><strong id="userCount">—</strong> members</span>
             </div>
-
-            <div class="hero-actions">
-                <a href="douggames.html" class="hero-action primary">🎮 Explore Games</a>
-                <a href="chat.html" class="hero-action secondary">💬 Join the Community</a>
-            </div>
-
-            <div class="guest-friendly-note">
-                ✨ New here? You can explore DougHub without an account.
-            </div>
-
         </div>
-
-    </section>
-
-
-    <!-- TOOL DIRECTORY: built to scale as DougHub grows -->
-    <section class="tool-directory" id="explore" aria-labelledby="toolDirectoryTitle">
-        <div class="directory-heading">
-            <div>
-                <p class="directory-eyebrow">YOUR DOUGHUB LAUNCHPAD</p>
-                <h2 id="toolDirectoryTitle">What do you want to do?</h2>
-                <p class="directory-description">Find a tool, jump into a game, or open a community feature — all from one place.</p>
-            </div>
-            <a class="directory-all-link" href="tools.html">Browse all tools <span aria-hidden="true">↗</span></a>
-        </div>
-
-        <label class="directory-search-wrap" for="toolDirectorySearch">
-            <span class="directory-search-icon" aria-hidden="true">⌕</span>
-            <input id="toolDirectorySearch" type="search" autocomplete="off" placeholder="Search tools, games, and features..." aria-describedby="toolDirectoryHelp">
-            <span class="directory-search-shortcut" aria-hidden="true">SEARCH</span>
-        </label>
-        <p class="directory-help" id="toolDirectoryHelp">Try “database”, “video”, “games”, or “create”.</p>
-
-        <div class="directory-filters" role="group" aria-label="Filter DougHub features">
-            <button class="directory-filter active" type="button" data-tool-filter="all" aria-pressed="true">All features</button>
-            <button class="directory-filter" type="button" data-tool-filter="create" aria-pressed="false">✦ Create</button>
-            <button class="directory-filter" type="button" data-tool-filter="productivity" aria-pressed="false">▦ Productivity</button>
-            <button class="directory-filter" type="button" data-tool-filter="play" aria-pressed="false">🎮 Play</button>
-            <button class="directory-filter" type="button" data-tool-filter="community" aria-pressed="false">◎ Community</button>
-        </div>
-
-        <div class="directory-results-line">
-            <span id="toolDirectoryCount">11 features</span>
-            <span>DougHub keeps growing <span class="directory-live-dot" aria-hidden="true"></span></span>
-        </div>
-
-        <div class="tool-grid" id="toolDirectoryGrid">
-            <a class="tool-tile tool-tile-featured" href="douggames.html" data-tool-card data-category="play" data-search="games douggames play arcade community games">
-                <span class="tool-tile-icon icon-violet">🎮</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <span class="tool-tile-label">PLAY</span><h3>DougGames</h3><p>Discover games from Doug and the community.</p><span class="tool-tile-open">Explore games <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile tool-tile-featured" href="tools.html" data-tool-card data-category="productivity create" data-search="tools dougtools utilities converters calculators handy">
-                <span class="tool-tile-icon icon-blue">🧰</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <span class="tool-tile-label">TOOLS</span><h3>DougTools</h3><p>Open the toolbox for useful online utilities.</p><span class="tool-tile-open">Open toolbox <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="work.html" data-tool-card data-category="productivity create" data-search="doug hub work workspace organize projects">
-                <span class="tool-tile-icon icon-cyan">🛠️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>DougHub Work</h3><p>A workspace for getting things done.</p><span class="tool-tile-open">Open Work <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="nova.html" data-tool-card data-category="create productivity" data-search="nova ai assistant artificial intelligence help ideas">
-                <span class="tool-tile-icon icon-pink">✳</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>Nova AI</h3><p>Explore the AI assistant on DougHub.</p><span class="tool-tile-open">Open Nova <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="dougbase/index.html" data-tool-card data-category="create productivity" data-search="dougbase database tables projects backend data">
-                <span class="tool-tile-icon icon-green">🗄️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>DougBase</h3><p>Build and manage database-powered projects.</p><span class="tool-tile-open">Open DougBase <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="dougdrive.html" data-tool-card data-category="productivity" data-search="dougdrive drive files storage cloud sync documents">
-                <span class="tool-tile-icon icon-blue">☁️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>DougDrive</h3><p>Access your DougHub file-storage service.</p><span class="tool-tile-open">Open Drive <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="scripting/scripting.html" data-tool-card data-category="create productivity" data-search="scripting editor coding code programming developer">
-                <span class="tool-tile-icon icon-orange">⌘</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>Scripting Editor</h3><p>Write and experiment with code.</p><span class="tool-tile-open">Start coding <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="DougTube.html" data-tool-card data-category="play community" data-search="dougtube videos watch upload music mp3 media">
-                <span class="tool-tile-icon icon-red">▶</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>DougTube</h3><p>Watch and share videos with the community.</p><span class="tool-tile-open">Watch videos <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="DMail.html" data-tool-card data-category="community productivity" data-search="dmail direct messages inbox mail friends">
-                <span class="tool-tile-icon icon-blue">✉️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>DMail</h3><p>Send direct messages to other members.</p><span class="tool-tile-open">Open messages <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="chat.html" data-tool-card data-category="community" data-search="community chat messages talk people discussion">
-                <span class="tool-tile-icon icon-green">💬</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>Community Chat</h3><p>Join conversations across DougHub.</p><span class="tool-tile-open">Join chat <span aria-hidden="true">→</span></span>
-            </a>
-            <a class="tool-tile" href="my-games.html" data-tool-card data-category="create play productivity" data-search="my games videos projects uploads manage published">
-                <span class="tool-tile-icon icon-pink">▣</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
-                <h3>My Creations</h3><p>Manage your games and videos in one place.</p><span class="tool-tile-open">View creations <span aria-hidden="true">→</span></span>
-            </a>
-        </div>
-        <div class="directory-empty" id="toolDirectoryEmpty" hidden>
-            <span>⌕</span><h3>No matching features</h3><p>Try another search or switch to “All features”.</p>
-            <button type="button" id="toolDirectoryReset">Clear search and filters</button>
+        <div class="hero-side-visual" aria-hidden="true">
+            <div class="orbit orbit-large"></div><div class="orbit orbit-small"></div>
+            <div class="visual-core"><div class="visual-core-inner">D<span>H</span></div></div>
+            <div class="float-chip chip-tools"><span>✳</span> Useful tools <i>↗</i></div>
+            <div class="float-chip chip-work"><span>▦</span> Your workspace <i>↗</i></div>
+            <div class="float-chip chip-build"><span>⌘</span> Build something <i>↗</i></div>
+            <div class="visual-caption"><span>01</span> ONE HUB. MORE POSSIBILITIES.</div>
         </div>
     </section>
 
-    <section class="home-lower-grid" aria-label="More from DougHub">
-        <article class="home-promo-card home-community-promo">
-            <div class="home-promo-icon">🌐</div><p class="directory-eyebrow">BUILT BY THE COMMUNITY</p>
-            <h2>More than just tools.</h2>
-            <p>Play, share, build projects, and connect with other people using DougHub.</p>
-            <a href="douggames.html">Explore the community <span aria-hidden="true">→</span></a>
+    <section class="tool-directory directory-v2" id="explore" aria-labelledby="toolDirectoryTitle">
+        <div class="directory-heading directory-heading-v2">
+            <div><p class="directory-eyebrow">THE TOOLKIT</p><h2 id="toolDirectoryTitle">Your next move.</h2><p class="directory-description">A growing collection of tools for thinking, building, and getting things done.</p></div>
+            <div class="directory-total"><strong id="toolDirectoryCount">6</strong><span>tools to explore</span></div>
+        </div>
+        <div class="directory-filters" role="group" aria-label="Filter DougHub tools">
+            <button class="directory-filter active" type="button" data-tool-filter="all" aria-pressed="true">All tools <span>06</span></button>
+            <button class="directory-filter" type="button" data-tool-filter="productivity" aria-pressed="false">Productivity</button>
+            <button class="directory-filter" type="button" data-tool-filter="create" aria-pressed="false">Creation</button>
+            <button class="directory-filter" type="button" data-tool-filter="ai" aria-pressed="false">AI</button>
+        </div>
+        <div class="tool-grid tool-grid-v2" id="toolDirectoryGrid">
+            <a class="tool-tile tool-tile-v2 tool-card-tools" href="tools.html" data-tool-card data-category="productivity" data-search="dougtools tools utilities converters calculators generators useful online">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-blue">✳</span><span class="tool-tile-arrow">↗</span></div><span class="tool-tile-label">EVERYDAY UTILITIES</span><h3>DougTools</h3><p>A handy collection of online utilities for everyday tasks.</p><span class="tool-tile-open">Explore tools <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 tool-card-work" href="work.html" data-tool-card data-category="productivity create" data-search="doug hub work workspace organize tasks projects productivity">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-cyan">▦</span><span class="tool-tile-arrow">↗</span></div><span class="tool-tile-label">FOCUS & ORGANIZE</span><h3>DougHub Work</h3><p>Your dedicated space to organize work and move projects forward.</p><span class="tool-tile-open">Open workspace <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 tool-card-nova" href="nova.html" data-tool-card data-category="ai create" data-search="nova ai artificial intelligence assistant brainstorm ideas writing help">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-pink">✧</span><span class="tool-tile-arrow">↗</span></div><span class="tool-tile-label">IDEAS & INTELLIGENCE</span><h3>Nova AI</h3><p>Explore ideas, get help, and turn questions into a starting point.</p><span class="tool-tile-open">Meet Nova <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 tool-card-base" href="dougbase/index.html" data-tool-card data-category="create productivity" data-search="dougbase database tables data projects backend storage">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-green">▤</span><span class="tool-tile-arrow">↗</span></div><span class="tool-tile-label">DATA & PROJECTS</span><h3>DougBase</h3><p>Set up and manage the data behind your own projects.</p><span class="tool-tile-open">Open DougBase <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 tool-card-drive" href="dougdrive.html" data-tool-card data-category="productivity" data-search="dougdrive drive files cloud storage sync documents file manager">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-violet">↗</span><span class="tool-tile-arrow">↗</span></div><span class="tool-tile-label">FILES & STORAGE</span><h3>DougDrive</h3><p>A central place to access your DougHub file-storage service.</p><span class="tool-tile-open">Open Drive <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 tool-card-code" href="scripting/scripting.html" data-tool-card data-category="create" data-search="scripting editor code coding programming developer write test">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-orange">⌘</span><span class="tool-tile-arrow">↗</span></div><span class="tool-tile-label">DEVELOPER TOOLS</span><h3>Scripting Editor</h3><p>Write code, experiment with ideas, and build something new.</p><span class="tool-tile-open">Open editor <b>→</b></span>
+            </a>
+        </div>
+        <div class="directory-empty" id="toolDirectoryEmpty" hidden><span>⌕</span><h3>Nothing found this time.</h3><p>Try a different search or choose another category.</p><button type="button" id="toolDirectoryReset">Reset filters</button></div>
+    </section>
+
+    <section class="home-lower-grid home-lower-v2" aria-label="More about DougHub">
+        <article class="home-promo-card home-promo-v2">
+            <div class="promo-index">01 / YOUR SPACE</div><div class="home-promo-icon">✦</div><h2>Less searching.<br>More doing.</h2><p>DougHub is growing into a home for useful tools and services. This is your starting point.</p><a href="#explore">Explore the toolkit <span>↗</span></a>
         </article>
-        <article class="home-promo-card home-feedback-promo">
-            <div class="home-promo-icon">💡</div><p class="directory-eyebrow">HELP SHAPE WHAT'S NEXT</p>
-            <h2>Have an idea?</h2>
-            <p>Suggest a new tool, report a problem, or tell us what would make DougHub better.</p>
-            <a href="#feedback">Send feedback <span aria-hidden="true">→</span></a>
+        <article class="home-promo-card home-promo-v2 promo-feedback">
+            <div class="promo-index">02 / HELP SHAPE IT</div><div class="home-promo-icon">⌁</div><h2>Have a better idea?</h2><p>Tell us what tool you wish existed here. Your feedback helps shape what comes next.</p><a href="#feedback">Suggest an improvement <span>↗</span></a>
         </article>
     </section>
 
         <!-- FEEDBACK -->
 
     
+
 <script id="dh-tool-directory-script">
 (function(){
-  const search=document.getElementById("toolDirectorySearch");
-  const cards=Array.from(document.querySelectorAll("[data-tool-card]"));
-  const filters=Array.from(document.querySelectorAll("[data-tool-filter]"));
-  const count=document.getElementById("toolDirectoryCount");
-  const empty=document.getElementById("toolDirectoryEmpty");
-  const reset=document.getElementById("toolDirectoryReset");
-  if(!search||!cards.length)return;
-  let active="all";
-  function render(){
-    const query=search.value.trim().toLowerCase();
-    let shown=0;
-    cards.forEach(card=>{
-      const categories=(card.dataset.category||"").split(/\s+/);
-      const haystack=((card.dataset.search||"")+" "+card.innerText).toLowerCase();
-      const matchCategory=active==="all"||categories.includes(active);
-      const matchQuery=!query||haystack.includes(query);
-      const visible=matchCategory&&matchQuery;
-      card.hidden=!visible;
-      if(visible)shown++;
-    });
-    if(count)count.textContent=shown+" feature"+(shown===1?"":"s");
-    if(empty)empty.hidden=shown!==0;
-  }
-  filters.forEach(button=>button.addEventListener("click",()=>{
-    active=button.dataset.toolFilter||"all";
-    filters.forEach(item=>{
-      const selected=item===button;
-      item.classList.toggle("active",selected);
-      item.setAttribute("aria-pressed",String(selected));
-    });
-    render();
-  }));
-  search.addEventListener("input",render);
-  reset?.addEventListener("click",()=>{
-    search.value="";
-    active="all";
-    filters.forEach(item=>{
-      const selected=item.dataset.toolFilter==="all";
-      item.classList.toggle("active",selected);
-      item.setAttribute("aria-pressed",String(selected));
-    });
-    render();
-    search.focus();
+ const search=document.getElementById("toolDirectorySearch");
+ const cards=Array.from(document.querySelectorAll("[data-tool-card]"));
+ const filters=Array.from(document.querySelectorAll("[data-tool-filter]"));
+ const count=document.getElementById("toolDirectoryCount");
+ const empty=document.getElementById("toolDirectoryEmpty");
+ const reset=document.getElementById("toolDirectoryReset");
+ if(!search||!cards.length)return;
+ let active="all";
+ function render(){
+  const query=search.value.trim().toLowerCase();let shown=0;
+  cards.forEach(card=>{
+   const categories=(card.dataset.category||"").split(/\s+/);
+   const haystack=((card.dataset.search||"")+" "+card.innerText).toLowerCase();
+   const visible=(active==="all"||categories.includes(active))&&(!query||haystack.includes(query));
+   card.hidden=!visible;if(visible)shown++;
   });
+  if(count)count.textContent=String(shown).padStart(2,"0");
+  if(empty)empty.hidden=shown!==0;
+ }
+ filters.forEach(button=>button.addEventListener("click",()=>{
+  active=button.dataset.toolFilter||"all";
+  filters.forEach(item=>{const selected=item===button;item.classList.toggle("active",selected);item.setAttribute("aria-pressed",String(selected));});
   render();
+ }));
+ search.addEventListener("input",render);
+ reset?.addEventListener("click",()=>{
+  search.value="";active="all";
+  filters.forEach(item=>{const selected=item.dataset.toolFilter==="all";item.classList.toggle("active",selected);item.setAttribute("aria-pressed",String(selected));});
+  render();search.focus();
+ });
+ render();
 })();
 </script>
 
