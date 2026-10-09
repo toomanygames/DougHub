@@ -106,6 +106,109 @@ footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);colo
       <div class="row"><div><label for="randomMin">Minimum</label><input id="randomMin" type="number" value="1" step="1"></div><div><label for="randomMax">Maximum</label><input id="randomMax" type="number" value="100" step="1"></div></div>
       <button type="button" id="generateRandom" style="width:100%;margin-top:12px">Generate number</button>
       <div id="randomResult" class="timer-display" aria-live="polite">—</div><div id="randomStatus" class="status"></div>
+
+    <article class="tool-card" data-search="password generator random secure passphrase">
+      <div class="tool-heading"><div class="tool-icon">🔐</div><div><h2>Password Generator</h2><p class="description">Generate a random password locally in your browser.</p></div></div>
+      <label for="pwLength">Password length</label><input id="pwLength" type="number" min="8" max="128" value="20">
+      <label><input id="pwSymbols" type="checkbox" checked style="width:auto;margin-right:8px">Include symbols</label>
+      <button id="makePassword" type="button" style="width:100%">Generate password</button>
+      <label for="pwOutput">Your password</label><input id="pwOutput" type="text" readonly autocomplete="off" spellcheck="false">
+      <button id="copyPassword" class="secondary" type="button" style="margin-top:8px;width:100%">Copy password</button><div id="pwStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="percentage calculator percent increase decrease discount">
+      <div class="tool-heading"><div class="tool-icon">％</div><div><h2>Percentage Calculator</h2><p class="description">Find percentages and discounts.</p></div></div>
+      <label>Percentage of a number</label><div class="row"><input id="pctPercent" type="number" placeholder="Percent" value="15" step="any"><input id="pctNumber" type="number" placeholder="Number" value="200" step="any"></div>
+      <button id="calcPercent" type="button" style="margin-top:10px;width:100%">Calculate</button><div id="pctResult" class="output">15% of 200 = 30</div>
+      <label>Discount calculator</label><div class="row"><input id="discountPrice" type="number" min="0" step="any" placeholder="Original price"><input id="discountPercent" type="number" min="0" max="100" step="any" placeholder="Discount %"></div>
+      <button id="calcDiscount" type="button" style="margin-top:8px">Calculate discount</button><div id="discountResult" class="output"></div>
+    </article>
+    <article class="tool-card" data-search="tip calculator split bill restaurant people">
+      <div class="tool-heading"><div class="tool-icon">🧾</div><div><h2>Tip & Bill Splitter</h2><p class="description">Work out a tip and split a bill.</p></div></div>
+      <label for="billAmount">Bill amount</label><input id="billAmount" type="number" min="0" step="0.01" value="50">
+      <div class="row"><div><label for="tipPercent">Tip (%)</label><input id="tipPercent" type="number" min="0" max="1000" value="18"></div><div><label for="billPeople">People</label><input id="billPeople" type="number" min="1" max="1000" value="2"></div></div>
+      <button id="calcBill" type="button" style="margin-top:10px;width:100%">Split bill</button><div id="billResult" class="output"></div>
+    </article>
+    <article class="tool-card" data-search="date difference days between dates date calculator">
+      <div class="tool-heading"><div class="tool-icon">📅</div><div><h2>Date Difference</h2><p class="description">Calculate days between two dates.</p></div></div>
+      <label for="dateStart">Start date</label><input id="dateStart" type="date">
+      <label for="dateEnd">End date</label><input id="dateEnd" type="date">
+      <button id="calcDates" type="button" style="margin-top:10px;width:100%">Calculate days</button><div id="dateResult" class="output"></div>
+    </article>
+    <article class="tool-card" data-search="base64 encoder decoder encode decode text developer">
+      <div class="tool-heading"><div class="tool-icon">⇄</div><div><h2>Base64 Encoder</h2><p class="description">Encode or decode text using Base64.</p></div></div>
+      <label for="base64Input">Input</label><textarea id="base64Input" placeholder="Enter text or Base64..." spellcheck="false"></textarea>
+      <div class="row"><button id="base64Encode" type="button">Encode</button><button id="base64Decode" type="button">Decode</button></div>
+      <label for="base64Output">Output</label><textarea id="base64Output" spellcheck="false"></textarea>
+      <button id="base64Copy" class="secondary" type="button" style="margin-top:8px;width:100%">Copy output</button><div id="base64Status" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="url encoder decoder percent encode decode query string">
+      <div class="tool-heading"><div class="tool-icon">🔗</div><div><h2>URL Encoder</h2><p class="description">Encode or decode URL-encoded text.</p></div></div>
+      <label for="urlInput">Input</label><textarea id="urlInput" placeholder="Text or encoded URL..." spellcheck="false"></textarea>
+      <div class="row"><button id="urlEncode" type="button">Encode</button><button id="urlDecode" type="button">Decode</button></div>
+      <label for="urlOutput">Output</label><textarea id="urlOutput" spellcheck="false"></textarea>
+      <button id="urlCopy" class="secondary" type="button" style="margin-top:8px;width:100%">Copy output</button><div id="urlStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="html escape unescape entities code developer">
+      <div class="tool-heading"><div class="tool-icon">&lt;/&gt;</div><div><h2>HTML Entity Tool</h2><p class="description">Escape special HTML characters or decode entities.</p></div></div>
+      <label for="htmlInput">Input</label><textarea id="htmlInput" placeholder="Paste text or HTML entities..." spellcheck="false"></textarea>
+      <div class="row"><button id="htmlEscape" type="button">Escape HTML</button><button id="htmlDecode" type="button">Decode entities</button></div>
+      <label for="htmlOutput">Output</label><textarea id="htmlOutput" spellcheck="false"></textarea>
+      <button id="htmlCopy" class="secondary" type="button" style="margin-top:8px;width:100%">Copy output</button><div id="htmlStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="slug generator url friendly title spaces text">
+      <div class="tool-heading"><div class="tool-icon">✂</div><div><h2>Slug Generator</h2><p class="description">Turn a title into a URL-friendly slug.</p></div></div>
+      <label for="slugInput">Title or phrase</label><textarea id="slugInput" placeholder="My Awesome Project Name"></textarea>
+      <button id="makeSlug" type="button" style="width:100%">Generate slug</button>
+      <label for="slugOutput">Slug</label><input id="slugOutput" readonly>
+      <button id="copySlug" class="secondary" type="button" style="margin-top:8px;width:100%">Copy slug</button><div id="slugStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="color picker hex rgb preview design">
+      <div class="tool-heading"><div class="tool-icon">🎨</div><div><h2>Color Picker</h2><p class="description">Pick a color and copy its HEX or RGB value.</p></div></div>
+      <label for="colorInput">Choose a color</label><input id="colorInput" type="color" value="#6366f1" style="height:54px;padding:5px">
+      <label for="hexColor">HEX value</label><input id="hexColor" value="#6366f1" maxlength="7">
+      <label for="rgbColor">RGB value</label><input id="rgbColor" readonly>
+      <div id="colorPreview" style="height:62px;border-radius:12px;margin-top:10px;border:1px solid #ffffff30;background:#6366f1"></div>
+      <button id="copyHex" type="button" style="margin-top:10px;width:100%">Copy HEX</button><div id="colorStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="gradient generator css background linear gradient design">
+      <div class="tool-heading"><div class="tool-icon">🌈</div><div><h2>CSS Gradient Maker</h2><p class="description">Create a two-color gradient and copy the CSS.</p></div></div>
+      <div class="row"><div><label for="gradientA">Color one</label><input id="gradientA" type="color" value="#6366f1" style="height:48px;padding:5px"></div><div><label for="gradientB">Color two</label><input id="gradientB" type="color" value="#a855f7" style="height:48px;padding:5px"></div></div>
+      <label for="gradientAngle">Angle: <span id="gradientAngleLabel">135°</span></label><input id="gradientAngle" type="range" min="0" max="360" value="135">
+      <div id="gradientPreview" style="height:75px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #ffffff30"></div>
+      <label for="gradientOutput">CSS</label><textarea id="gradientOutput" readonly rows="2">background: linear-gradient(135deg, #6366f1, #a855f7);</textarea>
+      <button id="copyGradient" type="button" style="width:100%">Copy CSS</button><div id="gradientStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="text line sorter sort alphabetically remove duplicates">
+      <div class="tool-heading"><div class="tool-icon">↕</div><div><h2>Line Sorter</h2><p class="description">Sort lines or remove duplicate lines.</p></div></div>
+      <label for="sortInput">Text (one item per line)</label><textarea id="sortInput" placeholder="Banana&#10;Apple&#10;Cherry"></textarea>
+      <div class="row"><button id="sortLines" type="button">Sort A–Z</button><button id="dedupeLines" type="button">Remove duplicates</button></div>
+      <label for="sortOutput">Result</label><textarea id="sortOutput"></textarea>
+      <button id="copySorted" class="secondary" type="button" style="margin-top:8px;width:100%">Copy result</button><div id="sortStatus" class="status"></div>
+    </article>
+    <article class="tool-card" data-search="markdown preview editor headings lists formatting">
+      <div class="tool-heading"><div class="tool-icon">M↓</div><div><h2>Markdown Preview</h2><p class="description">Preview simple Markdown headings, lists, and emphasis.</p></div></div>
+      <label for="markdownInput">Markdown</label><textarea id="markdownInput" placeholder="# My heading&#10;&#10;Write **bold** text or a list."></textarea>
+      <button id="previewMarkdown" type="button" style="width:100%">Preview Markdown</button>
+      <div id="markdownOutput" style="margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;min-height:90px;overflow-wrap:anywhere;line-height:1.6"></div>
+      <p class="description">Basic formatting only; raw HTML is displayed as text.</p>
+    </article>
+    <article class="tool-card" data-search="aspect ratio calculator image video screen width height">
+      <div class="tool-heading"><div class="tool-icon">▭</div><div><h2>Aspect Ratio Calculator</h2><p class="description">Find the ratio of an image, video, or screen size.</p></div></div>
+      <div class="row"><div><label for="ratioWidth">Width</label><input id="ratioWidth" type="number" min="0.000001" step="any" value="1920"></div><div><label for="ratioHeight">Height</label><input id="ratioHeight" type="number" min="0.000001" step="any" value="1080"></div></div>
+      <button id="calcRatio" type="button" style="width:100%;margin-top:10px">Calculate ratio</button><div id="ratioResult" class="output">16:9</div>
+    </article>
+    <article class="tool-card" data-search="average mean median statistics calculator numbers">
+      <div class="tool-heading"><div class="tool-icon">∑</div><div><h2>Statistics Calculator</h2><p class="description">Calculate count, sum, mean, median, minimum, and maximum.</p></div></div>
+      <label for="statsInput">Numbers separated by commas or spaces</label><textarea id="statsInput" placeholder="12, 18, 24, 30, 36"></textarea>
+      <button id="calcStats" type="button" style="width:100%">Calculate statistics</button><div id="statsResult" class="output"></div>
+    </article>
+    <article class="tool-card" data-search="text cleaner whitespace blank lines trim spaces">
+      <div class="tool-heading"><div class="tool-icon">🧹</div><div><h2>Text Cleaner</h2><p class="description">Trim spaces, collapse repeated spaces, and remove blank lines.</p></div></div>
+      <label for="cleanInput">Text to clean</label><textarea id="cleanInput" placeholder="Paste messy text here..."></textarea>
+      <div class="row"><button id="cleanSpaces" type="button">Clean spaces</button><button id="cleanBlank" type="button">Remove blank lines</button></div>
+      <label for="cleanOutput">Cleaned text</label><textarea id="cleanOutput"></textarea>
+      <button id="copyClean" class="secondary" type="button" style="margin-top:8px;width:100%">Copy result</button><div id="cleanStatus" class="status"></div>
+    </article>
     </article>
   </section>
   <p class="notice" id="noTools" hidden>No tools match your search. Try another word.</p>
@@ -291,6 +394,104 @@ footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);colo
     do { crypto.getRandomValues(values); n = values[0]; } while(n >= limit);
     $("randomResult").textContent = String(min+(n%span)); setStatus("randomStatus","Generated from your selected range.");
   });
+
+  $("makePassword").addEventListener("click",()=>{
+    const length=Number($("pwLength").value);
+    if(!Number.isInteger(length)||length<8||length>128){setStatus("pwStatus","Choose a length between 8 and 128.");return;}
+    const groups=["ABCDEFGHJKLMNPQRSTUVWXYZ","abcdefghijkmnopqrstuvwxyz","23456789"];
+    if($("pwSymbols").checked)groups.push("!@#$%^&*()-_=+[]{}?");
+    const chars=groups.join(""),bytes=new Uint8Array(length);crypto.getRandomValues(bytes);
+    const out=groups.map(g=>g[bytes[Math.floor(Math.random()*bytes.length)]%g.length]);
+    for(let i=out.length;i<length;i++)out.push(chars[bytes[i]%chars.length]);
+    for(let i=out.length-1;i>0;i--){const j=bytes[i%bytes.length]%(i+1);[out[i],out[j]]=[out[j],out[i]];}
+    $("pwOutput").value=out.join("");setStatus("pwStatus","Generated locally. DougTools does not save it.");
+  });
+  $("copyPassword").addEventListener("click",()=>copyText($("pwOutput").value,"pwStatus"));
+  $("calcPercent").addEventListener("click",()=>{
+    const p=Number($("pctPercent").value),n=Number($("pctNumber").value);
+    if($("pctPercent").value===""||$("pctNumber").value===""||!Number.isFinite(p)||!Number.isFinite(n)){setStatus("pctResult","Enter valid numbers.");return;}
+    setStatus("pctResult",p+"% of "+n+" = "+(p/100*n));
+  });
+  $("calcDiscount").addEventListener("click",()=>{
+    const price=Number($("discountPrice").value),p=Number($("discountPercent").value);
+    if($("discountPrice").value===""||$("discountPercent").value===""||price<0||p<0||p>100||!Number.isFinite(price)||!Number.isFinite(p)){setStatus("discountResult","Enter a price of 0 or more and a discount from 0–100%.");return;}
+    const money=n=>n.toLocaleString(undefined,{style:"currency",currency:"USD"});
+    setStatus("discountResult","You save "+money(price*p/100)+". Sale price: "+money(price*(1-p/100))+".");
+  });
+  $("calcBill").addEventListener("click",()=>{
+    const amount=Number($("billAmount").value),tip=Number($("tipPercent").value),people=Number($("billPeople").value);
+    if($("billAmount").value===""||$("tipPercent").value===""||$("billPeople").value===""||amount<0||tip<0||!Number.isInteger(people)||people<1||!Number.isFinite(amount+tip)){setStatus("billResult","Enter a valid bill, tip, and whole number of people.");return;}
+    const fmt=n=>n.toLocaleString(undefined,{style:"currency",currency:"USD"}),tipAmount=amount*tip/100,total=amount+tipAmount;
+    setStatus("billResult","Tip: "+fmt(tipAmount)+" · Total: "+fmt(total)+" · Each person: "+fmt(total/people));
+  });
+  const dateToday=new Date(),localDate=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  $("dateStart").value=localDate(dateToday);$("dateEnd").value=localDate(dateToday);
+  $("calcDates").addEventListener("click",()=>{
+    const a=$("dateStart").value,b=$("dateEnd").value;
+    if(!a||!b){setStatus("dateResult","Choose both dates.");return;}
+    const da=Date.parse(a+"T00:00:00Z"),db=Date.parse(b+"T00:00:00Z"),days=Math.round(Math.abs(db-da)/86400000);
+    setStatus("dateResult",days+" day"+(days===1?"":"s")+" apart"+(db<da?" (end date is earlier).":"."));
+  });
+  function toB64(s){const bytes=new TextEncoder().encode(s);let binary="";bytes.forEach(b=>binary+=String.fromCharCode(b));return btoa(binary);}
+  function fromB64(s){const binary=atob(s.trim()),bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));return new TextDecoder("utf-8",{fatal:true}).decode(bytes);}
+  $("base64Encode").addEventListener("click",()=>{try{$("base64Output").value=toB64($("base64Input").value);setStatus("base64Status","Encoded successfully.");}catch(e){setStatus("base64Status","Could not encode this input.");}});
+  $("base64Decode").addEventListener("click",()=>{try{$("base64Output").value=fromB64($("base64Input").value);setStatus("base64Status","Decoded successfully.");}catch(e){setStatus("base64Status","Invalid Base64 or unsupported text encoding.");}});
+  $("base64Copy").addEventListener("click",()=>copyText($("base64Output").value,"base64Status"));
+  $("urlEncode").addEventListener("click",()=>{$("urlOutput").value=encodeURIComponent($("urlInput").value);setStatus("urlStatus","Encoded successfully.");});
+  $("urlDecode").addEventListener("click",()=>{try{$("urlOutput").value=decodeURIComponent($("urlInput").value.replace(/\+/g," "));setStatus("urlStatus","Decoded successfully.");}catch(e){setStatus("urlStatus","Invalid URL-encoded input.");}});
+  $("urlCopy").addEventListener("click",()=>copyText($("urlOutput").value,"urlStatus"));
+  $("htmlEscape").addEventListener("click",()=>{$("htmlOutput").value=$("htmlInput").value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");setStatus("htmlStatus","HTML characters escaped.");});
+  $("htmlDecode").addEventListener("click",()=>{const t=document.createElement("textarea");t.innerHTML=$("htmlInput").value;$("htmlOutput").value=t.value;setStatus("htmlStatus","Entities decoded as text.");});
+  $("htmlCopy").addEventListener("click",()=>copyText($("htmlOutput").value,"htmlStatus"));
+  $("makeSlug").addEventListener("click",()=>{$("slugOutput").value=$("slugInput").value.normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");setStatus("slugStatus","Slug created.");});
+  $("copySlug").addEventListener("click",()=>copyText($("slugOutput").value,"slugStatus"));
+  function syncColor(fromPicker){
+    let hex=(fromPicker?$("colorInput").value:$("hexColor").value).trim();
+    if(!/^#[0-9a-fA-F]{6}$/.test(hex)){setStatus("colorStatus","Enter a valid six-digit HEX color, such as #6366f1.");return;}
+    hex=hex.toLowerCase();$("colorInput").value=hex;$("hexColor").value=hex;
+    const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    $("rgbColor").value="rgb("+r+", "+g+", "+b+")";$("colorPreview").style.background=hex;setStatus("colorStatus","Color updated.");
+  }
+  $("colorInput").addEventListener("input",()=>syncColor(true));$("hexColor").addEventListener("change",()=>syncColor(false));
+  $("copyHex").addEventListener("click",()=>copyText($("hexColor").value,"colorStatus"));
+  function updateGradient(){
+    const a=$("gradientA").value,b=$("gradientB").value,angle=$("gradientAngle").value;
+    $("gradientAngleLabel").textContent=angle+"°";$("gradientPreview").style.background="linear-gradient("+angle+"deg, "+a+", "+b+")";
+    $("gradientOutput").value="background: linear-gradient("+angle+"deg, "+a+", "+b+");";
+  }
+  ["gradientA","gradientB","gradientAngle"].forEach(id=>$(id).addEventListener("input",updateGradient));
+  $("copyGradient").addEventListener("click",()=>copyText($("gradientOutput").value,"gradientStatus"));
+  $("sortLines").addEventListener("click",()=>{$("sortOutput").value=$("sortInput").value.split(/\r?\n/).sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"})).join("\n");setStatus("sortStatus","Lines sorted.");});
+  $("dedupeLines").addEventListener("click",()=>{$("sortOutput").value=Array.from(new Set($("sortInput").value.split(/\r?\n/))).join("\n");setStatus("sortStatus","Duplicate lines removed.");});
+  $("copySorted").addEventListener("click",()=>copyText($("sortOutput").value,"sortStatus"));
+  function escapeHTML(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+  function simpleMarkdown(s){
+    let html=escapeHTML(s);
+    html=html.replace(/^### (.+)$/gm,"<h3>$1</h3>").replace(/^## (.+)$/gm,"<h2>$1</h2>").replace(/^# (.+)$/gm,"<h1>$1</h1>");
+    html=html.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");
+    html=html.replace(/^\s*[-*] (.+)$/gm,"<li>$1</li>").replace(/(?:<li>.*<\/li>\n?)+/g,m=>"<ul>"+m+"</ul>");
+    return html.split(/\n{2,}/).map(part=>/^\s*<(h[1-3]|ul|ol)/.test(part)?part:"<p>"+part.replace(/\n/g,"<br>")+"</p>").join("");
+  }
+  $("previewMarkdown").addEventListener("click",()=>{$("markdownOutput").innerHTML=simpleMarkdown($("markdownInput").value);});
+  $("calcRatio").addEventListener("click",()=>{
+    const w=Number($("ratioWidth").value),h=Number($("ratioHeight").value);
+    if(!Number.isFinite(w)||!Number.isFinite(h)||w<=0||h<=0){setStatus("ratioResult","Enter positive width and height values.");return;}
+    function gcd(a,b){return b<1e-10?a:gcd(b,a%b);}
+    const factor=gcd(w,h),fmt=n=>n.toFixed(4).replace(/\.?0+$/,"");
+    setStatus("ratioResult",fmt(w)+":"+fmt(h)+" = "+fmt(w/factor)+":"+fmt(h/factor)+" · Decimal ratio "+(w/h).toFixed(4));
+  });
+  $("calcStats").addEventListener("click",()=>{
+    const raw=$("statsInput").value.trim();
+    if(!raw){setStatus("statsResult","Enter at least one number.");return;}
+    const nums=raw.split(/[\s,;]+/).filter(Boolean).map(Number);
+    if(!nums.length||nums.some(n=>!Number.isFinite(n))){setStatus("statsResult","Use valid numbers separated by commas or spaces.");return;}
+    const sorted=[...nums].sort((a,b)=>a-b),sum=nums.reduce((a,b)=>a+b,0),mid=Math.floor(sorted.length/2),median=sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
+    setStatus("statsResult","Count: "+nums.length+"\nSum: "+sum+"\nMean: "+(sum/nums.length)+"\nMedian: "+median+"\nMinimum: "+sorted[0]+"\nMaximum: "+sorted[sorted.length-1]);
+  });
+  $("cleanSpaces").addEventListener("click",()=>{$("cleanOutput").value=$("cleanInput").value.split(/\r?\n/).map(line=>line.trim().replace(/[ \t]+/g," ")).join("\n");setStatus("cleanStatus","Spaces cleaned.");});
+  $("cleanBlank").addEventListener("click",()=>{$("cleanOutput").value=$("cleanInput").value.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).join("\n");setStatus("cleanStatus","Blank lines removed.");});
+  $("copyClean").addEventListener("click",()=>copyText($("cleanOutput").value,"cleanStatus"));
+
   paintTimer();
 })();
 </script>
