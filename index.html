@@ -1867,7 +1867,62 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
 </style><style id="dh-tutorial-style">
 .dh-tutorial-highlight{position:relative!important;z-index:100001!important;box-shadow:0 0 0 4px rgba(129,140,248,.75),0 0 35px rgba(129,140,248,.55)!important;border-color:rgba(196,181,253,.9)!important;animation:dhTutorialPulse 1.2s ease-in-out infinite}.dh-tutorial-highlight:after{content:"";position:absolute;inset:-7px;border:2px solid rgba(196,181,253,.5);border-radius:inherit;pointer-events:none}@keyframes dhTutorialPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.22)}}.dh-tutorial{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.dh-tutorial.show{display:flex}.dh-tutorial-backdrop{position:absolute;inset:0;background:rgba(1,2,8,.76);backdrop-filter:blur(14px)}.dh-tutorial-card{position:relative;width:min(520px,100%);padding:30px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:radial-gradient(circle at 85% 5%,rgba(168,85,247,.22),transparent 32%),radial-gradient(circle at 10% 90%,rgba(99,102,241,.2),transparent 38%),rgba(13,17,39,.94);box-shadow:0 35px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07);animation:dhTutorialIn .25s ease}.dh-tutorial-top{display:flex;align-items:center;justify-content:space-between;color:#777b94;font-size:12px;font-weight:800}.dh-tutorial-badge{color:#aaa9ff;letter-spacing:.1em}.dh-tutorial-icon{width:72px;height:72px;display:grid;place-items:center;margin:28px 0 18px;border-radius:22px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.25);font-size:34px;box-shadow:0 12px 35px rgba(99,102,241,.12)}.dh-tutorial-card h2{margin:0;font-size:30px;letter-spacing:-1px}.dh-tutorial-card p{margin:10px 0 0;color:#a7a8b8;font-size:15px;line-height:1.65}.dh-tutorial-dots{display:flex;gap:7px;margin:25px 0}.dh-tutorial-dot{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.16);transition:.2s}.dh-tutorial-dot.active{width:24px;background:linear-gradient(90deg,#6366f1,#a855f7)}.dh-tutorial-actions{display:flex;justify-content:space-between;gap:10px}.dh-tutorial-skip,.dh-tutorial-next{padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.dh-tutorial-skip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#a4a5b5}.dh-tutorial-next{border:0;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px rgba(99,102,241,.2)}@keyframes dhTutorialIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}@media(max-width:560px){.dh-tutorial-card{padding:24px;border-radius:22px}.dh-tutorial-card h2{font-size:25px}}
-</style>  <script src="nav.js" defer></script>
+</style>  
+<style id="dh-scalable-home-redesign">
+/* DougHub homepage refresh: searchable, scalable tool directory */
+.tool-directory{padding:24px 0 34px}
+.directory-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px}
+.directory-eyebrow{margin:0 0 9px;color:#a5a7ff;font-size:11px;font-weight:900;letter-spacing:.16em}
+.directory-heading h2,.home-promo-card h2{margin:0;color:#f7f7ff;font-size:clamp(26px,3vw,35px);letter-spacing:-1.1px}
+.directory-description{margin:9px 0 0;color:#9b9bb2;font-size:14px;line-height:1.7}
+.directory-all-link{flex:0 0 auto;display:inline-flex;align-items:center;gap:12px;padding:11px 15px;border:1px solid #7778ef55;border-radius:12px;background:#6366f11a;color:#dcdcff;font-size:13px;font-weight:800;transition:.2s}
+.directory-all-link:hover{transform:translateY(-2px);background:#6366f12c}
+.directory-search-wrap{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 16px;border:1px solid #8c8dff35;border-radius:16px;background:linear-gradient(100deg,#12152b,#0b0d1b);box-shadow:0 14px 35px #0002}
+.directory-search-icon{font-size:27px;color:#aaaaff;line-height:1}
+#toolDirectorySearch{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;font-size:15px}
+#toolDirectorySearch::placeholder{color:#74758e}
+#toolDirectorySearch:focus-visible{outline:0}
+.directory-search-shortcut{flex:0 0 auto;padding:5px 7px;border:1px solid #ffffff12;border-radius:6px;color:#70738f;font-size:9px;font-weight:900;letter-spacing:.1em}
+.directory-help{margin:8px 3px 17px;color:#74758d;font-size:12px}
+.directory-filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.directory-filter{padding:9px 13px;border:1px solid #ffffff12;border-radius:999px;background:#ffffff05;color:#a6a7bd;font-size:12px;font-weight:800;cursor:pointer;transition:.18s}
+.directory-filter:hover{border-color:#8b8dfc55;color:#f5f5ff}
+.directory-filter.active{background:linear-gradient(120deg,#6366f133,#a855f729);border-color:#8b8dfc70;color:#f1efff;box-shadow:inset 0 0 0 1px #8b8dfc13}
+.directory-results-line{display:flex;justify-content:space-between;gap:12px;margin:0 2px 12px;color:#777991;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.directory-live-dot{display:inline-block;width:6px;height:6px;margin-left:4px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade8070}
+.tool-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.tool-tile{position:relative;display:flex;min-width:0;min-height:210px;flex-direction:column;align-items:flex-start;padding:19px;border:1px solid #ffffff12;border-radius:18px;background:linear-gradient(145deg,#11152aeb,#0a0c19f5);overflow:hidden;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+.tool-tile::after{content:"";position:absolute;width:130px;height:130px;right:-65px;top:-75px;border-radius:50%;background:#7778f51a;filter:blur(10px);pointer-events:none}
+.tool-tile:hover{transform:translateY(-4px);border-color:#8b8dfc65;background:linear-gradient(145deg,#171a36,#0b0d1b);box-shadow:0 16px 35px #0003}
+.tool-tile:focus-visible,.directory-filter:focus-visible,.directory-all-link:focus-visible{outline:2px solid #b6b7ff;outline-offset:3px}
+.tool-tile-icon{display:grid;place-items:center;width:43px;height:43px;margin-bottom:17px;border:1px solid #ffffff12;border-radius:13px;font-size:21px}
+.icon-violet{background:#8b5cf621}.icon-blue{background:#3b82f621}.icon-cyan{background:#06b6d421}.icon-pink{background:#ec489921}.icon-green{background:#22c55e1c}.icon-orange{background:#f973161c}.icon-red{background:#ef44441c}
+.tool-tile-arrow{position:absolute;top:20px;right:19px;color:#747895;font-size:17px;transition:transform .2s}
+.tool-tile:hover .tool-tile-arrow{transform:translate(2px,-2px);color:#d1d1ff}
+.tool-tile-label{margin:-7px 0 6px;color:#aaaaff;font-size:9px;font-weight:900;letter-spacing:.16em}
+.tool-tile h3{margin:0 0 7px;color:#f2f2ff;font-size:16px;letter-spacing:-.2px}
+.tool-tile p{margin:0;color:#8e90a8;font-size:12px;line-height:1.6}
+.tool-tile-open{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:18px;color:#b6b8ff;font-size:11px;font-weight:800}
+.tool-tile-featured{min-height:224px;border-color:#7778ef30;background:radial-gradient(circle at 100% 0,#7c3aed20,transparent 48%),linear-gradient(145deg,#171936,#0a0c1b)}
+.directory-empty{padding:40px 20px;text-align:center;border:1px dashed #ffffff20;border-radius:18px;color:#a0a2bb}
+.directory-empty[hidden]{display:none}
+.directory-empty>span{font-size:30px;color:#a5a7ff}.directory-empty h3{margin:10px 0 5px;color:#f2f2ff}.directory-empty p{margin:0 0 17px;font-size:13px}
+#toolDirectoryReset{padding:10px 13px;border:1px solid #7778ef55;border-radius:10px;background:#6366f122;color:#e5e5ff;font-weight:800;cursor:pointer}
+.home-lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:5px 0 36px}
+.home-promo-card{position:relative;overflow:hidden;padding:24px;border:1px solid #ffffff12;border-radius:20px;background:linear-gradient(140deg,#12152a,#090b17)}
+.home-promo-card::after{content:"";position:absolute;right:-65px;bottom:-100px;width:190px;height:190px;border-radius:50%;background:#8b5cf622;filter:blur(32px);pointer-events:none}
+.home-promo-icon{display:grid;place-items:center;width:42px;height:42px;margin-bottom:18px;border-radius:13px;background:#8b5cf61b;font-size:20px}
+.home-promo-card h2{font-size:23px}
+.home-promo-card>p:not(.directory-eyebrow){max-width:450px;margin:9px 0 18px;color:#9698b0;font-size:13px;line-height:1.7}
+.home-promo-card>a{position:relative;z-index:1;display:inline-flex;gap:9px;align-items:center;color:#b9baff;font-size:12px;font-weight:900}
+.home-promo-card>a:hover{color:#fff}
+@media(max-width:1050px){.tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.directory-heading{align-items:flex-start;flex-direction:column;gap:14px}.tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tool-tile{min-height:200px;padding:16px}.tool-tile-featured{min-height:210px}.home-lower-grid{grid-template-columns:1fr}}
+@media(max-width:460px){.tool-grid{grid-template-columns:1fr 1fr;gap:9px}.tool-tile{min-height:196px;padding:13px;border-radius:15px}.tool-tile h3{font-size:14px}.tool-tile p{font-size:11px}.tool-tile-icon{width:38px;height:38px;margin-bottom:14px}.tool-tile-arrow{top:15px;right:13px}.directory-search-shortcut{display:none}.directory-filter{padding:8px 10px;font-size:11px}.directory-results-line{font-size:9px}.home-promo-card{padding:19px}}
+@media(prefers-reduced-motion:reduce){.tool-tile,.directory-filter,.directory-all-link{transition:none}.tool-tile:hover,.directory-all-link:hover{transform:none}}
+</style>
+
+<script src="nav.js" defer></script>
 </head>
 
 <body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
@@ -2076,129 +2131,158 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
     </section>
 
 
-    <section class="section" aria-labelledby="welcomeTitle">
-        <div class="section-heading-welcome">
-            <h2 id="welcomeTitle">Start exploring</h2>
-            <p>There’s always something to play, watch, build, or talk about.</p>
+    <!-- TOOL DIRECTORY: built to scale as DougHub grows -->
+    <section class="tool-directory" id="explore" aria-labelledby="toolDirectoryTitle">
+        <div class="directory-heading">
+            <div>
+                <p class="directory-eyebrow">YOUR DOUGHUB LAUNCHPAD</p>
+                <h2 id="toolDirectoryTitle">What do you want to do?</h2>
+                <p class="directory-description">Find a tool, jump into a game, or open a community feature — all from one place.</p>
+            </div>
+            <a class="directory-all-link" href="tools.html">Browse all tools <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="welcome-strip">
-            <a class="welcome-card" href="douggames.html">
-                <div class="welcome-icon">🎮</div>
-                <h3>Play</h3>
-                <p>Jump into DougGames and try the games already on DougHub.</p>
+
+        <label class="directory-search-wrap" for="toolDirectorySearch">
+            <span class="directory-search-icon" aria-hidden="true">⌕</span>
+            <input id="toolDirectorySearch" type="search" autocomplete="off" placeholder="Search tools, games, and features..." aria-describedby="toolDirectoryHelp">
+            <span class="directory-search-shortcut" aria-hidden="true">SEARCH</span>
+        </label>
+        <p class="directory-help" id="toolDirectoryHelp">Try “database”, “video”, “games”, or “create”.</p>
+
+        <div class="directory-filters" role="group" aria-label="Filter DougHub features">
+            <button class="directory-filter active" type="button" data-tool-filter="all" aria-pressed="true">All features</button>
+            <button class="directory-filter" type="button" data-tool-filter="create" aria-pressed="false">✦ Create</button>
+            <button class="directory-filter" type="button" data-tool-filter="productivity" aria-pressed="false">▦ Productivity</button>
+            <button class="directory-filter" type="button" data-tool-filter="play" aria-pressed="false">🎮 Play</button>
+            <button class="directory-filter" type="button" data-tool-filter="community" aria-pressed="false">◎ Community</button>
+        </div>
+
+        <div class="directory-results-line">
+            <span id="toolDirectoryCount">11 features</span>
+            <span>DougHub keeps growing <span class="directory-live-dot" aria-hidden="true"></span></span>
+        </div>
+
+        <div class="tool-grid" id="toolDirectoryGrid">
+            <a class="tool-tile tool-tile-featured" href="douggames.html" data-tool-card data-category="play" data-search="games douggames play arcade community games">
+                <span class="tool-tile-icon icon-violet">🎮</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <span class="tool-tile-label">PLAY</span><h3>DougGames</h3><p>Discover games from Doug and the community.</p><span class="tool-tile-open">Explore games <span aria-hidden="true">→</span></span>
             </a>
-            <a class="welcome-card" href="DougTube.html">
-                <div class="welcome-icon">▶</div>
-                <h3>Watch</h3>
-                <p>See what people are sharing on DougTube.</p>
+            <a class="tool-tile tool-tile-featured" href="tools.html" data-tool-card data-category="productivity create" data-search="tools dougtools utilities converters calculators handy">
+                <span class="tool-tile-icon icon-blue">🧰</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <span class="tool-tile-label">TOOLS</span><h3>DougTools</h3><p>Open the toolbox for useful online utilities.</p><span class="tool-tile-open">Open toolbox <span aria-hidden="true">→</span></span>
             </a>
-            <a class="welcome-card" href="chat.html">
-                <div class="welcome-icon">💬</div>
-                <h3>Connect</h3>
-                <p>Drop into Community Chat and join the conversation.</p>
+            <a class="tool-tile" href="work.html" data-tool-card data-category="productivity create" data-search="doug hub work workspace organize projects">
+                <span class="tool-tile-icon icon-cyan">🛠️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>DougHub Work</h3><p>A workspace for getting things done.</p><span class="tool-tile-open">Open Work <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="nova.html" data-tool-card data-category="create productivity" data-search="nova ai assistant artificial intelligence help ideas">
+                <span class="tool-tile-icon icon-pink">✳</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>Nova AI</h3><p>Explore the AI assistant on DougHub.</p><span class="tool-tile-open">Open Nova <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="dougbase/index.html" data-tool-card data-category="create productivity" data-search="dougbase database tables projects backend data">
+                <span class="tool-tile-icon icon-green">🗄️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>DougBase</h3><p>Build and manage database-powered projects.</p><span class="tool-tile-open">Open DougBase <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="dougdrive.html" data-tool-card data-category="productivity" data-search="dougdrive drive files storage cloud sync documents">
+                <span class="tool-tile-icon icon-blue">☁️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>DougDrive</h3><p>Access your DougHub file-storage service.</p><span class="tool-tile-open">Open Drive <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="scripting/scripting.html" data-tool-card data-category="create productivity" data-search="scripting editor coding code programming developer">
+                <span class="tool-tile-icon icon-orange">⌘</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>Scripting Editor</h3><p>Write and experiment with code.</p><span class="tool-tile-open">Start coding <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="DougTube.html" data-tool-card data-category="play community" data-search="dougtube videos watch upload music mp3 media">
+                <span class="tool-tile-icon icon-red">▶</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>DougTube</h3><p>Watch and share videos with the community.</p><span class="tool-tile-open">Watch videos <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="DMail.html" data-tool-card data-category="community productivity" data-search="dmail direct messages inbox mail friends">
+                <span class="tool-tile-icon icon-blue">✉️</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>DMail</h3><p>Send direct messages to other members.</p><span class="tool-tile-open">Open messages <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="chat.html" data-tool-card data-category="community" data-search="community chat messages talk people discussion">
+                <span class="tool-tile-icon icon-green">💬</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>Community Chat</h3><p>Join conversations across DougHub.</p><span class="tool-tile-open">Join chat <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="tool-tile" href="my-games.html" data-tool-card data-category="create play productivity" data-search="my games videos projects uploads manage published">
+                <span class="tool-tile-icon icon-pink">▣</span><span class="tool-tile-arrow" aria-hidden="true">↗</span>
+                <h3>My Creations</h3><p>Manage your games and videos in one place.</p><span class="tool-tile-open">View creations <span aria-hidden="true">→</span></span>
             </a>
         </div>
-    </section>
-    <section class="section" aria-labelledby="featureOverviewTitle">
-
-        <div class="overview-section">
-
-            <div class="feature-overview">
-                <p class="overview-eyebrow">One place, many things</p>
-                <h2 id="featureOverviewTitle">Everything DougHub Has</h2>
-
-                <ul class="feature-list">
-                    <li><span class="feature-check">✓</span>Games</li>
-                    <li><span class="feature-check">✓</span>Community Games</li>
-                    <li><span class="feature-check">✓</span>DougTube</li>
-                    <li><span class="feature-check">✓</span>DMail</li>
-                    <li><span class="feature-check">✓</span>Community Chat</li>
-                    <li><span class="feature-check">✓</span>Game Publishing</li>
-                    <li><span class="feature-check">✓</span>DougTools</li>
-                    <li><span class="feature-check">✓</span>User Accounts</li>
-                </ul>
-            </div>
-
-            <div class="douggames-overview">
-                <p class="overview-eyebrow">Play or create</p>
-                <h2>DougGames</h2>
-                <p>
-                    Find Doug's games and games made by the community in one place. Want to make your own? Open the creator and publish it to DougHub.
-                </p>
-                <a href="douggames.html" class="douggames-link">Explore DougGames →</a>
-            </div>
-
-        </div>
-
-    </section>
-
-    <section class="section" aria-label="DougHub services">
-
-        <div class="service-list">
-
-            <div class="service-row">
-                <div>
-                    <h2>DMail</h2>
-                    <p>Send direct messages to friends on DougHub.</p>
-                </div>
-                <a href="DMail.html" class="service-button">Open DMail</a>
-            </div>
-
-            <div class="service-row">
-                <div>
-                    <h2>DougTube</h2>
-                    <p>Watch and share videos with the DougHub community.</p>
-                </div>
-                <a href="DougTube.html" class="service-button">Open DougTube</a>
-            </div>
-
-            <div class="service-row">
-                <div>
-                    <h2>Community Chat</h2>
-                    <p>Talk with other people in the DougHub community.</p>
-                </div>
-                <a href="chat.html" class="service-button">Open Chat</a>
-            </div>
-
-        </div>
-
-    </section>
-
-    <section class="special-services" aria-labelledby="specialServicesTitle">
-        <div class="special-services-card">
-            <div class="special-services-heading">
-                <h2 id="specialServicesTitle">✨ Special Services</h2>
-                <p>Extra DougHub services and tools.</p>
-            </div>
-            <div class="special-services-list">
-                <div class="special-service-row">
-                    <div class="special-service-title">
-                        <div class="special-service-icon">☁️</div>
-                        <div><h3>DougDrive</h3><p>Store your files in DougBase and sync them with your Windows computer.</p></div>
-                    </div>
-                    <a href="dougdrive.html" class="special-service-button">Open DougDrive →</a>
-                </div>
-                <div class="special-service-row">
-                    <div class="special-service-title">
-                        <div class="special-service-icon">🗄️</div>
-                        <div><h3>DougBase</h3><p>Build and manage your own database-powered projects.</p></div>
-                    </div>
-                    <a href="dougbase/index.html" class="special-service-button">Open DougBase →</a>
-                </div>
-                <div class="special-service-row">
-                    <div class="special-service-title">
-                        <div class="special-service-icon">＋</div>
-                        <div><h3>More coming soon</h3><p>More special DougHub services are on the way.</p></div>
-                    </div>
-                    <span class="special-service-button" style="opacity:.55;cursor:default">Coming Soon</span>
-                </div>
-            </div>
+        <div class="directory-empty" id="toolDirectoryEmpty" hidden>
+            <span>⌕</span><h3>No matching features</h3><p>Try another search or switch to “All features”.</p>
+            <button type="button" id="toolDirectoryReset">Clear search and filters</button>
         </div>
     </section>
 
-    <!-- FEEDBACK -->
+    <section class="home-lower-grid" aria-label="More from DougHub">
+        <article class="home-promo-card home-community-promo">
+            <div class="home-promo-icon">🌐</div><p class="directory-eyebrow">BUILT BY THE COMMUNITY</p>
+            <h2>More than just tools.</h2>
+            <p>Play, share, build projects, and connect with other people using DougHub.</p>
+            <a href="douggames.html">Explore the community <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="home-promo-card home-feedback-promo">
+            <div class="home-promo-icon">💡</div><p class="directory-eyebrow">HELP SHAPE WHAT'S NEXT</p>
+            <h2>Have an idea?</h2>
+            <p>Suggest a new tool, report a problem, or tell us what would make DougHub better.</p>
+            <a href="#feedback">Send feedback <span aria-hidden="true">→</span></a>
+        </article>
+    </section>
 
-    <section class="feedback-section">
+        <!-- FEEDBACK -->
+
+    
+<script id="dh-tool-directory-script">
+(function(){
+  const search=document.getElementById("toolDirectorySearch");
+  const cards=Array.from(document.querySelectorAll("[data-tool-card]"));
+  const filters=Array.from(document.querySelectorAll("[data-tool-filter]"));
+  const count=document.getElementById("toolDirectoryCount");
+  const empty=document.getElementById("toolDirectoryEmpty");
+  const reset=document.getElementById("toolDirectoryReset");
+  if(!search||!cards.length)return;
+  let active="all";
+  function render(){
+    const query=search.value.trim().toLowerCase();
+    let shown=0;
+    cards.forEach(card=>{
+      const categories=(card.dataset.category||"").split(/\s+/);
+      const haystack=((card.dataset.search||"")+" "+card.innerText).toLowerCase();
+      const matchCategory=active==="all"||categories.includes(active);
+      const matchQuery=!query||haystack.includes(query);
+      const visible=matchCategory&&matchQuery;
+      card.hidden=!visible;
+      if(visible)shown++;
+    });
+    if(count)count.textContent=shown+" feature"+(shown===1?"":"s");
+    if(empty)empty.hidden=shown!==0;
+  }
+  filters.forEach(button=>button.addEventListener("click",()=>{
+    active=button.dataset.toolFilter||"all";
+    filters.forEach(item=>{
+      const selected=item===button;
+      item.classList.toggle("active",selected);
+      item.setAttribute("aria-pressed",String(selected));
+    });
+    render();
+  }));
+  search.addEventListener("input",render);
+  reset?.addEventListener("click",()=>{
+    search.value="";
+    active="all";
+    filters.forEach(item=>{
+      const selected=item.dataset.toolFilter==="all";
+      item.classList.toggle("active",selected);
+      item.setAttribute("aria-pressed",String(selected));
+    });
+    render();
+    search.focus();
+  });
+  render();
+})();
+</script>
+
+    <section class="feedback-section" id="feedback">
 
         <div class="feedback-card">
 
