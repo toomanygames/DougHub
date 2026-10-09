@@ -897,64 +897,9 @@
     ========================================= */
 
 
-    /* Shared site navigation: match Nova AI's clean pill-style links. */
-    function normalizeSiteNavigation() {
-        if (!document.getElementById("doughub-shared-nav-style")) {
-            const style = document.createElement("style");
-            style.id = "doughub-shared-nav-style";
-            style.textContent = `
-                .nav:has(a[href="index.html"]),
-                nav[aria-label="Main navigation"],
-                header .nav:has(a[href="douggames.html"]) {
-                    display:flex !important; align-items:center !important;
-                    justify-content:flex-end; gap:8px !important; flex-wrap:wrap;
-                }
-                .nav:has(a[href="index.html"]) a,
-                nav[aria-label="Main navigation"] a,
-                header .nav:has(a[href="douggames.html"]) a {
-                    display:inline-flex; align-items:center; justify-content:center;
-                    padding:9px 12px !important; border:1px solid transparent;
-                    border-radius:10px !important; color:#d9dcf4 !important;
-                    background:transparent; text-decoration:none !important;
-                    font-size:13px; line-height:1.25;
-                    transition:background .18s ease,color .18s ease,border-color .18s ease;
-                }
-                .nav:has(a[href="index.html"]) a:hover,
-                nav[aria-label="Main navigation"] a:hover,
-                header .nav:has(a[href="douggames.html"]) a:hover {
-                    background:#ffffff12 !important; color:#fff !important;
-                }
-                .nav:has(a[href="index.html"]) a.active,
-                .nav:has(a[href="index.html"]) a[aria-current="page"],
-                nav[aria-label="Main navigation"] a[aria-current="page"] {
-                    background:#ffffff12 !important; color:#fff !important;
-                    border-color:#ffffff18 !important;
-                }
-                @media(max-width:760px) {
-                    .nav:has(a[href="index.html"]),
-                    nav[aria-label="Main navigation"],
-                    header .nav:has(a[href="douggames.html"]) {
-                        justify-content:flex-start; width:100%;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        document.querySelectorAll('.nav, nav[aria-label="Main navigation"], header nav').forEach(nav => {
-            if (!nav.querySelector('a[href="index.html"], a[href="./"], a[href="douggames.html"], a[href="chat.html"]')) return;
-            nav.querySelectorAll('a[href]').forEach(link => {
-                const href = (link.getAttribute('href') || '').split(/[?#]/)[0].toLowerCase();
-                if (href === 'dmail.html' || href === './dmail.html' || href === 'dougtube.html' || href === './dougtube.html') link.remove();
-            });
-        });
-    }
-
     async function initialize() {
 
         try {
-
-            normalizeSiteNavigation();
-
             await loadSupabase();
 
 
