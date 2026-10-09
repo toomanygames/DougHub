@@ -62,7 +62,7 @@
   }
   async function loadFlags() {
     try {
-      const r = await fetch(API, { headers: { apikey: KEY, Authorization: "Bearer " + KEY } });
+      const r = await fetch(API, { headers: { apikey: KEY } });
       if (!r.ok) throw new Error("Feature flags unavailable");
       const rows = await r.json();
       const flags = {};
@@ -74,7 +74,7 @@
     }
   }
   function disabledUrl(feature) {
-    return "feature-disabled.html?feature=" + encodeURIComponent(feature);
+    return "/feature-disabled.html?feature=" + encodeURIComponent(feature);
   }
   function applyFlags(flags) {
     if (!flags) return;
