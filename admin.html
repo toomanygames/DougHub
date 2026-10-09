@@ -3816,7 +3816,14 @@ function setupAdminAuditTracking() {
         const control=target.closest("button,a,[role='button']");
         if(!control)return;
         const action="Clicked: "+auditTargetLabel(control);
-        writeAuditLog("admin_action",auditCategoryFor(control,action),action,{control:control.id||control.getAttribute("aria-label")||control.tagName.toLowerCase()});
+        const selected = [...adminArea.querySelectorAll("select")].filter(select => select.value).map(select => ({
+            field: select.id || select.name || "select",
+            choice: (select.options[select.selectedIndex]?.textContent || "").trim().slice(0, 100)
+        }));
+        writeAuditLog("admin_action",auditCategoryFor(control,action),action,{
+            control:control.id||control.getAttribute("aria-label")||control.tagName.toLowerCase(),
+            selected
+        });
     });
     adminArea.addEventListener("change",event=>{
         const target=event.target;
