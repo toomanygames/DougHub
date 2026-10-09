@@ -917,13 +917,25 @@
 
 
             supabaseClient.auth.onAuthStateChange(
-                function () {
-
-                    setTimeout(
-                        checkAccount,
-                        0
-                    );
-
+                function (event, session) {
+                    if (event === "SIGNED_IN" && session && session.user) {
+                        const signedInUser = session.user;
+                        setTimeout(async function () {
+                            try {
+                                await supabaseClient.from("admin_audit_logs").insert({
+                                    actor_id: signedInUser.id,
+                                    event_type: "login",
+                                    category: "authentication",
+                                    action: "Successful sign-in",
+                                    page: location.pathname,
+                                    details: { method: "Supabase Auth" }
+                                });
+                            } catch (auditError) {
+                                console.warn("Sign-in audit event could not be saved:", auditError);
+                            }
+                        }, 0);
+                    }
+                    setTimeout(checkAccount, 0);
                 }
             );
 
