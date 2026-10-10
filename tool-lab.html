@@ -5,12 +5,41 @@
 <meta name="theme-color" content="#070816">
 <title>Tool Lab — DougHub</title>
 <link rel="icon" href="DougHub.svg" type="image/x-icon">
-<link rel="stylesheet" href="douqhub-theme.css">
 <style>
 :root{color-scheme:dark;--line:rgba(255,255,255,.1);--muted:#aaa9bb;--panel:rgba(13,17,39,.82)}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0%,#17133b,transparent 32%),radial-gradient(circle at 90% 5%,#25104b,transparent 28%),#02040a;color:#fff;font-family:Arial,Helvetica,sans-serif}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}header{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px max(18px,calc((100% - 1180px)/2));background:#04050fdd;border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}.brand{font-size:20px;font-weight:900}.brand b{display:inline-grid;place-items:center;width:36px;height:36px;margin-right:8px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#a855f7)}nav{display:flex;gap:18px;flex-wrap:wrap}nav a{font-size:13px;color:#c4c3d2;font-weight:700}main{width:min(1180px,calc(100% - 30px));margin:auto}.hero{margin:36px 0 22px;padding:42px 24px;text-align:center;border:1px solid var(--line);border-radius:26px;background:radial-gradient(circle at 85% 15%,#a855f72c,transparent 35%),radial-gradient(circle at 15% 85%,#6366f129,transparent 35%),var(--panel)}.eyebrow{font-size:12px;font-weight:800;color:#c4b5fd;letter-spacing:.1em;text-transform:uppercase}h1{font-size:clamp(36px,6vw,64px);letter-spacing:-2px;margin:15px 0 10px}h1 span{background:linear-gradient(90deg,#818cf8,#d8b4fe);background-clip:text;color:transparent}.hero p{max-width:720px;margin:auto;color:var(--muted);line-height:1.7}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:38px}.card{min-width:0;padding:22px;border:1px solid var(--line);border-radius:19px;background:var(--panel);box-shadow:0 12px 36px #0002}.card h2{margin:0 0 7px;font-size:20px}.desc{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 14px}label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:#d9d8e5}input,textarea{width:100%;min-width:0;padding:11px 12px;color:#fff;background:#050713;border:1px solid var(--line);border-radius:10px;outline:none}textarea{resize:vertical;line-height:1.5}input:focus,textarea:focus{border-color:#818cf8}.row{display:flex;gap:9px;margin-top:10px}.row>*{flex:1;min-width:0}button{padding:10px 14px;border:1px solid #818cf855;border-radius:10px;color:white;background:#6366f12e;font-weight:800;cursor:pointer}button:hover{background:#6366f14a}.secondary{background:#ffffff08;border-color:var(--line);color:#d2d1df}.status{margin-top:9px;min-height:18px;color:#a5b4fc;font-size:12px;line-height:1.5;overflow-wrap:anywhere}.preview{display:block;width:100%;height:300px;margin-top:10px;border:1px solid var(--line);border-radius:12px;background:white}.warning{padding:12px;border:1px solid #f59e0b45;border-radius:12px;background:#f59e0b0c;color:#d8c7a5;font-size:12px;line-height:1.6;margin-top:12px}.output{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;color:#c9c8dc;font-size:13px;min-height:42px}footer{text-align:center;color:#77768b;border-top:1px solid var(--line);padding:24px;font-size:13px}@media(max-width:760px){header{align-items:flex-start;flex-direction:column}nav{gap:12px}.grid{grid-template-columns:1fr}.hero{margin-top:22px;padding:30px 18px}.card{padding:17px}.row{flex-wrap:wrap}}
 </style>
 <script src="nav.js" defer></script><script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* DougHub page-specific redesign — homepage glass language, embedded locally */
+:root{color-scheme:dark;--dh-ink:#f6f5ff;--dh-muted:#a4a7c4;--dh-line:rgba(177,184,255,.15);--dh-glass:rgba(13,17,39,.82);--dh-glass-deep:rgba(5,7,20,.86);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+*{box-sizing:border-box}
+body{color:var(--dh-ink);-webkit-font-smoothing:antialiased}
+a{transition:color .18s ease,text-decoration-color .18s ease}
+h1,h2,h3,h4{letter-spacing:-.035em}
+::selection{background:#7776ed66;color:#fff}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background-color:rgba(5,7,19,.82);border:1px solid var(--dh-line);border-radius:12px}
+input::placeholder,textarea::placeholder{color:#898eaf}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button,.button,.btn,a.button,input[type=button],input[type=submit]{border-radius:12px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease}
+button:not(:disabled):hover,.button:hover,.btn:hover,a.button:hover{filter:brightness(1.08)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+.card,.panel,.settings-card,.settings-section,.tool-card,.game-card,.feature-card,.content-card,.auth-card,.feedback-section,.section-card,.video-card,.post-card,.profile-card,.workspace-card,.modal,.modal-box,.modal-content{border-color:var(--dh-line)}
+@media(max-width:700px){button,.button,.btn,a.button{max-width:100%}}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 33%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
+.brand b{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 24px #6366f133}
+.hero{background:radial-gradient(circle at 80% 15%,#a855f72a,transparent 36%),rgba(13,17,39,.65);border:1px solid var(--dh-line);border-radius:26px}
+.grid .card{background:linear-gradient(145deg,rgba(17,22,49,.92),rgba(8,10,25,.88));border:1px solid var(--dh-line);border-radius:21px;box-shadow:0 16px 42px #0003}
+.preview,.output{background:#070918;border:1px solid var(--dh-line);border-radius:15px}
+.warning{background:#ef444410;border:1px solid #ef444433;border-radius:14px}
+
+</style>
 </head>
 <body>
 <header><a class="brand" href="index.html"><b>D</b>DougHub</a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="tools.html">DougTools</a><a href="douggames.html">Games</a><a href="chat.html">Chat</a></nav></header>
