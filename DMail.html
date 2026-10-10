@@ -1259,6 +1259,51 @@ html, body { background: radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.22),t
 }
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible { outline:2px solid #a5a1ff; outline-offset:2px; }
 
+
+/* Comprehensive final pass: correct all remaining inherited light styles */
+:root { color-scheme: dark; }
+body, body * { scrollbar-color: rgba(129,140,248,.45) transparent; }
+.sidebar, .content, .user-list, .chat, .other-view, .mail-layout { color:#f5f5ff !important; }
+.sidebar, .user-list { border-color:rgba(163,170,255,.15) !important; }
+.nav-button { color:#c9c8e5 !important; background:transparent !important; }
+.nav-button:hover,.nav-button.active { color:#fff !important; background:rgba(99,102,241,.19) !important; }
+.user-item { color:#f2f1ff !important; border-color:rgba(163,170,255,.09) !important; background:transparent !important; }
+.user-item:hover,.user-item.selected { background:rgba(99,102,241,.15) !important; }
+.user-sub,.user-role,.message-time,.file-name,.admin-to,.admin-date { color:#9b9fbd !important; }
+.message-author,.admin-from { color:#b9b8ff !important; }
+.empty { color:#9b9fbd !important; }
+button:not(.compose-button):not(.send-button):not(.modal-send) { color:#efedff; }
+.attach-button,.cancel-button { color:#f4f2ff !important; background:rgba(255,255,255,.07) !important; border:1px solid rgba(163,170,255,.15) !important; }
+.compose-button,.send-button,.modal-send { color:#fff !important; background:linear-gradient(135deg,#6366f1,#a855f7) !important; }
+.search-box,.composer,.notice,.admin-message,.user-box { border-color:rgba(163,170,255,.14) !important; }
+.notice { color:#b8bad3 !important; background:rgba(255,255,255,.035) !important; }
+.notice a { color:#a5b4fc !important; }
+.admin-warning { color:#dbeafe !important; background:rgba(59,130,246,.1) !important; border-color:rgba(59,130,246,.22) !important; }
+.modal-backdrop { background:rgba(1,2,10,.78) !important; }
+.modal { color:#f5f5ff !important; }
+.modal input::placeholder,.modal textarea::placeholder { color:#858baa !important; }
+@media (min-width:651px) {
+ .main { padding:14px; gap:14px; }
+ .sidebar { border:1px solid rgba(163,170,255,.14); border-radius:20px; }
+ .content { min-width:0; }
+ .mail-layout { min-width:0; }
+ .user-list { flex:0 0 290px; }
+}
+@media (max-width:850px) and (min-width:651px) {
+ .sidebar { width:210px !important; flex-basis:210px !important; }
+ .user-list { width:230px !important; flex-basis:230px !important; }
+}
+@media (max-width:650px) {
+ body { overflow:hidden !important; }
+ .main { padding:7px !important; gap:7px !important; }
+ .sidebar { width:100% !important; flex-basis:auto !important; max-height:180px !important; overflow-y:auto !important; border-radius:15px !important; }
+ .content { flex:1 1 0 !important; width:100% !important; }
+ .user-list { flex-basis:135px !important; max-height:135px !important; overflow-y:auto !important; }
+ .other-view { padding:14px !important; overflow-y:auto !important; }
+ .notice { margin:0 8px 8px !important; }
+ .top-actions { min-width:0; }
+}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
