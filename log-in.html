@@ -261,6 +261,64 @@ input:focus {
     padding: 25px 20px;
   }
 }
+
+/* DougHubApp-inspired login motion — visual-only enhancements */
+body { isolation: isolate; overflow-x: hidden; }
+body::before {
+  content: ""; position: fixed; z-index: -1; width: min(68vw, 720px); aspect-ratio: 1;
+  left: 50%; top: 48%; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,.13), rgba(168,85,247,.07) 38%, transparent 70%);
+  filter: blur(12px); pointer-events: none; animation: dhAuthAmbient 9s ease-in-out infinite alternate;
+}
+.container { perspective: 1000px; }
+.card {
+  transform-origin: 50% 60%;
+  animation: dhAuthCardEnter .72s cubic-bezier(.2,.8,.2,1) both;
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+.card:hover { border-color: rgba(139,92,246,.38); box-shadow: 0 28px 85px rgba(0,0,0,.48), 0 0 35px rgba(99,102,241,.08); }
+.logo h1 { background-size: 180% 180%; animation: dhAuthGradient 6s ease-in-out infinite; }
+.tab, .action, .close-terms, .back, .terms-link {
+  transition: transform .2s cubic-bezier(.2,.8,.2,1), filter .2s ease, box-shadow .2s ease, color .2s ease, background .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab { position: relative; overflow: hidden; }
+.tab:hover:not(:disabled) { transform: translateY(-1px); }
+.tab:active:not(:disabled), .action:active:not(:disabled), .close-terms:active { transform: scale(.975); }
+.tab.active { box-shadow: 0 5px 18px rgba(99,102,241,.18); }
+.action {
+  position: relative; isolation: isolate; overflow: hidden;
+  box-shadow: 0 9px 24px rgba(99,102,241,.22); background-size: 160% 160%;
+}
+.action:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 0 13px 30px rgba(99,102,241,.32); }
+.action:active:not(:disabled) { transform: scale(.985); }
+.action.is-loading { cursor: wait; padding-right: 44px; }
+.action.is-loading::after {
+  content: ""; position: absolute; right: 16px; top: calc(50% - 8px); width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%;
+  animation: dhAuthSpin .7s linear infinite;
+}
+input { transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease; }
+input:focus { transform: translateY(-1px); background: rgba(10,12,28,.68); }
+.dh-auth-mode-change { animation: dhAuthModeChange .32s ease; }
+.dh-motion-ripple {
+  position: absolute; z-index: 0; border-radius: 50%; pointer-events: none;
+  background: rgba(255,255,255,.3); transform: scale(0); animation: dhAuthRipple .58s ease-out forwards;
+}
+@keyframes dhAuthCardEnter {
+  from { opacity: 0; transform: translateY(22px) scale(.975) rotateX(2deg); filter: blur(5px); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); filter: blur(0); }
+}
+@keyframes dhAuthAmbient { from { opacity: .55; scale: .9; } to { opacity: 1; scale: 1.12; } }
+@keyframes dhAuthGradient { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes dhAuthModeChange { 0% { opacity: .75; transform: translateY(3px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes dhAuthRipple { to { transform: scale(1); opacity: 0; } }
+@keyframes dhAuthSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  body::before, .card, .logo h1, .dh-auth-mode-change, .dh-motion-ripple, .action.is-loading::after { animation: none !important; }
+  .tab, .action, input, .card { transition: none !important; }
+}
+
 </style>
   <script src="nav.js" defer></script>
 
@@ -494,11 +552,21 @@ const redirectAfterLogin = new URLSearchParams(window.location.search).get("redi
 const safeRedirect = /^[A-Za-z0-9_./-]+\.html$/.test(redirectAfterLogin) ? redirectAfterLogin : "index.html";
 
 
+/* Login screen mode transition */
+function animateAuthMode() {
+  const card = document.querySelector(".card");
+  if (!card) return;
+  card.classList.remove("dh-auth-mode-change");
+  void card.offsetWidth;
+  card.classList.add("dh-auth-mode-change");
+}
+
 /* LOGIN MODE */
 
 function showLogin() {
 
   signupMode = false;
+  animateAuthMode();
 
   document.getElementById("usernameBox").style.display =
     "none";
@@ -525,6 +593,7 @@ function showLogin() {
 function showSignup() {
 
   signupMode = true;
+  animateAuthMode();
 
   document.getElementById("usernameBox").style.display =
     "block";
@@ -608,6 +677,7 @@ async function submitForm() {
   }
 
   button.disabled = true;
+  button.classList.add("is-loading");
 
   try {
 
@@ -685,6 +755,7 @@ async function submitForm() {
   } finally {
 
     button.disabled = false;
+    button.classList.remove("is-loading");
 
   }
 
@@ -774,6 +845,26 @@ supabaseClient.auth.getSession().then(
   }
 );
 
+</script>
+
+
+<script>
+(function () {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.addEventListener("pointerdown", function (event) {
+    const target = event.target.closest("button");
+    if (!target || target.disabled) return;
+    const rect = target.getBoundingClientRect();
+    const diameter = Math.max(rect.width, rect.height) * 1.65;
+    const ripple = document.createElement("span");
+    ripple.className = "dh-motion-ripple";
+    ripple.style.width = ripple.style.height = diameter + "px";
+    ripple.style.left = (event.clientX - rect.left - diameter / 2) + "px";
+    ripple.style.top = (event.clientY - rect.top - diameter / 2) + "px";
+    target.appendChild(ripple);
+    ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+  }, { passive: true });
+})();
 </script>
 
 </body>
