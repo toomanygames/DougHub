@@ -632,6 +632,11 @@ button:disabled {
 .schedule-state-pill{display:inline-flex;padding:5px 9px;border-radius:999px;background:#14362b;color:#86efac;font-size:10px;font-weight:900;letter-spacing:.06em}
 .schedule-state-pill.off{background:#3a1b28;color:#fda4af}
 .admin-schedule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+
+/* Users gets a full-width card without making its list taller */
+#adminArea > .card:has(#usersList){grid-column:1/-1}
+#adminArea #usersList{max-height:330px;min-height:0}
+
 @media(max-width:760px){body{padding:12px}#adminArea{grid-template-columns:minmax(0,1fr)}#adminArea>.audit-card,#adminArea>#siteFeatureCard{grid-column:auto}#adminArea>.card{padding:14px}#adminQuickNav{top:4px}.admin-schedule-grid{grid-template-columns:minmax(0,1fr)}}
 
 </style>
