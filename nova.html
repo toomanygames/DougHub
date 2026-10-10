@@ -14,9 +14,36 @@
 </style>
   <script src="nav.js" defer></script>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Inline, page-owned DougHub redesign */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
+input::placeholder,textarea::placeholder{color:#858cab}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+.top{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
+.brand{letter-spacing:-.04em}
+.hero{background:radial-gradient(circle at 85% 15%,#a855f72b,transparent 36%),radial-gradient(circle at 12% 90%,#6366f125,transparent 34%),rgba(13,17,39,.82);border:1px solid var(--dh-line);border-radius:26px;box-shadow:0 24px 75px #0004}
+.panel{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(8,10,25,.91));border:1px solid var(--dh-line);border-radius:21px;box-shadow:0 18px 48px #0003}
+.tabs{background:#070918;border:1px solid var(--dh-line);border-radius:12px}
+.tabs button{border-radius:9px;color:#a4a7c4}
+.tabs button.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+.btn.primary{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white;box-shadow:0 8px 24px #6366f133}
+.btn.secondary{background:#ffffff08;border:1px solid var(--dh-line);color:#e7e7ff}
+.chatlog{background:#070918;border:1px solid var(--dh-line);border-radius:16px}
+.bubble.assistant{background:#6366f114;border:1px solid #818cf133;border-radius:14px}
+.result,.settingsbox{background:#070918;border:1px solid var(--dh-line);border-radius:15px}
+.progress{background:#070918;border-radius:999px;overflow:hidden}
+
+</style>
 </head>
 <body>
 <header class="top"><a href="index.html" class="brand" style="text-decoration:none">Doug<span>Hub</span></a><nav class="nav"><a href="index.html">Home</a><a href="douggames.html">Games</a><a href="DougTube.html">DougTube</a><a href="tools.html">Tools</a><a href="chat.html">Chat</a><a class="active" href="nova.html">✳ Nova AI</a></nav></header>
