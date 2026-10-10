@@ -1129,9 +1129,48 @@ button:not(.compose-button):not(.send-button):not(.modal-send) { color:#efedff; 
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* DougHub page-specific redesign — homepage glass language, embedded locally */
+:root{color-scheme:dark;--dh-ink:#f6f5ff;--dh-muted:#a4a7c4;--dh-line:rgba(177,184,255,.15);--dh-glass:rgba(13,17,39,.82);--dh-glass-deep:rgba(5,7,20,.86);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+*{box-sizing:border-box}
+body{color:var(--dh-ink);-webkit-font-smoothing:antialiased}
+a{transition:color .18s ease,text-decoration-color .18s ease}
+h1,h2,h3,h4{letter-spacing:-.035em}
+::selection{background:#7776ed66;color:#fff}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background-color:rgba(5,7,19,.82);border:1px solid var(--dh-line);border-radius:12px}
+input::placeholder,textarea::placeholder{color:#898eaf}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button,.button,.btn,a.button,input[type=button],input[type=submit]{border-radius:12px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease}
+button:not(:disabled):hover,.button:hover,.btn:hover,a.button:hover{filter:brightness(1.08)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+.card,.panel,.settings-card,.settings-section,.tool-card,.game-card,.feature-card,.content-card,.auth-card,.feedback-section,.section-card,.video-card,.post-card,.profile-card,.workspace-card,.modal,.modal-box,.modal-content{border-color:var(--dh-line)}
+@media(max-width:700px){button,.button,.btn,a.button{max-width:100%}}
+
+
+body{background:radial-gradient(circle at 0 0,#24104f66,transparent 36%),radial-gradient(circle at 100% 100%,#111b4f55,transparent 36%),#02040a}
+.topbar{background:rgba(4,5,18,.84);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(22px)}
+.logo-icon{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 25px #6366f133}
+.sidebar,.user-list,.chat,.content,.mail-layout{background:transparent}
+.sidebar{border-right:1px solid var(--dh-line)}
+.nav-button{border:1px solid transparent;border-radius:12px;color:#b9bdd8;background:transparent}
+.nav-button:hover,.nav-button.active{color:#fff;background:linear-gradient(110deg,#6366f132,#a855f71c);border-color:#9294f53b}
+.content-header,.chat-header,.list-toolbar{border-color:var(--dh-line)}
+.mail-layout{gap:16px}
+.user-list,.chat{border:1px solid var(--dh-line);border-radius:22px;background:rgba(13,17,39,.68);box-shadow:0 18px 50px #0003;overflow:hidden}
+.messages{scrollbar-color:#454778 transparent}
+.composer{background:rgba(7,9,24,.86);border-top:1px solid var(--dh-line)}
+.composer-inner{background:rgba(13,17,39,.85);border:1px solid var(--dh-line);border-radius:16px}
+.send-button,.compose-button{background:linear-gradient(135deg,#6366f1,#a855f7);color:white;border:1px solid #b6a4ff55;box-shadow:0 8px 24px #6366f133}
+.icon-button{background:#ffffff08;color:#dfe1ff;border:1px solid var(--dh-line)}
+.modal-backdrop{backdrop-filter:blur(12px)}
+.modal{background:#0d1127;border:1px solid var(--dh-line);border-radius:24px;box-shadow:0 30px 90px #0008}
+.notice,.dmail-notice{background:#6366f114;border:1px solid #818cf133;border-radius:14px;color:#b9bdd8}
+
+</style>
 </head>
 
 <body>
