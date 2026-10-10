@@ -665,6 +665,21 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 
     </section>
 
+
+    <section class="settings-section" id="tutorialSettingsSection">
+      <h2 class="section-title">Tutorial</h2>
+      <p class="section-description">Want a guided tour of DougHub again? Replay the interactive walkthrough whenever you need it.</p>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label">DougHub walkthrough</div>
+          <div class="setting-help">Highlights Games, Tools, Nova AI, DougTube, Work, community features and account settings.</div>
+        </div>
+        <div class="setting-control" style="align-items:center">
+          <button class="update-button" id="replayTutorialButton" type="button">↻ Replay Tutorial</button>
+        </div>
+      </div>
+    </section>
+
     <section class="settings-section">
 
       <h2 class="section-title">
@@ -1833,6 +1848,34 @@ function renderRewards(){
   select.value=currentProfile?.equipped_badge||""; document.getElementById("badgeNote").textContent=currentProfile?.is_admin?"Admin: all seasonal badges are unlocked.":(badges.length?badges.length+" badge"+(badges.length===1?"":"s")+" earned.":"No badges yet — play a seasonal game!");
 }
 document.getElementById("badgeSelect").addEventListener("change",async()=>{if(!currentUser||!currentProfile)return;const value=document.getElementById("badgeSelect").value||null;const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);if(error){showStatus("Could not update your badge.","error");return}currentProfile.equipped_badge=value;showStatus(value?"Chat badge updated!":"Chat badge removed.","success");});
+
+
+/* REPLAY THE INTERACTIVE DOUGHUB TUTORIAL */
+const replayTutorialButton = document.getElementById("replayTutorialButton");
+if (replayTutorialButton) {
+  replayTutorialButton.addEventListener("click", async function () {
+    clearStatus();
+    if (!currentUser) {
+      showStatus("Please sign in again to replay the tutorial.", "error");
+      return;
+    }
+    replayTutorialButton.disabled = true;
+    replayTutorialButton.textContent = "Preparing tutorial…";
+    try {
+      const { error } = await supabaseClient
+        .from("profiles")
+        .update({ tutorial_completed: false })
+        .eq("id", currentUser.id);
+      if (error) throw error;
+      window.location.href = "index.html?tutorial=1";
+    } catch (error) {
+      console.error("Could not reset tutorial status:", error);
+      showStatus(error.message || "Could not replay the tutorial. Please try again.", "error");
+      replayTutorialButton.disabled = false;
+      replayTutorialButton.textContent = "↻ Replay Tutorial";
+    }
+  });
+}
 
 /* =========================================
    LOGOUT
