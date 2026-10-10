@@ -388,3 +388,178 @@ hr { border-color: var(--dh-line-soft); }
     border-radius: 15px;
   }
 }
+
+
+
+/* === DougHub homepage visual language: final cross-page polish ===
+   Shared by every non-homepage page. Keeps page-specific backgrounds, layouts,
+   game mechanics and existing JavaScript intact while unifying the glass UI. */
+:root {
+  color-scheme: dark;
+  --dh-bg-deep: #02040a;
+  --dh-glass-1: rgba(13, 17, 39, .82);
+  --dh-glass-2: rgba(17, 21, 48, .92);
+  --dh-glass-border: rgba(177, 184, 255, .14);
+  --dh-glass-highlight: rgba(255,255,255,.045);
+  --dh-glow-indigo: rgba(99,102,241,.18);
+  --dh-glow-purple: rgba(168,85,247,.16);
+  --dh-round-xl: 26px;
+  --dh-round-lg: 20px;
+  --dh-round-md: 13px;
+}
+
+/* Consistent type and readable text contrast. Do not replace individual page backgrounds. */
+body {
+  color: #f5f6ff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, .page-title, .section-title, .content-title {
+  color: #f5f6ff;
+  letter-spacing: -.035em;
+}
+p, .subtitle, .description, .muted, .help-text, .section-subtitle, small {
+  text-wrap: pretty;
+}
+::selection { background: rgba(129,140,248,.38); color: #fff; }
+
+/* Header bars and navigation use the same subtle blurred glass as the homepage. */
+header, .topbar, .top-bar, .navbar, .app-header, .site-header, .main-header,
+nav[aria-label], .toolbar, .page-toolbar {
+  border-color: rgba(177,184,255,.12);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+}
+.nav a, .nav-link, nav a, .sidebar a, .side-nav a {
+  transition: color .18s ease, background-color .18s ease, border-color .18s ease;
+}
+.nav a:hover, .nav-link:hover, nav a:hover, .sidebar a:hover, .side-nav a:hover {
+  color: #e3ddff;
+}
+
+/* Glass surfaces: rich navy layers, fine borders, restrained inner highlights. */
+.card, .panel, .tool-card, .game-card, .feature-card, .stat-card,
+.settings-card, .settings-section, .section-card, .content-card, .auth-card,
+.project, .file-card, .video-card, .post-card, .message-card, .setting-card,
+.dashboard-card, .workspace-card, .editor-panel, .sidebar-card, .tool-panel,
+.content-panel, .main-card, .app-panel, .hero-card, .admin-event-card,
+.admin-schedule-card, .audit-card, .moderation-card, .feedback-section,
+.tool-output, .output-panel, .result-card, .profile-card, .user-card,
+.mail-card, .conversation-card, .empty-state, .feature-panel, .workspace,
+.settings-panel, .auth-panel, .form-card {
+  color: #f5f6ff;
+  border-color: rgba(177,184,255,.14);
+  box-shadow: 0 18px 48px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.025);
+}
+.card, .panel, .tool-card, .feature-card, .stat-card, .settings-card,
+.settings-section, .section-card, .content-card, .auth-card, .project,
+.file-card, .video-card, .post-card, .message-card, .setting-card,
+.dashboard-card, .workspace-card, .editor-panel, .sidebar-card, .tool-panel,
+.content-panel, .main-card, .app-panel, .hero-card, .admin-event-card,
+.admin-schedule-card, .audit-card, .moderation-card, .feedback-section,
+.result-card, .profile-card, .user-card, .mail-card, .conversation-card,
+.feature-panel, .settings-panel, .auth-panel, .form-card {
+  background-color: rgba(13,17,39,.78);
+  border-radius: var(--dh-round-lg);
+}
+.card:hover, .tool-card:hover, .feature-card:hover, .project:hover,
+.file-card:hover, .video-card:hover, .post-card:hover, .game-card:hover {
+  border-color: rgba(139,132,255,.36);
+  box-shadow: 0 20px 55px rgba(0,0,0,.24), 0 0 24px rgba(99,102,241,.055);
+}
+
+/* Buttons: quiet glass by default, strong indigo-violet gradient for primary actions.
+   Preserve danger, success, close, icon, nav and game-specific button states. */
+button:not(:disabled):not(.primary):not(.btn-primary):not(.primary-button):not(.cta):not(.save-button):not(.update-button):not(.upload-button):not(.hero-create-button):not(.compose-button):not(.danger):not(.delete):not(.delete-button):not(.ban-button):not(.logout):not(.logout-button):not(.close):not(.close-button):not(.icon-button):not(.nav-link):not(.nav-button):not(.slider-arrow):not(.community-slider-arrow):not(.success):not(.success-button):not(.green):not(.buy-button):not(.upgrade-button):not(.game-control):not([class*="danger"]):not([class*="delete"]),
+input[type="button"]:not(.primary):not(.btn-primary):not([class*="danger"]),
+input[type="reset"],
+.button:not(.primary):not(.btn-primary):not(.primary-button):not(.danger):not(.delete):not([class*="danger"]),
+.btn:not(.primary):not(.btn-primary):not(.danger):not(.delete):not([class*="danger"]),
+a.button:not(.primary):not(.btn-primary):not(.danger):not(.delete) {
+  color: #f3f2ff;
+  background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(168,85,247,.10));
+  border: 1px solid rgba(129,140,248,.27);
+  border-radius: 12px;
+}
+button:not(:disabled):not(.danger):not(.delete):not([class*="danger"]):not([class*="delete"]):hover,
+input[type="button"]:not(:disabled):hover,
+input[type="reset"]:not(:disabled):hover,
+.button:hover, .btn:hover, a.button:hover, a.btn:hover {
+  border-color: rgba(167,139,250,.62);
+  box-shadow: 0 9px 25px rgba(99,102,241,.13);
+}
+button.primary, button.btn-primary, button.primary-button, button.cta,
+a.primary, a.btn-primary, a.primary-button, a.cta,
+input[type="submit"], .save-button, .update-button, .upload-button,
+.hero-create-button, .compose-button {
+  color: #fff;
+  background: linear-gradient(135deg,#6366f1,#8b5cf6);
+  border: 1px solid rgba(196,181,253,.3);
+  box-shadow: 0 10px 30px rgba(99,102,241,.22);
+}
+button:disabled, input:disabled, select:disabled, textarea:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* Search, form controls, text areas and selects should never fall back to glaring white. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+textarea, select, .search-box, .search-input, .tool-search,
+.setting-input, .field input, .field textarea, .field select {
+  color: #f5f6ff;
+  background-color: rgba(5,7,19,.78);
+  border: 1px solid rgba(151,160,230,.2);
+  border-radius: 12px;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: rgba(129,140,248,.82);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.14);
+  outline: none;
+}
+input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: #818cf8; }
+input[type="file"] { color: #c8cbe0; }
+::placeholder { color: #858cab; opacity: 1; }
+
+/* Dialogs, dropdowns and menus match the dark glass surfaces. */
+.modal-box, .modal-content, .modal-card, .popup, .popup-content,
+.confirm-modal, .dialog, .account-menu, .dropdown-menu, .context-menu,
+.popover, [role="dialog"], dialog[open], .toast, .notification,
+.confirmation-popup, .settings-popup, .menu-dropdown {
+  color: #f5f6ff;
+  background: rgba(13,17,39,.97);
+  border: 1px solid rgba(177,184,255,.19);
+  border-radius: 18px;
+  box-shadow: 0 24px 75px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.035);
+}
+.account-menu a, .account-menu button, .dropdown-menu a,
+.context-menu button, .menu-dropdown a, .menu-dropdown button {
+  color: #e6e7ff;
+  border-radius: 10px;
+}
+.account-menu a:hover, .account-menu button:hover,
+.dropdown-menu a:hover, .context-menu button:hover,
+.menu-dropdown a:hover, .menu-dropdown button:hover {
+  background: rgba(99,102,241,.16);
+}
+
+/* Tables, editors, outputs, media and dividers stay inside the shared design. */
+table { border-color: rgba(177,184,255,.12); }
+th { color: #c9cdf0; }
+td, th { border-color: rgba(177,184,255,.12); }
+pre, code, .output, .tool-output, .code-editor, .editor, .editor-panel {
+  border-color: rgba(177,184,255,.13);
+}
+video, iframe { border-radius: 14px; }
+hr { border-color: rgba(177,184,255,.12); }
+:focus-visible { outline: 2px solid rgba(165,180,252,.95); outline-offset: 3px; }
+
+/* Keep touch targets and panels comfortable on smaller screens without changing layout logic. */
+@media (max-width: 700px) {
+  .card, .panel, .tool-card, .feature-card, .settings-card, .settings-section,
+  .content-card, .auth-card, .project, .file-card, .video-card, .post-card,
+  .dashboard-card, .workspace-card, .editor-panel, .hero-card, .form-card {
+    border-radius: 16px;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  textarea, select { max-width: 100%; }
+}
