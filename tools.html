@@ -86,9 +86,40 @@ footer{margin-top:26px}
 </style>
   <script src="nav.js" defer></script>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* DougHub page-specific redesign — homepage glass language, embedded locally */
+:root{color-scheme:dark;--dh-ink:#f6f5ff;--dh-muted:#a4a7c4;--dh-line:rgba(177,184,255,.15);--dh-glass:rgba(13,17,39,.82);--dh-glass-deep:rgba(5,7,20,.86);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+*{box-sizing:border-box}
+body{color:var(--dh-ink);-webkit-font-smoothing:antialiased}
+a{transition:color .18s ease,text-decoration-color .18s ease}
+h1,h2,h3,h4{letter-spacing:-.035em}
+::selection{background:#7776ed66;color:#fff}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background-color:rgba(5,7,19,.82);border:1px solid var(--dh-line);border-radius:12px}
+input::placeholder,textarea::placeholder{color:#898eaf}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button,.button,.btn,a.button,input[type=button],input[type=submit]{border-radius:12px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease}
+button:not(:disabled):hover,.button:hover,.btn:hover,a.button:hover{filter:brightness(1.08)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+.card,.panel,.settings-card,.settings-section,.tool-card,.game-card,.feature-card,.content-card,.auth-card,.feedback-section,.section-card,.video-card,.post-card,.profile-card,.workspace-card,.modal,.modal-box,.modal-content{border-color:var(--dh-line)}
+@media(max-width:700px){button,.button,.btn,a.button{max-width:100%}}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 33%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
+.logo-mark{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 24px #6366f133}
+.hero-card{background:radial-gradient(circle at 85% 20%,#a855f72b,transparent 36%),radial-gradient(circle at 12% 90%,#6366f125,transparent 34%),rgba(13,17,39,.82);border:1px solid var(--dh-line);border-radius:26px;box-shadow:0 25px 75px #0004}
+.tools-grid{gap:18px}
+.tool-card{background:linear-gradient(145deg,rgba(17,22,49,.92),rgba(8,10,25,.88));border:1px solid var(--dh-line);border-radius:21px;box-shadow:0 16px 40px #0003;transition:transform .2s,border-color .2s,box-shadow .2s}
+.tool-card:hover{transform:translateY(-3px);border-color:#8b83ff70;box-shadow:0 22px 48px #0004}
+.tool-icon{background:linear-gradient(135deg,#6366f128,#a855f724);border:1px solid #9294f533;border-radius:14px}
+.output,.preview{background:#070918;border:1px solid var(--dh-line);border-radius:15px}
+.notice{background:#6366f114;border:1px solid #818cf133;border-radius:14px;color:#c5c8e2}
+
+</style>
 </head>
 <body>
 <header>
