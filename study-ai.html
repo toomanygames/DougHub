@@ -63,13 +63,13 @@
       <div class="side-note"><b>Study tip</b><br>AI can make mistakes. For assignments, check facts against your class notes or teacher's materials and use explanations to build your own understanding.</div>
     </aside>
   </section>
-  <div class="footer">DougHub Study AI + AI Mode · Runs a lightweight local AI model in your browser. The first load downloads the smaller model; after that it is cached by your browser.<br>Don't enter passwords, private information, or sensitive personal details.</div>
+  <div class="footer">DougHub Study AI + AI Mode · Runs a lightweight local AI model in your browser. The first load downloads the lightweight model; after that it is cached by your browser.<br>Don't enter passwords, private information, or sensitive personal details.</div>
 </main>
 <div id="toast" class="toast hidden" role="status"></div>
 <script>
 (() => {
   const MEMORY_KEY = "doughub-study-ai-local-chat-v1";
-  const MODEL_ID = "SmolLM2-360M-Instruct-q4f16_1-MLC";
+  const MODEL_ID = "SmolLM2-360M-Instruct-q4f32_1-MLC";
   let mode = new URLSearchParams(location.search).get("mode") === "ai" ? "ai" : "study";
   const $ = id => document.getElementById(id);
   const messagesEl = $("messages");
@@ -147,11 +147,11 @@
     if (engine) return engine;
     if (enginePromise) return enginePromise;
     if (!navigator.gpu) {
-      throw new Error("This browser or device does not support WebGPU, which local AI needs. Try an up-to-date Microsoft Edge or Chrome on a compatible computer.");
+      throw new Error("WebGPU is unavailable in this browser session. Update Edge or Chrome, then open edge://gpu (or chrome://gpu) and check whether WebGPU is enabled. The powerPreference message alone is only a warning; this error means the browser did not expose WebGPU.");
     }
     enginePromise = (async () => {
       setStatus("Loading local AI…");
-      toast("First-time setup: downloading the lightweight AI model. It is much smaller than the previous model, but the first download still needs internet.");
+      toast("First-time setup: downloading the lightweight AI model. The compatible model may take a few minutes to download on the first visit.");
       const webllm = await import("https://esm.run/@mlc-ai/web-llm");
       const create = webllm.CreateMLCEngine || webllm.default?.CreateMLCEngine;
       if (typeof create !== "function") throw new Error("Could not start the local AI engine. Refresh and try again.");
