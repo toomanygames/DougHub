@@ -2,6 +2,7 @@
 "use strict";
 const $ = id => document.getElementById(id);
 const STORAGE_KEY = "doughub_scripting_project_v3";
+let dbClient=null;
 const STARTERS = {
   html: `<main class="app">
   <p class="eyebrow">MY FIRST PROJECT</p>
@@ -83,7 +84,7 @@ function saveProject(){saveCurrentFile();persist();setStatus("Project saved in t
 function download(filename,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function exportHTML(){saveCurrentFile();const name=($("projectName").value.trim()||"my-project").replace(/[^a-z0-9-_]+/gi,"-").replace(/^-|-$/g,"").slice(0,60)||"my-project";download(name+".html",buildDocument(),"text/html;charset=utf-8");setStatus("Standalone HTML exported");}
 async function copyCurrent(){saveCurrentFile();try{await navigator.clipboard.writeText(files[activeFile]);setStatus("Copied current file");}catch(e){$("codeEditor").focus();$("codeEditor").select();setStatus("Press Ctrl+C to copy the selected code");}}
-async function loadAccount(){try{const client=window.supabase?.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52");if(!client){$("accountLabel").textContent="Local project";return;}const {data:{session}}=await client.auth.getSession();if(!session){$("accountLabel").textContent="Local project";return;}const {data}=await client.from("profiles").select("username").eq("id",session.user.id).maybeSingle();$("accountLabel").textContent=data?.username?"@"+data.username:"Signed in";}catch(e){$("accountLabel").textContent="Local project";}}
+async function loadAccount(){try{const client=dbClient||(dbClient=window.supabase?.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"));if(!client){$("accountLabel").textContent="Local project";return;}const {data:{session}}=await client.auth.getSession();if(!session){$("accountLabel").textContent="Local project";return;}const {data}=await client.from("profiles").select("username").eq("id",session.user.id).maybeSingle();$("accountLabel").textContent=data?.username?"@"+data.username:"Signed in";}catch(e){$("accountLabel").textContent="Local project";}}
 document.querySelectorAll(".file-tab").forEach(btn=>btn.addEventListener("click",()=>switchFile(btn.dataset.file)));
 $("codeEditor").addEventListener("input",()=>{saveCurrentFile();});
 $("codeEditor").addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const el=e.currentTarget,start=el.selectionStart,end=el.selectionEnd;el.setRangeText("  ",start,end,"end");saveCurrentFile();}if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runPreview();}});
@@ -204,7 +205,7 @@ async function communityPublish(){
 function communityInit(){
   const create=window.supabase?.createClient;
   if(!create){communitySetStatus("Community Projects could not connect to Supabase.",true);$("communityProjectSlider").textContent="Community Projects are unavailable right now.";return;}
-  communityDb=create("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52");
+  communityDb=dbClient||(dbClient=create("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"));
   $("communitySearch").addEventListener("input",communityRender);
   $("refreshCommunityBtn").addEventListener("click",communityLoad);
   $("publishProjectBtn").addEventListener("click",communityPublish);
