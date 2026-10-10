@@ -604,6 +604,36 @@ button:disabled {
         gap: 6px;
     }
 }
+
+/* Modern compact admin layout and navigation */
+#adminQuickNav{position:sticky;top:8px;z-index:50;margin:0 0 18px;padding:11px 13px;border:1px solid rgba(148,163,255,.18);border-radius:16px;background:rgba(8,11,27,.9);backdrop-filter:blur(18px);box-shadow:0 12px 32px #0003}
+.admin-quicknav-label{font-size:10px;letter-spacing:.16em;font-weight:900;color:#818cf8;margin:0 0 8px 2px}
+#adminQuickNavLinks{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 7px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#6366f1 #171a31}
+#adminQuickNavLinks a{flex:0 0 auto;scroll-snap-align:start;color:#dfe3ff;text-decoration:none;font-size:12px;font-weight:750;white-space:nowrap;padding:8px 11px;border-radius:10px;border:1px solid #ffffff12;background:#ffffff08;transition:background .18s,border-color .18s,transform .18s}
+#adminQuickNavLinks a:hover,#adminQuickNavLinks a:focus-visible{background:#6366f133;border-color:#818cf855;transform:translateY(-1px);outline:none}
+#adminArea{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:15px}
+#adminArea>.card{min-width:0;margin:0;padding:17px;border-radius:17px}
+#adminArea>.audit-card,#adminArea>#siteFeatureCard{grid-column:1/-1}
+#adminArea .card h2{font-size:18px}
+#adminArea .status{margin-bottom:10px}
+#adminArea [id$="List"],#adminArea [id$="Rows"],#adminArea #chatMessages,#adminArea #communityGames,#adminArea #dougTubeVideos,#adminArea #activityList,#adminArea #siteFeatureList{max-height:330px;overflow:auto;overscroll-behavior:contain;padding-right:5px;scrollbar-width:thin;scrollbar-color:#6366f1 #111629}
+#adminArea [id$="List"]::-webkit-scrollbar,#adminArea [id$="Rows"]::-webkit-scrollbar,#adminArea #chatMessages::-webkit-scrollbar,#adminArea #communityGames::-webkit-scrollbar,#adminArea #dougTubeVideos::-webkit-scrollbar,#adminArea #activityList::-webkit-scrollbar,#adminArea #siteFeatureList::-webkit-scrollbar{width:8px;height:8px}
+#adminArea [id$="List"]::-webkit-scrollbar-track,#adminArea [id$="Rows"]::-webkit-scrollbar-track,#adminArea #chatMessages::-webkit-scrollbar-track,#adminArea #communityGames::-webkit-scrollbar-track,#adminArea #dougTubeVideos::-webkit-scrollbar-track,#adminArea #activityList::-webkit-scrollbar-track,#adminArea #siteFeatureList::-webkit-scrollbar-track{background:#111629;border-radius:9px}
+#adminArea [id$="List"]::-webkit-scrollbar-thumb,#adminArea [id$="Rows"]::-webkit-scrollbar-thumb,#adminArea #chatMessages::-webkit-scrollbar-thumb,#adminArea #communityGames::-webkit-scrollbar-thumb,#adminArea #dougTubeVideos::-webkit-scrollbar-thumb,#adminArea #activityList::-webkit-scrollbar-thumb,#adminArea #siteFeatureList::-webkit-scrollbar-thumb{background:linear-gradient(#818cf8,#a78bfa);border-radius:9px;border:2px solid #111629}
+.admin-card-help{font-size:12px;line-height:1.55;color:#9ca3c8;margin:0 0 13px}
+.admin-field-label{display:block;font-size:11px;font-weight:800;color:#c7cbea;margin:11px 0 6px;letter-spacing:.02em}
+#siteAnnouncementCard textarea,#pageScheduleCard textarea,#pageScheduleCard select,#pageScheduleCard input[type="datetime-local"]{width:100%;min-width:0;border:1px solid #ffffff18;border-radius:10px;background:#080b1b;color:#f4f4ff;padding:10px 11px;font:inherit;font-size:13px;outline:none}
+#siteAnnouncementCard textarea:focus,#pageScheduleCard textarea:focus,#pageScheduleCard select:focus,#pageScheduleCard input[type="datetime-local"]:focus{border-color:#818cf8;box-shadow:0 0 0 3px #6366f122}
+.admin-toggle-line{display:flex;align-items:center;gap:9px;color:#e5e7ff;font-size:12px;font-weight:750;margin:10px 0}
+.admin-toggle-line input{width:17px;height:17px;accent-color:#8b5cf6}
+.admin-card-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
+.admin-card-actions .status{flex:1;min-width:140px;margin:0!important}
+.admin-schedule-state{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.schedule-state-pill{display:inline-flex;padding:5px 9px;border-radius:999px;background:#14362b;color:#86efac;font-size:10px;font-weight:900;letter-spacing:.06em}
+.schedule-state-pill.off{background:#3a1b28;color:#fda4af}
+.admin-schedule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:760px){body{padding:12px}#adminArea{grid-template-columns:minmax(0,1fr)}#adminArea>.audit-card,#adminArea>#siteFeatureCard{grid-column:auto}#adminArea>.card{padding:14px}#adminQuickNav{top:4px}.admin-schedule-grid{grid-template-columns:minmax(0,1fr)}}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
@@ -672,6 +702,12 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
     </a>
 </header>
 
+<nav id="adminQuickNav" aria-label="Admin sections" style="display:none">
+  <div class="admin-quicknav-label">QUICK JUMP</div>
+  <div id="adminQuickNavLinks"></div>
+</nav>
+
+
 <div id="loading">
     Checking admin permissions...
 </div>
@@ -685,6 +721,31 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
         Turn DougHub sections on or off. Disabled features show a friendly unavailable page when someone opens them directly or clicks their navigation link. DMail and DougTube stay off the main navigation.
     </p>
     <div id="siteFeatureList"></div>
+</div>
+
+
+<div class="card admin-event-card" id="siteAnnouncementCard">
+  <h2>📣 Event Banner</h2>
+  <p class="admin-card-help">Show a dismissible announcement on the homepage. Dismissing it only hides it until the next full reload.</p>
+  <label class="admin-toggle-line"><input id="siteEventEnabled" type="checkbox"><span>Event banner is active</span></label>
+  <label class="admin-field-label" for="siteEventMessage">Banner message</label>
+  <textarea id="siteEventMessage" maxlength="500" rows="3" placeholder="Write the event announcement visitors should see…"></textarea>
+  <div class="admin-card-actions"><span id="siteEventStatus" class="status">Loading event settings…</span><button id="saveSiteEventButton" type="button" class="save-button">Save event</button></div>
+</div>
+
+<div class="card admin-schedule-card" id="pageScheduleCard">
+  <h2>🗓️ Page Availability</h2>
+  <p class="admin-card-help">Turn a page off immediately or schedule when it closes and reopens. Times use your browser’s local time.</p>
+  <label class="admin-field-label" for="schedulePageSelect">Page</label>
+  <select id="schedulePageSelect"><option value="">Loading pages…</option></select>
+  <div class="admin-schedule-state"><label class="admin-toggle-line"><input id="schedulePageEnabled" type="checkbox" checked><span>Page is available</span></label><span id="scheduleStatePill" class="schedule-state-pill">Loading…</span></div>
+  <div class="admin-schedule-grid">
+    <div><label class="admin-field-label" for="scheduleCloseAt">Close at (optional)</label><input id="scheduleCloseAt" type="datetime-local"></div>
+    <div><label class="admin-field-label" for="scheduleReopenAt">Reopen at (optional)</label><input id="scheduleReopenAt" type="datetime-local"></div>
+  </div>
+  <label class="admin-field-label" for="scheduleClosedMessage">Message shown while closed</label>
+  <textarea id="scheduleClosedMessage" maxlength="500" rows="2" placeholder="This page is temporarily unavailable while we make updates."></textarea>
+  <div class="admin-card-actions"><span id="pageScheduleStatus" class="status">Loading schedule…</span><button id="savePageScheduleButton" type="button" class="save-button">Save page settings</button></div>
 </div>
 
 <div class="card audit-card" id="auditLogCard">
@@ -1134,7 +1195,10 @@ async function checkAdmin() {
         "none";
 
     adminArea.style.display =
-        "block";
+        "grid";
+
+    const quickNav = document.getElementById("adminQuickNav");
+    if (quickNav) quickNav.style.display = "block";
 
     return true;
 }
@@ -3896,6 +3960,151 @@ function setupAuditFilters() {
     document.getElementById("auditExport")?.addEventListener("click",exportAuditCsv);
 }
 
+
+/* =========================================
+   EVENT BANNER + PAGE SCHEDULER
+========================================= */
+const scheduledPagesCache = new Map();
+function adminLocalDateTime(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    if (!Number.isFinite(d.getTime())) return "";
+    const pad = n => String(n).padStart(2, "0");
+    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+}
+function adminDateTimeToIso(value) {
+    if (!value) return null;
+    const d = new Date(value);
+    return Number.isFinite(d.getTime()) ? d.toISOString() : null;
+}
+async function loadSiteEvents() {
+    await Promise.all([loadSiteAnnouncement(), loadPageSchedules()]);
+}
+async function loadSiteAnnouncement() {
+    const status = document.getElementById("siteEventStatus");
+    const toggle = document.getElementById("siteEventEnabled");
+    const message = document.getElementById("siteEventMessage");
+    if (!status || !toggle || !message) return;
+    status.textContent = "Loading event settings…";
+    const {data,error} = await supabaseClient.from("site_announcements").select("id,enabled,message").eq("id",1).maybeSingle();
+    if (error) { status.textContent = "Could not load event: " + error.message; return; }
+    toggle.checked = !!data?.enabled;
+    message.value = data?.message || "";
+    status.textContent = toggle.checked ? "Banner is active." : "No active banner.";
+}
+async function saveSiteAnnouncement() {
+    const status = document.getElementById("siteEventStatus");
+    const toggle = document.getElementById("siteEventEnabled");
+    const message = document.getElementById("siteEventMessage");
+    const button = document.getElementById("saveSiteEventButton");
+    const value = message.value.trim();
+    if (toggle.checked && !value) { status.textContent = "Write a message before activating the banner."; message.focus(); return; }
+    button.disabled = true; status.textContent = "Saving event…";
+    const {error} = await supabaseClient.from("site_announcements").upsert({
+        id:1, enabled:toggle.checked, message:value,
+        updated_at:new Date().toISOString(), updated_by:currentAdminUser?.id || null
+    }, {onConflict:"id"});
+    button.disabled = false;
+    if (error) { status.textContent = "Could not save event: " + error.message; return; }
+    status.textContent = toggle.checked ? "Event saved and active on the homepage." : "Event saved and turned off.";
+    await writeAuditLog("admin_action","features",toggle.checked ? "Activated homepage event banner" : "Disabled homepage event banner");
+}
+async function loadPageSchedules() {
+    const status = document.getElementById("pageScheduleStatus");
+    const select = document.getElementById("schedulePageSelect");
+    if (!status || !select) return;
+    status.textContent = "Loading page settings…";
+    const {data,error} = await supabaseClient.from("site_page_schedules")
+        .select("page_path,display_name,enabled,close_at,reopen_at,closed_message")
+        .order("display_name",{ascending:true});
+    if (error) { status.textContent = "Could not load page settings: " + error.message; return; }
+    scheduledPagesCache.clear();
+    (data || []).forEach(row => scheduledPagesCache.set(row.page_path,row));
+    const previous = select.value;
+    select.innerHTML = "";
+    (data || []).forEach(row => {
+        const option = document.createElement("option");
+        option.value = row.page_path;
+        option.textContent = row.display_name + " · " + row.page_path;
+        select.appendChild(option);
+    });
+    if (previous && scheduledPagesCache.has(previous)) select.value = previous;
+    select.onchange = renderSelectedPageSchedule;
+    renderSelectedPageSchedule();
+    status.textContent = (data || []).length + " pages available. Changes apply when pages reload.";
+}
+function renderSelectedPageSchedule() {
+    const path = document.getElementById("schedulePageSelect")?.value;
+    const row = scheduledPagesCache.get(path);
+    if (!row) return;
+    document.getElementById("schedulePageEnabled").checked = !!row.enabled;
+    document.getElementById("scheduleCloseAt").value = adminLocalDateTime(row.close_at);
+    document.getElementById("scheduleReopenAt").value = adminLocalDateTime(row.reopen_at);
+    document.getElementById("scheduleClosedMessage").value = row.closed_message || "This page is temporarily unavailable while we make updates.";
+    const pill = document.getElementById("scheduleStatePill");
+    const now = Date.now();
+    const scheduledClosed = row.close_at && now >= new Date(row.close_at).getTime() && (!row.reopen_at || now < new Date(row.reopen_at).getTime());
+    const closed = !row.enabled || scheduledClosed;
+    pill.textContent = closed ? "CLOSED / SCHEDULED" : (row.close_at ? "SCHEDULE SET" : "OPEN");
+    pill.classList.toggle("off",closed);
+}
+async function savePageSchedule() {
+    const path = document.getElementById("schedulePageSelect").value;
+    const existing = scheduledPagesCache.get(path);
+    const status = document.getElementById("pageScheduleStatus");
+    const button = document.getElementById("savePageScheduleButton");
+    if (!existing) { status.textContent = "Choose a page first."; return; }
+    const closeRaw = document.getElementById("scheduleCloseAt").value;
+    const reopenRaw = document.getElementById("scheduleReopenAt").value;
+    const closeAt = adminDateTimeToIso(closeRaw);
+    const reopenAt = adminDateTimeToIso(reopenRaw);
+    if (closeAt && reopenAt && new Date(reopenAt) <= new Date(closeAt)) {
+        status.textContent = "Reopen time must be after the close time."; return;
+    }
+    const message = document.getElementById("scheduleClosedMessage").value.trim() || "This page is temporarily unavailable while we make updates.";
+    button.disabled = true; status.textContent = "Saving page settings…";
+    const payload = {
+        page_path:path, display_name:existing.display_name,
+        enabled:document.getElementById("schedulePageEnabled").checked,
+        close_at:closeAt, reopen_at:reopenAt, closed_message:message,
+        updated_at:new Date().toISOString(), updated_by:currentAdminUser?.id || null
+    };
+    const {error} = await supabaseClient.from("site_page_schedules").upsert(payload,{onConflict:"page_path"});
+    button.disabled = false;
+    if (error) { status.textContent = "Could not save: " + error.message; return; }
+    scheduledPagesCache.set(path,payload);
+    renderSelectedPageSchedule();
+    status.textContent = "Saved. " + existing.display_name + " availability updated.";
+    await writeAuditLog("admin_action","features","Updated page availability: "+existing.display_name,{pagePath:path,enabled:payload.enabled,closeAt:closeAt,reopenAt:reopenAt});
+}
+function setupAdminQuickNav() {
+    const nav = document.getElementById("adminQuickNavLinks");
+    if (!nav) return;
+    nav.innerHTML = "";
+    document.querySelectorAll("#adminArea > .card").forEach((card,index) => {
+        const heading = card.querySelector("h2,h3");
+        if (!heading) return;
+        if (!card.id) card.id = "adminSection" + index;
+        const link = document.createElement("a");
+        link.href = "#" + card.id;
+        link.textContent = heading.textContent.replace(/^[^A-Za-z0-9]+/,"").trim() || "Section " + (index+1);
+        link.title = "Jump to " + link.textContent;
+        link.addEventListener("click", event => {
+            event.preventDefault();
+            card.scrollIntoView({behavior:"smooth",block:"start"});
+        });
+        nav.appendChild(link);
+    });
+}
+document.getElementById("saveSiteEventButton")?.addEventListener("click",saveSiteAnnouncement);
+document.getElementById("savePageScheduleButton")?.addEventListener("click",savePageSchedule);
+document.getElementById("schedulePageEnabled")?.addEventListener("change",function(){
+    const pill=document.getElementById("scheduleStatePill");
+    pill.textContent=this.checked?"OPEN":"CLOSED / OFF";
+    pill.classList.toggle("off",!this.checked);
+});
+
+
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -3909,6 +4118,7 @@ async function startAdminPanel() {
         return;
     }
 
+    setupAdminQuickNav();
     setupAdminAuditTracking();
     setupAuditFilters();
     await writeAuditLog("admin_session", "authentication", "Admin panel opened");
@@ -3924,6 +4134,7 @@ async function startAdminPanel() {
         loadDougBaseAccessRequests(),
         loadCodeProjects(),
         loadSiteFeatures(),
+        loadSiteEvents(),
     ]);
 
     setInterval(
