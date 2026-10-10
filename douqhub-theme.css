@@ -15,15 +15,9 @@
 }
 html { scroll-behavior: smooth; }
 body {
+  /* Deliberately do not set any body background here.
+     Each page owns its own background and it must remain unchanged. */
   color: var(--dh-text);
-  background-color: var(--dh-bg);
-  background-image:
-    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
-    radial-gradient(ellipse at 12% -8%, rgba(99,102,241,.22), transparent 36%),
-    radial-gradient(ellipse at 92% 2%, rgba(168,85,247,.17), transparent 31%),
-    radial-gradient(ellipse at 50% 105%, rgba(34,211,238,.055), transparent 38%);
-  background-size: 44px 44px, 44px 44px, auto, auto, auto;
   accent-color: var(--dh-indigo);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -148,4 +142,54 @@ a { text-underline-offset: 4px; }
 :focus-visible { outline-color: #a5b4fc; }
 @media (max-width: 700px) {
   img, video, canvas, iframe { max-width: 100%; }
+}
+
+
+/* Homepage-inspired controls: polish without replacing page-specific colors. */
+button, input, textarea, select, .btn, .button, .action-button, .primary-button {
+  border-radius: 12px;
+}
+button:not(:disabled), .btn, .button, .action-button, .primary-button, a.button, a.btn {
+  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+}
+button:not(:disabled):hover, .btn:hover, .button:hover, .action-button:hover, .primary-button:hover, a.button:hover, a.btn:hover {
+  box-shadow: 0 10px 28px rgba(0,0,0,.18);
+}
+button:not(:disabled):active, .btn:active, .button:active, .action-button:active, .primary-button:active {
+  transform: translateY(1px);
+}
+/* Use the homepage indigo-to-purple gradient only on clearly primary actions. */
+button.primary, button.btn-primary, button.primary-button, button.cta,
+a.primary, a.btn-primary, a.primary-button, a.cta,
+input[type="submit"], input[type="button"].primary {
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: 1px solid rgba(196,181,253,.28);
+  box-shadow: 0 10px 30px rgba(99,102,241,.22);
+  font-weight: 800;
+}
+button.primary:hover:not(:disabled), button.btn-primary:hover:not(:disabled),
+button.primary-button:hover:not(:disabled), button.cta:hover:not(:disabled),
+a.primary:hover, a.btn-primary:hover, a.primary-button:hover, a.cta:hover,
+input[type="submit"]:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 14px 35px rgba(99,102,241,.3);
+}
+/* Account menus and common popup shells match the homepage's dark glass UI. */
+.account-menu, .dropdown-menu, .context-menu, .popover, .popup, .popup-content,
+.modal-box, .modal-content, .modal-card, .confirm-modal, .dialog, [role="dialog"] {
+  border: 1px solid var(--dh-border);
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.38);
+}
+.account-menu, .dropdown-menu, .context-menu, .popover {
+  background-color: rgba(12,13,28,.97);
+}
+.popup-content, .modal-box, .modal-content, .modal-card, .confirm-modal, .dialog, [role="dialog"] {
+  background-color: rgba(13,17,39,.97);
+}
+.modal, .modal-backdrop, .popup-backdrop {
+  /* Keep the page's own overlay color; do not apply backdrop filters globally. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
