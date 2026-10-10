@@ -227,3 +227,164 @@ body .account-menu, body .dropdown-menu, body .context-menu, body .popover {
   border-radius: 15px;
   box-shadow: 0 22px 65px rgba(0,0,0,.42);
 }
+
+
+/* === DougHub full-page formatting pass: consistent components, original layouts/backgrounds preserved === */
+/* This layer intentionally styles components, not body/page backgrounds or layout grids. */
+:root {
+  --dh-line-soft: rgba(180, 187, 255, .11);
+  --dh-line: rgba(165, 171, 255, .20);
+  --dh-surface: rgba(15, 19, 43, .74);
+  --dh-surface-raised: rgba(20, 25, 55, .86);
+  --dh-primary: #6366f1;
+  --dh-primary-hover: #7779ff;
+  --dh-radius-card: 18px;
+}
+
+/* Shared content surfaces: retain each page's geometry while giving components a coherent finish. */
+.card, .panel, .tool-card, .game-card, .feature-card, .stat-card,
+.settings-card, .settings-section, .section-card, .content-card, .auth-card,
+.project, .file-card, .video-card, .post-card, .message-card, .setting-card,
+.dashboard-card, .workspace-card, .editor-panel, .sidebar-card, .tool-panel,
+.content-panel, .main-card, .app-panel, .hero-card, .admin-event-card,
+.admin-schedule-card, .audit-card, .moderation-card, .feedback-section,
+.chat-container, .chat-top, .composer, .tool-output, .output-panel {
+  border-color: var(--dh-line-soft);
+  border-radius: var(--dh-radius-card);
+}
+.card, .panel, .tool-card, .feature-card, .stat-card, .settings-card,
+.settings-section, .section-card, .content-card, .auth-card, .project,
+.file-card, .video-card, .post-card, .setting-card, .dashboard-card,
+.workspace-card, .editor-panel, .sidebar-card, .tool-panel, .content-panel,
+.main-card, .app-panel, .hero-card, .admin-event-card, .admin-schedule-card,
+.audit-card, .moderation-card, .feedback-section {
+  box-shadow: 0 14px 42px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.025);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.card:hover, .tool-card:hover, .feature-card:hover, .game-card:hover,
+.project:hover, .file-card:hover, .video-card:hover, .post-card:hover {
+  border-color: rgba(139, 132, 255, .38);
+}
+
+/* Page headings, labels, descriptions and section dividers. */
+.page-title, .section-title, .section-heading, .admin-section-heading,
+.tool-heading, .settings-section-title, .hero h1, .hero-title {
+  letter-spacing: -.035em;
+}
+.subtitle, .section-subtitle, .section-description, .description,
+.setting-help, .admin-card-help, .muted, .empty, .empty-state {
+  color: var(--dh-muted);
+}
+.section-header, .page-header, .admin-section-heading, .tool-heading {
+  border-color: var(--dh-line-soft);
+}
+.badge, .pill, .tag, .chip, .status, .status-pill, .schedule-state-pill,
+.hero-badge, .dmail-badge {
+  border: 1px solid var(--dh-line-soft);
+  border-radius: 999px;
+}
+
+/* Primary and secondary actions. Specific danger/destructive and navigation controls keep their meaning. */
+button, input[type="button"], input[type="submit"], input[type="reset"],
+.button, .btn, a.button, a.btn, .back-button, .save-button, .update-button,
+.upload-button, .hero-create-button, .warning-send-button, .primary-button {
+  font-family: inherit;
+  border-radius: 12px;
+  font-weight: 650;
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease, filter .18s ease;
+}
+button:not(:disabled):not(.danger):not(.delete):not([class*="danger"]):not([class*="delete"]):not(.logout):not(.logout-button):not(.icon-button):not(.nav-link):not(.slider-arrow):not(.community-slider-arrow):hover,
+input[type="button"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover,
+.button:hover, .btn:hover, a.button:hover, a.btn:hover {
+  border-color: rgba(167, 139, 250, .65);
+  box-shadow: 0 8px 24px rgba(99,102,241,.15);
+}
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+.button:focus-visible, .btn:focus-visible, a.button:focus-visible, a.btn:focus-visible {
+  outline: 2px solid rgba(167,139,250,.95);
+  outline-offset: 3px;
+}
+button:disabled, input:disabled, select:disabled, textarea:disabled {
+  cursor: not-allowed;
+  opacity: .58;
+}
+button.primary, button.btn-primary, button.primary-button, button.cta,
+a.primary, a.btn-primary, a.primary-button, a.cta, .save-button,
+.update-button, .upload-button, .hero-create-button, input[type="submit"] {
+  border: 1px solid rgba(196,181,253,.28);
+  background-image: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(99,102,241,.19);
+}
+button.primary:hover:not(:disabled), button.btn-primary:hover:not(:disabled),
+button.primary-button:hover:not(:disabled), button.cta:hover:not(:disabled),
+a.primary:hover, a.btn-primary:hover, a.primary-button:hover, a.cta:hover,
+.save-button:hover:not(:disabled), .update-button:hover:not(:disabled),
+.upload-button:hover:not(:disabled), .hero-create-button:hover:not(:disabled),
+input[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 12px 30px rgba(99,102,241,.27);
+}
+
+/* Inputs are visually consistent without changing their dimensions or autocomplete behavior. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+textarea, select, .setting-input, .search-box, .search-input, .tool-search,
+.warning-form input, .warning-form textarea, .field input, .field textarea, .field select {
+  border: 1px solid var(--dh-line);
+  border-radius: 12px;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus,
+textarea:focus, select:focus, .setting-input:focus, .search-box:focus,
+.search-input:focus, .tool-search:focus {
+  border-color: rgba(129,140,248,.86) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+}
+input[type="checkbox"], input[type="radio"] { accent-color: #818cf8; }
+::placeholder { color: #8188a7; opacity: 1; }
+
+/* Popups, dropdowns and overlays — only the popup surface is styled, not the page behind it. */
+.modal-box, .modal-content, .modal-card, .popup, .popup-content,
+.confirm-modal, .dialog, .account-menu, .dropdown-menu, .context-menu,
+.popover, [role="dialog"], dialog[open], .toast, .notification,
+.confirmation-popup, .settings-popup {
+  border: 1px solid rgba(177,184,255,.19);
+  border-radius: 18px;
+  box-shadow: 0 24px 75px rgba(0,0,0,.40), inset 0 1px rgba(255,255,255,.035);
+}
+.modal-box, .modal-content, .modal-card, .popup-content, .confirm-modal,
+.dialog, [role="dialog"], dialog[open], .confirmation-popup, .settings-popup {
+  background-color: #0d1127;
+  color: #f5f6ff;
+}
+.dropdown-menu, .context-menu, .popover, .account-menu {
+  background-color: rgba(12,13,28,.98);
+}
+.account-menu a, .account-menu button, .dropdown-menu a, .context-menu button {
+  border-radius: 9px;
+}
+.modal-backdrop, .popup-backdrop, .modal-overlay {
+  /* Preserve each page's existing overlay tint and blur. */
+  color: inherit;
+}
+
+/* Tables, code fields and media controls get cleaner edges without changing functionality. */
+table { border-collapse: separate; border-spacing: 0; }
+thead th, th { color: #c9cdf0; }
+td, th { border-color: var(--dh-line-soft); }
+pre, code, .output, .tool-output, .code-editor, .editor {
+  border-color: var(--dh-line-soft);
+  border-radius: 12px;
+}
+video, iframe { border-radius: 12px; }
+a { text-underline-offset: 4px; }
+a:hover { text-decoration-color: rgba(196,181,253,.75); }
+hr { border-color: var(--dh-line-soft); }
+
+/* Keep every page's own background, spacing, responsive grids and sticky/fixed positioning. */
+@media (max-width: 700px) {
+  .card, .panel, .tool-card, .feature-card, .settings-card, .settings-section,
+  .content-card, .auth-card, .project, .file-card, .video-card, .post-card,
+  .dashboard-card, .workspace-card, .editor-panel, .hero-card {
+    border-radius: 15px;
+  }
+}
