@@ -132,11 +132,44 @@
       else a.removeAttribute("aria-current");
     });
   }
+
+  async function enforcePageSchedule() {
+    try {
+      const currentPath = pathKey();
+      const url = "https://agsqdqcsmsppcdqxlppj.supabase.co/rest/v1/site_page_schedules?select=page_path,display_name,enabled,close_at,reopen_at,closed_message&page_path=eq." + encodeURIComponent(currentPath);
+      const response = await fetch(url, {
+        headers: { apikey: KEY, Authorization: "Bearer " + KEY, Accept: "application/json" },
+        cache: "no-store"
+      });
+      if (!response.ok) return;
+      const rows = await response.json();
+      const page = rows && rows[0];
+      if (!page) return;
+      const now = Date.now();
+      const scheduledClosed = page.close_at && now >= new Date(page.close_at).getTime() &&
+        (!page.reopen_at || now < new Date(page.reopen_at).getTime());
+      if (page.enabled !== false && !scheduledClosed) return;
+
+      // Keep the admin panel reachable so a scheduling mistake can always be undone.
+      if (currentPath === "admin.html") return;
+
+      const safe = value => String(value || "").replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+      const title = safe(page.display_name || "This page");
+      const message = safe(page.closed_message || "This page is temporarily unavailable while we make updates.");
+      document.documentElement.style.cssText = "min-height:100%;background:#050713;color:#f5f5ff";
+      document.body.innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 20% 15%,#4338ca33,transparent 38%),radial-gradient(circle at 80% 85%,#9333ea22,transparent 35%),#050713"><section style="width:min(620px,100%);padding:clamp(24px,5vw,42px);border:1px solid #ffffff1a;border-radius:24px;background:#11152bd9;box-shadow:0 24px 90px #0006;text-align:center"><div style="font-size:38px;margin-bottom:12px">🛠️</div><div style="font-size:11px;letter-spacing:.18em;font-weight:800;color:#a5b4fc;margin-bottom:12px">DOUGHUB MAINTENANCE</div><h1 style="font-size:clamp(25px,5vw,38px);margin:0 0 12px;color:#fff">' + title + ' is temporarily closed</h1><p style="color:#b9bfd8;line-height:1.7;margin:0 auto 24px;max-width:460px;white-space:pre-wrap">' + message + '</p><a href="/index.html" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:white;font-weight:800;padding:11px 17px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7)">← Back to DougHub</a></section></main>';
+      document.title = (page.display_name || "Page") + " · Temporarily Closed | DougHub";
+    } catch (error) {
+      console.warn("DougHub page schedule could not be checked; leaving the page available.", error);
+    }
+  }
+
   function start() {
     addNavStyle();
     removeRetiredNavLinks();
     markActiveLinks();
     loadFlags().then(applyFlags);
+    enforcePageSchedule();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
