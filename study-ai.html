@@ -60,11 +60,11 @@
       <div class="side-item"><b>🧠 Understand, don't just copy</b><p>Get explanations, examples, worked steps, and a chance to try a problem yourself.</p></div>
       <div class="side-item"><b>🌎 Broad subject coverage</b><p>Ask about school subjects, practical questions, programming, creative ideas, and general knowledge.</p></div>
       <div class="side-item"><b>↪ Keep the conversation going</b><p>Ask for simpler wording, another example, a quiz, or more detail without starting again.</p></div>
-      <div class="side-item"><b>🔐 Secure connection</b><p>The model API key stays on the server. This page never asks you to paste a provider secret.</p></div>
+      <div class="side-item"><b>🔐 Secure connection</b><p>The provider API key stays on the server. This page never asks you to paste a secret.</p></div>
       <div class="side-note"><b>Study tip</b><br>AI can make mistakes. For assignments, check facts against your class notes or teacher's materials and use explanations to build your own understanding.</div>
     </aside>
   </section>
-  <div class="footer">DougHub Study AI + AI Mode · Powered by a server-side language model once the AI secret is configured.<br>Don't enter passwords, private information, or sensitive personal details.</div>
+  <div class="footer">DougHub Study AI + AI Mode · Powered by Groq AI. Free usage limits may apply.<br>Don't enter passwords, private information, or sensitive personal details.</div>
 </main>
 <div id="toast" class="toast hidden" role="status"></div>
 <script>
@@ -182,7 +182,7 @@
     } catch (error) {
       typing.remove();
       const message = error?.message || "Something went wrong.";
-      renderMessage("assistant", "I couldn't answer that yet. " + message + "\n\nIf this is a setup error, the site owner needs to configure the server-side OPENAI_API_KEY secret in Supabase.");
+      renderMessage("assistant", "I couldn't answer that yet. " + message + "\n\nIf this is a setup error, the site owner needs to configure the server-side GROQ_API_KEY secret in Supabase.");
     } finally {
       busy = false;
       sendButton.disabled = false;
