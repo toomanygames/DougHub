@@ -370,9 +370,26 @@ canvas {
 </style>
   <script src="../nav.js" defer></script>
 
-<link rel="stylesheet" href="../douqhub-theme.css">
-
 <script src="../search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Local DougHub glass redesign, styled in this page rather than a shared theme file */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+button{font:inherit;transition:filter .16s,border-color .16s,box-shadow .16s}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 35%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+.header{background:rgba(4,5,15,.84);border:1px solid var(--dh-line);border-radius:18px;backdrop-filter:blur(20px)}
+.logo .doug{color:#a5b4fc}.logo .hub{color:#c084fc}
+.stats .stat{background:rgba(13,17,39,.85);border:1px solid var(--dh-line);border-radius:13px}
+.game{border:1px solid var(--dh-line);border-radius:22px;overflow:hidden;box-shadow:0 22px 65px #0005}
+.overlay{background:rgba(2,4,10,.64);backdrop-filter:blur(10px)}.overlay .panel{background:linear-gradient(145deg,rgba(17,22,49,.97),rgba(7,9,24,.96));border:1px solid var(--dh-line);border-radius:23px;box-shadow:0 25px 80px #0008}
+.start{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white;border-radius:13px;box-shadow:0 9px 25px #6366f133}
+.control{background:#111630;border:1px solid var(--dh-line);border-radius:12px}
+
+</style>
 </head>
 
 <body>
