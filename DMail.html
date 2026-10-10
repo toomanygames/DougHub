@@ -1224,6 +1224,41 @@ html,body{background:radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.22),trans
  .content{background:linear-gradient(145deg,rgba(13,17,39,.82),rgba(6,9,23,.78))!important}
 }
 
+
+/* FINAL DMail CSS repair: force the dark glass theme over stale light-theme rules */
+html, body, .app, .main, .sidebar, .content, .content-header, .mail-layout,
+.user-list, .chat, .chat-header, .messages, .composer, .other-view {
+  color: #f5f5ff !important;
+  background-color: transparent !important;
+}
+html, body { background: radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.22),transparent 34%),radial-gradient(ellipse at 88% 90%,rgba(168,85,247,.16),transparent 34%),#03050d !important; }
+.topbar { background: rgba(7,9,24,.82) !important; border-bottom: 1px solid rgba(163,170,255,.16) !important; }
+.sidebar { background: linear-gradient(155deg,rgba(17,20,47,.9),rgba(7,10,25,.88)) !important; }
+.content { background: linear-gradient(145deg,rgba(13,17,39,.94),rgba(6,9,23,.92)) !important; border:1px solid rgba(163,170,255,.16) !important; border-radius:21px !important; }
+.content-header,.chat-header { background:rgba(255,255,255,.018) !important; border-color:rgba(163,170,255,.16) !important; }
+.user-list { background:rgba(4,7,19,.18) !important; border-color:rgba(163,170,255,.16) !important; }
+.messages { background:transparent !important; }
+.message { width:fit-content !important; max-width:min(760px,94%) !important; align-self:flex-start !important; color:#e4e6f5 !important; background:rgba(255,255,255,.045) !important; border:1px solid rgba(163,170,255,.13) !important; border-radius:14px !important; }
+.message.mine { align-self:flex-end !important; background:linear-gradient(125deg,rgba(99,102,241,.25),rgba(168,85,247,.15)) !important; border-color:rgba(157,146,255,.24) !important; }
+.message-text,.username,.chat-name,.content-title,.logo { color:#f5f5ff !important; }
+.search-box input,.composer textarea,.modal input,.modal textarea { color:#f5f5ff !important; background:rgba(7,9,23,.78) !important; border:1px solid rgba(163,170,255,.19) !important; }
+.modal { color:#f5f5ff !important; background:linear-gradient(145deg,#15172f,#0c1022) !important; border:1px solid rgba(163,170,255,.27) !important; }
+.modal-title { color:#f7f5ff !important; }
+@media(max-width:650px) {
+ html,body { height:100%; overflow:hidden; }
+ .app { height:100vh; height:100dvh; }
+ .topbar { flex-basis:60px !important; height:60px !important; min-height:60px; padding:0 12px !important; }
+ .main { height:calc(100vh - 60px) !important; height:calc(100dvh - 60px) !important; min-height:0 !important; padding:7px !important; gap:7px !important; flex-direction:column !important; }
+ .sidebar { width:100% !important; flex:0 0 auto !important; max-height:none !important; padding:10px !important; overflow:visible !important; }
+ .content { margin:0 !important; flex:1 1 0 !important; min-height:0 !important; border-radius:15px !important; }
+ .mail-layout { flex:1 1 0 !important; min-height:0 !important; flex-direction:column !important; }
+ .user-list { width:100% !important; flex:0 0 145px !important; max-height:145px !important; border-right:0 !important; border-bottom:1px solid rgba(163,170,255,.16) !important; }
+ .chat { flex:1 1 0 !important; min-height:0 !important; }
+ .messages { min-height:0 !important; overflow-y:auto !important; }
+ .message { max-width:96% !important; }
+}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible { outline:2px solid #a5a1ff; outline-offset:2px; }
+
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
