@@ -172,11 +172,16 @@ header {
 .feedback-message {
     white-space: pre-wrap;
     word-break: break-word;
-
     color: #d7d9e5;
-
     line-height: 1.55;
 }
+.feedback-reply-box{margin-top:15px;padding:14px;border:1px solid rgba(129,140,248,.22);border-radius:12px;background:rgba(99,102,241,.06)}
+.feedback-reply-box label{display:block;margin:0 0 7px;color:#c4b5fd;font-size:12px;font-weight:800}
+.feedback-reply-box textarea{display:block;width:100%;min-height:76px;resize:vertical;box-sizing:border-box;padding:10px 11px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#080b1b;color:#fff;font:inherit;line-height:1.5}
+.feedback-reply-box textarea:focus{outline:none;border-color:#818cf8}
+.feedback-reply-current{margin:0 0 10px;padding:10px;border-radius:9px;background:rgba(255,255,255,.04);color:#c9cbea;white-space:pre-wrap;overflow-wrap:anywhere}
+.feedback-reply-current:empty{display:none}
+.feedback-reply-status{min-height:15px;margin-top:7px;color:#a5b4fc;font-size:12px}
 
 .actions {
     display: flex;
@@ -460,7 +465,7 @@ async function loadFeedback() {
         await supabaseClient
             .from("feedback")
             .select(
-                "id,user_id,username,message,created_at"
+                "id,user_id,username,message,created_at,admin_reply,admin_replied_at"
             )
             .order(
                 "created_at",
@@ -541,40 +546,72 @@ async function loadFeedback() {
             </div>
 
 
-            <div class="actions">
-
-                <button
-                    class="delete"
-                    onclick="deleteFeedback('${item.id}')"
-                >
-                    🗑️ Delete
-                </button>
-
+            <div class="feedback-reply-box">
+                <label for="feedbackReply-${item.id}">Reply to this message</label>
+                <div class="feedback-reply-current">${item.admin_reply ? "Previous reply: " + escapeHtml(item.admin_reply) : ""}</div>
+                <textarea id="feedbackReply-${item.id}" maxlength="2000" placeholder="Write a reply the user can see on DougHub…">${escapeHtml(item.admin_reply || "")}</textarea>
+                <div class="actions">
+                    <button class="save-reply" type="button">💬 Save reply</button>
+                    <button class="delete" type="button">🗑️ Delete</button>
+                </div>
+                <div class="feedback-reply-status" aria-live="polite"></div>
             </div>
 
         `;
 
 
-        feedbackList.appendChild(
-            element
-        );
+        feedbackList.appendChild(element);
+
+        const replyButton = element.querySelector(".save-reply");
+        const deleteButton = element.querySelector(".delete");
+        replyButton.addEventListener("click", () => saveFeedbackReply(item.id, element));
+        deleteButton.addEventListener("click", () => deleteFeedback(item.id));
 
     });
 
 }
 
 
-async function deleteFeedback(id) {
-
-    if (
-        !confirm(
-            "Delete this feedback message?"
-        )
-    ) {
+async function saveFeedbackReply(id, element) {
+    const textarea = element.querySelector("textarea");
+    const status = element.querySelector(".feedback-reply-status");
+    const reply = textarea.value.trim();
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+        status.textContent = "Your admin session expired. Please sign in again.";
+        return;
+    }
+    if (reply.length > 2000) {
+        status.textContent = "Replies must be 2,000 characters or fewer.";
         return;
     }
 
+    const button = element.querySelector(".save-reply");
+    button.disabled = true;
+    button.textContent = "Saving…";
+    status.textContent = "";
+    const { error } = await supabaseClient
+        .from("feedback")
+        .update({
+            admin_reply: reply || null,
+            admin_replied_at: reply ? new Date().toISOString() : null,
+            admin_replied_by: reply ? user.id : null
+        })
+        .eq("id", id);
 
+    button.disabled = false;
+    button.textContent = "💬 Save reply";
+    if (error) {
+        console.error("Could not save feedback reply:", error);
+        status.textContent = "Could not save the reply. Check the console for details.";
+        return;
+    }
+    status.textContent = reply ? "Reply saved. The user can see it on DougHub." : "Reply cleared.";
+    await loadFeedback();
+}
+
+
+async function deleteFeedback(id) {
     const {
         error
     } =
