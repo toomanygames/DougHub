@@ -59,17 +59,17 @@
       <div class="side-item"><b>🧠 Understand, don't just copy</b><p>Get explanations, examples, worked steps, and a chance to try a problem yourself.</p></div>
       <div class="side-item"><b>🌎 Broad subject coverage</b><p>Ask about school subjects, practical questions, programming, creative ideas, and general knowledge.</p></div>
       <div class="side-item"><b>↪ Keep the conversation going</b><p>Ask for simpler wording, another example, a quiz, or more detail without starting again.</p></div>
-      <div class="side-item"><b>🔐 Secure connection</b><p>The AI model runs on your device. No account or API key is needed.</p></div>
+      <div class="side-item"><b>🔐 Secure connection</b><p>A lightweight AI model runs on your device. No account or API key is needed.</p></div>
       <div class="side-note"><b>Study tip</b><br>AI can make mistakes. For assignments, check facts against your class notes or teacher's materials and use explanations to build your own understanding.</div>
     </aside>
   </section>
-  <div class="footer">DougHub Study AI + AI Mode · Runs a local AI model in your browser. The first load downloads the model; after that it is cached by your browser.<br>Don't enter passwords, private information, or sensitive personal details.</div>
+  <div class="footer">DougHub Study AI + AI Mode · Runs a lightweight local AI model in your browser. The first load downloads the smaller model; after that it is cached by your browser.<br>Don't enter passwords, private information, or sensitive personal details.</div>
 </main>
 <div id="toast" class="toast hidden" role="status"></div>
 <script>
 (() => {
   const MEMORY_KEY = "doughub-study-ai-local-chat-v1";
-  const MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+  const MODEL_ID = "SmolLM2-360M-Instruct-q4f16_1-MLC";
   let mode = new URLSearchParams(location.search).get("mode") === "ai" ? "ai" : "study";
   const $ = id => document.getElementById(id);
   const messagesEl = $("messages");
@@ -151,7 +151,7 @@
     }
     enginePromise = (async () => {
       setStatus("Loading local AI…");
-      toast("First-time setup: downloading the AI model to this browser. It may take a while and uses your internet data.");
+      toast("First-time setup: downloading the lightweight AI model. It is much smaller than the previous model, but the first download still needs internet.");
       const webllm = await import("https://esm.run/@mlc-ai/web-llm");
       const create = webllm.CreateMLCEngine || webllm.default?.CreateMLCEngine;
       if (typeof create !== "function") throw new Error("Could not start the local AI engine. Refresh and try again.");
@@ -185,7 +185,7 @@
       const subject = isStudy ? $("subjectFilter").value : "Any subject";
       const style = isStudy ? $("styleFilter").value : "Natural response";
       const systemPrompt = isStudy
-        ? `You are DougHub Study AI, a friendly tutor running locally on the user's device. Subject focus: ${subject}. Answer style: ${style}. The subject is a focus, not a restriction; still answer unrelated questions. Quick answer means concise. Detailed explanation means examples and clear reasoning. Step-by-step tutor means numbered steps and show calculations when useful. Help the student learn. Be accurate, admit uncertainty, never invent sources, and follow safety rules.`
+        ? `You are DougHub Study AI, a friendly tutor running locally on the user's device. Subject focus: ${subject}. Answer style: ${style}. The subject is a focus, not a restriction; still answer unrelated questions. Quick answer means concise. Detailed explanation means examples and clear reasoning. Step-by-step tutor means numbered steps and show calculations when useful. This is a small local model, so keep answers clear and avoid pretending to know things you do not. Help the student learn. Be accurate, admit uncertainty, never invent sources, and follow safety rules.`
         : "You are DougHub Local AI, a friendly general-purpose assistant running on the user's device. There are no subject or answer-style filters. Help with appropriate questions about knowledge, coding, writing, brainstorming, explanations, and planning. Be accurate, admit uncertainty, do not invent sources, and follow safety rules.";
       const messages = [{role:"system",content:systemPrompt}];
       for (const item of prior) {
