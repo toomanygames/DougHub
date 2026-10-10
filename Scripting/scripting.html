@@ -70,7 +70,44 @@
     <div class="tip-card"><span class="tip-icon">✦</span><div><b>Real code, not just a game maker</b><p>Use standard HTML, CSS and JavaScript to build websites, widgets, tools and interactive projects.</p></div></div>
     <div class="tip-card"><span class="tip-icon">↗</span><div><b>Your work stays yours</b><p>Projects autosave in this browser. Use Export HTML to download a standalone copy of your current project.</p></div></div>
   </section>
+
+  <section class="community-projects-section" id="communityProjects">
+    <div class="community-heading">
+      <div>
+        <div class="eyebrow">MADE BY THE COMMUNITY</div>
+        <h2>Community Projects</h2>
+        <p>Explore projects other people have built. Preview any public project, and copy or download it only when its creator allows it.</p>
+      </div>
+      <button class="btn" id="refreshCommunityBtn" type="button">↻ Refresh projects</button>
+    </div>
+    <section class="publish-panel">
+      <div class="publish-title"><span class="publish-icon">↗</span><div><h3>Share your project</h3><p>Publish the code currently open in your editor for other DougHub users to preview.</p></div></div>
+      <div class="publish-fields">
+        <label>Project title<input id="communityTitle" maxlength="80" placeholder="My awesome project" autocomplete="off"></label>
+        <label>Short description<textarea id="communityDescription" maxlength="500" rows="2" placeholder="What does your project do?"></textarea></label>
+      </div>
+      <div class="permission-options">
+        <label class="permission-option"><input id="communityAllowCopy" type="checkbox"><span><b>Allow code copying</b><small>Visitors can copy the source code.</small></span></label>
+        <label class="permission-option"><input id="communityAllowDownload" type="checkbox"><span><b>Allow downloading</b><small>Visitors can download a standalone HTML version.</small></span></label>
+      </div>
+      <div class="publish-footer"><span id="communityPublishStatus" role="status">Your project stays private to your browser until you publish it here.</span><button class="btn primary" id="publishProjectBtn" type="button">Publish to Community Projects</button></div>
+    </section>
+    <div class="community-browser-tools"><label class="community-search"><span>⌕</span><input id="communitySearch" type="search" placeholder="Search community projects…" autocomplete="off" autocorrect="off" spellcheck="false"></label><span id="communityProjectCount" class="community-count">Loading projects…</span></div>
+    <div class="community-slider-wrap">
+      <button class="community-arrow left" id="communityPrev" type="button" aria-label="Scroll projects left">‹</button>
+      <div class="community-project-slider" id="communityProjectSlider" aria-live="polite"><div class="community-loading">Loading community projects…</div></div>
+      <button class="community-arrow right" id="communityNext" type="button" aria-label="Scroll projects right">›</button>
+    </div>
+    <div class="community-footnote">Creators control the Copy Code and Download options. Previewing runs the project in an isolated frame.</div>
+  </section>
+  <dialog id="communityPreviewDialog" class="community-preview-dialog">
+    <div class="community-preview-head"><div><span class="panel-kicker">COMMUNITY PREVIEW</span><h3 id="communityPreviewTitle">Project preview</h3><p id="communityPreviewDescription"></p></div><button class="btn" id="closeCommunityPreview" type="button" aria-label="Close preview">✕</button></div>
+    <div class="community-preview-toolbar"><span id="communityPreviewPermissions"></span><div class="community-preview-actions"><button class="btn" id="communityCopyCodeBtn" type="button">Copy code</button><button class="btn" id="communityDownloadBtn" type="button">Download HTML</button></div></div>
+    <iframe id="communityPreviewFrame" title="Community project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe>
+    <div class="community-preview-bottom"><span id="communityPreviewAuthor"></span><button class="btn" id="editCommunityProjectBtn" type="button" hidden>Edit my project</button></div>
+  </dialog>
+
 </main>
-<script src="scripting.js?v=3"></script>
+<script src="scripting.js?v=4"></script>
 </body>
 </html>
