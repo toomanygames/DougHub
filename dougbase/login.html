@@ -10,9 +10,28 @@
 </style>
   <script src="../nav.js" defer></script>
 
-<link rel="stylesheet" href="../douqhub-theme.css">
-
 <script src="../search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Individual inline visual refresh using DougHub's index palette */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
+input::placeholder,textarea::placeholder{color:#858cab}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 12% 8%,#29205d 0,transparent 35%),radial-gradient(circle at 90% 88%,#3b155e 0,transparent 32%),#02040a}
+.card{background:linear-gradient(145deg,rgba(18,22,51,.95),rgba(9,11,27,.92));border:1px solid rgba(177,184,255,.2);border-radius:27px;box-shadow:0 30px 100px #0007,inset 0 1px #ffffff08;backdrop-filter:blur(24px)}
+.tabs{padding:5px;background:#050715;border:1px solid var(--dh-line);border-radius:14px}
+.tabs .active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:10px}
+button.primary,input[type=submit]{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white}
+.note{background:#6366f114;border:1px solid #818cf133;border-radius:14px;color:#b9bdd8}
+
+</style>
 </head>
 <body>
 <div class="card">
