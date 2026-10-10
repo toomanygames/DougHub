@@ -42,9 +42,9 @@ footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);colo
 @media(max-width:900px){.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr))}header{padding:14px 18px}nav{gap:12px}}
 @media(max-width:600px){.tools-grid{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column;gap:12px}nav{width:100%;justify-content:space-between;gap:9px}nav a{font-size:12px}.hero{padding-top:24px}.hero-card{padding:32px 18px}.tools-grid{grid-template-columns:1fr}.tool-card{padding:18px}.search-wrap{flex-direction:column}}
 
-/* DougTools layout refresh */
-.hero{padding:38px 0 28px}
-.hero-card{padding:clamp(30px,5vw,56px) 24px;border-radius:30px;background:linear-gradient(135deg,rgba(99,102,241,.12),transparent 48%),radial-gradient(circle at 85% 18%,#a855f72e,transparent 32%),rgba(9,12,29,.92);box-shadow:0 28px 90px #0005}
+/* DougTools compact masonry layout */
+.hero{padding:34px 0 24px}
+.hero-card{padding:clamp(28px,4vw,46px) 24px;border-radius:26px;background:linear-gradient(135deg,rgba(99,102,241,.12),transparent 48%),radial-gradient(circle at 85% 18%,#a855f72e,transparent 32%),rgba(9,12,29,.92);box-shadow:0 24px 70px #0004}
 .hero-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 15%,#ffffff04 50%,transparent 80%)}
 .hero-card>*{position:relative}
 .hero p{font-size:16px}
@@ -52,29 +52,28 @@ footer{text-align:center;padding:26px 16px;border-top:1px solid var(--line);colo
 .search-wrap input{border:0;background:transparent;min-width:0}
 .search-wrap input:focus{box-shadow:none}
 .search-wrap button{flex:0 0 auto}
-.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
-.tool-card{position:relative;display:flex;flex-direction:column;min-width:0;padding:22px;border-radius:20px;background:linear-gradient(160deg,rgba(20,24,52,.94),rgba(8,10,24,.94));border-color:rgba(165,180,252,.13);box-shadow:0 12px 35px #0002;transition:transform .18s,border-color .18s,box-shadow .18s}
-.tool-card:hover{transform:translateY(-3px);border-color:#818cf855;box-shadow:0 18px 44px #0004}
-.tool-heading{align-items:flex-start;min-height:66px;margin-bottom:16px}
-.tool-icon{flex-shrink:0;background:linear-gradient(145deg,#6366f12c,#a855f71a);border-color:#a5b4fc2c;box-shadow:inset 0 1px #ffffff0a}
-.tool-heading h2{font-size:17px;line-height:1.35;letter-spacing:-.2px}
-.description{font-size:12.5px;line-height:1.55}
-.tool-card label{margin-top:13px}
-.tool-card button,.tool-card .button{min-height:40px}
-.tool-card textarea,.tool-card input:not([type=checkbox]):not([type=color]):not([type=range]),.tool-card select{background:#050713;border-color:#ffffff16}
+.tools-grid{display:block;column-count:3;column-gap:16px;column-fill:balance}
+.tool-card{position:relative;display:inline-flex;flex-direction:column;vertical-align:top;width:100%;min-width:0;margin:0 0 16px;padding:18px;border-radius:17px;background:linear-gradient(160deg,rgba(20,24,52,.94),rgba(8,10,24,.94));border:1px solid rgba(165,180,252,.16);box-shadow:0 8px 24px #0002;break-inside:avoid;page-break-inside:avoid;transition:border-color .18s,box-shadow .18s}
+.tool-card:hover{border-color:#818cf855;box-shadow:0 12px 30px #0003}
+.tool-heading{align-items:flex-start;min-height:0;margin-bottom:12px;gap:10px}
+.tool-icon{flex-shrink:0;width:38px;height:38px;flex-basis:38px;border-radius:12px;background:linear-gradient(145deg,#6366f12c,#a855f71a);border-color:#a5b4fc2c;box-shadow:inset 0 1px #ffffff0a;font-size:19px}
+.tool-heading h2{font-size:16px;line-height:1.35;letter-spacing:-.2px}
+.description{font-size:12px;line-height:1.5}
+.tool-card label{margin-top:10px}
+.tool-card button,.tool-card .button{min-height:36px;padding:9px 10px;border-radius:9px;font-size:12px}
+.tool-card textarea{min-height:76px}
+.tool-card textarea,.tool-card input:not([type=checkbox]):not([type=color]):not([type=range]),.tool-card select{background:#050713;border-color:#ffffff16;padding:9px 10px;border-radius:9px;font-size:13px}
 .tool-card textarea:focus,.tool-card input:focus,.tool-card select:focus{border-color:#818cf899;box-shadow:0 0 0 3px #6366f115}
-.tool-card .output{padding:11px 12px;background:#050713;border:1px solid #ffffff10;border-radius:11px;min-height:40px}
+.tool-card .output{padding:10px;background:#050713;border:1px solid #ffffff10;border-radius:10px;min-height:36px}
 .tool-card .status{padding-top:2px;overflow-wrap:anywhere}
 .tool-card input[type=checkbox]{accent-color:#8b5cf6}
 .tool-card input[type=color],.tool-card input[type=range]{cursor:pointer}
 .tool-card[hidden]{display:none!important}
 .notice{padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:#ffffff04}
-footer{margin-top:34px}
-@media(min-width:1100px){.tool-card{padding:23px}.tool-heading{min-height:72px}}
-@media(max-width:1000px){.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:620px){main{width:min(100% - 24px,1200px)}header{padding:12px 14px}.hero{padding-top:20px}.hero-card{padding:30px 16px;border-radius:22px}h1{letter-spacing:-1.3px}.hero p{font-size:14px}.search-wrap{flex-direction:column}.tools-grid{grid-template-columns:1fr;gap:13px}.tool-card{padding:18px}.tool-heading{min-height:0}.row{gap:7px}.row button{padding:10px 8px;font-size:13px}}
+footer{margin-top:26px}
+@media(max-width:1000px){.tools-grid{column-count:2;column-gap:14px}.tool-card{margin-bottom:14px}}
+@media(max-width:620px){main{width:calc(100% - 24px)}header{padding:12px 14px}.hero{padding-top:20px}.hero-card{padding:28px 16px;border-radius:22px}h1{letter-spacing:-1.3px}.hero p{font-size:14px}.search-wrap{flex-direction:column}.tools-grid{column-count:1}.tool-card{padding:17px;margin-bottom:12px}.row{gap:7px}.row button{padding:9px 8px;font-size:12px}}
 @media(prefers-reduced-motion:reduce){.tool-card,button,.button{transition:none}.tool-card:hover,button:hover,.button:hover{transform:none}}
-
 </style>
   <script src="nav.js" defer></script>
 
