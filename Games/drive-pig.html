@@ -45,9 +45,26 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
 </style>
   <script src="../nav.js" defer></script>
 
-<link rel="stylesheet" href="../douqhub-theme.css">
-
 <script src="../search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Local DougHub glass redesign, styled in this page rather than a shared theme file */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+button{font:inherit;transition:filter .16s,border-color .16s,box-shadow .16s}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+.overlay{background:radial-gradient(circle at 50% 0,#211a4e66,transparent 55%),rgba(2,4,10,.42);backdrop-filter:blur(9px)}
+.card,.levelcard{background:linear-gradient(145deg,rgba(17,22,49,.96),rgba(7,9,24,.95));border:1px solid var(--dh-line);border-radius:24px;box-shadow:0 25px 75px #0007,inset 0 1px #ffffff09;color:#f5f6ff}
+.logo{letter-spacing:-.05em}.subtitle,.desc,.help{color:#a4a7c4}
+.badge,.difficulty,.meta{border:1px solid var(--dh-line);border-radius:999px;background:#ffffff09}
+.primary{background:linear-gradient(135deg,#6366f1,#a855f7)!important;color:white!important;border:1px solid #c4b5fd66!important;border-radius:13px;box-shadow:0 8px 25px #6366f133}
+.secondary{background:#ffffff09!important;color:#f5f6ff!important;border:1px solid var(--dh-line)!important;border-radius:13px}
+.levelgrid{gap:12px}.levelcard{transition:transform .18s,border-color .18s}.levelcard:hover{transform:translateY(-3px);border-color:#9690ff77}
+.touch button{background:#111630dd;color:white;border:1px solid var(--dh-line);border-radius:13px}
+
+</style>
 </head>
 <body>
 <canvas id="game"></canvas>
