@@ -18,9 +18,29 @@ main{flex:1;display:grid;place-items:center;padding:28px 16px}.card{width:min(56
 @media(max-width:600px){.top{padding:14px;flex-wrap:wrap}.nav{margin-left:0;width:100%}.card{padding:24px 18px}}
 </style>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Individual inline visual refresh using DougHub's index palette */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
+input::placeholder,textarea::placeholder{color:#858cab}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 35%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+.top{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
+.brand .mark{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 24px #6366f133}
+.card{background:radial-gradient(circle at 85% 15%,#a855f726,transparent 36%),rgba(13,17,39,.86);border:1px solid var(--dh-line);border-radius:26px;box-shadow:0 25px 80px #0005}
+.icon{background:linear-gradient(135deg,#6366f12b,#a855f72b);border:1px solid #9294f544;border-radius:18px}
+.actions .primary{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:#fff}
+.foot{color:#898eaf}
+
+</style>
 </head>
 <body>
 <header class="top"><a href="index.html" class="brand">Doug<span>Hub</span></a><nav class="nav"><a href="index.html">Home</a><a href="douggames.html">Games</a><a href="tools.html">Tools</a><a href="nova.html">✳ Nova AI</a></nav></header>
