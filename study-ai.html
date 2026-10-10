@@ -79,12 +79,12 @@
   const sendButton = $("sendButton");
   const statusEl = $("connectionStatus");
   let busy = false;
-  let history = [];
+  let conversationHistory = [];
   let supabase = null;
 
   try {
     const saved = JSON.parse(localStorage.getItem(MEMORY_KEY) || "[]");
-    if (Array.isArray(saved)) history = saved.slice(-30).filter(m => m && ["user","assistant"].includes(m.role) && typeof m.content === "string");
+    if (Array.isArray(saved)) conversationHistory = saved.slice(-30).filter(m => m && ["user","assistant"].includes(m.role) && typeof m.content === "string");
   } catch (_) {}
 
   function toast(message) {
@@ -94,7 +94,7 @@
     toast.timer = setTimeout(() => $("toast").classList.add("hidden"), 3600);
   }
   function saveHistory() {
-    try { localStorage.setItem(MEMORY_KEY, JSON.stringify(history.slice(-30))); } catch (_) {}
+    try { localStorage.setItem(MEMORY_KEY, JSON.stringify(conversationHistory.slice(-30))); } catch (_) {}
   }
   function escapeHTML(value) {
     return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
@@ -120,16 +120,16 @@
     messagesEl.append(node);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     if (persist) {
-      history.push({role, content});
-      history = history.slice(-30);
+      conversationHistory.push({role, content});
+      conversationHistory = conversationHistory.slice(-30);
       saveHistory();
     }
     return node;
   }
   function renderSaved() {
-    if (!history.length) return;
+    if (!conversationHistory.length) return;
     $("welcome")?.remove();
-    history.forEach(m => renderMessage(m.role, m.content, false));
+    conversationHistory.forEach(m => renderMessage(m.role, m.content, false));
   }
   function setStatus(text, ready = false) {
     statusEl.textContent = text;
@@ -156,7 +156,7 @@
     sendButton.textContent = "Thinking…";
     renderMessage("user", clean);
     const typing = addTyping();
-    const prior = history.slice(0, -1).slice(-12);
+    const prior = conversationHistory.slice(0, -1).slice(-12);
     try {
       const {data: sessionData} = await supabase.auth.getSession();
       if (!sessionData?.session?.access_token) {
@@ -221,13 +221,13 @@
       ? "Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn."
       : "Ask freely about almost any topic. There are no subject or answer-style filters in this mode.";
     document.querySelectorAll(".message.assistant .who").forEach(el => el.textContent = isStudy ? "Study AI" : "DougHub AI");
-    if (history.length === 0) {
+    if (conversationHistory.length === 0) {
       $("welcome").innerHTML = isStudy
         ? '<div class="orb">✦</div><h3 id="welcomeTitle">What are we learning today?</h3><p id="welcomeText">Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain fractions with an easy example, then give me one to try.">➗ Help me understand fractions</button><button class="suggestion" data-prompt="Explain photosynthesis in simple terms and why it matters.">🌱 Explain photosynthesis</button><button class="suggestion" data-prompt="Teach me the key causes and effects of the American Revolution.">🏛️ Learn a history topic</button><button class="suggestion" data-prompt="Write a beginner-friendly Python example and explain each line.">⌘ Learn to code</button></div>'
         : '<div class="orb">✦</div><h3 id="welcomeTitle">What can I help you with?</h3><p id="welcomeText">Ask freely about almost any topic. There are no subject or answer-style filters in this mode.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain how AI language models work in simple terms.">✦ Explain AI</button><button class="suggestion" data-prompt="Help me debug this code and explain the fix.">⌘ Help with coding</button><button class="suggestion" data-prompt="Brainstorm five original ideas for a useful website.">💡 Brainstorm ideas</button><button class="suggestion" data-prompt="Compare the pros and cons of renewable energy.">🌎 Explore a topic</button></div>';
       bindSuggestions();
     }
-    try { const u = new URL(location.href); u.searchParams.set("mode", mode); history.replaceState({}, "", u); } catch (_) {}
+    try { const u = new URL(location.href); u.searchParams.set("mode", mode); window.history.replaceState({}, "", u); } catch (_) {}
   }
   function bindSuggestions() {
     document.querySelectorAll("[data-prompt]").forEach(button => {
@@ -239,7 +239,7 @@
 
   $("clearChat").addEventListener("click", () => {
     if (busy) return;
-    history = [];
+    conversationHistory = [];
     saveHistory();
     messagesEl.innerHTML = "";
     const welcome = document.createElement("div");
@@ -247,6 +247,7 @@
     welcome.id = "welcome";
     welcome.innerHTML = '<div class="orb">✦</div><h3>Fresh page, fresh questions.</h3><p>Pick a subject and an answer style, then ask away.</p>';
     messagesEl.append(welcome);
+    setMode(mode);
     toast("Conversation cleared from this browser.");
   });
 
