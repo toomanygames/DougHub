@@ -1198,6 +1198,32 @@ body{background:radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.22),transparen
  .modal{padding:19px}
 }
 
+
+/* Final glass-theme overrides and mailbox sizing */
+html,body{background:radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.22),transparent 34%),radial-gradient(ellipse at 88% 90%,rgba(168,85,247,.16),transparent 34%),#03050d!important;color:#f5f5ff!important}
+.app,.main{background:transparent!important}
+.content{margin:0!important;background:linear-gradient(145deg,rgba(13,17,39,.82),rgba(6,9,23,.78))!important;color:#f5f5ff!important}
+.sidebar{background:linear-gradient(155deg,rgba(17,20,47,.86),rgba(7,10,25,.8))!important;color:#f5f5ff!important}
+.content-header,.chat-header,.composer,.list-toolbar{background:rgba(255,255,255,.018)!important;color:#f5f5ff!important}
+.content-title,.chat-name,.username,.user-name,.message-text{color:#f0f1ff!important}
+.notice{background:linear-gradient(105deg,rgba(99,102,241,.09),rgba(168,85,247,.045))!important;color:#aeb4d0!important;border-color:rgba(129,140,248,.19)!important}
+.user-list{background:rgba(4,7,19,.18)!important}
+.search-box input,.composer textarea,.modal input,.modal textarea{color:#f5f5ff!important;background:rgba(255,255,255,.045)!important;border-color:rgba(163,170,255,.16)!important}
+.search-box input::placeholder,.composer textarea::placeholder,.modal input::placeholder,.modal textarea::placeholder{color:#7e85a5!important}
+.user-item{background:transparent!important;border-bottom-color:rgba(163,170,255,.075)!important}
+.user-item:hover{background:rgba(99,102,241,.08)!important}
+.user-item.selected{background:linear-gradient(100deg,rgba(99,102,241,.19),rgba(168,85,247,.065))!important}
+.message{color:#e4e6f5!important;background:rgba(255,255,255,.045)!important;border-color:rgba(163,170,255,.13)!important}
+.message.mine{background:linear-gradient(125deg,rgba(99,102,241,.19),rgba(168,85,247,.105))!important;border-color:rgba(157,146,255,.2)!important}
+.modal{background:linear-gradient(145deg,rgba(20,23,52,.97),rgba(8,11,28,.98))!important;color:#f5f5ff!important}
+.mail-layout{flex:1 1 auto!important;height:auto!important;min-height:0!important}
+.content{min-height:0!important;overflow:hidden!important}
+.mail-layout[style*="display: none"]{display:none!important}
+@media(max-width:650px){
+ html,body,.app,.main{background:transparent!important}
+ .content{background:linear-gradient(145deg,rgba(13,17,39,.82),rgba(6,9,23,.78))!important}
+}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
@@ -1613,8 +1639,8 @@ async function openConversation(profile) {
     selectedUser = profile;
 
     currentTab = "inbox";
-
-    setActiveNav("inboxButton");
+    const folderButton = ({inbox:"inboxButton",sent:"sentButton",starred:"starredButton",all:"allMailButton",contacts:"contactsButton",drafts:"draftsButton"})[mailFolder] || "inboxButton";
+    setActiveNav(folderButton);
 
     document.getElementById("mailLayout").style.display =
         "flex";
@@ -2126,16 +2152,15 @@ async function loadOtherMessages() {
 }
 
 function switchMailFolder(folder, buttonId, title, subtitle){
-    mailFolder=folder;currentTab="inbox";
+    mailFolder=folder;currentTab="inbox";selectedUser=null;
     setActiveNav(buttonId);
     document.getElementById("pageTitle").textContent=title;
-    document.getElementById("mailSubtitle")?.textContent;
     const sub=document.getElementById("pageSubtitle");if(sub)sub.textContent=subtitle;
     document.getElementById("mailLayout").style.display="flex";
     document.getElementById("otherView").style.display="none";
     document.getElementById("chatHeader").innerHTML='<div class="avatar">✉</div><div><div class="chat-name">'+escapeHtml(title)+'</div><div class="chat-presence">'+escapeHtml(subtitle)+'</div></div>';
     document.getElementById("messages").innerHTML='<div class="empty">Choose a conversation from the list to read and reply.</div>';
-    selectedUser=null;renderProfiles(allProfiles);
+    renderProfiles(allProfiles);
 }
 
 /* --------------------------------
@@ -2339,12 +2364,23 @@ document
         }
     );
 
-document.getElementById("composeMessage").addEventListener("input",()=>{
+function autosaveComposeDraft(){
     const recipient=document.getElementById("composeRecipient").value.trim();
     const message=document.getElementById("composeMessage").value;
     const hint=document.getElementById("draftHint");
-    if(hint)hint.textContent=message.trim()?"Draft will be saved if you close this window.":"Drafts are saved in this browser while you type.";
-});
+    if(!recipient&&!message.trim()){
+        if(hint)hint.textContent="Drafts are saved in this browser while you type.";
+        return;
+    }
+    const keyRecipient=recipient.toLowerCase();
+    const existing=mailDrafts.findIndex(d=>String(d.recipient||"").toLowerCase()===keyRecipient&&(!recipient||String(d.message||"").trim()===message.trim()));
+    const draft={recipient,message,updatedAt:new Date().toISOString()};
+    if(existing>=0)mailDrafts.splice(existing,1);
+    mailDrafts.unshift(draft);mailDrafts=mailDrafts.slice(0,50);saveDrafts();
+    if(hint)hint.textContent="Draft saved on this device · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+}
+document.getElementById("composeMessage").addEventListener("input",autosaveComposeDraft);
+document.getElementById("composeRecipient").addEventListener("input",autosaveComposeDraft);
 document.getElementById("messageInput").addEventListener("keydown",event=>{
     if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();document.getElementById("sendButton").click();}
 });
