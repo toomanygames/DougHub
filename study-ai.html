@@ -100,11 +100,11 @@
   }
   function formatAnswer(value) {
     let s = escapeHTML(value);
-    s = s.replace(/```([\\s\\S]*?)```/g, (_, code) => "<pre><code>" + code.trim() + "</code></pre>");
-    s = s.replace(/`([^`\\n]+)`/g, "<code>$1</code>");
-    s = s.replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>");
-    s = s.replace(/(^|\\n)[*-] (.+)/g, "$1• $2");
-    return s.split(/\\n{2,}/).map(part => part.startsWith("<pre>") ? part : "<p>" + part.replace(/\\n/g,"<br>") + "</p>").join("");
+    s = s.replace(/```([\s\S]*?)```/g, (_, code) => "<pre><code>" + code.trim() + "</code></pre>");
+    s = s.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|\n)[*-] (.+)/g, "$1• $2");
+    return s.split(/\n{2,}/).map(part => part.startsWith("<pre>") ? part : "<p>" + part.replace(/\n/g,"<br>") + "</p>").join("");
   }
   function renderMessage(role, content, persist = true) {
     $("welcome")?.remove();
@@ -114,7 +114,7 @@
     label.className = "who";
     label.textContent = role === "user" ? "You" : (mode === "ai" ? "DougHub Local AI" : "Study AI");
     const body = document.createElement("div");
-    body.innerHTML = role === "assistant" ? formatAnswer(content) : escapeHTML(content).replace(/\\n/g,"<br>");
+    body.innerHTML = role === "assistant" ? formatAnswer(content) : escapeHTML(content).replace(/\n/g,"<br>");
     node.append(label, body);
     messagesEl.append(node);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -207,7 +207,7 @@
     } catch (error) {
       typing.remove();
       const message = error?.message || "Unknown local AI error.";
-      renderMessage("assistant", "I couldn't answer that yet. " + message + "\\n\\nYour browser needs WebGPU support and enough available memory to run the model. No API key is needed.");
+      renderMessage("assistant", "I couldn't answer that yet. " + message + "\n\nYour browser needs WebGPU support and enough available memory to run the model. No API key is needed.");
       setStatus("Local AI needs attention");
     } finally {
       busy = false;
