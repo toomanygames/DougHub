@@ -2325,6 +2325,13 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 })();
 </script>
 
+<style>
+.feedback-reply-user-item{margin-top:12px;padding:15px;border:1px solid rgba(129,140,248,.22);border-radius:13px;background:rgba(99,102,241,.06);overflow-wrap:anywhere}
+.feedback-reply-user-label{font-size:12px;font-weight:800;color:#c4b5fd}
+.feedback-reply-user-original,.feedback-reply-user-text{margin:7px 0 13px;white-space:pre-wrap;line-height:1.55;color:#d5d7e8}
+.feedback-reply-user-text{margin-bottom:0;color:#e7e3ff}
+</style>
+
     <section class="feedback-section" id="feedback">
 
         <div class="feedback-card">
@@ -2360,6 +2367,12 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 
             <div id="feedbackStatus"></div>
 
+        </div>
+
+        <div class="feedback-card" id="feedbackRepliesCard" style="display:none;margin-top:16px;text-align:left">
+            <h2>📬 Replies to Your Feedback</h2>
+            <p>Replies from the DougHub team appear here.</p>
+            <div id="feedbackRepliesList" aria-live="polite"></div>
         </div>
 
     </section>
@@ -2570,6 +2583,8 @@ async function loadAccount() {
     if (!session) {
 
         currentUser = null;
+        const repliesCard = document.getElementById("feedbackRepliesCard");
+        if (repliesCard) repliesCard.style.display = "none";
 
         document
             .getElementById("accountName")
@@ -2598,6 +2613,10 @@ async function loadAccount() {
 
     currentUser =
         session.user;
+
+    if (typeof loadFeedbackReplies === "function") {
+        await loadFeedbackReplies();
+    }
 
     const guestNote = document.querySelector(".guest-friendly-note");
     if (guestNote) {
@@ -3499,6 +3518,64 @@ const feedbackCount =
         "feedbackCount"
     );
 
+async function loadFeedbackReplies() {
+    const card = document.getElementById("feedbackRepliesCard");
+    const list = document.getElementById("feedbackRepliesList");
+    if (!card || !list || !currentUser) {
+        if (card) card.style.display = "none";
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("feedback")
+        .select("id,message,created_at,admin_reply,admin_replied_at")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+    if (error) {
+        console.error("Could not load feedback replies:", error);
+        card.style.display = "block";
+        list.textContent = "Could not load your feedback replies right now.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        card.style.display = "none";
+        return;
+    }
+
+    card.style.display = "block";
+    list.replaceChildren();
+
+    const replies = data.filter(item => item.admin_reply);
+    if (!replies.length) {
+        const empty = document.createElement("div");
+        empty.className = "feedback-reply-user-item";
+        empty.textContent = "No replies yet. If the DougHub team replies to your feedback, it will show up here.";
+        list.appendChild(empty);
+        return;
+    }
+
+    replies.forEach(item => {
+        const wrapper = document.createElement("article");
+        wrapper.className = "feedback-reply-user-item";
+        const originalLabel = document.createElement("div");
+        originalLabel.className = "feedback-reply-user-label";
+        originalLabel.textContent = "Your feedback · " + new Date(item.created_at).toLocaleString();
+        const original = document.createElement("p");
+        original.className = "feedback-reply-user-original";
+        original.textContent = item.message;
+        const replyLabel = document.createElement("div");
+        replyLabel.className = "feedback-reply-user-label";
+        replyLabel.textContent = "DougHub team reply" + (item.admin_replied_at ? " · " + new Date(item.admin_replied_at).toLocaleString() : "");
+        const reply = document.createElement("p");
+        reply.className = "feedback-reply-user-text";
+        reply.textContent = item.admin_reply;
+        wrapper.append(originalLabel, original, replyLabel, reply);
+        list.appendChild(wrapper);
+    });
+}
 
 function updateFeedbackCount() {
 
@@ -3621,6 +3698,8 @@ if (feedbackButton) {
 
                 feedbackStatus.style.color =
                     "#22c55e";
+
+                await loadFeedbackReplies();
 
             } catch (error) {
 
