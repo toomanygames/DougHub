@@ -100,9 +100,35 @@ body{background:#eaf1fb;color:#202943;font-family:Inter,"Trebuchet MS",Arial,san
 </style>
   <script src="nav.js" defer></script>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Individual inline visual refresh using DougHub's index palette */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
+input::placeholder,textarea::placeholder{color:#858cab}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+.top{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
+.brand .mark{background:linear-gradient(135deg,#6366f1,#a855f7)}
+.workbench{gap:16px}
+.panel{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(8,10,25,.91));border:1px solid var(--dh-line);border-radius:20px;box-shadow:0 18px 48px #0003;overflow:hidden}
+.panel-head{background:#ffffff04;border-bottom:1px solid var(--dh-line)}
+.toolbox-category,.tab{background:#ffffff04;border:1px solid transparent;border-radius:11px;color:#b5b8d4}
+.toolbox-category.active,.tab.active{background:linear-gradient(135deg,#6366f132,#a855f71c);border-color:#9294f53b;color:#fff}
+.tool{background:#070918;border:1px solid var(--dh-line);border-radius:13px}
+.tool:hover{border-color:#8b83ff70;background:#6366f10d}
+.workspace,.codearea{background:#050714;border:1px solid #ffffff10;border-radius:13px}
+.callout{background:#6366f114;border:1px solid #818cf133;border-radius:14px}
+.btn.primary{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white}
+
+</style>
 </head>
 <body>
 <header class="top"><a class="brand" href="index.html"><span class="mark">D</span> DougHub Studio</a><div class="top-actions"><a class="btn" href="douggames.html">← Games</a><button id="newProject" class="btn">＋ New</button><button id="saveProject" class="btn">☁ Save Project</button><button id="publishProject" class="btn primary">🚀 Publish Game</button></div></header>
