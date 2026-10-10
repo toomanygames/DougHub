@@ -4058,6 +4058,10 @@ async function savePageSchedule() {
     const reopenRaw = document.getElementById("scheduleReopenAt").value;
     const closeAt = adminDateTimeToIso(closeRaw);
     const reopenAt = adminDateTimeToIso(reopenRaw);
+    if (reopenAt && !closeAt) {
+        status.textContent = "Set a close time before a reopen time.";
+        return;
+    }
     if (closeAt && reopenAt && new Date(reopenAt) <= new Date(closeAt)) {
         status.textContent = "Reopen time must be after the close time."; return;
     }
