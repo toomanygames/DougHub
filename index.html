@@ -2061,7 +2061,7 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 <body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
   <div class="dh-tutorial-backdrop"></div>
   <section class="dh-tutorial-card" role="dialog" aria-modal="true" aria-labelledby="dhTutorialTitle">
-    <div class="dh-tutorial-top"><span class="dh-tutorial-badge">✨ WELCOME TO DOUGHUB</span><span id="dhTutorialStep">1 / 5</span></div>
+    <div class="dh-tutorial-top"><span class="dh-tutorial-badge">✨ WELCOME TO DOUGHUB</span><span id="dhTutorialStep">1 / 9</span></div>
     <div id="dhTutorialIcon" class="dh-tutorial-icon">👋</div>
     <h2 id="dhTutorialTitle">Welcome to DougHub!</h2>
     <p id="dhTutorialText">Your new account is ready. Let’s take a quick tour so you know where everything is.</p>
@@ -3797,12 +3797,15 @@ setInterval(
 
 <script>
 const DOUGHUB_TUTORIAL_STEPS = [
-  {icon:"👋",title:"Welcome to DougHub!",text:"Your new account is ready. I’ll show you exactly where to click to get around DougHub.",target:null},
-  {icon:"🎮",title:"Games",text:"Click Games in the top navigation to open DougHub Games and play available games.",target:"a[href="douggames.html"]"},
-  {icon:"🛠️",title:"DougHub Work",text:"Click the 🛠️ tool icon in the top-left of this big header to open DougHub Work.",target:".work-hero-icon"},
-  {icon:"⚙️",title:"Your account settings",text:"Click your account button in the top-right, then choose Settings. You can change your account details and preferences there.",target:"#accountButton"},
-  {icon:"💬",title:"Community",text:"Use Chat and DMail in the top navigation to connect with the DougHub community.",target:"#communityChatLink"},
-  {icon:"🚀",title:"You’re ready!",text:"That’s the basics! You now know where the main buttons are and where to manage your account.",target:null}
+  {icon:"👋",title:"Welcome to DougHub!",text:"Your account is ready! This quick interactive tour shows you the main things you can do. Follow the highlighted areas, or press Skip at any time.",target:null},
+  {icon:"🎮",title:"Play games",text:"Open Games to browse and play DougHub games. Community Games lets you explore creations shared by other people.",target:'a[href="douggames.html"]'},
+  {icon:"🧰",title:"Explore your tools",text:"The Tools page has useful utilities and projects to help you get things done. You can also use the search box on this homepage to find tools.",target:'a[href="tools.html"]'},
+  {icon:"✳️",title:"Meet Nova AI",text:"Open Nova AI to try DougHub's AI features and get help with ideas or tasks.",target:'a[href="nova.html"]'},
+  {icon:"▶️",title:"Watch and share videos",text:"DougTube is where you can explore community videos and supported media posts.",target:'a[href="DougTube.html"]'},
+  {icon:"🛠️",title:"Build things in Work",text:"DougHub Work is your workspace for creating things. You can open the coding editor, write HTML/CSS/JavaScript, try visual coding blocks, preview your work, and explore Community Projects.",target:'.work-hero-icon'},
+  {icon:"💬",title:"Connect with people",text:"Use Community Chat to talk with other users. DMail is available from the top navigation for messages.",target:'#communityChatLink'},
+  {icon:"⚙️",title:"Make your account yours",text:"Click your account button to find Settings. Update your username, profile picture, email, password, badges, and replay this tour whenever you want.",target:'#accountButton'},
+  {icon:"🚀",title:"You're ready!",text:"That's the tour! You can use Next to review any step, or press Finish. You can replay this tutorial later from Settings.",target:null}
 ];
 let dhTutorialIndex=0;
 function showDougHubTutorial(){
@@ -3811,6 +3814,7 @@ function showDougHubTutorial(){
   dhTutorialIndex=0;
   modal.classList.add("show");
   modal.setAttribute("aria-hidden","false");
+  document.body.classList.add("dh-tutorial-open");
   renderDougHubTutorial();
 }
 function renderDougHubTutorial(){
@@ -3824,13 +3828,19 @@ function renderDougHubTutorial(){
   document.querySelectorAll(".dh-tutorial-highlight").forEach(el=>el.classList.remove("dh-tutorial-highlight"));
   if(s.target){
     const target=document.querySelector(s.target);
-    if(target) target.classList.add("dh-tutorial-highlight");
+    if(target){
+      target.classList.add("dh-tutorial-highlight");
+      target.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
+    }
   }
 }
 async function finishDougHubTutorial(){
   const modal=document.getElementById("dhTutorial");
+  if(!modal)return;
   modal.classList.remove("show");
   modal.setAttribute("aria-hidden","true");
+  document.body.classList.remove("dh-tutorial-open");
+  document.querySelectorAll(".dh-tutorial-highlight").forEach(el=>el.classList.remove("dh-tutorial-highlight"));
   if(currentUser){
     const {error}=await supabaseClient.from("profiles").update({tutorial_completed:true}).eq("id",currentUser.id);
     if(error) console.error("Could not save tutorial status:",error);
@@ -3841,7 +3851,13 @@ document.getElementById("dhTutorialNext")?.addEventListener("click",()=>{
 });
 document.getElementById("dhTutorialSkip")?.addEventListener("click",finishDougHubTutorial);
 document.querySelector(".dh-tutorial-backdrop")?.addEventListener("click",finishDougHubTutorial);
-</script>
+document.addEventListener("keydown",event=>{
+  const modal=document.getElementById("dhTutorial");
+  if(!modal?.classList.contains("show"))return;
+  if(event.key==="Escape")finishDougHubTutorial();
+  if(event.key==="ArrowRight"&&dhTutorialIndex<DOUGHUB_TUTORIAL_STEPS.length-1){dhTutorialIndex++;renderDougHubTutorial();}
+  if(event.key==="ArrowLeft"&&dhTutorialIndex>0){dhTutorialIndex--;renderDougHubTutorial();}
+});</script>
 <script>
 /* Small Material-style press ripple; leaves each control's existing click handler alone. */
 (function () {
