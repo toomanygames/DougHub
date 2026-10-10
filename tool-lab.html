@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070816">
+<title>Tool Lab — DougHub</title>
+<link rel="icon" href="DougHub.svg" type="image/x-icon">
+<link rel="stylesheet" href="douqhub-theme.css">
+<style>
+:root{color-scheme:dark;--line:rgba(255,255,255,.1);--muted:#aaa9bb;--panel:rgba(13,17,39,.82)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0%,#17133b,transparent 32%),radial-gradient(circle at 90% 5%,#25104b,transparent 28%),#02040a;color:#fff;font-family:Arial,Helvetica,sans-serif}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}header{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px max(18px,calc((100% - 1180px)/2));background:#04050fdd;border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}.brand{font-size:20px;font-weight:900}.brand b{display:inline-grid;place-items:center;width:36px;height:36px;margin-right:8px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#a855f7)}nav{display:flex;gap:18px;flex-wrap:wrap}nav a{font-size:13px;color:#c4c3d2;font-weight:700}main{width:min(1180px,calc(100% - 30px));margin:auto}.hero{margin:36px 0 22px;padding:42px 24px;text-align:center;border:1px solid var(--line);border-radius:26px;background:radial-gradient(circle at 85% 15%,#a855f72c,transparent 35%),radial-gradient(circle at 15% 85%,#6366f129,transparent 35%),var(--panel)}.eyebrow{font-size:12px;font-weight:800;color:#c4b5fd;letter-spacing:.1em;text-transform:uppercase}h1{font-size:clamp(36px,6vw,64px);letter-spacing:-2px;margin:15px 0 10px}h1 span{background:linear-gradient(90deg,#818cf8,#d8b4fe);background-clip:text;color:transparent}.hero p{max-width:720px;margin:auto;color:var(--muted);line-height:1.7}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:38px}.card{min-width:0;padding:22px;border:1px solid var(--line);border-radius:19px;background:var(--panel);box-shadow:0 12px 36px #0002}.card h2{margin:0 0 7px;font-size:20px}.desc{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 14px}label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:#d9d8e5}input,textarea{width:100%;min-width:0;padding:11px 12px;color:#fff;background:#050713;border:1px solid var(--line);border-radius:10px;outline:none}textarea{resize:vertical;line-height:1.5}input:focus,textarea:focus{border-color:#818cf8}.row{display:flex;gap:9px;margin-top:10px}.row>*{flex:1;min-width:0}button{padding:10px 14px;border:1px solid #818cf855;border-radius:10px;color:white;background:#6366f12e;font-weight:800;cursor:pointer}button:hover{background:#6366f14a}.secondary{background:#ffffff08;border-color:var(--line);color:#d2d1df}.status{margin-top:9px;min-height:18px;color:#a5b4fc;font-size:12px;line-height:1.5;overflow-wrap:anywhere}.preview{display:block;width:100%;height:300px;margin-top:10px;border:1px solid var(--line);border-radius:12px;background:white}.warning{padding:12px;border:1px solid #f59e0b45;border-radius:12px;background:#f59e0b0c;color:#d8c7a5;font-size:12px;line-height:1.6;margin-top:12px}.output{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;color:#c9c8dc;font-size:13px;min-height:42px}footer{text-align:center;color:#77768b;border-top:1px solid var(--line);padding:24px;font-size:13px}@media(max-width:760px){header{align-items:flex-start;flex-direction:column}nav{gap:12px}.grid{grid-template-columns:1fr}.hero{margin-top:22px;padding:30px 18px}.card{padding:17px}.row{flex-wrap:wrap}}
+</style>
+<script src="nav.js" defer></script><script src="search-autofill-fix.js" defer></script>
+</head>
+<body>
+<header><a class="brand" href="index.html"><b>D</b>DougHub</a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="tools.html">DougTools</a><a href="douggames.html">Games</a><a href="chat.html">Chat</a></nav></header>
+<main>
+<section class="hero"><div class="eyebrow">✦ Developer utilities</div><h1>Welcome to <span>Tool Lab</span></h1><p>Experiment with code and inspect links using browser-based tools. No unknown files need to be downloaded. Sandbox previews reduce some risks, but they are not a replacement for a real disposable virtual machine.</p></section>
+<section class="grid" aria-label="Tool Lab tools">
+<article class="card">
+<h2>⌘ Code Tester</h2><p class="desc">Test HTML, CSS, and JavaScript in an isolated preview. The code frame cannot read DougHub's page storage or DOM.</p>
+<label for="labHtml">HTML</label><textarea id="labHtml" rows="5" spellcheck="false" placeholder="<h1>Hello, DougHub!</h1>"></textarea>
+<label for="labCss">CSS</label><textarea id="labCss" rows="4" spellcheck="false" placeholder="body { font-family: sans-serif; padding: 20px; }"></textarea>
+<label for="labJs">JavaScript</label><textarea id="labJs" rows="4" spellcheck="false" placeholder="console.log('It works!');"></textarea>
+<div class="row"><button id="runCode" type="button">▶ Run code</button><button id="clearCode" class="secondary" type="button">Clear</button></div>
+<label for="codePreview">Sandboxed preview</label><iframe id="codePreview" class="preview" title="Sandboxed code preview" sandbox="allow-scripts" referrerpolicy="no-referrer" srcdoc="<!doctype html><html><body style='font:14px Arial;padding:18px;color:#555'>Your preview will appear here.</body></html>"></iframe>
+<div id="codeStatus" class="status" aria-live="polite">Sandboxed with scripts enabled, but no same-origin access, forms, pop-ups, or top-level navigation.</div><pre id="codeLogs" class="output" aria-live="polite"></pre>
+</article>
+<article class="card">
+<h2>▣ Sandbox Browser Preview</h2><p class="desc">Try loading a website inside a restricted frame rather than opening it in a normal tab.</p>
+<label for="siteUrl">Website URL</label><input id="siteUrl" type="url" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+<div class="row"><button id="loadSite" type="button">Load in sandbox</button><button id="clearSite" class="secondary" type="button">Clear</button></div>
+<div id="siteStatus" class="status" aria-live="polite">The frame disables downloads, forms, pop-ups, and top-level navigation by default.</div>
+<iframe id="sitePreview" class="preview" title="Restricted website preview" sandbox="allow-scripts" referrerpolicy="no-referrer" loading="lazy" srcdoc="<!doctype html><html><body style='font:14px Arial;padding:18px;color:#555'>Enter a URL above, then choose Load in sandbox.</body></html>"></iframe>
+<div class="warning"><b>Safety limits:</b> This is not a full virtual machine or malware scanner. Some sites block embedded previews; browser vulnerabilities can still exist. Never enter passwords, payment information, or personal details on suspicious sites. Do not download or open files from them.</div>
+</article>
+<article class="card">
+<h2>⌕ Link Inspector</h2><p class="desc">Inspect the URL text for common warning signs before deciding whether to visit it. This tool does not open the link.</p>
+<label for="inspectUrl">Paste a link</label><input id="inspectUrl" type="text" placeholder="https://example.com/login" autocomplete="off" spellcheck="false">
+<button id="inspectLink" type="button" style="width:100%;margin-top:10px">Inspect link</button>
+<div id="inspectResult" class="output" aria-live="polite">Only the URL text is checked. A normal-looking URL can still lead to a dangerous site.</div>
+</article>
+<article class="card">
+<h2>{ } JSON Validator</h2><p class="desc">Quickly test whether JSON is valid, then format it neatly or compact it.</p>
+<label for="jsonInput">JSON input</label><textarea id="jsonInput" rows="7" spellcheck="false" placeholder='{"name":"DougHub","tools":["code","links"]}'></textarea>
+<div class="row"><button id="formatJson" type="button">Format</button><button id="minifyJson" class="secondary" type="button">Minify</button></div>
+<label for="jsonOutput">Result</label><textarea id="jsonOutput" rows="7" spellcheck="false" placeholder="Result appears here"></textarea><div id="jsonStatus" class="status" aria-live="polite"></div>
+</article>
+</section>
+</main>
+<footer>DougHub © 2026 · Tool Lab</footer>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+$("runCode").addEventListener("click",()=>{
+  const html=$("labHtml").value,css=$("labCss").value,js=$("labJs").value;
+  const safeCss=css.replace(/<\/style/gi,"<\\/style");
+  const safeJs=js.replace(/<\/script/gi,"<\\/script");
+  const doc="<!doctype html><html><head><meta charset='utf-8'><meta http-equiv='Content-Security-Policy' content=\"default-src 'none'; img-src data: blob:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; font-src data:\"><style>body{font:16px Arial,sans-serif;color:#171717;padding:16px;overflow-wrap:anywhere}"+safeCss+"</style></head><body>"+html+"<script>console.log=function(){parent.postMessage({type:'lab-log',text:Array.from(arguments).map(v=>{try{return typeof v==='string'?v:JSON.stringify(v)}catch(e){return String(v)}}).join(' ')},'*')};console.error=function(){parent.postMessage({type:'lab-log',text:'ERROR: '+Array.from(arguments).map(String).join(' ')},'*')};window.onerror=function(m){parent.postMessage({type:'lab-log',text:'ERROR: '+m},'*')};try{\\n"+safeJs+"\\n}catch(e){parent.postMessage({type:'lab-log',text:'ERROR: '+e.message},'*')}</script></body></html>";
+  $("codeLogs").textContent="";$("codePreview").srcdoc=doc;$("codeStatus").textContent="Preview refreshed. Console output appears below when available.";
+});
+$("clearCode").addEventListener("click",()=>{["labHtml","labCss","labJs"].forEach(id=>$(id).value="");$("codePreview").srcdoc="<!doctype html><html><body style='font:14px Arial;padding:18px'>Preview cleared.</body></html>";$("codeLogs").textContent="";$("codeStatus").textContent="Cleared."});
+window.addEventListener("message",e=>{if(e.source!==$("codePreview").contentWindow||!e.data||e.data.type!=="lab-log")return;$("codeLogs").textContent+=($("codeLogs").textContent?"\n":"")+e.data.text});
+$("loadSite").addEventListener("click",()=>{let u;try{u=new URL($("siteUrl").value.trim())}catch(e){$("siteStatus").textContent="Enter a complete URL starting with https://";return}if(!["https:","http:"].includes(u.protocol)){ $("siteStatus").textContent="Only http:// and https:// links are allowed.";return}if(u.username||u.password){$("siteStatus").textContent="URLs with embedded usernames or passwords are blocked.";return}$("sitePreview").src=u.href;$("siteStatus").textContent="Requested the restricted preview. It may not display if the site blocks embedding; this does not certify that the site is safe."});
+$("clearSite").addEventListener("click",()=>{$("siteUrl").value="";$("sitePreview").srcdoc="<!doctype html><html><body style='font:14px Arial;padding:18px;color:#555'>Preview cleared.</body></html>";$("siteStatus").textContent="Preview cleared."});
+$("inspectLink").addEventListener("click",()=>{
+ const raw=$("inspectUrl").value.trim();let u;try{u=new URL(raw)}catch(e){$("inspectResult").textContent="This doesn't look like a complete URL. Include https:// and check the spelling carefully.";return}
+ const notes=[];if(!["https:","http:"].includes(u.protocol))notes.push("Unusual protocol: "+u.protocol);if(u.protocol==="http:")notes.push("Uses HTTP, not HTTPS; information may not be encrypted in transit.");if(u.username||u.password)notes.push("Contains text before @ that may disguise the real hostname.");if(u.hostname.split(".").some(x=>x.toLowerCase().startsWith("xn--")))notes.push("Contains a punycode hostname; check carefully for look-alike characters.");if(/^\d{1,3}(\.\d{1,3}){3}$/.test(u.hostname))notes.push("Uses an IP address rather than a typical domain.");if(u.hostname.split(".").length>5)notes.push("Has an unusually long subdomain chain.");if(u.href.length>180)notes.push("The URL is unusually long; inspect redirects and tracking carefully.");$("inspectResult").textContent="Hostname: "+u.hostname+"\nProtocol: "+u.protocol+"\n"+(notes.length?"Warnings:\n• "+notes.join("\n• "):"No obvious structural warning found.")+"\n\nThis is only a basic text check. It does not query reputation databases or prove the site is safe.";
+});
+function json(pretty){try{const value=JSON.parse($("jsonInput").value);$("jsonOutput").value=JSON.stringify(value,null,pretty?2:0);$("jsonStatus").textContent="Valid JSON."}catch(e){$("jsonStatus").textContent="Invalid JSON: "+e.message}}
+$("formatJson").addEventListener("click",()=>json(true));$("minifyJson").addEventListener("click",()=>json(false));
+})();
+</script>
+</body></html>
