@@ -2711,8 +2711,10 @@ async function loadAccount() {
 
     await loadDMailCount();
 
-    if (profile?.tutorial_completed !== true) {
+    const forceTutorial = new URLSearchParams(window.location.search).get("tutorial") === "1";
+    if (forceTutorial || profile?.tutorial_completed !== true) {
         showDougHubTutorial();
+        if (forceTutorial) history.replaceState({}, document.title, window.location.pathname + window.location.hash);
     }
 
 }
