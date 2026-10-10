@@ -53,16 +53,20 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 <div class="tabs"><button class="active" data-tab="research">🔬 Research</button><button data-tab="chat">💬 Ask Nova</button><button data-tab="knowledge">📚 Knowledge</button><button data-tab="settings">⚙ Setup</button></div>
 <section id="tab-research" class="labgrid">
 <div class="panel"><h2>Teach Nova a topic</h2><p class="muted">Nova searches Wikipedia, generates related questions, explores them, and saves source-backed snippets for later.</p><form id="researchForm"><input id="topic" class="field" required maxlength="180" placeholder="e.g. How do AI systems learn?"><div class="row" style="margin-top:11px"><label class="muted" for="depth">Research depth</label><select id="depth" class="field" style="max-width:200px"><option value="2">Quick · 2 questions</option><option value="4" selected>Normal · 4 questions</option><option value="6">Deep · 6 questions</option></select><button id="start" class="btn primary">Start learning ↗</button></div></form><div class="steps"><div class="step">1 · Search topic</div><div class="step">2 · Ask follow-ups</div><div class="step">3 · Check evidence</div><div class="step">4 · Save lessons</div></div><div id="progressWrap" class="hidden"><div class="row" style="justify-content:space-between"><span id="progressLabel" class="muted">Preparing…</span><span id="progressPct" class="muted">0%</span></div><div class="progress"><div id="progressBar"></div></div></div><div id="researchOutput"><div class="empty">Your research and follow-up questions will appear here.</div></div></div>
-<aside class="panel"><h3>How Nova learns</h3><p class="muted">It creates follow-up search queries from a topic, gathers results, compares titles against the initial search, and stores useful snippets.</p><div class="result"><h4>🧠 Persistent memory</h4><p>Saved facts and research remain in localStorage on this browser, even after you close the page.</p></div><div class="result"><h4>✓ Self-review</h4><p>Nova flags unverified information and keeps links to source pages. Matching results are not proof of truth.</p></div><div class="settingsbox" style="margin-top:12px"><b>Honest limitation</b><br>This page is not yet connected to a real AI model. Follow-up questions use a research strategy, not model reasoning.</div></aside>
+<aside class="panel"><h3>How Nova learns</h3><p class="muted">It creates follow-up search queries from a topic, gathers results, compares titles against the initial search, and stores useful snippets.</p><div class="result"><h4>🧠 Persistent memory</h4><p>Saved facts and research remain in localStorage on this browser, even after you close the page.</p></div><div class="result"><h4>✓ Self-review</h4><p>Nova flags unverified information and keeps links to source pages. Matching results are not proof of truth.</p></div><div class="settingsbox" style="margin-top:12px"><b>How the AI connection works</b><br>Nova chat uses the server-side DougHub AI function, which keeps the provider key out of this page. Research mode still uses Wikipedia snippets and basic source-overlap checks; those checks do not prove that a claim is true.</div></aside>
 </section>
-<section id="tab-chat" class="panel hidden"><h2>Ask Nova</h2><p class="muted">Ask about saved lessons or search the web. Nova is a prototype, so it won't answer every open-ended question like ChatGPT.</p><div class="row" style="margin-top:12px"><input id="chatInput" class="field" placeholder="Ask something or say “search the web for…”"><button id="chatSend" class="btn primary">Send</button></div><div id="chatLog" class="chatlog"><div class="bubble assistant">Hi! I can search Wikipedia, recall saved research, and learn facts you teach me. Try asking about a topic.</div></div></section>
+<section id="tab-chat" class="panel hidden"><h2>Ask Nova</h2><p class="muted">Chat with Nova using DougHub’s secure AI connection, search Wikipedia when you need sources, or ask it to recall saved lessons.</p><p id="aiStatus" class="muted">AI connection: ready to test. Send a message to check the connection.</p><div class="row" style="margin-top:12px"><input id="chatInput" class="field" placeholder="Ask something or say “search the web for…”"><button id="chatSend" class="btn primary">Send</button></div><div id="chatLog" class="chatlog"><div class="bubble assistant">Hi! I can search Wikipedia, recall saved research, and learn facts you teach me. Try asking about a topic.</div></div></section>
 <section id="tab-knowledge" class="panel hidden"><div class="row" style="justify-content:space-between"><div><h2>Knowledge base</h2><p class="muted">Saved locally in this browser. Export it to back it up.</p></div><button id="export" class="btn secondary">Export data</button></div><input id="filter" class="field" style="margin-top:12px" placeholder="Search saved lessons…"><div id="knowledgeList" class="list" style="margin-top:12px"></div><div id="knowledgeEmpty" class="empty" style="margin-top:12px">No lessons saved yet. Start a research run or teach Nova a fact.</div><div class="row" style="margin-top:14px"><button id="teach" class="btn secondary">+ Teach a fact</button><button id="clear" class="btn danger">Clear knowledge</button></div><form id="teachForm" class="hidden" style="margin-top:12px"><input id="factTitle" class="field" required placeholder="Fact title"><textarea id="factBody" class="field" required rows="3" style="margin-top:8px" placeholder="What should Nova remember?"></textarea><button class="btn primary" style="margin-top:8px">Save fact</button></form></section>
-<section id="tab-settings" class="panel hidden"><h2>AI connection & automatic learning</h2><p class="muted">This version is installed on DougHub and can research automatically, save lessons, and recall them. For true AI reasoning, it needs a server-side model connection.</p><div class="settingsbox" style="margin-top:14px"><b>Security</b><br>Never put an AI provider's secret API key in this page or localStorage. A backend endpoint (for example, a Supabase Edge Function) must keep that secret private.</div><div class="result"><h4>What is already implemented</h4><p>Live Wikipedia search · generated follow-up questions · source links · local memory · export/forget controls · basic consistency checks.</p></div><div class="result"><h4>What needs a real model</h4><p>Original AI-generated questions, deeper reasoning across articles, robust fact-checking, and autonomous decisions about what to learn next.</p></div></section>
+<section id="tab-settings" class="panel hidden"><h2>AI connection & automatic learning</h2><p class="muted">Nova connects to DougHub’s server-side AI function for conversational answers. Research, saved memory, and AI chat are separate features.</p><div class="settingsbox" style="margin-top:14px"><b>Security</b><br>Never put an AI provider's secret API key in this page or localStorage. A backend endpoint (for example, a Supabase Edge Function) must keep that secret private.</div><div class="result"><h4>What is already implemented</h4><p>AI chat through the secure server-side function · Wikipedia search · source links · local memory · export/forget controls · basic consistency checks.</p></div><div class="result"><h4>Research limitations</h4><p>Research follow-up questions are currently template-based, and search snippets are not independent fact-checking. The AI connection also needs its provider secret configured in Supabase.</p></div></section>
 <div class="foot">Nova AI is experimental. Always verify important claims using the linked sources.</div><div class="footerlinks"><a href="tos.html">Terms</a><a href="chat.html">Community Chat</a><a href="douggames.html">DougGames</a></div>
 </main><div id="toast" class="toast hidden"></div>
 <script>
 (function(){
-const $=id=>document.getElementById(id),KEY='doughub-nova-learning-v1';let data={lessons:[],runs:[],stats:{research:0,questions:0}},busy=false,stop=false;
+const $=id=>document.getElementById(id),KEY='doughub-nova-learning-v1';
+const SUPABASE_URL='https://agsqdqcsmsppcdqxlppj.supabase.co';
+const SUPABASE_KEY='sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52';
+const aiClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let chatHistory=[],data={lessons:[],runs:[],stats:{research:0,questions:0}},busy=false,stop=false;
 try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&Array.isArray(x.lessons))data=Object.assign(data,x);}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){notify('Storage full. Export your knowledge before removing old entries.');}}
 function notify(t){$('toast').textContent=t;$('toast').classList.remove('hidden');clearTimeout(notify.timer);notify.timer=setTimeout(()=>$('toast').classList.add('hidden'),2800);}
@@ -79,7 +83,57 @@ function drawKnowledge(){const q=$('filter').value.toLowerCase(),list=$('knowled
 $('filter').oninput=drawKnowledge;$('teach').onclick=()=>$('teachForm').classList.toggle('hidden');$('teachForm').onsubmit=e=>{e.preventDefault();addLesson({title:$('factTitle').value.trim(),snippet:$('factBody').value.trim(),url:''},'User-taught fact');const item=data.lessons[0];if(item)item.confidence='user-provided';save();metrics();drawKnowledge();$('factTitle').value='';$('factBody').value='';$('teachForm').classList.add('hidden');notify('Fact saved in browser memory.');};
 $('export').onclick=()=>{const a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=u;a.download='doughub-nova-memory.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};$('clear').onclick=()=>{if(confirm('Delete all Nova knowledge saved in this browser?')){data.lessons=[];save();metrics();drawKnowledge();}};
 function addChat(who,text,sources){const d=document.createElement('div');d.className='bubble '+who;d.textContent=(who==='user'?'You: ':'Nova: ')+text;if(sources?.length)sources.forEach(s=>{const a=document.createElement('a');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='\nSource: '+s.title;d.append(a);});$('chatLog').prepend(d);}
-async function ask(){const q=$('chatInput').value.trim();if(!q)return;$('chatInput').value='';addChat('user',q);$('chatSend').disabled=true;try{if(/remember that|teach nova/i.test(q)){const body=q.replace(/.*?(remember that|teach nova)/i,'').trim();addLesson({title:body.slice(0,70)||'User fact',snippet:body,url:''},'User-taught fact');addChat('assistant','I saved that as a lesson in local browser memory. This stores your information; it does not retrain an AI model.');metrics();return;}if(/what have you learned|what do you remember/i.test(q)){addChat('assistant',data.lessons.length?'Here are some saved lessons:\n'+data.lessons.slice(0,12).map(x=>x.title+': '+x.body).join('\n'):'I have no saved lessons yet. Run research or teach me a fact.');return;}const words=q.toLowerCase().split(/\W+/).filter(w=>w.length>3);const matches=data.lessons.map(x=>({x,n:words.filter(w=>(x.title+' '+x.body+' '+x.topic).toLowerCase().includes(w)).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,3);if(/search|online|internet|latest|current|who is|what is|tell me about|how does/i.test(q)){const results=await search(q.replace(/^(search( the web| online| the internet)?( for)?|look up)\s*/i,'')||q);if(!results.length){addChat('assistant','No Wikipedia results found. Try a different query.');return;}results.forEach(x=>addLesson(x,'Chat search'));addChat('assistant','I found these results. These are search snippets, not a fully verified answer. Open the linked pages to check details.',results.slice(0,4));metrics();return;}if(matches.length){addChat('assistant','From my saved memory:\n'+matches.map(x=>x.x.title+': '+x.x.body).join('\n')+'\n\nThese notes are not independently verified.');return;}addChat('assistant','I can search Wikipedia and recall saved notes, but I am not connected to a real AI model yet. Ask me to search the web, run a research cycle, or teach me a fact.');}catch(e){addChat('assistant','I could not complete that request. Check your internet connection and try again.');}finally{$('chatSend').disabled=false;}}
+async function callNovaModel(question,history=[]){
+  const {data:sessionData,error:sessionError}=await aiClient.auth.getSession();
+  if(sessionError)throw new Error('Could not check your DougHub login. Please refresh and sign in again.');
+  const session=sessionData?.session;
+  if(!session?.access_token)throw new Error('Please log in to your DougHub account before using Nova AI.');
+  const {data:result,error}=await aiClient.functions.invoke('study-ai',{
+    body:{question,mode:'ai',subject:'All subjects',style:'Detailed explanation',history:history.slice(-10)}
+  });
+  if(error){
+    let detail='';
+    try{if(error.context?.json){const payload=await error.context.json();detail=payload?.error||payload?.message||'';}}catch(_){}
+    throw new Error(detail||error.message||'Nova could not reach the AI service. Please try again.');
+  }
+  if(result?.error)throw new Error(result.error);
+  if(typeof result?.answer!=='string'||!result.answer.trim())throw new Error('Nova returned an empty response. Please try again.');
+  return result.answer.trim();
+}
+async function ask(){
+  const q=$('chatInput').value.trim();if(!q)return;
+  $('chatInput').value='';addChat('user',q);$('chatSend').disabled=true;
+  $('aiStatus').textContent='AI connection: contacting DougHub AI…';
+  try{
+    if(/remember that|teach nova/i.test(q)){
+      const body=q.replace(/.*?(remember that|teach nova)/i,'').trim();
+      addLesson({title:body.slice(0,70)||'User fact',snippet:body,url:''},'User-taught fact');
+      addChat('assistant','Saved that as a lesson in this browser. This adds a memory note; it does not train the underlying AI model.');
+      metrics();return;
+    }
+    if(/what have you learned|what do you remember/i.test(q)){
+      addChat('assistant',data.lessons.length?'Here are some saved lessons:\n'+data.lessons.slice(0,12).map(x=>x.title+': '+x.body).join('\n'):'I have no saved lessons yet. Run research or teach me a fact.');
+      return;
+    }
+    if(/^(search( the web| online| the internet)?( for)?|look up)\s*/i.test(q)){
+      const query=q.replace(/^(search( the web| online| the internet)?( for)?|look up)\s*/i,'').trim()||q;
+      const results=await search(query);
+      if(!results.length){addChat('assistant','No Wikipedia results found. Try a different query.');return;}
+      results.forEach(x=>addLesson(x,'Chat search'));
+      addChat('assistant','Here are Wikipedia search results. These snippets are not a fully verified answer.',results.slice(0,4));
+      metrics();return;
+    }
+    const answer=await callNovaModel(q,chatHistory);
+    chatHistory.push({role:'user',content:q},{role:'assistant',content:answer});
+    chatHistory=chatHistory.slice(-12);
+    addChat('assistant',answer);
+    $('aiStatus').textContent='AI connection: response received from DougHub AI.';
+  }catch(e){
+    const message=e?.message||'Nova could not complete that request.';
+    addChat('assistant',message);
+    $('aiStatus').textContent='AI connection: needs attention — '+message;
+  }finally{$('chatSend').disabled=false;}
+}
 $('chatSend').onclick=ask;$('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')ask();});metrics();
 })();
 </script>
