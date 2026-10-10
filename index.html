@@ -2011,6 +2011,38 @@ main{width:min(1180px,calc(100% - 64px));margin:0 auto}
 @media(max-width:850px){.quick-access-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.home-quick-access{padding:17px;margin:20px auto 26px;border-radius:18px}.quick-access-grid{grid-template-columns:1fr;gap:9px}.quick-access-card{padding:13px}}
 @media(prefers-reduced-motion:reduce){.quick-access-card{transition:none}.quick-access-card:hover{transform:none}}
+
+/* DOUGHUBAPP-INSPIRED BUTTON MOTION — additive, visual only */
+button, .hero-action, .hero-create-button, .service-button, .community-slider-arrow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform .2s cubic-bezier(.2,.8,.2,1), filter .2s ease, box-shadow .2s ease, border-color .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+button:hover:not(:disabled), .hero-action:hover, .hero-create-button:hover, .service-button:hover, .community-slider-arrow:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .service-button:active, .community-slider-arrow:active:not(:disabled) {
+  transform: scale(.975);
+}
+.dh-motion-ripple {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: rgba(255,255,255,.32);
+  transform: scale(0);
+  animation: dhRipple .58s ease-out forwards;
+}
+@keyframes dhRipple {
+  to { transform: scale(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button, .hero-action, .hero-create-button, .service-button, .community-slider-arrow { transition: none !important; }
+  .dh-motion-ripple { display: none !important; }
+}
+
 </style>
 
 </head>
@@ -3713,5 +3745,26 @@ document.getElementById("dhTutorialNext")?.addEventListener("click",()=>{
 });
 document.getElementById("dhTutorialSkip")?.addEventListener("click",finishDougHubTutorial);
 document.querySelector(".dh-tutorial-backdrop")?.addEventListener("click",finishDougHubTutorial);
-</script></body>
+</script>
+<script>
+/* Small Material-style press ripple; leaves each control's existing click handler alone. */
+(function () {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.addEventListener("pointerdown", function (event) {
+    const target = event.target.closest("button, .hero-action, .hero-create-button, .service-button, .community-slider-arrow");
+    if (!target || target.disabled) return;
+    const rect = target.getBoundingClientRect();
+    const diameter = Math.max(rect.width, rect.height) * 1.7;
+    const ripple = document.createElement("span");
+    ripple.className = "dh-motion-ripple";
+    ripple.style.width = ripple.style.height = diameter + "px";
+    ripple.style.left = (event.clientX - rect.left - diameter / 2) + "px";
+    ripple.style.top = (event.clientY - rect.top - diameter / 2) + "px";
+    target.appendChild(ripple);
+    ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+  }, { passive: true });
+})();
+</script>
+
+</body>
 </html>
