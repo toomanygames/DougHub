@@ -1638,6 +1638,74 @@ dialog#gameCreatorChooser a:hover {
   .nav-link { padding: 7px 8px; }
 }
 
+
+/* INDEX-INSPIRED DOUG GAMES VISUAL REFRESH */
+.hero{position:relative;isolation:isolate;padding:30px 0 34px;overflow:hidden}
+.hero-card{
+ position:relative;isolation:isolate;overflow:hidden;text-align:left;
+ display:flex;flex-direction:column;align-items:flex-start;
+ padding:clamp(30px,5vw,54px);border:1px solid #b3a7ff20;border-radius:30px;
+ background:linear-gradient(115deg,#13152a 0%,#111326 48%,#101b2d 100%);
+ box-shadow:0 30px 90px #0004;
+}
+.hero-card:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background-image:linear-gradient(#ffffff04 1px,transparent 1px),linear-gradient(90deg,#ffffff04 1px,transparent 1px);
+ background-size:38px 38px;mask-image:linear-gradient(90deg,#000,transparent 95%);
+}
+.hero-card:after{
+ content:"";position:absolute;z-index:-1;width:350px;height:350px;right:-90px;top:-190px;
+ border-radius:50%;background:#7c3aed24;filter:blur(8px);pointer-events:none;
+}
+.hero-badge{
+ display:inline-flex;align-items:center;gap:9px;margin:0 0 20px;padding:0;
+ border:0;border-radius:0;background:none;color:#b6b7d3;
+ font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;
+}
+.hero-badge:before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#70e3b0;box-shadow:0 0 12px #70e3b080}
+.hero h1{margin:0;color:#fbfaff;font-size:clamp(44px,6vw,70px);line-height:1.02;letter-spacing:-.065em;font-weight:850}
+.hero h1 span{color:transparent;background:linear-gradient(95deg,#b9a8ff 0%,#8ba8ff 48%,#70dfd0 100%);background-clip:text;-webkit-background-clip:text}
+.hero p{max-width:650px;margin:20px 0 0;color:#b2b4cc;font-size:15px;line-height:1.8}
+.hero-stats{justify-content:flex-start;gap:12px;margin-top:28px}
+.hero-stat{min-width:145px;padding:16px 19px;border:1px solid #b1b3ff20;border-radius:15px;background:linear-gradient(145deg,#ffffff0b,#ffffff04)}
+.hero-stat-number{background:linear-gradient(95deg,#b9a8ff,#70dfd0);background-clip:text;-webkit-background-clip:text}
+.hero-stat-label{color:#9698b1}
+.hero-create-button{margin-top:25px;padding:13px 19px;border:1px solid #ffffff1c;border-radius:12px;background:linear-gradient(110deg,#7068ee,#9362ee 70%,#667eea);box-shadow:0 12px 32px #7466ee2b}
+.hero-create-button:hover{background:linear-gradient(110deg,#8179ff,#a879ff 70%,#7c91ff);box-shadow:0 16px 38px #7466ee40}
+.section{padding:24px 0 46px}
+.section-header{margin-bottom:18px}
+.section-title{font-size:25px;font-weight:850;letter-spacing:-.035em;color:#f3f2ff}
+.section-subtitle{color:#8588a7;line-height:1.6}
+.game-card,.community-card{
+ border:1px solid #b3a7ff18;
+ background:linear-gradient(145deg,rgba(23,25,49,.94),rgba(12,15,32,.92));
+ box-shadow:0 14px 36px #0000001c;
+}
+.game-card:before,.community-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,rgba(139,92,246,.10),transparent 52%);opacity:.9}
+.game-card h3,.community-card h3{color:#f3f2ff;letter-spacing:-.025em}
+.game-card p,.community-card p{color:#a0a2bd}
+.game-icon{border-color:#b1a3ff2c;background:linear-gradient(145deg,#7770f026,#9b70f01c)}
+.play-label{color:#b8b1ff}
+.community-category{border:1px solid #a78bfa28;background:#8b5cf616;color:#c7bbff}
+.search-box{width:280px;border:1px solid #b1b3ff26;border-radius:12px;background:#080a17b8;color:#f8f7ff}
+.search-box:focus{border-color:#a7a0ffb0;box-shadow:0 0 0 4px #8b7bff14}
+.feedback-card{border:1px solid #b3a7ff20;background:linear-gradient(115deg,#15172c,#101426);box-shadow:0 24px 60px #0003}
+.feedback-card h2{color:#f3f2ff;letter-spacing:-.035em}
+.feedback-card p{color:#9698b1}
+#feedbackMessage{border-color:#b1b3ff24;background:#080a17b8}
+#feedbackMessage:focus{border-color:#a7a0ffb0;box-shadow:0 0 0 4px #8b7bff14}
+@media(max-width:760px){
+ .hero{padding-top:18px}
+ .hero-card{padding:28px 22px;border-radius:22px}
+ .hero h1{font-size:clamp(40px,11vw,58px);letter-spacing:-.055em}
+ .hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+ .hero-stat{min-width:0;padding:15px}
+ .hero-create-button{align-self:flex-start}
+ .section-title{font-size:22px}
+ .section-header{align-items:flex-start;flex-wrap:wrap}
+ .search-box{width:100%}
+}
+
 </style>
   <script src="nav.js" defer></script>
 
