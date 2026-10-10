@@ -680,9 +680,27 @@
   </style>
   <script src="../nav.js" defer></script>
 
-<link rel="stylesheet" href="../douqhub-theme.css">
-
 <script src="../search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Local DougHub glass redesign, styled in this page rather than a shared theme file */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+button{font:inherit;transition:filter .16s,border-color .16s,box-shadow .16s}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 15% 0,#22215b,transparent 35%),radial-gradient(circle at 88% 12%,#501e69,transparent 32%),#050713}
+.topbar{background:rgba(5,7,20,.8);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
+.fragments,.coins{background:linear-gradient(135deg,#6366f126,#a855f72b);border:1px solid #9b91ff44;border-radius:14px;padding:10px 14px}
+.content{gap:20px}.panel{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(7,9,24,.91));border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 18px 48px #0004}
+.pig-wrap{background:radial-gradient(circle,#6366f129,transparent 68%);border:1px solid #8b83ff20;border-radius:28px}.pig{filter:drop-shadow(0 15px 30px #a855f72b)}
+.tap,.btn,.home-space-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:1px solid #c4b5fd55;border-radius:14px;box-shadow:0 9px 25px #6366f133}
+.btn.secondary{background:#ffffff09!important;border:1px solid var(--dh-line)!important}
+.stats .stat{background:#ffffff05;border:1px solid #ffffff0b;border-radius:13px}
+.upg-icon{background:linear-gradient(135deg,#6366f128,#a855f728);border:1px solid #9294f533;border-radius:13px}
+
+</style>
 </head>
 
 <body>
