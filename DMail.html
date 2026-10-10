@@ -1069,6 +1069,135 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
  .modal{width:calc(100vw - 28px)!important}
 }
 
+
+/* DMail mailbox layout: preserve DougHub's dark glass / indigo identity */
+:root{--mail-line:rgba(163,170,255,.16);--mail-line-hot:rgba(163,170,255,.29);--mail-muted:#969bb8;--mail-panel:rgba(13,17,39,.74);--mail-accent:linear-gradient(110deg,#6366f1,#a855f7 62%,#818cf8)}
+body{background:radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.22),transparent 34%),radial-gradient(ellipse at 88% 90%,rgba(168,85,247,.16),transparent 34%),#03050d;color:#f5f5ff}
+.app{gap:0;background:transparent}
+.topbar{
+ display:flex;flex:0 0 70px;align-items:center;justify-content:space-between;
+ padding:0 clamp(14px,2.2vw,30px);height:70px;
+ background:rgba(7,9,24,.76);border-bottom:1px solid var(--mail-line);
+ backdrop-filter:blur(24px);box-shadow:0 10px 35px rgba(0,0,0,.16)
+}
+.logo{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:900;letter-spacing:-.8px}
+.logo-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:13px;background:var(--mail-accent);box-shadow:0 8px 24px rgba(99,102,241,.3)}
+.logo small{display:block;color:#8e94b3;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.top-actions{display:flex;align-items:center;gap:10px}
+.home-button{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--mail-line);border-radius:12px;color:#e9eaff;text-decoration:none;background:rgba(255,255,255,.045);transition:.18s}
+.home-button:hover{border-color:var(--mail-line-hot);background:rgba(99,102,241,.12);transform:translateY(-1px)}
+.main{flex:1;min-height:0;height:calc(100vh - 70px);padding:14px;gap:14px}
+.sidebar{
+ width:224px;flex:0 0 224px;padding:17px 13px;border:1px solid var(--mail-line);
+ border-radius:20px;background:linear-gradient(155deg,rgba(17,20,47,.86),rgba(7,10,25,.8));
+ box-shadow:0 18px 50px rgba(0,0,0,.18);backdrop-filter:blur(20px)
+}
+.compose-button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px 16px;border:1px solid rgba(255,255,255,.17);border-radius:14px;color:white;background:var(--mail-accent);box-shadow:0 10px 28px rgba(99,102,241,.25);font-weight:800;transition:transform .18s,filter .18s}
+.compose-button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.nav{margin-top:20px;gap:5px}
+.nav-button{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:11px;color:#aeb4d0;background:transparent;text-align:left;transition:background .16s,border-color .16s,color .16s}
+.nav-button span:nth-child(2){flex:1}
+.nav-button:hover{color:#fff;background:rgba(255,255,255,.045)}
+.nav-button.active{color:#f5f4ff;background:linear-gradient(100deg,rgba(99,102,241,.23),rgba(168,85,247,.11));border-color:rgba(165,160,255,.16)}
+.folder-count{font-size:11px;color:#bfc4e7;opacity:.85}
+.user-box{margin:25px 2px 0;border:1px solid var(--mail-line);border-radius:14px;background:rgba(255,255,255,.035)}
+.content{
+ min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;
+ border:1px solid var(--mail-line);border-radius:21px;
+ background:linear-gradient(145deg,rgba(13,17,39,.82),rgba(6,9,23,.78));
+ box-shadow:0 20px 60px rgba(0,0,0,.2);backdrop-filter:blur(22px)
+}
+.content-header{min-height:74px;padding:17px 22px;gap:14px;border-bottom:1px solid var(--mail-line);background:rgba(255,255,255,.018)}
+.content-title{font-size:23px;letter-spacing:-.7px;font-weight:900}
+.mail-subtitle{margin-top:4px;color:var(--mail-muted);font-size:12px}
+.notice{margin:10px 16px 0;border-radius:11px;border:1px solid rgba(129,140,248,.19);background:linear-gradient(105deg,rgba(99,102,241,.09),rgba(168,85,247,.045));color:#aeb4d0;line-height:1.5}
+.mail-layout{gap:0;min-height:0}
+.user-list{width:320px;flex:0 0 320px;border-right:1px solid var(--mail-line);background:rgba(4,7,19,.18)}
+.list-toolbar{position:sticky;top:0;z-index:2;background:rgba(10,13,30,.84);backdrop-filter:blur(18px);border-bottom:1px solid var(--mail-line)}
+.search-box{display:flex;align-items:center;gap:8px;padding:13px 13px 8px;border:0}
+.search-icon{color:#a5a9ca;font-size:22px;line-height:1}
+.search-box input{min-width:0;width:100%;padding:11px 13px;border-radius:11px;border:1px solid rgba(163,170,255,.15);color:#f5f5ff;background:rgba(255,255,255,.045);outline:none}
+.search-box input:focus{border-color:rgba(129,140,248,.65);box-shadow:0 0 0 3px rgba(99,102,241,.11)}
+.search-box input::placeholder{color:#7e85a5}
+.list-toolbar-bottom{display:flex;align-items:center;justify-content:space-between;padding:2px 15px 10px;color:#858cab;font-size:11px;font-weight:750;letter-spacing:.35px;text-transform:uppercase}
+.icon-button{width:29px;height:29px;border:1px solid var(--mail-line);border-radius:9px;background:rgba(255,255,255,.04);color:#c8cbeb;font-size:19px}
+.icon-button:hover{background:rgba(99,102,241,.15)}
+.user-item{position:relative;gap:10px;padding:13px 13px;border-bottom:1px solid rgba(163,170,255,.075);transition:background .16s}
+.user-item:hover{background:rgba(99,102,241,.08)}
+.user-item.selected{background:linear-gradient(100deg,rgba(99,102,241,.19),rgba(168,85,247,.065));box-shadow:inset 3px 0 #8b80ff}
+.user-item .avatar{width:39px;height:39px;flex-basis:39px;border:1px solid rgba(255,255,255,.12)}
+.user-info{flex:1;overflow:hidden}
+.user-row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.username{color:#eff0ff;font-size:13px;font-weight:800}
+.user-sub{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9298b6;font-size:11px;line-height:1.45}
+.user-date{color:#858ba8;font-size:10px;white-space:nowrap}
+.star-contact{flex:0 0 auto;border:0;background:transparent;color:#707796;font-size:16px;padding:2px 4px;border-radius:7px}
+.star-contact:hover,.star-contact.starred{color:#f6ce76;background:rgba(246,206,118,.08)}
+.chat{background:radial-gradient(ellipse at top right,rgba(99,102,241,.055),transparent 45%)}
+.chat-header{min-height:75px;padding:15px 21px;border-bottom:1px solid var(--mail-line);background:rgba(255,255,255,.018)}
+.chat-header .avatar{border:1px solid rgba(255,255,255,.13)}
+.chat-name{color:#f2f2ff;font-size:15px;font-weight:850}
+.chat-presence{margin-top:4px;color:#8e94b3;font-size:11px}
+.messages{gap:9px;padding:19px 22px;scrollbar-width:thin;scrollbar-color:rgba(129,140,248,.35) transparent}
+.message{position:relative;width:min(760px,94%);max-width:94%;padding:15px 17px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(163,170,255,.13);box-shadow:0 8px 22px rgba(0,0,0,.09)}
+.message.mine{align-self:flex-end;background:linear-gradient(125deg,rgba(99,102,241,.19),rgba(168,85,247,.105));border-color:rgba(157,146,255,.2)}
+.message-author{font-size:12px;color:#c4b5fd;font-weight:850;margin-bottom:7px}
+.message-text{color:#e4e6f5;line-height:1.65}
+.message-time{margin-top:9px;color:#858ba8;font-size:10px}
+.message-image{border:1px solid rgba(255,255,255,.1)}
+.empty{padding:20px;color:#858ba8;line-height:1.7}
+.composer{padding:14px 16px;border-top:1px solid var(--mail-line);background:rgba(6,9,24,.38)}
+.composer-inner{align-items:flex-end;gap:9px}
+.composer textarea{min-height:48px;padding:13px 14px;color:#f5f5ff;background:rgba(255,255,255,.045);border:1px solid rgba(163,170,255,.16);border-radius:12px;line-height:1.5}
+.composer textarea:focus{border-color:rgba(129,140,248,.65);box-shadow:0 0 0 3px rgba(99,102,241,.10)}
+.composer textarea::placeholder{color:#7e85a5}
+.attach-button,.send-button{min-height:47px;border-radius:12px;border:1px solid rgba(163,170,255,.15);transition:transform .16s,filter .16s}
+.attach-button{background:rgba(255,255,255,.055)}
+.attach-button:hover{background:rgba(99,102,241,.13)}
+.send-button{background:var(--mail-accent);font-weight:800;box-shadow:0 7px 20px rgba(99,102,241,.19)}
+.send-button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.other-view{color:#f3f3ff}
+.admin-warning,.admin-message{border-radius:14px;backdrop-filter:blur(14px)}
+.modal-backdrop{background:rgba(2,4,14,.72);backdrop-filter:blur(10px)}
+.modal{width:min(560px,100%);padding:25px;border:1px solid var(--mail-line-hot);border-radius:21px;background:linear-gradient(145deg,rgba(20,23,52,.97),rgba(8,11,28,.98));box-shadow:0 28px 90px rgba(0,0,0,.5)}
+.modal-kicker{margin-bottom:7px;color:#a5a9ff;font-size:10px;font-weight:900;letter-spacing:1.6px}
+.modal-title{margin-bottom:6px;color:#f7f6ff;font-size:23px;letter-spacing:-.6px}
+.modal-help{margin:0 0 18px;color:#969bb8;font-size:13px;line-height:1.5}
+.field-label{display:block;margin:10px 0 6px;color:#c8cbed;font-size:12px;font-weight:800}
+.modal input,.modal textarea{margin-bottom:8px;color:#f5f5ff;background:rgba(255,255,255,.045);border:1px solid rgba(163,170,255,.16);border-radius:11px}
+.modal input:focus,.modal textarea:focus{border-color:rgba(129,140,248,.65);box-shadow:0 0 0 3px rgba(99,102,241,.10)}
+.draft-hint{margin:0 0 15px;color:#7f86a7;font-size:11px}
+.cancel-button{color:#d7d9ef;background:rgba(255,255,255,.06);border:1px solid var(--mail-line)}
+.modal-send{color:#fff;background:var(--mail-accent);box-shadow:0 8px 22px rgba(99,102,241,.2)}
+@media(max-width:900px){.sidebar{width:190px;flex-basis:190px;padding:14px 10px}.user-list{width:280px;flex-basis:280px}.main{padding:10px;gap:10px}}
+@media(max-width:650px){
+ .main{padding:7px;gap:7px;flex-direction:column}
+ .sidebar{width:100%;flex:0 0 auto;max-height:none;padding:10px;border-radius:15px;overflow:visible}
+ .compose-button{width:auto;padding:11px 16px;margin-bottom:8px}
+ .nav{margin-top:3px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ .nav-button{justify-content:flex-start;gap:6px;padding:9px 8px;font-size:11px;border-radius:9px}
+ .nav-button span:first-child{font-size:12px}
+ .user-box{display:none}
+ .content{margin:0;flex:1;border-radius:15px;min-height:0}
+ .content-header{padding:12px 14px;min-height:60px}
+ .content-title{font-size:20px}
+ .mail-subtitle{font-size:10px}
+ .notice{margin:7px 8px 0;padding:8px 10px;font-size:10px}
+ .mail-layout{flex-direction:column}
+ .user-list{width:100%;flex:0 0 145px;max-height:145px;border-right:0;border-bottom:1px solid var(--mail-line)}
+ .search-box{padding:8px 10px 4px}
+ .list-toolbar-bottom{padding:0 12px 5px}
+ .user-item{padding:8px 10px}
+ .user-item .avatar{width:31px;height:31px;flex-basis:31px}
+ .chat-header{min-height:57px;padding:9px 12px}
+ .messages{padding:10px}
+ .message{width:96%;max-width:96%;padding:11px 12px}
+ .composer{padding:8px}
+ .composer-inner{gap:5px}
+ .attach-button,.send-button{padding:0 11px;min-height:43px}
+ .modal{padding:19px}
+}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
@@ -1081,7 +1210,10 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
 <body>
 
 <div class="app">
-
+    <header class="topbar">
+        <div class="logo"><div class="logo-icon">✉</div><div>DMail<small>DOUGHUB MESSAGING</small></div></div>
+        <div class="top-actions"><a class="home-button" href="index.html">⌂ <span>DougHub home</span></a></div>
+    </header>
     <main class="main">
 
         <aside class="sidebar">
@@ -1090,23 +1222,14 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
                 ✏️ Compose
             </button>
 
-            <div class="nav">
-
-                <button
-                    class="nav-button active"
-                    id="inboxButton"
-                >
-                    📥 Inbox
-                </button>
-
-                <button
-                    class="nav-button admin"
-                    id="otherButton"
-                    style="display:none;"
-                >
-                    👀 Other
-                </button>
-
+            <div class="nav mail-folders" aria-label="Mail folders">
+                <button class="nav-button active" id="inboxButton" data-folder="inbox"><span>📥</span><span>Inbox</span><span class="folder-count" id="inboxCount">0</span></button>
+                <button class="nav-button" id="sentButton" data-folder="sent"><span>↗️</span><span>Sent</span></button>
+                <button class="nav-button" id="starredButton" data-folder="starred"><span>⭐</span><span>Starred</span></button>
+                <button class="nav-button" id="allMailButton" data-folder="all"><span>✉️</span><span>All mail</span></button>
+                <button class="nav-button" id="contactsButton" data-folder="contacts"><span>👥</span><span>Contacts</span></button>
+                <button class="nav-button" id="draftsButton" data-folder="drafts"><span>📝</span><span>Drafts</span><span class="folder-count" id="draftCount">0</span></button>
+                <button class="nav-button admin" id="otherButton" style="display:none;"><span>👀</span><span>Admin review</span></button>
             </div>
 
             <div class="user-box">
@@ -1124,12 +1247,12 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
         <section class="content">
 
             <div class="content-header">
-                <div class="content-title">Inbox</div>
+                <div><div class="content-title" id="pageTitle">Inbox</div><div class="mail-subtitle" id="pageSubtitle">Your messages and conversations</div></div>
                 <a class="home-button" href="index.html">← DougHub</a>
             </div>
 
             <div class="notice">
-                🔒 DMail messages are private and are not stored. Once a message is sent, it is not saved or accessible later.
+                🔒 Your conversations are saved in DMail so you can revisit them. Avoid sending sensitive personal information.
 
 
             </div>
@@ -1138,14 +1261,13 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
 
                 <div class="user-list">
 
-                    <div class="search-box">
-                        <input
-                            type="text"
-                            id="userSearch"
-                            placeholder="Search users..."
-                        >
+                    <div class="list-toolbar">
+                        <div class="search-box">
+                            <span class="search-icon">⌕</span>
+                            <input type="search" id="userSearch" placeholder="Search mail or people..." autocomplete="off" autocapitalize="off" spellcheck="false">
+                        </div>
+                        <div class="list-toolbar-bottom"><span id="listCount">Contacts</span><button id="refreshMailButton" class="icon-button" type="button" title="Refresh mail" aria-label="Refresh mail">↻</button></div>
                     </div>
-
                     <div id="userList"></div>
 
                 </div>
@@ -1157,8 +1279,8 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
 
                         <div>
                             <div class="chat-name">
-                                Select a user
-                            </div>
+                                Select a conversation
+                            </div><div class="chat-presence">Choose a message from your mail list</div>
                         </div>
                     </div>
 
@@ -1233,20 +1355,13 @@ html,body{background:var(--mail-bg)!important;color:var(--mail-text)!important;f
 >
     <div class="modal">
 
-        <div class="modal-title">
-            New DMail
-        </div>
+        <div class="modal-kicker">NEW MESSAGE</div><div class="modal-title">
+            Compose DMail
+        </div><p class="modal-help">Send a private message to another DougHub member.</p>
 
-        <input
-            type="text"
-            id="composeRecipient"
-            placeholder="Recipient username"
-        >
+        <label class="field-label" for="composeRecipient">To</label><input type="text" id="composeRecipient" placeholder="Recipient username" autocomplete="off" autocapitalize="off" spellcheck="false">
 
-        <textarea
-            id="composeMessage"
-            placeholder="Write your message..."
-        ></textarea>
+        <label class="field-label" for="composeMessage">Message</label><textarea id="composeMessage" placeholder="Write your message..."></textarea><div class="draft-hint" id="draftHint">Drafts are saved in this browser while you type.</div>
 
         <div class="modal-actions">
 
@@ -1288,6 +1403,10 @@ let selectedUser = null;
 let selectedFile = null;
 let currentTab = "inbox";
 let allProfiles = [];
+let mailRecords = [];
+let mailFolder = "inbox";
+let starredContacts = new Set(JSON.parse(localStorage.getItem("dmail_starred_contacts") || "[]"));
+let mailDrafts = JSON.parse(localStorage.getItem("dmail_drafts") || "[]");
 
 /* --------------------------------
    HELPERS
@@ -1411,89 +1530,80 @@ async function loadUser() {
 -------------------------------- */
 
 async function loadProfiles() {
-
-    const result =
-        await supabaseClient
-            .from("profiles")
-            .select("id, username, avatar_url")
-            .neq("id", currentUser.id)
-            .order("username");
-
-    if (result.error) {
-        console.error(result.error);
-        return;
-    }
-
-    allProfiles =
-        result.data || [];
-
+    const result = await supabaseClient.from("profiles").select("id, username, avatar_url").neq("id", currentUser.id).order("username");
+    if (result.error) { console.error(result.error); return; }
+    allProfiles = result.data || [];
+    const messagesResult = await supabaseClient.from("direct_messages").select("id,sender_id,receiver_id,message,image_url,created_at").or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`).order("created_at", {ascending:false});
+    if (messagesResult.error) console.error("Could not load mail list:", messagesResult.error);
+    else mailRecords = messagesResult.data || [];
     renderProfiles(allProfiles);
+    updateMailCounts();
 }
-
+function saveStars(){ localStorage.setItem("dmail_starred_contacts", JSON.stringify([...starredContacts])); }
+function saveDrafts(){ localStorage.setItem("dmail_drafts", JSON.stringify(mailDrafts)); updateMailCounts(); }
+function updateMailCounts(){
+    const inboxCount=document.getElementById("inboxCount");
+    if(inboxCount) inboxCount.textContent=String(new Set(mailRecords.filter(m=>m.receiver_id===currentUser?.id).map(m=>m.sender_id)).size);
+    const draftCount=document.getElementById("draftCount");
+    if(draftCount) draftCount.textContent=String(mailDrafts.length);
+}
+function messagesForProfile(profile){
+    return mailRecords.filter(m=>(m.sender_id===currentUser.id&&m.receiver_id===profile.id)||(m.receiver_id===currentUser.id&&m.sender_id===profile.id));
+}
 function renderProfiles(profiles) {
-
-    const container =
-        document.getElementById("userList");
-
-    if (!profiles.length) {
-        container.innerHTML =
-            `<div class="empty" style="padding:25px;">
-                No users found.
-            </div>`;
+    const container=document.getElementById("userList");
+    const query=(document.getElementById("userSearch")?.value||"").trim().toLowerCase();
+    let visible=profiles.filter(profile=>{
+        const records=messagesForProfile(profile);
+        if(mailFolder==="inbox"&&!records.some(m=>m.receiver_id===currentUser.id))return false;
+        if(mailFolder==="sent"&&!records.some(m=>m.sender_id===currentUser.id))return false;
+        if(mailFolder==="starred"&&!starredContacts.has(profile.id))return false;
+        if(mailFolder==="all"&&!records.length)return false;
+        if(mailFolder==="contacts"){} 
+        const latest=records[0];
+        const haystack=[profile.username,latest?.message].join(" ").toLowerCase();
+        return !query||haystack.includes(query);
+    });
+    const draftsMode=mailFolder==="drafts";
+    const listCount=document.getElementById("listCount");
+    if(listCount)listCount.textContent=draftsMode?mailDrafts.length+" DRAFTS":visible.length+" "+(mailFolder==="contacts"?"CONTACTS":"CONVERSATIONS");
+    if(draftsMode){
+        if(!mailDrafts.length){container.innerHTML='<div class="empty" style="padding:22px 15px;font-size:12px">No drafts yet. Start composing and your unfinished message will be saved here.</div>';return;}
+        container.innerHTML=mailDrafts.map((draft,index)=>`<div class="user-item draft-item" data-draft-index="${index}"><div class="avatar">📝</div><div class="user-info"><div class="user-row"><div class="username">Draft to ${escapeHtml(draft.recipient||"recipient")}</div></div><div class="user-sub">${escapeHtml(draft.message||"Empty draft")}</div></div><button class="star-contact" data-delete-draft="${index}" title="Delete draft">×</button></div>`).join("");
+        container.querySelectorAll("[data-draft-index]").forEach(item=>item.addEventListener("click",e=>{if(e.target.closest("[data-delete-draft]"))return;const draft=mailDrafts[Number(item.dataset.draftIndex)];document.getElementById("composeRecipient").value=draft.recipient||"";document.getElementById("composeMessage").value=draft.message||"";document.getElementById("composeModal").classList.add("show");}));
+        container.querySelectorAll("[data-delete-draft]").forEach(btn=>btn.addEventListener("click",e=>{e.stopPropagation();mailDrafts.splice(Number(btn.dataset.deleteDraft),1);saveDrafts();renderProfiles(allProfiles);}));
         return;
     }
-
-    container.innerHTML =
-        profiles.map(profile => `
-            <div
-                class="user-item ${
-                    selectedUser?.id === profile.id
-                        ? "selected"
-                        : ""
-                }"
-                data-id="${profile.id}"
-            >
-
-                ${avatarHtml(profile)}
-
-                <div class="user-info">
-
-                    <div class="username">
-                        ${escapeHtml(profile.username || "User")}
-                    </div>
-
-                    <div class="user-sub">
-                        Send private DMail
-                    </div>
-
-                </div>
-
-            </div>
-        `).join("");
-
-    container
-        .querySelectorAll(".user-item")
-        .forEach(item => {
-
-            item.addEventListener(
-                "click",
-                () => {
-
-                    const profile =
-                        allProfiles.find(
-                            p => p.id === item.dataset.id
-                        );
-
-                    if (profile) {
-                        openConversation(profile);
-                    }
-
-                }
-            );
-
-        });
+    if(!visible.length){container.innerHTML='<div class="empty" style="padding:24px 16px;font-size:12px">'+(query?'No matching mail or people.':mailFolder==="inbox"?'Your inbox is clear. New incoming conversations will appear here.':mailFolder==="sent"?'No sent conversations yet.':mailFolder==="starred"?'Star a conversation to keep it handy.':mailFolder==="contacts"?'No other DougHub members found.':'No conversations yet. Compose a DMail to get started.')+'</div>';return;}
+    visible.sort((a,b)=>{
+        const at=messagesForProfile(a)[0]?.created_at||"";
+        const bt=messagesForProfile(b)[0]?.created_at||"";
+        return bt.localeCompare(at)||String(a.username||"").localeCompare(String(b.username||""));
+    });
+    container.innerHTML=visible.map(profile=>{
+        const records=messagesForProfile(profile);
+        const latest=records[0];
+        const lastText=latest?(latest.image_url&&!latest.message?"📎 Image attachment":latest.message||"📎 Attachment"):"No messages yet · Start a conversation";
+        const date=latest?new Date(latest.created_at).toLocaleDateString([], {month:"short",day:"numeric"}):"";
+        const isStarred=starredContacts.has(profile.id);
+        return `<div class="user-item ${selectedUser?.id===profile.id?"selected":""}" data-id="${profile.id}">
+            ${avatarHtml(profile)}
+            <div class="user-info"><div class="user-row"><div class="username">${escapeHtml(profile.username||"User")}</div><span class="user-date">${escapeHtml(date)}</span></div><div class="user-sub">${escapeHtml(lastText)}</div></div>
+            <button class="star-contact ${isStarred?"starred":""}" data-star-id="${profile.id}" title="${isStarred?"Unstar conversation":"Star conversation"}" aria-label="${isStarred?"Unstar conversation":"Star conversation"}">${isStarred?"★":"☆"}</button>
+        </div>`;
+    }).join("");
+    container.querySelectorAll(".user-item[data-id]").forEach(item=>item.addEventListener("click",e=>{
+        const id=item.dataset.id;
+        if(e.target.closest("[data-star-id]"))return;
+        const profile=allProfiles.find(p=>p.id===id);
+        if(profile)openConversation(profile);
+    }));
+    container.querySelectorAll("[data-star-id]").forEach(btn=>btn.addEventListener("click",e=>{
+        e.stopPropagation();const id=btn.dataset.starId;
+        if(starredContacts.has(id))starredContacts.delete(id);else starredContacts.add(id);
+        saveStars();renderProfiles(allProfiles);
+    }));
 }
-
 /* --------------------------------
    CONVERSATION
 -------------------------------- */
@@ -2015,6 +2125,19 @@ async function loadOtherMessages() {
     view.innerHTML = html;
 }
 
+function switchMailFolder(folder, buttonId, title, subtitle){
+    mailFolder=folder;currentTab="inbox";
+    setActiveNav(buttonId);
+    document.getElementById("pageTitle").textContent=title;
+    document.getElementById("mailSubtitle")?.textContent;
+    const sub=document.getElementById("pageSubtitle");if(sub)sub.textContent=subtitle;
+    document.getElementById("mailLayout").style.display="flex";
+    document.getElementById("otherView").style.display="none";
+    document.getElementById("chatHeader").innerHTML='<div class="avatar">✉</div><div><div class="chat-name">'+escapeHtml(title)+'</div><div class="chat-presence">'+escapeHtml(subtitle)+'</div></div>';
+    document.getElementById("messages").innerHTML='<div class="empty">Choose a conversation from the list to read and reply.</div>';
+    selectedUser=null;renderProfiles(allProfiles);
+}
+
 /* --------------------------------
    NAVIGATION
 -------------------------------- */
@@ -2036,29 +2159,7 @@ function setActiveNav(id) {
         );
 }
 
-function showInbox() {
-
-    currentTab = "inbox";
-
-    setActiveNav(
-        "inboxButton"
-    );
-
-    document.getElementById(
-        "pageTitle"
-    ).textContent =
-        "Inbox";
-
-    document.getElementById(
-        "mailLayout"
-    ).style.display =
-        "flex";
-
-    document.getElementById(
-        "otherView"
-    ).style.display =
-        "none";
-}
+function showInbox(){switchMailFolder("inbox","inboxButton","Inbox","Your incoming conversations");}
 
 document
     .getElementById("inboxButton")
@@ -2066,6 +2167,13 @@ document
         "click",
         showInbox
     );
+document.getElementById("sentButton").addEventListener("click",()=>switchMailFolder("sent","sentButton","Sent","Messages you have sent"));
+document.getElementById("starredButton").addEventListener("click",()=>switchMailFolder("starred","starredButton","Starred","Conversations you have marked for quick access"));
+document.getElementById("allMailButton").addEventListener("click",()=>switchMailFolder("all","allMailButton","All mail","Every conversation with message history"));
+document.getElementById("contactsButton").addEventListener("click",()=>switchMailFolder("contacts","contactsButton","Contacts","Find DougHub members and start a conversation"));
+document.getElementById("draftsButton").addEventListener("click",()=>switchMailFolder("drafts","draftsButton","Drafts","Unfinished messages saved in this browser"));
+document.getElementById("refreshMailButton").addEventListener("click",async()=>{await loadProfiles();if(selectedUser)await loadConversation();});
+
 
 document
     .getElementById("otherButton")
@@ -2133,15 +2241,8 @@ document
         "click",
         () => {
 
-            composeModal
-                .classList
-                .add("show");
-
-            document
-                .getElementById(
-                    "composeRecipient"
-                )
-                .focus();
+            composeModal.classList.add("show");
+            document.getElementById("composeRecipient").focus();
         }
     );
 
@@ -2150,9 +2251,15 @@ document
     .addEventListener(
         "click",
         () => {
-            composeModal
-                .classList
-                .remove("show");
+            const recipient=document.getElementById("composeRecipient").value.trim();
+            const message=document.getElementById("composeMessage").value.trim();
+            if(message||recipient){
+                mailDrafts=mailDrafts.filter(d=>!(d.recipient===recipient&&d.message===message));
+                mailDrafts.unshift({recipient,message,updatedAt:new Date().toISOString()});
+                mailDrafts=mailDrafts.slice(0,50);saveDrafts();
+            }
+            composeModal.classList.remove("show");
+            renderProfiles(allProfiles);
         }
     );
 
@@ -2219,21 +2326,11 @@ document
 
             if (success) {
 
-                composeModal
-                    .classList
-                    .remove("show");
-
-                document
-                    .getElementById(
-                        "composeRecipient"
-                    )
-                    .value = "";
-
-                document
-                    .getElementById(
-                        "composeMessage"
-                    )
-                    .value = "";
+                composeModal.classList.remove("show");
+                mailDrafts=mailDrafts.filter(d=>!(String(d.recipient||"").toLowerCase()===username.toLowerCase()&&String(d.message||"").trim()===message));
+                saveDrafts();
+                document.getElementById("composeRecipient").value="";
+                document.getElementById("composeMessage").value="";
 
                 await openConversation(
                     recipient
@@ -2241,6 +2338,19 @@ document
             }
         }
     );
+
+document.getElementById("composeMessage").addEventListener("input",()=>{
+    const recipient=document.getElementById("composeRecipient").value.trim();
+    const message=document.getElementById("composeMessage").value;
+    const hint=document.getElementById("draftHint");
+    if(hint)hint.textContent=message.trim()?"Draft will be saved if you close this window.":"Drafts are saved in this browser while you type.";
+});
+document.getElementById("messageInput").addEventListener("keydown",event=>{
+    if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();document.getElementById("sendButton").click();}
+});
+document.getElementById("composeModal").addEventListener("click",event=>{
+    if(event.target.id==="composeModal")document.getElementById("cancelCompose").click();
+});
 
 /* --------------------------------
    START
