@@ -443,9 +443,43 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
 </style>  <script src="nav.js" defer></script>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* DougHub page-specific redesign — homepage glass language, embedded locally */
+:root{color-scheme:dark;--dh-ink:#f6f5ff;--dh-muted:#a4a7c4;--dh-line:rgba(177,184,255,.15);--dh-glass:rgba(13,17,39,.82);--dh-glass-deep:rgba(5,7,20,.86);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+*{box-sizing:border-box}
+body{color:var(--dh-ink);-webkit-font-smoothing:antialiased}
+a{transition:color .18s ease,text-decoration-color .18s ease}
+h1,h2,h3,h4{letter-spacing:-.035em}
+::selection{background:#7776ed66;color:#fff}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background-color:rgba(5,7,19,.82);border:1px solid var(--dh-line);border-radius:12px}
+input::placeholder,textarea::placeholder{color:#898eaf}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button,.button,.btn,a.button,input[type=button],input[type=submit]{border-radius:12px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease}
+button:not(:disabled):hover,.button:hover,.btn:hover,a.button:hover{filter:brightness(1.08)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+.card,.panel,.settings-card,.settings-section,.tool-card,.game-card,.feature-card,.content-card,.auth-card,.feedback-section,.section-card,.video-card,.post-card,.profile-card,.workspace-card,.modal,.modal-box,.modal-content{border-color:var(--dh-line)}
+@media(max-width:700px){button,.button,.btn,a.button{max-width:100%}}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 95% 100%,#25104b,transparent 35%),#02040a}
+header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
+.brand-icon{background:linear-gradient(135deg,#6366f1,#a855f7)}
+.page-header{margin-bottom:24px}
+.settings-card,.settings-section{background:rgba(13,17,39,.8);border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 18px 50px #0003}
+.settings-section{padding:clamp(18px,3vw,28px)}
+.section-title{font-size:clamp(19px,2vw,24px);color:#f5f3ff}
+.section-description,.setting-help,.upload-help{color:#a4a7c4}
+.setting-row{border-color:rgba(177,184,255,.1)}
+.profile-preview{border:2px solid #8585ef;box-shadow:0 0 0 5px #6366f11a}
+.upload-button,.update-button{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #b6a4ff55;color:#fff;box-shadow:0 8px 24px #6366f133}
+.logout-section{background:#ef44440b;border:1px solid #ef44442b;border-radius:18px}
+.logout-button{background:#ef444418;border:1px solid #ef444455;color:#fecaca}
+
+</style>
 </head>
 
 <body>
