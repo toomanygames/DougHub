@@ -34,9 +34,33 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
 </style>  <script src="../nav.js" defer></script>
 
-<link rel="stylesheet" href="../douqhub-theme.css">
-
 <script src="../search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Individual inline visual refresh using DougHub's index palette */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
+input::placeholder,textarea::placeholder{color:#858cab}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+.side{background:rgba(5,7,20,.84);border-right:1px solid var(--dh-line);backdrop-filter:blur(18px)}
+.logo{letter-spacing:-.05em}
+.nav a{border:1px solid transparent;border-radius:12px;color:#aeb2d0}
+.nav a:hover,.nav a.active{background:linear-gradient(110deg,#6366f132,#a855f71b);border-color:#9294f533;color:#fff}
+.main .top{background:rgba(4,5,15,.7);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
+.card,.access-card,.access-modal-card{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(8,10,25,.9));border:1px solid var(--dh-line);border-radius:21px;box-shadow:0 18px 48px #0003}
+.pill,.status{background:#6366f118;border:1px solid #818cf133;border-radius:999px;color:#c4b5fd}
+.toolbar{border-color:var(--dh-line)}
+.access-chart{background:#070918;border:1px solid var(--dh-line);border-radius:15px}
+.primary{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white}
+
+</style>
 </head>
 <body>
 <div id="accessBlock" class="access-hidden" style="display:flex!important">
