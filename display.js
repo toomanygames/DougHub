@@ -909,6 +909,10 @@
                     SUPABASE_KEY
                 );
 
+            // Share the existing authenticated client with pages that need it.
+            // This avoids creating duplicate GoTrue clients and keeps one session.
+            window.DougHubSupabaseClient = supabaseClient;
+            window.dispatchEvent(new Event("douqhub:supabase-ready"));
 
             createStyles();
 
