@@ -65,7 +65,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 const $=id=>document.getElementById(id),KEY='doughub-nova-learning-v1';
 const SUPABASE_URL='https://agsqdqcsmsppcdqxlppj.supabase.co';
 const SUPABASE_KEY='sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52';
-const aiClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
 let chatHistory=[],data={lessons:[],runs:[],stats:{research:0,questions:0}},busy=false,stop=false;
 try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&Array.isArray(x.lessons))data=Object.assign(data,x);}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){notify('Storage full. Export your knowledge before removing old entries.');}}
@@ -83,7 +83,20 @@ function drawKnowledge(){const q=$('filter').value.toLowerCase(),list=$('knowled
 $('filter').oninput=drawKnowledge;$('teach').onclick=()=>$('teachForm').classList.toggle('hidden');$('teachForm').onsubmit=e=>{e.preventDefault();addLesson({title:$('factTitle').value.trim(),snippet:$('factBody').value.trim(),url:''},'User-taught fact');const item=data.lessons[0];if(item)item.confidence='user-provided';save();metrics();drawKnowledge();$('factTitle').value='';$('factBody').value='';$('teachForm').classList.add('hidden');notify('Fact saved in browser memory.');};
 $('export').onclick=()=>{const a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=u;a.download='doughub-nova-memory.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};$('clear').onclick=()=>{if(confirm('Delete all Nova knowledge saved in this browser?')){data.lessons=[];save();metrics();drawKnowledge();}};
 function addChat(who,text,sources){const d=document.createElement('div');d.className='bubble '+who;d.textContent=(who==='user'?'You: ':'Nova: ')+text;if(sources?.length)sources.forEach(s=>{const a=document.createElement('a');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='\nSource: '+s.title;d.append(a);});$('chatLog').prepend(d);}
+async function getAIClient(){
+  if(window.DougHubSupabaseClient)return window.DougHubSupabaseClient;
+  await new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error('DougHub login is still loading. Refresh the page and try again.')),8000);
+    window.addEventListener('douqhub:supabase-ready',()=>{
+      clearTimeout(timer);
+      resolve();
+    },{once:true});
+  });
+  if(!window.DougHubSupabaseClient)throw new Error('DougHub login could not initialize. Refresh the page and try again.');
+  return window.DougHubSupabaseClient;
+}
 async function callNovaModel(question,history=[]){
+  const aiClient=await getAIClient();
   const {data:sessionData,error:sessionError}=await aiClient.auth.getSession();
   if(sessionError)throw new Error('Could not check your DougHub login. Please refresh and sign in again.');
   const session=sessionData?.session;
