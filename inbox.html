@@ -270,9 +270,33 @@ button:hover {
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
 
-<link rel="stylesheet" href="douqhub-theme.css">
-
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Inline, page-owned DougHub redesign */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
+input::placeholder,textarea::placeholder{color:#858cab}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+.container{max-width:1100px}
+header{background:rgba(4,5,15,.78);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
+.logo{letter-spacing:-.05em}
+.card{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(8,10,25,.9));border:1px solid var(--dh-line);border-radius:21px;box-shadow:0 18px 48px #0003}
+.subtitle,.time{color:#a4a7c4}
+.feedback-top{border-bottom:1px solid var(--dh-line)}
+.feedback-message{background:#ffffff04;border:1px solid #ffffff0b;border-radius:14px}
+.feedback-reply-box{background:#070918;border:1px solid var(--dh-line);border-radius:15px}
+.save-reply{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white}
+.delete{background:#ef444418;border:1px solid #ef444455;color:#fecaca;border-radius:11px}
+
+</style>
 </head>
 
 
