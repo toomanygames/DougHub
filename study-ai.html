@@ -7,7 +7,6 @@
 <title>Study AI | DougHub</title>
 <link rel="icon" href="DougHub.svg" type="image/x-icon">
 <link rel="stylesheet" href="douqhub-theme.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="nav.js" defer></script>
 <script src="search-autofill-fix.js" defer></script>
 <style>
@@ -60,18 +59,17 @@
       <div class="side-item"><b>🧠 Understand, don't just copy</b><p>Get explanations, examples, worked steps, and a chance to try a problem yourself.</p></div>
       <div class="side-item"><b>🌎 Broad subject coverage</b><p>Ask about school subjects, practical questions, programming, creative ideas, and general knowledge.</p></div>
       <div class="side-item"><b>↪ Keep the conversation going</b><p>Ask for simpler wording, another example, a quiz, or more detail without starting again.</p></div>
-      <div class="side-item"><b>🔐 Secure connection</b><p>The provider API key stays on the server. This page never asks you to paste a secret.</p></div>
+      <div class="side-item"><b>🔐 Secure connection</b><p>The AI model runs on your device. No account or API key is needed.</p></div>
       <div class="side-note"><b>Study tip</b><br>AI can make mistakes. For assignments, check facts against your class notes or teacher's materials and use explanations to build your own understanding.</div>
     </aside>
   </section>
-  <div class="footer">DougHub Study AI + AI Mode · Powered by Groq AI. Free usage limits may apply.<br>Don't enter passwords, private information, or sensitive personal details.</div>
+  <div class="footer">DougHub Study AI + AI Mode · Runs a local AI model in your browser. The first load downloads the model; after that it is cached by your browser.<br>Don't enter passwords, private information, or sensitive personal details.</div>
 </main>
 <div id="toast" class="toast hidden" role="status"></div>
 <script>
 (() => {
-  const SUPABASE_URL = "https://agsqdqcsmsppcdqxlppj.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnc3FkcWNzbXNwcGNkcXhscHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4NDc2MDYsImV4cCI6MjEwNTQyMzYwNn0.2FFRec6crnbFNPRxeE4qz_8rm4nPQn9py1DwWkXk32A";
-  const MEMORY_KEY = "doughub-study-ai-chat-v2";
+  const MEMORY_KEY = "doughub-study-ai-local-chat-v1";
+  const MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
   let mode = new URLSearchParams(location.search).get("mode") === "ai" ? "ai" : "study";
   const $ = id => document.getElementById(id);
   const messagesEl = $("messages");
@@ -79,8 +77,9 @@
   const sendButton = $("sendButton");
   const statusEl = $("connectionStatus");
   let busy = false;
+  let engine = null;
+  let enginePromise = null;
   let conversationHistory = [];
-  let supabase = null;
 
   try {
     const saved = JSON.parse(localStorage.getItem(MEMORY_KEY) || "[]");
@@ -90,8 +89,8 @@
   function toast(message) {
     $("toast").textContent = message;
     $("toast").classList.remove("hidden");
-    clearTimeout(toast.timer);
-    toast.timer = setTimeout(() => $("toast").classList.add("hidden"), 3600);
+    if (toast.timer) clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => $("toast").classList.add("hidden"), 4200);
   }
   function saveHistory() {
     try { localStorage.setItem(MEMORY_KEY, JSON.stringify(conversationHistory.slice(-30))); } catch (_) {}
@@ -101,11 +100,11 @@
   }
   function formatAnswer(value) {
     let s = escapeHTML(value);
-    s = s.replace(/```([\s\S]*?)```/g, (_, code) => "<pre><code>" + code.trim() + "</code></pre>");
-    s = s.replace(/`([^`\n]+)`/g, "<code>$1</code>");
-    s = s.replace(/**([^*]+)**/g, "<strong>$1</strong>");
-    s = s.replace(/(^|\n)[*-] (.+)/g, "$1• $2");
-    return s.split(/\n{2,}/).map(part => part.startsWith("<pre>") ? part : "<p>" + part.replace(/\n/g,"<br>") + "</p>").join("");
+    s = s.replace(/```([\\s\\S]*?)```/g, (_, code) => "<pre><code>" + code.trim() + "</code></pre>");
+    s = s.replace(/`([^`\\n]+)`/g, "<code>$1</code>");
+    s = s.replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|\\n)[*-] (.+)/g, "$1• $2");
+    return s.split(/\\n{2,}/).map(part => part.startsWith("<pre>") ? part : "<p>" + part.replace(/\\n/g,"<br>") + "</p>").join("");
   }
   function renderMessage(role, content, persist = true) {
     $("welcome")?.remove();
@@ -113,9 +112,9 @@
     node.className = "message " + (role === "user" ? "user" : "assistant");
     const label = document.createElement("span");
     label.className = "who";
-    label.textContent = role === "user" ? "You" : (mode === "ai" ? "DougHub AI" : "Study AI");
+    label.textContent = role === "user" ? "You" : (mode === "ai" ? "DougHub Local AI" : "Study AI");
     const body = document.createElement("div");
-    body.innerHTML = role === "assistant" ? formatAnswer(content) : escapeHTML(content).replace(/\n/g,"<br>");
+    body.innerHTML = role === "assistant" ? formatAnswer(content) : escapeHTML(content).replace(/\\n/g,"<br>");
     node.append(label, body);
     messagesEl.append(node);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -139,54 +138,81 @@
     const node = document.createElement("article");
     node.className = "message assistant";
     node.id = "typingMessage";
-    node.innerHTML = '<span class="who">DougHub AI</span><span class="typing">Thinking <span class="dots"><i></i><i></i><i></i></span></span>';
+    node.innerHTML = '<span class="who">Local AI</span><span class="typing">Thinking <span class="dots"><i></i><i></i><i></i></span></span>';
     messagesEl.append(node);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return node;
   }
+  async function loadLocalModel() {
+    if (engine) return engine;
+    if (enginePromise) return enginePromise;
+    if (!navigator.gpu) {
+      throw new Error("This browser or device does not support WebGPU, which local AI needs. Try an up-to-date Microsoft Edge or Chrome on a compatible computer.");
+    }
+    enginePromise = (async () => {
+      setStatus("Loading local AI…");
+      toast("First-time setup: downloading the AI model to this browser. It may take a while and uses your internet data.");
+      const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+      const create = webllm.CreateMLCEngine || webllm.default?.CreateMLCEngine;
+      if (typeof create !== "function") throw new Error("Could not start the local AI engine. Refresh and try again.");
+      const loadedEngine = await create(MODEL_ID, {
+        initProgressCallback: report => {
+          const text = report?.text || "Preparing local model";
+          const progress = Number.isFinite(report?.progress) ? Math.round(report.progress * 100) : null;
+          setStatus(progress === null ? text : `Loading AI ${progress}%`);
+        }
+      });
+      engine = loadedEngine;
+      setStatus("Local AI ready", true);
+      return engine;
+    })();
+    try { return await enginePromise; }
+    catch (error) { enginePromise = null; setStatus("Local AI not ready"); throw error; }
+  }
   async function sendQuestion(question) {
     const clean = question.trim();
     if (!clean || busy) return;
-    if (!supabase) {
-      toast("The AI connection is still loading. Refresh the page and try again.");
-      return;
-    }
     busy = true;
     sendButton.disabled = true;
     sendButton.textContent = "Thinking…";
     renderMessage("user", clean);
     const typing = addTyping();
-    const prior = conversationHistory.slice(0, -1).slice(-12);
+    const prior = conversationHistory.slice(0, -1).slice(-10);
     try {
-      const {data: sessionData} = await supabase.auth.getSession();
-      if (!sessionData?.session?.access_token) {
-        throw new Error("Please log in to your DougHub account first. The AI endpoint requires an authenticated session to prevent public abuse.");
-      }
-      const {data, error} = await supabase.functions.invoke("study-ai", {
-        body: {
-          mode,
-          question: clean,
-          subject: mode === "study" ? $("subjectFilter").value : "All subjects",
-          style: mode === "study" ? $("styleFilter").value : "General AI assistant",
-          history: prior
+      const localEngine = await loadLocalModel();
+      setStatus("Generating on your device", true);
+      const isStudy = mode === "study";
+      const subject = isStudy ? $("subjectFilter").value : "Any subject";
+      const style = isStudy ? $("styleFilter").value : "Natural response";
+      const systemPrompt = isStudy
+        ? `You are DougHub Study AI, a friendly tutor running locally on the user's device. Subject focus: ${subject}. Answer style: ${style}. The subject is a focus, not a restriction; still answer unrelated questions. Quick answer means concise. Detailed explanation means examples and clear reasoning. Step-by-step tutor means numbered steps and show calculations when useful. Help the student learn. Be accurate, admit uncertainty, never invent sources, and follow safety rules.`
+        : "You are DougHub Local AI, a friendly general-purpose assistant running on the user's device. There are no subject or answer-style filters. Help with appropriate questions about knowledge, coding, writing, brainstorming, explanations, and planning. Be accurate, admit uncertainty, do not invent sources, and follow safety rules.";
+      const messages = [{role:"system",content:systemPrompt}];
+      for (const item of prior) {
+        if (item && ["user","assistant"].includes(item.role) && typeof item.content === "string") {
+          messages.push({role:item.role,content:item.content.slice(0,3000)});
         }
-      });
-      if (error) {
-        let detail = error.message || "The AI request failed.";
-        try { const context = error.context; if (context && typeof context.json === "function") { const body = await context.json(); if (body?.error) detail = body.error; } } catch (_) {}
-        throw new Error(detail);
       }
-      if (!data || typeof data.answer !== "string") throw new Error("The AI service returned an unexpected response.");
+      messages.push({role:"user",content:clean});
+      const result = await localEngine.chat.completions.create({
+        messages,
+        temperature: 0.6,
+        max_tokens: 850
+      });
+      const answer = result?.choices?.[0]?.message?.content;
       typing.remove();
-      renderMessage("assistant", data.answer);
+      if (typeof answer !== "string" || !answer.trim()) throw new Error("The local model returned an empty answer. Please try again.");
+      renderMessage("assistant", answer.trim());
+      setStatus("Local AI ready", true);
     } catch (error) {
       typing.remove();
-      const message = error?.message || "Something went wrong.";
-      renderMessage("assistant", "I couldn't answer that yet. " + message + "\n\nIf this is a setup error, the site owner needs to configure the server-side GROQ_API_KEY secret in Supabase.");
+      const message = error?.message || "Unknown local AI error.";
+      renderMessage("assistant", "I couldn't answer that yet. " + message + "\\n\\nYour browser needs WebGPU support and enough available memory to run the model. No API key is needed.");
+      setStatus("Local AI needs attention");
     } finally {
       busy = false;
       sendButton.disabled = false;
-      sendButton.textContent = "Ask Study AI ↗";
+      sendButton.textContent = mode === "ai" ? "Ask Local AI ↗" : "Ask Study AI ↗";
       promptEl.focus();
     }
   }
@@ -203,7 +229,12 @@
       $("composer").requestSubmit();
     }
   });
-  bindSuggestions();
+
+  function bindSuggestions() {
+    document.querySelectorAll("[data-prompt]").forEach(button => {
+      button.onclick = () => { promptEl.value = button.dataset.prompt; promptEl.focus(); };
+    });
+  }
   function setMode(nextMode) {
     mode = nextMode === "ai" ? "ai" : "study";
     const isStudy = mode === "study";
@@ -212,31 +243,27 @@
     $("studyModeBtn").setAttribute("aria-pressed", String(isStudy));
     $("aiModeBtn").setAttribute("aria-pressed", String(!isStudy));
     $("studyFilters").classList.toggle("mode-hidden", !isStudy);
-    $("conversationTitle").textContent = isStudy ? "✦ Study conversation" : "✦ AI conversation";
+    $("conversationTitle").textContent = isStudy ? "✦ Study conversation" : "✦ Local AI conversation";
     $("modeDescription").textContent = isStudy
-      ? "Guided learning with subject and answer-style filters."
-      : "No filters. Ask general questions, explore ideas, write, code, or brainstorm.";
+      ? "Local guided learning with subject and answer-style filters."
+      : "Runs on your device. No subject filters, no API key, and no AI server.";
     $("welcomeTitle").textContent = isStudy ? "What are we learning today?" : "What can I help you with?";
     $("welcomeText").textContent = isStudy
       ? "Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn."
-      : "Ask freely about almost any topic. There are no subject or answer-style filters in this mode.";
-    document.querySelectorAll(".message.assistant .who").forEach(el => el.textContent = isStudy ? "Study AI" : "DougHub AI");
+      : "Ask freely about a wide range of topics. This mode uses the same local model without the study filters.";
+    document.querySelectorAll(".message.assistant .who").forEach(el => el.textContent = isStudy ? "Study AI" : "DougHub Local AI");
     if (conversationHistory.length === 0) {
       $("welcome").innerHTML = isStudy
         ? '<div class="orb">✦</div><h3 id="welcomeTitle">What are we learning today?</h3><p id="welcomeText">Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain fractions with an easy example, then give me one to try.">➗ Help me understand fractions</button><button class="suggestion" data-prompt="Explain photosynthesis in simple terms and why it matters.">🌱 Explain photosynthesis</button><button class="suggestion" data-prompt="Teach me the key causes and effects of the American Revolution.">🏛️ Learn a history topic</button><button class="suggestion" data-prompt="Write a beginner-friendly Python example and explain each line.">⌘ Learn to code</button></div>'
-        : '<div class="orb">✦</div><h3 id="welcomeTitle">What can I help you with?</h3><p id="welcomeText">Ask freely about almost any topic. There are no subject or answer-style filters in this mode.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain how AI language models work in simple terms.">✦ Explain AI</button><button class="suggestion" data-prompt="Help me debug this code and explain the fix.">⌘ Help with coding</button><button class="suggestion" data-prompt="Brainstorm five original ideas for a useful website.">💡 Brainstorm ideas</button><button class="suggestion" data-prompt="Compare the pros and cons of renewable energy.">🌎 Explore a topic</button></div>';
+        : '<div class="orb">✦</div><h3 id="welcomeTitle">What can I help you with?</h3><p id="welcomeText">Ask freely about a wide range of topics. This mode runs locally in your browser.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain how AI language models work in simple terms.">✦ Explain AI</button><button class="suggestion" data-prompt="Help me debug this code and explain the fix.">⌘ Help with coding</button><button class="suggestion" data-prompt="Brainstorm five original ideas for a useful website.">💡 Brainstorm ideas</button><button class="suggestion" data-prompt="Compare the pros and cons of renewable energy.">🌎 Explore a topic</button></div>';
       bindSuggestions();
     }
+    $("sendButton").textContent = isStudy ? "Ask Study AI ↗" : "Ask Local AI ↗";
     try { const u = new URL(location.href); u.searchParams.set("mode", mode); window.history.replaceState({}, "", u); } catch (_) {}
   }
-  function bindSuggestions() {
-    document.querySelectorAll("[data-prompt]").forEach(button => {
-      button.onclick = () => { promptEl.value = button.dataset.prompt; promptEl.focus(); };
-    });
-  }
+
   $("studyModeBtn").addEventListener("click", () => setMode("study"));
   $("aiModeBtn").addEventListener("click", () => setMode("ai"));
-
   $("clearChat").addEventListener("click", () => {
     if (busy) return;
     conversationHistory = [];
@@ -245,22 +272,13 @@
     const welcome = document.createElement("div");
     welcome.className = "welcome";
     welcome.id = "welcome";
-    welcome.innerHTML = '<div class="orb">✦</div><h3>Fresh page, fresh questions.</h3><p>Pick a subject and an answer style, then ask away.</p>';
+    welcome.innerHTML = '<div class="orb">✦</div><h3>Fresh page, fresh questions.</h3><p>Choose a mode and ask away. The model runs locally on your device.</p>';
     messagesEl.append(welcome);
     setMode(mode);
     toast("Conversation cleared from this browser.");
   });
 
-  try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    supabase.auth.getSession().then(({data}) => {
-      if (data?.session) setStatus("AI endpoint ready", true);
-      else setStatus("Log in to use AI", false);
-    }).catch(() => setStatus("Connection needs attention", false));
-    supabase.auth.onAuthStateChange((_event, session) => setStatus(session ? "AI endpoint ready" : "Log in to use AI", !!session));
-  } catch (_) {
-    setStatus("Connection needs attention", false);
-  }
+  setStatus(navigator.gpu ? "Local AI not loaded" : "WebGPU unavailable");
   renderSaved();
   setMode(mode);
 })();
