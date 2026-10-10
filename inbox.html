@@ -606,8 +606,9 @@ async function saveFeedbackReply(id, element) {
         status.textContent = "Could not save the reply. Check the console for details.";
         return;
     }
+    const previousReply = element.querySelector(".feedback-reply-current");
+    previousReply.textContent = reply ? "Previous reply: " + reply : "";
     status.textContent = reply ? "Reply saved. The user can see it on DougHub." : "Reply cleared.";
-    await loadFeedback();
 }
 
 
