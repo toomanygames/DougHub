@@ -1877,7 +1877,7 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#818cf8,#c084fc)}
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
 </style><style id="dh-tutorial-style">
-.dh-tutorial-highlight{position:relative!important;z-index:100001!important;box-shadow:0 0 0 4px rgba(129,140,248,.75),0 0 35px rgba(129,140,248,.55)!important;border-color:rgba(196,181,253,.9)!important;animation:dhTutorialPulse 1.2s ease-in-out infinite}.dh-tutorial-highlight:after{content:"";position:absolute;inset:-7px;border:2px solid rgba(196,181,253,.5);border-radius:inherit;pointer-events:none}@keyframes dhTutorialPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.22)}}.dh-tutorial{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.dh-tutorial.show{display:flex}.dh-tutorial-backdrop{position:absolute;inset:0;background:rgba(1,2,8,.76);backdrop-filter:blur(14px)}.dh-tutorial-card{position:relative;width:min(520px,100%);padding:30px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:radial-gradient(circle at 85% 5%,rgba(168,85,247,.22),transparent 32%),radial-gradient(circle at 10% 90%,rgba(99,102,241,.2),transparent 38%),rgba(13,17,39,.94);box-shadow:0 35px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07);animation:dhTutorialIn .25s ease}.dh-tutorial-top{display:flex;align-items:center;justify-content:space-between;color:#777b94;font-size:12px;font-weight:800}.dh-tutorial-badge{color:#aaa9ff;letter-spacing:.1em}.dh-tutorial-icon{width:72px;height:72px;display:grid;place-items:center;margin:28px 0 18px;border-radius:22px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.25);font-size:34px;box-shadow:0 12px 35px rgba(99,102,241,.12)}.dh-tutorial-card h2{margin:0;font-size:30px;letter-spacing:-1px}.dh-tutorial-card p{margin:10px 0 0;color:#a7a8b8;font-size:15px;line-height:1.65}.dh-tutorial-dots{display:flex;gap:7px;margin:25px 0}.dh-tutorial-dot{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.16);transition:.2s}.dh-tutorial-dot.active{width:24px;background:linear-gradient(90deg,#6366f1,#a855f7)}.dh-tutorial-actions{display:flex;justify-content:space-between;gap:10px}.dh-tutorial-skip,.dh-tutorial-next{padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.dh-tutorial-skip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#a4a5b5}.dh-tutorial-next{border:0;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px rgba(99,102,241,.2)}@keyframes dhTutorialIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}@media(max-width:560px){.dh-tutorial-card{padding:24px;border-radius:22px}.dh-tutorial-card h2{font-size:25px}}
+.dh-tutorial-highlight{position:relative!important;z-index:100001!important;box-shadow:0 0 0 4px rgba(129,140,248,.75),0 0 35px rgba(129,140,248,.55)!important;border-color:rgba(196,181,253,.9)!important;animation:dhTutorialPulse 1.2s ease-in-out infinite}.dh-tutorial-highlight:after{content:"";position:absolute;inset:-7px;border:2px solid rgba(196,181,253,.5);border-radius:inherit;pointer-events:none}@keyframes dhTutorialPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.22)}}.dh-tutorial{position:fixed;inset:0;z-index:99999;display:none;align-items:flex-end;justify-content:flex-end;padding:22px;pointer-events:none}.dh-tutorial.show{display:flex}.dh-tutorial-backdrop{position:absolute;inset:0;background:rgba(1,2,8,.76);backdrop-filter:blur(14px)}.dh-tutorial-card{position:relative;pointer-events:auto;width:min(430px,100%);padding:25px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:radial-gradient(circle at 85% 5%,rgba(168,85,247,.22),transparent 32%),radial-gradient(circle at 10% 90%,rgba(99,102,241,.2),transparent 38%),rgba(13,17,39,.94);box-shadow:0 35px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07);animation:dhTutorialIn .25s ease}.dh-tutorial-top{display:flex;align-items:center;justify-content:space-between;color:#777b94;font-size:12px;font-weight:800}.dh-tutorial-badge{color:#aaa9ff;letter-spacing:.1em}.dh-tutorial-icon{width:72px;height:72px;display:grid;place-items:center;margin:28px 0 18px;border-radius:22px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.25);font-size:34px;box-shadow:0 12px 35px rgba(99,102,241,.12)}.dh-tutorial-card h2{margin:0;font-size:30px;letter-spacing:-1px}.dh-tutorial-card p{margin:10px 0 0;color:#a7a8b8;font-size:15px;line-height:1.65}.dh-tutorial-dots{display:flex;gap:7px;margin:25px 0}.dh-tutorial-dot{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.16);transition:.2s}.dh-tutorial-dot.active{width:24px;background:linear-gradient(90deg,#6366f1,#a855f7)}.dh-tutorial-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}.dh-tutorial-nav-actions{display:flex;align-items:center;gap:8px}.dh-tutorial-prev{padding:11px 12px;border-radius:12px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#dedfff}.dh-tutorial-prev:disabled{opacity:.35;cursor:default}.dh-tutorial-dot{padding:0;border:0;cursor:pointer}.dh-tutorial-dot:focus-visible{outline:2px solid #fff;outline-offset:3px}.dh-tutorial-skip,.dh-tutorial-next{padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.dh-tutorial-skip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#a4a5b5}.dh-tutorial-next{border:0;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px rgba(99,102,241,.2)}@keyframes dhTutorialIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}@media(max-width:560px){.dh-tutorial{align-items:flex-end;justify-content:center;padding:10px}.dh-tutorial-card{width:100%;padding:20px;border-radius:20px;max-height:72vh;overflow:auto}.dh-tutorial-card h2{font-size:23px}.dh-tutorial-icon{width:54px;height:54px;margin:16px 0 12px;border-radius:16px;font-size:27px}.dh-tutorial-dots{margin:17px 0;gap:5px}.dh-tutorial-actions{align-items:stretch;flex-wrap:wrap}.dh-tutorial-nav-actions{margin-left:auto}.dh-tutorial-prev,.dh-tutorial-skip,.dh-tutorial-next{padding:10px 11px;font-size:12px}}
 </style>  
 <style id="dh-scalable-home-redesign">
 /* DougHub homepage refresh: searchable, scalable tool directory */
@@ -2066,7 +2066,7 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
     <h2 id="dhTutorialTitle">Welcome to DougHub!</h2>
     <p id="dhTutorialText">Your new account is ready. Let’s take a quick tour so you know where everything is.</p>
     <div class="dh-tutorial-dots" id="dhTutorialDots"></div>
-    <div class="dh-tutorial-actions"><button id="dhTutorialSkip" class="dh-tutorial-skip">Skip</button><button id="dhTutorialNext" class="dh-tutorial-next">Next →</button></div>
+    <div class="dh-tutorial-actions"><button id="dhTutorialSkip" class="dh-tutorial-skip">Skip tour</button><div class="dh-tutorial-nav-actions"><button id="dhTutorialPrev" class="dh-tutorial-prev" type="button" disabled>← Previous</button><button id="dhTutorialNext" class="dh-tutorial-next" type="button">Next →</button></div></div>
   </section>
 </div>
 
@@ -3797,16 +3797,22 @@ setInterval(
 
 <script>
 const DOUGHUB_TUTORIAL_STEPS = [
-  {icon:"👋",title:"Welcome to DougHub!",text:"Your account is ready! This quick interactive tour shows you the main things you can do. Follow the highlighted areas, or press Skip at any time.",target:null},
-  {icon:"🎮",title:"Play games",text:"Open Games to browse and play DougHub games. Community Games lets you explore creations shared by other people.",target:'a[href="douggames.html"]'},
-  {icon:"🧰",title:"Explore your tools",text:"The Tools page has useful utilities and projects to help you get things done. You can also use the search box on this homepage to find tools.",target:'a[href="tools.html"]'},
-  {icon:"✳️",title:"Meet Nova AI",text:"Open Nova AI to try DougHub's AI features and get help with ideas or tasks.",target:'a[href="nova.html"]'},
-  {icon:"▶️",title:"Watch and share videos",text:"DougTube is where you can explore community videos and supported media posts.",target:'a[href="DougTube.html"]'},
-  {icon:"🛠️",title:"Organize your work",text:"DougHub Work is a dedicated workspace for organizing work and moving projects forward.",target:'.tool-card-work'},
-  {icon:"⌘",title:"Create and code projects",text:"Open the Scripting Editor to write HTML, CSS and JavaScript, use visual coding blocks, run a live preview, and publish projects for the community to explore.",target:'a[href="Scripting/scripting.html"]'},
-  {icon:"💬",title:"Connect with people",text:"Use Community Chat to talk with other users. DMail is available from the top navigation for messages.",target:'#communityChatLink'},
-  {icon:"⚙️",title:"Make your account yours",text:"Click your account button to find Settings. Update your username, profile picture, email, password, badges, and replay this tour whenever you want.",target:'#accountButton'},
-  {icon:"🚀",title:"You're ready!",text:"That's the tour! You can use Next to review any step, or press Finish. You can replay this tutorial later from Settings.",target:null}
+  {icon:"👋",title:"Welcome to DougHub!",text:"This is your homepage and launchpad. We’ll point out the actual buttons and explain where each one takes you. The highlighted item is what we’re talking about; use Next to continue or Skip whenever you like.",target:null},
+  {icon:"🔎",title:"Find anything on the homepage",text:"Use the search box in the Explore section to filter the tool cards. The category buttons narrow the list, and the Open all tools link takes you to the full Tools page.",target:"#explore"},
+  {icon:"🧰",title:"DougTools — everyday utilities",text:"This card opens DougTools, a collection of handy online utilities and helpers. It’s a good place to look for a quick tool without leaving DougHub.",target:".tool-card-tools"},
+  {icon:"🗂️",title:"DougHub Work — your workspace",text:"This opens DougHub Work, the workspace for keeping tasks and projects organised. Choose it when you want to focus on getting work done rather than browsing games or videos.",target:".tool-card-work"},
+  {icon:"✳️",title:"Nova AI — AI assistance",text:"Nova AI opens DougHub’s AI area. Use it for help with ideas, writing, questions, and other tasks supported by the page.",target:".tool-card-nova"},
+  {icon:"🗃️",title:"DougBase — data and tables",text:"DougBase opens the database workspace, where you can create and manage project data and tables through its interface.",target:".tool-card-base"},
+  {icon:"📁",title:"DougDrive — files and storage",text:"DougDrive is the file-storage area. Open it to work with files and documents supported by DougHub’s drive tools.",target:".tool-card-drive"},
+  {icon:"⌘",title:"Scripting Editor — build with code",text:"The Scripting Editor is for coding, not making games. Write HTML, CSS, and JavaScript, preview your work, use visual coding blocks, and browse or publish Community Projects.",target:".tool-card-code"},
+  {icon:"🎮",title:"Quick access: Games",text:"This shortcut takes you straight to DougGames, where you can browse built-in games and community-made games. It’s the fastest route if you just want to play.",target:'.quick-access-card[href="douggames.html"]'},
+  {icon:"💬",title:"Quick access: Community Chat",text:"This opens Community Chat, where you can talk with other DougHub users. Keep conversations friendly and don’t share private information.",target:'.quick-access-card[href="chat.html"]'},
+  {icon:"▶️",title:"Quick access: DougTube",text:"DougTube is DougHub’s video and media-sharing area. Browse posts from the community and use the features available on that page to share or interact with supported media.",target:'.quick-access-card[href="DougTube.html"]'},
+  {icon:"✉️",title:"Quick access: What is DMail?",text:"DMail is DougHub’s built-in messaging area for messages between users. Click this shortcut to open your inbox and check your messages; the DMail link in the top navigation goes there too.",target:'.quick-access-card[href="DMail.html"]'},
+  {icon:"🧭",title:"The top navigation",text:"The top menu is another way to get around: Home returns here, Games opens the game area, Tools opens the utilities page, DougTube opens videos, and DMail opens messages. You don’t have to return to the homepage every time.",target:"header .nav"},
+  {icon:"👤",title:"Your account menu",text:"Click your avatar or username to open your account menu. From there you can get to Settings and other account options that are available to you.",target:"#accountButton"},
+  {icon:"⚙️",title:"Settings and Replay Tutorial",text:"Settings is where you can manage account preferences and profile details. If you want this tour again later, open Settings and press Replay Tutorial.",target:null},
+  {icon:"🚀",title:"You’re ready to explore!",text:"That’s the main tour of DougHub’s homepage and quick-access shortcuts. Use Previous/Next to revisit a step, or Finish to close the tour. You can replay it any time from Settings.",target:null}
 ];
 let dhTutorialIndex=0;
 function showDougHubTutorial(){
@@ -3825,15 +3831,16 @@ function renderDougHubTutorial(){
   document.getElementById("dhTutorialText").textContent=s.text;
   document.getElementById("dhTutorialStep").textContent=(dhTutorialIndex+1)+" / "+DOUGHUB_TUTORIAL_STEPS.length;
   document.getElementById("dhTutorialNext").textContent=dhTutorialIndex===DOUGHUB_TUTORIAL_STEPS.length-1?"Finish ✓":"Next →";
-  document.getElementById("dhTutorialDots").innerHTML=DOUGHUB_TUTORIAL_STEPS.map((_,i)=>'<span class="dh-tutorial-dot '+(i===dhTutorialIndex?"active":"")+'"></span>').join("");
+  document.getElementById("dhTutorialDots").innerHTML=DOUGHUB_TUTORIAL_STEPS.map((_,i)=>'<button type="button" class="dh-tutorial-dot '+(i===dhTutorialIndex?"active":"")+'" aria-label="Go to tutorial step '+(i+1)+'" data-tutorial-step="'+i+'"></button>').join("");
   document.querySelectorAll(".dh-tutorial-highlight").forEach(el=>el.classList.remove("dh-tutorial-highlight"));
   if(s.target){
     const target=document.querySelector(s.target);
     if(target){
       target.classList.add("dh-tutorial-highlight");
-      target.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
+      target.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center",inline:"nearest"});
     }
   }
+  document.getElementById("dhTutorialPrev").disabled=dhTutorialIndex===0;
 }
 async function finishDougHubTutorial(){
   const modal=document.getElementById("dhTutorial");
@@ -3849,6 +3856,15 @@ async function finishDougHubTutorial(){
 }
 document.getElementById("dhTutorialNext")?.addEventListener("click",()=>{
   if(dhTutorialIndex<DOUGHUB_TUTORIAL_STEPS.length-1){dhTutorialIndex++;renderDougHubTutorial();}else{finishDougHubTutorial();}
+});
+document.getElementById("dhTutorialPrev")?.addEventListener("click",()=>{
+  if(dhTutorialIndex>0){dhTutorialIndex--;renderDougHubTutorial();}
+});
+document.getElementById("dhTutorialDots")?.addEventListener("click",event=>{
+  const dot=event.target.closest("[data-tutorial-step]");
+  if(!dot)return;
+  dhTutorialIndex=Number(dot.dataset.tutorialStep);
+  renderDougHubTutorial();
 });
 document.getElementById("dhTutorialSkip")?.addEventListener("click",finishDougHubTutorial);
 document.querySelector(".dh-tutorial-backdrop")?.addEventListener("click",finishDougHubTutorial);
