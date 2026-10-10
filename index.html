@@ -1994,6 +1994,25 @@ main{width:min(1180px,calc(100% - 64px));margin:0 auto}
 <script src="nav.js" defer></script>
 
 <script src="search-autofill-fix.js" defer></script>
+
+<style id="home-quick-access-style">
+.home-quick-access{width:min(1200px,100%);margin:26px auto 34px;padding:24px;border:1px solid rgba(165,180,252,.16);border-radius:22px;background:linear-gradient(145deg,rgba(17,21,47,.88),rgba(7,9,23,.9));box-shadow:0 18px 45px #0002}
+.quick-access-heading{margin-bottom:18px}
+.quick-access-heading h2{margin:3px 0 6px;font-size:clamp(23px,3vw,30px);letter-spacing:-.6px}
+.quick-access-heading p:not(.directory-eyebrow){margin:0;color:#a5a4b8;font-size:14px;line-height:1.5}
+.quick-access-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.quick-access-card{display:flex;align-items:center;gap:12px;min-width:0;padding:15px;border:1px solid rgba(165,180,252,.15);border-radius:15px;background:rgba(5,7,19,.7);transition:background .16s,border-color .16s,transform .16s}
+.quick-access-card:hover{background:rgba(99,102,241,.12);border-color:rgba(129,140,248,.55);transform:translateY(-2px)}
+.quick-access-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,rgba(99,102,241,.24),rgba(168,85,247,.16));font-size:20px}
+.quick-access-card>span:nth-child(2){display:flex;flex-direction:column;gap:4px;min-width:0}
+.quick-access-card strong{font-size:14px;color:#fff}
+.quick-access-card small{font-size:11px;color:#a5a4b8;line-height:1.4}
+.quick-access-arrow{margin-left:auto;color:#a5b4fc;font-size:17px}
+@media(max-width:850px){.quick-access-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.home-quick-access{padding:17px;margin:20px auto 26px;border-radius:18px}.quick-access-grid{grid-template-columns:1fr;gap:9px}.quick-access-card{padding:13px}}
+@media(prefers-reduced-motion:reduce){.quick-access-card{transition:none}.quick-access-card:hover{transform:none}}
+</style>
+
 </head>
 
 <body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
@@ -2194,6 +2213,18 @@ main{width:min(1180px,calc(100% - 64px));margin:0 auto}
             </a>
         </div>
         <div class="directory-empty" id="toolDirectoryEmpty" hidden><span>⌕</span><h3>Nothing found this time.</h3><p>Try a different search or choose another category.</p><button type="button" id="toolDirectoryReset">Reset filters</button></div>
+    </section>
+
+    <section class="home-quick-access" aria-labelledby="quickAccessTitle">
+        <div class="quick-access-heading">
+            <div><p class="directory-eyebrow">JUMP RIGHT IN</p><h2 id="quickAccessTitle">Quick access</h2><p>Head straight to the main parts of DougHub.</p></div>
+        </div>
+        <div class="quick-access-grid">
+            <a class="quick-access-card" href="douggames.html"><span class="quick-access-icon">🎮</span><span><strong>Games</strong><small>Play and explore games</small></span><span class="quick-access-arrow">↗</span></a>
+            <a class="quick-access-card" href="chat.html"><span class="quick-access-icon">💬</span><span><strong>Community Chat</strong><small>Talk with the community</small></span><span class="quick-access-arrow">↗</span></a>
+            <a class="quick-access-card" href="DougTube.html"><span class="quick-access-icon">▶</span><span><strong>DougTube</strong><small>Watch and share videos</small></span><span class="quick-access-arrow">↗</span></a>
+            <a class="quick-access-card" href="DMail.html"><span class="quick-access-icon">✉</span><span><strong>DMail</strong><small>Open your messages</small></span><span class="quick-access-arrow">↗</span></a>
+        </div>
     </section>
 
     <section class="home-lower-grid home-lower-v2" aria-label="More about DougHub">
