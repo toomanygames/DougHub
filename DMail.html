@@ -744,6 +744,150 @@ html, body {
     overflow-y: scroll !important;
     overflow-x: hidden !important;
 }
+
+/* INDEX-INSPIRED DMAIL REFRESH — component styling only */
+:root{
+ --dm-line:rgba(177,167,255,.16);
+ --dm-line-strong:rgba(177,167,255,.27);
+ --dm-muted:#9698b7;
+ --dm-panel:linear-gradient(145deg,rgba(22,24,48,.96),rgba(12,15,32,.96));
+ --dm-accent:linear-gradient(105deg,#7770f2 0%,#9a63ef 58%,#6e8df4 100%);
+}
+.topbar{
+ background:rgba(10,12,28,.88);
+ border-bottom:1px solid var(--dm-line);
+ box-shadow:0 8px 30px rgba(0,0,0,.14);
+}
+.logo{letter-spacing:-.04em;color:#fbfaff}
+.logo-icon{border-radius:13px;background:linear-gradient(135deg,#7770f2,#a855f7 70%,#6e8df4);box-shadow:0 8px 25px rgba(99,102,241,.28)}
+.home-button{
+ border:1px solid var(--dm-line);border-radius:11px;
+ background:linear-gradient(145deg,rgba(99,102,241,.16),rgba(168,85,247,.10));
+ transition:transform .18s,border-color .18s,background .18s;
+}
+.home-button:hover{transform:translateY(-1px);border-color:var(--dm-line-strong);background:rgba(99,102,241,.22)}
+.sidebar{
+ background:rgba(9,11,26,.72);
+ border-right:1px solid var(--dm-line);
+}
+.compose-button{
+ border:1px solid rgba(255,255,255,.13);
+ border-radius:13px;background:var(--dm-accent);
+ box-shadow:0 12px 30px rgba(99,102,241,.22);
+ transition:transform .18s,box-shadow .18s,filter .18s;
+}
+.compose-button:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(99,102,241,.30);filter:brightness(1.05)}
+.nav{gap:7px}
+.nav-button{
+ border:1px solid transparent;border-radius:11px;
+ color:#aeb0ca;transition:background .18s,border-color .18s,color .18s;
+}
+.nav-button:hover,.nav-button.active{
+ color:#f8f7ff;border-color:rgba(167,139,250,.17);
+ background:linear-gradient(100deg,rgba(99,102,241,.19),rgba(168,85,247,.10));
+}
+.nav-button.admin{color:#a8c8ff}
+.user-box{
+ border:1px solid var(--dm-line);border-radius:15px;
+ background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+}
+.user-name{color:#f3f2ff}
+.user-role{color:var(--dm-muted)}
+.content-header{
+ padding:20px 26px;
+ background:rgba(11,13,30,.56);
+ border-bottom:1px solid var(--dm-line);
+}
+.content-title{color:#fbfaff;font-size:24px;letter-spacing:-.04em}
+.notice{
+ border:1px solid rgba(129,140,248,.20);border-radius:12px;
+ color:#aeb2d0;background:linear-gradient(105deg,rgba(99,102,241,.10),rgba(14,165,233,.045));
+}
+.user-list{border-right:1px solid var(--dm-line)}
+.search-box{border-bottom:1px solid var(--dm-line)}
+.search-box input,.composer textarea,.modal input,.modal textarea{
+ border:1px solid rgba(177,179,255,.19);border-radius:12px;
+ background:rgba(7,9,23,.74);transition:border-color .18s,box-shadow .18s;
+}
+.search-box input:focus,.composer textarea:focus,.modal input:focus,.modal textarea:focus{
+ border-color:rgba(167,160,255,.72);box-shadow:0 0 0 4px rgba(139,123,255,.10);
+}
+.search-box input::placeholder,.composer textarea::placeholder,.modal input::placeholder,.modal textarea::placeholder{color:#777b99}
+.user-item{border-bottom:1px solid rgba(177,167,255,.075);transition:background .16s}
+.user-item:hover,.user-item.selected{
+ background:linear-gradient(100deg,rgba(99,102,241,.16),rgba(168,85,247,.055));
+}
+.user-item.selected{box-shadow:inset 3px 0 #9285ff}
+.avatar{background:linear-gradient(135deg,#7770f2,#a855f7 70%,#6e8df4);box-shadow:0 5px 16px rgba(99,102,241,.15)}
+.username{color:#eeedff}
+.user-sub{color:#8588a7}
+.chat-header{background:rgba(14,16,36,.48);border-bottom:1px solid var(--dm-line)}
+.chat-name{color:#f4f2ff;letter-spacing:-.02em}
+.messages{gap:14px}
+.message{
+ padding:11px 14px;border-radius:15px;
+ background:linear-gradient(145deg,rgba(31,33,59,.9),rgba(18,20,40,.9));
+ border:1px solid rgba(177,179,255,.13);
+ box-shadow:0 8px 22px rgba(0,0,0,.10);
+}
+.message.mine{
+ background:linear-gradient(125deg,rgba(99,102,241,.28),rgba(139,92,246,.20));
+ border-color:rgba(167,139,250,.24);border-bottom-right-radius:5px;
+}
+.message:not(.mine){border-bottom-left-radius:5px}
+.message-author{color:#b9b0ff}
+.message-time{color:#8588a7}
+.empty{color:#8588a7;line-height:1.7}
+.composer{background:rgba(10,12,28,.66);border-top:1px solid var(--dm-line)}
+.composer-inner{align-items:stretch;gap:9px}
+.composer textarea{min-height:48px}
+.attach-button,.send-button{
+ min-height:46px;border-radius:12px;border:1px solid rgba(177,179,255,.15);
+ transition:transform .18s,filter .18s,background .18s;
+}
+.attach-button{background:rgba(255,255,255,.055)}
+.attach-button:hover{background:rgba(99,102,241,.14);transform:translateY(-1px)}
+.send-button,.modal-send{
+ background:var(--dm-accent);box-shadow:0 8px 22px rgba(99,102,241,.18);
+}
+.send-button:hover,.modal-send:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.send-button:disabled,.modal-send:disabled{opacity:.6;cursor:wait;transform:none}
+.file-name{color:#9698b7}
+.other-view{scrollbar-color:rgba(129,140,248,.45) transparent}
+.admin-warning{
+ border:1px solid rgba(96,165,250,.22);border-radius:14px;
+ background:linear-gradient(105deg,rgba(59,130,246,.11),rgba(99,102,241,.06));
+}
+.admin-message{
+ border:1px solid var(--dm-line);border-radius:15px;
+ background:var(--dm-panel);box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+.admin-from{color:#b9b0ff}
+.modal-backdrop{background:rgba(2,4,14,.76)}
+.modal{
+ border:1px solid var(--dm-line-strong);border-radius:22px;
+ background:linear-gradient(145deg,#15172f,#0c1022);
+ box-shadow:0 30px 90px rgba(0,0,0,.56);
+}
+.modal-title{color:#f7f5ff;letter-spacing:-.035em}
+.cancel-button{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.055)}
+.cancel-button:hover{background:rgba(255,255,255,.10)}
+@media(max-width:850px){
+ .content-header{padding:16px 18px}
+ .content-title{font-size:22px}
+}
+@media(max-width:650px){
+ .sidebar{background:rgba(9,11,26,.95);border-bottom:1px solid var(--dm-line)}
+ .nav-button{border:1px solid rgba(177,167,255,.10)}
+ .content-header{gap:12px;padding:14px}
+ .notice{margin-left:12px;margin-right:12px}
+ .messages{padding:16px}
+ .message{max-width:88%}
+ .composer{padding:10px}
+ .composer-inner{gap:6px}
+ .attach-button,.send-button{padding:0 12px}
+}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
   <script src="nav.js" defer></script>
