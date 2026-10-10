@@ -56,9 +56,22 @@
 </style>
   <script src="../nav.js" defer></script>
 
-<link rel="stylesheet" href="../douqhub-theme.css">
-
 <script src="../search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* Local DougHub glass redesign, styled in this page rather than a shared theme file */
+:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+button{font:inherit;transition:filter .16s,border-color .16s,box-shadow .16s}
+button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+
+
+#hud{background:linear-gradient(110deg,rgba(7,9,24,.94),rgba(23,17,54,.9));border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px);box-shadow:0 12px 35px #0003}
+#hud button,#hudToggle,#reset,#homeBtn{background:linear-gradient(135deg,#171b3c,#25204b);color:#f5f6ff;border:1px solid var(--dh-line);border-radius:11px;padding:9px 13px}
+#hud button:hover,#hudToggle:hover,#reset:hover,#homeBtn:hover{border-color:#918bff88;box-shadow:0 6px 20px #6366f122}
+#dmg{color:#fda4af}
+
+</style>
 </head>
 <body>
 <div id="hud"></div>
