@@ -150,16 +150,21 @@
       throw new Error("WebGPU is unavailable in this browser session. Update Edge or Chrome, then open edge://gpu (or chrome://gpu) and check whether WebGPU is enabled. The powerPreference message alone is only a warning; this error means the browser did not expose WebGPU.");
     }
     enginePromise = (async () => {
-      setStatus("Loading local AI…");
-      toast("First-time setup: downloading the lightweight AI model. The compatible model may take a few minutes to download on the first visit.");
+      setStatus("Connecting to local AI library…");
+      toast("First-time setup downloads the local model. Keep this tab open while it loads.");
       const webllm = await import("https://esm.run/@mlc-ai/web-llm");
       const create = webllm.CreateMLCEngine || webllm.default?.CreateMLCEngine;
-      if (typeof create !== "function") throw new Error("Could not start the local AI engine. Refresh and try again.");
+      if (typeof create !== "function") throw new Error("The AI library loaded without its engine function. Refresh and try again.");
+      setStatus("Starting GPU and checking model cache…");
+      const appConfig = webllm.prebuiltAppConfig
+        ? { ...webllm.prebuiltAppConfig, cacheBackend: "indexeddb" }
+        : undefined;
       const loadedEngine = await create(MODEL_ID, {
+        ...(appConfig ? { appConfig } : {}),
         initProgressCallback: report => {
-          const text = report?.text || "Preparing local model";
+          const detail = typeof report?.text === "string" ? report.text : "Preparing model files";
           const progress = Number.isFinite(report?.progress) ? Math.round(report.progress * 100) : null;
-          setStatus(progress === null ? text : `Loading AI ${progress}%`);
+          setStatus(progress === null ? detail : `Downloading / preparing AI: ${progress}%`);
         }
       });
       engine = loadedEngine;
