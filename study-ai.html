@@ -12,7 +12,7 @@
 <script src="search-autofill-fix.js" defer></script>
 <style>
 :root{color-scheme:dark;--bg:#070814;--panel:rgba(17,19,43,.82);--line:rgba(255,255,255,.09);--muted:#a3a5bf;--purple:#8b5cf6;--indigo:#6366f1}
-*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;color:#f8f7ff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 10% -10%,#29205c 0,transparent 38%),radial-gradient(ellipse at 95% 5%,#32144b 0,transparent 32%),var(--bg)}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}.topbar{height:70px;padding:0 clamp(16px,4vw,42px);display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);background:#070814c9;backdrop-filter:blur(18px);position:sticky;top:0;z-index:10}.brand{font-size:21px;font-weight:900;letter-spacing:-.7px}.brand span{color:#b9a4ff}.navlinks{display:flex;gap:20px;align-items:center;flex-wrap:wrap;color:#b7b6ce;font-size:13px;font-weight:700}.navlinks a:hover,.navlinks a.active{color:#fff}.wrap{width:min(1160px,calc(100% - 32px));margin:0 auto;padding:36px 0 56px}.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;padding:clamp(26px,5vw,52px);background:linear-gradient(130deg,#17163bdb,#111126df 60%,#28153bba);box-shadow:0 26px 90px #0005}.hero:after{content:"✦";position:absolute;right:7%;top:6%;font-size:clamp(100px,20vw,230px);line-height:1;color:#c4b5fd0b;pointer-events:none}.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid #a78bfa45;border-radius:999px;padding:7px 11px;background:#8b5cf619;color:#c4b5fd;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}.eyebrow i{width:7px;height:7px;border-radius:50%;background:#a78bfa;box-shadow:0 0 14px #a78bfa}.hero h1{font-size:clamp(36px,6vw,66px);line-height:1.02;letter-spacing:-2.5px;margin:20px 0 13px;max-width:760px}.gradient{background:linear-gradient(90deg,#a5b4fc,#d8b4fe,#f0abfc);color:transparent;background-clip:text;-webkit-background-clip:text}.hero p{max-width:710px;margin:0;color:#b9b8cf;font-size:16px;line-height:1.75}.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.tag{border:1px solid #ffffff12;border-radius:10px;background:#ffffff07;padding:8px 11px;color:#c9c8dc;font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:18px;margin-top:20px;align-items:start}.chat-panel,.side-panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 60px #0002}.chat-panel{min-width:0;overflow:hidden}.panel-head{padding:19px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-head h2{font-size:16px;margin:0}.status{display:flex;align-items:center;gap:7px;color:#9ca3b8;font-size:11px}.status:before{content:"";width:7px;height:7px;border-radius:50%;background:#fbbf24}.status.ready:before{background:#34d399}.filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:17px 20px;border-bottom:1px solid var(--line);background:#ffffff02}.filter label{display:block;color:#9e9db7;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}.select{width:100%;border:1px solid #ffffff16;border-radius:11px;background:#0b0c1e;color:#f6f4ff;padding:11px 12px;outline:none}.select:focus,.prompt:focus{border-color:#8b5cf6a6;box-shadow:0 0 0 3px #8b5cf61c}.messages{padding:20px;min-height:380px;max-height:58vh;overflow:auto;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}.welcome{margin:auto;max-width:530px;text-align:center;padding:22px 10px}.orb{width:60px;height:60px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 40px #8b5cf638}.welcome h3{font-size:23px;margin:0 0 8px;letter-spacing:-.5px}.welcome p{color:var(--muted);font-size:13px;line-height:1.7;margin:0 auto;max-width:440px}.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px;text-align:left}.suggestion{border:1px solid var(--line);border-radius:13px;padding:12px;background:#ffffff05;color:#d7d4ed;font-size:12px;line-height:1.45;cursor:pointer;transition:.18s}.suggestion:hover{border-color:#a78bfa66;background:#8b5cf614;transform:translateY(-1px)}.message{max-width:92%;border:1px solid var(--line);border-radius:16px;padding:13px 15px;line-height:1.7;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{align-self:flex-end;background:linear-gradient(135deg,#3730a3a8,#6d28d9a1);border-color:#a78bfa3b;border-bottom-right-radius:5px}.message.assistant{align-self:flex-start;background:#ffffff05;border-bottom-left-radius:5px}.message .who{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#bcb7ed;margin-bottom:7px}.message p{margin:0 0 10px}.message p:last-child{margin-bottom:0}.message ul,.message ol{margin:8px 0;padding-left:20px}.message code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#0004;border-radius:5px;padding:2px 5px}.message pre{white-space:pre-wrap;background:#050610;padding:12px;border-radius:9px;overflow:auto}.message strong{color:#fff}.message a{color:#c4b5fd;text-decoration:underline}.typing{color:#b9b4db;display:flex;align-items:center;gap:8px}.dots{display:inline-flex;gap:4px}.dots i{width:5px;height:5px;border-radius:50%;background:#c4b5fd;animation:bob 1s infinite alternate}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes bob{to{opacity:.25;transform:translateY(-3px)}}.composer{border-top:1px solid var(--line);padding:15px 17px 17px;background:#080917a8}.prompt-wrap{position:relative;border:1px solid #ffffff19;border-radius:16px;background:#080a19;transition:.2s}.prompt-wrap:focus-within{border-color:#8b5cf6a6;box-shadow:0 0 0 3px #8b5cf61c}.prompt{display:block;width:100%;min-height:65px;max-height:190px;resize:vertical;border:0;outline:0;background:transparent;color:white;padding:14px 15px;font-size:13px;line-height:1.6}.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px 8px 12px}.hint{font-size:10px;color:#73748f}.send{border:0;border-radius:10px;padding:10px 15px;color:white;font-size:12px;font-weight:900;background:linear-gradient(135deg,#6366f1,#9333ea);cursor:pointer;box-shadow:0 7px 22px #6366f12a;transition:.18s}.send:hover{filter:brightness(1.13);transform:translateY(-1px)}.send:disabled{opacity:.55;cursor:wait;transform:none}.composer-actions{display:flex;align-items:center;gap:12px}.text-btn{background:transparent;border:0;color:#9d9bb9;font-size:11px;cursor:pointer}.text-btn:hover{color:#fff}.side-panel{padding:19px}.side-panel h3{font-size:14px;margin:0 0 14px}.side-item{padding:13px 0;border-top:1px solid var(--line)}.side-item:first-of-type{border-top:0;padding-top:0}.side-item b{display:block;font-size:12px;margin-bottom:5px;color:#e8e5ff}.side-item p{margin:0;color:#9e9db7;font-size:11px;line-height:1.65}.side-note{border:1px solid #fbbf2433;background:#fbbf240b;border-radius:12px;padding:12px;color:#e9d6a0;font-size:11px;line-height:1.6;margin-top:13px}.footer{text-align:center;color:#6f718b;font-size:11px;margin-top:24px;line-height:1.7}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:99;padding:12px 16px;border:1px solid #ffffff22;border-radius:12px;background:#17152c;color:#f6f2ff;box-shadow:0 12px 40px #0008;font-size:12px;max-width:calc(100% - 30px)}.hidden{display:none!important}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;color:#f8f7ff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 10% -10%,#29205c 0,transparent 38%),radial-gradient(ellipse at 95% 5%,#32144b 0,transparent 32%),var(--bg)}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}.topbar{height:70px;padding:0 clamp(16px,4vw,42px);display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);background:#070814c9;backdrop-filter:blur(18px);position:sticky;top:0;z-index:10}.brand{font-size:21px;font-weight:900;letter-spacing:-.7px}.brand span{color:#b9a4ff}.navlinks{display:flex;gap:20px;align-items:center;flex-wrap:wrap;color:#b7b6ce;font-size:13px;font-weight:700}.navlinks a:hover,.navlinks a.active{color:#fff}.wrap{width:min(1160px,calc(100% - 32px));margin:0 auto;padding:36px 0 56px}.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;padding:clamp(26px,5vw,52px);background:linear-gradient(130deg,#17163bdb,#111126df 60%,#28153bba);box-shadow:0 26px 90px #0005}.hero:after{content:"✦";position:absolute;right:7%;top:6%;font-size:clamp(100px,20vw,230px);line-height:1;color:#c4b5fd0b;pointer-events:none}.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid #a78bfa45;border-radius:999px;padding:7px 11px;background:#8b5cf619;color:#c4b5fd;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}.eyebrow i{width:7px;height:7px;border-radius:50%;background:#a78bfa;box-shadow:0 0 14px #a78bfa}.hero h1{font-size:clamp(36px,6vw,66px);line-height:1.02;letter-spacing:-2.5px;margin:20px 0 13px;max-width:760px}.gradient{background:linear-gradient(90deg,#a5b4fc,#d8b4fe,#f0abfc);color:transparent;background-clip:text;-webkit-background-clip:text}.hero p{max-width:710px;margin:0;color:#b9b8cf;font-size:16px;line-height:1.75}.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.tag{border:1px solid #ffffff12;border-radius:10px;background:#ffffff07;padding:8px 11px;color:#c9c8dc;font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:18px;margin-top:20px;align-items:start}.chat-panel,.side-panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 60px #0002}.chat-panel{min-width:0;overflow:hidden}.panel-head{padding:19px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-head h2{font-size:16px;margin:0}.status{display:flex;align-items:center;gap:7px;color:#9ca3b8;font-size:11px}.status:before{content:"";width:7px;height:7px;border-radius:50%;background:#fbbf24}.status.ready:before{background:#34d399}.mode-switch{display:flex;gap:7px;padding:12px 20px 0}.mode-btn{flex:1;border:1px solid #ffffff14;border-radius:11px;padding:12px;background:#ffffff04;color:#a7a5c4;font-weight:850;font-size:12px;cursor:pointer;transition:.18s}.mode-btn.active{color:#fff;border-color:#a78bfa66;background:linear-gradient(120deg,#6366f12b,#a855f72b);box-shadow:inset 0 0 0 1px #a78bfa12}.mode-description{padding:10px 20px 0;color:#9d9bb8;font-size:11px;line-height:1.5}.filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line);background:#ffffff02}.filters.mode-hidden{display:none}.filter label{display:block;color:#9e9db7;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}.select{width:100%;border:1px solid #ffffff16;border-radius:11px;background:#0b0c1e;color:#f6f4ff;padding:11px 12px;outline:none}.select:focus,.prompt:focus{border-color:#8b5cf6a6;box-shadow:0 0 0 3px #8b5cf61c}.messages{padding:20px;min-height:380px;max-height:58vh;overflow:auto;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}.welcome{margin:auto;max-width:530px;text-align:center;padding:22px 10px}.orb{width:60px;height:60px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 40px #8b5cf638}.welcome h3{font-size:23px;margin:0 0 8px;letter-spacing:-.5px}.welcome p{color:var(--muted);font-size:13px;line-height:1.7;margin:0 auto;max-width:440px}.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px;text-align:left}.suggestion{border:1px solid var(--line);border-radius:13px;padding:12px;background:#ffffff05;color:#d7d4ed;font-size:12px;line-height:1.45;cursor:pointer;transition:.18s}.suggestion:hover{border-color:#a78bfa66;background:#8b5cf614;transform:translateY(-1px)}.message{max-width:92%;border:1px solid var(--line);border-radius:16px;padding:13px 15px;line-height:1.7;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{align-self:flex-end;background:linear-gradient(135deg,#3730a3a8,#6d28d9a1);border-color:#a78bfa3b;border-bottom-right-radius:5px}.message.assistant{align-self:flex-start;background:#ffffff05;border-bottom-left-radius:5px}.message .who{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#bcb7ed;margin-bottom:7px}.message p{margin:0 0 10px}.message p:last-child{margin-bottom:0}.message ul,.message ol{margin:8px 0;padding-left:20px}.message code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#0004;border-radius:5px;padding:2px 5px}.message pre{white-space:pre-wrap;background:#050610;padding:12px;border-radius:9px;overflow:auto}.message strong{color:#fff}.message a{color:#c4b5fd;text-decoration:underline}.typing{color:#b9b4db;display:flex;align-items:center;gap:8px}.dots{display:inline-flex;gap:4px}.dots i{width:5px;height:5px;border-radius:50%;background:#c4b5fd;animation:bob 1s infinite alternate}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes bob{to{opacity:.25;transform:translateY(-3px)}}.composer{border-top:1px solid var(--line);padding:15px 17px 17px;background:#080917a8}.prompt-wrap{position:relative;border:1px solid #ffffff19;border-radius:16px;background:#080a19;transition:.2s}.prompt-wrap:focus-within{border-color:#8b5cf6a6;box-shadow:0 0 0 3px #8b5cf61c}.prompt{display:block;width:100%;min-height:65px;max-height:190px;resize:vertical;border:0;outline:0;background:transparent;color:white;padding:14px 15px;font-size:13px;line-height:1.6}.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px 8px 12px}.hint{font-size:10px;color:#73748f}.send{border:0;border-radius:10px;padding:10px 15px;color:white;font-size:12px;font-weight:900;background:linear-gradient(135deg,#6366f1,#9333ea);cursor:pointer;box-shadow:0 7px 22px #6366f12a;transition:.18s}.send:hover{filter:brightness(1.13);transform:translateY(-1px)}.send:disabled{opacity:.55;cursor:wait;transform:none}.composer-actions{display:flex;align-items:center;gap:12px}.text-btn{background:transparent;border:0;color:#9d9bb9;font-size:11px;cursor:pointer}.text-btn:hover{color:#fff}.side-panel{padding:19px}.side-panel h3{font-size:14px;margin:0 0 14px}.side-item{padding:13px 0;border-top:1px solid var(--line)}.side-item:first-of-type{border-top:0;padding-top:0}.side-item b{display:block;font-size:12px;margin-bottom:5px;color:#e8e5ff}.side-item p{margin:0;color:#9e9db7;font-size:11px;line-height:1.65}.side-note{border:1px solid #fbbf2433;background:#fbbf240b;border-radius:12px;padding:12px;color:#e9d6a0;font-size:11px;line-height:1.6;margin-top:13px}.footer{text-align:center;color:#6f718b;font-size:11px;margin-top:24px;line-height:1.7}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:99;padding:12px 16px;border:1px solid #ffffff22;border-radius:12px;background:#17152c;color:#f6f2ff;box-shadow:0 12px 40px #0008;font-size:12px;max-width:calc(100% - 30px)}.hidden{display:none!important}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.side-panel{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.side-panel h3{grid-column:1/-1}.side-note{grid-column:1/-1}.messages{max-height:62vh}.navlinks{gap:12px}}
 @media(max-width:540px){.topbar{height:auto;min-height:62px;padding:12px 15px;align-items:flex-start;flex-direction:column;gap:10px}.navlinks{width:100%;gap:15px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.navlinks a{white-space:nowrap}.wrap{width:calc(100% - 20px);padding-top:18px}.hero{border-radius:21px;padding:25px 20px}.hero h1{letter-spacing:-1.7px}.hero p{font-size:14px}.filters{padding:13px;gap:9px}.filter label{font-size:10px}.select{padding:10px 8px;font-size:12px}.panel-head{padding:15px}.messages{padding:13px;min-height:360px}.welcome{padding:15px 2px}.suggestions{grid-template-columns:1fr}.message{max-width:98%;font-size:12px}.composer{padding:12px}.side-panel{display:block;padding:16px}.side-item{padding:12px 0}.hint{max-width:170px;line-height:1.5}}
 </style>
@@ -33,14 +33,15 @@
   </section>
   <section class="layout">
     <div class="chat-panel">
-      <div class="panel-head"><h2>✦ Study conversation</h2><span id="connectionStatus" class="status">Checking AI connection</span></div>
-      <div class="filters">
+      <div class="panel-head"><h2 id="conversationTitle">✦ Study conversation</h2><span id="connectionStatus" class="status">Checking AI connection</span></div>
+      <div class="mode-switch" role="group" aria-label="Choose AI mode"><button type="button" class="mode-btn active" id="studyModeBtn" aria-pressed="true">📚 Study Mode</button><button type="button" class="mode-btn" id="aiModeBtn" aria-pressed="false">✦ AI Mode</button></div><div class="mode-description" id="modeDescription">Guided learning with subject and answer-style filters.</div>
+      <div class="filters" id="studyFilters">
         <div class="filter"><label for="subjectFilter">Filter 1 · Subject</label><select id="subjectFilter" class="select"><option value="All subjects">All subjects</option><option>Maths</option><option>Science</option><option>History</option><option>English & writing</option><option>Geography</option><option>Computers & coding</option><option>Art & music</option><option>Languages</option><option>Economics & business</option><option>Health & everyday knowledge</option></select></div>
         <div class="filter"><label for="styleFilter">Filter 2 · Answer style</label><select id="styleFilter" class="select"><option value="Step-by-step tutor">Step-by-step tutor</option><option value="Quick answer">Quick answer</option><option value="Detailed explanation">Detailed explanation</option></select></div>
       </div>
       <div id="messages" class="messages" aria-live="polite">
         <div class="welcome" id="welcome">
-          <div class="orb">✦</div><h3>What are we learning today?</h3><p>Ask almost anything. Pick a subject and an answer style above, then keep asking follow-ups as you learn.</p>
+          <div class="orb">✦</div><h3 id="welcomeTitle">What are we learning today?</h3><p id="welcomeText">Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn.</p>
           <div class="suggestions">
             <button class="suggestion" data-prompt="Explain fractions with an easy example, then give me one to try.">➗ Help me understand fractions</button>
             <button class="suggestion" data-prompt="Explain photosynthesis in simple terms and why it matters.">🌱 Explain photosynthesis</button>
@@ -51,7 +52,7 @@
       </div>
       <form id="composer" class="composer">
         <div class="prompt-wrap"><textarea id="prompt" class="prompt" maxlength="6000" rows="2" placeholder="Ask a question, paste a problem, or tell me what you want to learn…" aria-label="Your question" required></textarea><div class="composer-bottom"><span class="hint">Enter to send · Shift + Enter for a new line</span><button class="send" id="sendButton" type="submit">Ask Study AI ↗</button></div></div>
-        <div class="composer-actions" style="justify-content:space-between;margin-top:10px"><span class="hint">Your conversation is saved only in this browser.</span><button type="button" class="text-btn" id="clearChat">Clear conversation</button></div>
+        <div class="composer-actions" style="justify-content:space-between;margin-top:10px"><span class="hint">Conversation saved only in this browser.</span><button type="button" class="text-btn" id="clearChat">Clear conversation</button></div>
       </form>
     </div>
     <aside class="side-panel">
@@ -63,14 +64,15 @@
       <div class="side-note"><b>Study tip</b><br>AI can make mistakes. For assignments, check facts against your class notes or teacher's materials and use explanations to build your own understanding.</div>
     </aside>
   </section>
-  <div class="footer">DougHub Study AI · Powered by a server-side language model once the AI secret is configured.<br>Don't enter passwords, private information, or sensitive personal details.</div>
+  <div class="footer">DougHub Study AI + AI Mode · Powered by a server-side language model once the AI secret is configured.<br>Don't enter passwords, private information, or sensitive personal details.</div>
 </main>
 <div id="toast" class="toast hidden" role="status"></div>
 <script>
 (() => {
   const SUPABASE_URL = "https://agsqdqcsmsppcdqxlppj.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnc3FkcWNzbXNwcGNkcXhscHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4NDc2MDYsImV4cCI6MjEwNTQyMzYwNn0.2FFRec6crnbFNPRxeE4qz_8rm4nPQn9py1DwWkXk32A";
-  const MEMORY_KEY = "doughub-study-ai-chat-v1";
+  const MEMORY_KEY = "doughub-study-ai-chat-v2";
+  let mode = new URLSearchParams(location.search).get("mode") === "ai" ? "ai" : "study";
   const $ = id => document.getElementById(id);
   const messagesEl = $("messages");
   const promptEl = $("prompt");
@@ -111,7 +113,7 @@
     node.className = "message " + (role === "user" ? "user" : "assistant");
     const label = document.createElement("span");
     label.className = "who";
-    label.textContent = role === "user" ? "You" : "Study AI";
+    label.textContent = role === "user" ? "You" : (mode === "ai" ? "DougHub AI" : "Study AI");
     const body = document.createElement("div");
     body.innerHTML = role === "assistant" ? formatAnswer(content) : escapeHTML(content).replace(/\n/g,"<br>");
     node.append(label, body);
@@ -137,7 +139,7 @@
     const node = document.createElement("article");
     node.className = "message assistant";
     node.id = "typingMessage";
-    node.innerHTML = '<span class="who">Study AI</span><span class="typing">Thinking <span class="dots"><i></i><i></i><i></i></span></span>';
+    node.innerHTML = '<span class="who">DougHub AI</span><span class="typing">Thinking <span class="dots"><i></i><i></i><i></i></span></span>';
     messagesEl.append(node);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return node;
@@ -162,9 +164,10 @@
       }
       const {data, error} = await supabase.functions.invoke("study-ai", {
         body: {
+          mode,
           question: clean,
-          subject: $("subjectFilter").value,
-          style: $("styleFilter").value,
+          subject: mode === "study" ? $("subjectFilter").value : "All subjects",
+          style: mode === "study" ? $("styleFilter").value : "General AI assistant",
           history: prior
         }
       });
@@ -200,10 +203,40 @@
       $("composer").requestSubmit();
     }
   });
-  document.querySelectorAll("[data-prompt]").forEach(button => button.addEventListener("click", () => {
-    promptEl.value = button.dataset.prompt;
-    promptEl.focus();
-  }));
+  bindSuggestions();
+  function setMode(nextMode) {
+    mode = nextMode === "ai" ? "ai" : "study";
+    const isStudy = mode === "study";
+    $("studyModeBtn").classList.toggle("active", isStudy);
+    $("aiModeBtn").classList.toggle("active", !isStudy);
+    $("studyModeBtn").setAttribute("aria-pressed", String(isStudy));
+    $("aiModeBtn").setAttribute("aria-pressed", String(!isStudy));
+    $("studyFilters").classList.toggle("mode-hidden", !isStudy);
+    $("conversationTitle").textContent = isStudy ? "✦ Study conversation" : "✦ AI conversation";
+    $("modeDescription").textContent = isStudy
+      ? "Guided learning with subject and answer-style filters."
+      : "No filters. Ask general questions, explore ideas, write, code, or brainstorm.";
+    $("welcomeTitle").textContent = isStudy ? "What are we learning today?" : "What can I help you with?";
+    $("welcomeText").textContent = isStudy
+      ? "Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn."
+      : "Ask freely about almost any topic. There are no subject or answer-style filters in this mode.";
+    document.querySelectorAll(".message.assistant .who").forEach(el => el.textContent = isStudy ? "Study AI" : "DougHub AI");
+    if (history.length === 0) {
+      $("welcome").innerHTML = isStudy
+        ? '<div class="orb">✦</div><h3 id="welcomeTitle">What are we learning today?</h3><p id="welcomeText">Ask a question, choose a subject and answer style, then keep asking follow-ups as you learn.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain fractions with an easy example, then give me one to try.">➗ Help me understand fractions</button><button class="suggestion" data-prompt="Explain photosynthesis in simple terms and why it matters.">🌱 Explain photosynthesis</button><button class="suggestion" data-prompt="Teach me the key causes and effects of the American Revolution.">🏛️ Learn a history topic</button><button class="suggestion" data-prompt="Write a beginner-friendly Python example and explain each line.">⌘ Learn to code</button></div>'
+        : '<div class="orb">✦</div><h3 id="welcomeTitle">What can I help you with?</h3><p id="welcomeText">Ask freely about almost any topic. There are no subject or answer-style filters in this mode.</p><div class="suggestions"><button class="suggestion" data-prompt="Explain how AI language models work in simple terms.">✦ Explain AI</button><button class="suggestion" data-prompt="Help me debug this code and explain the fix.">⌘ Help with coding</button><button class="suggestion" data-prompt="Brainstorm five original ideas for a useful website.">💡 Brainstorm ideas</button><button class="suggestion" data-prompt="Compare the pros and cons of renewable energy.">🌎 Explore a topic</button></div>';
+      bindSuggestions();
+    }
+    try { const u = new URL(location.href); u.searchParams.set("mode", mode); history.replaceState({}, "", u); } catch (_) {}
+  }
+  function bindSuggestions() {
+    document.querySelectorAll("[data-prompt]").forEach(button => {
+      button.onclick = () => { promptEl.value = button.dataset.prompt; promptEl.focus(); };
+    });
+  }
+  $("studyModeBtn").addEventListener("click", () => setMode("study"));
+  $("aiModeBtn").addEventListener("click", () => setMode("ai"));
+
   $("clearChat").addEventListener("click", () => {
     if (busy) return;
     history = [];
@@ -228,6 +261,7 @@
     setStatus("Connection needs attention", false);
   }
   renderSaved();
+  setMode(mode);
 })();
 </script>
 </body>
