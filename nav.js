@@ -146,8 +146,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dmail.html"]);
-  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dmail.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
