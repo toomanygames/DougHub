@@ -175,6 +175,9 @@
     nav.appendChild(account);
     if (!account.dataset.dhAccountBound) {
       account.dataset.dhAccountBound = "true";
+      // These pages already have the homepage-style account controller in their own scripts.
+      const pageAlreadyBindsAccount = ["index.html","douggames.html","dougtube.html"].includes(pathKey());
+      if (pageAlreadyBindsAccount) return;
       const button = account.querySelector("#accountButton");
       const menu = account.querySelector("#accountMenu");
       const logout = account.querySelector("#logoutButton");
