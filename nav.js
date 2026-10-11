@@ -47,7 +47,7 @@
         display:flex; align-items:center; justify-content:flex-end;
         gap:8px; flex-wrap:wrap; min-width:0;
       }
-      header .nav > a, header nav[aria-label="Main navigation"] > a {
+      header .nav > a, header nav[aria-label="Main navigation"] > a, header.top>nav.nav>a {
         display:inline-flex; align-items:center; justify-content:center;
         gap:5px; font-size:13px; line-height:1.25; text-decoration:none !important;
         padding:9px 12px !important; border:1px solid transparent;
@@ -55,7 +55,7 @@
         background:transparent; white-space:nowrap;
         transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
       }
-      header .nav > a:hover, header nav[aria-label="Main navigation"] > a:hover {
+      header .nav > a:hover, header nav[aria-label="Main navigation"] > a:hover, header.top>nav.nav>a:hover {
         background:#ffffff12 !important; color:#fff !important; transform:translateY(-1px);
       }
       header .nav > a.active, header .nav > a[aria-current="page"],
