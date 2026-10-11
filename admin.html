@@ -3957,7 +3957,7 @@ async function loadDougHubMusicModeration() {
             if (track.status !== "rejected") {
                 const reject = document.createElement("button");
                 reject.type = "button";
-                reject.className = "secondary-button";
+                reject.className = "delete-button";
                 reject.textContent = "Reject";
                 reject.addEventListener("click", async () => {
                     const updated = await supabaseClient.from("douqhub_music_tracks").update({status:"rejected"}).eq("id", track.id);
@@ -4021,7 +4021,7 @@ async function loadDougHubMusicModeration() {
             if (album.status !== "rejected") {
                 const reject = document.createElement("button");
                 reject.type = "button";
-                reject.className = "secondary-button";
+                reject.className = "delete-button";
                 reject.textContent = "Reject album";
                 reject.addEventListener("click", async () => {
                     const updated = await supabaseClient.from("douqhub_music_albums").update({status:"rejected"}).eq("id", album.id);
