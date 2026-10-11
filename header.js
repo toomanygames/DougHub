@@ -234,6 +234,37 @@
       opacity: .94;
     }
 
+    html body header .dh-shared-account,
+    html body header .account-area.dh-shared-account {
+      display: flex !important;
+      align-items: center !important;
+      flex: 0 0 auto !important;
+      position: relative !important;
+      margin: 0 0 0 8px !important;
+    }
+    html body header .dh-shared-account .account-btn {
+      min-height: 46px !important;
+      padding: 6px 12px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 9px !important;
+      border-radius: 12px !important;
+      white-space: nowrap !important;
+    }
+    html body header .dh-shared-account .account-avatar {
+      width: 32px !important;
+      height: 32px !important;
+      min-width: 32px !important;
+      flex: 0 0 32px !important;
+      border-radius: 50% !important;
+      overflow: hidden !important;
+    }
+    html body header .dh-shared-account .account-avatar img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+
     html body header .logo-icon,
     html body header .logo-mark,
     html body header .brand-icon,
