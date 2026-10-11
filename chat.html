@@ -683,11 +683,35 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+// Reuse display.js's single authenticated client instead of creating a
+// second GoTrueClient with the same browser storage key.
+let supabaseClient = window.DougHubSupabaseClient || null;
+
+function waitForSharedSupabaseClient(timeoutMs = 15000) {
+  if (window.DougHubSupabaseClient) {
+    return Promise.resolve(window.DougHubSupabaseClient);
+  }
+
+  return new Promise((resolve, reject) => {
+    let finished = false;
+    const finish = (client) => {
+      if (finished) return;
+      finished = true;
+      window.removeEventListener("douqhub:supabase-ready", onReady);
+      clearTimeout(timer);
+      if (client) resolve(client);
+      else reject(new Error("DougHub's shared Supabase client did not initialize."));
+    };
+    const onReady = () => finish(window.DougHubSupabaseClient || null);
+    window.addEventListener("douqhub:supabase-ready", onReady);
+    const timer = setTimeout(
+      () => finish(window.DougHubSupabaseClient || null),
+      timeoutMs
+    );
+    // Check again after registering in case initialization completed in between.
+    if (window.DougHubSupabaseClient) finish(window.DougHubSupabaseClient);
+  });
+}
 
 
 /* =========================================
@@ -1260,7 +1284,7 @@ async function sendMessage() {
     );
 
     showError(
-      "Could not send your message."
+      "Could not send your message: " + (error.message || error.details || "Supabase rejected the request.")
     );
 
     return;
@@ -1430,28 +1454,35 @@ function startChatRefresh() {
    AUTH
 ========================================= */
 
-supabaseClient.auth.onAuthStateChange(
-  (event, session) => {
-
-    currentUser = session?.user || null;
-
-  if (!currentUser) {
-
-    currentUsername = "Guest";
-    currentAvatarUrl = "";
-    currentUsernameEl.textContent = "Guest";
-
-  }
-
-  }
-);
-
-
 /* =========================================
    START
 ========================================= */
 
-loadAccount();
+async function startCommunityChat() {
+  try {
+    supabaseClient = await waitForSharedSupabaseClient();
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      currentUser = session?.user || null;
+
+      if (!currentUser) {
+        currentUsername = "Guest";
+        currentAvatarUrl = "";
+        currentUsernameEl.textContent = "Guest";
+      }
+    });
+
+    await loadAccount();
+  } catch (error) {
+    console.error("Community Chat could not initialize Supabase:", error);
+    showError("Chat couldn't connect to DougHub's database. Please refresh the page.");
+    messagesEl.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div>Chat could not connect.</div></div>';
+    sendButton.disabled = true;
+    messageInput.disabled = true;
+  }
+}
+
+startCommunityChat();
 
 </script>
 
