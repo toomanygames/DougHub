@@ -893,6 +893,96 @@
 
 
     /* =========================================
+       SITE-WIDE CHAT MESSAGE DINGS
+    ========================================= */
+
+    function startDougHubChatDings(client) {
+        if (window.__douqhubChatDingsStarted) return;
+        window.__douqhubChatDingsStarted = true;
+        const enabledKey = "douqhub_chat_dings_enabled";
+        const cooldownKey = "douqhub_chat_ding_last_played";
+        const cooldownMs = 90 * 1000;
+        let cursorCreatedAt = null, initialized = false, audioContext = null, audioUnlocked = false, checking = false;
+
+        function enabled() {
+            try { return localStorage.getItem(enabledKey) !== "false"; } catch (_) { return true; }
+        }
+        function unlockAudio() {
+            try {
+                const AudioCtor = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtor) return;
+                if (!audioContext) audioContext = new AudioCtor();
+                if (audioContext.state === "suspended") audioContext.resume();
+                audioUnlocked = true;
+            } catch (_) {}
+        }
+        window.addEventListener("pointerdown", unlockAudio, { passive: true });
+        window.addEventListener("keydown", unlockAudio);
+        window.addEventListener("douqhub:chat-ding-setting-changed", () => { if (enabled()) unlockAudio(); });
+
+        function playDing() {
+            if (!enabled() || !audioUnlocked || !audioContext || document.visibilityState === "hidden") return;
+            const now = Date.now();
+            try {
+                const previous = Number(localStorage.getItem(cooldownKey) || 0);
+                if (now - previous < cooldownMs) return;
+                localStorage.setItem(cooldownKey, String(now));
+            } catch (_) {
+                if (window.__douqhubLastLocalDing && now - window.__douqhubLastLocalDing < cooldownMs) return;
+                window.__douqhubLastLocalDing = now;
+            }
+            try {
+                const ctx = audioContext, gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.025);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.65);
+                gain.connect(ctx.destination);
+                [880, 1174.66].forEach((frequency, index) => {
+                    const oscillator = ctx.createOscillator();
+                    oscillator.type = "sine";
+                    oscillator.frequency.value = frequency;
+                    oscillator.connect(gain);
+                    const start = ctx.currentTime + index * 0.13;
+                    oscillator.start(start);
+                    oscillator.stop(start + 0.24);
+                });
+            } catch (error) { console.debug("DougHub chat ding could not play:", error); }
+        }
+
+        async function checkForMessages() {
+            if (checking || document.visibilityState === "hidden") return;
+            checking = true;
+            try {
+                if (!initialized) {
+                    const baseline = await client.from("chat_messages").select("created_at")
+                        .order("created_at", { ascending: false }).limit(1);
+                    if (!baseline.error) {
+                        cursorCreatedAt = baseline.data && baseline.data[0] ? baseline.data[0].created_at : null;
+                        initialized = true;
+                    }
+                    return;
+                }
+                let query = client.from("chat_messages").select("created_at,user_id")
+                    .order("created_at", { ascending: true }).limit(50);
+                if (cursorCreatedAt) query = query.gt("created_at", cursorCreatedAt);
+                const result = await query;
+                if (result.error || !result.data || !result.data.length) return;
+                cursorCreatedAt = result.data[result.data.length - 1].created_at;
+                const sessionResult = await client.auth.getSession();
+                const ownUserId = sessionResult.data?.session?.user?.id || null;
+                if (result.data.some(message => !ownUserId || message.user_id !== ownUserId)) playDing();
+            } catch (error) { console.debug("DougHub chat notification check failed:", error); }
+            finally { checking = false; }
+        }
+        checkForMessages().finally(() => window.setInterval(checkForMessages, 5000));
+        window.addEventListener("focus", checkForMessages);
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") checkForMessages();
+        });
+    }
+
+
+    /* =========================================
        INITIALIZE
     ========================================= */
 
@@ -913,6 +1003,7 @@
             // This avoids creating duplicate GoTrue clients and keeps one session.
             window.DougHubSupabaseClient = supabaseClient;
             window.dispatchEvent(new Event("douqhub:supabase-ready"));
+            startDougHubChatDings(supabaseClient);
 
             createStyles();
 
