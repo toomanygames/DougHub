@@ -129,7 +129,7 @@
     if (pathKey() === "nova.html") return;
     document.querySelectorAll("header .nav > a[href], header nav > a[href], nav[aria-label='Main navigation'] > a[href]").forEach(a => {
       const href = (a.getAttribute("href") || "").split(/[?#]/)[0].replace(/^\.\//, "").toLowerCase();
-      if (href === "dmail.html" || href === "dougtube.html") a.remove();
+      if (href === "dmail.html") a.remove();
     });
   }
   function markActiveLinks() {
