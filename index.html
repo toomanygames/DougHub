@@ -2057,6 +2057,23 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 </style>
 
 <link rel="stylesheet" href="douqhub-theme.css">
+
+<style id="home-original-games-style">
+.home-original-games{width:min(1200px,100%);margin:22px auto 34px;padding:24px;border:1px solid rgba(165,180,252,.16);border-radius:22px;background:linear-gradient(145deg,rgba(17,21,47,.88),rgba(7,9,23,.9));box-shadow:0 18px 45px #0002}
+.home-original-games .directory-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}
+.home-original-games .directory-heading h2{margin:3px 0 6px;font-size:clamp(23px,3vw,30px);letter-spacing:-.6px}
+.home-original-games .directory-description{margin:0;color:#a5a4b8;font-size:14px;line-height:1.55}
+.original-games-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.original-games-grid .tool-tile{min-height:220px;text-decoration:none}
+.original-game-pig{--tile-glow:#53d98a24}.original-game-drive{--tile-glow:#43d5db20}.original-game-rebirth{--tile-glow:#a78bfa24}.original-game-space{--tile-glow:#5898ff24}.original-game-racing{--tile-glow:#ffad5c20}.original-game-puzzle{--tile-glow:#ed78d724}.original-game-punch{--tile-glow:#ef444424}
+.original-games-all{display:inline-flex;align-items:center;gap:9px;flex:0 0 auto;padding:11px 14px;border:1px solid rgba(165,160,255,.28);border-radius:11px;background:rgba(119,112,229,.12);color:#d9d5ff;font-size:12px;font-weight:800;transition:transform .2s,border-color .2s,background .2s}
+.original-games-all:hover{transform:translateY(-2px);border-color:rgba(165,160,255,.55);background:rgba(119,112,229,.2)}
+.quick-access-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:900px){.original-games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.home-original-games{padding:17px;margin:20px auto 26px;border-radius:18px}.home-original-games .directory-heading{align-items:flex-start;flex-direction:column}.original-games-grid{grid-template-columns:1fr}.original-games-all{width:100%;justify-content:center}.quick-access-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.original-games-all{transition:none}.original-games-all:hover{transform:none}}
+</style>
+
 </head>
 
 <body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
@@ -2267,6 +2284,48 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
         <div class="directory-empty" id="toolDirectoryEmpty" hidden><span>⌕</span><h3>Nothing found this time.</h3><p>Try a different search or choose another category.</p><button type="button" id="toolDirectoryReset">Reset filters</button></div>
     </section>
 
+
+    <section class="home-original-games" aria-labelledby="originalGamesTitle">
+        <div class="directory-heading directory-heading-v2">
+            <div>
+                <p class="directory-eyebrow">MADE BY DOUGHUB</p>
+                <h2 id="originalGamesTitle">My games</h2>
+                <p class="directory-description">Jump into the games built for DougHub. These are DougHub originals, separate from community-made games.</p>
+            </div>
+            <a class="original-games-all" href="douggames.html">Browse all games <span>↗</span></a>
+        </div>
+        <div class="tool-grid-v2 original-games-grid">
+            <a class="tool-tile tool-tile-v2 original-game-pig" href="Games/pig-clicker.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-green">🐷</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">CLICKER GAME</span><h3>Pig Clicker</h3><p>Click, earn coins, and build up your pig-powered progress.</p><span class="tool-tile-open">Play Pig Clicker <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 original-game-drive" href="Games/drive-pig.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-cyan">🚗</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">DRIVING GAME</span><h3>Drive Pig</h3><p>Take the pig for a drive and see how far you can go.</p><span class="tool-tile-open">Play Drive Pig <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 original-game-rebirth" href="Games/rebirth-clicker.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-violet">♻</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">PROGRESSION GAME</span><h3>Rebirth Clicker</h3><p>Keep progressing, rebirth, and work toward bigger upgrades.</p><span class="tool-tile-open">Play Rebirth Clicker <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 original-game-space" href="Games/pig-clicker-space.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-blue">🚀</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">SPACE ADVENTURE</span><h3>Pig Clicker: Space</h3><p>Take the pig beyond Earth and explore the space-themed clicker.</p><span class="tool-tile-open">Go to space <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 original-game-racing" href="Games/racing.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-orange">🏁</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">ARCADE RACING</span><h3>Racing</h3><p>Race around the track and try to beat your best run.</p><span class="tool-tile-open">Start racing <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 original-game-puzzle" href="Games/puzzle.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-pink">🧩</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">PUZZLE GAME</span><h3>Puzzle</h3><p>Put your problem-solving skills to work with a quick puzzle.</p><span class="tool-tile-open">Play Puzzle <b>→</b></span>
+            </a>
+            <a class="tool-tile tool-tile-v2 original-game-punch" href="Games/smack-n-punch.html">
+                <div class="tool-card-top"><span class="tool-tile-icon icon-red">🥊</span><span class="tool-tile-arrow">↗</span></div>
+                <span class="tool-tile-label">ARCADE ACTION</span><h3>Smack ’n Punch</h3><p>Jump into the action and take on the game’s challenges.</p><span class="tool-tile-open">Play Smack ’n Punch <b>→</b></span>
+            </a>
+        </div>
+    </section>
+
     <section class="home-quick-access" aria-labelledby="quickAccessTitle">
         <div class="quick-access-heading">
             <div><p class="directory-eyebrow">JUMP RIGHT IN</p><h2 id="quickAccessTitle">Quick access</h2><p>Head straight to the main parts of DougHub.</p></div>
@@ -2276,6 +2335,7 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
             <a class="quick-access-card" href="chat.html"><span class="quick-access-icon">💬</span><span><strong>Community Chat</strong><small>Talk with the community</small></span><span class="quick-access-arrow">↗</span></a>
             <a class="quick-access-card" href="DougTube.html"><span class="quick-access-icon">▶</span><span><strong>DougTube</strong><small>Watch and share videos</small></span><span class="quick-access-arrow">↗</span></a>
             <a class="quick-access-card" href="DMail.html"><span class="quick-access-icon">✉</span><span><strong>DMail</strong><small>Open your messages</small></span><span class="quick-access-arrow">↗</span></a>
+            <a class="quick-access-card" href="douqhub-music.html"><span class="quick-access-icon">♫</span><span><strong>DougHub Music</strong><small>Discover and share tracks</small></span><span class="quick-access-arrow">↗</span></a>
         </div>
     </section>
 
