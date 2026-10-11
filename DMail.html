@@ -1365,6 +1365,8 @@ let currentTab = "inbox";
 let allProfiles = [];
 let mailRecords = [];
 let mailFolder = "inbox";
+let dmailRealtimeChannel = null;
+let dmailRefreshRunning = false;
 let starredContacts = new Set(JSON.parse(localStorage.getItem("dmail_starred_contacts") || "[]"));
 let mailDrafts = JSON.parse(localStorage.getItem("dmail_drafts") || "[]");
 
@@ -2166,24 +2168,61 @@ document
 
 
 /* --------------------------------
-   AUTOMATIC REFRESH
+   LIVE MESSAGE UPDATES + FALLBACK
 -------------------------------- */
 
-async function refreshDMail() {
-    if (document.hidden) {
-        return;
-    }
+// Realtime makes new messages appear immediately. The short polling fallback
+// keeps DMail usable if Realtime is not enabled for direct_messages in Supabase.
+function subscribeToDMailUpdates() {
+    if (!currentUser || dmailRealtimeChannel) return;
 
-    if (currentTab === "other") {
-        await loadOtherMessages();
-    } else if (selectedUser) {
-        await loadConversation();
-    }
+    dmailRealtimeChannel = supabaseClient
+        .channel("dmail-live-" + currentUser.id)
+        .on(
+            "postgres_changes",
+            {
+                event: "INSERT",
+                schema: "public",
+                table: "direct_messages"
+            },
+            async (payload) => {
+                const message = payload.new;
+                if (!message || !currentUser) return;
 
-    await loadProfiles();
+                // Ignore messages that do not involve this account.
+                if (message.sender_id !== currentUser.id &&
+                    message.receiver_id !== currentUser.id) return;
+
+                // Update the conversation and mailbox list without reloading the page.
+                await refreshDMail();
+            }
+        )
+        .subscribe((status) => {
+            console.log("DMail live updates:", status);
+        });
 }
 
-setInterval(refreshDMail, 60000);
+async function refreshDMail() {
+    if (document.hidden || !currentUser || dmailRefreshRunning) return;
+
+    dmailRefreshRunning = true;
+    try {
+        if (currentTab === "other") {
+            await loadOtherMessages();
+        } else if (selectedUser) {
+            await loadConversation();
+        }
+
+        await loadProfiles();
+    } catch (error) {
+        console.error("DMail background refresh failed:", error);
+    } finally {
+        dmailRefreshRunning = false;
+    }
+}
+
+// Keep a fast fallback in case Supabase Realtime is unavailable or not enabled.
+setInterval(refreshDMail, 5000);
 
 /* --------------------------------
    COMPOSE
@@ -2336,6 +2375,7 @@ async function start() {
     }
 
     await loadProfiles();
+    subscribeToDMailUpdates();
 }
 
 start();
