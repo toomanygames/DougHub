@@ -10,7 +10,7 @@
   style.textContent = `
     :root {
       --dh-header-height: 72px;
-      --dh-header-pad: clamp(14px, 2.2vw, 30px);
+      --dh-header-pad: max(20px, calc((100% - 1200px) / 2));
       --dh-header-gap: 12px;
       --dh-header-bg: rgba(4, 5, 15, .86);
       --dh-header-border: rgba(255, 255, 255, .09);
