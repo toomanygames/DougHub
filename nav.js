@@ -351,7 +351,7 @@
         link = Array.from(document.querySelectorAll("header a[href], header nav a[href], header .nav a[href]"))
           .find(anchor => {
             try {
-              const path = new URL(anchor.getAttribute("href"), location.href).pathname.replace(/^\\/+/, "").toLowerCase();
+              const path = new URL(anchor.getAttribute("href"), location.href).pathname.split("/").filter(Boolean).join("/").toLowerCase();
               return path === "chat.html";
             } catch (_) { return false; }
           }) || null;
