@@ -98,6 +98,13 @@
       header nav[aria-label="Main navigation"] > a[aria-current="page"] {
         background:#ffffff12 !important; color:#fff !important; border-color:#ffffff18 !important;
       }
+      .chat-notification {
+        display:none;width:9px;height:9px;flex:0 0 9px;margin-left:3px;
+        border-radius:50%;background:#ff3b5c;box-shadow:0 0 0 3px #ff3b5c22,0 0 12px #ff3b5c99;
+        vertical-align:middle;animation:dh-chat-dot-pulse 1.8s ease-in-out infinite;
+      }
+      .chat-notification.is-unread { display:inline-block; }
+      @keyframes dh-chat-dot-pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
       .dh-shared-account { position:relative; flex:0 0 auto; margin-left:2px; }
       .dh-shared-account .account-btn {
         display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:12px;
@@ -327,6 +334,102 @@
     }
   }
 
+  // Keep the Community Chat red dot in sync with Supabase and with the
+  // read timestamp written by chat.html. The dot is deliberately polled because
+  // this project also needs to work when Realtime subscriptions are unavailable.
+  function startChatNotificationWatcher() {
+    if (window.__dhChatNotificationWatcherStarted) return;
+    window.__dhChatNotificationWatcherStarted = true;
+
+    const seenKey = "doughub_chat_last_seen";
+    let inFlight = false;
+    let initialized = false;
+    let lastLatestTimestamp = "";
+
+    function setDot(unread) {
+      const dot = document.getElementById("chatNotification");
+      if (!dot) return;
+      dot.classList.toggle("is-unread", !!unread);
+      dot.setAttribute("aria-hidden", String(!unread));
+      const link = document.getElementById("communityChatLink");
+      if (link) {
+        if (unread) link.setAttribute("aria-label", "Community Chat — unread messages");
+        else link.removeAttribute("aria-label");
+      }
+    }
+
+    async function refreshDot() {
+      if (inFlight || document.visibilityState === "hidden") return;
+      inFlight = true;
+      try {
+        const client = await getNavSupabase();
+        if (!client) return;
+
+        const [{ data: sessionData }, { data, error }] = await Promise.all([
+          client.auth.getSession(),
+          client.from("chat_messages")
+            .select("created_at,user_id")
+            .order("created_at", { ascending: false })
+            .limit(1)
+        ]);
+        if (error) throw error;
+
+        const latest = data && data[0];
+        if (!latest || !latest.created_at) {
+          initialized = true;
+          setDot(false);
+          return;
+        }
+
+        const latestTime = new Date(latest.created_at).getTime();
+        const latestStamp = String(latest.created_at);
+        const ownUserId = sessionData?.session?.user?.id || null;
+        const isChatPage = pathKey() === "chat.html";
+
+        let seen = "";
+        try { seen = localStorage.getItem(seenKey) || ""; } catch (_) {}
+
+        // On first use, establish a baseline instead of showing a dot for old
+        // history. Opening Chat keeps the timestamp fresh across all pages.
+        if (!initialized && !seen) {
+          try { localStorage.setItem(seenKey, latestStamp); } catch (_) {}
+          seen = latestStamp;
+        }
+
+        if (isChatPage && document.visibilityState === "visible") {
+          try { localStorage.setItem(seenKey, latestStamp); } catch (_) {}
+          seen = latestStamp;
+          setDot(false);
+        } else {
+          const seenTime = seen ? new Date(seen).getTime() : 0;
+          const unread = Number.isFinite(latestTime) &&
+            latestTime > seenTime &&
+            (!ownUserId || latest.user_id !== ownUserId);
+          setDot(unread);
+        }
+
+        initialized = true;
+        lastLatestTimestamp = latestStamp;
+      } catch (error) {
+        // Keep the last displayed state during transient network errors.
+        console.debug("Community Chat notification refresh failed:", error);
+      } finally {
+        inFlight = false;
+      }
+    }
+
+    refreshDot();
+    window.setInterval(refreshDot, 5000);
+    window.addEventListener("focus", refreshDot);
+    window.addEventListener("storage", event => {
+      if (!event.key || event.key === seenKey) refreshDot();
+    });
+    window.addEventListener("douqhub:chat-seen-updated", refreshDot);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") refreshDot();
+    });
+  }
+
   function removeRetiredNavLinks() {
     // Nova has its own compact page navigation. Do not silently remove its
     // DougTube link; the generic retired-link cleanup is for other page headers.
@@ -384,6 +487,7 @@
   function start() {
     addNavStyle();
     normalizePrimaryNav();
+    startChatNotificationWatcher();
     removeRetiredNavLinks();
     markActiveLinks();
     // Feature flags are optional; never let a missing flag loader break the header.\n    if (typeof loadFlags === "function" && typeof applyFlags === "function") loadFlags().then(applyFlags).catch(() => {});
