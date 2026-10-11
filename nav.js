@@ -146,23 +146,10 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set([
-    "index.html",
-    "douggames.html",
-    "tools.html",
-    "nova.html",
-    "dougtube.html",
-    "douqhub-music.html",
-    "dmail.html"
-  ]);
-
   function normalizePrimaryNav() {
-    // The shared navigation belongs only on DougHub's main destinations.
-    // Keep focused tools such as chat, coding, game creation, and individual games
-    // with their own page-specific headers instead of adding cross-site tabs there.
+    // Apply the same primary navigation to every page that loads nav.js.
+    // Preserve page content and page-specific controls outside the navigation.
     const current = pathKey();
-    if (!MAIN_NAV_PAGES.has(current)) return;
-
     const header = document.querySelector("header");
     if (!header) return;
 
@@ -198,11 +185,11 @@
     account.classList.add("dh-shared-account");
 
     const links = [
-      ["index.html", "Home", "home"],
-      ["douggames.html", "Games", "games"],
-      ["tools.html", "Tools", "tools"],
-      ["nova.html", "✳ Nova AI", "nova"],
-      ["chat.html", "Chat", "chat"]
+      ["/index.html", "Home", "home"],
+      ["/douggames.html", "Games", "games"],
+      ["/tools.html", "Tools", "tools"],
+      ["/nova.html", "✳ Nova AI", "nova"],
+      ["/chat.html", "Chat", "chat"]
     ];
     nav.querySelectorAll(":scope > a").forEach(a => a.remove());
     links.forEach(([href, label, feature]) => {
