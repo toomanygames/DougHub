@@ -594,7 +594,7 @@
       for(const el of actions){
         if(found.length>=12)break;
         if(!el||el.closest("#dh-help-card")||found.some(x=>x.el===el))continue;
-        const label=(el.innerText||el.getAttribute("aria-label")||el.getAttribute("title")||"").replace(/\\s+/g," ").trim();
+        const label=(el.innerText||el.getAttribute("aria-label")||el.getAttribute("title")||"").replace(/\s+/g," ").trim();
         if(!label||label.length>70)continue;
         const isLink=el.tagName==="A";
         found.push({el,title:label,text:isLink?"Click this link to open "+label+". If it takes you to a different page, use the navigation bar to return here.":"Click "+label+" to run that action. Check any fields or options first, then read the result or status message shown on the page."});
