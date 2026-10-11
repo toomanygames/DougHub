@@ -1139,60 +1139,47 @@ async function loadMessages() {
     return;
   }
 
-  loadingMessages =
-    true;
+  loadingMessages = true;
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
+  try {
+    // Fetch the newest 200 messages first, then reverse them for chronological display.
+    // Ordering ascending before limiting would keep returning the oldest 200 forever.
+    const {
+      data,
+      error
+    } = await supabaseClient
       .from("chat_messages")
-      .select(
-        "id, user_id, username, message, created_at"
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
-      )
+      .select("id, user_id, username, message, created_at")
+      .order("created_at", { ascending: false })
       .limit(200);
 
-  loadingMessages =
-    false;
+    if (error) {
+      showError("Could not load chat messages.");
+      console.error("Could not load chat messages:", error);
+      return;
+    }
 
-  if (error) {
+    hideError();
 
-    showError(
-      "Could not load chat messages."
+    const distanceFromBottom =
+      messagesEl.scrollHeight -
+      messagesEl.scrollTop -
+      messagesEl.clientHeight;
+
+    const shouldScrollBottom =
+      messagesEl.children.length === 0 ||
+      distanceFromBottom < 80;
+
+    await renderMessages(
+      (data || []).reverse(),
+      shouldScrollBottom
     );
-
-    console.error(
-      error
-    );
-
-    return;
-
+  } catch (error) {
+    showError("Could not load chat messages. Please try again.");
+    console.error("Unexpected error loading chat messages:", error);
+  } finally {
+    loadingMessages = false;
   }
-
-  hideError();
-
-  // Only follow the newest message if the user was already near the bottom.
-  // If they are reading older messages, refreshing chat must not move them.
-  const distanceFromBottom =
-    messagesEl.scrollHeight -
-    messagesEl.scrollTop -
-    messagesEl.clientHeight;
-
-  const shouldScrollBottom =
-    messagesEl.children.length === 0 ||
-    distanceFromBottom < 80;
-
-  await renderMessages(
-    data || [],
-    shouldScrollBottom
-  );
 
 }
 
