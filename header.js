@@ -14,8 +14,8 @@
         !el.matches(".logo-icon, .logo-mark, .brand-icon, .brand-mark, .icon")
       );
       if (!label || label.dataset.dhWordmarkNormalized === "true") return;
-      const raw = (label.textContent || "").replace(/\\s+/g, " ").trim();
-      const match = raw.match(/^DougHub(?:\\s*[-:]?\\s*)(.*)$/i);
+      const raw = (label.textContent || "").replace(/\s+/g, " ").trim();
+      const match = raw.match(/^DougHub(?:\s*[-:]?\s*)(.*)$/i);
       if (!match) return;
       const suffix = match[1].trim();
       label.replaceChildren();
