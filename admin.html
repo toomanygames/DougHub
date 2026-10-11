@@ -4318,7 +4318,7 @@ function setupAuditFilters() {
     document.getElementById("auditExport")?.addEventListener("click",exportAuditCsv);
     document.getElementById("auditClear")?.addEventListener("click",clearAuditLogs);
     const toggle=document.getElementById("auditLogToggle"),content=document.getElementById("auditLogContent"),card=document.getElementById("auditLogCard");
-    if(toggle&&content&&card){toggle.setAttribute("aria-expanded","false");content.setAttribute("aria-hidden","true");card.classList.add("collapsed");toggle.addEventListener("click",()=>{const open=toggle.getAttribute("aria-expanded")!=="true";toggle.setAttribute("aria-expanded",String(open));content.setAttribute("aria-hidden",String(!open));card.classList.toggle("collapsed",!open);});}
+    if(toggle&&content&&card){const collapseAudit=()=>{toggle.setAttribute("aria-expanded","false");content.setAttribute("aria-hidden","true");card.classList.add("collapsed");};collapseAudit();toggle.addEventListener("click",()=>{const open=toggle.getAttribute("aria-expanded")!=="true";toggle.setAttribute("aria-expanded",String(open));content.setAttribute("aria-hidden",String(!open));card.classList.toggle("collapsed",!open);});window.addEventListener("pageshow",collapseAudit);}
 }
 
 
