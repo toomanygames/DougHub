@@ -511,7 +511,7 @@
       #dh-help-overlay.active{display:block}
       #dh-help-line{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
       #dh-help-line path{fill:none;stroke:#c4b5fd;stroke-width:3;stroke-linecap:round;stroke-dasharray:7 7;filter:drop-shadow(0 0 5px #8b5cf6)}
-      #dh-help-card{position:fixed;right:18px;bottom:72px;width:min(360px,calc(100vw - 28px));padding:18px;border:1px solid #a5b4fc55;border-radius:18px;background:rgba(10,12,30,.97);color:#f7f7ff;box-shadow:0 24px 75px #000a;pointer-events:auto;font:14px/1.55 Arial,sans-serif}
+      #dh-help-card{position:fixed;z-index:2147483001;right:18px;bottom:72px;width:min(360px,calc(100vw - 28px));padding:18px;border:1px solid #a5b4fc55;border-radius:18px;background:rgba(10,12,30,.97);color:#f7f7ff;box-shadow:0 24px 75px #000a;pointer-events:auto;font:14px/1.55 Arial,sans-serif}
       #dh-help-card .dh-help-kicker{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#a5b4fc;text-transform:uppercase}
       #dh-help-card h2{font-size:20px;margin:7px 0}
       #dh-help-card p{margin:0;color:#c3c5da}
