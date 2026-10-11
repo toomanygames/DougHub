@@ -2977,10 +2977,7 @@ async function buildMediaCard(post){
           '</div>'
         :'<div class="media-note">Log in to comment.</div>';
 
-    const isAudio=post.media_type==="audio";
-    const mediaVisual=isAudio
-        ?'<div class="media-audio-wrap"><div class="media-audio-icon">🎵</div><audio class="media-audio" controls preload="metadata" src="'+escapeHtml(post.media_url)+'"></audio></div>'
-        :'<div class="media-image-wrap">'+
+    const mediaVisual='<div class="media-image-wrap">'+
           '<img class="media-image" src="'+escapeHtml(post.media_url)+'" alt="'+escapeHtml(post.title||"DougTube photo")+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">'+
           '<div class="media-image-fallback" style="display:none;">This image could not be displayed.</div>'+
           '</div>';
@@ -2990,7 +2987,7 @@ async function buildMediaCard(post){
         '<div class="media-info">'+
         '<h3 class="media-title">'+escapeHtml(post.title||"Untitled Photo")+'</h3>'+
         '<p class="media-description">'+escapeHtml(post.description||"No description.")+'</p>'+
-        '<div class="media-meta"><span>'+formatDate(post.created_at)+'</span><span>${post.media_type==="audio" ? "MP3 Music" : "Photo"}</span></div>'+
+        '<div class="media-meta"><span>'+formatDate(post.created_at)+'</span><span>Photo</span></div>'+
         '<div class="media-actions">'+
         '<button class="media-like-button'+(liked?" liked":"")+'" data-media-like="'+escapeHtml(post.id)+'" type="button">'+(liked?"👍 Liked":"👍 Like")+'</button>'+
         '<span class="media-like-count" data-media-like-count="'+escapeHtml(post.id)+'">'+Number(likeCount||0).toLocaleString()+" likes</span>"+
