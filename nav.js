@@ -116,6 +116,9 @@
     }
   }
   function removeRetiredNavLinks() {
+    // Nova has its own compact page navigation. Do not silently remove its
+    // DougTube link; the generic retired-link cleanup is for other page headers.
+    if (pathKey() === "nova.html") return;
     document.querySelectorAll("header .nav > a[href], header nav > a[href], nav[aria-label='Main navigation'] > a[href]").forEach(a => {
       const href = (a.getAttribute("href") || "").split(/[?#]/)[0].replace(/^\.\//, "").toLowerCase();
       if (href === "dmail.html" || href === "dougtube.html") a.remove();
