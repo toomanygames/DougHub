@@ -759,6 +759,7 @@ let currentUsername = "Anonymous";
 let currentAvatarUrl = "";
 
 let loadingMessages = false;
+let lastRenderedMessageSignature = null;
 
 const CHAT_SEEN_KEY =
   "doughub_chat_last_seen";
@@ -1136,17 +1137,21 @@ async function markChatAsSeen() {
 
   if (latest) {
 
-    localStorage.setItem(
-      CHAT_SEEN_KEY,
-      latest
-    );
+    try {
+      localStorage.setItem(CHAT_SEEN_KEY, latest);
+      window.dispatchEvent(new Event("douqhub:chat-seen-updated"));
+    } catch (storageError) {
+      console.debug("Could not save Community Chat read state:", storageError);
+    }
 
   } else {
 
-    localStorage.setItem(
-      CHAT_SEEN_KEY,
-      new Date().toISOString()
-    );
+    try {
+      localStorage.setItem(CHAT_SEEN_KEY, new Date().toISOString());
+      window.dispatchEvent(new Event("douqhub:chat-seen-updated"));
+    } catch (storageError) {
+      console.debug("Could not save Community Chat read state:", storageError);
+    }
 
   }
 
@@ -1185,19 +1190,39 @@ async function loadMessages() {
 
     hideError();
 
+    const orderedMessages = (data || []).reverse();
+    // Do not rebuild the entire message DOM every two seconds when nothing
+    // changed. Replacing every node repeatedly caused flicker and intermittent
+    // "Node cannot be found in the current page" errors in some browsers.
+    const signature = orderedMessages
+      .map(message => String(message.id) + ":" + String(message.created_at))
+      .join("|");
+
+    if (signature === lastRenderedMessageSignature) {
+      // The chat is open, so keep its unread marker cleared even when no new
+      // message arrived during this poll.
+      if (document.visibilityState === "visible") {
+        await markChatAsSeen();
+      }
+      return;
+    }
+
     const distanceFromBottom =
       messagesEl.scrollHeight -
       messagesEl.scrollTop -
       messagesEl.clientHeight;
 
     const shouldScrollBottom =
-      messagesEl.children.length === 0 ||
+      lastRenderedMessageSignature === null ||
       distanceFromBottom < 80;
 
-    await renderMessages(
-      (data || []).reverse(),
-      shouldScrollBottom
-    );
+    lastRenderedMessageSignature = signature;
+    await renderMessages(orderedMessages, shouldScrollBottom);
+
+    // A message received while this page is open is considered seen.
+    if (document.visibilityState === "visible") {
+      await markChatAsSeen();
+    }
   } catch (error) {
     showError("Could not load chat messages. Please try again.");
     console.error("Unexpected error loading chat messages:", error);
@@ -1249,52 +1274,34 @@ async function sendMessage() {
 
   hideError();
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from(
-        "chat_messages"
-      )
+  try {
+    const { error } = await supabaseClient
+      .from("chat_messages")
       .insert({
-
-        user_id:
-          currentUser.id,
-
-        username:
-          currentUsername,
-
-        message:
-          text
-
+        user_id: currentUser.id,
+        username: currentUsername,
+        message: text
       });
 
-  sendButton.disabled =
-    false;
+    if (error) {
+      console.error("Could not send Community Chat message:", error);
+      showError("Could not send your message: " + (error.message || error.details || "Supabase rejected the request."));
+      return;
+    }
 
-  messageInput.disabled =
-    false;
-
-  messageInput.focus();
-
-  if (error) {
-
-    console.error(
-      error
-    );
-
-    showError(
-      "Could not send your message: " + (error.message || error.details || "Supabase rejected the request.")
-    );
-
-    return;
-
+    messageInput.value = "";
+    // Force the next load to render the new row even if the server timestamp
+    // matches a previous poll's result.
+    lastRenderedMessageSignature = null;
+    await loadMessages();
+  } catch (error) {
+    console.error("Unexpected Community Chat send error:", error);
+    showError("Could not send your message: " + (error?.message || "Network connection failed. Please try again."));
+  } finally {
+    sendButton.disabled = false;
+    messageInput.disabled = false;
+    messageInput.focus();
   }
-
-  messageInput.value =
-    "";
-
-  await loadMessages();
 
 }
 
