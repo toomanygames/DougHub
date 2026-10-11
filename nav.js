@@ -14,13 +14,13 @@
     "douggames.html":"games","games/drive-pig.html":"games","games/dve-pig.html":"games",
     "games/pig-clicker.html":"games","games/pig-clicker-space.html":"games","games/puzzle.html":"games",
     "games/racing.html":"games","games/rebirth-clicker.html":"games","games/smack-n-punch.html":"games",
-    "dougtube.html":"dougtube","dmail.html":"dmail","tools.html":"tools","nova.html":"nova",
+    "dougtube.html":"dougtube","douqhub-music.html":"music","dmail.html":"dmail","tools.html":"tools","nova.html":"nova",
     "chat.html":"chat","game-creator.html":"community_games","my-games.html":"community_games",
     "dougbase.html":"dougbase","dougbase/index.html":"dougbase","dougbase/login.html":"dougbase",
     "dougcode.html":"dougcode","scripting/scripting.html":"scripting","work.html":"work"
   };
   const labels = {
-    games:"DougGames",dougtube:"DougTube",dmail:"DMail",tools:"DougTools",nova:"Nova AI",
+    games:"DougGames",dougtube:"DougTube",music:"DougHub Music",dmail:"DMail",tools:"DougTools",nova:"Nova AI",
     chat:"Community Chat",community_games:"Community Games",dougbase:"DougBase",
     dougcode:"DougCode",scripting:"Scripting Editor",work:"DougHub Work"
   };
