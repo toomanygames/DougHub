@@ -172,9 +172,9 @@
       brand.classList.add("dh-wordmark");
       const label = Array.from(brand.children).find(el => !el.matches(".logo-icon,.logo-mark,.brand-icon,.brand-mark,.icon"));
       if (label) {
-        const raw = (label.textContent || "").replace(/\\s+/g, " ").trim();
+        const raw = (label.textContent || "").replace(/\s+/g, " ").trim();
         if (/^DougHub/i.test(raw)) {
-          const suffix = raw.replace(/^DougHub\\s*/i, "").trim();
+          const suffix = raw.replace(/^(?:DougHub\s*[-:]?\s*)+/i, "").trim();
           label.replaceChildren();
           const base = document.createElement("span");
           base.className = "dh-wordmark-base";
@@ -519,7 +519,7 @@
     }
     const sharedHeader = document.createElement("script");
     sharedHeader.id = "dh-shared-header-script";
-    sharedHeader.src = new URL("header.js", NAV_SCRIPT_URL).href;
+    sharedHeader.src = new URL("header.js?v=2", NAV_SCRIPT_URL).href;
     sharedHeader.onload = function () {
       sharedHeader.dataset.loaded = "true";
       start();
