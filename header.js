@@ -5,6 +5,77 @@
   "use strict";
   if (document.getElementById("dh-shared-header-style")) return;
 
+
+  // Keep every DougHub-family wordmark aligned: the shared "DougHub" text
+  // always occupies the same slot and any product name follows it.
+  function normalizeDougHubWordmarks() {
+    document.querySelectorAll("header .logo, header .brand, header a.logo, header a.brand").forEach(brand => {
+      const label = Array.from(brand.children).find(el =>
+        !el.matches(".logo-icon, .logo-mark, .brand-icon, .brand-mark, .icon")
+      );
+      if (!label || label.dataset.dhWordmarkNormalized === "true") return;
+      const raw = (label.textContent || "").replace(/\\s+/g, " ").trim();
+      const match = raw.match(/^DougHub(?:\\s*[-:]?\\s*)(.*)$/i);
+      if (!match) return;
+      const suffix = match[1].trim();
+      label.replaceChildren();
+      const base = document.createElement("span");
+      base.className = "dh-wordmark-base";
+      base.textContent = "DougHub";
+      label.appendChild(base);
+      if (suffix) {
+        const extra = document.createElement("span");
+        extra.className = "dh-wordmark-suffix";
+        extra.textContent = suffix;
+        label.appendChild(extra);
+      }
+      label.dataset.dhWordmarkNormalized = "true";
+      brand.classList.add("dh-wordmark");
+    });
+  }
+
+  // Restore the last known account label immediately during navigation, then
+  // let the page's normal Supabase auth check refresh it when that check finishes.
+  function primeAccountDisplay() {
+    const key = "dh-account-display-v1";
+    const name = document.getElementById("accountName");
+    const avatar = document.getElementById("accountAvatar");
+    if (!name || !avatar) return;
+    try {
+      const cached = sessionStorage.getItem(key);
+      if (cached) {
+        const value = JSON.parse(cached);
+        if (value && value.name && value.name !== "Log In") {
+          name.textContent = value.name;
+          if (value.avatarText) avatar.textContent = value.avatarText;
+          else if (value.avatarUrl && !avatar.querySelector("img")) {
+            const img = document.createElement("img");
+            img.src = value.avatarUrl;
+            img.alt = "Profile";
+            avatar.replaceChildren(img);
+          }
+        }
+      }
+    } catch (_) {}
+    const save = () => {
+      try {
+        const img = avatar.querySelector("img");
+        const currentName = (name.textContent || "").trim();
+        if (currentName) {
+          sessionStorage.setItem(key, JSON.stringify({
+            name: currentName,
+            avatarText: img ? "" : (avatar.textContent || "").trim(),
+            avatarUrl: img ? img.getAttribute("src") || "" : ""
+          }));
+        }
+      } catch (_) {}
+    };
+    const observer = new MutationObserver(save);
+    observer.observe(name, { childList: true, characterData: true, subtree: true });
+    observer.observe(avatar, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["src"] });
+    save();
+  }
+
   const style = document.createElement("style");
   style.id = "dh-shared-header-style";
   style.textContent = `
@@ -48,6 +119,21 @@
       min-width: 0;
       white-space: nowrap;
       text-decoration: none;
+    }
+
+    html body header .dh-wordmark > span:not(.logo-icon):not(.logo-mark):not(.brand-icon):not(.brand-mark):not(.icon),
+    html body header .dh-wordmark > span.dh-wordmark-base,
+    html body header .dh-wordmark > span.dh-wordmark-suffix {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+    html body header .dh-wordmark > span.dh-wordmark-base {
+      flex: 0 0 auto;
+    }
+    html body header .dh-wordmark > span.dh-wordmark-suffix {
+      margin-left: 5px;
+      opacity: .94;
     }
 
     html body header .logo-icon,
@@ -224,4 +310,13 @@
     }
   `;
   document.head.appendChild(style);
+  const applySharedHeaderFixes = () => {
+    normalizeDougHubWordmarks();
+    primeAccountDisplay();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", applySharedHeaderFixes, { once: true });
+  } else {
+    applySharedHeaderFixes();
+  }
 })();
