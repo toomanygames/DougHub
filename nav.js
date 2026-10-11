@@ -111,26 +111,40 @@
     `;
     document.head.appendChild(style);
   }
+  const MAIN_NAV_PAGES = new Set([
+    "index.html",
+    "douggames.html",
+    "tools.html",
+    "nova.html",
+    "dougtube.html",
+    "douqhub-music.html",
+    "dmail.html"
+  ]);
+
   function normalizePrimaryNav() {
+    // The shared navigation belongs only on DougHub's main destinations.
+    // Keep focused tools such as chat, coding, game creation, and individual games
+    // with their own page-specific headers instead of adding cross-site tabs there.
+    const current = pathKey();
+    if (!MAIN_NAV_PAGES.has(current)) return;
+
     const header = document.querySelector("header");
     if (!header) return;
+
     let nav = header.querySelector(".nav, nav[aria-label='Main navigation']");
     if (!nav) {
       nav = document.createElement("nav");
       nav.className = "nav";
       nav.setAttribute("aria-label", "Main navigation");
-      const oldButtons = header.querySelector(".header-buttons");
-      if (oldButtons) {
-        oldButtons.querySelectorAll("a,button").forEach(el => el.remove());
-        oldButtons.remove();
-      }
-      const oldBack = header.querySelector(".back-button");
-      if (oldBack) oldBack.remove();
-      header.appendChild(nav);
+      const oldAccount = header.querySelector(".account-area, .dh-shared-account");
+      if (oldAccount && oldAccount.parentElement === header) header.insertBefore(nav, oldAccount);
+      else header.appendChild(nav);
     }
     nav.setAttribute("aria-label", "Main navigation");
-    nav.querySelectorAll(":scope > a").forEach(a => a.remove());
-    let account = nav.querySelector(":scope > .account-area, :scope > .dh-shared-account");
+
+    // Reuse an existing account area wherever the page placed it; otherwise create
+    // the same profile/account menu used by the homepage.
+    let account = header.querySelector(".account-area, .dh-shared-account");
     if (!account) {
       account = document.createElement("div");
       account.className = "account-area dh-shared-account";
@@ -145,17 +159,17 @@
           <a href="settings.html">Settings</a>
           <button id="logoutButton" class="logout" type="button">Log Out</button>
         </div>`;
-    } else {
-      account.classList.add("dh-shared-account");
     }
+    account.classList.add("dh-shared-account");
+
     const links = [
       ["index.html", "Home", "home"],
       ["douggames.html", "Games", "games"],
       ["tools.html", "Tools", "tools"],
       ["nova.html", "✳ Nova AI", "nova"],
-      ["chat.html", "Chat", "chat"],
-      ["douqhub-music.html", "♫ Music", "music"]
+      ["chat.html", "Chat", "chat"]
     ];
+    nav.querySelectorAll(":scope > a").forEach(a => a.remove());
     links.forEach(([href, label, feature]) => {
       const a = document.createElement("a");
       a.href = href;
@@ -173,11 +187,11 @@
       nav.appendChild(a);
     });
     nav.appendChild(account);
-    if (!account.dataset.dhAccountBound) {
+
+    // These pages have their own working homepage-style account controller.
+    const pageAlreadyBindsAccount = ["index.html", "douggames.html", "dougtube.html"].includes(current);
+    if (!pageAlreadyBindsAccount && !account.dataset.dhAccountBound) {
       account.dataset.dhAccountBound = "true";
-      // These pages already have the homepage-style account controller in their own scripts.
-      const pageAlreadyBindsAccount = ["index.html","douggames.html","dougtube.html"].includes(pathKey());
-      if (pageAlreadyBindsAccount) return;
       const button = account.querySelector("#accountButton");
       const menu = account.querySelector("#accountMenu");
       const logout = account.querySelector("#logoutButton");
@@ -187,19 +201,23 @@
         button?.setAttribute("aria-expanded", String(open));
       };
       button?.addEventListener("click", async event => {
-        event.preventDefault(); event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
         const client = await getNavSupabase();
         if (!client) { location.href = "log-in.html"; return; }
-        const {data:{session}} = await client.auth.getSession();
+        const { data: { session } } = await client.auth.getSession();
         if (!session) { location.href = "log-in.html"; return; }
         setOpen(!menu?.classList.contains("show"));
       });
       document.addEventListener("click", event => {
         if (!event.target.closest(".dh-shared-account")) setOpen(false);
       });
-      document.addEventListener("keydown", event => { if (event.key === "Escape") setOpen(false); });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") setOpen(false);
+      });
       logout?.addEventListener("click", async event => {
-        event.preventDefault(); event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
         const client = await getNavSupabase();
         if (client) await client.auth.signOut();
         location.reload();
@@ -207,145 +225,7 @@
       loadNavAccount();
     }
   }
-  let navSupabasePromise;
-  async function getNavSupabase() {
-    if (!navSupabasePromise) navSupabasePromise = (async () => {
-      if (!window.supabase) {
-        await new Promise((resolve,reject) => {
-          const script=document.createElement("script");
-          script.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-          script.onload=resolve; script.onerror=reject; document.head.appendChild(script);
-        });
-      }
-      if (!window.__DOUGHUB_NAV_CLIENT) {
-        window.__DOUGHUB_NAV_CLIENT = window.supabase.createClient(
-          "https://agsqdqcsmsppcdqxlppj.supabase.co",
-          "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"
-        );
-      }
-      return window.__DOUGHUB_NAV_CLIENT;
-    })().catch(error => { console.warn("Account controls unavailable",error); return null; });
-    return navSupabasePromise;
-  }
-  async function loadNavAccount() {
-    const button=document.getElementById("accountButton");
-    const nameEl=document.getElementById("accountName");
-    const avatar=document.getElementById("accountAvatar");
-    if(!button||!nameEl||!avatar)return;
-    const client=await getNavSupabase();
-    if(!client)return;
-    try {
-      const {data:{session}}=await client.auth.getSession();
-      if(!session) { nameEl.textContent="Log In";avatar.textContent="?";return; }
-      const {data:profile}=await client.from("profiles").select("username,avatar_url,is_admin").eq("id",session.user.id).maybeSingle();
-      const username=profile?.username||session.user.email?.split("@")[0]||"User";
-      nameEl.textContent=username;
-      if(profile?.avatar_url) {
-        const img=document.createElement("img");img.src=profile.avatar_url;img.alt="Profile";avatar.replaceChildren(img);
-      } else avatar.textContent=username.charAt(0).toUpperCase();
-      const admin=document.getElementById("adminLink"),feedback=document.getElementById("feedbackInboxLink");
-      if(admin)admin.style.display=profile?.is_admin===true?"block":"none";
-      if(feedback)feedback.style.display=profile?.is_admin===true?"block":"none";
-      button.title="Account: "+username;
-    } catch(error) { console.warn("Could not load DougHub account info",error); }
-  }
-  async function loadFlags() {
-    try {
-      const r = await fetch(API, { headers: { apikey: KEY, Authorization: "Bearer " + KEY, Accept: "application/json" }, cache: "no-store" });
-      if (!r.ok) throw new Error("Feature flags unavailable");
-      const rows = await r.json();
-      const flags = {};
-      rows.forEach(row => flags[row.feature_key] = row.enabled !== false);
-      return flags;
-    } catch (e) {
-      console.warn("DougHub feature settings could not load; leaving pages available.", e);
-      return null;
-    }
-  }
-  function disabledUrl(feature) {
-    return "/feature-disabled.html?feature=" + encodeURIComponent(feature);
-  }
-  function applyFlags(flags) {
-    if (!flags) return;
 
-    // Mark navigation links for accessibility, but enforce the setting globally.
-    // This catches homepage cards/buttons and other page links as well as the header.
-    document.querySelectorAll('a[href]').forEach(a => {
-      const feature = featureForHref(a.getAttribute("href"));
-      if (feature && flags[feature] === false) {
-        a.setAttribute("aria-label", (labels[feature] || feature) + " (currently unavailable)");
-        a.setAttribute("data-dh-disabled-feature", feature);
-      }
-    });
-
-    // Capture phase runs before page-specific click handlers, including handlers
-    // on cards and buttons that contain links. It blocks clicks only; direct URLs
-    // and bookmarks remain accessible as requested.
-    if (!document.documentElement.dataset.dhFeatureGuardInstalled) {
-      document.documentElement.dataset.dhFeatureGuardInstalled = "true";
-      document.addEventListener("click", function (event) {
-        const target = event.target && event.target.closest
-          ? event.target.closest('a[href], [data-href], [data-feature-href]')
-          : null;
-        if (!target) return;
-
-        const href = target.matches('a[href]')
-          ? target.getAttribute("href")
-          : (target.getAttribute("data-href") || target.getAttribute("data-feature-href"));
-        if (!href) return;
-
-        const feature = featureForHref(href);
-        if (feature && flags[feature] === false) {
-          event.preventDefault();
-          event.stopPropagation();
-          if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
-          location.href = disabledUrl(feature);
-        }
-      }, true);
-    }
-  }
-  function normalizePrimaryNav() {
-    const header = document.querySelector("header");
-    if (!header) return;
-    let nav = header.querySelector(".nav, nav[aria-label='Main navigation']");
-    if (!nav) {
-      nav = document.createElement("nav");
-      nav.className = "nav";
-      nav.setAttribute("aria-label", "Main navigation");
-      const account = header.querySelector(".account-area");
-      const back = header.querySelector(".back-button, a[href='index.html']");
-      if (account && account.parentElement === header) header.insertBefore(nav, account);
-      else if (back && back.parentElement === header) header.insertBefore(nav, back);
-      else header.appendChild(nav);
-    }
-    // Keep account/profile controls, but make the primary destinations identical everywhere.
-    nav.querySelectorAll(":scope > a").forEach(a => a.remove());
-    const links = [
-      ["index.html", "Home", "home"],
-      ["douggames.html", "Games", "games"],
-      ["tools.html", "Tools", "tools"],
-      ["nova.html", "Nova AI", "nova"],
-      ["chat.html", "Chat", "chat"]
-    ];
-    const account = nav.querySelector(":scope > .account-area");
-    links.forEach(([href, label, feature]) => {
-      const a = document.createElement("a");
-      a.href = href;
-      a.className = "nav-link";
-      a.textContent = label;
-      a.dataset.dhPrimaryNav = feature;
-      if (feature === "chat") {
-        a.id = "communityChatLink";
-        const dot = document.createElement("span");
-        dot.id = "chatNotification";
-        dot.className = "chat-notification";
-        dot.setAttribute("aria-label", "New chat messages");
-        a.appendChild(dot);
-      }
-      if (account) nav.insertBefore(a, account);
-      else nav.appendChild(a);
-    });
-  }
   function removeRetiredNavLinks() {
     // Nova has its own compact page navigation. Do not silently remove its
     // DougTube link; the generic retired-link cleanup is for other page headers.
