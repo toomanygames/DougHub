@@ -1,5 +1,13 @@
 (function () {
   "use strict";
+  // Ensure the shared DougHub tab notifications are active on pages that use
+  // the common navigation but do not otherwise load display.js.
+  if (!document.querySelector('script[src*="display.js"]')) {
+    const sharedDisplay = document.createElement("script");
+    sharedDisplay.src = "display.js";
+    sharedDisplay.defer = true;
+    document.head.appendChild(sharedDisplay);
+  }
   const API = "https://agsqdqcsmsppcdqxlppj.supabase.co/rest/v1/site_feature_flags?select=feature_key,enabled,display_name";
   const KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
   const pathMap = {
