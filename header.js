@@ -18,9 +18,15 @@
       --dh-header-purple: #a855f7;
     }
 
-    body > header {
+    html body header {
       box-sizing: border-box !important;
+      width: 100% !important;
+      max-width: none !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
       min-height: var(--dh-header-height);
+      padding-top: 15px !important;
+      padding-bottom: 15px !important;
       padding-left: var(--dh-header-pad) !important;
       padding-right: var(--dh-header-pad) !important;
       gap: var(--dh-header-gap) !important;
@@ -31,10 +37,10 @@
       z-index: 1000;
     }
 
-    body > header > .logo,
-    body > header > .brand,
-    body > header > a.logo,
-    body > header > a.brand {
+    html body header > .logo,
+    html body header > .brand,
+    html body header > a.logo,
+    html body header > a.brand {
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -44,11 +50,11 @@
       text-decoration: none;
     }
 
-    body > header .logo-icon,
-    body > header .logo-mark,
-    body > header .brand-icon,
-    body > header .brand-mark,
-    body > header .icon {
+    html body header .logo-icon,
+    html body header .logo-mark,
+    html body header .brand-icon,
+    html body header .brand-mark,
+    html body header .icon {
       box-sizing: border-box;
       width: 38px;
       height: 38px;
@@ -64,13 +70,13 @@
       line-height: 1;
     }
 
-    body > header > nav,
-    body > header > .nav,
-    body > header > .header-buttons,
-    body > header > .top-actions,
-    body > header > .actions,
-    body > header > .account-area,
-    body > header > .dh-shared-account {
+    html body header > nav,
+    html body header > .nav,
+    html body header > .header-buttons,
+    html body header > .top-actions,
+    html body header > .actions,
+    html body header > .account-area,
+    html body header > .dh-shared-account {
       display: flex;
       align-items: center;
       justify-content: flex-end;
@@ -79,28 +85,28 @@
       margin-left: auto;
     }
 
-    body > header > nav,
-    body > header > .nav {
+    html body header > nav,
+    html body header > .nav {
       flex: 0 1 auto;
       flex-wrap: nowrap;
     }
 
-    body > header > .header-buttons,
-    body > header > .top-actions,
-    body > header > .actions {
+    html body header > .header-buttons,
+    html body header > .top-actions,
+    html body header > .actions {
       flex: 0 0 auto;
       flex-wrap: nowrap;
     }
 
-    body > header .account-area,
-    body > header .dh-shared-account {
+    html body header .account-area,
+    html body header .dh-shared-account {
       position: relative;
       flex: 0 0 auto;
     }
 
-    body > header .account-btn,
-    body > header .account-button,
-    body > header .profile-button {
+    html body header .account-btn,
+    html body header .account-button,
+    html body header .profile-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -111,8 +117,8 @@
       white-space: nowrap;
     }
 
-    body > header .account-avatar,
-    body > header .profile-avatar {
+    html body header .account-avatar,
+    html body header .profile-avatar {
       width: 32px;
       height: 32px;
       min-width: 32px;
@@ -124,64 +130,64 @@
       justify-content: center;
     }
 
-    body > header .account-avatar img,
-    body > header .profile-avatar img {
+    html body header .account-avatar img,
+    html body header .profile-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    body > header nav > a,
-    body > header .nav > a {
+    html body header nav > a,
+    html body header .nav > a {
       flex: 0 0 auto;
       white-space: nowrap;
     }
 
     @media (max-width: 900px) {
-      body > header {
+      html body header {
         flex-wrap: wrap;
         min-height: var(--dh-header-height);
         row-gap: 8px !important;
       }
 
-      body > header > nav,
-      body > header > .nav {
+      html body header > nav,
+      html body header > .nav {
         max-width: 100%;
         overflow-x: auto;
         justify-content: flex-start;
         scrollbar-width: none;
       }
 
-      body > header > nav::-webkit-scrollbar,
-      body > header > .nav::-webkit-scrollbar {
+      html body header > nav::-webkit-scrollbar,
+      html body header > .nav::-webkit-scrollbar {
         display: none;
       }
 
-      body > header > .header-buttons,
-      body > header > .top-actions,
-      body > header > .actions {
+      html body header > .header-buttons,
+      html body header > .top-actions,
+      html body header > .actions {
         max-width: 100%;
       }
     }
 
     @media (max-width: 600px) {
-      body > header {
+      html body header {
         padding-top: 10px !important;
         padding-bottom: 10px !important;
       }
 
-      body > header > .logo,
-      body > header > .brand,
-      body > header > a.logo,
-      body > header > a.brand {
+      html body header > .logo,
+      html body header > .brand,
+      html body header > a.logo,
+      html body header > a.brand {
         gap: 8px;
       }
 
-      body > header .logo-icon,
-      body > header .logo-mark,
-      body > header .brand-icon,
-      body > header .brand-mark,
-      body > header .icon {
+      html body header .logo-icon,
+      html body header .logo-mark,
+      html body header .brand-icon,
+      html body header .brand-mark,
+      html body header .icon {
         width: 34px;
         height: 34px;
         min-width: 34px;
@@ -189,16 +195,16 @@
         flex-basis: 34px;
       }
 
-      body > header .account-btn,
-      body > header .account-button,
-      body > header .profile-button {
+      html body header .account-btn,
+      html body header .account-button,
+      html body header .profile-button {
         min-height: 40px;
         padding: 4px 8px;
         gap: 6px;
       }
 
-      body > header .account-avatar,
-      body > header .profile-avatar {
+      html body header .account-avatar,
+      html body header .profile-avatar {
         width: 28px;
         height: 28px;
         min-width: 28px;
@@ -207,9 +213,9 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      body > header *,
-      body > header *::before,
-      body > header *::after {
+      html body header *,
+      html body header *::before,
+      html body header *::after {
         scroll-behavior: auto !important;
         transition-duration: .01ms !important;
         animation-duration: .01ms !important;
