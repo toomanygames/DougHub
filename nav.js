@@ -123,6 +123,48 @@
       }, true);
     }
   }
+  function normalizePrimaryNav() {
+    const header = document.querySelector("header");
+    if (!header) return;
+    let nav = header.querySelector(".nav, nav[aria-label='Main navigation']");
+    if (!nav) {
+      nav = document.createElement("nav");
+      nav.className = "nav";
+      nav.setAttribute("aria-label", "Main navigation");
+      const account = header.querySelector(".account-area");
+      const back = header.querySelector(".back-button, a[href='index.html']");
+      if (account && account.parentElement === header) header.insertBefore(nav, account);
+      else if (back && back.parentElement === header) header.insertBefore(nav, back);
+      else header.appendChild(nav);
+    }
+    // Keep account/profile controls, but make the primary destinations identical everywhere.
+    nav.querySelectorAll(":scope > a").forEach(a => a.remove());
+    const links = [
+      ["index.html", "Home", "home"],
+      ["douggames.html", "Games", "games"],
+      ["tools.html", "Tools", "tools"],
+      ["nova.html", "Nova AI", "nova"],
+      ["chat.html", "Chat", "chat"]
+    ];
+    const account = nav.querySelector(":scope > .account-area");
+    links.forEach(([href, label, feature]) => {
+      const a = document.createElement("a");
+      a.href = href;
+      a.className = "nav-link";
+      a.textContent = label;
+      a.dataset.dhPrimaryNav = feature;
+      if (feature === "chat") {
+        a.id = "communityChatLink";
+        const dot = document.createElement("span");
+        dot.id = "chatNotification";
+        dot.className = "chat-notification";
+        dot.setAttribute("aria-label", "New chat messages");
+        a.appendChild(dot);
+      }
+      if (account) nav.insertBefore(a, account);
+      else nav.appendChild(a);
+    });
+  }
   function removeRetiredNavLinks() {
     // Nova has its own compact page navigation. Do not silently remove its
     // DougTube link; the generic retired-link cleanup is for other page headers.
@@ -179,6 +221,7 @@
 
   function start() {
     addNavStyle();
+    normalizePrimaryNav();
     removeRetiredNavLinks();
     markActiveLinks();
     loadFlags().then(applyFlags);
