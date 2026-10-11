@@ -235,13 +235,12 @@
         menu?.setAttribute("aria-hidden", String(!open));
         button?.setAttribute("aria-expanded", String(open));
       };
-      button?.addEventListener("click", async event => {
+      // Open the menu immediately. Waiting for Supabase here made the button
+      // appear broken when auth was slow or unavailable, and redirected guests
+      // before they could see the account menu.
+      button?.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
-        const client = await getNavSupabase();
-        if (!client) { location.href = "/log-in.html"; return; }
-        const { data: { session } } = await client.auth.getSession();
-        if (!session) { location.href = "/log-in.html"; return; }
         setOpen(!menu?.classList.contains("show"));
       });
       document.addEventListener("click", event => {
