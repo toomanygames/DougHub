@@ -900,8 +900,6 @@
         if (window.__douqhubChatDingsStarted) return;
         window.__douqhubChatDingsStarted = true;
         const enabledKey = "douqhub_chat_dings_enabled";
-        const cooldownKey = "douqhub_chat_ding_last_played";
-        const cooldownMs = 90 * 1000;
         let cursorCreatedAt = null, initialized = false, audioContext = null, audioUnlocked = false, checking = false;
 
         function enabled() {
@@ -922,19 +920,10 @@
 
         function playDing() {
             if (!enabled() || !audioUnlocked || !audioContext) return;
-            const now = Date.now();
-            try {
-                const previous = Number(localStorage.getItem(cooldownKey) || 0);
-                if (now - previous < cooldownMs) return;
-                localStorage.setItem(cooldownKey, String(now));
-            } catch (_) {
-                if (window.__douqhubLastLocalDing && now - window.__douqhubLastLocalDing < cooldownMs) return;
-                window.__douqhubLastLocalDing = now;
-            }
             try {
                 const ctx = audioContext, gain = ctx.createGain();
                 gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.025);
+                gain.gain.exponentialRampToValueAtTime(0.65, ctx.currentTime + 0.025);
                 gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.65);
                 gain.connect(ctx.destination);
                 [880, 1174.66].forEach((frequency, index) => {
