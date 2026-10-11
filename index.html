@@ -2285,46 +2285,7 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
     </section>
 
 
-    <section class="home-original-games" aria-labelledby="originalGamesTitle">
-        <div class="directory-heading directory-heading-v2">
-            <div>
-                <p class="directory-eyebrow">MADE BY DOUGHUB</p>
-                <h2 id="originalGamesTitle">My games</h2>
-                <p class="directory-description">Jump into the games built for DougHub. These are DougHub originals, separate from community-made games.</p>
-            </div>
-            <a class="original-games-all" href="douggames.html">Browse all games <span>↗</span></a>
-        </div>
-        <div class="tool-grid-v2 original-games-grid">
-            <a class="tool-tile tool-tile-v2 original-game-pig" href="Games/pig-clicker.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-green">🐷</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">CLICKER GAME</span><h3>Pig Clicker</h3><p>Click, earn coins, and build up your pig-powered progress.</p><span class="tool-tile-open">Play Pig Clicker <b>→</b></span>
-            </a>
-            <a class="tool-tile tool-tile-v2 original-game-drive" href="Games/drive-pig.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-cyan">🚗</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">DRIVING GAME</span><h3>Drive Pig</h3><p>Take the pig for a drive and see how far you can go.</p><span class="tool-tile-open">Play Drive Pig <b>→</b></span>
-            </a>
-            <a class="tool-tile tool-tile-v2 original-game-rebirth" href="Games/rebirth-clicker.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-violet">♻</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">PROGRESSION GAME</span><h3>Rebirth Clicker</h3><p>Keep progressing, rebirth, and work toward bigger upgrades.</p><span class="tool-tile-open">Play Rebirth Clicker <b>→</b></span>
-            </a>
-            <a class="tool-tile tool-tile-v2 original-game-space" href="Games/pig-clicker-space.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-blue">🚀</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">SPACE ADVENTURE</span><h3>Pig Clicker: Space</h3><p>Take the pig beyond Earth and explore the space-themed clicker.</p><span class="tool-tile-open">Go to space <b>→</b></span>
-            </a>
-            <a class="tool-tile tool-tile-v2 original-game-racing" href="Games/racing.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-orange">🏁</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">ARCADE RACING</span><h3>Racing</h3><p>Race around the track and try to beat your best run.</p><span class="tool-tile-open">Start racing <b>→</b></span>
-            </a>
-            <a class="tool-tile tool-tile-v2 original-game-puzzle" href="Games/puzzle.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-pink">🧩</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">PUZZLE GAME</span><h3>Puzzle</h3><p>Put your problem-solving skills to work with a quick puzzle.</p><span class="tool-tile-open">Play Puzzle <b>→</b></span>
-            </a>
-            <a class="tool-tile tool-tile-v2 original-game-punch" href="Games/smack-n-punch.html">
-                <div class="tool-card-top"><span class="tool-tile-icon icon-red">🥊</span><span class="tool-tile-arrow">↗</span></div>
-                <span class="tool-tile-label">ARCADE ACTION</span><h3>Smack ’n Punch</h3><p>Jump into the action and take on the game’s challenges.</p><span class="tool-tile-open">Play Smack ’n Punch <b>→</b></span>
-            </a>
-        </div>
-    </section>
+    
 
     <section class="home-quick-access" aria-labelledby="quickAccessTitle">
         <div class="quick-access-heading">
@@ -2388,12 +2349,7 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 })();
 </script>
 
-<style>
-.feedback-reply-user-item{margin-top:12px;padding:15px;border:1px solid rgba(129,140,248,.22);border-radius:13px;background:rgba(99,102,241,.06);overflow-wrap:anywhere}
-.feedback-reply-user-label{font-size:12px;font-weight:800;color:#c4b5fd}
-.feedback-reply-user-original,.feedback-reply-user-text{margin:7px 0 13px;white-space:pre-wrap;line-height:1.55;color:#d5d7e8}
-.feedback-reply-user-text{margin-bottom:0;color:#e7e3ff}
-</style>
+
 
     <section class="feedback-section" id="feedback">
 
@@ -2432,11 +2388,7 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 
         </div>
 
-        <div class="feedback-card" id="feedbackRepliesCard" style="display:none;margin-top:16px;text-align:left">
-            <h2>📬 Replies to Your Feedback</h2>
-            <p>Replies from the DougHub team appear here.</p>
-            <div id="feedbackRepliesList" aria-live="polite"></div>
-        </div>
+        
 
     </section>
 
@@ -2646,9 +2598,6 @@ async function loadAccount() {
     if (!session) {
 
         currentUser = null;
-        const repliesCard = document.getElementById("feedbackRepliesCard");
-        if (repliesCard) repliesCard.style.display = "none";
-
         document
             .getElementById("accountName")
             .textContent =
@@ -2676,12 +2625,7 @@ async function loadAccount() {
 
     currentUser =
         session.user;
-
-    if (typeof loadFeedbackReplies === "function") {
-        await loadFeedbackReplies();
-    }
-
-    const guestNote = document.querySelector(".guest-friendly-note");
+const guestNote = document.querySelector(".guest-friendly-note");
     if (guestNote) {
         guestNote.classList.add("hidden");
     }
@@ -3583,65 +3527,6 @@ const feedbackCount =
         "feedbackCount"
     );
 
-async function loadFeedbackReplies() {
-    const card = document.getElementById("feedbackRepliesCard");
-    const list = document.getElementById("feedbackRepliesList");
-    if (!card || !list || !currentUser) {
-        if (card) card.style.display = "none";
-        return;
-    }
-
-    const { data, error } = await supabaseClient
-        .from("feedback")
-        .select("id,message,created_at,admin_reply,admin_replied_at")
-        .eq("user_id", currentUser.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-    if (error) {
-        console.error("Could not load feedback replies:", error);
-        card.style.display = "block";
-        list.textContent = "Could not load your feedback replies right now.";
-        return;
-    }
-
-    if (!data || data.length === 0) {
-        card.style.display = "none";
-        return;
-    }
-
-    card.style.display = "block";
-    list.replaceChildren();
-
-    const replies = data.filter(item => item.admin_reply);
-    if (!replies.length) {
-        const empty = document.createElement("div");
-        empty.className = "feedback-reply-user-item";
-        empty.textContent = "No replies yet. If the DougHub team replies to your feedback, it will show up here.";
-        list.appendChild(empty);
-        return;
-    }
-
-    replies.forEach(item => {
-        const wrapper = document.createElement("article");
-        wrapper.className = "feedback-reply-user-item";
-        const originalLabel = document.createElement("div");
-        originalLabel.className = "feedback-reply-user-label";
-        originalLabel.textContent = "Your feedback · " + new Date(item.created_at).toLocaleString();
-        const original = document.createElement("p");
-        original.className = "feedback-reply-user-original";
-        original.textContent = item.message;
-        const replyLabel = document.createElement("div");
-        replyLabel.className = "feedback-reply-user-label";
-        replyLabel.textContent = "DougHub team reply" + (item.admin_replied_at ? " · " + new Date(item.admin_replied_at).toLocaleString() : "");
-        const reply = document.createElement("p");
-        reply.className = "feedback-reply-user-text";
-        reply.textContent = item.admin_reply;
-        wrapper.append(originalLabel, original, replyLabel, reply);
-        list.appendChild(wrapper);
-    });
-}
-
 function updateFeedbackCount() {
 
     feedbackCount.textContent =
@@ -3763,10 +3648,7 @@ if (feedbackButton) {
 
                 feedbackStatus.style.color =
                     "#22c55e";
-
-                await loadFeedbackReplies();
-
-            } catch (error) {
+} catch (error) {
 
                 console.error(
                     "Feedback error:",
