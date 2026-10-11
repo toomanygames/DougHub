@@ -533,19 +533,73 @@
     document.body.appendChild(card);
     const stepsForPage=()=>{
       const p=location.pathname.toLowerCase();
-      const candidates=[
-        {selector:'header .nav,header nav[aria-label="Main navigation"]',title:"Move around DougHub",text:"Use the top navigation to switch between Home, Games, Tools, Nova AI and Chat."},
-        {selector:'#accountButton, .dh-shared-account .account-btn',title:"Your account menu",text:"Open this button to find account settings, your saved work and sign-out options."},
-        {selector:'main h1, .top h1, .heading h1',title:"Page overview",text:"This heading tells you what this page is for. The controls underneath are the main workspace."},
-        {selector:'#quickAccess, .home-quick-access, .quick-access-grid',title:"Quick access",text:"These shortcuts take you directly to commonly used DougHub features."},
-        {selector:'#modeSwitch, #projectModeSwitch, [data-mode-switch]',title:"Choose a mode",text:"Where available, switch between Project Mode for general coding and Game Maker mode for game-focused tools."},
-        {selector:'#toolSearch, #projectSearch, input[type="search"]',title:"Search",text:"Type a keyword to find tools, projects or games without scrolling through everything."},
-        {selector:'#editor, #codeEditor, #blockList, .workspace',title:"Create and edit",text:"This is where you write code or build with blocks. Save your work before leaving."},
-        {selector:'#preview, #previewFrame, .preview-frame, iframe.preview',title:"Test your work",text:"Run or preview your project here. If something looks wrong, return to the editor and try again."},
-        {selector:'#saveProject, #publishProject, button[onclick*="saveProject"]',title:"Save or publish",text:"Save a private copy first. Publish only when you're ready for other people to see it."},
-        {selector:'main button, main a.btn, main .quick-access-card, main .tool-card',title:"Explore page actions",text:"Buttons and cards open features or perform actions. Hover or focus a control to see its label."}
+      const common=[
+        {selector:'header .nav,header nav[aria-label="Main navigation"]',title:"Navigation bar",text:"Choose Home to return to the homepage, Games to browse and create games, Tools for utilities, Nova AI for AI assistance, or Chat to join the community conversation."},
+        {selector:'#accountButton, .dh-shared-account .account-btn',title:"Account button",text:"Click your avatar or username to open the account menu. From there, use Settings to manage preferences, My Games & Videos to find your saved creations, or Log Out when you are finished."}
       ];
-      return candidates.map(x=>({...x,el:document.querySelector(x.selector)})).filter(x=>x.el&&!x.el.closest("#dh-help-card"));
+      const pageSteps={
+        code:[
+          {selector:'#modeSwitch',title:"Project Mode vs Game Maker",text:"Choose Project Mode for websites, apps and general coding. Choose Game Maker for game-focused work. You can switch modes at any time; the mode changes the workspace label and keeps your current project open."},
+          {selector:'#fileTabs',title:"Project files",text:"This area lists the files in your project. Select a file to edit it. Use + File to add another file, and Delete only when you really want to remove the selected file."},
+          {selector:'#fileType',title:"File type",text:"Choose the extension for the selected file, such as .html for page structure, .css for appearance, or .js for interactive behavior. Keep the extension matched to the code you put in the file."},
+          {selector:'#editor',title:"Code editor",text:"Write or paste your code here. HTML defines page content, CSS styles it, and JavaScript makes it interactive. Start with index.html, then use the other files to keep your project organized."},
+          {selector:'#preview',title:"Live preview",text:"The preview shows your web project. Press Run after changing code to test it. If the result is wrong, edit the code and run it again. Browser previews cannot run every language or server-only feature."},
+          {selector:'button[onclick="saveProject()"]',title:"Save your project",text:"Click Save to store your current project in your DougHub account. Give it a clear title and description in Project settings so you can recognize it later."},
+          {selector:'#runtime',title:"Runtime setting",text:"Select Web for HTML, CSS and JavaScript projects. Python and Java are separate runtimes and may not run inside the browser preview in the same way as a web page."},
+          {selector:'#visibility',title:"Project visibility",text:"Public projects can be discovered by others; private projects are intended to stay in your own project list. Check this setting before saving or sharing."},
+          {selector:'#entry',title:"Preview page",text:"Choose which HTML file should open first when you run the project. Most small projects use index.html as their entry page."},
+          {selector:'#projectSearch',title:"Find community projects",text:"Type a keyword to narrow the community code-project list. Clear the search to show the full list again."}
+        ],
+        tools:[
+          {selector:'input[type="search"],#toolSearch',title:"Search tools",text:"Type what you want to do—for example, convert, calculate, format or generate. Select a matching tool card to open that utility."},
+          {selector:'main .tool-card,main a[href]',title:"Open a tool",text:"Each tool card or link opens a specific utility. Read its title and short description, open the one that matches your task, and use the fields or buttons shown on that tool."}
+        ],
+        home:[
+          {selector:'.home-quick-access,.quick-access-grid,#quickAccess',title:"Quick Access shortcuts",text:"These are shortcuts to popular DougHub features. Click a card to open that feature directly instead of finding it through the navigation. If you are not sure where to start, choose the shortcut whose title matches what you want to do."},
+          {selector:'input[type="search"],#searchInput,.search-box',title:"Homepage search",text:"Enter a keyword to find a page, tool or feature. Choose a result from the suggestions; if you do not see the right result, try a shorter keyword."},
+          {selector:'header .nav a[href="/douggames.html"]',title:"Games and Game Maker",text:"Open Games to browse games. Use the Game Maker option there to launch DougCode directly in Game Maker mode."}
+        ],
+        gameMaker:[
+          {selector:'#blockList,.workspace,#editor,textarea',title:"Build area",text:"This is the main area for making your game. Select a tool or block, follow its on-screen settings, and add or edit game logic one small step at a time."},
+          {selector:'button[onclick*="run"],button[id*="run"],button[title*="Run"]',title:"Run or test",text:"Use Run or Play to test the current version of your game. Test after each major change so it is easier to find what needs fixing."},
+          {selector:'button[onclick*="save"],button[id*="save"]',title:"Save your game",text:"Save regularly so you do not lose your latest changes. If there is a project name field, give the game a name before saving."}
+        ],
+        chat:[
+          {selector:'textarea,input[type="text"]',title:"Write a message",text:"Type your message in the message box. Check that it says what you mean, then use Send or press Enter if the page supports it. Keep private information such as passwords out of public chat."},
+          {selector:'button[type="submit"],button[aria-label*="Send"],button[id*="send"]',title:"Send message",text:"Click this button to send the message you wrote. If nothing appears, check your connection and whether the message box is empty."}
+        ],
+        dmail:[
+          {selector:'textarea,input[type="text"]',title:"Compose a message",text:"Choose the recipient if the page asks, write your message in the compose box, then review it before sending. Direct messages are for the intended recipient, not a public post."},
+          {selector:'button[type="submit"],button[aria-label*="Send"],button[id*="send"]',title:"Send direct message",text:"Use Send after you have chosen the recipient and written your message. If it does not appear in the conversation, wait a moment and check your connection."}
+        ]
+      };
+      let chosen=common.slice();
+      if(p.includes("dougcode")||p.includes("work.html")) chosen=chosen.concat(pageSteps.code);
+      else if(p.includes("tools")) chosen=chosen.concat(pageSteps.tools);
+      else if(p.endsWith("/index.html")||p==="/") chosen=chosen.concat(pageSteps.home);
+      else if(p.includes("scripting")||p.includes("game-creator")) chosen=chosen.concat(pageSteps.gameMaker);
+      else if(p.includes("dmail")) chosen=chosen.concat(pageSteps.dmail);
+      else if(p.includes("chat")) chosen=chosen.concat(pageSteps.chat);
+      // Add a page-specific heading explanation and useful actions as a fallback.
+      const heading=document.querySelector('main h1,.top h1,.heading h1,h1');
+      if(heading) chosen.push({selector:'main h1,.top h1,.heading h1,h1',title:heading.textContent.trim()||"Page overview",text:"This page is for "+(heading.textContent.trim()||"this feature")+". Read the short descriptions beside controls, choose the action you need, and use Help again if you want a guided tour of another area."});
+      const found=[];
+      for(const step of chosen){
+        let el=null;
+        try{el=document.querySelector(step.selector)}catch(_){}
+        if(el&&!el.closest("#dh-help-card")&&!found.some(x=>x.el===el))found.push({...step,el});
+      }
+      // Explain actual prominent controls by their own visible labels rather than a generic placeholder.
+      const actions=[...document.querySelectorAll('main button,main a.btn,main .quick-access-card,main .tool-card')];
+      for(const el of actions){
+        if(found.length>=12)break;
+        if(!el||el.closest("#dh-help-card")||found.some(x=>x.el===el))continue;
+        const label=(el.innerText||el.getAttribute("aria-label")||el.getAttribute("title")||"").replace(/\\s+/g," ").trim();
+        if(!label||label.length>70)continue;
+        const isLink=el.tagName==="A";
+        found.push({el,title:label,text:isLink?"Click this link to open "+label+". If it takes you to a different page, use the navigation bar to return here.":"Click "+label+" to run that action. Check any fields or options first, then read the result or status message shown on the page."});
+      }
+      return found;
     };
     let steps=[],index=0;
     const path=document.getElementById("dh-help-path");
