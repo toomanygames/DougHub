@@ -146,10 +146,12 @@
     `;
     document.head.appendChild(style);
   }
+  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dmail.html"]);
   function normalizePrimaryNav() {
     // Apply the same primary navigation to every page that loads nav.js.
     // Preserve page content and page-specific controls outside the navigation.
     const current = pathKey();
+    if (!MAIN_NAV_PAGES.has(current)) return;
     const header = document.querySelector("header");
     if (!header) return;
 
