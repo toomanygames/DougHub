@@ -15,9 +15,9 @@
       );
       if (!label || label.dataset.dhWordmarkNormalized === "true") return;
       const raw = (label.textContent || "").replace(/\s+/g, " ").trim();
-      const match = raw.match(/^DougHub(?:\s*[-:]?\s*)(.*)$/i);
-      if (!match) return;
-      const suffix = match[1].trim();
+      if (!/^DougHub/i.test(raw)) return;
+      // Strip any repeated DougHub prefixes left by older header code.
+      const suffix = raw.replace(/^(?:DougHub\s*[-:]?\s*)+/i, "").trim();
       label.replaceChildren();
       const base = document.createElement("span");
       base.className = "dh-wordmark-base";
