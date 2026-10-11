@@ -153,7 +153,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "scripting/scripting.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
