@@ -565,6 +565,9 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .brand-icon{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 25px #6366f133}
 .chat-container{background:rgba(13,17,39,.76);border:1px solid var(--dh-line);border-radius:26px;box-shadow:0 24px 80px #0004;overflow:hidden}
 .chat-top{background:rgba(255,255,255,.025);border-bottom:1px solid var(--dh-line)}
+.chat-ding-setting{display:inline-flex;align-items:center;gap:8px;margin-left:auto;color:var(--dh-muted,#aab0d0);font-size:13px;cursor:pointer;user-select:none}
+.chat-ding-setting input{width:16px;height:16px;accent-color:#818cf8;cursor:pointer}
+@media(max-width:520px){.chat-ding-setting{margin-left:0}.chat-top{flex-wrap:wrap;gap:10px}}
 .messages{background:transparent}
 .composer{background:rgba(6,8,22,.78);border-top:1px solid var(--dh-line)}
 .composer textarea,.composer input{background:#080a19;border:1px solid var(--dh-line);border-radius:14px}
@@ -612,6 +615,10 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         <span class="status-dot"></span>
         <span>Live Chat</span>
       </div>
+      <label class="chat-ding-setting" for="chatDingToggle" title="Play a short sound when someone sends a community chat message">
+        <input id="chatDingToggle" type="checkbox" checked>
+        <span>Message dings</span>
+      </label>
 
       <div
         class="username-display"
@@ -686,6 +693,19 @@ const supabaseClient =
 /* =========================================
    COMMUNITY CHAT ELEMENTS
 ========================================= */
+
+/* Chat message sound preference: shared by DougHub tabs on this browser. */
+(function setupChatDingToggle() {
+  const key = "douqhub_chat_dings_enabled";
+  const toggle = document.getElementById("chatDingToggle");
+  if (!toggle) return;
+  try { toggle.checked = localStorage.getItem(key) !== "false"; }
+  catch (_) { toggle.checked = true; }
+  toggle.addEventListener("change", () => {
+    try { localStorage.setItem(key, toggle.checked ? "true" : "false"); } catch (_) {}
+    window.dispatchEvent(new Event("douqhub:chat-ding-setting-changed"));
+  });
+})();
 
 const messagesEl =
   document.getElementById("messages");
