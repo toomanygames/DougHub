@@ -76,6 +76,104 @@
     save();
   }
 
+  // Use one consistent header layout even when individual pages have older CSS.
+  // The brand stays left; navigation and the account control form a relaxed group on the right.
+  const sharedLayoutStyle = document.createElement("style");
+  sharedLayoutStyle.id = "dh-header-layout-overrides";
+  sharedLayoutStyle.textContent = `
+    html body header {
+      display: flex !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 72px !important;
+      padding: 12px max(24px, calc((100% - 1340px) / 2)) !important;
+      gap: 24px !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      flex-wrap: nowrap !important;
+    }
+    html body header > .logo,
+    html body header > .brand,
+    html body header > a.logo,
+    html body header > a.brand {
+      flex: 0 0 auto !important;
+      margin: 0 !important;
+      gap: 10px !important;
+      font-size: 21px !important;
+      line-height: 1.15 !important;
+    }
+    html body header > .nav,
+    html body header > nav,
+    html body header > nav[aria-label="Main navigation"] {
+      display: flex !important;
+      flex: 0 1 auto !important;
+      width: auto !important;
+      max-width: none !important;
+      min-width: 0 !important;
+      margin: 0 0 0 auto !important;
+      padding: 0 !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: clamp(8px, 1.1vw, 18px) !important;
+      flex-wrap: nowrap !important;
+      overflow: visible !important;
+    }
+    html body header > .nav > a,
+    html body header > nav > a,
+    html body header > nav[aria-label="Main navigation"] > a {
+      flex: 0 0 auto !important;
+      min-height: 40px !important;
+      padding: 9px 13px !important;
+      font-size: 13px !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+    }
+    html body header .account-area,
+    html body header .dh-shared-account {
+      flex: 0 0 auto !important;
+      margin: 0 0 0 2px !important;
+    }
+    html body header .account-btn,
+    html body header .account-button,
+    html body header .profile-button {
+      min-height: 46px !important;
+      padding: 6px 12px !important;
+    }
+    @media (max-width: 900px) {
+      html body header {
+        flex-wrap: wrap !important;
+        gap: 10px 16px !important;
+      }
+      html body header > .nav,
+      html body header > nav,
+      html body header > nav[aria-label="Main navigation"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+      }
+    }
+    @media (max-width: 600px) {
+      html body header {
+        padding: 10px 14px !important;
+      }
+      html body header > .nav,
+      html body header > nav,
+      html body header > nav[aria-label="Main navigation"] {
+        gap: 5px !important;
+      }
+      html body header > .nav > a,
+      html body header > nav > a,
+      html body header > nav[aria-label="Main navigation"] > a {
+        padding: 7px 9px !important;
+        font-size: 12px !important;
+      }
+    }
+  `;
+  document.head.appendChild(sharedLayoutStyle);
+
   const style = document.createElement("style");
   style.id = "dh-shared-header-style";
   style.textContent = `
