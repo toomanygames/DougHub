@@ -138,6 +138,61 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 
+
+/* Nova header navigation fix: keep the brand and pill links aligned */
+.top{
+  width:min(calc(100% - 48px),1320px);
+  max-width:none;
+  margin:0 auto;
+  padding:16px 0;
+  display:flex;
+  flex-flow:row nowrap;
+  align-items:center;
+  gap:22px;
+}
+.top .brand{flex:0 0 auto;white-space:nowrap}
+.top .nav{
+  flex:1 1 auto;
+  min-width:0;
+  width:auto;
+  margin-left:auto;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.top .nav>a{
+  flex:0 0 auto;
+  min-height:36px;
+  padding:9px 12px!important;
+  border:1px solid transparent;
+  border-radius:999px!important;
+  line-height:1.2;
+}
+.top .nav>a.active{
+  background:linear-gradient(135deg,#6366f12b,#a855f72b)!important;
+  border-color:#a5b4fc44!important;
+  color:#fff!important;
+}
+@media(max-width:1000px){
+  .top{width:calc(100% - 36px);gap:16px}
+  .top .nav{justify-content:flex-end}
+}
+@media(max-width:850px){
+  .top{width:auto;margin:0;padding:14px 18px;flex-wrap:wrap;gap:12px}
+  .top .nav{flex:1 0 100%;width:100%;margin:0;justify-content:flex-start;gap:7px}
+}
+@media(max-width:640px){
+  .top{padding:14px 12px;gap:12px}
+  .top .nav{display:flex;flex-wrap:wrap;gap:6px}
+  .top .nav>a{font-size:12px;padding:8px 10px!important;min-height:34px}
+}
+@media(max-width:380px){
+  .top .nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:6px}
+  .top .nav>a{width:100%;white-space:normal;text-align:center}
+}
+
 </style>
 </head>
 <body>
