@@ -5,6 +5,36 @@
   const NAV_SCRIPT_URL = document.currentScript && document.currentScript.src
     ? document.currentScript.src
     : new URL("nav.js", location.href).href;
+
+  // Paint the last known account label before any asynchronous Supabase checks
+  // finish, so page-to-page navigation does not flash "Log In" for signed-in users.
+  (function primeCachedAccountLabel() {
+    try {
+      const cached = JSON.parse(sessionStorage.getItem("dh-account-display-v1") || "null");
+      if (!cached || !cached.name || cached.name === "Log In") return;
+      const paint = () => {
+        const name = document.getElementById("accountName");
+        const avatar = document.getElementById("accountAvatar");
+        if (!name || !avatar) return false;
+        name.textContent = cached.name;
+        if (cached.avatarUrl) {
+          let img = avatar.querySelector("img");
+          if (!img) {
+            img = document.createElement("img");
+            img.alt = "Profile";
+            avatar.replaceChildren(img);
+          }
+          img.src = cached.avatarUrl;
+        } else if (cached.avatarText) {
+          avatar.textContent = cached.avatarText;
+        }
+        return true;
+      };
+      if (!paint() && document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", paint, { once: true });
+      }
+    } catch (_) {}
+  })();
   // Ensure the shared DougHub tab notifications are active on pages that use
   // the common navigation but do not otherwise load display.js.
   if (!document.querySelector('script[src*="display.js"]')) {
