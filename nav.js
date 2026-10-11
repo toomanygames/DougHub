@@ -238,11 +238,13 @@
       // Open the menu immediately. Waiting for Supabase here made the button
       // appear broken when auth was slow or unavailable, and redirected guests
       // before they could see the account menu.
+      // Capture the click before page-specific legacy account handlers. Several
+      // pages had their own toggle handler, which cancelled this one out.
       button?.addEventListener("click", event => {
         event.preventDefault();
-        event.stopPropagation();
+        event.stopImmediatePropagation();
         setOpen(!menu?.classList.contains("show"));
-      });
+      }, true);
       document.addEventListener("click", event => {
         if (!event.target.closest(".dh-shared-account")) setOpen(false);
       });
@@ -496,8 +498,89 @@
     }
   }
 
+
+  // Universal contextual Help: a short guided tour with a visible leader line
+  // pointing from the guide card to the current control.
+  function installHelpGuide() {
+    if (document.getElementById("dh-global-help")) return;
+    const style = document.createElement("style");
+    style.id = "dh-global-help-style";
+    style.textContent = `
+      #dh-global-help{position:fixed;right:18px;bottom:18px;z-index:2147483000;border:1px solid #c4b5fd66;border-radius:999px;padding:11px 16px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font:800 13px Arial,sans-serif;box-shadow:0 12px 34px #0006;cursor:pointer}
+      #dh-help-overlay{position:fixed;inset:0;z-index:2147482998;display:none;pointer-events:none}
+      #dh-help-overlay.active{display:block}
+      #dh-help-line{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+      #dh-help-line path{fill:none;stroke:#c4b5fd;stroke-width:3;stroke-linecap:round;stroke-dasharray:7 7;filter:drop-shadow(0 0 5px #8b5cf6)}
+      #dh-help-card{position:fixed;right:18px;bottom:72px;width:min(360px,calc(100vw - 28px));padding:18px;border:1px solid #a5b4fc55;border-radius:18px;background:rgba(10,12,30,.97);color:#f7f7ff;box-shadow:0 24px 75px #000a;pointer-events:auto;font:14px/1.55 Arial,sans-serif}
+      #dh-help-card .dh-help-kicker{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#a5b4fc;text-transform:uppercase}
+      #dh-help-card h2{font-size:20px;margin:7px 0}
+      #dh-help-card p{margin:0;color:#c3c5da}
+      #dh-help-card .dh-help-actions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:15px}
+      #dh-help-card button{border:1px solid #ffffff24;border-radius:9px;padding:8px 11px;background:#ffffff0c;color:#fff;font-weight:800;cursor:pointer}
+      #dh-help-card button.dh-help-next{background:linear-gradient(135deg,#6366f1,#a855f7);border:0}
+      .dh-help-target{position:relative!important;z-index:2147482997!important;outline:3px solid #c4b5fd!important;outline-offset:4px!important;box-shadow:0 0 0 9999px #02040ab3,0 0 28px #a78bfa!important;scroll-margin:100px}
+      @media(max-width:600px){#dh-global-help{right:12px;bottom:12px}#dh-help-card{right:12px;bottom:64px}}
+    `;
+    document.head.appendChild(style);
+    const button=document.createElement("button");
+    button.id="dh-global-help";button.type="button";button.textContent="❔ Help";button.setAttribute("aria-haspopup","dialog");
+    document.body.appendChild(button);
+    const overlay=document.createElement("div");overlay.id="dh-help-overlay";
+    overlay.innerHTML='<svg id="dh-help-line" aria-hidden="true"><path id="dh-help-path"></path></svg>';
+    document.body.appendChild(overlay);
+    const card=document.createElement("section");card.id="dh-help-card";card.hidden=true;card.setAttribute("role","dialog");card.setAttribute("aria-modal","false");card.setAttribute("aria-label","Page help");
+    card.innerHTML='<div class="dh-help-kicker">DougHub quick guide <span id="dh-help-count"></span></div><h2 id="dh-help-title">Need a hand?</h2><p id="dh-help-text">Choose Next to see the main controls on this page.</p><div class="dh-help-actions"><button id="dh-help-close" type="button">Close</button><div><button id="dh-help-prev" type="button">←</button> <button id="dh-help-next" class="dh-help-next" type="button">Next →</button></div></div>';
+    document.body.appendChild(card);
+    const stepsForPage=()=>{
+      const p=location.pathname.toLowerCase();
+      const candidates=[
+        {selector:'header .nav,header nav[aria-label="Main navigation"]',title:"Move around DougHub",text:"Use the top navigation to switch between Home, Games, Tools, Nova AI and Chat."},
+        {selector:'#accountButton, .dh-shared-account .account-btn',title:"Your account menu",text:"Open this button to find account settings, your saved work and sign-out options."},
+        {selector:'main h1, .top h1, .heading h1',title:"Page overview",text:"This heading tells you what this page is for. The controls underneath are the main workspace."},
+        {selector:'#quickAccess, .home-quick-access, .quick-access-grid',title:"Quick access",text:"These shortcuts take you directly to commonly used DougHub features."},
+        {selector:'#modeSwitch, #projectModeSwitch, [data-mode-switch]',title:"Choose a mode",text:"Where available, switch between Project Mode for general coding and Game Maker mode for game-focused tools."},
+        {selector:'#toolSearch, #projectSearch, input[type="search"]',title:"Search",text:"Type a keyword to find tools, projects or games without scrolling through everything."},
+        {selector:'#editor, #codeEditor, #blockList, .workspace',title:"Create and edit",text:"This is where you write code or build with blocks. Save your work before leaving."},
+        {selector:'#preview, #previewFrame, .preview-frame, iframe.preview',title:"Test your work",text:"Run or preview your project here. If something looks wrong, return to the editor and try again."},
+        {selector:'#saveProject, #publishProject, button[onclick*="saveProject"]',title:"Save or publish",text:"Save a private copy first. Publish only when you're ready for other people to see it."},
+        {selector:'main button, main a.btn, main .quick-access-card, main .tool-card',title:"Explore page actions",text:"Buttons and cards open features or perform actions. Hover or focus a control to see its label."}
+      ];
+      return candidates.map(x=>({...x,el:document.querySelector(x.selector)})).filter(x=>x.el&&!x.el.closest("#dh-help-card"));
+    };
+    let steps=[],index=0;
+    const path=document.getElementById("dh-help-path");
+    function drawLine(el){
+      overlay.classList.add("active");
+      if(!el){path.setAttribute("d","");return;}
+      const r=el.getBoundingClientRect(),b=card.getBoundingClientRect();
+      const x1=Math.max(8,Math.min(innerWidth-8,r.left+r.width/2)),y1=Math.max(8,Math.min(innerHeight-8,r.top+r.height/2));
+      const x2=Math.max(8,Math.min(innerWidth-8,b.left+Math.min(b.width/2,80))),y2=Math.max(8,Math.min(innerHeight-8,b.top+12));
+      path.setAttribute("d",`M ${x1} ${y1} C ${x1} ${(y1+y2)/2}, ${x2} ${(y1+y2)/2}, ${x2} ${y2}`);
+    }
+    function render(){
+      document.querySelectorAll(".dh-help-target").forEach(el=>el.classList.remove("dh-help-target"));
+      const s=steps[index];if(!s)return;
+      document.getElementById("dh-help-title").textContent=s.title;
+      document.getElementById("dh-help-text").textContent=s.text;
+      document.getElementById("dh-help-count").textContent=(index+1)+" / "+steps.length;
+      document.getElementById("dh-help-prev").disabled=index===0;
+      document.getElementById("dh-help-next").textContent=index===steps.length-1?"Finish ✓":"Next →";
+      if(s.el){s.el.classList.add("dh-help-target");s.el.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});}
+      requestAnimationFrame(()=>drawLine(s.el));
+    }
+    function close(){card.hidden=true;overlay.classList.remove("active");document.querySelectorAll(".dh-help-target").forEach(el=>el.classList.remove("dh-help-target"));}
+    button.addEventListener("click",()=>{steps=stepsForPage();if(!steps.length)steps=[{title:"Welcome to DougHub",text:"Use the page controls to explore. If you need help with a particular feature, look for its label.",el:null}];index=0;card.hidden=false;render();});
+    document.getElementById("dh-help-close").addEventListener("click",close);
+    document.getElementById("dh-help-prev").addEventListener("click",()=>{if(index>0){index--;render();}});
+    document.getElementById("dh-help-next").addEventListener("click",()=>{if(index<steps.length-1){index++;render();}else close();});
+    window.addEventListener("resize",()=>{if(!card.hidden)drawLine(steps[index]?.el);});
+    window.addEventListener("scroll",()=>{if(!card.hidden)drawLine(steps[index]?.el);},{passive:true});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!card.hidden)close();});
+  }
+
   function start() {
     addNavStyle();
+    installHelpGuide();
     normalizePrimaryNav();
     startChatNotificationWatcher();
     removeRetiredNavLinks();
