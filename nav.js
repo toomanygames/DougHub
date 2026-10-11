@@ -254,6 +254,79 @@
     loadNavAccount();
   }
 
+
+  // Reuse display.js's authenticated Supabase client rather than creating another
+  // GoTrueClient, preventing session races and a permanently stuck account label.
+  async function getNavSupabase() {
+    if (window.DougHubSupabaseClient) return window.DougHubSupabaseClient;
+    if (window.__dhNavClientPromise) return window.__dhNavClientPromise;
+    window.__dhNavClientPromise = new Promise(resolve => {
+      let done = false;
+      let timer;
+      const finish = client => {
+        if (done) return;
+        done = true;
+        window.removeEventListener("douqhub:supabase-ready", onReady);
+        clearTimeout(timer);
+        resolve(client || null);
+      };
+      const onReady = () => finish(window.DougHubSupabaseClient || null);
+      window.addEventListener("douqhub:supabase-ready", onReady);
+      if (window.DougHubSupabaseClient) finish(window.DougHubSupabaseClient);
+      timer = setTimeout(() => finish(window.DougHubSupabaseClient || null), 10000);
+    });
+    return window.__dhNavClientPromise;
+  }
+
+  async function loadNavAccount() {
+    const name = document.getElementById("accountName");
+    const avatar = document.getElementById("accountAvatar");
+    const adminLink = document.getElementById("adminLink");
+    const feedbackLink = document.getElementById("feedbackInboxLink");
+    if (!name || !avatar) return;
+    try {
+      const client = await getNavSupabase();
+      if (!client) { name.textContent = "Log In"; avatar.textContent = "?"; return; }
+      const { data, error } = await client.auth.getSession();
+      if (error) throw error;
+      const session = data && data.session;
+      if (!session || !session.user) {
+        name.textContent = "Log In";
+        avatar.textContent = "?";
+        try { sessionStorage.removeItem("dh-account-display-v1"); } catch (_) {}
+        if (adminLink) adminLink.style.display = "none";
+        if (feedbackLink) feedbackLink.style.display = "none";
+        return;
+      }
+      const user = session.user;
+      let profile = null;
+      const result = await client.from("profiles").select("username,avatar_url,is_admin")
+        .eq("id", user.id).maybeSingle();
+      if (!result.error) profile = result.data;
+      const username = profile?.username || user.user_metadata?.username ||
+        user.user_metadata?.full_name || user.email?.split("@")[0] || "Account";
+      name.textContent = username;
+      if (profile?.avatar_url) {
+        let img = avatar.querySelector("img");
+        if (!img) { img = document.createElement("img"); img.alt = "Profile"; avatar.replaceChildren(img); }
+        img.src = profile.avatar_url;
+      } else {
+        avatar.textContent = username.slice(0, 1).toUpperCase();
+      }
+      if (adminLink) adminLink.style.display = profile?.is_admin ? "" : "none";
+      if (feedbackLink) feedbackLink.style.display = profile?.is_admin ? "" : "none";
+      try {
+        sessionStorage.setItem("dh-account-display-v1", JSON.stringify({
+          name: username, avatarText: profile?.avatar_url ? "" : username.slice(0, 1).toUpperCase(),
+          avatarUrl: profile?.avatar_url || ""
+        }));
+      } catch (_) {}
+    } catch (error) {
+      console.warn("DougHub account display could not load:", error);
+      if (name.textContent === "Loading…" || name.textContent === "Loading...") name.textContent = "Account";
+    }
+  }
+
   function removeRetiredNavLinks() {
     // Nova has its own compact page navigation. Do not silently remove its
     // DougTube link; the generic retired-link cleanup is for other page headers.
@@ -313,7 +386,7 @@
     normalizePrimaryNav();
     removeRetiredNavLinks();
     markActiveLinks();
-    loadFlags().then(applyFlags);
+    // Feature flags are optional; never let a missing flag loader break the header.\n    if (typeof loadFlags === "function" && typeof applyFlags === "function") loadFlags().then(applyFlags).catch(() => {});
     enforcePageSchedule();
     window.setInterval(enforcePageSchedule, 30000);
     document.addEventListener("visibilitychange", function () {
