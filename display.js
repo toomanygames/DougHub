@@ -921,7 +921,7 @@
         window.addEventListener("douqhub:chat-ding-setting-changed", () => { if (enabled()) unlockAudio(); });
 
         function playDing() {
-            if (!enabled() || !audioUnlocked || !audioContext || document.visibilityState === "hidden") return;
+            if (!enabled() || !audioUnlocked || !audioContext) return;
             const now = Date.now();
             try {
                 const previous = Number(localStorage.getItem(cooldownKey) || 0);
@@ -950,7 +950,7 @@
         }
 
         async function checkForMessages() {
-            if (checking || document.visibilityState === "hidden") return;
+            if (checking) return;
             checking = true;
             try {
                 if (!initialized) {
@@ -976,9 +976,7 @@
         }
         checkForMessages().finally(() => window.setInterval(checkForMessages, 5000));
         window.addEventListener("focus", checkForMessages);
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") checkForMessages();
-        });
+        document.addEventListener("visibilitychange", checkForMessages);
     }
 
 
