@@ -2074,6 +2074,18 @@ button:active:not(:disabled), .hero-action:active, .hero-create-button:active, .
 @media(prefers-reduced-motion:reduce){.original-games-all{transition:none}.original-games-all:hover{transform:none}}
 </style>
 
+
+<style id="quick-access-visibility-update">
+.home-quick-access{position:relative;margin-top:34px;padding:28px;border-color:rgba(129,140,248,.38);background:radial-gradient(circle at 0 0,#6366f126,transparent 45%),radial-gradient(circle at 100% 100%,#a855f71b,transparent 40%),linear-gradient(145deg,#10142feF,#090b1c);box-shadow:0 20px 60px #0005,0 0 0 1px #8b5cf622}
+.quick-access-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.quick-access-heading:after{content:"SHORTCUTS";font-size:10px;font-weight:900;letter-spacing:1.4px;color:#ddd6fe;padding:7px 10px;border-radius:999px;background:#8b5cf629;border:1px solid #a5b4fc4a}
+.quick-access-card{min-height:86px;padding:17px;border-color:#a5b4fc2e;background:linear-gradient(145deg,#161a37,#0a0c20);box-shadow:inset 0 1px #ffffff0a}
+.quick-access-card:hover{box-shadow:0 12px 30px #0005,0 0 0 1px #a5b4fc44}
+.quick-access-card strong{font-size:15px}
+.quick-access-card small{font-size:12px;color:#b0b3ce}
+.quick-access-icon{flex-basis:46px;width:46px;height:46px;font-size:22px;box-shadow:0 7px 20px #6366f122}
+@media(max-width:700px){.home-quick-access{padding:18px}.quick-access-card{min-height:74px;padding:12px}}
+</style>
 </head>
 
 <body><div id="dhTutorial" class="dh-tutorial" aria-hidden="true">
@@ -3759,6 +3771,9 @@ const DOUGHUB_TUTORIAL_STEPS = [
   {icon:"🧭",title:"The top navigation",text:"The top menu is another way to get around: Home returns here, Games opens the game area, Tools opens the utilities page, DougTube opens videos, and DMail opens messages. You don’t have to return to the homepage every time.",target:"header .nav"},
   {icon:"👤",title:"Your account menu",text:"Click your avatar or username to open your account menu. From there you can get to Settings and other account options that are available to you.",target:"#accountButton"},
   {icon:"⚙️",title:"Settings and Replay Tutorial",text:"Settings is where you can manage account preferences and profile details. If you want this tour again later, open Settings and press Replay Tutorial.",target:null},
+  {icon:"🧰",title:"DougTools and Nova AI",text:"Use the top navigation to open Tools for quick utilities or Nova AI for AI-powered help. The Help button on most pages can point out important controls.",target:'header .nav'},
+  {icon:"💻",title:"DougCode and Game Maker",text:"Open DougCode from Tools or another shortcut for Project Mode. Choose Game Maker from Games to open DougCode directly in Game Maker mode. Use the wide mode switch to change whenever you want.",target:'header .nav a[href="/douggames.html"]'},
+  {icon:"❔",title:"Page Help",text:"Look for the floating Help button on supported pages. It opens a guided tour with a highlighted control and a line pointing to what is being explained.",target:null},
   {icon:"🚀",title:"You’re ready to explore!",text:"That’s the main tour of DougHub’s homepage and quick-access shortcuts. Use Previous/Next to revisit a step, or Finish to close the tour. You can replay it any time from Settings.",target:null}
 ];
 let dhTutorialIndex=0;
