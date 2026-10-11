@@ -1150,6 +1150,18 @@ input,textarea,select{background:#070918}
 </div>
 
 
+<!-- DOUGHUB MUSIC MODERATION -->
+<div class="card" id="dougHubMusicModerationCard">
+  <h2>♫ DougHub Music Moderation</h2>
+  <p style="color:#9698b1;font-size:12px;line-height:1.6">Review community-submitted tracks and albums. Only approved music appears publicly.</p>
+  <h3 style="margin:18px 0 8px">Tracks</h3>
+  <div class="status" id="musicModerationStatus">Loading music tracks…</div>
+  <div id="dougHubMusicTracks" class="admin-scroll-area"></div>
+  <h3 style="margin:22px 0 8px">Albums</h3>
+  <div class="status" id="musicAlbumModerationStatus">Loading albums…</div>
+  <div id="dougHubMusicAlbums" class="admin-scroll-area"></div>
+</div>
+
 <!-- DOUGTUBE MODERATION -->
 
 <div class="card">
@@ -3885,6 +3897,156 @@ async function loadDougBaseAccessRequests() {
 
 
 
+
+/* DOUGHUB MUSIC MODERATION */
+async function loadDougHubMusicModeration() {
+    const tracksBox = document.getElementById("dougHubMusicTracks");
+    const albumsBox = document.getElementById("dougHubMusicAlbums");
+    const trackStatus = document.getElementById("musicModerationStatus");
+    const albumStatus = document.getElementById("musicAlbumModerationStatus");
+    if (!tracksBox || !albumsBox) return;
+    tracksBox.innerHTML = "";
+    albumsBox.innerHTML = "";
+    trackStatus.textContent = "Loading music tracks…";
+    albumStatus.textContent = "Loading albums…";
+
+    const [trackResult, albumResult] = await Promise.all([
+        supabaseClient.from("douqhub_music_tracks").select("id,owner_id,album_id,title,artist,description,audio_url,storage_path,status,created_at").order("created_at", {ascending:false}).limit(250),
+        supabaseClient.from("douqhub_music_albums").select("id,owner_id,title,artist,description,status,created_at").order("created_at", {ascending:false}).limit(150)
+    ]);
+    if (trackResult.error) {
+        trackStatus.textContent = "Could not load music tracks: " + trackResult.error.message;
+    } else {
+        const tracks = trackResult.data || [];
+        trackStatus.textContent = tracks.length + " track" + (tracks.length === 1 ? "" : "s");
+        if (!tracks.length) tracksBox.innerHTML = '<div class="empty">No music tracks have been submitted.</div>';
+        tracks.forEach(track => {
+            const item = document.createElement("div");
+            item.className = "video-moderation-item";
+            const title = document.createElement("div");
+            title.className = "video-moderation-title";
+            title.textContent = track.title || "Untitled track";
+            const info = document.createElement("div");
+            info.className = "video-moderation-info";
+            info.textContent = (track.artist || "Unknown artist") + " · " + (track.status || "pending") + " · " + new Date(track.created_at).toLocaleString();
+            const description = document.createElement("div");
+            description.className = "video-moderation-description";
+            description.textContent = track.description || "No description.";
+            const player = document.createElement("audio");
+            player.controls = true;
+            player.preload = "none";
+            player.src = track.audio_url;
+            player.style.width = "100%";
+            player.style.marginTop = "10px";
+            const actions = document.createElement("div");
+            actions.className = "video-moderation-actions";
+            if (track.status !== "approved") {
+                const approve = document.createElement("button");
+                approve.type = "button";
+                approve.className = "save-button";
+                approve.textContent = "✓ Approve";
+                approve.addEventListener("click", async () => {
+                    approve.disabled = true;
+                    const updated = await supabaseClient.from("douqhub_music_tracks").update({status:"approved"}).eq("id", track.id);
+                    if (updated.error) { alert("Could not approve track: " + updated.error.message); approve.disabled = false; return; }
+                    if (track.album_id) await supabaseClient.from("douqhub_music_albums").update({status:"approved"}).eq("id", track.album_id);
+                    await loadDougHubMusicModeration();
+                });
+                actions.appendChild(approve);
+            }
+            if (track.status !== "rejected") {
+                const reject = document.createElement("button");
+                reject.type = "button";
+                reject.className = "secondary-button";
+                reject.textContent = "Reject";
+                reject.addEventListener("click", async () => {
+                    const updated = await supabaseClient.from("douqhub_music_tracks").update({status:"rejected"}).eq("id", track.id);
+                    if (updated.error) { alert("Could not reject track: " + updated.error.message); return; }
+                    await loadDougHubMusicModeration();
+                });
+                actions.appendChild(reject);
+            }
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "delete-button";
+            remove.textContent = "🗑 Delete";
+            remove.addEventListener("click", async () => {
+                if (!confirm('Permanently delete "' + (track.title || "this track") + '"?')) return;
+                if (track.storage_path) {
+                    const removed = await supabaseClient.storage.from("douqhub-music").remove([track.storage_path]);
+                    if (removed.error) console.warn("Could not remove audio file:", removed.error);
+                }
+                const deleted = await supabaseClient.from("douqhub_music_tracks").delete().eq("id", track.id);
+                if (deleted.error) { alert("Could not delete track: " + deleted.error.message); return; }
+                await loadDougHubMusicModeration();
+            });
+            actions.appendChild(remove);
+            item.append(title, info, description, player, actions);
+            tracksBox.appendChild(item);
+        });
+    }
+
+    if (albumResult.error) {
+        albumStatus.textContent = "Could not load albums: " + albumResult.error.message;
+    } else {
+        const albums = albumResult.data || [];
+        albumStatus.textContent = albums.length + " album" + (albums.length === 1 ? "" : "s");
+        if (!albums.length) albumsBox.innerHTML = '<div class="empty">No community albums have been submitted.</div>';
+        albums.forEach(album => {
+            const item = document.createElement("div");
+            item.className = "video-moderation-item";
+            const title = document.createElement("div");
+            title.className = "video-moderation-title";
+            title.textContent = album.title || "Untitled album";
+            const info = document.createElement("div");
+            info.className = "video-moderation-info";
+            info.textContent = (album.artist || "Unknown artist") + " · " + (album.status || "pending") + " · " + new Date(album.created_at).toLocaleString();
+            const description = document.createElement("div");
+            description.className = "video-moderation-description";
+            description.textContent = album.description || "No description.";
+            const actions = document.createElement("div");
+            actions.className = "video-moderation-actions";
+            if (album.status !== "approved") {
+                const approve = document.createElement("button");
+                approve.type = "button";
+                approve.className = "save-button";
+                approve.textContent = "✓ Approve album";
+                approve.addEventListener("click", async () => {
+                    const updated = await supabaseClient.from("douqhub_music_albums").update({status:"approved"}).eq("id", album.id);
+                    if (updated.error) { alert("Could not approve album: " + updated.error.message); return; }
+                    await loadDougHubMusicModeration();
+                });
+                actions.appendChild(approve);
+            }
+            if (album.status !== "rejected") {
+                const reject = document.createElement("button");
+                reject.type = "button";
+                reject.className = "secondary-button";
+                reject.textContent = "Reject album";
+                reject.addEventListener("click", async () => {
+                    const updated = await supabaseClient.from("douqhub_music_albums").update({status:"rejected"}).eq("id", album.id);
+                    if (updated.error) { alert("Could not reject album: " + updated.error.message); return; }
+                    await loadDougHubMusicModeration();
+                });
+                actions.appendChild(reject);
+            }
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "delete-button";
+            remove.textContent = "🗑 Delete album";
+            remove.addEventListener("click", async () => {
+                if (!confirm('Delete album "' + (album.title || "this album") + '"? Tracks will remain as singles.')) return;
+                const deleted = await supabaseClient.from("douqhub_music_albums").delete().eq("id", album.id);
+                if (deleted.error) { alert("Could not delete album: " + deleted.error.message); return; }
+                await loadDougHubMusicModeration();
+            });
+            actions.appendChild(remove);
+            item.append(title, info, description, actions);
+            albumsBox.appendChild(item);
+        });
+    }
+}
+
 /* DOUGHUB CODE PROJECT MODERATION */
 const codeProjectStatus=document.getElementById("codeProjectStatus");
 const codeProjects=document.getElementById("codeProjects");
@@ -4286,6 +4448,7 @@ async function startAdminPanel() {
         loadGames(),
         loadUserActivity(),
         loadDougTubeVideos(),
+        loadDougHubMusicModeration(),
         loadDougBaseAccessRequests(),
         loadCodeProjects(),
         loadSiteFeatures(),
