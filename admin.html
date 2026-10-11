@@ -657,6 +657,26 @@ button:disabled {
   .admin-schedule-grid{grid-template-columns:minmax(0,1fr)}
 }
 
+
+/* Collapsible audit stream: starts closed on every page load. */
+.audit-card{padding:0!important;overflow:hidden}
+.audit-collapse-toggle{display:flex;width:100%;min-height:76px;align-items:center;justify-content:space-between;gap:16px;padding:17px 20px;text-align:left;border:0;border-radius:18px;background:linear-gradient(100deg,#071a20,#0a1228 58%,#11102b);cursor:pointer}
+.audit-collapse-title,.audit-collapse-right{display:flex;align-items:center;gap:14px;min-width:0}
+.audit-collapse-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 auto;border:1px solid #34d39945;border-radius:12px;color:#a7f3d0;background:#34d3990d;font-size:20px}
+.audit-collapse-title strong{display:block;font:800 15px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.06em;color:#d1fae5}
+.audit-collapse-title small{display:block;margin-top:4px;color:#8da6b1;font-size:12px;font-weight:500;line-height:1.45}
+.audit-collapse-right{flex:0 0 auto}
+.audit-chevron{display:grid;place-items:center;width:34px;height:34px;border:1px solid #ffffff1a;border-radius:10px;color:#d1d5ff;font-size:24px;line-height:1;transition:transform .22s ease,background .22s ease}
+.audit-collapse-toggle:hover{background:linear-gradient(100deg,#0b262b,#111a35 58%,#1a1438)}
+.audit-collapse-toggle:hover .audit-chevron{background:#ffffff0c}
+.audit-card:not(.collapsed) .audit-chevron{transform:rotate(180deg)}
+#auditLogContent{padding:0 18px 18px;animation:auditReveal .22s ease}
+#auditLogContent[hidden]{display:none}
+#auditClear{border-color:#ef444455;background:#ef444414;color:#fca5a5}
+#auditClear:hover{background:#ef444426}
+@keyframes auditReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.audit-collapse-toggle{padding:14px;gap:8px}.audit-collapse-title{gap:9px}.audit-collapse-title small{max-width:230px}.audit-collapse-right{gap:8px}.audit-live{display:none}#auditLogContent{padding:0 10px 12px}}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
@@ -897,18 +917,24 @@ input,textarea,select{background:#070918}
   <div class="admin-card-actions"><span id="pageScheduleStatus" class="status">Loading schedule…</span><button id="savePageScheduleButton" type="button" class="save-button">Save page settings</button></div>
 </div>
 
-<div class="card audit-card" id="auditLogCard">
-    <div class="audit-heading"><div><h2>▣ SYSTEM ACTIVITY LOG</h2><div class="audit-subtitle">Admin actions and successful sign-ins · Washington / Pacific Time</div></div><div class="audit-live"><span></span> AUDIT STREAM</div></div>
-    <div class="audit-filters">
-        <input id="auditSearch" type="search" placeholder="Search user, action, page…" aria-label="Search audit log">
-        <select id="auditType" aria-label="Filter event type"><option value="">All event types</option><option value="login">Sign-ins</option><option value="signup">Sign-ups</option><option value="admin_session">Admin sessions</option><option value="admin_action">Admin actions</option><option value="feature_toggle">Feature toggles</option></select>
-        <select id="auditCategory" aria-label="Filter category"><option value="">All categories</option><option value="authentication">Authentication</option><option value="users">Users</option><option value="moderation">Moderation</option><option value="features">Site features</option><option value="navigation">Navigation</option><option value="projects">Projects</option><option value="chat">Chat</option><option value="videos">Videos</option><option value="general">General</option></select>
-        <input id="auditFrom" type="date" aria-label="Start date"><input id="auditTo" type="date" aria-label="End date">
-        <button id="auditRefresh" type="button">↻ Refresh</button><button id="auditExport" type="button">↓ Export CSV</button>
+<div class="card audit-card collapsed" id="auditLogCard">
+    <button class="audit-collapse-toggle" id="auditLogToggle" type="button" aria-expanded="false" aria-controls="auditLogContent">
+      <span class="audit-collapse-title"><span class="audit-collapse-icon">▣</span><span><strong>SYSTEM ACTIVITY LOG</strong><small>Admin actions and successful sign-ins · Washington / Pacific Time</small></span></span>
+      <span class="audit-collapse-right"><span class="audit-live"><span></span> AUDIT STREAM</span><span class="audit-chevron" aria-hidden="true">⌄</span></span>
+    </button>
+    <div id="auditLogContent" hidden>
+      <div class="audit-filters">
+          <input id="auditSearch" type="search" placeholder="Search user, action, page…" aria-label="Search audit log">
+          <select id="auditType" aria-label="Filter event type"><option value="">All event types</option><option value="login">Sign-ins</option><option value="signup">Sign-ups</option><option value="admin_session">Admin sessions</option><option value="admin_action">Admin actions</option><option value="feature_toggle">Feature toggles</option></select>
+          <select id="auditCategory" aria-label="Filter category"><option value="">All categories</option><option value="authentication">Authentication</option><option value="users">Users</option><option value="moderation">Moderation</option><option value="features">Site features</option><option value="navigation">Navigation</option><option value="projects">Projects</option><option value="chat">Chat</option><option value="videos">Videos</option><option value="general">General</option></select>
+          <input id="auditFrom" type="date" aria-label="Start date"><input id="auditTo" type="date" aria-label="End date">
+          <button id="auditRefresh" type="button">↻ Refresh</button><button id="auditExport" type="button">↓ Export CSV</button>
+          <button id="auditClear" class="delete-button" type="button">🗑 Clear all logs</button>
+      </div>
+      <div class="audit-status" id="auditStatus">Connecting to audit stream…</div>
+      <div class="audit-table-wrap"><table class="audit-table"><thead><tr><th>TIME · WA</th><th>LEVEL</th><th>ACTOR</th><th>EVENT</th><th>LOCATION</th></tr></thead><tbody id="auditRows"><tr><td colspan="5">Awaiting log records…</td></tr></tbody></table></div>
+      <div class="audit-footer"><span>TIMEZONE: America/Los_Angeles</span><span>Newest first · up to 1,000 recent events</span></div>
     </div>
-    <div class="audit-status" id="auditStatus">Connecting to audit stream…</div>
-    <div class="audit-table-wrap"><table class="audit-table"><thead><tr><th>TIME · WA</th><th>LEVEL</th><th>ACTOR</th><th>EVENT</th><th>LOCATION</th></tr></thead><tbody id="auditRows"><tr><td colspan="5">Awaiting log records…</td></tr></tbody></table></div>
-    <div class="audit-footer"><span>TIMEZONE: America/Los_Angeles</span><span>Newest first · up to 1,000 recent events</span></div>
 </div>
 
 <div class="card">
@@ -4265,12 +4291,35 @@ function exportAuditCsv() {
     const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
     const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="doughub-audit-log.csv";a.click();URL.revokeObjectURL(url);
 }
+async function clearAuditLogs() {
+    const button=document.getElementById("auditClear");
+    const status=document.getElementById("auditStatus");
+    if(!supabaseClient||!currentAdminUser)return;
+    if(!window.confirm("Permanently delete every stored admin audit log? This cannot be undone. Export a CSV first if you need a copy."))return;
+    if(button)button.disabled=true;
+    if(status)status.textContent="CLEARING STORED AUDIT LOGS…";
+    try {
+        const {error}=await supabaseClient.from("admin_audit_logs").delete().not("id","is",null);
+        if(error)throw error;
+        auditState.rows=[];
+        auditState.usernames={};
+        renderAuditRows();
+        if(status)status.textContent="AUDIT LOG CLEARED // STORED RECORDS DELETED";
+    } catch(error) {
+        if(status)status.textContent="COULD NOT CLEAR LOGS // "+(error.message||"Unknown database error");
+    } finally {
+        if(button)button.disabled=false;
+    }
+}
 function setupAuditFilters() {
     ["auditSearch","auditType","auditCategory","auditFrom","auditTo"].forEach(id=>{
         const el=document.getElementById(id);if(el)el.addEventListener(id==="auditSearch"?"input":"change",renderAuditRows);
     });
     document.getElementById("auditRefresh")?.addEventListener("click",loadAuditLogs);
     document.getElementById("auditExport")?.addEventListener("click",exportAuditCsv);
+    document.getElementById("auditClear")?.addEventListener("click",clearAuditLogs);
+    const toggle=document.getElementById("auditLogToggle"),content=document.getElementById("auditLogContent"),card=document.getElementById("auditLogCard");
+    if(toggle&&content&&card){content.hidden=true;toggle.setAttribute("aria-expanded","false");card.classList.add("collapsed");toggle.addEventListener("click",()=>{const open=toggle.getAttribute("aria-expanded")!=="true";toggle.setAttribute("aria-expanded",String(open));content.hidden=!open;card.classList.toggle("collapsed",!open);});}
 }
 
 
