@@ -1199,11 +1199,6 @@ async function loadMessages() {
       .join("|");
 
     if (signature === lastRenderedMessageSignature) {
-      // The chat is open, so keep its unread marker cleared even when no new
-      // message arrived during this poll.
-      if (document.visibilityState === "visible") {
-        await markChatAsSeen();
-      }
       return;
     }
 
