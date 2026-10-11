@@ -1,5 +1,10 @@
 (function () {
   "use strict";
+  // Every branded page loads this shared header controller through nav.js, so
+  // global header spacing and icon sizing can be maintained in one file.
+  const NAV_SCRIPT_URL = document.currentScript && document.currentScript.src
+    ? document.currentScript.src
+    : new URL("nav.js", location.href).href;
   // Ensure the shared DougHub tab notifications are active on pages that use
   // the common navigation but do not otherwise load display.js.
   if (!document.querySelector('script[src*="display.js"]')) {
@@ -292,6 +297,23 @@
       if (document.visibilityState === "visible") enforcePageSchedule();
     });
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
-  else start();
+  function startAfterSharedHeader() {
+    const existing = document.getElementById("dh-shared-header-script");
+    if (existing) {
+      if (existing.dataset.loaded === "true") start();
+      else existing.addEventListener("load", start, { once: true });
+      return;
+    }
+    const sharedHeader = document.createElement("script");
+    sharedHeader.id = "dh-shared-header-script";
+    sharedHeader.src = new URL("header.js", NAV_SCRIPT_URL).href;
+    sharedHeader.onload = function () {
+      sharedHeader.dataset.loaded = "true";
+      start();
+    };
+    sharedHeader.onerror = start;
+    document.head.appendChild(sharedHeader);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startAfterSharedHeader);
+  else startAfterSharedHeader();
 })();
