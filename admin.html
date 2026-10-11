@@ -670,11 +670,10 @@ button:disabled {
 .audit-collapse-toggle:hover{background:linear-gradient(100deg,#0b262b,#111a35 58%,#1a1438)}
 .audit-collapse-toggle:hover .audit-chevron{background:#ffffff0c}
 .audit-card:not(.collapsed) .audit-chevron{transform:rotate(180deg)}
-#auditLogContent{padding:0 18px 18px;animation:auditReveal .22s ease}
-#auditLogContent[hidden]{display:none}
+#auditLogContent{max-height:0;overflow:hidden;opacity:0;padding:0 18px;transition:max-height .32s ease,opacity .22s ease,padding .22s ease}
+.audit-card:not(.collapsed) #auditLogContent{max-height:5000px;opacity:1;padding:0 18px 18px}
 #auditClear{border-color:#ef444455;background:#ef444414;color:#fca5a5}
 #auditClear:hover{background:#ef444426}
-@keyframes auditReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:600px){.audit-collapse-toggle{padding:14px;gap:8px}.audit-collapse-title{gap:9px}.audit-collapse-title small{max-width:230px}.audit-collapse-right{gap:8px}.audit-live{display:none}#auditLogContent{padding:0 10px 12px}}
 
 </style>
@@ -922,7 +921,7 @@ input,textarea,select{background:#070918}
       <span class="audit-collapse-title"><span class="audit-collapse-icon">▣</span><span><strong>SYSTEM ACTIVITY LOG</strong><small>Admin actions and successful sign-ins · Washington / Pacific Time</small></span></span>
       <span class="audit-collapse-right"><span class="audit-live"><span></span> AUDIT STREAM</span><span class="audit-chevron" aria-hidden="true">⌄</span></span>
     </button>
-    <div id="auditLogContent" hidden>
+    <div id="auditLogContent" aria-hidden="true">
       <div class="audit-filters">
           <input id="auditSearch" type="search" placeholder="Search user, action, page…" aria-label="Search audit log">
           <select id="auditType" aria-label="Filter event type"><option value="">All event types</option><option value="login">Sign-ins</option><option value="signup">Sign-ups</option><option value="admin_session">Admin sessions</option><option value="admin_action">Admin actions</option><option value="feature_toggle">Feature toggles</option></select>
@@ -4319,7 +4318,7 @@ function setupAuditFilters() {
     document.getElementById("auditExport")?.addEventListener("click",exportAuditCsv);
     document.getElementById("auditClear")?.addEventListener("click",clearAuditLogs);
     const toggle=document.getElementById("auditLogToggle"),content=document.getElementById("auditLogContent"),card=document.getElementById("auditLogCard");
-    if(toggle&&content&&card){content.hidden=true;toggle.setAttribute("aria-expanded","false");card.classList.add("collapsed");toggle.addEventListener("click",()=>{const open=toggle.getAttribute("aria-expanded")!=="true";toggle.setAttribute("aria-expanded",String(open));content.hidden=!open;card.classList.toggle("collapsed",!open);});}
+    if(toggle&&content&&card){toggle.setAttribute("aria-expanded","false");content.setAttribute("aria-hidden","true");card.classList.add("collapsed");toggle.addEventListener("click",()=>{const open=toggle.getAttribute("aria-expanded")!=="true";toggle.setAttribute("aria-expanded",String(open));content.setAttribute("aria-hidden",String(!open));card.classList.toggle("collapsed",!open);});}
 }
 
 
