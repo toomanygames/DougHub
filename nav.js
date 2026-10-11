@@ -35,38 +35,216 @@
     } catch (_) { return null; }
   }
   function addNavStyle() {
-    if (document.getElementById("doughub-nova-nav-style")) return;
+    if (document.getElementById("doughub-shared-nav-style")) return;
     const style = document.createElement("style");
-    style.id = "doughub-nova-nav-style";
+    style.id = "doughub-shared-nav-style";
     style.textContent = `
-      header .nav, header nav, nav[aria-label="Main navigation"] {
-        display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      header {
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; flex-wrap:wrap; position:relative; z-index:1000;
       }
-      header .nav > a, header nav > a, nav[aria-label="Main navigation"] > a {
+      header .nav, header nav[aria-label="Main navigation"] {
+        display:flex; align-items:center; justify-content:flex-end;
+        gap:8px; flex-wrap:wrap; min-width:0;
+      }
+      header .nav > a, header nav[aria-label="Main navigation"] > a {
         display:inline-flex; align-items:center; justify-content:center;
-        font-size:13px; line-height:1.25; text-decoration:none !important;
+        gap:5px; font-size:13px; line-height:1.25; text-decoration:none !important;
         padding:9px 12px !important; border:1px solid transparent;
         border-radius:10px !important; color:#d9dcf4 !important;
         background:transparent; white-space:nowrap;
-        transition:background .18s ease,color .18s ease,border-color .18s ease;
+        transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
       }
-      header .nav > a:hover, header nav > a:hover, nav[aria-label="Main navigation"] > a:hover {
-        background:#ffffff12 !important; color:#fff !important;
+      header .nav > a:hover, header nav[aria-label="Main navigation"] > a:hover {
+        background:#ffffff12 !important; color:#fff !important; transform:translateY(-1px);
       }
       header .nav > a.active, header .nav > a[aria-current="page"],
-      header nav > a.active, header nav > a[aria-current="page"],
-      nav[aria-label="Main navigation"] > a.active,
-      nav[aria-label="Main navigation"] > a[aria-current="page"] {
+      header nav[aria-label="Main navigation"] > a.active,
+      header nav[aria-label="Main navigation"] > a[aria-current="page"] {
         background:#ffffff12 !important; color:#fff !important; border-color:#ffffff18 !important;
       }
-      @media(max-width:760px) {
-        header .nav, header nav, nav[aria-label="Main navigation"] { gap:6px; }
-        header .nav > a, header nav > a, nav[aria-label="Main navigation"] > a {
-          padding:8px 10px !important; font-size:12px;
-        }
+      .dh-shared-account { position:relative; flex:0 0 auto; margin-left:2px; }
+      .dh-shared-account .account-btn {
+        display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:12px;
+        color:#fff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+        cursor:pointer;font:inherit;white-space:nowrap;transition:background .18s ease,border-color .18s ease;
+      }
+      .dh-shared-account .account-btn:hover { background:rgba(255,255,255,.09);border-color:#ffffff20; }
+      .dh-shared-account .account-avatar {
+        width:32px;height:32px;flex:0 0 32px;border-radius:50%;overflow:hidden;
+        background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;
+        justify-content:center;font-weight:800;color:white;
+      }
+      .dh-shared-account .account-avatar img { width:100%;height:100%;object-fit:cover; }
+      .dh-shared-account .account-menu {
+        position:absolute;right:0;top:calc(100% + 10px);width:210px;padding:8px;
+        border-radius:14px;background:rgba(12,13,28,.97);border:1px solid rgba(255,255,255,.1);
+        box-shadow:0 20px 60px rgba(0,0,0,.4);backdrop-filter:blur(20px);
+        display:block;opacity:0;visibility:hidden;transform:translateY(-7px) scale(.98);
+        transform-origin:top right;transition:opacity .18s ease,transform .18s ease,visibility .18s;
+        z-index:99999;
+      }
+      .dh-shared-account .account-menu.show {
+        opacity:1;visibility:visible;transform:translateY(0) scale(1);
+      }
+      .dh-shared-account .account-menu a,.dh-shared-account .account-menu button {
+        display:block;width:100%;padding:10px 12px;text-align:left;color:#d8d7e5;
+        background:transparent;border:0;border-radius:9px;cursor:pointer;text-decoration:none;
+        font:inherit;font-size:13px;
+      }
+      .dh-shared-account .account-menu a:hover,.dh-shared-account .account-menu button:hover {
+        background:rgba(255,255,255,.07);color:white;
+      }
+      .dh-shared-account .logout { color:#ff7777 !important; }
+      @media(max-width:900px) {
+        header { align-items:flex-start; }
+        header .nav, header nav[aria-label="Main navigation"] { justify-content:flex-start; gap:6px; }
+        header .nav > a, header nav[aria-label="Main navigation"] > a { padding:8px 10px !important;font-size:12px; }
+      }
+      @media(max-width:600px) {
+        header { gap:10px; }
+        header .nav, header nav[aria-label="Main navigation"] { width:100%;justify-content:flex-start; }
+        .dh-shared-account .account-btn { padding:5px 8px;gap:6px; }
+        .dh-shared-account .account-avatar { width:28px;height:28px;flex-basis:28px; }
+        .dh-shared-account .account-menu { right:auto;left:0;transform-origin:top left; }
       }
     `;
     document.head.appendChild(style);
+  }
+  function normalizePrimaryNav() {
+    const header = document.querySelector("header");
+    if (!header) return;
+    let nav = header.querySelector(".nav, nav[aria-label='Main navigation']");
+    if (!nav) {
+      nav = document.createElement("nav");
+      nav.className = "nav";
+      nav.setAttribute("aria-label", "Main navigation");
+      const oldButtons = header.querySelector(".header-buttons");
+      if (oldButtons) {
+        oldButtons.querySelectorAll("a,button").forEach(el => el.remove());
+        oldButtons.remove();
+      }
+      const oldBack = header.querySelector(".back-button");
+      if (oldBack) oldBack.remove();
+      header.appendChild(nav);
+    }
+    nav.setAttribute("aria-label", "Main navigation");
+    nav.querySelectorAll(":scope > a").forEach(a => a.remove());
+    let account = nav.querySelector(":scope > .account-area, :scope > .dh-shared-account");
+    if (!account) {
+      account = document.createElement("div");
+      account.className = "account-area dh-shared-account";
+      account.innerHTML = `
+        <button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false">
+          <div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Log In</span>
+        </button>
+        <div id="accountMenu" class="account-menu" aria-hidden="true">
+          <a href="my-games.html">My Games &amp; Videos</a>
+          <a href="admin.html" id="adminLink" style="display:none">Admin Panel</a>
+          <a href="inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a>
+          <a href="settings.html">Settings</a>
+          <button id="logoutButton" class="logout" type="button">Log Out</button>
+        </div>`;
+    } else {
+      account.classList.add("dh-shared-account");
+    }
+    const links = [
+      ["index.html", "Home", "home"],
+      ["douggames.html", "Games", "games"],
+      ["tools.html", "Tools", "tools"],
+      ["nova.html", "✳ Nova AI", "nova"],
+      ["chat.html", "Chat", "chat"],
+      ["douqhub-music.html", "♫ Music", "music"]
+    ];
+    links.forEach(([href, label, feature]) => {
+      const a = document.createElement("a");
+      a.href = href;
+      a.className = "nav-link";
+      a.textContent = label;
+      a.dataset.dhPrimaryNav = feature;
+      if (feature === "chat") {
+        a.id = "communityChatLink";
+        const dot = document.createElement("span");
+        dot.id = "chatNotification";
+        dot.className = "chat-notification";
+        dot.setAttribute("aria-label", "New chat messages");
+        a.appendChild(dot);
+      }
+      nav.appendChild(a);
+    });
+    nav.appendChild(account);
+    if (!account.dataset.dhAccountBound) {
+      account.dataset.dhAccountBound = "true";
+      const button = account.querySelector("#accountButton");
+      const menu = account.querySelector("#accountMenu");
+      const logout = account.querySelector("#logoutButton");
+      const setOpen = open => {
+        menu?.classList.toggle("show", open);
+        menu?.setAttribute("aria-hidden", String(!open));
+        button?.setAttribute("aria-expanded", String(open));
+      };
+      button?.addEventListener("click", async event => {
+        event.preventDefault(); event.stopPropagation();
+        const client = await getNavSupabase();
+        if (!client) { location.href = "log-in.html"; return; }
+        const {data:{session}} = await client.auth.getSession();
+        if (!session) { location.href = "log-in.html"; return; }
+        setOpen(!menu?.classList.contains("show"));
+      });
+      document.addEventListener("click", event => {
+        if (!event.target.closest(".dh-shared-account")) setOpen(false);
+      });
+      document.addEventListener("keydown", event => { if (event.key === "Escape") setOpen(false); });
+      logout?.addEventListener("click", async event => {
+        event.preventDefault(); event.stopPropagation();
+        const client = await getNavSupabase();
+        if (client) await client.auth.signOut();
+        location.reload();
+      });
+      loadNavAccount();
+    }
+  }
+  let navSupabasePromise;
+  async function getNavSupabase() {
+    if (!navSupabasePromise) navSupabasePromise = (async () => {
+      if (!window.supabase) {
+        await new Promise((resolve,reject) => {
+          const script=document.createElement("script");
+          script.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+          script.onload=resolve; script.onerror=reject; document.head.appendChild(script);
+        });
+      }
+      if (!window.__DOUGHUB_NAV_CLIENT) {
+        window.__DOUGHUB_NAV_CLIENT = window.supabase.createClient(
+          "https://agsqdqcsmsppcdqxlppj.supabase.co",
+          "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"
+        );
+      }
+      return window.__DOUGHUB_NAV_CLIENT;
+    })().catch(error => { console.warn("Account controls unavailable",error); return null; });
+    return navSupabasePromise;
+  }
+  async function loadNavAccount() {
+    const button=document.getElementById("accountButton");
+    const nameEl=document.getElementById("accountName");
+    const avatar=document.getElementById("accountAvatar");
+    if(!button||!nameEl||!avatar)return;
+    const client=await getNavSupabase();
+    if(!client)return;
+    try {
+      const {data:{session}}=await client.auth.getSession();
+      if(!session) { nameEl.textContent="Log In";avatar.textContent="?";return; }
+      const {data:profile}=await client.from("profiles").select("username,avatar_url,is_admin").eq("id",session.user.id).maybeSingle();
+      const username=profile?.username||session.user.email?.split("@")[0]||"User";
+      nameEl.textContent=username;
+      if(profile?.avatar_url) {
+        const img=document.createElement("img");img.src=profile.avatar_url;img.alt="Profile";avatar.replaceChildren(img);
+      } else avatar.textContent=username.charAt(0).toUpperCase();
+      const admin=document.getElementById("adminLink"),feedback=document.getElementById("feedbackInboxLink");
+      if(admin)admin.style.display=profile?.is_admin===true?"block":"none";
+      if(feedback)feedback.style.display=profile?.is_admin===true?"block":"none";
+      button.title="Account: "+username;
+    } catch(error) { console.warn("Could not load DougHub account info",error); }
   }
   async function loadFlags() {
     try {
