@@ -1943,8 +1943,8 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 
         <div class="media-heading">
             <div>
-                <h2>📸 Photos &amp; Media</h2>
-                <p>Share photos, MP3 music, and other media with the DougHub community.</p>
+                <h2>📸 Photos</h2>
+                <p>Share photos with the DougHub community.</p>
             </div>
 
             <div class="media-heading-actions">
@@ -2174,14 +2174,14 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
         </div>
 
         <div class="field">
-            <label for="mediaFile">Photo or MP3 Music</label>
-            <input id="mediaFile" class="file-input" type="file" accept="image/*,.mp3,audio/mpeg">
-            <div class="media-upload-note">Images up to 10 MB • MP3 music up to 100 MB</div>
+            <label for="mediaFile">Photo</label>
+            <input id="mediaFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+            <div class="media-upload-note">JPG, PNG, WebP, or GIF • up to 10 MB</div>
         </div>
 
         <div class="field">
-            <label for="mediaTitle">Photo Name</label>
-            <input id="mediaTitle" type="text" maxlength="120" placeholder="Give your photo a name...">
+            <label for="mediaTitle">Photo title</label>
+            <input id="mediaTitle" type="text" maxlength="120" placeholder="Give your photo a title...">
         </div>
 
         <div class="field">
@@ -2193,7 +2193,7 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 
         <div class="publish-actions">
             <button id="mediaCancelPublish" class="cancel-publish" type="button">Cancel</button>
-            <button id="mediaSubmitPublish" class="submit-publish" type="button">Post Media</button>
+            <button id="mediaSubmitPublish" class="submit-publish" type="button">Post Photo</button>
         </div>
     </div>
 </div>
@@ -2828,21 +2828,19 @@ mediaSubmitPublish.addEventListener("click",async function(){
     const status=document.getElementById("mediaPublishStatus");
     status.textContent="";
 
-    if(!file){ status.textContent="Please choose an image or MP3 music file."; return; }
+    if(!file){ status.textContent="Please choose a photo file."; return; }
 
-    const isAudio=file.type==="audio/mpeg" || file.name.toLowerCase().endsWith(".mp3");
     const allowedImages=["image/jpeg","image/png","image/webp","image/gif"];
 
-    if(!isAudio && !allowedImages.includes(file.type)){
-        status.textContent="Please choose a JPG, PNG, WebP, GIF, or MP3 file.";
+    if(!allowedImages.includes(file.type)){
+        status.textContent="Please choose a JPG, PNG, WebP, or GIF image.";
         return;
     }
 
     if(!title){ status.textContent="Please give your media a title."; return; }
 
-    const maxSize=isAudio ? 100*1024*1024 : 10*1024*1024;
-    if(file.size>maxSize){
-        status.textContent=isAudio ? "That MP3 is too large. The maximum is 100 MB." : "That image is too large. The maximum is 10 MB.";
+    if(file.size>10*1024*1024){
+        status.textContent="That photo is too large. The maximum is 10 MB.";
         return;
     }
 
@@ -2855,10 +2853,10 @@ mediaSubmitPublish.addEventListener("click",async function(){
         const filePath=currentUser.id+"/"+Date.now()+"-"+crypto.randomUUID()+"."+extension;
         uploadedPath=filePath;
 
-        status.textContent=isAudio ? "Uploading MP3..." : "Uploading image...";
+        status.textContent="Uploading photo...";
 
         const {error:uploadError}=await supabaseClient.storage.from(MEDIA_BUCKET).upload(filePath,file,{
-            contentType:isAudio ? "audio/mpeg" : file.type,
+            contentType:file.type,
             upsert:false
         });
         if(uploadError) throw uploadError;
@@ -2874,11 +2872,11 @@ mediaSubmitPublish.addEventListener("click",async function(){
             title:title,
             description:description||null,
             media_url:mediaUrl,
-            media_type:isAudio ? "audio" : "image"
+            media_type:"image"
         });
         if(databaseError) throw databaseError;
 
-        status.textContent=isAudio ? "MP3 posted!" : "Photo posted!";
+        status.textContent="Photo posted!";
         setTimeout(async function(){ closeMediaPublish(); await loadMediaPosts(); },600);
 
     }catch(error){
@@ -2891,7 +2889,7 @@ mediaSubmitPublish.addEventListener("click",async function(){
         status.textContent=error.message||"Could not post the media.";
     }finally{
         mediaSubmitPublish.disabled=false;
-        mediaSubmitPublish.textContent="Post Media";
+        mediaSubmitPublish.textContent="Post Photo";
     }
 });
 
@@ -2903,6 +2901,7 @@ async function loadMediaPosts(){
     const {data,error}=await supabaseClient
         .from("dougtube_media")
         .select("id, creator_id, title, description, media_url, media_type, created_at")
+        .eq("media_type","image")
         .order("created_at",{ascending:false});
 
     if(error){
