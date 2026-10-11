@@ -147,60 +147,67 @@
     document.head.appendChild(style);
   }
   const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dmail.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dmail.html"]);
+
   function normalizePrimaryNav() {
-    // Apply the same primary navigation to every page that loads nav.js.
-    // Preserve page content and page-specific controls outside the navigation.
     const current = pathKey();
     if (!MAIN_NAV_PAGES.has(current)) return;
     const header = document.querySelector("header");
     if (!header) return;
 
-    let nav = header.querySelector(".nav, nav[aria-label='Main navigation']");
+    let brand = header.querySelector(":scope > .logo, :scope > a.logo, :scope > .brand, :scope > a.brand");
+    if (!brand) {
+      brand = document.createElement("a");
+      brand.className = "logo";
+      brand.href = "/index.html";
+      brand.innerHTML = '<span class="logo-icon">D</span><span class="dh-wordmark-base">DougHub</span>';
+      header.prepend(brand);
+    } else {
+      brand.classList.add("dh-wordmark");
+      const label = Array.from(brand.children).find(el => !el.matches(".logo-icon,.logo-mark,.brand-icon,.brand-mark,.icon"));
+      if (label) {
+        const raw = (label.textContent || "").replace(/\\s+/g, " ").trim();
+        if (/^DougHub/i.test(raw)) {
+          const suffix = raw.replace(/^DougHub\\s*/i, "").trim();
+          label.replaceChildren();
+          const base = document.createElement("span");
+          base.className = "dh-wordmark-base";
+          base.textContent = "DougHub";
+          label.appendChild(base);
+          if (suffix) {
+            const extra = document.createElement("span");
+            extra.className = "dh-wordmark-suffix";
+            extra.textContent = suffix;
+            label.appendChild(extra);
+          }
+        }
+      }
+    }
+
+    let nav = header.querySelector(":scope > .nav, :scope > nav[aria-label='Main navigation']");
     if (!nav) {
       nav = document.createElement("nav");
       nav.className = "nav";
-      nav.setAttribute("aria-label", "Main navigation");
-      const oldAccount = header.querySelector(".account-area, .dh-shared-account");
-      if (oldAccount && oldAccount.parentElement === header) header.insertBefore(nav, oldAccount);
-      else header.appendChild(nav);
+      header.appendChild(nav);
     }
+    nav.className = "nav";
     nav.setAttribute("aria-label", "Main navigation");
 
-    // Reuse an existing account area wherever the page placed it; otherwise create
-    // the same profile/account menu used by the homepage.
     let account = header.querySelector(".account-area, .dh-shared-account");
     if (!account) {
       account = document.createElement("div");
-      account.className = "account-area dh-shared-account";
-      account.innerHTML = `
-        <button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false">
-          <div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Log In</span>
-        </button>
-        <div id="accountMenu" class="account-menu" aria-hidden="true">
-          <a href="my-games.html">My Games &amp; Videos</a>
-          <a href="admin.html" id="adminLink" style="display:none">Admin Panel</a>
-          <a href="inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a>
-          <a href="settings.html">Settings</a>
-          <button id="logoutButton" class="logout" type="button">Log Out</button>
-        </div>`;
+      account.className = "account-area";
+      account.innerHTML = '<button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false"><div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Loading…</span></button><div id="accountMenu" class="account-menu" aria-hidden="true"><a href="/my-games.html">My Games &amp; Videos</a><a href="/admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="/inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><a href="/settings.html">Settings</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>';
     }
     account.classList.add("dh-shared-account");
-
-    const links = [
-      ["/index.html", "Home", "home"],
-      ["/douggames.html", "Games", "games"],
-      ["/tools.html", "Tools", "tools"],
-      ["/nova.html", "✳ Nova AI", "nova"],
-      ["/chat.html", "Chat", "chat"]
-    ];
-    nav.querySelectorAll(":scope > a").forEach(a => a.remove());
-    links.forEach(([href, label, feature]) => {
+    const links = [["/index.html","Home"],["/douggames.html","Games"],["/tools.html","Tools"],["/nova.html","✳ Nova AI"],["/chat.html","Chat"]];
+    nav.replaceChildren();
+    links.forEach(([href,label]) => {
       const a = document.createElement("a");
       a.href = href;
       a.className = "nav-link";
       a.textContent = label;
-      a.dataset.dhPrimaryNav = feature;
-      if (feature === "chat") {
+      if (href === "/chat.html") {
         a.id = "communityChatLink";
         const dot = document.createElement("span");
         dot.id = "chatNotification";
@@ -212,9 +219,7 @@
     });
     nav.appendChild(account);
 
-    // These pages have their own working homepage-style account controller.
-    const pageAlreadyBindsAccount = ["index.html", "douggames.html", "dougtube.html"].includes(current);
-    if (!pageAlreadyBindsAccount && !account.dataset.dhAccountBound) {
+    if (!account.dataset.dhAccountBound) {
       account.dataset.dhAccountBound = "true";
       const button = account.querySelector("#accountButton");
       const menu = account.querySelector("#accountMenu");
@@ -228,9 +233,9 @@
         event.preventDefault();
         event.stopPropagation();
         const client = await getNavSupabase();
-        if (!client) { location.href = "log-in.html"; return; }
+        if (!client) { location.href = "/log-in.html"; return; }
         const { data: { session } } = await client.auth.getSession();
-        if (!session) { location.href = "log-in.html"; return; }
+        if (!session) { location.href = "/log-in.html"; return; }
         setOpen(!menu?.classList.contains("show"));
       });
       document.addEventListener("click", event => {
@@ -246,8 +251,8 @@
         if (client) await client.auth.signOut();
         location.reload();
       });
-      loadNavAccount();
     }
+    loadNavAccount();
   }
 
   function removeRetiredNavLinks() {
