@@ -344,18 +344,32 @@
     const seenKey = "doughub_chat_last_seen";
     let inFlight = false;
     let initialized = false;
-    let lastLatestTimestamp = "";
 
     function setDot(unread) {
-      const dot = document.getElementById("chatNotification");
-      if (!dot) return;
+      let link = document.getElementById("communityChatLink");
+      if (!link) {
+        link = Array.from(document.querySelectorAll("header a[href], header nav a[href], header .nav a[href]"))
+          .find(anchor => {
+            try {
+              const path = new URL(anchor.getAttribute("href"), location.href).pathname.replace(/^\\/+/, "").toLowerCase();
+              return path === "chat.html";
+            } catch (_) { return false; }
+          }) || null;
+      }
+      if (!link) return;
+
+      let dot = link.querySelector("#chatNotification");
+      if (!dot) {
+        dot = document.createElement("span");
+        dot.id = "chatNotification";
+        dot.className = "chat-notification";
+        dot.setAttribute("aria-label", "New chat messages");
+        link.appendChild(dot);
+      }
       dot.classList.toggle("is-unread", !!unread);
       dot.setAttribute("aria-hidden", String(!unread));
-      const link = document.getElementById("communityChatLink");
-      if (link) {
-        if (unread) link.setAttribute("aria-label", "Community Chat — unread messages");
-        else link.removeAttribute("aria-label");
-      }
+      if (unread) link.setAttribute("aria-label", "Community Chat — unread messages");
+      else link.removeAttribute("aria-label");
     }
 
     async function refreshDot() {
@@ -402,14 +416,13 @@
           setDot(false);
         } else {
           const seenTime = seen ? new Date(seen).getTime() : 0;
-          const unread = Number.isFinite(latestTime) &&
-            latestTime > seenTime &&
-            (!ownUserId || latest.user_id !== ownUserId);
+          const isNewer = Number.isFinite(latestTime) &&
+            (latestTime > seenTime || (latestTime === seenTime && latestStamp > seen));
+          const unread = isNewer && (!ownUserId || latest.user_id !== ownUserId);
           setDot(unread);
         }
 
         initialized = true;
-        lastLatestTimestamp = latestStamp;
       } catch (error) {
         // Keep the last displayed state during transient network errors.
         console.debug("Community Chat notification refresh failed:", error);
