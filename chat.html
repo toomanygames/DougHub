@@ -576,6 +576,30 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .message-username{color:#c4b5fd}
 
 </style>
+
+<style id="community-chat-attachments-style">
+.attachment-toolbar{display:flex;align-items:center;gap:7px;flex:0 0 100%;flex-wrap:wrap}
+.attachment-button{border:1px solid rgba(165,180,252,.24);background:rgba(99,102,241,.12);color:#e0e7ff;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer}
+.attachment-button:hover{background:rgba(99,102,241,.22)}
+#attachmentStatus{font-size:12px;color:#a5b4fc;min-width:0;overflow-wrap:anywhere}
+#messageForm{flex-wrap:wrap;align-items:flex-end}
+#messageInput{flex:1 1 220px}
+.chat-attachment{display:block;margin-top:8px;max-width:min(420px,100%);border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;background:rgba(0,0,0,.18)}
+.chat-attachment img{display:block;max-width:100%;max-height:320px;object-fit:contain}
+.chat-attachment a{display:block;color:#c4b5fd;padding:10px 12px;text-decoration:none;overflow-wrap:anywhere}
+.chat-attachment a:hover{text-decoration:underline}
+.gif-modal-backdrop{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
+.gif-modal-backdrop[hidden]{display:none}
+.gif-modal{width:min(480px,100%);padding:22px;border:1px solid rgba(177,184,255,.2);border-radius:20px;background:#0d1127;box-shadow:0 24px 90px #0008}
+.gif-modal h2{margin:0 0 8px;font-size:22px}
+.gif-modal p{color:#a4a7c4;font-size:13px;line-height:1.5}
+.gif-modal input{width:100%;padding:12px;margin:8px 0 12px}
+.gif-modal-actions{display:flex;flex-wrap:wrap;gap:8px}
+.gif-modal-actions button{padding:10px 13px;border:1px solid rgba(255,255,255,.12);background:#ffffff0d;color:white;cursor:pointer}
+.gif-modal-actions .primary{background:linear-gradient(135deg,#6366f1,#a855f7)}
+@media(max-width:520px){.attachment-toolbar{gap:6px}.attachment-button{padding:8px 9px}.composer{gap:8px}}
+</style>
+
 </head>
 
 <body>
@@ -649,6 +673,15 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
       id="messageForm"
     >
 
+      <div class="attachment-toolbar" aria-label="Add an attachment">
+        <button class="attachment-button" type="button" id="addImageButton">＋ Image</button>
+        <button class="attachment-button" type="button" id="addDocumentButton">＋ Document</button>
+        <button class="attachment-button" type="button" id="addGifButton">＋ GIF</button>
+        <span id="attachmentStatus" aria-live="polite">30 messages per day · Resets at UTC midnight</span>
+      </div>
+      <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+      <input id="documentFileInput" type="file" accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.txt,.docx" hidden>
+
       <textarea
         id="messageInput"
         maxlength="1000"
@@ -674,6 +707,21 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
   </div>
 
 </main>
+
+  <div class="gif-modal-backdrop" id="gifModal" hidden>
+    <section class="gif-modal" role="dialog" aria-modal="true" aria-labelledby="gifModalTitle">
+      <h2 id="gifModalTitle">Add a GIF</h2>
+      <p>Search GIPHY in a new tab, then paste a direct GIF media URL here. Use content you have permission to share. GIFs are labelled as coming from GIPHY.</p>
+      <div class="gif-modal-actions">
+        <button type="button" id="openGiphyButton">Browse GIPHY ↗</button>
+      </div>
+      <input id="gifUrlInput" type="url" placeholder="https://media.giphy.com/.../giphy.gif" autocomplete="off">
+      <div class="gif-modal-actions">
+        <button type="button" class="primary" id="attachGifConfirm">Attach GIF</button>
+        <button type="button" id="closeGifModal">Cancel</button>
+      </div>
+    </section>
+  </div>
 
 <script>
 
@@ -748,6 +796,17 @@ const currentUsernameEl =
 
 const errorBox =
   document.getElementById("errorBox");
+
+const imageFileInput = document.getElementById("imageFileInput");
+const documentFileInput = document.getElementById("documentFileInput");
+const attachmentStatus = document.getElementById("attachmentStatus");
+const gifModal = document.getElementById("gifModal");
+const gifUrlInput = document.getElementById("gifUrlInput");
+let pendingAttachment = null;
+let pendingUploadKind = "image";
+const CHAT_ATTACHMENT_BUCKET = "community-chat-attachments";
+const CHAT_ATTACHMENT_MAX_BYTES = 5 * 1024 * 1024;
+
 
 
 /* =========================================
@@ -1059,16 +1118,39 @@ async function renderMessages(
       bubble.className =
         "message-bubble";
 
-      bubble.textContent =
-        message.message;
+      bubble.textContent = message.message || "";
+      content.appendChild(header);
+      if (message.message) content.appendChild(bubble);
 
-      content.appendChild(
-        header
-      );
-
-      content.appendChild(
-        bubble
-      );
+      if (message.attachment_url) {
+        const attachment = document.createElement("div");
+        attachment.className = "chat-attachment";
+        const safeUrl = safeAttachmentUrl(message.attachment_url, message.attachment_type);
+        if (safeUrl && (message.attachment_type === "image" || message.attachment_type === "gif")) {
+          const img = document.createElement("img");
+          img.src = safeUrl;
+          img.alt = message.attachment_name || (message.attachment_type === "gif" ? "GIF via GIPHY" : "Chat image");
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
+          attachment.appendChild(img);
+          if (message.attachment_type === "gif") {
+            const attribution = document.createElement("a");
+            attribution.href = "https://giphy.com/";
+            attribution.target = "_blank";
+            attribution.rel = "noopener noreferrer";
+            attribution.textContent = "GIF via GIPHY ↗";
+            attachment.appendChild(attribution);
+          }
+        } else if (safeUrl) {
+          const link = document.createElement("a");
+          link.href = safeUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "📄 " + (message.attachment_name || "Open document") + " ↗";
+          attachment.appendChild(link);
+        }
+        if (attachment.childNodes.length) content.appendChild(attachment);
+      }
 
       if (mine) {
 
@@ -1178,7 +1260,7 @@ async function loadMessages() {
       error
     } = await supabaseClient
       .from("chat_messages")
-      .select("id, user_id, username, message, created_at")
+      .select("id, user_id, username, message, created_at, attachment_url, attachment_type, attachment_name, attachment_source")
       .order("created_at", { ascending: false })
       .limit(200);
 
@@ -1234,12 +1316,9 @@ async function loadMessages() {
 
 async function sendMessage() {
 
-  const text =
-    messageInput.value.trim();
+  const text = messageInput.value.trim();
 
-  if (!text) {
-    return;
-  }
+  if (!text && !pendingAttachment) return;
 
   if (!currentUser) {
 
@@ -1275,16 +1354,23 @@ async function sendMessage() {
       .insert({
         user_id: currentUser.id,
         username: currentUsername,
-        message: text
+        message: text,
+        attachment_url: pendingAttachment?.url || null,
+        attachment_type: pendingAttachment?.type || null,
+        attachment_name: pendingAttachment?.name || null,
+        attachment_source: pendingAttachment?.source || null
       });
 
     if (error) {
       console.error("Could not send Community Chat message:", error);
-      showError("Could not send your message: " + (error.message || error.details || "Supabase rejected the request."));
+      const detail = error.message || error.details || "Supabase rejected the request.";
+      showError(detail.includes("Daily chat limit reached") ? "Daily limit reached: 30 messages. It resets at UTC midnight." : "Could not send your message: " + detail);
       return;
     }
 
     messageInput.value = "";
+    pendingAttachment = null;
+    attachmentStatus.textContent = "30 messages per day · Resets at UTC midnight";
     // Force the next load to render the new row even if the server timestamp
     // matches a previous poll's result.
     lastRenderedMessageSignature = null;
@@ -1330,6 +1416,119 @@ messageInput.addEventListener(
 
   }
 );
+
+
+
+/* =========================================
+   CHAT ATTACHMENTS + DAILY USAGE
+========================================= */
+function safeAttachmentUrl(rawUrl, type) {
+  try {
+    const u = new URL(rawUrl);
+    if (u.protocol !== "https:") return null;
+    if (type === "gif") {
+      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com"].includes(u.hostname)) return null;
+      if (!/\.(gif|webp)$/i.test(u.pathname)) return null;
+      return u.href;
+    }
+    const base = SUPABASE_URL + "/storage/v1/object/public/" + CHAT_ATTACHMENT_BUCKET + "/";
+    if (!u.href.startsWith(base)) return null;
+    return u.href;
+  } catch (_) { return null; }
+}
+
+function setAttachmentStatus(message) {
+  if (attachmentStatus) attachmentStatus.textContent = message;
+}
+
+document.getElementById("addImageButton").addEventListener("click", () => {
+  pendingUploadKind = "image";
+  imageFileInput.click();
+});
+document.getElementById("addDocumentButton").addEventListener("click", () => {
+  pendingUploadKind = "document";
+  documentFileInput.click();
+});
+document.getElementById("addGifButton").addEventListener("click", () => {
+  gifModal.hidden = false;
+  gifUrlInput.focus();
+});
+document.getElementById("closeGifModal").addEventListener("click", () => {
+  gifModal.hidden = true;
+});
+gifModal.addEventListener("click", event => {
+  if (event.target === gifModal) gifModal.hidden = true;
+});
+document.getElementById("openGiphyButton").addEventListener("click", () => {
+  window.open("https://giphy.com/", "_blank", "noopener,noreferrer");
+});
+document.getElementById("attachGifConfirm").addEventListener("click", () => {
+  const url = gifUrlInput.value.trim();
+  if (!safeAttachmentUrl(url, "gif")) {
+    showError("Paste a direct HTTPS GIF URL from media.giphy.com or i.giphy.com ending in .gif or .webp.");
+    return;
+  }
+  pendingAttachment = { url, type: "gif", name: "GIF via GIPHY", source: "GIPHY" };
+  setAttachmentStatus("GIF attached · " + url.split("/").pop().split("?")[0]);
+  gifModal.hidden = true;
+  gifUrlInput.value = "";
+  hideError();
+});
+
+async function handleChatFile(file, kind) {
+  if (!file) return;
+  if (!currentUser) {
+    showError("Sign in to attach files to Community Chat.");
+    return;
+  }
+  if (file.size > CHAT_ATTACHMENT_MAX_BYTES) {
+    showError("Attachments must be 5 MB or smaller.");
+    return;
+  }
+  const imageTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+  const documentTypes = ["application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+  const allowed = kind === "image" ? imageTypes : documentTypes;
+  if (!allowed.includes(file.type)) {
+    showError(kind === "image"
+      ? "Choose a PNG, JPG, WEBP, or GIF image."
+      : "Choose a PDF, TXT, or DOCX document.");
+    return;
+  }
+  setAttachmentStatus("Uploading " + file.name + "…");
+  hideError();
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100) || "attachment";
+  const path = currentUser.id + "/" + Date.now() + "-" + safeName;
+  try {
+    const { data, error } = await supabaseClient.storage
+      .from(CHAT_ATTACHMENT_BUCKET)
+      .upload(path, file, { upsert: false, contentType: file.type, cacheControl: "3600" });
+    if (error) throw error;
+    const { data: publicData } = supabaseClient.storage
+      .from(CHAT_ATTACHMENT_BUCKET)
+      .getPublicUrl(data.path);
+    const url = publicData?.publicUrl;
+    if (!url) throw new Error("Could not create the attachment link.");
+    pendingAttachment = {
+      url,
+      type: kind === "image" ? "image" : "document",
+      name: file.name.slice(0, 180),
+      source: "user-upload"
+    };
+    setAttachmentStatus("Attached: " + file.name + " · 5 MB max");
+  } catch (error) {
+    console.error("Community Chat attachment upload failed:", error);
+    setAttachmentStatus("No attachment selected");
+    showError("Attachment upload failed: " + (error.message || "Please try again."));
+  }
+}
+imageFileInput.addEventListener("change", () => {
+  handleChatFile(imageFileInput.files?.[0], "image");
+  imageFileInput.value = "";
+});
+documentFileInput.addEventListener("change", () => {
+  handleChatFile(documentFileInput.files?.[0], "document");
+  documentFileInput.value = "";
+});
 
 
 /* =========================================
