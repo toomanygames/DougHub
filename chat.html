@@ -592,6 +592,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .chat-emoji-tools button{width:31px;height:30px;border:0;border-radius:7px;background:transparent;font-size:19px;cursor:pointer}
 .chat-emoji-tools button:hover{background:#ffffff18}
 .chat-text-tools-hint{font-size:10px;color:#aab0d0;margin-top:8px}
+.chat-format-open{align-self:flex-start;margin:0 0 7px;font-size:12px}
 </style>
 
 <style id="community-chat-attachments-style">
@@ -848,6 +849,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
       <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
       <input id="documentFileInput" type="file" accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.txt,.docx" hidden>
 
+      <button type="button" id="openChatTextTools" class="attachment-button chat-format-open" aria-label="Open message formatting tools" title="Formatting, colors and emojis">Aa ✨ Format</button>
       <textarea
         id="messageInput"
         maxlength="1000"
@@ -1031,6 +1033,14 @@ function positionChatTextTools(x, y) {
   chatTextTools.style.top = Math.max(margin, Math.min(y, window.innerHeight - chatTextTools.offsetHeight - margin)) + "px";
 }
 
+const openChatTextToolsButton = document.getElementById("openChatTextTools");
+openChatTextToolsButton.addEventListener("click", () => {
+  saveChatTextSelection();
+  const rect = openChatTextToolsButton.getBoundingClientRect();
+  positionChatTextTools(rect.left, Math.max(12, rect.top - 8));
+});
+
+// Open with the visible button using a normal left-click. Right-click remains supported.
 // Open the formatting toolbox anywhere in the message composer, not only
 // when the exact textarea element receives the right-click.
 document.addEventListener("contextmenu", (event) => {
