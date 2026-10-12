@@ -1951,7 +1951,6 @@ startCommunityChat();
       gsrnamespace: "6",
       gsrsearch: queryParts.join(" "),
       gsrlimit: "30",
-      gsrsort: "random",
       prop: "imageinfo",
       iiprop: "url|mime|size|extmetadata",
       iiurlwidth: "320",
@@ -1982,6 +1981,12 @@ startCommunityChat();
           artist: cleanText(info.extmetadata?.Artist?.value || info.extmetadata?.Credit?.value)
         };
       }).filter(item => item && item.url && item.preview);
+
+      // Shuffle the valid GIF results locally for a random-looking selection.
+      for (let i = results.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [results[i], results[j]] = [results[j], results[i]];
+      }
 
       if (!results.length) {
         showMessage("No matching animated GIFs found. Try a shorter or different search.");
