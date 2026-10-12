@@ -1706,6 +1706,30 @@ dialog#gameCreatorChooser a:hover {
  .search-box{width:100%}
 }
 
+
+/* TRENDING GAMES */
+.trending-panel{position:relative;overflow:hidden;padding:22px;border:1px solid rgba(167,139,250,.2);border-radius:22px;background:linear-gradient(135deg,rgba(25,27,62,.82),rgba(11,14,31,.94));box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.trending-panel:before{content:"";position:absolute;right:-80px;top:-130px;width:280px;height:280px;border-radius:50%;background:rgba(124,58,237,.12);filter:blur(35px);pointer-events:none}
+.trending-controls{display:flex;gap:8px;flex-wrap:wrap}
+.trending-tab{border:1px solid rgba(177,184,255,.17);background:rgba(255,255,255,.035);color:#b9bdd6;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer}
+.trending-tab.active{color:#fff;background:linear-gradient(120deg,rgba(99,102,241,.28),rgba(168,85,247,.2));border-color:rgba(167,139,250,.45)}
+.trending-grid{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.trending-card{position:relative;min-width:0;text-align:left;color:#fff;padding:17px;border:1px solid rgba(177,184,255,.14);border-radius:16px;background:linear-gradient(145deg,rgba(26,30,64,.82),rgba(9,12,28,.94));cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.trending-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.52);box-shadow:0 14px 32px rgba(0,0,0,.24)}
+.trending-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:13px}
+.trending-rank{display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:27px;padding:0 7px;border-radius:9px;background:rgba(129,140,248,.15);color:#d6d2ff;font-size:12px;font-weight:900}
+.trending-type{color:#969ab8;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.trending-game-icon{font-size:25px;margin-bottom:10px}
+.trending-card h3{margin:0 0 7px;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.trending-card p{margin:0;color:#969bb8;font-size:12px;line-height:1.5}
+.trending-metrics{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid rgba(177,184,255,.1)}
+.trending-metric{color:#bfc4e3;font-size:11px;font-weight:800}
+.trending-metric strong{display:block;color:#f5f3ff;font-size:16px;margin-bottom:3px}
+.trending-note{position:relative;margin:0 0 16px;color:#9297b5;font-size:13px;line-height:1.6}
+.trending-empty{grid-column:1/-1;padding:26px;border:1px dashed rgba(177,184,255,.18);border-radius:15px;text-align:center;color:#9ba0bd;font-size:13px}
+@media(max-width:900px){.trending-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.trending-panel{padding:16px}.trending-grid{grid-template-columns:1fr}.trending-card{padding:15px}}
+
 </style>
   <script src="nav.js" defer></script>
 
@@ -1923,6 +1947,26 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 
         </div>
 
+    </section>
+
+
+    <section class="section" id="trendingSection">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">🔥 Trending Games</h2>
+                <p class="section-subtitle">A live leaderboard for DougHub games and community creations.</p>
+            </div>
+            <div class="trending-controls" role="group" aria-label="Sort trending games">
+                <button type="button" class="trending-tab active" data-trending-sort="plays">Most played</button>
+                <button type="button" class="trending-tab" data-trending-sort="time">Avg. playtime</button>
+            </div>
+        </div>
+        <div class="trending-panel">
+            <p class="trending-note">Ranked using recorded game launches. Average playtime updates as people play; brand-new games appear after their first recorded launch.</p>
+            <div id="trendingGames" class="trending-grid">
+                <div class="trending-empty">Loading live game stats…</div>
+            </div>
+        </div>
     </section>
 
     <!-- DOUG'S GAMES -->
@@ -2736,6 +2780,148 @@ async function updateGameCount() {
 }
 
 
+
+/* =========================================
+   CROSS-SITE TRENDING GAME ANALYTICS
+========================================= */
+const BUILTIN_TRENDING_GAMES = {
+    "builtin:pig-clicker": { title: "Pig Clicker", icon: "🐷", href: "Games/pig-clicker.html" },
+    "builtin:rebirth-clicker": { title: "Rebirth Clicker", icon: "🔄", href: "Games/rebirth-clicker.html" },
+    "builtin:racing": { title: "Doug Racing", icon: "🏎️", href: "Games/racing.html" },
+    "builtin:puzzle": { title: "Doug Puzzle", icon: "🧩", href: "Games/puzzle.html" },
+    "builtin:drive-pig": { title: "Drive Pig", icon: "🐷", href: "Games/drive-pig.html" },
+    "builtin:smack-n-punch": { title: "Smack 'n Punch", icon: "💥", href: "Games/smack-n-punch.html" }
+};
+let trendingRows = [];
+let trendingSortMode = "plays";
+
+function formatPlaytime(seconds) {
+    const total = Math.max(0, Number(seconds) || 0);
+    if (total < 60) return Math.round(total) + " sec";
+    const mins = Math.floor(total / 60);
+    const secs = Math.round(total % 60);
+    if (mins < 60) return mins + "m " + secs + "s";
+    return Math.floor(mins / 60) + "h " + (mins % 60) + "m";
+}
+
+function renderTrendingGames() {
+    const container = document.getElementById("trendingGames");
+    if (!container) return;
+    const rows = [...trendingRows].sort((a, b) => {
+        if (trendingSortMode === "time") {
+            return (Number(b.avg_playtime_seconds || 0) - Number(a.avg_playtime_seconds || 0)) ||
+                   (Number(b.play_count || 0) - Number(a.play_count || 0));
+        }
+        return (Number(b.play_count || 0) - Number(a.play_count || 0)) ||
+               (Number(b.avg_playtime_seconds || 0) - Number(a.avg_playtime_seconds || 0));
+    }).slice(0, 8);
+    if (!rows.length) {
+        container.innerHTML = '<div class="trending-empty">No game stats yet. Launch a DougHub or community game and it will start appearing here.</div>';
+        return;
+    }
+    container.innerHTML = rows.map((row, index) => {
+        const builtIn = BUILTIN_TRENDING_GAMES[row.game_key];
+        const isCommunity = row.game_type === "community";
+        const communityId = isCommunity ? row.game_key.replace(/^community:/, "") : "";
+        const icon = builtIn?.icon || (isCommunity ? "🎮" : "🕹️");
+        const title = escapeHtml(row.game_title || builtIn?.title || "Untitled game");
+        const type = isCommunity ? "Community game" : "DougHub game";
+        const playCount = Number(row.play_count || 0).toLocaleString();
+        const avg = formatPlaytime(row.avg_playtime_seconds);
+        const action = isCommunity
+            ? 'type="button" data-trending-community-id="' + escapeHtml(communityId) + '"'
+            : 'type="button" data-trending-href="' + escapeHtml(builtIn?.href || "douggames.html") + '"';
+        return '<button class="trending-card" ' + action + '>' +
+            '<div class="trending-card-top"><span class="trending-rank">#' + (index + 1) + '</span><span class="trending-type">' + type + '</span></div>' +
+            '<div class="trending-game-icon">' + icon + '</div><h3>' + title + '</h3>' +
+            '<p>' + (trendingSortMode === "time" ? "Sorted by average playtime" : "Sorted by launches") + '</p>' +
+            '<div class="trending-metrics"><div class="trending-metric"><strong>' + playCount + '</strong>plays</div><div class="trending-metric"><strong>' + escapeHtml(avg) + '</strong>avg. playtime</div></div></button>';
+    }).join("");
+    container.querySelectorAll("[data-trending-community-id]").forEach(button => {
+        button.addEventListener("click", () => openCommunityGame(button.dataset.trendingCommunityId));
+    });
+    container.querySelectorAll("[data-trending-href]").forEach(button => {
+        button.addEventListener("click", () => { window.location.href = button.dataset.trendingHref; });
+    });
+}
+
+async function loadTrendingGames() {
+    const container = document.getElementById("trendingGames");
+    try {
+        const { data, error } = await supabaseClient
+            .from("game_trending_stats")
+            .select("game_key, game_type, game_title, play_count, avg_playtime_seconds")
+            .gt("play_count", 0)
+            .order("play_count", { ascending: false })
+            .limit(100);
+        if (error) throw error;
+        trendingRows = data || [];
+        renderTrendingGames();
+    } catch (error) {
+        console.error("Could not load trending game stats:", error);
+        if (container) container.innerHTML = '<div class="trending-empty">Trending stats could not load. Check the game analytics table permissions in Supabase.</div>';
+    }
+}
+
+document.querySelectorAll("[data-trending-sort]").forEach(button => {
+    button.addEventListener("click", () => {
+        trendingSortMode = button.dataset.trendingSort;
+        document.querySelectorAll("[data-trending-sort]").forEach(tab => tab.classList.toggle("active", tab === button));
+        renderTrendingGames();
+    });
+});
+
+async function recordTrendingEvent(gameKey, gameType, gameTitle, eventType, durationSeconds = 0) {
+    try {
+        const { error } = await supabaseClient.from("game_trending_events").insert({
+            game_key: gameKey,
+            game_type: gameType,
+            game_title: String(gameTitle || "Untitled game").slice(0, 120),
+            event_type: eventType,
+            duration_seconds: Math.max(0, Math.min(86400, Math.floor(durationSeconds || 0))),
+            user_id: currentUser?.id || null
+        });
+        if (error) console.warn("Trending event was not saved:", error.message);
+    } catch (error) {
+        console.warn("Trending event was not saved:", error);
+    }
+}
+let communityTrendingStartedAt = null;
+let communityTrendingRecordedSeconds = 0;
+let communityTrendingTimer = null;
+
+async function startCommunityTrending(game) {
+    clearInterval(communityTrendingTimer);
+    communityTrendingStartedAt = Date.now();
+    communityTrendingRecordedSeconds = 0;
+    await recordTrendingEvent("community:" + game.id, "community", game.title || "Community Game", "play", 0);
+    communityTrendingTimer = setInterval(async () => {
+        if (!communityTrendingStartedAt || document.hidden) return;
+        const elapsed = Math.floor((Date.now() - communityTrendingStartedAt) / 1000);
+        const delta = Math.min(60, elapsed - communityTrendingRecordedSeconds);
+        if (delta > 0) {
+            communityTrendingRecordedSeconds += delta;
+            await recordTrendingEvent("community:" + game.id, "community", game.title || "Community Game", "duration", delta);
+        }
+    }, 15000);
+}
+async function endCommunityTrending(game) {
+    clearInterval(communityTrendingTimer);
+    communityTrendingTimer = null;
+    if (!communityTrendingStartedAt || !game) return;
+    const elapsed = Math.min(86400, Math.floor((Date.now() - communityTrendingStartedAt) / 1000));
+    let remaining = Math.max(0, elapsed - communityTrendingRecordedSeconds);
+    while (remaining > 0) {
+        const chunk = Math.min(60, remaining);
+        await recordTrendingEvent("community:" + game.id, "community", game.title || "Community Game", "duration", chunk);
+        remaining -= chunk;
+    }
+    communityTrendingStartedAt = null;
+    communityTrendingRecordedSeconds = 0;
+    loadTrendingGames();
+}
+
+
 /* =========================================
    COMMUNITY GAMES
 ========================================= */
@@ -3042,6 +3228,7 @@ async function openCommunityGame(
     await startPlaySession(
         game.id
     );
+    await startCommunityTrending(game);
 
 }
 
@@ -3093,6 +3280,8 @@ if (playerOverlay) {
 
 async function closeGame() {
 
+    const playedCommunityGame = communityGames.find(item => item.id === currentGameId);
+    await endCommunityTrending(playedCommunityGame);
     await endPlaySession();
 
     document
@@ -3467,7 +3656,7 @@ window.addEventListener("pageshow",function(){requestAnimationFrame(centerDougHu
 ========================================= */
 
 loadAccount();
-loadCommunityGames();
+loadCommunityGames().finally(loadTrendingGames);
 setupCommunitySlider();
 loadUserCount();
 updateFeedbackCount();
