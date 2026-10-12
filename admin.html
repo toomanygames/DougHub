@@ -1653,19 +1653,23 @@ async function deleteBannedAccount(userId) {
 
     const buttons = document.querySelectorAll("#bannedUsersList button");
     buttons.forEach(button => button.disabled = true);
-    const { data, error } = await supabaseClient.functions.invoke(
-        "doughub-admin-delete-user",
-        { body: { user_id: userId } }
-    );
-    if (error || data?.error) {
-        console.error("Could not delete banned account:", error || data.error);
-        alert("Could not delete @" + username + ": " + (error?.message || data?.error || "Unknown error"));
+    try {
+        const { data, error } = await supabaseClient.functions.invoke(
+            "doughub-admin-delete-user",
+            { body: { user_id: userId } }
+        );
+        if (error || data?.error) {
+            throw new Error(error?.message || data?.error || "The delete function did not confirm success.");
+        }
+        await writeAuditLog("admin_action", "accounts", "Deleted banned account", { userId, username });
+        await loadUsers();
+        alert("@" + username + " was deleted successfully.");
+    } catch (error) {
+        console.error("Could not delete banned account:", error);
+        alert("Could not delete @" + username + ": " + (error.message || "Request failed. Check that the doughub-admin-delete-user Edge Function is deployed and configured."));
+    } finally {
         buttons.forEach(button => button.disabled = false);
-        return;
     }
-    await writeAuditLog("admin_action", "accounts", "Deleted banned account", { userId, username });
-    await loadUsers();
-    alert("@" + username + " was deleted successfully.");
 }
 
 function isRecentlyActive(lastSeen) {
@@ -2034,21 +2038,12 @@ async function banAccount() {
 
     let error = null;
 
-    if (type === "ban") {
+    try {
         /*
-         * Permanent bans remove the account from Supabase Auth and
-         * cascade-delete its profile and other user-owned rows.
-         * The privileged Auth deletion happens in the protected
-         * DougHub Edge Function, never in the browser.
+         * Keep banned accounts in profiles so they appear in the
+         * Banned & suspended users dropdown and can later be unbanned
+         * or permanently deleted separately.
          */
-        const result = await supabaseClient.functions.invoke(
-            "doughub-admin-delete-user",
-            {
-                body: { user_id: userId }
-            }
-        );
-        error = result.error || (result.data?.error ? new Error(result.data.error) : null);
-    } else {
         const result = await supabaseClient
             .from("profiles")
             .update({
@@ -2059,7 +2054,10 @@ async function banAccount() {
                 suspended_until: suspendedUntil
             })
             .eq("id", userId);
+
         error = result.error;
+    } catch (requestError) {
+        error = requestError;
     }
 
     banAccountButton.disabled = false;
@@ -2069,7 +2067,7 @@ async function banAccount() {
         console.error(error);
         banResult.className = "error";
         banResult.textContent =
-            "Could not " + actionName + " account: " + error.message;
+            "Could not " + actionName + " account: " + (error.message || "Request failed. Check your connection and Supabase permissions.");
         banResult.style.display = "block";
         return;
     }
@@ -2110,41 +2108,30 @@ async function unbanAccount(userId) {
         return;
     }
 
-    const {
-        error
-    } =
-        await supabaseClient
+    try {
+        const { data, error } = await supabaseClient
             .from("profiles")
             .update({
-                is_banned:
-                    false,
-                ban_reason:
-                    null,
-                banned_at:
-                    null,
-                ban_type:
-                    null,
-                suspended_until:
-                    null
+                is_banned: false,
+                ban_reason: null,
+                banned_at: null,
+                ban_type: null,
+                suspended_until: null
             })
-            .eq(
-                "id",
-                userId
-            );
+            .eq("id", userId)
+            .select("id");
 
-    if (error) {
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            throw new Error("Supabase did not update the profile. Check that your admin account has UPDATE permission on profiles.");
+        }
 
-        console.error(error);
-
-        alert(
-            "Could not unban account:\n\n" +
-            error.message
-        );
-
-        return;
+        await loadUsers();
+        alert("@" + (user.username || "User") + " was unbanned.");
+    } catch (error) {
+        console.error("Could not unban account:", error);
+        alert("Could not unban account:\n\n" + (error.message || "Request failed. Check your connection and Supabase permissions."));
     }
-
-    await loadUsers();
 }
 
 
