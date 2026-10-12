@@ -1930,6 +1930,16 @@ startCommunityChat();
     return search.value.trim().replace(/^#+\s*/, "").replace(/\s+/g, " ");
   }
 
+  function summarizeName(filename) {
+    return String(filename || "")
+      .replace(/^File:/i, "")
+      .replace(/\.gif$/i, "")
+      .replace(/[_-]+/g, " ")
+      .replace(/\b\d{3,4}\s*[x×]\s*\d{3,4}\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   async function searchCommons() {
     const requestId = ++latestRequest;
     const term = getSearchTerm();
@@ -1950,7 +1960,7 @@ startCommunityChat();
       generator: "search",
       gsrnamespace: "6",
       gsrsearch: queryParts.join(" "),
-      gsrlimit: "30",
+      gsrlimit: "12",
       prop: "imageinfo",
       iiprop: "url|mime|size|extmetadata",
       iiurlwidth: "320",
@@ -1982,10 +1992,12 @@ startCommunityChat();
         };
       }).filter(item => item && item.url && item.preview);
 
-      // Shuffle the valid GIF results locally for a random-looking selection.
-      for (let i = results.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [results[i], results[j]] = [results[j], results[i]];
+      // Randomize the initial suggestions, but preserve Commons relevance while searching.
+      if (!term) {
+        for (let i = results.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [results[i], results[j]] = [results[j], results[i]];
+        }
       }
 
       if (!results.length) {
@@ -1998,7 +2010,7 @@ startCommunityChat();
         const button = document.createElement("button");
         button.type = "button";
         button.className = "gif-library-card";
-        button.title = "Attach " + item.title;
+        button.title = "Attach " + summarizeName(item.title);
 
         const img = document.createElement("img");
         img.src = item.preview;
@@ -2011,7 +2023,9 @@ startCommunityChat();
         };
 
         const title = document.createElement("span");
-        title.textContent = item.title.length > 62 ? item.title.slice(0, 59) + "…" : item.title;
+        const shortName = summarizeName(item.title);
+        title.textContent = shortName.length > 42 ? shortName.slice(0, 39) + "…" : shortName;
+        title.title = item.title;
         const license = document.createElement("small");
         license.textContent = item.license + (item.artist ? " · " + item.artist.slice(0, 45) : "");
         button.append(img, title, license);
