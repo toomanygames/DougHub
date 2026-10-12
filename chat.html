@@ -744,6 +744,21 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 @media(max-width:420px){.gif-library-grid{gap:7px}.gif-library-card img{height:100px}.gif-modal{padding:16px}}
 </style>
 
+<style id="chat-message-input-autogrow">
+#messageInput{
+  box-sizing:border-box;
+  height:58px;
+  min-height:58px;
+  max-height:150px;
+  overflow-y:hidden;
+  resize:none;
+  line-height:1.45;
+  padding:15px 16px;
+}
+@media(max-width:520px){
+  #messageInput{height:56px;min-height:56px;max-height:140px;padding:14px 13px}
+}
+</style>
 </head>
 
 </head>
@@ -981,6 +996,18 @@ const messageForm =
 
 const messageInput =
   document.getElementById("messageInput");
+
+function resizeChatMessageInput() {
+  if (!messageInput) return;
+  messageInput.style.height = "auto";
+  const maxHeight = window.matchMedia("(max-width: 520px)").matches ? 140 : 150;
+  const nextHeight = Math.min(messageInput.scrollHeight, maxHeight);
+  messageInput.style.height = nextHeight + "px";
+  messageInput.style.overflowY = messageInput.scrollHeight > maxHeight ? "auto" : "hidden";
+}
+messageInput.addEventListener("input", resizeChatMessageInput);
+window.addEventListener("resize", resizeChatMessageInput);
+resizeChatMessageInput();
 
 const emojiPickerToggle = document.getElementById("emojiPickerToggle");
 const quickEmojiPicker = document.getElementById("quickEmojiPicker");
