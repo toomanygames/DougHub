@@ -745,11 +745,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 </style>
 
 <style id="chat-message-input-autogrow">
-#messageForm{align-items:stretch}
-#messageInput{
-  box-sizing:border-box;height:48px;min-height:48px;max-height:48px;overflow-y:auto;resize:none;line-height:1.4;padding:12px 15px;
-  scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.8) rgba(255,255,255,.035);
-}
+#messageInput{box-sizing:border-box;height:48px;min-height:48px;max-height:48px;overflow-y:auto;resize:none;line-height:1.4;padding:12px 15px;scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.8) rgba(255,255,255,.035)}
 #messageInput::-webkit-scrollbar{width:7px}
 #messageInput::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border-radius:10px;margin:7px 0}
 #messageInput::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#818cf8,#a855f7);border:2px solid transparent;background-clip:padding-box;border-radius:10px}
@@ -995,9 +991,7 @@ const messageForm =
 const messageInput =
   document.getElementById("messageInput");
 
-// Keep the composer a fixed height; long messages scroll inside the field.
-messageInput.style.height = "";
-messageInput.style.overflowY = "auto";
+// Keep the message field at its original compact height; overflow scrolls inside it.
 
 const emojiPickerToggle = document.getElementById("emojiPickerToggle");
 const quickEmojiPicker = document.getElementById("quickEmojiPicker");
