@@ -891,6 +891,22 @@ input,textarea,select{background:#070918}
     <div id="siteFeatureList"></div>
 </div>
 
+<div class="card" id="chatRetentionCard">
+  <h2>🧹 Community Chat Message Retention</h2>
+  <p class="admin-card-help">Automatically and permanently delete the oldest community chat messages whenever the message count exceeds your limit. This affects Community Chat only, not DMail.</p>
+  <label class="admin-toggle-line" for="chatRetentionEnabled">
+    <input id="chatRetentionEnabled" type="checkbox">
+    <span>Automatically keep Community Chat under the message limit</span>
+  </label>
+  <label class="admin-field-label" for="chatRetentionLimit">Maximum messages to keep</label>
+  <input id="chatRetentionLimit" type="number" min="1" max="100000" step="1" value="150" inputmode="numeric" style="width:100%;max-width:240px;padding:11px 12px;border:1px solid var(--dh-line);border-radius:11px;color:#fff">
+  <p class="admin-card-help" style="margin-top:9px">Example: set 150 to keep only the newest 150 messages. When enabled, messages beyond this number are permanently deleted, including existing excess messages when you save.</p>
+  <div class="admin-card-actions">
+    <span id="chatRetentionStatus" class="status">Loading message retention settings…</span>
+    <button id="saveChatRetentionButton" type="button" class="save-button">Save retention settings</button>
+  </div>
+</div>
+
 
 <div class="card admin-event-card" id="siteAnnouncementCard">
   <h2>📣 Event Banner</h2>
@@ -4086,6 +4102,92 @@ async function loadCodeProjects(){
 
 
 /* =========================================
+   COMMUNITY CHAT MESSAGE RETENTION
+========================================= */
+async function loadChatRetentionSettings() {
+    const status = document.getElementById("chatRetentionStatus");
+    const toggle = document.getElementById("chatRetentionEnabled");
+    const limitInput = document.getElementById("chatRetentionLimit");
+    const saveButton = document.getElementById("saveChatRetentionButton");
+    if (!status || !toggle || !limitInput || !saveButton) return;
+
+    status.textContent = "Loading message retention settings…";
+    toggle.disabled = true;
+    limitInput.disabled = true;
+    saveButton.disabled = true;
+
+    const { data, error } = await supabaseClient
+        .from("chat_retention_settings")
+        .select("enabled,max_messages")
+        .eq("id", 1)
+        .maybeSingle();
+
+    if (error) {
+        status.textContent = "Could not load retention settings: " + error.message;
+        toggle.disabled = false;
+        limitInput.disabled = false;
+        saveButton.disabled = false;
+        return;
+    }
+
+    toggle.checked = !!data?.enabled;
+    limitInput.value = String(data?.max_messages || 150);
+    status.textContent = toggle.checked
+        ? "Automatic cleanup is ON. Keeping up to " + limitInput.value + " messages."
+        : "Automatic cleanup is OFF. No chat messages will be deleted by this setting.";
+    toggle.disabled = false;
+    limitInput.disabled = false;
+    saveButton.disabled = false;
+}
+
+async function saveChatRetentionSettings() {
+    const status = document.getElementById("chatRetentionStatus");
+    const toggle = document.getElementById("chatRetentionEnabled");
+    const limitInput = document.getElementById("chatRetentionLimit");
+    const saveButton = document.getElementById("saveChatRetentionButton");
+    if (!status || !toggle || !limitInput || !saveButton) return;
+
+    const maxMessages = Number(limitInput.value);
+    if (!Number.isInteger(maxMessages) || maxMessages < 1 || maxMessages > 100000) {
+        status.textContent = "Enter a whole number from 1 to 100000.";
+        limitInput.focus();
+        return;
+    }
+
+    saveButton.disabled = true;
+    toggle.disabled = true;
+    limitInput.disabled = true;
+    status.textContent = "Saving retention settings…";
+
+    const { data, error } = await supabaseClient.rpc("set_chat_retention_settings", {
+        p_enabled: toggle.checked,
+        p_max_messages: maxMessages
+    });
+
+    saveButton.disabled = false;
+    toggle.disabled = false;
+    limitInput.disabled = false;
+
+    if (error) {
+        status.textContent = "Could not save retention settings: " + error.message;
+        return;
+    }
+
+    const saved = Array.isArray(data) ? data[0] : data;
+    status.textContent = saved?.enabled
+        ? "Saved. Automatic cleanup is ON; Community Chat is limited to " + saved.max_messages + " messages. Older excess messages were permanently deleted."
+        : "Saved. Automatic cleanup is OFF. Existing messages were left untouched.";
+    await writeAuditLog(
+        "chat_retention_settings",
+        "chat",
+        "Set automatic chat message cleanup to " + (toggle.checked ? "ON" : "OFF") + " with a limit of " + maxMessages + " messages",
+        { enabled: toggle.checked, maxMessages }
+    );
+}
+
+document.getElementById("saveChatRetentionButton")?.addEventListener("click", saveChatRetentionSettings);
+
+/* =========================================
    ADMIN SITE FEATURE TOGGLES
 ========================================= */
 async function loadSiteFeatures() {
@@ -4487,6 +4589,7 @@ async function startAdminPanel() {
         loadCodeProjects(),
         loadSiteFeatures(),
         loadSiteEvents(),
+        loadChatRetentionSettings(),
     ]);
 
     setInterval(
