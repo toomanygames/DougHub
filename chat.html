@@ -836,9 +836,9 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         </div>
         <button type="button" id="closeGifModal" aria-label="Close GIF picker">✕</button>
       </div>
-      <p class="gif-library-description">Pick from DougHub’s built-in collection. No API key or account needed.</p>
-      <label class="gif-library-search-label" for="gifLibrarySearch">Search the collection</label>
-      <input id="gifLibrarySearch" class="gif-library-search" type="search" placeholder="Try “fun”, “nature”, or “animation”" autocomplete="off">
+      <p class="gif-library-description">Search animated GIFs on Wikimedia Commons. No API key or account needed.</p>
+      <label class="gif-library-search-label" for="gifLibrarySearch">Search Wikimedia Commons</label>
+      <input id="gifLibrarySearch" class="gif-library-search" type="search" placeholder="Try cat, dancing, reaction, or #funny" autocomplete="off">
       <div class="gif-library-categories" id="gifLibraryCategories" aria-label="GIF categories">
         <button type="button" class="gif-category active" data-category="all">All</button>
         <button type="button" class="gif-category" data-category="fun">Fun</button>
@@ -846,7 +846,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         <button type="button" class="gif-category" data-category="art">Art</button>
       </div>
       <div id="gifLibraryGrid" class="gif-library-grid" aria-live="polite"></div>
-      <p class="gif-library-credit">GIFs are from Wikimedia Commons and remain subject to the license shown on each source page.</p>
+      <p class="gif-library-credit">Results come from Wikimedia Commons. Open each file’s source page to check its creator and license.</p>
     </section>
   </div>
 
@@ -1263,13 +1263,13 @@ async function renderMessages(
           if (message.attachment_type === "gif") {
             const attribution = document.createElement("a");
             const isDougHubGif = message.attachment_source === "DOUGHUB";
-            const match = isDougHubGif ? safeUrl.match(/\/Special:Redirect\/file\/(.+)$/i) : null;
-            attribution.href = match
-              ? "https://commons.wikimedia.org/wiki/File:" + match[1].replace(/ /g, "_")
+            const fileName = (message.attachment_name || "").replace(/^File:/i, "").replace(/ /g, "_");
+            attribution.href = isDougHubGif && fileName
+              ? "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(fileName).replace(/%2F/gi, "/")
               : (isDougHubGif ? "https://commons.wikimedia.org/wiki/Category:Animated_GIF_files" : "https://giphy.com/");
             attribution.target = "_blank";
             attribution.rel = "noopener noreferrer";
-            attribution.textContent = isDougHubGif ? "DougHub GIF Library · Wikimedia Commons ↗" : "Powered by GIPHY ↗";
+            attribution.textContent = isDougHubGif ? "View on Wikimedia Commons ↗" : "Powered by GIPHY ↗";
             attachment.appendChild(attribution);
           }
         } else if (safeUrl) {
@@ -1558,7 +1558,7 @@ function safeAttachmentUrl(rawUrl, type) {
     const u = new URL(rawUrl);
     if (u.protocol !== "https:") return null;
     if (type === "gif") {
-      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "static.klipy.com", "commons.wikimedia.org"].includes(u.hostname)) return null;
+      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "static.klipy.com", "commons.wikimedia.org", "upload.wikimedia.org"].includes(u.hostname)) return null;
       if (!/\.(gif|webp|png|jpg|jpeg)$/i.test(u.pathname)) return null;
       return u.href;
     }
@@ -1832,103 +1832,141 @@ startCommunityChat();
 
 
 <script>
-/* DougHub's built-in, no-key GIF collection. The media files are served by Wikimedia Commons. */
+/* Search animated GIFs directly on Wikimedia Commons. No provider key required. */
 (function initDougHubGifLibrary() {
   const mount = document.getElementById("gifLibraryGrid");
   const search = document.getElementById("gifLibrarySearch");
   const categories = document.getElementById("gifLibraryCategories");
   if (!mount || !search || !categories) return;
 
-  const library = [
-    {
-      title: "Bouncing Ball",
-      category: "art",
-      tags: "bounce bouncing ball physics fun animation",
-      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Animexample.gif",
-      license: "Public domain"
-    },
-    {
-      title: "Silly Stick Figure",
-      category: "fun",
-      tags: "fun funny reaction cartoon stick figure tongue silly",
-      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Pffffft.gif",
-      license: "Public domain"
-    },
-    {
-      title: "Green Balloon",
-      category: "nature",
-      tags: "nature green balloon float floating celebration",
-      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Green_balloon.gif",
-      license: "CC0"
-    },
-    {
-      title: "Animated Drawing",
-      category: "art",
-      tags: "art drawing animation animated illustration",
-      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Gif-animado-.gif",
-      license: "CC BY-SA 4.0"
-    },
-    {
-      title: "Abstract Animation",
-      category: "art",
-      tags: "abstract art animation colorful visual",
-      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Animation3.gif",
-      license: "Public domain"
-    }
-  ];
-
+  const apiUrl = "https://commons.wikimedia.org/w/api.php";
   let selectedCategory = "all";
+  let debounceTimer = null;
+  let activeController = null;
+  let latestRequest = 0;
 
-  function render() {
-    const term = search.value.trim().toLowerCase();
-    const items = library.filter(item =>
-      (selectedCategory === "all" || item.category === selectedCategory) &&
-      (!term || (item.title + " " + item.tags + " " + item.license).toLowerCase().includes(term))
-    );
-
+  function showMessage(message, className = "gif-library-empty") {
     mount.replaceChildren();
-    if (!items.length) {
-      const empty = document.createElement("div");
-      empty.className = "gif-library-empty";
-      empty.textContent = "No matches in the built-in collection. Try another search or category.";
-      mount.appendChild(empty);
+    const box = document.createElement("div");
+    box.className = className;
+    box.textContent = message;
+    mount.appendChild(box);
+  }
+
+  function cleanText(value) {
+    return String(value || "").replace(/<[^>]*>/g, "").replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"').replace(/&#039;/g, "'").trim();
+  }
+
+  function getSearchTerm() {
+    // A leading hashtag is just a normal search term, e.g. #funny -> funny.
+    return search.value.trim().replace(/^#+\s*/, "").replace(/\s+/g, " ");
+  }
+
+  async function searchCommons() {
+    const requestId = ++latestRequest;
+    const term = getSearchTerm();
+    if (activeController) activeController.abort();
+
+    if (term.length < 2 && selectedCategory === "all") {
+      showMessage("Type a word or hashtag (for example, cat, dancing, or #funny) to search Commons for GIFs.");
       return;
     }
 
-    items.forEach(item => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "gif-library-card";
-      button.title = "Attach " + item.title;
-
-      const img = document.createElement("img");
-      img.src = item.url;
-      img.alt = item.title;
-      img.loading = "lazy";
-      img.referrerPolicy = "no-referrer";
-      img.onerror = () => {
-        button.disabled = true;
-        button.style.opacity = ".45";
-        img.alt = "Preview unavailable";
-      };
-
-      const title = document.createElement("span");
-      title.textContent = item.title;
-      const license = document.createElement("small");
-      license.textContent = item.license;
-
-      button.append(img, title, license);
-      button.addEventListener("click", () => {
-        window.dispatchEvent(new CustomEvent("douqhub:gif-picked", {
-          detail: {
-            imageUrl: item.url,
-            description: item.title,
-            source: "DOUGHUB"
-          }
-        }));
-      });
-      mount.appendChild(button);
+    const queryParts = ['filemime:"image/gif"'];
+    if (term) queryParts.unshift(term);
+    if (selectedCategory !== "all") queryParts.unshift(selectedCategory);
+    const params = new URLSearchParams({
+      action: "query",
+      format: "json",
+      origin: "*",
+      generator: "search",
+      gsrnamespace: "6",
+      gsrsearch: queryParts.join(" "),
+      gsrlimit: "30",
+      prop: "imageinfo",
+      iiprop: "url|mime|size|extmetadata",
+      iiurlwidth: "320",
+      iiextmetadatafilter: "LicenseShortName|Artist|Credit"
     });
+
+    activeController = new AbortController();
+    showMessage("Searching Wikimedia Commons for GIFs…");
+
+    try {
+      const response = await fetch(apiUrl + "?" + params.toString(), {
+        signal: activeController.signal
+      });
+      if (!response.ok) throw new Error("Wikimedia Commons returned HTTP " + response.status);
+      const data = await response.json();
+      if (requestId !== latestRequest) return;
+
+      const pages = Object.values(data.query?.pages || {});
+      const results = pages.map(page => {
+        const info = page.imageinfo && page.imageinfo[0];
+        if (!info || info.mime !== "image/gif" || !/\.gif$/i.test(page.title || "")) return null;
+        return {
+          title: (page.title || "").replace(/^File:/i, ""),
+          url: info.url,
+          preview: info.thumburl || info.url,
+          sourcePage: info.descriptionurl || ("https://commons.wikimedia.org/wiki/" + encodeURIComponent(page.title.replace(/ /g, "_"))),
+          license: cleanText(info.extmetadata?.LicenseShortName?.value) || "Check source page",
+          artist: cleanText(info.extmetadata?.Artist?.value || info.extmetadata?.Credit?.value)
+        };
+      }).filter(item => item && item.url && item.preview);
+
+      if (!results.length) {
+        showMessage("No matching animated GIFs found. Try a shorter or different search.");
+        return;
+      }
+
+      mount.replaceChildren();
+      results.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "gif-library-card";
+        button.title = "Attach " + item.title;
+
+        const img = document.createElement("img");
+        img.src = item.preview;
+        img.alt = item.title;
+        img.loading = "lazy";
+        img.referrerPolicy = "no-referrer";
+        img.onerror = () => {
+          img.alt = "Preview unavailable";
+          img.style.display = "none";
+        };
+
+        const title = document.createElement("span");
+        title.textContent = item.title.length > 62 ? item.title.slice(0, 59) + "…" : item.title;
+        const license = document.createElement("small");
+        license.textContent = item.license + (item.artist ? " · " + item.artist.slice(0, 45) : "");
+        button.append(img, title, license);
+
+        button.addEventListener("click", () => {
+          window.dispatchEvent(new CustomEvent("douqhub:gif-picked", {
+            detail: {
+              imageUrl: item.url,
+              description: item.title,
+              source: "DOUGHUB",
+              sourcePage: item.sourcePage
+            }
+          }));
+        });
+        mount.appendChild(button);
+      });
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      console.error("DougHub Wikimedia GIF search failed:", error);
+      if (requestId === latestRequest) {
+        showMessage("GIF search couldn't connect to Wikimedia Commons. Check your connection and try again.");
+      }
+    }
+  }
+
+  function queueSearch() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(searchCommons, 400);
   }
 
   categories.querySelectorAll("[data-category]").forEach(button => {
@@ -1937,13 +1975,20 @@ startCommunityChat();
       categories.querySelectorAll("[data-category]").forEach(item => {
         item.classList.toggle("active", item === button);
       });
-      render();
+      queueSearch();
     });
   });
-  search.addEventListener("input", render);
-  render();
-})();
-</script>
+
+  search.addEventListener("input", queueSearch);
+  search.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      clearTimeout(debounceTimer);
+      searchCommons();
+    }
+  });
+  showMessage("Type a word or hashtag (for example, cat, dancing, or #funny) to search Commons for GIFs.");
+})();</script>
 
 </body>
 </html>
