@@ -609,7 +609,106 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .gif-picker-key-notice a{color:#c4b5fd;font-weight:800}
 .gif-picker-modal .GifPickerReact{--gpr-bg-color:#0d1127;--gpr-text-color:#f6f5ff;--gpr-highlight-color:#818cf8}
 @media(max-width:520px){.attachment-toolbar{gap:6px}.attachment-button{padding:8px 9px}.composer{gap:8px}}
+
+/* Community chat composer polish */
+.composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 14px;
+}
+.attachment-toolbar {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-bottom: 2px;
+}
+#messageInput {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+}
+#sendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  min-width: 92px;
+  padding: 0 20px;
+  border: 1px solid rgba(199, 190, 255, .3);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 750;
+  white-space: nowrap;
+  box-shadow: 0 5px 16px rgba(99, 102, 241, .2);
+  transform: none;
+}
+#sendButton:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(99,102,241,.28); }
+#sendButton:active { transform: translateY(0); }
+.dmail-notice {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 11px 14px 15px;
+  border: 0;
+  border-radius: 0 0 21px 21px;
+  background: rgba(2,4,10,.22);
+  color: #9299b5;
+  font-size: 12px;
+  letter-spacing: .01em;
+}
+.dmail-notice a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border: 1px solid rgba(129,140,248,.22);
+  border-radius: 999px;
+  background: rgba(99,102,241,.10);
+  color: #c4b5fd;
+  font-weight: 750;
+  text-decoration: none;
+  transition: background .18s ease, border-color .18s ease;
+}
+.dmail-notice a::after { content: "↗"; font-size: 11px; opacity: .8; }
+.dmail-notice a:hover { background: rgba(99,102,241,.2); border-color: rgba(167,139,250,.48); text-decoration: none; }
+.gif-picker-modal { width: min(560px, 100%); }
+#gifPickerMount { min-height: 440px; }
+#gifPickerMount .GifPickerReact { width: 100% !important; }
+.gif-picker-load-error {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(248,113,113,.25);
+  background: rgba(127,29,29,.15);
+  color: #fecaca;
+  font-size: 13px;
+  line-height: 1.5;
+}
+@media (max-width: 520px) {
+  .composer { grid-template-columns: minmax(0, 1fr) auto; padding: 10px; gap: 8px; }
+  #sendButton { min-width: 76px; padding: 0 13px; height: 46px; }
+  #messageInput { height: 46px; min-height: 46px; padding: 12px; }
+  .dmail-notice { padding: 10px 12px 13px; }
+}
+
 </style>
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.2.0",
+    "react-dom": "https://esm.sh/react-dom@19.2.0"
+  }
+}
+</script>
 
 </head>
 
@@ -1712,30 +1811,50 @@ startCommunityChat();
 
 
 <script type="module">
-  import React from "https://esm.sh/react@19.2.0";
-  import { createRoot } from "https://esm.sh/react-dom@19.2.0/client?external=react";
+  import React from "react";
+  import { createRoot } from "react-dom/client";
   import { GifPicker } from "https://esm.sh/gif-picker-react@2.0.0?external=react,react-dom";
   import { Klipy } from "https://esm.sh/gif-picker-react@2.0.0/providers/klipy?external=react,react-dom";
 
-  // KLIPY requires a free app key; its docs expect the key in frontend code.
   const KLIPY_APP_KEY = "81UL8SdiZVWKwSQRmrx9c0H8gGguMF3TSXfHU8wOwDQQD1wkQs2bQumowhqsW64v";
   const mount = document.getElementById("gifPickerMount");
   const notice = document.getElementById("gifPickerKeyNotice");
 
-  if (KLIPY_APP_KEY === "ADD_KLIPY_APP_KEY_HERE") {
-    notice.hidden = false;
-  } else {
-    notice.hidden = true;
-    const root = createRoot(mount);
-    root.render(React.createElement(GifPicker, {
-      provider: Klipy(KLIPY_APP_KEY, { contentFilter: "high", showBranding: true }),
-      theme: "dark",
-      width: "100%",
-      height: 460,
-      onGifClick: (gif) => {
-        window.dispatchEvent(new CustomEvent("douqhub:gif-picked", { detail: gif }));
-      }
-    }));
+  function showPickerError(error) {
+    console.error("DougHub GIF picker failed to initialize:", error);
+    if (notice) {
+      notice.hidden = false;
+      notice.textContent = "GIF search couldn't load. Refresh the page and try again. If it still fails, the KLIPY key or browser connection may be rejecting the request.";
+    }
+    if (mount && !mount.querySelector(".gif-picker-load-error")) {
+      const message = document.createElement("div");
+      message.className = "gif-picker-load-error";
+      message.textContent = "The GIF picker failed to start. Check the browser console for the exact error, then refresh and try again.";
+      mount.appendChild(message);
+    }
+  }
+
+  try {
+    if (KLIPY_APP_KEY === "ADD_KLIPY_APP_KEY_HERE") {
+      notice.hidden = false;
+    } else {
+      notice.hidden = true;
+      const root = createRoot(mount);
+      root.render(React.createElement(GifPicker, {
+        provider: Klipy(KLIPY_APP_KEY, { contentFilter: "high", showBranding: true }),
+        theme: "dark",
+        width: "100%",
+        height: 460,
+        onGifClick: (gif) => {
+          window.dispatchEvent(new CustomEvent("douqhub:gif-picked", { detail: gif }));
+        }
+      }));
+      window.addEventListener("error", (event) => {
+        if (String(event.message || "").toLowerCase().includes("gif")) showPickerError(event.error || event.message);
+      });
+    }
+  } catch (error) {
+    showPickerError(error);
   }
 </script>
 
