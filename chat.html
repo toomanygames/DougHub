@@ -606,6 +606,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 #gifPickerMount{min-height:420px}
 .gif-picker-key-notice{padding:12px;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.08);color:#fde68a;border-radius:12px;font-size:13px;line-height:1.5;margin-bottom:12px}
 .gif-picker-key-notice[hidden]{display:none}
+.gif-picker-key-notice a{color:#c4b5fd;font-weight:800}
 .gif-picker-modal .GifPickerReact{--gpr-bg-color:#0d1127;--gpr-text-color:#f6f5ff;--gpr-highlight-color:#818cf8}
 @media(max-width:520px){.attachment-toolbar{gap:6px}.attachment-button{padding:8px 9px}.composer{gap:8px}}
 </style>
@@ -727,7 +728,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         <button type="button" id="closeGifModal" aria-label="Close GIF picker">✕</button>
       </div>
       <div id="gifPickerKeyNotice" class="gif-picker-key-notice">
-        GIF search needs a free KLIPY app key. Add the key to enable the picker.
+        GIF search needs a free KLIPY app key. <a href="https://partner.klipy.com/api-keys" target="_blank" rel="noopener noreferrer">Create a key ↗</a>, then send it to me and I’ll finish connecting the picker.
       </div>
       <div id="gifPickerMount"></div>
     </section>
