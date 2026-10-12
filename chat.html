@@ -747,16 +747,16 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 <style id="chat-message-input-autogrow">
 #messageInput{
   box-sizing:border-box;
-  height:58px;
-  min-height:58px;
+  height:48px;
+  min-height:48px;
   max-height:150px;
   overflow-y:hidden;
   resize:none;
-  line-height:1.45;
-  padding:15px 16px;
+  line-height:1.4;
+  padding:12px 15px;
 }
 @media(max-width:520px){
-  #messageInput{height:56px;min-height:56px;max-height:140px;padding:14px 13px}
+  #messageInput{height:46px;min-height:46px;max-height:140px;padding:11px 13px}
 }
 </style>
 </head>
@@ -1000,8 +1000,10 @@ const messageInput =
 function resizeChatMessageInput() {
   if (!messageInput) return;
   messageInput.style.height = "auto";
-  const maxHeight = window.matchMedia("(max-width: 520px)").matches ? 140 : 150;
-  const nextHeight = Math.min(messageInput.scrollHeight, maxHeight);
+  const isMobile = window.matchMedia("(max-width: 520px)").matches;
+  const baseHeight = isMobile ? 46 : 48;
+  const maxHeight = isMobile ? 140 : 150;
+  const nextHeight = Math.min(Math.max(messageInput.scrollHeight, baseHeight), maxHeight);
   messageInput.style.height = nextHeight + "px";
   messageInput.style.overflowY = messageInput.scrollHeight > maxHeight ? "auto" : "hidden";
 }
