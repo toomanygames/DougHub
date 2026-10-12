@@ -577,11 +577,15 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 
 </style>
 
-.quick-emoji-picker{display:flex;flex-wrap:wrap;gap:4px;padding:9px;margin:6px 0 9px;border:1px solid rgba(165,180,252,.24);border-radius:12px;background:rgba(12,15,36,.98);max-width:320px}
+<style id="quick-emoji-popup-style">
+#messageForm{position:relative}
+.quick-emoji-picker{position:absolute;right:8px;bottom:100%;z-index:1000;display:grid;grid-template-columns:repeat(6,38px);gap:3px;padding:10px;margin:0 0 10px;border:1px solid rgba(165,180,252,.3);border-radius:20px;background:rgba(22,25,48,.98);box-shadow:0 14px 40px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(20px);max-width:min(270px,calc(100vw - 32px));animation:emojiPopupIn .14s ease-out;transform-origin:bottom right}
 .quick-emoji-picker[hidden]{display:none}
-.quick-emoji{width:34px;height:34px;border:0;border-radius:8px;background:transparent;font-size:21px;cursor:pointer}
-.quick-emoji:hover{background:#ffffff18}
+.quick-emoji{width:38px;height:38px;border:0;border-radius:12px;background:transparent;font-size:23px;cursor:pointer;transition:background .12s,transform .12s}
+.quick-emoji:hover{background:#ffffff18;transform:scale(1.12)}
 .emoji-picker-toggle{font-size:18px;min-width:38px}
+@keyframes emojiPopupIn{from{opacity:0;transform:translateY(5px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:480px){.quick-emoji-picker{right:4px;grid-template-columns:repeat(6,36px);padding:8px;border-radius:18px}.quick-emoji{width:36px;height:36px}}
 </style>
 
 <style id="community-chat-attachments-style">
