@@ -2053,9 +2053,13 @@ async function banAccount() {
                 ban_type: type,
                 suspended_until: suspendedUntil
             })
-            .eq("id", userId);
+            .eq("id", userId)
+            .select("id");
 
         error = result.error;
+        if (!error && (!result.data || result.data.length === 0)) {
+            error = new Error("Supabase did not update the profile. Check that your admin account has UPDATE permission on profiles.");
+        }
     } catch (requestError) {
         error = requestError;
     }
