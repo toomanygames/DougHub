@@ -1868,8 +1868,8 @@ startCommunityChat();
     const term = getSearchTerm();
     if (activeController) activeController.abort();
 
-    if (term.length < 2 && selectedCategory === "all") {
-      showMessage("Type a word or hashtag (for example, cat, dancing, or #funny) to search Commons for GIFs.");
+    if (term.length === 1 && selectedCategory === "all") {
+      showMessage("Enter at least two characters to search for GIFs.");
       return;
     }
 
@@ -1884,6 +1884,7 @@ startCommunityChat();
       gsrnamespace: "6",
       gsrsearch: queryParts.join(" "),
       gsrlimit: "30",
+      gsrsort: "random",
       prop: "imageinfo",
       iiprop: "url|mime|size|extmetadata",
       iiurlwidth: "320",
@@ -1891,7 +1892,7 @@ startCommunityChat();
     });
 
     activeController = new AbortController();
-    showMessage("Searching Wikimedia Commons for GIFs…");
+    showMessage(term ? "Searching Wikimedia Commons for GIFs…" : "Loading random GIFs…");
 
     try {
       const response = await fetch(apiUrl + "?" + params.toString(), {
@@ -1987,7 +1988,7 @@ startCommunityChat();
       searchCommons();
     }
   });
-  showMessage("Type a word or hashtag (for example, cat, dancing, or #funny) to search Commons for GIFs.");
+  searchCommons();
 })();</script>
 
 </body>
