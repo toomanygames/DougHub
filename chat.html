@@ -1043,7 +1043,7 @@ messageInput.addEventListener("select", saveChatTextSelection);
 chatTextTools.querySelectorAll("[data-format]").forEach(button => {
   button.addEventListener("click", () => applyChatFormat(button.dataset.format));
 });
-chatTextColor.addEventListener("input", () => applyChatColor(chatTextColor.value));
+chatTextColor.addEventListener("change", () => applyChatColor(chatTextColor.value));
 chatTextTools.querySelectorAll("[data-emoji]").forEach(button => {
   button.addEventListener("click", () => {
     saveChatTextSelection();
