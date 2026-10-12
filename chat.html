@@ -677,7 +677,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         <button class="attachment-button" type="button" id="addImageButton">＋ Image</button>
         <button class="attachment-button" type="button" id="addDocumentButton">＋ Document</button>
         <button class="attachment-button" type="button" id="addGifButton">＋ GIF</button>
-        <span id="attachmentStatus" aria-live="polite">30 messages per day · Resets at UTC midnight</span>
+        <span id="attachmentStatus" aria-live="polite">Unlimited messages · No spam or bad words</span>
       </div>
       <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
       <input id="documentFileInput" type="file" accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.txt,.docx" hidden>
@@ -1363,13 +1363,13 @@ async function sendMessage() {
     if (error) {
       console.error("Could not send Community Chat message:", error);
       const detail = error.message || error.details || "Supabase rejected the request.";
-      showError(detail.includes("Daily chat limit reached") ? "Daily limit reached: 30 messages. It resets at UTC midnight." : "Could not send your message: " + detail);
+      showError(detail.includes("language that is not allowed") ? "That message contains words that are not allowed in Community Chat." : detail.includes("sending messages too quickly") ? "Slow down a little to prevent spam, then try again." : detail.includes("Duplicate messages are blocked") ? "That looks like a duplicate message. Change it before sending again." : "Could not send your message: " + detail);
       return;
     }
 
     messageInput.value = "";
     pendingAttachment = null;
-    attachmentStatus.textContent = "30 messages per day · Resets at UTC midnight";
+    attachmentStatus.textContent = "Unlimited messages · No spam or bad words";
     // Force the next load to render the new row even if the server timestamp
     // matches a previous poll's result.
     lastRenderedMessageSignature = null;
