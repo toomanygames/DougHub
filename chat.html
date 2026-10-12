@@ -1262,7 +1262,7 @@ async function renderMessages(
           if (message.attachment_type === "gif") {
             const attribution = document.createElement("a");
             const isDougHubGif = message.attachment_source === "DOUGHUB";
-            const match = isDougHubGif ? safeUrl.match(/\\/Special:Redirect\\/file\\/(.+)$/i) : null;
+            const match = isDougHubGif ? safeUrl.match(/\/Special:Redirect\/file\/(.+)$/i) : null;
             attribution.href = match
               ? "https://commons.wikimedia.org/wiki/File:" + match[1].replace(/ /g, "_")
               : (isDougHubGif ? "https://commons.wikimedia.org/wiki/Category:Animated_GIF_files" : "https://giphy.com/");
