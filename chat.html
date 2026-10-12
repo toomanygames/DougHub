@@ -10,7 +10,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gif-picker-react@2.0.0/style.css">
 
 <style>
 * {
@@ -699,17 +698,26 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
   .dmail-notice { padding: 10px 12px 13px; }
 }
 
+
+/* Built-in DougHub GIF library */
+.gif-library-description{margin:0 0 15px!important;color:#a4a7c4;font-size:13px;line-height:1.5}
+.gif-library-search-label{display:block;font-size:12px;font-weight:800;color:#c7c9e5;margin-bottom:6px}
+.gif-library-search{display:block;width:100%;padding:12px 13px;margin:0 0 12px!important;background:#080a19!important;color:#fff!important;border:1px solid rgba(177,184,255,.2)!important;border-radius:12px!important}
+.gif-library-categories{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 14px}
+.gif-category{padding:7px 11px;border-radius:999px;border:1px solid rgba(177,184,255,.16);background:rgba(255,255,255,.04);color:#bfc4df;font-size:12px;font-weight:750;cursor:pointer}
+.gif-category.active{background:rgba(99,102,241,.22);border-color:rgba(129,140,248,.55);color:#fff}
+.gif-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:43vh;overflow:auto;padding:2px}
+.gif-library-card{min-width:0;overflow:hidden;border:1px solid rgba(177,184,255,.15);border-radius:13px;background:rgba(255,255,255,.035);padding:0;color:#f6f5ff;text-align:left;cursor:pointer;transition:transform .16s,border-color .16s,background .16s}
+.gif-library-card:hover{transform:translateY(-2px);border-color:rgba(167,139,250,.55);background:rgba(99,102,241,.1)}
+.gif-library-card img{display:block;width:100%;height:120px;object-fit:contain;background:rgba(0,0,0,.22)}
+.gif-library-card span{display:block;padding:9px 10px 10px;font-size:12px;font-weight:800}
+.gif-library-card small{display:block;padding:0 10px 10px;color:#9299b5;font-size:10px}
+.gif-library-empty{grid-column:1/-1;padding:24px 12px;text-align:center;color:#a4a7c4;border:1px dashed rgba(177,184,255,.2);border-radius:12px;font-size:13px}
+.gif-library-credit{margin:12px 0 0!important;color:#858ba3!important;font-size:11px!important}
+@media(max-width:420px){.gif-library-grid{gap:7px}.gif-library-card img{height:100px}.gif-modal{padding:16px}}
 </style>
 
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.2.0",
-    "react-dom": "https://esm.sh/react-dom@19.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.2.0/client"
-  }
-}
-</script>
+</head>
 
 </head>
 
@@ -827,10 +835,17 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         </div>
         <button type="button" id="closeGifModal" aria-label="Close GIF picker">✕</button>
       </div>
-      <div id="gifPickerKeyNotice" class="gif-picker-key-notice">
-        GIF search needs a free KLIPY app key. <a href="https://partner.klipy.com/api-keys" target="_blank" rel="noopener noreferrer">Create a key ↗</a>, then send it to me and I’ll finish connecting the picker.
+      <p class="gif-library-description">Pick from DougHub’s built-in collection. No API key or account needed.</p>
+      <label class="gif-library-search-label" for="gifLibrarySearch">Search the collection</label>
+      <input id="gifLibrarySearch" class="gif-library-search" type="search" placeholder="Try “fun”, “nature”, or “animation”" autocomplete="off">
+      <div class="gif-library-categories" id="gifLibraryCategories" aria-label="GIF categories">
+        <button type="button" class="gif-category active" data-category="all">All</button>
+        <button type="button" class="gif-category" data-category="fun">Fun</button>
+        <button type="button" class="gif-category" data-category="nature">Nature</button>
+        <button type="button" class="gif-category" data-category="art">Art</button>
       </div>
-      <div id="gifPickerMount"></div>
+      <div id="gifLibraryGrid" class="gif-library-grid" aria-live="polite"></div>
+      <p class="gif-library-credit">GIFs are from Wikimedia Commons and remain subject to the license shown on each source page.</p>
     </section>
   </div>
 
@@ -1246,10 +1261,14 @@ async function renderMessages(
           attachment.appendChild(img);
           if (message.attachment_type === "gif") {
             const attribution = document.createElement("a");
-            attribution.href = "https://giphy.com/";
+            const isDougHubGif = message.attachment_source === "DOUGHUB";
+            const match = isDougHubGif ? safeUrl.match(/\\/Special:Redirect\\/file\\/(.+)$/i) : null;
+            attribution.href = match
+              ? "https://commons.wikimedia.org/wiki/File:" + match[1].replace(/ /g, "_")
+              : (isDougHubGif ? "https://commons.wikimedia.org/wiki/Category:Animated_GIF_files" : "https://giphy.com/");
             attribution.target = "_blank";
             attribution.rel = "noopener noreferrer";
-            attribution.textContent = "Powered by GIPHY ↗";
+            attribution.textContent = isDougHubGif ? "DougHub GIF Library · Wikimedia Commons ↗" : "Powered by GIPHY ↗";
             attachment.appendChild(attribution);
           }
         } else if (safeUrl) {
@@ -1538,7 +1557,7 @@ function safeAttachmentUrl(rawUrl, type) {
     const u = new URL(rawUrl);
     if (u.protocol !== "https:") return null;
     if (type === "gif") {
-      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "static.klipy.com"].includes(u.hostname)) return null;
+      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "static.klipy.com", "commons.wikimedia.org"].includes(u.hostname)) return null;
       if (!/\.(gif|webp|png|jpg|jpeg)$/i.test(u.pathname)) return null;
       return u.href;
     }
@@ -1577,9 +1596,9 @@ window.addEventListener("douqhub:gif-picked", event => {
     url: gif.imageUrl,
     type: "gif",
     name: (gif.description || "GIF").slice(0, 180),
-    source: "KLIPY"
+    source: gif.source || "DOUGHUB"
   };
-  setAttachmentStatus("GIF attached · KLIPY");
+  setAttachmentStatus("GIF attached · DougHub GIF Library");
   gifModal.hidden = true;
   hideError();
 });
@@ -1811,55 +1830,118 @@ startCommunityChat();
 </script>
 
 
-<script type="module">
-  import React from "react";
-  import { createRoot } from "react-dom/client";
-  import { GifPicker } from "https://esm.sh/gif-picker-react@2.0.0?external=react,react-dom";
-  import { Klipy } from "https://esm.sh/gif-picker-react@2.0.0/providers/klipy?external=react,react-dom";
+<script>
+/* DougHub's built-in, no-key GIF collection. The media files are served by Wikimedia Commons. */
+(function initDougHubGifLibrary() {
+  const mount = document.getElementById("gifLibraryGrid");
+  const search = document.getElementById("gifLibrarySearch");
+  const categories = document.getElementById("gifLibraryCategories");
+  if (!mount || !search || !categories) return;
 
-  const KLIPY_APP_KEY = "81UL8SdiZVWKwSQRmrx9c0H8gGguMF3TSXfHU8wOwDQQD1wkQs2bQumowhqsW64v";
-  const mount = document.getElementById("gifPickerMount");
-  const notice = document.getElementById("gifPickerKeyNotice");
+  const library = [
+    {
+      title: "Bouncing Ball",
+      category: "art",
+      tags: "bounce bouncing ball physics fun animation",
+      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Animexample.gif",
+      license: "Public domain"
+    },
+    {
+      title: "Silly Stick Figure",
+      category: "fun",
+      tags: "fun funny reaction cartoon stick figure tongue silly",
+      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Pffffft.gif",
+      license: "Public domain"
+    },
+    {
+      title: "Green Balloon",
+      category: "nature",
+      tags: "nature green balloon float floating celebration",
+      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Green_balloon.gif",
+      license: "CC0"
+    },
+    {
+      title: "Animated Drawing",
+      category: "art",
+      tags: "art drawing animation animated illustration",
+      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Gif-animado-.gif",
+      license: "CC BY-SA 4.0"
+    },
+    {
+      title: "Abstract Animation",
+      category: "art",
+      tags: "abstract art animation colorful visual",
+      url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Animation3.gif",
+      license: "Public domain"
+    }
+  ];
 
-  function showPickerError(error) {
-    console.error("DougHub GIF picker failed to initialize:", error);
-    if (notice) {
-      notice.hidden = false;
-      notice.textContent = "GIF search couldn't load. Refresh the page and try again. If it still fails, the KLIPY key or browser connection may be rejecting the request.";
+  let selectedCategory = "all";
+
+  function render() {
+    const term = search.value.trim().toLowerCase();
+    const items = library.filter(item =>
+      (selectedCategory === "all" || item.category === selectedCategory) &&
+      (!term || (item.title + " " + item.tags + " " + item.license).toLowerCase().includes(term))
+    );
+
+    mount.replaceChildren();
+    if (!items.length) {
+      const empty = document.createElement("div");
+      empty.className = "gif-library-empty";
+      empty.textContent = "No matches in the built-in collection. Try another search or category.";
+      mount.appendChild(empty);
+      return;
     }
-    if (mount && !mount.querySelector(".gif-picker-load-error")) {
-      const message = document.createElement("div");
-      message.className = "gif-picker-load-error";
-      message.textContent = "The GIF picker failed to start. Check the browser console for the exact error, then refresh and try again.";
-      mount.appendChild(message);
-    }
+
+    items.forEach(item => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "gif-library-card";
+      button.title = "Attach " + item.title;
+
+      const img = document.createElement("img");
+      img.src = item.url;
+      img.alt = item.title;
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => {
+        button.disabled = true;
+        button.style.opacity = ".45";
+        img.alt = "Preview unavailable";
+      };
+
+      const title = document.createElement("span");
+      title.textContent = item.title;
+      const license = document.createElement("small");
+      license.textContent = item.license;
+
+      button.append(img, title, license);
+      button.addEventListener("click", () => {
+        window.dispatchEvent(new CustomEvent("douqhub:gif-picked", {
+          detail: {
+            imageUrl: item.url,
+            description: item.title,
+            source: "DOUGHUB"
+          }
+        }));
+      });
+      mount.appendChild(button);
+    });
   }
 
-  try {
-    if (KLIPY_APP_KEY === "ADD_KLIPY_APP_KEY_HERE") {
-      notice.hidden = false;
-    } else {
-      notice.hidden = true;
-      const root = createRoot(mount);
-      root.render(React.createElement(GifPicker, {
-        provider: Klipy(KLIPY_APP_KEY, { contentFilter: "high", showBranding: true }),
-        theme: "dark",
-        width: "100%",
-        height: 460,
-        onGifClick: (gif) => {
-          window.dispatchEvent(new CustomEvent("douqhub:gif-picked", { detail: gif }));
-        }
-      }));
-      window.addEventListener("error", (event) => {
-        if (gifModal && !gifModal.hidden) showPickerError(event.error || event.message);
+  categories.querySelectorAll("[data-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedCategory = button.dataset.category || "all";
+      categories.querySelectorAll("[data-category]").forEach(item => {
+        item.classList.toggle("active", item === button);
       });
-      window.addEventListener("unhandledrejection", (event) => {
-        if (gifModal && !gifModal.hidden) showPickerError(event.reason || "GIF provider request failed");
-      });
-    }
-  } catch (error) {
-    showPickerError(error);
-  }
+      render();
+    });
+  });
+  search.addEventListener("input", render);
+  render();
+})();
 </script>
 
 </body>
