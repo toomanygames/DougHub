@@ -1851,7 +1851,10 @@ startCommunityChat();
         }
       }));
       window.addEventListener("error", (event) => {
-        if (String(event.message || "").toLowerCase().includes("gif")) showPickerError(event.error || event.message);
+        if (gifModal && !gifModal.hidden) showPickerError(event.error || event.message);
+      });
+      window.addEventListener("unhandledrejection", (event) => {
+        if (gifModal && !gifModal.hidden) showPickerError(event.reason || "GIF provider request failed");
       });
     }
   } catch (error) {
