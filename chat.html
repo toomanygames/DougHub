@@ -710,7 +710,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
   <div class="gif-modal-backdrop" id="gifModal" hidden>
     <section class="gif-modal" role="dialog" aria-modal="true" aria-labelledby="gifModalTitle">
       <h2 id="gifModalTitle">Add a GIF</h2>
-      <p>Search GIPHY in a new tab, then paste a direct GIF media URL here. Use content you have permission to share. GIFs are labelled as coming from GIPHY.</p>
+      <p>Open GIPHY in a new tab and paste a direct GIF media URL here. Only share content you have permission to use. This is a link-based option, not the official GIPHY API; an API integration needs a registered key and must follow GIPHY attribution and usage terms.</p>
       <div class="gif-modal-actions">
         <button type="button" id="openGiphyButton">Browse GIPHY ↗</button>
       </div>
@@ -1137,7 +1137,7 @@ async function renderMessages(
             attribution.href = "https://giphy.com/";
             attribution.target = "_blank";
             attribution.rel = "noopener noreferrer";
-            attribution.textContent = "GIF via GIPHY ↗";
+            attribution.textContent = "Powered by GIPHY ↗";
             attachment.appendChild(attribution);
           }
         } else if (safeUrl) {
