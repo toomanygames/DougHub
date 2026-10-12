@@ -959,7 +959,15 @@
                 cursorCreatedAt = result.data[result.data.length - 1].created_at;
                 const sessionResult = await client.auth.getSession();
                 const ownUserId = sessionResult.data?.session?.user?.id || null;
-                if (result.data.some(message => !ownUserId || message.user_id !== ownUserId)) playDing();
+
+                // Do not guess who sent a message when auth is loading or the visitor is logged out.
+                // Also avoid duplicating the ding while the Community Chat page is already open.
+                const path = (window.location.pathname || "").toLowerCase();
+                const isCommunityChatPage = path.endsWith("/chat.html") || path === "chat.html";
+                const hasIncomingMessage = Boolean(ownUserId) && result.data.some(message =>
+                    Boolean(message.user_id) && message.user_id !== ownUserId
+                );
+                if (hasIncomingMessage && !isCommunityChatPage) playDing();
             } catch (error) { console.debug("DougHub chat notification check failed:", error); }
             finally { checking = false; }
         }
