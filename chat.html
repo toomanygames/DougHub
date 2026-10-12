@@ -589,9 +589,13 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .attachment-preview-panel.collapsed .attachment-preview-arrow{transform:rotate(180deg)}
 .attachment-preview-body{display:grid;grid-template-rows:1fr;opacity:1;max-height:230px;overflow:hidden;padding:0 12px 12px;transition:max-height .28s ease,opacity .2s ease,padding .28s ease}
 .attachment-preview-panel.collapsed .attachment-preview-body{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
-#attachmentPreviewImage{display:block;max-width:min(100%,320px);max-height:170px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.2)}
-#attachmentPreviewName{font-size:11px;color:#a5b4fc;overflow-wrap:anywhere;margin-top:6px}
-@media(max-width:520px){#attachmentPreviewImage{max-width:100%;max-height:140px}.attachment-preview-body{max-height:200px}}
+.attachment-preview-media-wrap{position:relative;display:inline-block;max-width:100%;line-height:0}
+#attachmentPreviewImage,#attachmentPreviewVideo{display:block;max-width:min(100%,320px);max-height:170px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.2)}
+#attachmentPreviewVideo{width:min(320px,100%);height:auto}
+.attachment-preview-remove{position:absolute;top:6px;right:6px;z-index:2;display:flex;align-items:center;justify-content:center;width:25px;height:25px;padding:0;border:1px solid rgba(255,255,255,.38);border-radius:50%;background:rgba(8,10,25,.9);color:#fff;font-size:19px;line-height:1;cursor:pointer;box-shadow:0 2px 8px #0006}
+.attachment-preview-remove:hover{background:#dc2626;border-color:#fecaca}
+#attachmentPreviewName{font-size:11px;color:#a5b4fc;overflow-wrap:anywhere;margin-top:6px;line-height:1.4}
+@media(max-width:520px){#attachmentPreviewImage,#attachmentPreviewVideo{max-width:100%;max-height:140px}.attachment-preview-body{max-height:200px}}
 
 #messageForm{flex-wrap:wrap;align-items:flex-end}
 #messageInput{flex:1 1 220px}
@@ -810,7 +814,11 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
           <span id="attachmentPreviewArrow" class="attachment-preview-arrow" aria-hidden="true">↑</span>
         </button>
         <div id="attachmentPreviewBody" class="attachment-preview-body">
-          <img id="attachmentPreviewImage" alt="Selected attachment preview">
+          <div id="attachmentPreviewMediaWrap" class="attachment-preview-media-wrap">
+            <img id="attachmentPreviewImage" alt="Selected attachment preview">
+            <video id="attachmentPreviewVideo" controls muted playsinline hidden></video>
+            <button type="button" id="removeAttachmentButton" class="attachment-preview-remove" aria-label="Remove attachment" title="Cancel attachment">×</button>
+          </div>
           <span id="attachmentPreviewName"></span>
         </div>
       </div>
@@ -952,6 +960,8 @@ const attachmentPreviewPanel = document.getElementById("attachmentPreviewPanel")
 const attachmentPreviewToggle = document.getElementById("attachmentPreviewToggle");
 const attachmentPreviewTitle = document.getElementById("attachmentPreviewTitle");
 const attachmentPreviewImage = document.getElementById("attachmentPreviewImage");
+const attachmentPreviewVideo = document.getElementById("attachmentPreviewVideo");
+const removeAttachmentButton = document.getElementById("removeAttachmentButton");
 const attachmentPreviewName = document.getElementById("attachmentPreviewName");
 const attachmentPreviewBody = document.getElementById("attachmentPreviewBody");
 const attachmentPreviewArrow = document.getElementById("attachmentPreviewArrow");
@@ -1603,10 +1613,15 @@ function setAttachmentStatus(message) {
 
 function showAttachmentPreview(attachment) {
   if (!attachmentPreviewPanel) return;
-  const isVisual = attachment && (attachment.type === "gif" || attachment.type === "image");
+  const isVisual = attachment && ["gif", "image", "video"].includes(attachment.type);
   if (!isVisual) {
     attachmentPreviewPanel.hidden = true;
     attachmentPreviewImage.removeAttribute("src");
+    attachmentPreviewVideo.pause();
+    attachmentPreviewVideo.removeAttribute("src");
+    attachmentPreviewVideo.load();
+    attachmentPreviewVideo.hidden = true;
+    attachmentPreviewImage.hidden = false;
     attachmentPreviewName.textContent = "";
     attachmentPreviewPanel.classList.remove("collapsed");
     attachmentPreviewToggle.setAttribute("aria-expanded", "true");
@@ -1617,14 +1632,36 @@ function showAttachmentPreview(attachment) {
   attachmentPreviewPanel.classList.remove("collapsed");
   attachmentPreviewToggle.setAttribute("aria-expanded", "true");
   attachmentPreviewArrow.textContent = "↑";
-  attachmentPreviewTitle.textContent = attachment.type === "gif" ? "GIF preview" : "Photo preview";
-  attachmentPreviewImage.alt = attachment.type === "gif" ? "Selected GIF preview" : "Selected photo preview";
-  attachmentPreviewImage.src = attachment.url;
+  attachmentPreviewTitle.textContent = attachment.type === "gif" ? "GIF preview" : attachment.type === "video" ? "Video preview" : "Photo preview";
   attachmentPreviewName.textContent = attachment.name || "";
-  attachmentPreviewImage.onerror = () => {
-    attachmentPreviewName.textContent = "Preview unavailable, but you can still try sending it.";
-  };
+  if (attachment.type === "video") {
+    attachmentPreviewImage.removeAttribute("src");
+    attachmentPreviewImage.hidden = true;
+    attachmentPreviewVideo.hidden = false;
+    attachmentPreviewVideo.src = attachment.url;
+  } else {
+    attachmentPreviewVideo.pause();
+    attachmentPreviewVideo.removeAttribute("src");
+    attachmentPreviewVideo.load();
+    attachmentPreviewVideo.hidden = true;
+    attachmentPreviewImage.hidden = false;
+    attachmentPreviewImage.alt = attachment.type === "gif" ? "Selected GIF preview" : "Selected photo preview";
+    attachmentPreviewImage.src = attachment.url;
+    attachmentPreviewImage.onerror = () => {
+      attachmentPreviewName.textContent = "Preview unavailable, but you can still try sending it.";
+    };
+  }
 }
+
+removeAttachmentButton.addEventListener("click", (event) => {
+  event.stopPropagation();
+  pendingAttachment = null;
+  setAttachmentStatus("");
+  showAttachmentPreview(null);
+  imageFileInput.value = "";
+  documentFileInput.value = "";
+  hideError();
+});
 
 attachmentPreviewToggle.addEventListener("click", () => {
   const collapsed = attachmentPreviewPanel.classList.toggle("collapsed");
