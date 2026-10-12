@@ -1158,6 +1158,18 @@ input,textarea,select{background:#070918}
         Loading...
     </div>
 
+    <div class="admin-card-help">Clear older messages to reduce the chat table's stored rows. Newer messages are kept.</div>
+    <div class="buttons" style="align-items:center;margin:0 0 12px">
+        <label for="clearChatRange" style="color:#c7cbea;font-size:12px;font-weight:800">Remove messages older than</label>
+        <select id="clearChatRange" style="max-width:180px;padding:9px 11px;border-radius:9px;border:1px solid #ffffff18;background:#080b1b;color:#fff;font:inherit">
+            <option value="hour">Last hour</option>
+            <option value="day" selected>Last day</option>
+            <option value="week">Last week</option>
+        </select>
+        <button id="clearChatButton" type="button" class="delete-button">🧹 Clear old messages</button>
+    </div>
+    <div id="clearChatStatus" class="status" role="status" aria-live="polite"></div>
+
     <div id="chatMessages" class="admin-scroll-area"></div>
 
 </div>
@@ -2497,6 +2509,55 @@ async function markWarningRead(id) {
     await loadWarnings();
 }
 
+
+async function clearOldChatMessages() {
+    const button = document.getElementById("clearChatButton");
+    const rangeSelect = document.getElementById("clearChatRange");
+    const status = document.getElementById("clearChatStatus");
+    if (!button || !rangeSelect || !status || !supabaseClient || !currentAdminUser) {
+        if (status) status.textContent = "Admin session is not ready. Please reload the page.";
+        return;
+    }
+
+    const range = rangeSelect.value;
+    const rangeLabels = { hour: "last hour", day: "last day", week: "last week" };
+    const durations = { hour: 60 * 60 * 1000, day: 24 * 60 * 60 * 1000, week: 7 * 24 * 60 * 60 * 1000 };
+    if (!durations[range]) return;
+
+    const cutoff = new Date(Date.now() - durations[range]).toISOString();
+    const label = rangeLabels[range];
+    if (!window.confirm("Permanently delete chat messages older than the " + label + "? Newer messages will be kept. This cannot be undone.")) return;
+
+    button.disabled = true;
+    rangeSelect.disabled = true;
+    status.textContent = "Removing older messages…";
+    try {
+        // Delete only rows before the cutoff; recent messages are deliberately preserved.
+        const { data, error } = await supabaseClient
+            .from("chat_messages")
+            .delete()
+            .lt("created_at", cutoff)
+            .select("id");
+
+        if (error) throw error;
+        const removed = data ? data.length : 0;
+        status.textContent = removed
+            ? "Cleared " + removed + " older message" + (removed === 1 ? "" : "s") + ". Newer messages were kept."
+            : "No messages older than the " + label + " were found.";
+        await loadChatMessages();
+        await writeAuditLog("admin_action", "chat", "Cleared old chat messages", {
+            range: range,
+            cutoff: cutoff,
+            deletedCount: removed
+        });
+    } catch (error) {
+        console.error("Could not clear old chat messages:", error);
+        status.textContent = "Could not clear messages: " + (error.message || "Unknown database error");
+    } finally {
+        button.disabled = false;
+        rangeSelect.disabled = false;
+    }
+}
 
 async function loadChatMessages() {
 
@@ -4461,6 +4522,7 @@ function setupAdminQuickNav() {
         nav.appendChild(link);
     });
 }
+document.getElementById("clearChatButton")?.addEventListener("click", clearOldChatMessages);
 document.getElementById("saveSiteEventButton")?.addEventListener("click",saveSiteAnnouncement);
 document.getElementById("savePageScheduleButton")?.addEventListener("click",savePageSchedule);
 document.getElementById("schedulePageEnabled")?.addEventListener("change",function(){
