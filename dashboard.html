@@ -2,139 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050611">
 <title>Dashboard • DougHub</title>
-<link rel="icon" href="DougHub.svg" type="image/x-icon">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
 <style>
-:root{color-scheme:dark;--bg:#02040a;--panel:rgba(13,17,39,.76);--line:rgba(255,255,255,.085);--muted:#9998ad;--purple:#a855f7;--blue:#6366f1}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:#fff;background:radial-gradient(circle at 0 0,#17133b 0,transparent 32%),radial-gradient(circle at 100% 10%,#25104b 0,transparent 30%),var(--bg)}a{color:inherit;text-decoration:none}button{font:inherit}
-header{position:sticky;top:0;z-index:1000;min-height:72px;padding:0 30px;display:flex;align-items:center;gap:24px;justify-content:space-between;background:rgba(4,5,15,.84);border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}
-.logo{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:800;white-space:nowrap}.logo-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),var(--purple));box-shadow:0 0 25px #6366f155}
-.nav{display:flex;align-items:center;justify-content:flex-end;gap:19px;margin-left:auto}.nav-link{font-size:13px;font-weight:700;color:#aaa9bb;transition:.2s;white-space:nowrap}.nav-link:hover,.nav-link.active{color:#fff}
-.account-area{position:relative}.account-btn{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:12px;color:white;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer}.account-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;font-weight:800}.account-avatar img{width:100%;height:100%;object-fit:cover}.account-menu{position:absolute;right:0;top:calc(100% + 10px);width:205px;padding:8px;border-radius:14px;background:rgba(12,13,28,.98);border:1px solid var(--line);box-shadow:0 20px 60px #0008;display:none}.account-menu.show{display:block}.account-menu a,.account-menu button{display:block;width:100%;padding:10px 12px;text-align:left;color:#d8d7e5;background:transparent;border:0;border-radius:9px;cursor:pointer;font-size:14px}.account-menu a:hover,.account-menu button:hover{background:#ffffff10;color:white}.logout{color:#ff7777!important}
-main{width:min(1240px,calc(100% - 36px));margin:0 auto;padding:38px 0 70px}.eyebrow{color:#aaa9ff;text-transform:uppercase;font-size:11px;font-weight:800;letter-spacing:.13em}.hero{position:relative;isolation:isolate;overflow:hidden;padding:36px 38px;border-radius:26px;border:1px solid var(--line);background:radial-gradient(circle at 82% 10%,#a855f72b,transparent 36%),radial-gradient(circle at 10% 100%,#6366f126,transparent 42%),linear-gradient(125deg,#11152eeb,#0b0d20e8);box-shadow:0 25px 80px #0004}.hero:after{content:"";position:absolute;z-index:-1;width:270px;height:270px;right:-85px;bottom:-160px;background:#8b5cf6;filter:blur(90px);opacity:.35}.hero-top{display:flex;align-items:center;justify-content:space-between;gap:18px}.live-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid #6366f14d;background:#6366f11a;color:#d9d7ff;font-size:12px;font-weight:700}.live-dot{width:7px;height:7px;background:#86efac;border-radius:50%;box-shadow:0 0 12px #86efac}.hero h1{font-size:clamp(34px,5vw,56px);letter-spacing:-2px;line-height:1.03;margin:22px 0 12px}.hero h1 span{background:linear-gradient(90deg,#a5b4fc,#d8b4fe);background-clip:text;color:transparent}.hero p{max-width:650px;margin:0;color:#aaa9bb;font-size:16px;line-height:1.7}.hero-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;border:1px solid #818cf84a;background:#6366f121;color:white;font-size:13px;font-weight:800;transition:.2s;cursor:pointer}.btn.primary{border:0;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 10px 28px #6366f133}.btn:hover{transform:translateY(-2px);filter:brightness(1.12)}.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr);gap:18px;margin-top:20px}.panel{min-width:0;padding:23px;border:1px solid var(--line);border-radius:21px;background:var(--panel);box-shadow:0 16px 40px #0002}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}.panel h2{font-size:18px;margin:0}.panel-sub{color:var(--muted);font-size:13px;line-height:1.5;margin:6px 0 0}.small-link{font-size:12px;font-weight:800;color:#b9b8ff;white-space:nowrap}.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.quick-card{min-height:116px;display:flex;flex-direction:column;justify-content:space-between;padding:15px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(145deg,#ffffff08,#ffffff02);transition:.2s}.quick-card:hover{transform:translateY(-3px);border-color:#a855f75c;background:#8b5cf61a}.quick-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#6366f124;border:1px solid #818cf82b;font-size:19px}.quick-card strong{display:block;margin-top:13px;font-size:13px}.quick-card small{display:block;margin-top:4px;color:var(--muted);font-size:11px}.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:16px;border-radius:15px;background:#ffffff06;border:1px solid var(--line)}.stat-number{font-size:28px;font-weight:900;letter-spacing:-1px;background:linear-gradient(90deg,#a5b4fc,#d8b4fe);background-clip:text;color:transparent}.stat-label{margin-top:5px;color:var(--muted);font-size:12px}.profile-mini{display:flex;align-items:center;gap:13px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}.profile-avatar{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,var(--blue),var(--purple));font-size:20px;font-weight:900;flex:0 0 auto}.profile-avatar img{width:100%;height:100%;object-fit:cover}.profile-mini strong{display:block;font-size:15px;overflow-wrap:anywhere}.profile-mini span{display:block;margin-top:4px;color:var(--muted);font-size:12px}.status{display:inline-flex;align-items:center;gap:7px;color:#a7f3d0;font-size:11px;font-weight:800;margin-top:7px}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:#34d399}.community-list{display:grid;gap:10px}.community-item{display:flex;align-items:center;gap:13px;padding:13px;border-radius:15px;background:#ffffff04;border:1px solid var(--line);transition:.2s}.community-item:hover{border-color:#a855f755;background:#a855f70b}.item-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;border-radius:13px;background:#8b5cf61a;font-size:20px}.item-info{min-width:0;flex:1}.item-info strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item-info p{margin:5px 0 0;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item-arrow{color:#a5b4fc;font-size:20px}.empty{padding:25px;text-align:center;border:1px dashed #ffffff20;border-radius:15px;color:var(--muted);font-size:13px;line-height:1.6}.empty a{color:#c4b5fd;font-weight:800}.section-label{margin:28px 0 13px;display:flex;align-items:center;justify-content:space-between;gap:12px}.section-label h2{font-size:17px;margin:0}.footer-note{text-align:center;color:#66667e;font-size:12px;padding:28px 0 0}
-@media(max-width:1000px){header{padding:0 18px;flex-wrap:wrap;gap:12px;padding-top:12px;padding-bottom:12px}.nav{gap:12px;flex-wrap:wrap}.nav-link{font-size:12px}.dashboard-grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:640px){header{align-items:flex-start}.logo{font-size:18px}.nav{width:100%;justify-content:flex-start;order:3;overflow-x:auto;flex-wrap:nowrap;padding:4px 0 2px}.account-area{margin-left:auto}.nav-link{flex:0 0 auto}.hero{padding:25px 21px;border-radius:21px}.hero-top{align-items:flex-start;flex-direction:column}.hero h1{letter-spacing:-1.4px}.hero p{font-size:14px}.dashboard-grid{gap:13px}.panel{padding:18px}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-card{min-height:105px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}main{width:calc(100% - 24px);padding-top:22px}.panel-head{align-items:flex-start}}
+:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--line:rgba(255,255,255,.09);--muted:#9c9bb2;--purple:#a855f7;--indigo:#6366f1;--cyan:#67e8f9}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:#f8f7ff;background:radial-gradient(ellipse at 10% -5%,#312e8166,transparent 38%),radial-gradient(ellipse at 95% 10%,#701a7540,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit;text-decoration:none}button,input{font:inherit}
+header{height:auto;min-height:76px;position:sticky;top:0;z-index:100;background:#050611d9;backdrop-filter:blur(18px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:13px max(24px,calc((100vw - 1320px)/2))}
+.logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}.logo-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 6px 24px #8b5cf644;font-weight:900}
+.nav{display:flex;align-items:center;gap:18px;margin-left:auto;min-width:0}.nav-link{font-size:12px;font-weight:750;color:#aaa9bf;white-space:nowrap;transition:color .2s}.nav-link:hover,.nav-link.active{color:white}
+.header-actions{display:flex;align-items:center;gap:9px}.header-cta{border:1px solid #ffffff17;background:#ffffff08;padding:10px 12px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;transition:.2s}.header-cta:hover{background:#8b5cf625;border-color:#a855f75c;transform:translateY(-1px)}.header-cta.primary{border:0;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 5px 20px #6366f133}
+.account-area{position:relative}.account-btn{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line);background:#ffffff08;border-radius:12px;color:white;cursor:pointer;max-width:180px}.account-avatar{width:30px;height:30px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;font-weight:800;flex-shrink:0}.account-avatar img{width:100%;height:100%;object-fit:cover}.account-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:750}.account-menu{position:absolute;right:0;top:calc(100% + 10px);width:210px;padding:8px;border:1px solid var(--line);border-radius:14px;background:#101127;box-shadow:0 20px 55px #0009;display:none}.account-menu.show{display:block}.account-menu a,.account-menu button{display:block;width:100%;padding:10px 11px;border:0;border-radius:9px;text-align:left;color:#deddf0;background:transparent;cursor:pointer;font-size:13px}.account-menu a:hover,.account-menu button:hover{background:#ffffff0d;color:white}.logout{color:#fca5a5!important}
+main{width:min(1260px,calc(100% - 40px));margin:0 auto;padding:32px 0 70px}.hero{position:relative;overflow:hidden;isolation:isolate;min-height:285px;padding:38px;display:flex;align-items:center;border:1px solid #a5b4fc22;border-radius:26px;background:linear-gradient(115deg,#10152ff5 0%,#14102cf0 57%,#281244e8 100%);box-shadow:0 25px 80px #0003}.hero:before{content:"";position:absolute;z-index:-1;width:420px;height:420px;right:1%;top:-200px;border:1px solid #c4b5fd20;border-radius:50%;box-shadow:0 0 0 38px #a78bfa08,0 0 0 78px #a78bfa06,0 0 100px #8b5cf622}.hero:after{content:"";position:absolute;z-index:-1;width:300px;height:230px;right:8%;bottom:-190px;background:#8b5cf6;filter:blur(100px);opacity:.3}.hero-content{max-width:740px}.eyebrow{display:inline-flex;align-items:center;gap:9px;color:#c4b5fd;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:#86efac;box-shadow:0 0 12px #86efac}.hero h1{font-size:clamp(38px,5vw,59px);line-height:1.04;letter-spacing:-2.3px;margin:19px 0 13px}.hero h1 span{background:linear-gradient(95deg,#a5b4fc,#d8b4fe 70%,#67e8f9);background-clip:text;color:transparent}.hero p{max-width:610px;margin:0;color:#b5b4c9;font-size:15px;line-height:1.7}.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:23px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #ffffff18;background:#ffffff08;color:#fff;border-radius:11px;padding:11px 15px;font-size:12px;font-weight:800;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}.btn:hover{transform:translateY(-2px);border-color:#a78bfa66;background:#8b5cf622}.btn.primary{border:0;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 8px 25px #6366f133}
+.section{margin-top:29px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:15px}.section-kicker{color:#a5b4fc;font-size:10px;letter-spacing:.15em;font-weight:850;text-transform:uppercase;margin-bottom:7px}.section-head h2{margin:0;font-size:22px;letter-spacing:-.55px}.section-head p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}.section-link{color:#c4b5fd;font-size:12px;font-weight:800;white-space:nowrap}.section-link:hover{color:white}
+.games-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.game-card{position:relative;min-height:206px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;border-radius:19px;border:1px solid var(--line);background:linear-gradient(145deg,#171b3a,#0d1022 76%);transition:transform .22s,border-color .22s,box-shadow .22s}.game-card:hover{transform:translateY(-4px);border-color:#a78bfa66;box-shadow:0 18px 38px #0004}.game-card:before{content:"";position:absolute;width:180px;height:180px;top:-75px;right:-50px;border-radius:50%;background:var(--glow,#8b5cf6);opacity:.22;filter:blur(2px)}.game-card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 5%,#080a17a8 100%);pointer-events:none}.game-card>*{position:relative;z-index:1}.game-art{position:absolute!important;top:19px;left:19px;width:54px;height:54px;display:grid;place-items:center;border-radius:16px;border:1px solid #ffffff1d;background:#ffffff0d;font-size:28px;box-shadow:0 10px 30px #0002}.game-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#c4b5fd;font-weight:850}.game-card h3{font-size:17px;margin:7px 0 5px;letter-spacing:-.3px}.game-card p{margin:0;color:#aaa9bf;font-size:11px;line-height:1.55;max-width:240px}.game-play{margin-top:14px;color:#ddd6fe;font-size:10px;font-weight:900;letter-spacing:.08em}.game-card.pig{--glow:#fb923c}.game-card.rebirth{--glow:#f472b6}.game-card.racing{--glow:#22d3ee}.game-card.puzzle{--glow:#a78bfa}
+.stats-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}.stat{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#ffffff05}.stat-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:#818cf81a;font-size:18px}.stat strong{display:block;font-size:22px;letter-spacing:-.5px}.stat span{display:block;margin-top:3px;color:var(--muted);font-size:11px}
+.community-panel{padding:18px;border:1px solid var(--line);border-radius:21px;background:linear-gradient(145deg,#0e1229e8,#0b0d1ee8)}.community-toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:15px}.community-toolbar p{margin:0;color:var(--muted);font-size:12px}.search-box{width:min(310px,100%);display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid #ffffff15;border-radius:11px;background:#05061188;color:#aaa9bf}.search-box span{font-size:16px}.search-box input{width:100%;min-width:0;outline:0;border:0;background:transparent;color:white;font-size:12px}.search-box input::placeholder{color:#77768f}
+.community-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.community-card{display:flex;align-items:center;gap:12px;min-width:0;padding:13px;border:1px solid #ffffff0d;border-radius:14px;background:#ffffff04;transition:.2s}.community-card:hover{border-color:#a78bfa55;background:#8b5cf610;transform:translateY(-2px)}.community-icon{width:43px;height:43px;flex-shrink:0;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#6366f12b,#a855f729);font-size:20px}.community-info{min-width:0;flex:1}.community-info strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.community-info small{display:block;margin-top:5px;color:var(--muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.community-arrow{color:#c4b5fd;font-size:17px}.empty{grid-column:1/-1;padding:28px;text-align:center;border:1px dashed #ffffff1c;border-radius:14px;color:var(--muted);font-size:12px;line-height:1.7}.empty a{color:#c4b5fd;font-weight:800}
+.bottom-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:15px;margin-top:20px}.feature-panel{padding:22px;border:1px solid var(--line);border-radius:20px;background:radial-gradient(circle at 100% 0,#8b5cf61b,transparent 45%),#0d1127c9}.feature-panel h3{font-size:17px;margin:0 0 7px}.feature-panel p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}.feature-panel .btn{margin-top:16px}.mini-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:15px}.mini-link{padding:12px;border-radius:12px;border:1px solid var(--line);background:#ffffff04;font-size:11px;font-weight:800}.mini-link:hover{border-color:#a78bfa66;background:#8b5cf612}
+footer{text-align:center;color:#686880;font-size:11px;padding:34px 0 0}
+@media(max-width:1100px){header{flex-wrap:wrap;gap:13px}.nav{order:3;width:100%;margin:0;justify-content:flex-start;overflow-x:auto;padding:5px 0}.header-actions{margin-left:auto}.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.community-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){header{padding:12px 14px}.logo{font-size:19px}.header-actions{gap:6px}.header-cta{padding:9px;font-size:10px}.header-cta.chat{display:none}.account-name{display:none}.nav{gap:17px}.nav-link{font-size:11px}main{width:calc(100% - 24px);padding-top:18px}.hero{padding:25px 21px;min-height:0;border-radius:21px}.hero h1{font-size:39px;letter-spacing:-1.6px}.hero p{font-size:13px}.section-head h2{font-size:19px}.games-grid{gap:10px}.game-card{min-height:195px;padding:14px}.game-art{left:14px;top:14px;width:46px;height:46px;font-size:24px}.game-card h3{font-size:15px}.game-card p{font-size:10px}.stats-row{gap:8px}.stat{padding:11px 9px;gap:8px;align-items:flex-start;flex-direction:column}.stat strong{font-size:20px}.stat span{font-size:10px}.community-panel{padding:12px}.community-toolbar{align-items:stretch;flex-direction:column}.search-box{width:100%}.community-row{grid-template-columns:1fr}.bottom-grid{grid-template-columns:1fr}.section{margin-top:24px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
 <header>
-  <a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a>
+  <a class="logo" href="index.html"><span class="logo-mark">D</span><span>DougHub</span></a>
   <nav class="nav" aria-label="Main navigation">
-    <a href="index.html" class="nav-link">Home</a>
-    <a href="douggames.html" class="nav-link">Games</a>
-    <a href="DougTube.html" class="nav-link">DougTube</a>
-    <a href="douqhub-music.html" class="nav-link">♫ Music</a>
-    <a href="DMail.html" class="nav-link">DMail</a>
-    <a href="tools.html" class="nav-link">Tools</a>
-    <a href="nova.html" class="nav-link">✳ Nova AI</a>
-    <a href="chat.html" class="nav-link">Chat</a>
+    <a class="nav-link" href="index.html">Home</a><a class="nav-link" href="douggames.html">Games</a><a class="nav-link" href="DougTube.html">DougTube</a><a class="nav-link" href="douqhub-music.html">♫ Music</a><a class="nav-link" href="DMail.html">DMail</a><a class="nav-link" href="tools.html">Tools</a><a class="nav-link" href="nova.html">✳ Nova AI</a><a class="nav-link" href="chat.html">Chat</a>
   </nav>
-  <div class="account-area">
-    <button id="accountButton" class="account-btn" type="button" aria-expanded="false">
-      <span id="accountAvatar" class="account-avatar">?</span><span id="accountName">Loading…</span><span aria-hidden="true">⌄</span>
-    </button>
-    <div id="accountMenu" class="account-menu">
-      <a href="dashboard.html">Dashboard</a><a href="my-games.html">My Games &amp; Videos</a><a href="settings.html">Settings</a>
-      <a href="admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a>
-      <button id="logoutButton" class="logout" type="button">Log Out</button>
+  <div class="header-actions"><a class="header-cta primary" href="Scripting/scripting.html">⌘ Create a Game</a><a class="header-cta chat" href="chat.html">💬 Community Chat</a>
+    <div class="account-area"><button id="accountButton" class="account-btn" type="button" aria-expanded="false"><span id="accountAvatar" class="account-avatar">?</span><span id="accountName" class="account-name">Log In</span><span aria-hidden="true">⌄</span></button>
+      <div id="accountMenu" class="account-menu"><a href="dashboard.html">Dashboard</a><a href="my-games.html">My Games &amp; Videos</a><a href="settings.html">Settings</a><a href="admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>
     </div>
   </div>
 </header>
 <main>
   <section class="hero">
-    <div class="hero-top"><span class="eyebrow">YOUR DOUGHUB SPACE</span><span class="live-pill"><span class="live-dot"></span> Your dashboard</span></div>
-    <h1 id="welcomeTitle">A little space for<br><span>everything you do.</span></h1>
-    <p>Your personal launchpad for DougHub. Jump back into your favourite areas, keep an eye on your projects, and discover what the community is making.</p>
-    <div class="hero-actions"><a class="btn primary" href="douggames.html">🎮 Explore games <span>↗</span></a><a class="btn" href="tools.html">✳ Open tools <span>↗</span></a><a class="btn" href="my-games.html">▦ My content <span>↗</span></a></div>
+    <div class="hero-content"><div class="eyebrow">YOUR PERSONAL LAUNCHPAD</div>
+      <h1 id="welcomeTitle">Welcome to<br><span>DougHub.</span></h1>
+      <p>Your space to play, create, and connect. Jump into a game, explore what the community is building, or start making something of your own.</p>
+      <div class="hero-actions"><a class="btn primary" href="douggames.html">🎮 Explore all games <span>↗</span></a><a class="btn" href="Scripting/scripting.html">⌘ Start creating <span>↗</span></a><a class="btn" href="chat.html">💬 Visit the community <span>↗</span></a></div>
+    </div>
   </section>
-  <div class="dashboard-grid">
-    <section class="panel">
-      <div class="panel-head"><div><h2>Quick launch</h2><p class="panel-sub">Your most useful DougHub destinations, one click away.</p></div><span class="eyebrow">SHORTCUTS</span></div>
-      <div class="quick-grid">
-        <a class="quick-card" href="douggames.html"><span class="quick-icon">🎮</span><span><strong>DougGames</strong><small>Play and explore</small></span></a>
-        <a class="quick-card" href="tools.html"><span class="quick-icon">✳</span><span><strong>DougTools</strong><small>Useful utilities</small></span></a>
-        <a class="quick-card" href="nova.html"><span class="quick-icon">✧</span><span><strong>Nova AI</strong><small>Ideas and answers</small></span></a>
-        <a class="quick-card" href="chat.html"><span class="quick-icon">💬</span><span><strong>Community Chat</strong><small>Talk with the community</small></span></a>
-        <a class="quick-card" href="DougTube.html"><span class="quick-icon">▶</span><span><strong>DougTube</strong><small>Community media</small></span></a>
-        <a class="quick-card" href="douqhub-music.html"><span class="quick-icon">♫</span><span><strong>DougHub Music</strong><small>Music and listening</small></span></a>
-        <a class="quick-card" href="DMail.html"><span class="quick-icon">✉</span><span><strong>DMail</strong><small>Your messages</small></span></a>
-        <a class="quick-card" href="Scripting/scripting.html"><span class="quick-icon">⌘</span><span><strong>DougCode</strong><small>Build a project</small></span></a>
-        <a class="quick-card" href="settings.html"><span class="quick-icon">⚙</span><span><strong>Settings</strong><small>Manage your account</small></span></a>
-      </div>
-    </section>
-    <aside class="panel">
-      <div class="panel-head"><div><h2>Your overview</h2><p class="panel-sub">A quick look at your DougHub space.</p></div><span class="eyebrow">OVERVIEW</span></div>
-      <div class="profile-mini"><div class="profile-avatar" id="profileAvatar">?</div><div><strong id="profileUsername">Loading profile…</strong><span id="profileEmail">Checking your account</span><span class="status" id="accountStatus">Connected to DougHub</span></div></div>
-      <div class="stats-grid">
-        <div class="stat"><div class="stat-number" id="communityTotal">—</div><div class="stat-label">Community games</div></div>
-        <div class="stat"><div class="stat-number" id="myGamesTotal">—</div><div class="stat-label">Your published games</div></div>
-        <div class="stat"><div class="stat-number" id="memberTotal">—</div><div class="stat-label">DougHub members</div></div>
-        <div class="stat"><div class="stat-number" id="recentTotal">—</div><div class="stat-label">New games this week</div></div>
-      </div>
-      <div style="margin-top:16px"><a class="btn" style="width:100%" href="settings.html">Manage profile &amp; settings ↗</a></div>
-    </aside>
+  <section class="section">
+    <div class="section-head"><div><div class="section-kicker">Pick up and play</div><h2>DougHub Games</h2><p>Jump straight into one of the built-in favourites.</p></div><a class="section-link" href="douggames.html">Browse all games ↗</a></div>
+    <div class="games-grid">
+      <a class="game-card pig" href="Games/pig-clicker.html"><span class="game-art">🐷</span><span class="game-tag">Clicker · Casual</span><h3>Pig Clicker</h3><p>Click the pig, earn points, and keep upgrading your world.</p><span class="game-play">PLAY NOW ↗</span></a>
+      <a class="game-card rebirth" href="Games/rebirth-clicker.html"><span class="game-art">♻️</span><span class="game-tag">Progression · Clicker</span><h3>Rebirth Clicker</h3><p>Click, upgrade, rebirth, and build your progress.</p><span class="game-play">PLAY NOW ↗</span></a>
+      <a class="game-card racing" href="Games/racing.html"><span class="game-art">🏎️</span><span class="game-tag">Racing · Arcade</span><h3>Doug Racing</h3><p>Race around the track and try to beat your best time.</p><span class="game-play">PLAY NOW ↗</span></a>
+      <a class="game-card puzzle" href="Games/puzzle.html"><span class="game-art">🧩</span><span class="game-tag">Puzzle · Brain</span><h3>Doug Puzzle</h3><p>Solve puzzles and put your skills to the test.</p><span class="game-play">PLAY NOW ↗</span></a>
+    </div>
+  </section>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-icon">👥</span><div><strong id="memberTotal">—</strong><span>DougHub members</span></div></div>
+    <div class="stat"><span class="stat-icon">🎮</span><div><strong id="communityTotal">—</strong><span>Community games</span></div></div>
+    <div class="stat"><span class="stat-icon">✨</span><div><strong id="recentTotal">—</strong><span>Games added this week</span></div></div>
   </div>
-  <section class="section-label"><h2>Fresh from the community</h2><a class="small-link" href="douggames.html">Browse all games ↗</a></section>
-  <section class="panel">
-    <div class="panel-head"><div><h2>Recently published games</h2><p class="panel-sub">New creations from people on DougHub.</p></div><span class="eyebrow">COMMUNITY</span></div>
-    <div id="communityList" class="community-list"><div class="empty">Loading community creations…</div></div>
+  <section class="section">
+    <div class="section-head"><div><div class="section-kicker">Made by the community</div><h2>Community Games</h2><p>Find something new to play from DougHub creators.</p></div><a class="section-link" href="douggames.html">Explore community ↗</a></div>
+    <div class="community-panel">
+      <div class="community-toolbar"><p id="communitySummary">Loading community creations…</p><label class="search-box"><span>⌕</span><input id="communitySearch" type="search" autocomplete="off" spellcheck="false" placeholder="Search community games…" aria-label="Search community games"></label></div>
+      <div class="community-row" id="communityList"><div class="empty">Loading games…</div></div>
+    </div>
   </section>
-  <p class="footer-note">DougHub · Your tools, ideas, and community in one place.</p>
+  <section class="bottom-grid">
+    <div class="feature-panel"><div class="section-kicker">Make something yours</div><h3>Got an idea for a game?</h3><p>Open the Scripting Editor to start a project, or head into DougGames to explore the community's creations.</p><a class="btn primary" href="Scripting/scripting.html">Open the Scripting Editor ↗</a></div>
+    <div class="feature-panel"><div class="section-kicker">Your DougHub</div><h3>Everything within reach</h3><p>Keep your messages, media, and account tools just a click away.</p><div class="mini-links"><a class="mini-link" href="DMail.html">✉ DMail</a><a class="mini-link" href="DougTube.html">▶ DougTube</a><a class="mini-link" href="douqhub-music.html">♫ Music</a><a class="mini-link" href="my-games.html">▦ My content</a></div></div>
+  </section>
+  <footer>DougHub — Games, creators, and community.</footer>
 </main>
 <script>
 "use strict";
 const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
 const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null;
+let currentUser=null;let allCommunityGames=[];
 const $=id=>document.getElementById(id);
-function safe(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 $("accountButton").addEventListener("click",()=>{const open=$("accountMenu").classList.toggle("show");$("accountButton").setAttribute("aria-expanded",String(open));});
-document.addEventListener("click",e=>{if(!e.target.closest(".account-area")){$("accountMenu").classList.remove("show");$("accountButton").setAttribute("aria-expanded","false");}});
+document.addEventListener("click",event=>{if(!event.target.closest(".account-area")){$("accountMenu").classList.remove("show");$("accountButton").setAttribute("aria-expanded","false");}});
 $("logoutButton").addEventListener("click",async()=>{const {error}=await supabaseClient.auth.signOut();if(error){alert("Could not log out: "+error.message);return;}location.href="index.html";});
-async function loadProfile(){
- const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
- if(sessionError)console.warn("Session check:",sessionError);
- currentUser=session?.user||null;
- if(!currentUser){
-  $("accountName").textContent="Log In";$("accountAvatar").textContent="?";$("profileUsername").textContent="Welcome, guest";$("profileEmail").textContent="Explore DougHub without signing in";$("accountStatus").textContent="Guest mode";$("welcomeTitle").innerHTML="A little space for<br><span>everything you do.</span>";
-  $("myGamesTotal").textContent="—";$("profileAvatar").textContent="✦";
-  $("communityList").innerHTML='<div class="empty">You’re browsing as a guest. You can explore community creations now, or <a href="index.html">sign in</a> to access your account features.</div>';
-  await loadCommunityData();return;
- }
- const {data:profile,error}=await supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle();
- if(error)console.warn("Profile could not be loaded:",error.message);
- const name=profile?.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
- $("accountName").textContent=name;$("profileUsername").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed-in account";$("welcomeTitle").innerHTML="Welcome back,<br><span>"+safe(name)+"</span>.";
- $("accountAvatar").innerHTML=profile?.avatar_url?'<img src="'+safe(profile.avatar_url)+'" alt="Profile avatar">':safe(name.charAt(0).toUpperCase());
- $("profileAvatar").innerHTML=profile?.avatar_url?'<img src="'+safe(profile.avatar_url)+'" alt="Profile avatar">':safe(name.charAt(0).toUpperCase());
- if(profile?.is_admin===true){$("adminLink").style.display="block";$("feedbackInboxLink").style.display="block";}
- await loadCommunityData();
+function renderCommunityGames(){
+ const query=$("communitySearch").value.trim().toLowerCase();
+ const games=allCommunityGames.filter(game=>[game.title,game.description,game.author,game.category].some(value=>String(value||"").toLowerCase().includes(query))).slice(0,9);
+ $("communitySummary").textContent=query?games.length+" matching games":"Latest community creations";
+ if(!games.length){$("communityList").innerHTML='<div class="empty">'+(query?'No games match that search. Try another title or creator.':'No community games are available yet. Be the first to create one!')+'<br><a href="douggames.html">Open DougGames ↗</a></div>';return;}
+ $("communityList").innerHTML=games.map(game=>'<a class="community-card" href="douggames.html" title="Browse this game on DougGames"><span class="community-icon">'+(game.category==="Puzzle"?"🧩":game.category==="Action"?"⚡":game.category==="Racing"?"🏎️":"🎮")+'</span><span class="community-info"><strong>'+escapeHTML(game.title||"Untitled game")+'</strong><small>'+escapeHTML(game.author||"DougHub creator")+(game.category?" · "+escapeHTML(game.category):"")+'</small></span><span class="community-arrow">↗</span></a>').join("");
 }
-async function loadCommunityData(){
- const {data:games,error}=await supabaseClient.from("community_games").select("id,title,description,author,category,created_at,creator_id").order("created_at",{ascending:false}).limit(6);
- if(error){console.error("Community games could not load:",error);$("communityList").innerHTML='<div class="empty">Community games could not load right now. You can still <a href="douggames.html">open DougGames</a>.</div>';return;}
- const rows=games||[];
- const {count:allGames,error:allGamesError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true});
- $("communityTotal").textContent=allGamesError?"—":String(allGames||0);
- const weekAgo=new Date(Date.now()-7*86400000).toISOString();
- const {count:newGames,error:newGamesError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",weekAgo);
- $("recentTotal").textContent=newGamesError?"—":String(newGames||0);
+$("communitySearch").addEventListener("input",renderCommunityGames);
+async function loadDashboard(){
+ const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+ if(sessionError)console.warn("Session check failed:",sessionError.message);
+ currentUser=session?.user||null;
  if(currentUser){
-  const {count,error:mineError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true}).eq("creator_id",currentUser.id);
-  $("myGamesTotal").textContent=mineError?"—":String(count||0);
+  const {data:profile,error}=await supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle();
+  if(error)console.warn("Profile could not load:",error.message);
+  const name=profile?.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
+  $("accountName").textContent=name;
+  $("accountAvatar").innerHTML=profile?.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
+  $("welcomeTitle").innerHTML="Welcome back,<br><span>"+escapeHTML(name)+".</span>";
+  if(profile?.is_admin===true){$("adminLink").style.display="block";$("feedbackInboxLink").style.display="block";}
+ }else{
+  $("accountName").textContent="Log In";$("accountAvatar").textContent="?";
  }
+ const {data:games,error:gamesError}=await supabaseClient.from("community_games").select("id,title,description,author,category,created_at,creator_id").order("created_at",{ascending:false}).limit(60);
+ if(gamesError){console.error("Community games failed to load:",gamesError.message);$("communitySummary").textContent="Community games could not load right now";$("communityList").innerHTML='<div class="empty">There was a problem loading community games. You can still <a href="douggames.html">open DougGames ↗</a>.</div>';}else{allCommunityGames=games||[];renderCommunityGames();}
  const {count:members,error:memberError}=await supabaseClient.from("profiles").select("id",{count:"exact",head:true});
  $("memberTotal").textContent=memberError?"—":Number(members||0).toLocaleString();
- if(!rows.length){$("communityList").innerHTML='<div class="empty">No community games are showing yet. Head to <a href="douggames.html">DougGames</a> to explore more.</div>';return;}
- $("communityList").innerHTML=rows.map(game=>'<a class="community-item" href="douggames.html"><span class="item-icon">'+(game.category==="Puzzle"?"🧩":game.category==="Action"?"⚡":"🎮")+'</span><span class="item-info"><strong>'+safe(game.title||"Untitled game")+'</strong><p>'+safe(game.description||"Community-made game")+' · '+safe(game.author||"DougHub creator")+'</p></span><span class="item-arrow">↗</span></a>').join("");
+ const {count:communityCount,error:communityError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true});
+ $("communityTotal").textContent=communityError?"—":Number(communityCount||0).toLocaleString();
+ const weekAgo=new Date(Date.now()-7*86400000).toISOString();
+ const {count:newCount,error:newError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",weekAgo);
+ $("recentTotal").textContent=newError?"—":Number(newCount||0).toLocaleString();
 }
-loadProfile().catch(error=>{console.error("Dashboard failed to initialise:",error);$("profileUsername").textContent="Welcome to DougHub";$("profileEmail").textContent="Some dashboard information could not load.";});
+loadDashboard().catch(error=>{console.error("Dashboard initialisation failed:",error);$("communitySummary").textContent="Some dashboard information could not load.";});
 </script>
 </body>
 </html>
