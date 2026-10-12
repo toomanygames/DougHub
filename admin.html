@@ -946,6 +946,14 @@ input,textarea,select{background:#070918}
 
     <div id="usersList"></div>
 
+    <details id="bannedUsersDropdown" style="margin-top:16px;border:1px solid rgba(239,68,68,.22);border-radius:13px;background:rgba(239,68,68,.045);overflow:hidden">
+        <summary style="cursor:pointer;padding:13px 15px;color:#fca5a5;font-weight:800;user-select:none">🚫 Banned & suspended users <span id="bannedUsersCount" style="color:#9da4b8;font-weight:600">(0)</span></summary>
+        <div style="padding:0 12px 12px">
+            <div class="admin-card-help">Banned and suspended accounts are hidden from the main user list. You can unban an account or permanently delete it from Supabase.</div>
+            <div id="bannedUsersList"></div>
+        </div>
+    </details>
+
 </div>
 
 <div class="card">
@@ -1517,223 +1525,148 @@ function populateUserSelects() {
 
 
 function renderUsers() {
+    const bannedList = document.getElementById("bannedUsersList");
+    const bannedCount = document.getElementById("bannedUsersCount");
+    const activeUsers = allUsers.filter(user => !user.is_banned);
+    const bannedUsers = allUsers.filter(user => !!user.is_banned);
 
-    usersList.innerHTML =
-        "";
-
-    if (!allUsers.length) {
-
-        usersList.innerHTML =
-            '<div class="empty">No users found.</div>';
-
-        return;
+    usersList.innerHTML = "";
+    if (!activeUsers.length) {
+        usersList.innerHTML = '<div class="empty">No active users found.</div>';
     }
 
-    allUsers.forEach(user => {
-
-        const item =
-            document.createElement("div");
-
-        item.className =
-            "user-item";
-
-        const top =
-            document.createElement("div");
-
-        top.className =
-            "top-row";
-
-        const left =
-            document.createElement("div");
-
-        const name =
-            document.createElement("div");
-
-        name.className =
-            "user-name";
-
-        name.textContent =
-            "@" +
-            (
-                user.username ||
-                "User"
-            );
+    activeUsers.forEach(user => {
+        const item = document.createElement("div");
+        item.className = "user-item";
+        const top = document.createElement("div");
+        top.className = "top-row";
+        const left = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "user-name";
+        name.textContent = "@" + (user.username || "User");
 
         if (user.is_admin) {
-
-            const badge =
-                document.createElement("span");
-
-            badge.className =
-                "admin-badge";
-
-            badge.textContent =
-                "ADMIN";
-
-            name.appendChild(
-                badge
-            );
+            const badge = document.createElement("span");
+            badge.className = "admin-badge";
+            badge.textContent = "ADMIN";
+            name.appendChild(badge);
         }
 
-        const info =
-            document.createElement("div");
-
-        info.className =
-            "user-info";
-
-        if (user.is_banned) {
-
-            if (
-                user.ban_type === "suspend" &&
-                user.suspended_until &&
-                new Date(user.suspended_until).getTime() > Date.now()
-            ) {
-                info.innerHTML =
-                    '<span class="user-banned">⏸️ SUSPENDED until ' +
-                    escapeHtml(new Date(user.suspended_until).toLocaleString()) +
-                    '</span>';
-            } else {
-                info.innerHTML =
-                    '<span class="user-banned">🚫 BANNED</span>';
-            }
-
-        } else {
-
-            const presence =
-                presenceMap.get(user.id);
-
-            const online =
-                presence &&
-                isRecentlyActive(
-                    presence.last_seen_at
-                );
-
-            if (online) {
-
-                info.innerHTML =
-                    '<span class="user-active">● Online</span>';
-
-            } else {
-
-                info.innerHTML =
-                    '<span class="user-offline">● Offline</span>';
-
-            }
-        }
-
+        const info = document.createElement("div");
+        info.className = "user-info";
+        const presence = presenceMap.get(user.id);
+        const online = presence && isRecentlyActive(presence.last_seen_at);
+        info.innerHTML = online
+            ? '<span class="user-active">● Online</span>'
+            : '<span class="user-offline">● Offline</span>';
         left.appendChild(name);
         left.appendChild(info);
 
-        const buttons =
-            document.createElement("div");
-
-        buttons.className =
-            "buttons";
-
-        if (user.is_banned) {
-
-            const unbanButton =
-                document.createElement("button");
-
-            unbanButton.className =
-                "unban-button";
-
-            unbanButton.type =
-                "button";
-
-            unbanButton.textContent =
-                "♻️ Unban";
-
-            unbanButton.addEventListener(
-                "click",
-                function() {
-
-                    unbanAccount(
-                        user.id
-                    );
-
-                }
-            );
-
-            buttons.appendChild(
-                unbanButton
-            );
-
-        } else {
-
-            const banButton =
-                document.createElement("button");
-
-            banButton.className =
-                "ban-button";
-
-            banButton.type =
-                "button";
-
-            banButton.textContent =
-                "🚫 Ban";
-
-            banButton.addEventListener(
-                "click",
-                function() {
-
-                    banUser.value =
-                        user.id;
-
-                    document
-                        .getElementById("banReason")
-                        .focus();
-
-                    window.scrollTo({
-                        top:
-                            document
-                                .getElementById("banUser")
-                                .getBoundingClientRect()
-                                .top +
-                            window.scrollY -
-                            120,
-                        behavior:
-                            "smooth"
-                    });
-
-                }
-            );
-
-            buttons.appendChild(
-                banButton
-            );
-        }
-
+        const buttons = document.createElement("div");
+        buttons.className = "buttons";
+        const banButton = document.createElement("button");
+        banButton.className = "ban-button";
+        banButton.type = "button";
+        banButton.textContent = "🚫 Ban";
+        banButton.addEventListener("click", function() {
+            banUser.value = user.id;
+            document.getElementById("banReason").focus();
+            document.getElementById("banUser").scrollIntoView({behavior:"smooth",block:"center"});
+        });
+        buttons.appendChild(banButton);
         top.appendChild(left);
         top.appendChild(buttons);
-
         item.appendChild(top);
-
-        if (user.is_banned && user.ban_reason) {
-
-            const reason =
-                document.createElement("div");
-
-            reason.className =
-                "user-reason";
-
-            reason.textContent =
-                "Reason: " +
-                user.ban_reason;
-
-            item.appendChild(
-                reason
-            );
-        }
-
-        usersList.appendChild(
-            item
-        );
-
+        usersList.appendChild(item);
     });
 
+    if (bannedCount) bannedCount.textContent = "(" + bannedUsers.length + ")";
+    if (bannedList) {
+        bannedList.innerHTML = "";
+        if (!bannedUsers.length) {
+            bannedList.innerHTML = '<div class="empty">No banned or suspended users.</div>';
+        }
+        bannedUsers.forEach(user => {
+            const item = document.createElement("div");
+            item.className = "user-item";
+            const top = document.createElement("div");
+            top.className = "top-row";
+            const left = document.createElement("div");
+            const name = document.createElement("div");
+            name.className = "user-name";
+            name.textContent = "@" + (user.username || "User");
+            if (user.is_admin) {
+                const badge = document.createElement("span");
+                badge.className = "admin-badge";
+                badge.textContent = "ADMIN";
+                name.appendChild(badge);
+            }
+            const info = document.createElement("div");
+            info.className = "user-info";
+            const isActiveSuspension = user.ban_type === "suspend" && user.suspended_until && new Date(user.suspended_until).getTime() > Date.now();
+            info.innerHTML = isActiveSuspension
+                ? '<span class="user-banned">⏸️ SUSPENDED until ' + escapeHtml(new Date(user.suspended_until).toLocaleString()) + '</span>'
+                : '<span class="user-banned">🚫 BANNED</span>';
+            left.appendChild(name);
+            left.appendChild(info);
+            const buttons = document.createElement("div");
+            buttons.className = "buttons";
+            const unbanButton = document.createElement("button");
+            unbanButton.className = "unban-button";
+            unbanButton.type = "button";
+            unbanButton.textContent = "♻️ Unban";
+            unbanButton.addEventListener("click", () => unbanAccount(user.id));
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "delete-button";
+            deleteButton.type = "button";
+            deleteButton.textContent = "🗑️ Delete account";
+            deleteButton.addEventListener("click", () => deleteBannedAccount(user.id));
+            buttons.append(unbanButton, deleteButton);
+            top.append(left, buttons);
+            item.appendChild(top);
+            if (user.ban_reason) {
+                const reason = document.createElement("div");
+                reason.className = "user-reason";
+                reason.textContent = "Reason: " + user.ban_reason;
+                item.appendChild(reason);
+            }
+            bannedList.appendChild(item);
+        });
+    }
+
+    usersStatus.textContent = activeUsers.length + " active user" + (activeUsers.length === 1 ? "" : "s") +
+        " · " + bannedUsers.length + " banned/suspended hidden below";
 }
 
+async function deleteBannedAccount(userId) {
+    const user = allUsers.find(item => item.id === userId && item.is_banned);
+    if (!user) {
+        alert("Could not find that banned account. Refresh the list and try again.");
+        return;
+    }
+    if (user.id === currentAdminUser?.id) {
+        alert("You cannot delete your own admin account.");
+        return;
+    }
+    const username = user.username || "User";
+    if (!confirm("Permanently delete @" + username + " from Supabase? This removes the Auth account and, where configured, its linked profile and user-owned records. This cannot be undone.")) return;
+
+    const buttons = document.querySelectorAll("#bannedUsersList button");
+    buttons.forEach(button => button.disabled = true);
+    const { data, error } = await supabaseClient.functions.invoke(
+        "doughub-admin-delete-user",
+        { body: { user_id: userId } }
+    );
+    if (error || data?.error) {
+        console.error("Could not delete banned account:", error || data.error);
+        alert("Could not delete @" + username + ": " + (error?.message || data?.error || "Unknown error"));
+        buttons.forEach(button => button.disabled = false);
+        return;
+    }
+    await writeAuditLog("admin_action", "accounts", "Deleted banned account", { userId, username });
+    await loadUsers();
+    alert("@" + username + " was deleted successfully.");
+}
 
 function isRecentlyActive(lastSeen) {
 
