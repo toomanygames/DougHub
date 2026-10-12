@@ -577,22 +577,11 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 
 </style>
 
-<style id="community-chat-text-tools-style">
-#messageInput{position:relative}
-.chat-text-tools{position:fixed;z-index:12000;width:min(290px,calc(100vw - 24px));padding:12px;border:1px solid rgba(165,180,252,.28);border-radius:14px;background:rgba(12,15,36,.98);box-shadow:0 16px 48px #0009;backdrop-filter:blur(18px);color:#eef2ff}
-.chat-text-tools[hidden]{display:none}
-.chat-text-tools-title{font-size:12px;font-weight:800;color:#c4b5fd;margin:0 0 9px}
-.chat-text-tools-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
-.chat-text-tool{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 9px;border:1px solid rgba(165,180,252,.23);border-radius:8px;background:rgba(99,102,241,.14);color:#eef2ff;font-size:13px;cursor:pointer}
-.chat-text-tool:hover{background:rgba(99,102,241,.34)}
-.chat-text-tool strong{font-weight:900}.chat-text-tool em{font-style:italic}
-.chat-text-tools label{font-size:11px;color:#c7cbea}
-#chatTextColor{width:34px;height:32px;padding:2px;border:1px solid rgba(165,180,252,.3);border-radius:8px;background:#11152d;cursor:pointer}
-.chat-emoji-tools{display:flex;gap:5px;flex-wrap:wrap}
-.chat-emoji-tools button{width:31px;height:30px;border:0;border-radius:7px;background:transparent;font-size:19px;cursor:pointer}
-.chat-emoji-tools button:hover{background:#ffffff18}
-.chat-text-tools-hint{font-size:10px;color:#aab0d0;margin-top:8px}
-.chat-format-open{align-self:flex-start;margin:0 0 7px;font-size:12px}
+.quick-emoji-picker{display:flex;flex-wrap:wrap;gap:4px;padding:9px;margin:6px 0 9px;border:1px solid rgba(165,180,252,.24);border-radius:12px;background:rgba(12,15,36,.98);max-width:320px}
+.quick-emoji-picker[hidden]{display:none}
+.quick-emoji{width:34px;height:34px;border:0;border-radius:8px;background:transparent;font-size:21px;cursor:pointer}
+.quick-emoji:hover{background:#ffffff18}
+.emoji-picker-toggle{font-size:18px;min-width:38px}
 </style>
 
 <style id="community-chat-attachments-style">
@@ -844,42 +833,45 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         <button class="attachment-button" type="button" id="addImageButton">＋ Image</button>
         <button class="attachment-button" type="button" id="addDocumentButton">＋ Document</button>
         <button class="attachment-button" type="button" id="addGifButton">＋ GIF</button>
+        <button class="attachment-button emoji-picker-toggle" type="button" id="emojiPickerToggle" aria-label="Open emoji picker" title="Add emoji">😊</button>
         <span id="attachmentStatus" aria-live="polite"></span>
+      </div>
+      <div id="quickEmojiPicker" class="quick-emoji-picker" role="group" aria-label="Quick emojis" hidden>
+        <button type="button" class="quick-emoji" data-quick-emoji="😀" aria-label="😀">😀</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="😂" aria-label="😂">😂</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🥹" aria-label="🥹">🥹</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="😍" aria-label="😍">😍</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🥳" aria-label="🥳">🥳</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="😎" aria-label="😎">😎</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🤔" aria-label="🤔">🤔</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="😭" aria-label="😭">😭</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="💀" aria-label="💀">💀</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="👍" aria-label="👍">👍</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="👎" aria-label="👎">👎</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="👏" aria-label="👏">👏</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🙏" aria-label="🙏">🙏</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="❤️" aria-label="❤️">❤️</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="💜" aria-label="💜">💜</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🔥" aria-label="🔥">🔥</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="✨" aria-label="✨">✨</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🎉" aria-label="🎉">🎉</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="💯" aria-label="💯">💯</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🤣" aria-label="🤣">🤣</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="😊" aria-label="😊">😊</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="😢" aria-label="😢">😢</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="🙌" aria-label="🙌">🙌</button>
+        <button type="button" class="quick-emoji" data-quick-emoji="👀" aria-label="👀">👀</button>
       </div>
       <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
       <input id="documentFileInput" type="file" accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.txt,.docx" hidden>
 
-      <button type="button" id="openChatTextTools" class="attachment-button chat-format-open" aria-label="Open message formatting tools" title="Formatting, colors and emojis">Aa ✨ Format</button>
       <textarea
         id="messageInput"
         maxlength="1000"
         placeholder="Type a message..."
         autocomplete="off"
-        aria-label="Chat message. Right-click for formatting and emoji tools."
+        aria-label="Chat message"
       ></textarea>
-      <div id="chatTextTools" class="chat-text-tools" role="toolbar" aria-label="Message formatting tools" hidden>
-        <p class="chat-text-tools-title">Message tools</p>
-        <div class="chat-text-tools-row">
-          <button type="button" class="chat-text-tool" data-format="bold" title="Bold"><strong>B</strong></button>
-          <button type="button" class="chat-text-tool" data-format="italic" title="Italic"><em>I</em></button>
-          <label for="chatTextColor">Text color</label>
-          <input id="chatTextColor" type="color" value="#c4b5fd" aria-label="Text color">
-        </div>
-        <div class="chat-emoji-tools" aria-label="Emoji">
-          <button type="button" data-emoji="😀" aria-label="Grinning face">😀</button>
-          <button type="button" data-emoji="😂" aria-label="Laughing">😂</button>
-          <button type="button" data-emoji="😍" aria-label="Heart eyes">😍</button>
-          <button type="button" data-emoji="🥳" aria-label="Party">🥳</button>
-          <button type="button" data-emoji="👍" aria-label="Thumbs up">👍</button>
-          <button type="button" data-emoji="❤️" aria-label="Red heart">❤️</button>
-          <button type="button" data-emoji="🔥" aria-label="Fire">🔥</button>
-          <button type="button" data-emoji="💀" aria-label="Skull">💀</button>
-          <button type="button" data-emoji="😭" aria-label="Crying">😭</button>
-          <button type="button" data-emoji="✨" aria-label="Sparkles">✨</button>
-        </div>
-        <div class="chat-text-tools-hint">Select text first to format it, or insert a style and type between the markers.</div>
-      </div>
-
       <button
         type="submit"
         id="sendButton"
@@ -986,117 +978,35 @@ const messageForm =
 const messageInput =
   document.getElementById("messageInput");
 
-const chatTextTools = document.getElementById("chatTextTools");
-const chatTextColor = document.getElementById("chatTextColor");
-let chatTextToolsRange = null;
+const emojiPickerToggle = document.getElementById("emojiPickerToggle");
+const quickEmojiPicker = document.getElementById("quickEmojiPicker");
 
-function saveChatTextSelection() {
-  chatTextToolsRange = {
-    start: messageInput.selectionStart,
-    end: messageInput.selectionEnd
-  };
-}
-
-function insertChatText(value, open = "", close = "") {
-  const start = chatTextToolsRange ? chatTextToolsRange.start : messageInput.selectionStart;
-  const end = chatTextToolsRange ? chatTextToolsRange.end : messageInput.selectionEnd;
-  const before = messageInput.value.slice(0, start);
-  const selected = messageInput.value.slice(start, end);
-  const after = messageInput.value.slice(end);
-  const replacement = value === null ? open + selected + close : value;
-  messageInput.value = before + replacement + after;
-  const caret = start + (value === null ? open.length + selected.length : replacement.length);
-  const selectionStart = value === null ? (selected ? caret : start + open.length) : caret;
-  const selectionEnd = value === null ? (selected ? caret : start + open.length) : caret;
-  messageInput.focus();
-  messageInput.setSelectionRange(selectionStart, selectionEnd);
-  saveChatTextSelection();
-  messageInput.dispatchEvent(new Event("input", { bubbles: true }));
-}
-
-function applyChatFormat(format) {
-  saveChatTextSelection();
-  if (format === "bold") insertChatText(null, "**", "**");
-  if (format === "italic") insertChatText(null, "*", "*");
-}
-
-function applyChatColor(color) {
-  saveChatTextSelection();
-  insertChatText(null, "[color=" + color + "]", "[/color]");
-}
-
-function positionChatTextTools(x, y) {
-  chatTextTools.hidden = false;
-  const margin = 12;
-  const width = Math.min(290, window.innerWidth - margin * 2);
-  chatTextTools.style.left = Math.max(margin, Math.min(x, window.innerWidth - width - margin)) + "px";
-  chatTextTools.style.top = Math.max(margin, Math.min(y, window.innerHeight - chatTextTools.offsetHeight - margin)) + "px";
-}
-
-const openChatTextToolsButton = document.getElementById("openChatTextTools");
-openChatTextToolsButton.addEventListener("click", () => {
-  saveChatTextSelection();
-  const rect = openChatTextToolsButton.getBoundingClientRect();
-  positionChatTextTools(rect.left, Math.max(12, rect.top - 8));
+emojiPickerToggle.addEventListener("click", () => {
+  quickEmojiPicker.hidden = !quickEmojiPicker.hidden;
 });
 
-// Open with the visible button using a normal left-click. Right-click remains supported.
-// Open the formatting toolbox anywhere in the message composer, not only
-// when the exact textarea element receives the right-click.
-document.addEventListener("contextmenu", (event) => {
-  const target = event.target;
-  const composer = target && target.closest
-    ? target.closest(".composer")
-    : null;
-  if (target !== messageInput && !composer) return;
-
-  event.preventDefault();
-  if (target === messageInput) saveChatTextSelection();
-  positionChatTextTools(event.clientX, event.clientY);
-}, true);
-function showChatTextToolsForSelection() {
-  saveChatTextSelection();
-  // Behave like a compact editor toolbar: show it when the user selects text.
-  if (messageInput.selectionStart === messageInput.selectionEnd) return;
-  const rect = messageInput.getBoundingClientRect();
-  const x = Math.min(rect.left + 12, window.innerWidth - 310);
-  const y = Math.max(12, rect.top - 12);
-  positionChatTextTools(x, y);
-}
-
-messageInput.addEventListener("keyup", () => {
-  saveChatTextSelection();
-  if (messageInput.selectionStart !== messageInput.selectionEnd) {
-    showChatTextToolsForSelection();
-  }
-});
-messageInput.addEventListener("mouseup", showChatTextToolsForSelection);
-messageInput.addEventListener("select", () => {
-  saveChatTextSelection();
-  if (messageInput.selectionStart !== messageInput.selectionEnd) {
-    showChatTextToolsForSelection();
-  }
-});
-
-chatTextTools.querySelectorAll("[data-format]").forEach(button => {
-  button.addEventListener("click", () => applyChatFormat(button.dataset.format));
-});
-chatTextColor.addEventListener("change", () => applyChatColor(chatTextColor.value));
-chatTextTools.querySelectorAll("[data-emoji]").forEach(button => {
+quickEmojiPicker.querySelectorAll("[data-quick-emoji]").forEach(button => {
   button.addEventListener("click", () => {
-    saveChatTextSelection();
-    insertChatText(button.dataset.emoji);
+    const emoji = button.dataset.quickEmoji;
+    const start = messageInput.selectionStart ?? messageInput.value.length;
+    const end = messageInput.selectionEnd ?? start;
+    messageInput.setRangeText(emoji, start, end, "end");
+    messageInput.focus();
+    messageInput.dispatchEvent(new Event("input", { bubbles: true }));
+    quickEmojiPicker.hidden = true;
   });
 });
-document.addEventListener("pointerdown", (event) => {
-  if (!chatTextTools.hidden && !chatTextTools.contains(event.target) && event.target !== messageInput) {
-    chatTextTools.hidden = true;
+
+document.addEventListener("pointerdown", event => {
+  if (!quickEmojiPicker.hidden &&
+      !quickEmojiPicker.contains(event.target) &&
+      event.target !== emojiPickerToggle) {
+    quickEmojiPicker.hidden = true;
   }
 });
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !chatTextTools.hidden) chatTextTools.hidden = true;
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") quickEmojiPicker.hidden = true;
 });
-window.addEventListener("resize", () => { chatTextTools.hidden = true; });
 
 const sendButton =
   document.getElementById("sendButton");
@@ -1168,16 +1078,6 @@ function hideError() {
 /* =========================================
    HTML SAFETY
 ========================================= */
-
-function formatChatMessage(rawText) {
-  let safe = escapeHtml(String(rawText ?? ""));
-  // Formatting markers are converted only after escaping user text, so they cannot inject HTML.
-  safe = safe.replace(/\[color=(#[0-9a-fA-F]{6})\]([\s\S]*?)\[\/color\]/g,
-    '<span style="color:$1">$2</span>');
-  safe = safe.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
-  safe = safe.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
-  return safe.replace(/\n/g, "<br>");
-}
 
 function escapeHtml(text) {
 
@@ -1447,7 +1347,7 @@ async function renderMessages(
       bubble.className =
         "message-bubble";
 
-      bubble.innerHTML = formatChatMessage(message.message || "");
+      bubble.textContent = message.message || "";
       content.appendChild(header);
       if (message.message) content.appendChild(bubble);
 
