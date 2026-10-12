@@ -10,6 +10,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gif-picker-react@2.0.0/style.css">
 
 <style>
 * {
@@ -597,6 +598,15 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .gif-modal-actions{display:flex;flex-wrap:wrap;gap:8px}
 .gif-modal-actions button{padding:10px 13px;border:1px solid rgba(255,255,255,.12);background:#ffffff0d;color:white;cursor:pointer}
 .gif-modal-actions .primary{background:linear-gradient(135deg,#6366f1,#a855f7)}
+.gif-picker-modal{width:min(540px,100%);max-height:min(88vh,760px);overflow:auto}
+.gif-picker-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.gif-picker-heading h2{margin:0 0 6px}
+.gif-picker-heading p{margin:0 0 14px}
+#closeGifModal{flex:0 0 auto;padding:7px 10px;border:1px solid rgba(255,255,255,.14);background:#ffffff0d;color:white;cursor:pointer}
+#gifPickerMount{min-height:420px}
+.gif-picker-key-notice{padding:12px;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.08);color:#fde68a;border-radius:12px;font-size:13px;line-height:1.5;margin-bottom:12px}
+.gif-picker-key-notice[hidden]{display:none}
+.gif-picker-modal .GifPickerReact{--gpr-bg-color:#0d1127;--gpr-text-color:#f6f5ff;--gpr-highlight-color:#818cf8}
 @media(max-width:520px){.attachment-toolbar{gap:6px}.attachment-button{padding:8px 9px}.composer{gap:8px}}
 </style>
 
@@ -677,7 +687,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
         <button class="attachment-button" type="button" id="addImageButton">＋ Image</button>
         <button class="attachment-button" type="button" id="addDocumentButton">＋ Document</button>
         <button class="attachment-button" type="button" id="addGifButton">＋ GIF</button>
-        <span id="attachmentStatus" aria-live="polite">Unlimited messages · No spam or bad words</span>
+        <span id="attachmentStatus" aria-live="polite">No attachment selected</span>
       </div>
       <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
       <input id="documentFileInput" type="file" accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.txt,.docx" hidden>
@@ -708,21 +718,22 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 </main>
 
   <div class="gif-modal-backdrop" id="gifModal" hidden>
-    <section class="gif-modal" role="dialog" aria-modal="true" aria-labelledby="gifModalTitle">
-      <h2 id="gifModalTitle">Add a GIF</h2>
-      <p>Open GIPHY in a new tab and paste a direct GIF media URL here. Only share content you have permission to use. This is a link-based option, not the official GIPHY API; an API integration needs a registered key and must follow GIPHY attribution and usage terms.</p>
-      <div class="gif-modal-actions">
-        <button type="button" id="openGiphyButton">Browse GIPHY ↗</button>
+    <section class="gif-modal gif-picker-modal" role="dialog" aria-modal="true" aria-labelledby="gifModalTitle">
+      <div class="gif-picker-heading">
+        <div>
+          <h2 id="gifModalTitle">Choose a GIF</h2>
+          <p>Search and select a GIF to attach it to your message.</p>
+        </div>
+        <button type="button" id="closeGifModal" aria-label="Close GIF picker">✕</button>
       </div>
-      <input id="gifUrlInput" type="url" placeholder="https://media.giphy.com/.../giphy.gif" autocomplete="off">
-      <div class="gif-modal-actions">
-        <button type="button" class="primary" id="attachGifConfirm">Attach GIF</button>
-        <button type="button" id="closeGifModal">Cancel</button>
+      <div id="gifPickerKeyNotice" class="gif-picker-key-notice">
+        GIF search needs a free KLIPY app key. Add the key to enable the picker.
       </div>
+      <div id="gifPickerMount"></div>
     </section>
   </div>
 
-<script>
+<script><script>
 
 const SUPABASE_URL =
   "https://agsqdqcsmsppcdqxlppj.supabase.co";
@@ -1128,7 +1139,7 @@ async function renderMessages(
         if (safeUrl && (message.attachment_type === "image" || message.attachment_type === "gif")) {
           const img = document.createElement("img");
           img.src = safeUrl;
-          img.alt = message.attachment_name || (message.attachment_type === "gif" ? "GIF via GIPHY" : "Chat image");
+          img.alt = message.attachment_name || (message.attachment_type === "gif" ? "Shared GIF" : "Chat image");
           img.loading = "lazy";
           img.referrerPolicy = "no-referrer";
           attachment.appendChild(img);
@@ -1363,13 +1374,13 @@ async function sendMessage() {
     if (error) {
       console.error("Could not send Community Chat message:", error);
       const detail = error.message || error.details || "Supabase rejected the request.";
-      showError(detail.includes("language that is not allowed") ? "That message contains words that are not allowed in Community Chat." : detail.includes("sending messages too quickly") ? "Slow down a little to prevent spam, then try again." : detail.includes("Duplicate messages are blocked") ? "That looks like a duplicate message. Change it before sending again." : "Could not send your message: " + detail);
+      showError("Could not send your message: " + detail);
       return;
     }
 
     messageInput.value = "";
     pendingAttachment = null;
-    attachmentStatus.textContent = "Unlimited messages · No spam or bad words";
+    attachmentStatus.textContent = "No attachment selected";
     // Force the next load to render the new row even if the server timestamp
     // matches a previous poll's result.
     lastRenderedMessageSignature = null;
@@ -1426,8 +1437,8 @@ function safeAttachmentUrl(rawUrl, type) {
     const u = new URL(rawUrl);
     if (u.protocol !== "https:") return null;
     if (type === "gif") {
-      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com"].includes(u.hostname)) return null;
-      if (!/\.(gif|webp)$/i.test(u.pathname)) return null;
+      if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "static.klipy.com"].includes(u.hostname)) return null;
+      if (!/\.(gif|webp|png|jpg|jpeg)$/i.test(u.pathname)) return null;
       return u.href;
     }
     const base = SUPABASE_URL + "/storage/v1/object/public/" + CHAT_ATTACHMENT_BUCKET + "/";
@@ -1450,7 +1461,7 @@ document.getElementById("addDocumentButton").addEventListener("click", () => {
 });
 document.getElementById("addGifButton").addEventListener("click", () => {
   gifModal.hidden = false;
-  gifUrlInput.focus();
+  window.dispatchEvent(new Event("douqhub:gif-picker-open"));
 });
 document.getElementById("closeGifModal").addEventListener("click", () => {
   gifModal.hidden = true;
@@ -1458,19 +1469,17 @@ document.getElementById("closeGifModal").addEventListener("click", () => {
 gifModal.addEventListener("click", event => {
   if (event.target === gifModal) gifModal.hidden = true;
 });
-document.getElementById("openGiphyButton").addEventListener("click", () => {
-  window.open("https://giphy.com/", "_blank", "noopener,noreferrer");
-});
-document.getElementById("attachGifConfirm").addEventListener("click", () => {
-  const url = gifUrlInput.value.trim();
-  if (!safeAttachmentUrl(url, "gif")) {
-    showError("Paste a direct HTTPS GIF URL from media.giphy.com or i.giphy.com ending in .gif or .webp.");
-    return;
-  }
-  pendingAttachment = { url, type: "gif", name: "GIF via GIPHY", source: "GIPHY" };
-  setAttachmentStatus("GIF attached · " + url.split("/").pop().split("?")[0]);
+window.addEventListener("douqhub:gif-picked", event => {
+  const gif = event.detail;
+  if (!gif || !gif.imageUrl) return;
+  pendingAttachment = {
+    url: gif.imageUrl,
+    type: "gif",
+    name: (gif.description || "GIF").slice(0, 180),
+    source: "KLIPY"
+  };
+  setAttachmentStatus("GIF attached · KLIPY");
   gifModal.hidden = true;
-  gifUrlInput.value = "";
   hideError();
 });
 
@@ -1698,6 +1707,35 @@ async function startCommunityChat() {
 
 startCommunityChat();
 
+</script>
+
+
+<script type="module">
+  import React from "https://esm.sh/react@19.2.0";
+  import { createRoot } from "https://esm.sh/react-dom@19.2.0/client?external=react";
+  import { GifPicker } from "https://esm.sh/gif-picker-react@2.0.0?external=react,react-dom";
+  import { Klipy } from "https://esm.sh/gif-picker-react@2.0.0/providers/klipy?external=react,react-dom";
+
+  // KLIPY requires a free app key; its docs expect the key in frontend code.
+  const KLIPY_APP_KEY = "ADD_KLIPY_APP_KEY_HERE";
+  const mount = document.getElementById("gifPickerMount");
+  const notice = document.getElementById("gifPickerKeyNotice");
+
+  if (KLIPY_APP_KEY === "ADD_KLIPY_APP_KEY_HERE") {
+    notice.hidden = false;
+  } else {
+    notice.hidden = true;
+    const root = createRoot(mount);
+    root.render(React.createElement(GifPicker, {
+      provider: Klipy(KLIPY_APP_KEY, { contentFilter: "high", showBranding: true }),
+      theme: "dark",
+      width: "100%",
+      height: 460,
+      onGifClick: (gif) => {
+        window.dispatchEvent(new CustomEvent("douqhub:gif-picked", { detail: gif }));
+      }
+    }));
+  }
 </script>
 
 </body>
