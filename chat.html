@@ -582,6 +582,17 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .attachment-button{border:1px solid rgba(165,180,252,.24);background:rgba(99,102,241,.12);color:#e0e7ff;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer}
 .attachment-button:hover{background:rgba(99,102,241,.22)}
 #attachmentStatus{font-size:12px;color:#a5b4fc;min-width:0;overflow-wrap:anywhere}
+.attachment-preview-panel{flex:0 0 100%;width:100%;border:1px solid rgba(165,180,252,.22);background:rgba(99,102,241,.08);border-radius:13px;overflow:hidden}
+.attachment-preview-panel[hidden]{display:none}
+.attachment-preview-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px;border:0;background:transparent;color:#e0e7ff;font-weight:750;font-size:12px;text-align:left;cursor:pointer}
+.attachment-preview-arrow{display:inline-flex;align-items:center;justify-content:center;font-size:19px;line-height:1;transition:transform .24s ease}
+.attachment-preview-panel.collapsed .attachment-preview-arrow{transform:rotate(180deg)}
+.attachment-preview-body{display:grid;grid-template-rows:1fr;opacity:1;max-height:230px;overflow:hidden;padding:0 12px 12px;transition:max-height .28s ease,opacity .2s ease,padding .28s ease}
+.attachment-preview-panel.collapsed .attachment-preview-body{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+#attachmentPreviewImage{display:block;max-width:min(100%,320px);max-height:170px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.2)}
+#attachmentPreviewName{font-size:11px;color:#a5b4fc;overflow-wrap:anywhere;margin-top:6px}
+@media(max-width:520px){#attachmentPreviewImage{max-width:100%;max-height:140px}.attachment-preview-body{max-height:200px}}
+
 #messageForm{flex-wrap:wrap;align-items:flex-end}
 #messageInput{flex:1 1 220px}
 .chat-attachment{display:block;margin-top:8px;max-width:min(420px,100%);border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;background:rgba(0,0,0,.18)}
@@ -793,6 +804,16 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
       id="messageForm"
     >
 
+      <div id="attachmentPreviewPanel" class="attachment-preview-panel" hidden>
+        <button type="button" id="attachmentPreviewToggle" class="attachment-preview-toggle" aria-expanded="true">
+          <span id="attachmentPreviewTitle">Attachment preview</span>
+          <span id="attachmentPreviewArrow" class="attachment-preview-arrow" aria-hidden="true">↑</span>
+        </button>
+        <div id="attachmentPreviewBody" class="attachment-preview-body">
+          <img id="attachmentPreviewImage" alt="Selected attachment preview">
+          <span id="attachmentPreviewName"></span>
+        </div>
+      </div>
       <div class="attachment-toolbar" aria-label="Add an attachment">
         <button class="attachment-button" type="button" id="addImageButton">＋ Image</button>
         <button class="attachment-button" type="button" id="addDocumentButton">＋ Document</button>
@@ -927,6 +948,13 @@ const errorBox =
 const imageFileInput = document.getElementById("imageFileInput");
 const documentFileInput = document.getElementById("documentFileInput");
 const attachmentStatus = document.getElementById("attachmentStatus");
+const attachmentPreviewPanel = document.getElementById("attachmentPreviewPanel");
+const attachmentPreviewToggle = document.getElementById("attachmentPreviewToggle");
+const attachmentPreviewTitle = document.getElementById("attachmentPreviewTitle");
+const attachmentPreviewImage = document.getElementById("attachmentPreviewImage");
+const attachmentPreviewName = document.getElementById("attachmentPreviewName");
+const attachmentPreviewBody = document.getElementById("attachmentPreviewBody");
+const attachmentPreviewArrow = document.getElementById("attachmentPreviewArrow");
 const gifModal = document.getElementById("gifModal");
 const gifUrlInput = document.getElementById("gifUrlInput");
 let pendingAttachment = null;
@@ -1502,6 +1530,7 @@ async function sendMessage() {
     messageInput.value = "";
     pendingAttachment = null;
     attachmentStatus.textContent = "";
+    showAttachmentPreview(null);
     // Force the next load to render the new row even if the server timestamp
     // matches a previous poll's result.
     lastRenderedMessageSignature = null;
@@ -1559,7 +1588,7 @@ function safeAttachmentUrl(rawUrl, type) {
     if (u.protocol !== "https:") return null;
     if (type === "gif") {
       if (!["media.giphy.com", "i.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "static.klipy.com", "commons.wikimedia.org", "upload.wikimedia.org"].includes(u.hostname)) return null;
-      if (!/\.(gif|webp|png|jpg|jpeg)$/i.test(u.pathname)) return null;
+      if (!/\.gif$/i.test(u.pathname)) return null;
       return u.href;
     }
     const base = SUPABASE_URL + "/storage/v1/object/public/" + CHAT_ATTACHMENT_BUCKET + "/";
@@ -1571,6 +1600,37 @@ function safeAttachmentUrl(rawUrl, type) {
 function setAttachmentStatus(message) {
   if (attachmentStatus) attachmentStatus.textContent = message;
 }
+
+function showAttachmentPreview(attachment) {
+  if (!attachmentPreviewPanel) return;
+  const isVisual = attachment && (attachment.type === "gif" || attachment.type === "image");
+  if (!isVisual) {
+    attachmentPreviewPanel.hidden = true;
+    attachmentPreviewImage.removeAttribute("src");
+    attachmentPreviewName.textContent = "";
+    attachmentPreviewPanel.classList.remove("collapsed");
+    attachmentPreviewToggle.setAttribute("aria-expanded", "true");
+    attachmentPreviewArrow.textContent = "↑";
+    return;
+  }
+  attachmentPreviewPanel.hidden = false;
+  attachmentPreviewPanel.classList.remove("collapsed");
+  attachmentPreviewToggle.setAttribute("aria-expanded", "true");
+  attachmentPreviewArrow.textContent = "↑";
+  attachmentPreviewTitle.textContent = attachment.type === "gif" ? "GIF preview" : "Photo preview";
+  attachmentPreviewImage.alt = attachment.type === "gif" ? "Selected GIF preview" : "Selected photo preview";
+  attachmentPreviewImage.src = attachment.url;
+  attachmentPreviewName.textContent = attachment.name || "";
+  attachmentPreviewImage.onerror = () => {
+    attachmentPreviewName.textContent = "Preview unavailable, but you can still try sending it.";
+  };
+}
+
+attachmentPreviewToggle.addEventListener("click", () => {
+  const collapsed = attachmentPreviewPanel.classList.toggle("collapsed");
+  attachmentPreviewToggle.setAttribute("aria-expanded", String(!collapsed));
+  attachmentPreviewArrow.textContent = collapsed ? "↓" : "↑";
+});
 
 document.getElementById("addImageButton").addEventListener("click", () => {
   pendingUploadKind = "image";
@@ -1593,6 +1653,10 @@ gifModal.addEventListener("click", event => {
 window.addEventListener("douqhub:gif-picked", event => {
   const gif = event.detail;
   if (!gif || !gif.imageUrl) return;
+  if (!/\.gif(?:$|[?#])/i.test(gif.imageUrl)) {
+    showError("That result isn't a GIF file. Please choose another result.");
+    return;
+  }
   pendingAttachment = {
     url: gif.imageUrl,
     type: "gif",
@@ -1600,6 +1664,7 @@ window.addEventListener("douqhub:gif-picked", event => {
     source: gif.source || "DOUGHUB"
   };
   setAttachmentStatus(pendingAttachment.name);
+  showAttachmentPreview(pendingAttachment);
   gifModal.hidden = true;
   hideError();
 });
@@ -1644,9 +1709,11 @@ async function handleChatFile(file, kind) {
       source: "user-upload"
     };
     setAttachmentStatus(file.name);
+    showAttachmentPreview(pendingAttachment);
   } catch (error) {
     console.error("Community Chat attachment upload failed:", error);
     setAttachmentStatus("");
+    showAttachmentPreview(null);
     showError("Attachment upload failed: " + (error.message || "Please try again."));
   }
 }
