@@ -745,19 +745,17 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 </style>
 
 <style id="chat-message-input-autogrow">
+#messageForm{align-items:stretch}
 #messageInput{
-  box-sizing:border-box;
-  height:48px;
-  min-height:48px;
-  max-height:150px;
-  overflow-y:hidden;
-  resize:none;
-  line-height:1.4;
-  padding:12px 15px;
+  box-sizing:border-box;height:48px;min-height:48px;max-height:48px;overflow-y:auto;resize:none;line-height:1.4;padding:12px 15px;
+  scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.8) rgba(255,255,255,.035);
 }
-@media(max-width:520px){
-  #messageInput{height:46px;min-height:46px;max-height:140px;padding:11px 13px}
-}
+#messageInput::-webkit-scrollbar{width:7px}
+#messageInput::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border-radius:10px;margin:7px 0}
+#messageInput::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#818cf8,#a855f7);border:2px solid transparent;background-clip:padding-box;border-radius:10px}
+#messageInput::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#a5b4fc,#c084fc);border:1px solid transparent;background-clip:padding-box}
+#sendButton{box-sizing:border-box;height:48px;min-height:48px;align-self:stretch}
+@media(max-width:520px){#messageInput{height:46px;min-height:46px;max-height:46px;padding:11px 13px}#sendButton{height:46px;min-height:46px}}
 </style>
 </head>
 
@@ -997,19 +995,9 @@ const messageForm =
 const messageInput =
   document.getElementById("messageInput");
 
-function resizeChatMessageInput() {
-  if (!messageInput) return;
-  messageInput.style.height = "auto";
-  const isMobile = window.matchMedia("(max-width: 520px)").matches;
-  const baseHeight = isMobile ? 46 : 48;
-  const maxHeight = isMobile ? 140 : 150;
-  const nextHeight = Math.min(Math.max(messageInput.scrollHeight, baseHeight), maxHeight);
-  messageInput.style.height = nextHeight + "px";
-  messageInput.style.overflowY = messageInput.scrollHeight > maxHeight ? "auto" : "hidden";
-}
-messageInput.addEventListener("input", resizeChatMessageInput);
-window.addEventListener("resize", resizeChatMessageInput);
-resizeChatMessageInput();
+// Keep the composer a fixed height; long messages scroll inside the field.
+messageInput.style.height = "";
+messageInput.style.overflowY = "auto";
 
 const emojiPickerToggle = document.getElementById("emojiPickerToggle");
 const quickEmojiPicker = document.getElementById("quickEmojiPicker");
