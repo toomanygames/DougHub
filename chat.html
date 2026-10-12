@@ -1031,11 +1031,19 @@ function positionChatTextTools(x, y) {
   chatTextTools.style.top = Math.max(margin, Math.min(y, window.innerHeight - chatTextTools.offsetHeight - margin)) + "px";
 }
 
-messageInput.addEventListener("contextmenu", (event) => {
+// Open the formatting toolbox anywhere in the message composer, not only
+// when the exact textarea element receives the right-click.
+document.addEventListener("contextmenu", (event) => {
+  const target = event.target;
+  const composer = target && target.closest
+    ? target.closest(".composer")
+    : null;
+  if (target !== messageInput && !composer) return;
+
   event.preventDefault();
-  saveChatTextSelection();
+  if (target === messageInput) saveChatTextSelection();
   positionChatTextTools(event.clientX, event.clientY);
-});
+}, true);
 messageInput.addEventListener("keyup", saveChatTextSelection);
 messageInput.addEventListener("mouseup", saveChatTextSelection);
 messageInput.addEventListener("select", saveChatTextSelection);
