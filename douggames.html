@@ -1962,8 +1962,8 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
             </div>
         </div>
         <div class="trending-panel">
-            <p class="trending-note">Ranked using recorded game launches. Average playtime updates as people play; brand-new games appear after their first recorded launch.</p>
-            <div id="trendingGames" class="trending-grid">
+            <p class="trending-note">Ranked using recorded game launches. All games with tracked plays are shown; use the tabs to switch ranking. Average playtime updates as people play.</p>
+            <div id="trendingGames" class="trending-grid" aria-live="polite">
                 <div class="trending-empty">Loading live game stats…</div>
             </div>
         </div>
@@ -2814,7 +2814,7 @@ function renderTrendingGames() {
         }
         return (Number(b.play_count || 0) - Number(a.play_count || 0)) ||
                (Number(b.avg_playtime_seconds || 0) - Number(a.avg_playtime_seconds || 0));
-    }).slice(0, 8);
+    });
     if (!rows.length) {
         container.innerHTML = '<div class="trending-empty">No game stats yet. Launch a DougHub or community game and it will start appearing here.</div>';
         return;
@@ -2853,10 +2853,11 @@ async function loadTrendingGames() {
             .select("game_key, game_type, game_title, play_count, avg_playtime_seconds")
             .gt("play_count", 0)
             .order("play_count", { ascending: false })
-            .limit(100);
+            .limit(1000);
         if (error) throw error;
         trendingRows = data || [];
         renderTrendingGames();
+        console.info("DougHub trending games loaded:", trendingRows.length);
     } catch (error) {
         console.error("Could not load trending game stats:", error);
         if (container) container.innerHTML = '<div class="trending-empty">Trending stats could not load. Check the game analytics table permissions in Supabase.</div>';
