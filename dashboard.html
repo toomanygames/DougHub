@@ -120,8 +120,11 @@ async function loadCommunityData(){
  const {data:games,error}=await supabaseClient.from("community_games").select("id,title,description,author,category,created_at,creator_id").order("created_at",{ascending:false}).limit(6);
  if(error){console.error("Community games could not load:",error);$("communityList").innerHTML='<div class="empty">Community games could not load right now. You can still <a href="douggames.html">open DougGames</a>.</div>';return;}
  const rows=games||[];
- $("communityTotal").textContent=rows.length?String(rows.length):"0";
- $("recentTotal").textContent=String(rows.filter(g=>g.created_at&&Date.now()-new Date(g.created_at).getTime()<7*86400000).length);
+ const {count:allGames,error:allGamesError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true});
+ $("communityTotal").textContent=allGamesError?"—":String(allGames||0);
+ const weekAgo=new Date(Date.now()-7*86400000).toISOString();
+ const {count:newGames,error:newGamesError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",weekAgo);
+ $("recentTotal").textContent=newGamesError?"—":String(newGames||0);
  if(currentUser){
   const {count,error:mineError}=await supabaseClient.from("community_games").select("id",{count:"exact",head:true}).eq("creator_id",currentUser.id);
   $("myGamesTotal").textContent=mineError?"—":String(count||0);
