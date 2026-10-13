@@ -144,7 +144,14 @@ async function communityPublish(){
   }catch(e){console.error("Community Game publish failed:",e);communitySetStatus("Couldn't publish: "+(e.message||"check your connection and try again"),true);}
   finally{button.disabled=false;button.textContent="Publish to Community Games";}
 }
-$("publishProjectBtn").addEventListener("click",communityPublish);
+const publishDialog=$("publishGameDialog");
+function openPublishDialog(){if(!publishDialog)return;const title=$("communityTitle");if(title&&!title.value.trim())title.value=$("projectName").value.trim().slice(0,80);if(typeof publishDialog.showModal==="function")publishDialog.showModal();else publishDialog.setAttribute("open","");setTimeout(()=>title?.focus(),50);}
+function closePublishDialog(){if(!publishDialog)return;if(typeof publishDialog.close==="function")publishDialog.close();else publishDialog.removeAttribute("open");}
+$("openPublishDialog")?.addEventListener("click",openPublishDialog);
+$("closePublishDialog")?.addEventListener("click",closePublishDialog);
+$("cancelPublishDialog")?.addEventListener("click",closePublishDialog);
+publishDialog?.addEventListener("click",event=>{if(event.target===publishDialog)closePublishDialog();});
+$("publishGameForm")?.addEventListener("submit",event=>{event.preventDefault();communityPublish();});
 communityInit();
 restore();renderFile();renderLibrary();renderBlocks();updateGenerated();loadAccount();
 })();
