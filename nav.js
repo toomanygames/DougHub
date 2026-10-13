@@ -235,14 +235,25 @@
         menu?.setAttribute("aria-hidden", String(!open));
         button?.setAttribute("aria-expanded", String(open));
       };
-      // Open the menu immediately. Waiting for Supabase here made the button
-      // appear broken when auth was slow or unavailable, and redirected guests
-      // before they could see the account menu.
-      // Capture the click before page-specific legacy account handlers. Several
-      // pages had their own toggle handler, which cancelled this one out.
-      button?.addEventListener("click", event => {
+      // Resolve the session before deciding what an account click should do.
+      // This prevents the brief pre-auth "Loading…" button from opening an
+      // account dropdown for guests instead of taking them to the login page.
+      // Capture first so legacy page-specific handlers cannot toggle it too.
+      button?.addEventListener("click", async event => {
         event.preventDefault();
         event.stopImmediatePropagation();
+        const client = await getNavSupabase();
+        let session = null;
+        try {
+          const result = client ? await client.auth.getSession() : null;
+          session = result?.data?.session || null;
+        } catch (_) {}
+        if (!session?.user) {
+          showGuestLogin();
+          const redirect = encodeURIComponent(location.pathname.slice(1) + location.search);
+          location.href = "/log-in.html?redirect=" + redirect;
+          return;
+        }
         setOpen(!menu?.classList.contains("show"));
       }, true);
       document.addEventListener("click", event => {
