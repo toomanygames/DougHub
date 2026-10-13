@@ -12,7 +12,7 @@
 <script src="search-autofill-fix.js" defer></script>
 <style>
 :root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--panel2:#10152f;--line:rgba(255,255,255,.085);--muted:#999ab4;--purple:#a855f7;--indigo:#6366f1;--green:#86efac}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:#f8f7ff;background:radial-gradient(ellipse at 10% -5%,#312e8140,transparent 38%),radial-gradient(ellipse at 95% 10%,#701a7525,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{visibility:hidden;margin:0;min-height:100vh;color:#f8f7ff;background:radial-gradient(ellipse at 10% -5%,#312e8140,transparent 38%),radial-gradient(ellipse at 95% 10%,#701a7525,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
 header{height:72px;position:sticky;top:0;z-index:1000;background:rgba(4,5,15,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:22px;padding:0 30px}
 .logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}.logo-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 0 25px #6366f159;font-weight:900}
 .nav{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto;min-width:0}.nav-link{display:inline-flex;align-items:center;color:#d9dcf4;font-size:13px;font-weight:700;white-space:nowrap;padding:9px 12px;border:1px solid transparent;border-radius:10px;transition:.18s}.nav-link:hover{background:#ffffff12;color:white;transform:translateY(-1px)}
@@ -171,9 +171,23 @@ function renderCommunityGames(){
 }
 $("communitySearch").addEventListener("input",renderCommunityGames);
 async function loadDashboard(){
- const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+ let sessionResult;
+ try{
+  sessionResult=await supabaseClient.auth.getSession();
+ }catch(error){
+  console.warn("Dashboard session check failed:",error);
+  location.replace("log-in.html?redirect=dashboard.html");
+  return;
+ }
+ const session=sessionResult?.data?.session||null;
+ const sessionError=sessionResult?.error;
  if(sessionError)console.warn("Dashboard session check:",sessionError.message);
  currentUser=session?.user||null;
+ if(!currentUser){
+  location.replace("log-in.html?redirect=dashboard.html");
+  return;
+ }
+ document.body.style.visibility="visible";
  const today=new Date();
  $("dashboardDate").textContent=today.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
  if(currentUser){
