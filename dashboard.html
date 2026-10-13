@@ -158,11 +158,14 @@ footer{border-top-color:#ffffff14}
       <div><div class="crumb">Workspace / <span>Dashboard</span></div><h1>Dashboard</h1><p>Your personal overview of DougHub, your creations, and what’s happening in the community.</p></div>
       <div class="heading-actions"><a class="btn" href="my-games.html">▦ My content</a><a class="btn primary" href="Scripting/scripting.html">＋ Create a game</a></div>
     </div>
+    <nav class="dashboard-jumps" aria-label="Dashboard sections">
+      <a href="#overview">Overview</a><a href="#my-creations-section">My creations</a><a href="#quick-access-section">Quick access</a><a href="#community-games-section">Community</a><a href="#built-in-games-section">Built-in games</a><a href="#preferences">Preferences</a>
+    </nav>
     <section class="welcome">
       <div class="welcome-copy"><div class="eyebrow"><span class="live-dot"></span> YOUR WORKSPACE</div><h2 id="welcomeTitle">Welcome to <span>DougHub.</span></h2><p id="welcomeDescription">Everything you need to keep creating, discover new games, and stay connected with the community.</p><div class="welcome-actions"><a class="btn primary" href="Scripting/scripting.html">＋ Start creating</a><a class="btn" href="douggames.html">Explore games ↗</a></div></div>
       <div class="welcome-mark" aria-hidden="true"><span>D</span></div>
     </section>
-    <section class="section">
+    <section class="section" id="overview">
       <div class="section-head"><div><h2 class="section-title">Your overview</h2><p class="section-subtitle">A live snapshot of your account and creator activity.</p></div><span class="status-pill" id="accountStatus">Checking account</span></div>
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-top"><span class="stat-label">Published games</span><span class="stat-icon">GAME</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Games published by your account</div></div>
@@ -171,7 +174,7 @@ footer{border-top-color:#ffffff14}
         <div class="stat-card"><div class="stat-top"><span class="stat-label">New this week</span><span class="stat-icon">NEW</span></div><div class="stat-value" id="recentTotal">—</div><div class="stat-foot">Community games added in 7 days</div></div>
       </div>
     </section>
-    <section class="section">
+    <section class="section" id="my-creations-section">
       <div class="content-grid">
         <div class="panel">
           <div class="panel-head"><div><h3>Your recent creations</h3><p>Your latest published games in one place.</p></div><a class="section-link" href="my-games.html">Manage all ↗</a></div>
@@ -186,20 +189,21 @@ footer{border-top-color:#ffffff14}
         </div>
       </div>
     </section>
-    <section class="section">
+    <section class="section" id="quick-access-section">
       <div class="section-head"><div><h2 class="section-title">Quick access</h2><p class="section-subtitle">Go straight to a part of DougHub.</p></div></div>
       <div class="quick-grid">
         <a class="quick-card" href="douggames.html"><span class="quick-icon">PLAY</span><span><strong>DougGames</strong><small>Play and discover games</small></span></a>
         <a class="quick-card" href="DougTube.html"><span class="quick-icon">VID</span><span><strong>DougTube</strong><small>Watch community videos</small></span></a>
-        <a class="quick-card" href="douqhub-music.html"><span class="quick-icon">♫</span><span><strong>DougHub Music</strong><small>Explore music posts</small></span></a>
+        <a class="quick-card" href="douqhub-music.html"><span class="quick-icon">MUSIC</span><span><strong>DougHub Music</strong><small>Explore music posts</small></span></a>
+        <a class="quick-card" href="dougforum.html"><span class="quick-icon">DF</span><span><strong>DougForum</strong><small>Posts, votes, and discussions</small></span></a>
         <a class="quick-card" href="tools.html"><span class="quick-icon">TOOLS</span><span><strong>DougTools</strong><small>Open your tool collection</small></span></a>
       </div>
     </section>
-    <section class="section">
+    <section class="section" id="community-games-section">
       <div class="section-head"><div><h2 class="section-title">Community games</h2><p class="section-subtitle">Find something new made by a DougHub creator.</p></div><a class="section-link" href="douggames.html">Browse all ↗</a></div>
       <div class="panel"><div class="panel-body"><div class="community-toolbar"><p id="communitySummary">Loading community creations…</p><label class="search-box"><span>⌕</span><input id="communitySearch" type="search" autocomplete="off" spellcheck="false" placeholder="Search games or creators…" aria-label="Search community games"></label></div><div class="community-list" id="communityList"><div class="empty">Loading games…</div></div></div></div>
     </section>
-    <section class="section">
+    <section class="section" id="built-in-games-section">
       <div class="section-head"><div><h2 class="section-title">Play something</h2><p class="section-subtitle">A few built-in games, ready when you are.</p></div><a class="section-link" href="douggames.html">All games ↗</a></div>
       <div class="built-in-grid">
         <a class="built-in" href="Games/pig-clicker.html"><span class="built-in-icon">PIG</span><span><strong>Pig Clicker</strong><small>Casual clicker</small></span></a>
