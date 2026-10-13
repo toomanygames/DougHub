@@ -899,81 +899,184 @@
     function startDougHubChatDings(client) {
         if (window.__douqhubChatDingsStarted) return;
         window.__douqhubChatDingsStarted = true;
+
         const enabledKey = "douqhub_chat_dings_enabled";
-        let cursorCreatedAt = null, initialized = false, audioContext = null, audioUnlocked = false, checking = false;
+        let cursorCreatedAt = null;
+        let initialized = false;
+        let audioContext = null;
+        let audioUnlocked = false;
+        let checking = false;
+        let checkAgain = false;
+        let lastDingAt = 0;
+        let realtimeChannel = null;
 
         function enabled() {
-            try { return localStorage.getItem(enabledKey) !== "false"; } catch (_) { return true; }
+            try { return localStorage.getItem(enabledKey) !== "false"; }
+            catch (_) { return true; }
         }
-        function unlockAudio() {
+
+        async function unlockAudio() {
             try {
                 const AudioCtor = window.AudioContext || window.webkitAudioContext;
-                if (!AudioCtor) return;
-                if (!audioContext) audioContext = new AudioCtor();
-                if (audioContext.state === "suspended") audioContext.resume();
-                audioUnlocked = true;
-            } catch (_) {}
+                if (!AudioCtor) return false;
+                if (!audioContext) {
+                    audioContext = new AudioCtor();
+                    audioContext.addEventListener("statechange", () => {
+                        audioUnlocked = audioContext.state === "running";
+                    });
+                }
+                if (audioContext.state !== "running") await audioContext.resume();
+                audioUnlocked = audioContext.state === "running";
+                return audioUnlocked;
+            } catch (error) {
+                audioUnlocked = false;
+                console.debug("DougHub chat ding audio is not ready yet:", error);
+                return false;
+            }
         }
-        window.addEventListener("pointerdown", unlockAudio, { passive: true });
-        window.addEventListener("keydown", unlockAudio);
-        window.addEventListener("douqhub:chat-ding-setting-changed", () => { if (enabled()) unlockAudio(); });
 
-        function playDing() {
-            if (!enabled() || !audioUnlocked || !audioContext) return;
+        // Browsers require a user gesture before sound can be enabled. Re-attempt
+        // after gestures and whenever a sleeping/throttled tab becomes active.
+        window.addEventListener("pointerdown", () => { unlockAudio(); }, { passive: true });
+        window.addEventListener("keydown", () => { unlockAudio(); });
+        window.addEventListener("touchstart", () => { unlockAudio(); }, { passive: true });
+        window.addEventListener("douqhub:chat-ding-setting-changed", () => {
+            if (enabled()) unlockAudio();
+        });
+
+        async function playDing() {
+            if (!enabled()) return;
+            if (!audioContext || audioContext.state !== "running") {
+                const ready = await unlockAudio();
+                if (!ready) return;
+            }
+            if (!audioContext || audioContext.state !== "running") return;
+
+            // Avoid a burst of duplicate dings if Realtime and the fallback poll
+            // notice the same message at nearly the same time.
+            const now = Date.now();
+            if (now - lastDingAt < 900) return;
+            lastDingAt = now;
+
             try {
-                const ctx = audioContext, gain = ctx.createGain();
+                const ctx = audioContext;
+                const gain = ctx.createGain();
                 gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.65, ctx.currentTime + 0.025);
-                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.65);
+                gain.gain.exponentialRampToValueAtTime(0.55, ctx.currentTime + 0.025);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.62);
                 gain.connect(ctx.destination);
                 [880, 1174.66].forEach((frequency, index) => {
                     const oscillator = ctx.createOscillator();
                     oscillator.type = "sine";
                     oscillator.frequency.value = frequency;
                     oscillator.connect(gain);
-                    const start = ctx.currentTime + index * 0.13;
-                    oscillator.start(start);
-                    oscillator.stop(start + 0.24);
+                    const at = ctx.currentTime + index * 0.13;
+                    oscillator.start(at);
+                    oscillator.stop(at + 0.24);
                 });
-            } catch (error) { console.debug("DougHub chat ding could not play:", error); }
+            } catch (error) {
+                console.debug("DougHub chat ding could not play:", error);
+            }
+        }
+
+        async function handleIncomingMessage(message) {
+            if (!message || !message.created_at) return;
+            if (!initialized) {
+                cursorCreatedAt = message.created_at;
+                initialized = true;
+                return;
+            }
+            // Keep the cursor moving forward even if audio is blocked by browser policy.
+            if (cursorCreatedAt && message.created_at <= cursorCreatedAt) return;
+            cursorCreatedAt = message.created_at;
+
+            const path = (window.location.pathname || "").toLowerCase();
+            const isCommunityChatPage = path.endsWith("/chat.html") || path === "chat.html";
+            if (isCommunityChatPage || !message.user_id) return;
+
+            try {
+                const sessionResult = await client.auth.getSession();
+                const ownUserId = sessionResult.data?.session?.user?.id || null;
+                if (ownUserId && message.user_id !== ownUserId) await playDing();
+            } catch (error) {
+                console.debug("DougHub could not verify chat message sender:", error);
+            }
         }
 
         async function checkForMessages() {
-            if (checking) return;
+            if (checking) {
+                checkAgain = true;
+                return;
+            }
             checking = true;
             try {
                 if (!initialized) {
-                    const baseline = await client.from("chat_messages").select("created_at")
-                        .order("created_at", { ascending: false }).limit(1);
+                    const baseline = await client.from("chat_messages")
+                        .select("created_at")
+                        .order("created_at", { ascending: false })
+                        .limit(1);
                     if (!baseline.error) {
-                        cursorCreatedAt = baseline.data && baseline.data[0] ? baseline.data[0].created_at : null;
+                        cursorCreatedAt = baseline.data?.[0]?.created_at || null;
                         initialized = true;
                     }
                     return;
                 }
-                let query = client.from("chat_messages").select("created_at,user_id")
-                    .order("created_at", { ascending: true }).limit(50);
+
+                let query = client.from("chat_messages")
+                    .select("created_at,user_id")
+                    .order("created_at", { ascending: true })
+                    .limit(100);
                 if (cursorCreatedAt) query = query.gt("created_at", cursorCreatedAt);
                 const result = await query;
-                if (result.error || !result.data || !result.data.length) return;
-                cursorCreatedAt = result.data[result.data.length - 1].created_at;
-                const sessionResult = await client.auth.getSession();
-                const ownUserId = sessionResult.data?.session?.user?.id || null;
+                if (result.error || !result.data?.length) return;
 
-                // Do not guess who sent a message when auth is loading or the visitor is logged out.
-                // Also avoid duplicating the ding while the Community Chat page is already open.
-                const path = (window.location.pathname || "").toLowerCase();
-                const isCommunityChatPage = path.endsWith("/chat.html") || path === "chat.html";
-                const hasIncomingMessage = Boolean(ownUserId) && result.data.some(message =>
-                    Boolean(message.user_id) && message.user_id !== ownUserId
-                );
-                if (hasIncomingMessage && !isCommunityChatPage) playDing();
-            } catch (error) { console.debug("DougHub chat notification check failed:", error); }
-            finally { checking = false; }
+                // Process every fetched row in order; a cursor only advances after
+                // each row so multiple messages between polls are not collapsed.
+                for (const message of result.data) {
+                    await handleIncomingMessage(message);
+                }
+            } catch (error) {
+                console.debug("DougHub chat notification check failed:", error);
+            } finally {
+                checking = false;
+                if (checkAgain) {
+                    checkAgain = false;
+                    checkForMessages();
+                }
+            }
         }
-        checkForMessages().finally(() => window.setInterval(checkForMessages, 5000));
-        window.addEventListener("focus", checkForMessages);
-        document.addEventListener("visibilitychange", checkForMessages);
+
+        // Realtime delivers promptly while connected; polling is a fallback for
+        // temporary Realtime disconnects. Browsers can suspend both in deep sleep.
+        try {
+            realtimeChannel = client.channel("douqhub-site-chat-dings")
+                .on("postgres_changes", {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "chat_messages"
+                }, payload => {
+                    handleIncomingMessage(payload.new);
+                })
+                .subscribe(status => {
+                    if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                        console.debug("DougHub chat ding Realtime status:", status);
+                    }
+                });
+        } catch (error) {
+            console.debug("DougHub chat ding Realtime could not start; polling remains active.", error);
+        }
+
+        checkForMessages();
+        window.setInterval(checkForMessages, 5000);
+        const resumeAndCheck = () => {
+            unlockAudio();
+            checkForMessages();
+        };
+        window.addEventListener("focus", resumeAndCheck);
+        window.addEventListener("pageshow", resumeAndCheck);
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") resumeAndCheck();
+        });
     }
 
 
