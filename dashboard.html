@@ -121,6 +121,17 @@ footer{border-top-color:#ffffff14}
 @media(max-width:850px){header{height:auto;min-height:76px;flex-wrap:wrap;padding:12px 18px}}
 @media(max-width:600px){header{padding:11px 12px}.page-heading h1{font-size:30px}.section-title{font-size:20px}}
 
+
+/* Faster dashboard navigation: one-click jumps to each major section */
+.dashboard-jumps{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:-3px 0 20px;padding:7px;border:1px solid #ffffff12;border-radius:14px;background:#090b19a8}
+.dashboard-jumps a{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid transparent;border-radius:9px;color:#b6b8d0;font-size:11px;font-weight:750;transition:background .18s,border-color .18s,color .18s}
+.dashboard-jumps a:hover{color:#fff;background:#ffffff0b;border-color:#ffffff12}
+.stat-icon,.activity-icon,.quick-icon,.community-icon,.built-in-icon{font-size:10px;font-weight:900;letter-spacing:.01em}
+.side-icon{font-size:10px;font-weight:900;letter-spacing:.01em}
+.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1150px){.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.dashboard-jumps{gap:5px}.dashboard-jumps a{padding:0 8px;font-size:10px}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 </head>
 <body>
@@ -132,18 +143,18 @@ footer{border-top-color:#ffffff14}
   <aside class="sidebar" aria-label="Dashboard shortcuts">
     <div class="side-label">Workspace</div>
     <a class="side-link active" href="dashboard.html" aria-current="page"><span class="side-icon">▦</span><span>Dashboard</span></a>
-    <a class="side-link" href="my-games.html"><span class="side-icon">🎮</span><span>My Games &amp; Videos</span></a>
+    <a class="side-link" href="my-games.html"><span class="side-icon">GAME</span><span>My Games &amp; Videos</span></a>
     <a class="side-link" href="Scripting/scripting.html"><span class="side-icon">⌘</span><span>Create a game</span></a>
     <div class="side-divider"></div>
     <div class="side-label">DougHub</div>
-    <a class="side-link" href="douggames.html"><span class="side-icon">🕹️</span><span>Explore games</span></a>
-    <a class="side-link" href="chat.html"><span class="side-icon">💬</span><span>Community chat</span></a>
-    <a class="side-link" href="DMail.html"><span class="side-icon">✉️</span><span>DMail</span></a>
-    <a class="side-link" href="settings.html"><span class="side-icon">⚙️</span><span>Settings</span></a>
+    <a class="side-link" href="douggames.html"><span class="side-icon">PLAY</span><span>Explore games</span></a>
+    <a class="side-link" href="dougforum.html"><span class="side-icon">DF</span><span>DougForum</span></a><a class="side-link" href="chat.html"><span class="side-icon">CHAT</span><span>Community chat</span></a>
+    <a class="side-link" href="DMail.html"><span class="side-icon">MAIL</span><span>DMail</span></a>
+    <a class="side-link" href="settings.html"><span class="side-icon">SET</span><span>Settings</span></a>
     <div class="side-help"><strong>Ready to build?</strong><p>Turn an idea into your next game.</p><a href="Scripting/scripting.html">Open creator tools ↗</a></div>
   </aside>
   <main>
-    <div class="page-heading">
+    <div class="page-heading" id="top">
       <div><div class="crumb">Workspace / <span>Dashboard</span></div><h1>Dashboard</h1><p>Your personal overview of DougHub, your creations, and what’s happening in the community.</p></div>
       <div class="heading-actions"><a class="btn" href="my-games.html">▦ My content</a><a class="btn primary" href="Scripting/scripting.html">＋ Create a game</a></div>
     </div>
@@ -154,10 +165,10 @@ footer{border-top-color:#ffffff14}
     <section class="section">
       <div class="section-head"><div><h2 class="section-title">Your overview</h2><p class="section-subtitle">A live snapshot of your account and creator activity.</p></div><span class="status-pill" id="accountStatus">Checking account</span></div>
       <div class="stat-grid">
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">Published games</span><span class="stat-icon">🎮</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Games published by your account</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">Community games</span><span class="stat-icon">🧩</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Published by DougHub creators</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">DougHub members</span><span class="stat-icon">👥</span></div><div class="stat-value" id="memberTotal">—</div><div class="stat-foot">People in the community</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">New this week</span><span class="stat-icon">✨</span></div><div class="stat-value" id="recentTotal">—</div><div class="stat-foot">Community games added in 7 days</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-label">Published games</span><span class="stat-icon">GAME</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Games published by your account</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-label">Community games</span><span class="stat-icon">ALL</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Published by DougHub creators</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-label">DougHub members</span><span class="stat-icon">MEM</span></div><div class="stat-value" id="memberTotal">—</div><div class="stat-foot">People in the community</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-label">New this week</span><span class="stat-icon">NEW</span></div><div class="stat-value" id="recentTotal">—</div><div class="stat-foot">Community games added in 7 days</div></div>
       </div>
     </section>
     <section class="section">
@@ -178,10 +189,10 @@ footer{border-top-color:#ffffff14}
     <section class="section">
       <div class="section-head"><div><h2 class="section-title">Quick access</h2><p class="section-subtitle">Go straight to a part of DougHub.</p></div></div>
       <div class="quick-grid">
-        <a class="quick-card" href="douggames.html"><span class="quick-icon">🕹️</span><span><strong>DougGames</strong><small>Play and discover games</small></span></a>
-        <a class="quick-card" href="DougTube.html"><span class="quick-icon">▶️</span><span><strong>DougTube</strong><small>Watch community videos</small></span></a>
+        <a class="quick-card" href="douggames.html"><span class="quick-icon">PLAY</span><span><strong>DougGames</strong><small>Play and discover games</small></span></a>
+        <a class="quick-card" href="DougTube.html"><span class="quick-icon">VID</span><span><strong>DougTube</strong><small>Watch community videos</small></span></a>
         <a class="quick-card" href="douqhub-music.html"><span class="quick-icon">♫</span><span><strong>DougHub Music</strong><small>Explore music posts</small></span></a>
-        <a class="quick-card" href="tools.html"><span class="quick-icon">🧰</span><span><strong>DougTools</strong><small>Open your tool collection</small></span></a>
+        <a class="quick-card" href="tools.html"><span class="quick-icon">TOOLS</span><span><strong>DougTools</strong><small>Open your tool collection</small></span></a>
       </div>
     </section>
     <section class="section">
@@ -191,13 +202,13 @@ footer{border-top-color:#ffffff14}
     <section class="section">
       <div class="section-head"><div><h2 class="section-title">Play something</h2><p class="section-subtitle">A few built-in games, ready when you are.</p></div><a class="section-link" href="douggames.html">All games ↗</a></div>
       <div class="built-in-grid">
-        <a class="built-in" href="Games/pig-clicker.html"><span class="built-in-icon">🐷</span><span><strong>Pig Clicker</strong><small>Casual clicker</small></span></a>
-        <a class="built-in" href="Games/rebirth-clicker.html"><span class="built-in-icon">♻️</span><span><strong>Rebirth Clicker</strong><small>Progression</small></span></a>
-        <a class="built-in" href="Games/racing.html"><span class="built-in-icon">🏎️</span><span><strong>Doug Racing</strong><small>Arcade racing</small></span></a>
-        <a class="built-in" href="Games/puzzle.html"><span class="built-in-icon">🧩</span><span><strong>Doug Puzzle</strong><small>Puzzle game</small></span></a>
+        <a class="built-in" href="Games/pig-clicker.html"><span class="built-in-icon">PIG</span><span><strong>Pig Clicker</strong><small>Casual clicker</small></span></a>
+        <a class="built-in" href="Games/rebirth-clicker.html"><span class="built-in-icon">REB</span><span><strong>Rebirth Clicker</strong><small>Progression</small></span></a>
+        <a class="built-in" href="Games/racing.html"><span class="built-in-icon">RACE</span><span><strong>Doug Racing</strong><small>Arcade racing</small></span></a>
+        <a class="built-in" href="Games/puzzle.html"><span class="built-in-icon">ALL</span><span><strong>Doug Puzzle</strong><small>Puzzle game</small></span></a>
       </div>
     </section>
-    <section class="auto-dashboard-setting" aria-labelledby="autoDashboardTitle">
+    <section class="auto-dashboard-setting" id="preferences" aria-labelledby="autoDashboardTitle">
       <div class="auto-dashboard-icon" aria-hidden="true">↗</div>
       <div class="auto-dashboard-copy">
         <h2 id="autoDashboardTitle">Open Dashboard automatically</h2>
@@ -236,7 +247,7 @@ autoDashboardToggle.addEventListener("change",()=>{
  autoDashboardStatus.textContent=enabled?"Saved — DougHub will open your dashboard automatically.":"Saved — DougHub will open the homepage instead.";
 });
 function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
-function gameIcon(game){const c=String(game.category||"").toLowerCase();return c.includes("puzz")?"🧩":c.includes("rac")?"🏎️":c.includes("action")?"⚡":c.includes("sim")?"🌎":"🎮";}
+function gameIcon(game){const c=String(game.category||"").toLowerCase();return c.includes("puzz")?"PUZ":c.includes("rac")?"RACE":c.includes("action")?"ACT":c.includes("sim")?"SIM":"GAME";}
 function renderMyCreations(){
  const host=$("myCreations");
  if(!currentUser){host.innerHTML='<div class="empty">Sign in to see your published games here.<br><a href="log-in.html?redirect=dashboard.html">Log in to DougHub ↗</a></div>';return;}
