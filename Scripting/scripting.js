@@ -147,3 +147,4 @@ async function communityPublish(){
 $("publishProjectBtn").addEventListener("click",communityPublish);
 communityInit();
 restore();renderFile();renderLibrary();renderBlocks();updateGenerated();loadAccount();
+})();
