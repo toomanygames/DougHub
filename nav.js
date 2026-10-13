@@ -291,7 +291,7 @@
     if (!account) return;
     // Guests get a direct sign-in link, never an empty profile dropdown.
     account.innerHTML = '<a class="account-btn guest-login-link" href="/log-in.html?redirect=' +
-      encodeURIComponent(location.pathname.replace(/^\\//, "") + location.search) +
+      encodeURIComponent(location.pathname.slice(1) + location.search) +
       '">Log In <span aria-hidden="true">↗</span></a>';
     account.dataset.dhGuest = "true";
     try { sessionStorage.removeItem("dh-account-display-v1"); } catch (_) {}
