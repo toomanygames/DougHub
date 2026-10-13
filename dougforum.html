@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050611">
+<title>DougForum • DougHub</title>
+<meta name="description" content="Discuss games, share projects, ask questions, and connect with the DougHub community.">
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="nav.js" defer></script>
+<script src="search-autofill-fix.js" defer></script>
+<style>
+:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--line:#ffffff14;--muted:#a0a1bb;--indigo:#6366f1;--purple:#a855f7;--text:#f8f7ff}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:100px}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 4% 0%,#312e8145,transparent 35%),radial-gradient(ellipse at 92% 9%,#701a7530,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+header{height:76px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,56px);background:#050611dc;border-bottom:1px solid var(--line);backdrop-filter:blur(20px)}header .logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}header .logo-icon{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 26px #6366f14d;font-weight:950}
+main{width:min(1250px,calc(100% - 36px));margin:auto;padding:34px 0 58px}.hero{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:clamp(25px,4vw,43px);border:1px solid #ffffff1b;border-radius:25px;background:linear-gradient(145deg,#151a37f5,#0b0d1df5);box-shadow:0 30px 90px #0004}.hero:before{content:"";position:absolute;z-index:-1;right:-90px;top:-190px;width:420px;height:420px;border:1px solid #a5b4fc20;border-radius:50%;box-shadow:0 0 0 35px #a78bfa05,0 0 0 75px #a78bfa04}.hero-copy{max-width:760px}.eyebrow{display:flex;align-items:center;gap:9px;color:#c4b5fd;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:#86efac;box-shadow:0 0 13px #86efac}.hero h1{margin:15px 0 10px;font-size:clamp(34px,5vw,55px);line-height:1;letter-spacing:-.06em;font-weight:850}.gradient{background:linear-gradient(100deg,#a5b4fc,#d8b4fe 56%,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent}.hero p{max-width:650px;margin:0;color:#b4b5cc;font-size:14px;line-height:1.8}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;padding:0 15px;border:1px solid #ffffff17;border-radius:13px;background:#ffffff06;color:white;font-size:12px;font-weight:800;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}.button:hover{transform:translateY(-2px);border-color:#a78bfa70;background:#ffffff0d}.button.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 10px 30px #6366f133}.button.primary:hover{background:linear-gradient(120deg,#7477ff,#b367ff);box-shadow:0 14px 36px #6366f144}.hero-mark{width:105px;height:105px;flex:0 0 105px;display:grid;place-items:center;border:1px solid #a78bfa3a;border-radius:28px;background:linear-gradient(145deg,#6366f126,#a855f729);box-shadow:0 0 55px #8b5cf626}.hero-mark span{font-size:44px;font-weight:950;letter-spacing:-.08em;background:linear-gradient(135deg,#a5b4fc,#d8b4fe 65%,#67e8f9);background-clip:text;color:transparent}
+.layout{display:grid;grid-template-columns:225px minmax(0,1fr);gap:20px;align-items:start;margin-top:22px}.side,.panel{border:1px solid var(--line);border-radius:19px;background:linear-gradient(150deg,#10142bef,#090b19ed);backdrop-filter:blur(16px)}.side{position:sticky;top:94px;padding:14px}.side-title{padding:9px 10px;color:#777b9d;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.community-nav{display:grid;gap:5px}.community-choice{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:1px solid transparent;border-radius:11px;background:transparent;color:#b7b8d0;text-align:left;font-size:12px;font-weight:750;cursor:pointer;transition:.18s}.community-choice:hover{background:#ffffff09;color:white}.community-choice.active{color:white;border-color:#a78bfa38;background:linear-gradient(100deg,#6366f126,#a855f71b);box-shadow:inset 3px 0 #a78bfa}.community-letter{width:31px;height:31px;display:grid;place-items:center;flex:0 0 31px;border:1px solid #ffffff12;border-radius:10px;background:linear-gradient(135deg,#6366f126,#a855f71c);color:#d9d5ff;font-size:11px;font-weight:900}.side-note{margin-top:13px;padding:13px;border:1px solid #ffffff12;border-radius:13px;background:#ffffff04}.side-note strong{font-size:11px}.side-note p{margin:6px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+.feed{min-width:0}.feed-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:0 0 14px}.feed-head h2{margin:0;font-size:21px;letter-spacing:-.04em}.feed-head p{margin:6px 0 0;color:var(--muted);font-size:11px}.feed-controls{display:flex;gap:8px;align-items:center}.select,.search{min-height:40px;border:1px solid #ffffff17;border-radius:12px;background:#080a17;color:#e8e8fa;padding:0 12px;font-size:11px}.search{width:min(240px,100%)}.search:focus,.select:focus{border-color:#a78bfa80;outline:0;box-shadow:0 0 0 3px #8b5cf626}.compose{margin-bottom:14px;padding:17px;border:1px solid #a78bfa32;border-radius:17px;background:linear-gradient(110deg,#6366f115,#a855f70b)}.compose-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.compose-top strong{font-size:13px}.compose-top span{font-size:10px;color:var(--muted)}.form-grid{display:grid;grid-template-columns:1fr 180px;gap:9px}.field{width:100%;min-width:0;border:1px solid #ffffff17;border-radius:11px;background:#070916;color:white;padding:11px 12px;font-size:12px}.field::placeholder{color:#777b98}.field:focus{outline:0;border-color:#a78bfa80;box-shadow:0 0 0 3px #8b5cf622}.form-grid .full{grid-column:1/-1}.compose textarea{min-height:86px;resize:vertical;line-height:1.6}.compose-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.helper{color:#898baa;font-size:10px;line-height:1.5}.message{display:none;margin-bottom:12px;padding:11px 13px;border:1px solid #a78bfa38;border-radius:12px;background:#6366f112;color:#dcd8ff;font-size:11px;line-height:1.6}.message.show{display:block}
+.post-list{display:grid;gap:12px}.post{display:grid;grid-template-columns:53px minmax(0,1fr);gap:14px;padding:17px;border:1px solid #ffffff13;border-radius:17px;background:linear-gradient(145deg,#10142bef,#090b19ed);transition:border-color .18s,transform .18s,box-shadow .18s}.post:hover{border-color:#a78bfa35;box-shadow:0 15px 38px #0002}.vote-column{display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:3px}.vote{width:35px;height:32px;display:grid;place-items:center;border:1px solid #ffffff13;border-radius:10px;background:#ffffff05;color:#c8c8df;font-size:16px;cursor:pointer;transition:.16s}.vote:hover{border-color:#a78bfa65;color:white;background:#8b5cf61c}.vote.up.active{color:#c4b5fd;border-color:#a78bfa75;background:#8b5cf629}.vote.down.active{color:#fca5a5;border-color:#fb718555;background:#ef444418}.score{color:#d8d8ee;font-size:11px;font-weight:850;font-variant-numeric:tabular-nums}.post-content{min-width:0}.post-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#898baa;font-size:10px}.community-tag{padding:4px 7px;border:1px solid #a78bfa25;border-radius:7px;background:#8b5cf612;color:#d6c9ff;font-weight:800}.post h3{margin:10px 0 8px;font-size:17px;line-height:1.35;letter-spacing:-.025em;overflow-wrap:anywhere}.post-body{color:#c2c3d8;font-size:12px;line-height:1.75;overflow-wrap:anywhere;white-space:pre-wrap}.post-link{display:inline-block;margin-top:9px;color:#a5b4fc;font-size:11px;font-weight:800;overflow-wrap:anywhere}.post-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:11px;border-top:1px solid #ffffff0d}.text-button{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:8px;background:transparent;color:#a9abc6;padding:6px 8px;font-size:10px;font-weight:800;cursor:pointer}.text-button:hover{background:#ffffff0a;color:white}.text-button .mini{font-size:12px;color:#c4b5fd}.comments{display:none;margin-top:13px;padding-top:13px;border-top:1px solid #ffffff12}.comments.open{display:block}.comment-list{display:grid;gap:10px;margin-bottom:12px}.comment{padding:10px 12px;border-left:2px solid #8b5cf655;border-radius:0 10px 10px 0;background:#ffffff04}.comment-meta{margin-bottom:5px;color:#8587a5;font-size:10px}.comment-body{color:#c9c9dc;font-size:11px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}.comment-form{display:flex;gap:8px}.comment-form input{flex:1;min-width:0}.empty{padding:38px 18px;border:1px dashed #ffffff1b;border-radius:16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}.empty strong{display:block;margin-bottom:6px;color:#ecebff;font-size:14px}.loading{padding:30px;text-align:center;color:#a0a1bb;font-size:12px}.footer{padding:25px 0 0;color:#6f718d;text-align:center;font-size:10px}
+@media(max-width:900px){.layout{grid-template-columns:190px minmax(0,1fr);gap:13px}.side{padding:10px}.feed-controls{flex-wrap:wrap;justify-content:flex-end}.search{width:100%}.hero-mark{width:82px;height:82px;flex-basis:82px}.form-grid{grid-template-columns:1fr 150px}}
+@media(max-width:700px){main{width:calc(100% - 24px);padding-top:18px}.hero{padding:23px 19px;border-radius:19px}.hero h1{font-size:38px}.hero p{font-size:12px}.hero-mark{display:none}.layout{grid-template-columns:1fr}.side{position:static;overflow:hidden}.community-nav{display:flex;overflow-x:auto;padding-bottom:3px}.community-choice{width:auto;flex:0 0 auto;padding:7px 9px}.community-choice span:last-child{white-space:nowrap}.side-title,.side-note{display:none}.feed-head{align-items:flex-start;flex-direction:column}.feed-controls{width:100%;justify-content:stretch}.search{flex:1;width:auto}.select{max-width:140px}.post{grid-template-columns:40px minmax(0,1fr);gap:10px;padding:12px}.vote{width:31px;height:29px}.post h3{font-size:15px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.compose-footer{align-items:flex-start;flex-direction:column}.compose-footer .button{width:100%}.comment-form{flex-direction:column}.comment-form .button{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<main>
+<section class="hero">
+ <div class="hero-copy"><div class="eyebrow">THE DOUGHUB COMMUNITY</div><h1>Welcome to <span class="gradient">DougForum.</span></h1><p>A place to share what you're making, ask questions, talk about games, and help shape DougHub. Find your community and join the conversation.</p><div class="hero-actions"><button class="button primary" id="startPost">Create a post <span aria-hidden="true">↗</span></button><a class="button" href="dashboard.html">Back to Dashboard</a></div></div>
+ <div class="hero-mark" aria-hidden="true"><span>DF</span></div>
+</section>
+<div class="layout">
+ <aside class="side" aria-label="Forum communities"><div class="side-title">Communities</div><div class="community-nav" id="communityNav"><button class="community-choice active" data-community="all"><span class="community-letter">ALL</span><span>All posts</span></button></div><div class="side-note"><strong>Keep it constructive</strong><p>Be kind, protect private information, and keep posts relevant to the selected community.</p></div></aside>
+ <section class="feed" id="feed">
+  <div class="feed-head"><div><h2 id="feedTitle">All posts</h2><p id="feedDescription">Recent conversations from across DougHub.</p></div><div class="feed-controls"><input class="search" id="searchPosts" type="search" placeholder="Search posts..." autocomplete="off" spellcheck="false" aria-label="Search posts"><select class="select" id="sortPosts" aria-label="Sort posts"><option value="new">Newest</option><option value="top">Top voted</option></select></div></div>
+  <div class="message" id="statusMessage" role="status" aria-live="polite"></div>
+  <section class="compose" id="compose">
+   <div class="compose-top"><strong>Start a discussion</strong><span id="composeAccount">Sign in to post</span></div>
+   <form id="postForm">
+    <div class="form-grid"><input class="field" id="postTitle" maxlength="180" required placeholder="Give your post a clear title"><select class="field" id="postCommunity" required aria-label="Choose a community"></select><textarea class="field full" id="postBody" maxlength="12000" placeholder="What's on your mind? Add context, details, or a question."></textarea><input class="field full" id="postLink" type="url" maxlength="1500" placeholder="Optional link (https://...)"></div>
+    <div class="compose-footer"><span class="helper" id="postHelp">Posts are public. Don't share passwords or private information.</span><button class="button primary" type="submit" id="publishPost">Publish post</button></div>
+   </form>
+  </section>
+  <div class="post-list" id="postList"><div class="loading">Loading DougForum…</div></div>
+ </section>
+</div>
+<div class="footer">DougForum · Part of DougHub</div>
+</main>
+<script>
+"use strict";
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const $=id=>document.getElementById(id);
+let db=null,currentUser=null,currentProfile=null,communities=[],posts=[],commentCache=new Map(),activeCommunity="all",expandedComments=new Set(),busy=false;
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function dateLabel(value){const d=new Date(value);if(!Number.isFinite(d.getTime()))return "Recently";return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:d.getFullYear()!==new Date().getFullYear()?"numeric":undefined})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});}
+function tell(message){const el=$("statusMessage");el.textContent=message;el.classList.add("show");}
+function clearMessage(){$("statusMessage").textContent="";$("statusMessage").classList.remove("show");}
+function getCommunity(id){return communities.find(c=>c.id===id)||{name:"Community",slug:"general"};}
+function myVote(post){return (post.dougforum_votes||[]).find(v=>v.user_id===currentUser?.id)?.value||0;}
+function score(post){return (post.dougforum_votes||[]).reduce((n,v)=>n+Number(v.value||0),0);}
+function displayName(id){return postNames[id]||"DougHub member";}
+let postNames={};
+function renderCommunities(){
+ const nav=$("communityNav");nav.innerHTML='<button class="community-choice '+(activeCommunity==="all"?"active":"")+'" data-community="all"><span class="community-letter">ALL</span><span>All posts</span></button>'+communities.map(c=>'<button class="community-choice '+(activeCommunity===c.id?"active":"")+'" data-community="'+esc(c.id)+'"><span class="community-letter">'+esc(c.name.slice(0,3).toUpperCase())+'</span><span>'+esc(c.name)+'</span></button>').join("");
+ const options=communities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");$("postCommunity").innerHTML=options;
+ if(activeCommunity!=="all"&&!communities.some(c=>c.id===activeCommunity))activeCommunity="all";
+ nav.querySelectorAll("[data-community]").forEach(b=>b.addEventListener("click",()=>{activeCommunity=b.dataset.community;renderCommunities();renderPosts();}));
+ const c=getCommunity(activeCommunity);$("feedTitle").textContent=activeCommunity==="all"?"All posts":c.name;$("feedDescription").textContent=activeCommunity==="all"?"Recent conversations from across DougHub.":c.description||"Posts shared with this community.";
+}
+function renderPosts(){
+ const query=$("searchPosts").value.trim().toLowerCase(),sort=$("sortPosts").value;
+ let rows=posts.filter(p=>(activeCommunity==="all"||p.community_id===activeCommunity)&&[p.title,p.body,p.authorName,getCommunity(p.community_id).name].some(v=>String(v||"").toLowerCase().includes(query)));
+ rows.sort((a,b)=>sort==="top"?(score(b)-score(a)||new Date(b.created_at)-new Date(a.created_at)):new Date(b.created_at)-new Date(a.created_at));
+ if(!rows.length){$("postList").innerHTML='<div class="empty"><strong>No posts found</strong>'+(query?"Try a different search.":"Be the first to start a conversation in this community.")+'</div>';return;}
+ $("postList").innerHTML=rows.map(p=>{
+  const c=getCommunity(p.community_id),vote=myVote(p),commentsOpen=expandedComments.has(p.id),comments=commentCache.get(p.id)||[];
+  const link=p.link_url&&/^https?:\/\//i.test(p.link_url)?'<a class="post-link" href="'+esc(p.link_url)+'" target="_blank" rel="noopener noreferrer">Open linked resource ↗</a>':"";
+  return '<article class="post" id="post-'+esc(p.id)+'"><div class="vote-column"><button class="vote up '+(vote===1?"active":"")+'" data-vote="1" data-post="'+esc(p.id)+'" aria-label="Upvote post" title="Upvote">▲</button><span class="score">'+score(p)+'</span><button class="vote down '+(vote===-1?"active":"")+'" data-vote="-1" data-post="'+esc(p.id)+'" aria-label="Downvote post" title="Downvote">▼</button></div><div class="post-content"><div class="post-meta"><span class="community-tag">d/'+esc(c.slug)+'</span><span>Posted by '+esc(p.authorName||"DougHub member")+'</span><span>·</span><time>'+esc(dateLabel(p.created_at))+'</time></div><h3>'+esc(p.title)+'</h3>'+(p.body?'<div class="post-body">'+esc(p.body)+'</div>':"")+link+'<div class="post-actions"><button class="text-button" data-comments="'+esc(p.id)+'"><span class="mini">▤</span>'+(commentsOpen?"Hide comments":"Comments")+' ('+(p.commentCount||0)+')</button>'+(currentUser?.id===p.author_id?'<button class="text-button" data-delete="'+esc(p.id)+'">Delete post</button>':"")+'</div><div class="comments '+(commentsOpen?"open":"")+'" id="comments-'+esc(p.id)+'"><div class="comment-list">'+(comments.length?comments.map(cm=>'<div class="comment"><div class="comment-meta">'+esc(cm.authorName||"DougHub member")+' · '+esc(dateLabel(cm.created_at))+'</div><div class="comment-body">'+esc(cm.body)+'</div>'+(currentUser?.id===cm.author_id?'<button class="text-button" data-delete-comment="'+esc(cm.id)+'">Delete</button>':"")+'</div>').join(""):'<div class="helper">No comments yet. Start the conversation.</div>')+'</div><form class="comment-form" data-comment-form="'+esc(p.id)+'"><input class="field" name="body" maxlength="5000" required placeholder="'+(currentUser?"Write a comment…":"Sign in to comment")+'" '+(!currentUser?"disabled":"")+'><button class="button" type="submit" '+(!currentUser?"disabled":"")+'>Reply</button></form>'+'</div></div></article>';
+ }).join("");
+ $("postList").querySelectorAll("[data-vote]").forEach(b=>b.addEventListener("click",()=>castVote(b.dataset.post,Number(b.dataset.vote))));
+ $("postList").querySelectorAll("[data-comments]").forEach(b=>b.addEventListener("click",()=>toggleComments(b.dataset.comments)));
+ $("postList").querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deletePost(b.dataset.delete)));
+ $("postList").querySelectorAll("[data-delete-comment]").forEach(b=>b.addEventListener("click",()=>deleteComment(b.dataset.deleteComment)));
+ $("postList").querySelectorAll("[data-comment-form]").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();submitComment(f.dataset.commentForm,new FormData(f).get("body"));}));
+}
+async function loadClient(){
+ if(window.DougHubSupabaseClient)return window.DougHubSupabaseClient;
+ if(window.__dhNavClientPromise){const client=await window.__dhNavClientPromise;if(client)return client;}
+ if(!window.supabase)return null;
+ return window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+}
+async function loadCommunities(){
+ const {data,error}=await db.from("dougforum_communities").select("id,slug,name,description,created_at").order("name");
+ if(error)throw error;communities=data||[];renderCommunities();
+}
+async function loadPosts(){
+ const {data,error}=await db.from("dougforum_posts").select("id,community_id,author_id,title,body,link_url,created_at,dougforum_votes(value,user_id),dougforum_comments(count)").order("created_at",{ascending:false}).limit(100);
+ if(error)throw error;
+ posts=(data||[]).map(p=>({...p,commentCount:p.dougforum_comments?.[0]?.count||0,authorName:""}));
+ const ids=[...new Set(posts.map(p=>p.author_id))];
+ if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username").in("id",ids);postNames={};(profiles||[]).forEach(p=>postNames[p.id]=p.username||"DougHub member");}
+ posts.forEach(p=>p.authorName=postNames[p.author_id]||"DougHub member");
+ renderPosts();
+}
+async function loadComments(postId){
+ const {data,error}=await db.from("dougforum_comments").select("id,post_id,author_id,body,created_at").eq("post_id",postId).order("created_at",{ascending:true});
+ if(error)throw error;const rows=data||[],ids=[...new Set(rows.map(c=>c.author_id))],names={};
+ if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username").in("id",ids);(profiles||[]).forEach(p=>names[p.id]=p.username||"DougHub member");}
+ commentCache.set(postId,rows.map(c=>({...c,authorName:names[c.author_id]||"DougHub member"})));
+}
+async function toggleComments(id){
+ if(expandedComments.has(id)){expandedComments.delete(id);renderPosts();return;}
+ expandedComments.add(id);renderPosts();
+ try{await loadComments(id);renderPosts();}catch(e){tell("Comments couldn't be loaded. Please try again.");console.error(e);}
+}
+async function castVote(postId,value){
+ if(!currentUser){location.href="log-in.html?redirect=dougforum.html";return;}
+ const p=posts.find(x=>x.id===postId);if(!p||busy)return;busy=true;
+ try{
+  const existing=(p.dougforum_votes||[]).find(v=>v.user_id===currentUser.id);
+  if(existing&&existing.value===value){const {error}=await db.from("dougforum_votes").delete().eq("post_id",postId).eq("user_id",currentUser.id);if(error)throw error;}
+  else{const {error}=await db.from("dougforum_votes").upsert({post_id:postId,user_id:currentUser.id,value},{onConflict:"post_id,user_id"});if(error)throw error;}
+  await loadPosts();
+ }catch(e){tell("Your vote could not be saved. Please try again.");console.error(e);}finally{busy=false;}
+}
+async function submitComment(postId,body){
+ if(!currentUser){location.href="log-in.html?redirect=dougforum.html";return;}
+ const text=String(body||"").trim();if(!text)return;
+ try{const {error}=await db.from("dougforum_comments").insert({post_id:postId,author_id:currentUser.id,body:text});if(error)throw error;await loadComments(postId);await loadPosts();expandedComments.add(postId);renderPosts();tell("Comment posted.");}
+ catch(e){tell("Your comment could not be posted. Please try again.");console.error(e);}
+}
+async function deletePost(id){
+ if(!currentUser||!confirm("Delete this post? This also deletes its comments and votes."))return;
+ try{const {error}=await db.from("dougforum_posts").delete().eq("id",id).eq("author_id",currentUser.id);if(error)throw error;posts=posts.filter(p=>p.id!==id);renderPosts();tell("Post deleted.");}
+ catch(e){tell("The post could not be deleted.");console.error(e);}
+}
+async function deleteComment(id){
+ if(!currentUser||!confirm("Delete this comment?"))return;
+ try{const {error}=await db.from("dougforum_comments").delete().eq("id",id).eq("author_id",currentUser.id);if(error)throw error;for(const postId of expandedComments){await loadComments(postId);}await loadPosts();renderPosts();}
+ catch(e){tell("The comment could not be deleted.");console.error(e);}
+}
+$("postForm").addEventListener("submit",async e=>{
+ e.preventDefault();clearMessage();if(!currentUser){location.href="log-in.html?redirect=dougforum.html";return;}if(busy)return;
+ const title=$("postTitle").value.trim(),body=$("postBody").value.trim(),link=$("postLink").value.trim(),communityId=$("postCommunity").value;
+ if(title.length<3){tell("Use a title with at least 3 characters.");return;}
+ if(link&&!/^https?:\/\//i.test(link)){tell("Links must start with https:// or http://.");return;}
+ busy=true;$("publishPost").disabled=true;$("publishPost").textContent="Publishing…";
+ try{const {error}=await db.from("dougforum_posts").insert({community_id:communityId,author_id:currentUser.id,title,body,link_url:link||null});if(error)throw error;$("postForm").reset();if(communities.length)$("postCommunity").value=activeCommunity!=="all"?activeCommunity:communities[0].id;await loadPosts();tell("Your post is live.");$("feed").scrollIntoView({behavior:"smooth",block:"start"});}
+ catch(e){tell("Your post could not be published. Check your connection and try again.");console.error(e);}
+ finally{busy=false;$("publishPost").disabled=false;$("publishPost").textContent="Publish post";}
+});
+$("searchPosts").addEventListener("input",renderPosts);$("sortPosts").addEventListener("change",renderPosts);
+$("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavior:"smooth",block:"center"});$("postTitle").focus({preventScroll:true});});
+(async function init(){
+ try{db=await loadClient();if(!db)throw new Error("Supabase client is unavailable");
+  const {data,error}=await db.auth.getSession();if(error)throw error;currentUser=data?.session?.user||null;
+  if(currentUser){const {data:profile}=await db.from("profiles").select("username").eq("id",currentUser.id).maybeSingle();currentProfile=profile;$("composeAccount").textContent="Posting as "+(profile?.username||currentUser.email?.split("@")[0]||"member");$("postHelp").textContent="Posts are public. Keep personal details private.";$("publishPost").textContent="Publish post";}
+  else{$("composeAccount").innerHTML='<a href="log-in.html?redirect=dougforum.html" style="color:#c4b5fd;font-weight:800">Log in to post</a>';$("postHelp").textContent="You can browse freely. Log in to post, vote, or comment.";$("publishPost").textContent="Log in to post";}
+  await loadCommunities();await loadPosts();
+ }catch(e){console.error("DougForum initialization failed:",e);$("postList").innerHTML='<div class="empty"><strong>DougForum could not connect</strong>Try refreshing the page. If this continues, the database permissions may need checking.</div>';tell("The forum could not load its data.");}
+})();
+</script>
+</body>
+</html>
