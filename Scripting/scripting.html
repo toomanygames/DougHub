@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Scripting Editor • DougHub</title>
+<title>DougCode • Community Game Studio</title>
 <link rel="icon" href="../DougHub.svg" type="image/x-icon">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../display.js"></script>
@@ -38,6 +38,9 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .file-tab.active,.mode-btn.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white}
 .btn.primary{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white;box-shadow:0 8px 24px #6366f133}
 .preview-wrap,.preview-empty{background:#070918;border-color:var(--dh-line);border-radius:15px}
+.file-add-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:9px 0 2px}.file-add-hint{font-size:11px;color:#858cab}
+.file-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:7px}.file-tab{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.file-tab .remove-file{margin-left:7px;color:#fca5a5;border:0;background:transparent;padding:0 2px;cursor:pointer;font-weight:900}
+.add-file-dialog{width:min(460px,calc(100% - 28px));padding:0;border:1px solid #a5b4fc44;border-radius:20px;background:#0b0e22;color:#f5f6ff;box-shadow:0 30px 100px #000b}.add-file-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}.add-file-head{padding:20px 22px;background:linear-gradient(130deg,#6366f128,#a855f71c);border-bottom:1px solid var(--dh-line)}.add-file-head h3{margin:0 0 5px;font-size:21px}.add-file-body{padding:20px 22px;display:grid;gap:14px}.add-file-body label{display:grid;gap:7px;font-size:12px;font-weight:800;color:#c7cbea}.add-file-body input,.add-file-body select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--dh-line);background:#070918;color:#fff}.add-file-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .brand-name{font-weight:900;letter-spacing:-.025em;color:#f5f6ff}
 .separation-warning{display:flex;align-items:flex-start;gap:10px;margin:0 0 18px;padding:13px 15px;border:1px solid #fbbf244d;border-radius:14px;background:linear-gradient(120deg,#f59e0b12,#f9731610);color:#fde8b0;line-height:1.55;font-size:13px}
 .separation-warning strong{display:block;color:#fff0c2;margin-bottom:2px}
@@ -53,7 +56,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 <main class="wrap">
   <div class="separation-warning" role="note"><span class="warning-icon" aria-hidden="true">!</span><div><strong>DougCode and Community Games are separate</strong>Projects made or published in DougCode are listed under Community Projects. They do not automatically appear in Doug Games → Community Games, which is a separate feature.</div></div>
   <section class="page-heading">
-    <div><div class="eyebrow">BUILD SOMETHING REAL</div><h1>Scripting Editor</h1><p>Write HTML, style it with CSS, add JavaScript, or build your logic with visual coding blocks.</p></div>
+    <div><div class="eyebrow">DOUG GAMES · COMMUNITY CREATOR</div><h1>DougCode</h1><p>Build a playable community game with HTML, CSS, JavaScript, or visual blocks, then publish it to Doug Games.</p></div>
     <div class="project-name"><label for="projectName">Project name</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"></div>
   </section>
   <section class="toolbar">
@@ -63,8 +66,8 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   <section id="codeMode" class="editor-layout">
     <div class="panel code-panel">
       <div class="panel-head"><div><span class="panel-kicker">SOURCE FILES</span><h2>Code</h2></div><span class="live-dot">Autosaves locally</span></div>
-      <div class="file-tabs" role="tablist" aria-label="Code files"><button class="file-tab active" data-file="html">index.html</button><button class="file-tab" data-file="css">style.css</button><button class="file-tab" data-file="js">main.js</button></div>
-      <div class="editor-caption"><span id="activeFileLabel">index.html</span><span id="lineCount">1 line</span></div>
+      <div class="file-tabs" id="fileTabs" role="tablist" aria-label="Project files"><button class="file-tab active" data-file="html">index.html</button><button class="file-tab" data-file="css">style.css</button><button class="file-tab" data-file="js">main.js</button></div>
+      <div class="file-add-row"><button class="btn small" id="addFileBtn" type="button">＋ Add file</button><span class="file-add-hint">Add more source files to your project</span></div><div class="editor-caption"><span id="activeFileLabel">index.html</span><span id="lineCount">1 line</span></div>
       <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Source code" wrap="off"></textarea>
       <div class="editor-footer"><span>Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span><button class="text-btn" id="copyCodeBtn">Copy current file</button></div>
     </div>
@@ -107,14 +110,13 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   <section class="community-projects-section" id="communityProjects">
     <div class="community-heading">
       <div>
-        <div class="eyebrow">MADE BY THE COMMUNITY</div>
-        <h2>Community Projects</h2>
-        <p>Explore projects other people have built. Preview any public project, and copy or download it only when its creator allows it.</p>
+        <div class="eyebrow">SHARE YOUR CREATION</div>
+        <h2>Publish to Community Games</h2>
+        <p>Publish your playable HTML game to Doug Games so other people can play it. DougCode projects and Community Games are separate destinations.</p>
       </div>
-      <button class="btn" id="refreshCommunityBtn" type="button">↻ Refresh projects</button>
     </div>
     <section class="publish-panel">
-      <div class="publish-title"><span class="publish-icon">↗</span><div><h3>Share your project</h3><p>Publish the code currently open in your editor for other DougHub users to preview.</p></div></div>
+      <div class="publish-title"><span class="publish-icon">↗</span><div><h3>Publish your game</h3><p>Your HTML, CSS, and JavaScript are combined into a playable game for Doug Games → Community Games.</p></div></div>
       <div class="publish-fields">
         <label>Project title<input id="communityTitle" maxlength="80" placeholder="My awesome project" autocomplete="off"></label>
         <label>Short description<textarea id="communityDescription" maxlength="500" rows="2" placeholder="What does your project do?"></textarea></label>
@@ -123,24 +125,22 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
         <label class="permission-option"><input id="communityAllowCopy" type="checkbox"><span><b>Allow code copying</b><small>Visitors can copy the source code.</small></span></label>
         <label class="permission-option"><input id="communityAllowDownload" type="checkbox"><span><b>Allow downloading</b><small>Visitors can download a standalone HTML version.</small></span></label>
       </div>
-      <div class="publish-footer"><span id="communityPublishStatus" role="status">Your project stays private to your browser until you publish it here.</span><button class="btn primary" id="publishProjectBtn" type="button">Publish to Community Projects</button></div>
+      <div class="publish-footer"><span id="communityPublishStatus" role="status">Your game stays in this browser until you publish it.</span><button class="btn primary" id="publishProjectBtn" type="button">Publish to Community Games</button></div>
     </section>
-    <div class="community-browser-tools"><label class="community-search"><span>⌕</span><input id="communitySearch" type="search" placeholder="Search community projects…" autocomplete="off" autocorrect="off" spellcheck="false"></label><span id="communityProjectCount" class="community-count">Loading projects…</span></div>
-    <div class="community-slider-wrap">
-      <button class="community-arrow left" id="communityPrev" type="button" aria-label="Scroll projects left">‹</button>
-      <div class="community-project-slider" id="communityProjectSlider" aria-live="polite"><div class="community-loading">Loading community projects…</div></div>
-      <button class="community-arrow right" id="communityNext" type="button" aria-label="Scroll projects right">›</button>
-    </div>
-    <div class="community-footnote">Creators control the Copy Code and Download options. Previewing runs the project in an isolated frame.</div>
+    <div class="community-footnote">Only browser-runnable HTML, CSS, and JavaScript are included in the published game. Other source files remain in your project workspace.</div>
   </section>
-  <dialog id="communityPreviewDialog" class="community-preview-dialog">
-    <div class="community-preview-head"><div><span class="panel-kicker">COMMUNITY PREVIEW</span><h3 id="communityPreviewTitle">Project preview</h3><p id="communityPreviewDescription"></p></div><button class="btn" id="closeCommunityPreview" type="button" aria-label="Close preview">✕</button></div>
-    <div class="community-preview-toolbar"><span id="communityPreviewPermissions"></span><div class="community-preview-actions"><button class="btn" id="communityCopyCodeBtn" type="button">Copy code</button><button class="btn" id="communityDownloadBtn" type="button">Download HTML</button></div></div>
-    <iframe id="communityPreviewFrame" title="Community project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe>
-    <div class="community-preview-bottom"><span id="communityPreviewAuthor"></span><button class="btn" id="editCommunityProjectBtn" type="button" hidden>Edit my project</button></div>
-  </dialog>
 
 </main>
+<dialog id="addFileDialog" class="add-file-dialog" aria-labelledby="addFileDialogTitle">
+<div class="add-file-head"><h3 id="addFileDialogTitle">Add a project file</h3><div class="muted">Choose a file type, then give it a name.</div></div>
+<form id="addFileForm" class="add-file-body">
+<label for="newFileType">File type<select id="newFileType" required>
+<option value=".html">.html — Web page</option><option value=".css">.css — Stylesheet</option><option value=".js">.js — JavaScript</option><option value=".ts">.ts — TypeScript</option><option value=".json">.json — Data / settings</option><option value=".py">.py — Python source</option><option value=".java">.java — Java source</option><option value=".c">.c — C source</option><option value=".cpp">.cpp — C++ source</option><option value=".cs">.cs — C# source</option><option value=".php">.php — PHP source</option><option value=".sql">.sql — SQL script</option><option value=".sh">.sh — Shell script</option><option value=".lua">.lua — Lua source</option><option value=".xml">.xml — XML document</option><option value=".svg">.svg — Vector image</option><option value=".md">.md — Markdown notes</option><option value=".txt">.txt — Text file</option><option value=".csv">.csv — Table data</option><option value=".yaml">.yaml — YAML config</option><option value=".toml">.toml — TOML config</option>
+</select></label>
+<label for="newFileName">File name<input id="newFileName" maxlength="60" placeholder="example" autocomplete="off" required></label>
+<div class="small">Python, Java, C/C++, and other non-browser files can be edited and saved here, but the live game preview runs HTML, CSS, and JavaScript.</div>
+<div class="add-file-actions"><button class="btn" type="button" id="cancelAddFile">Cancel</button><button class="btn primary" type="submit">Create file</button></div>
+</form></dialog>
 <script src="scripting.js?v=5"></script>
 </body>
 </html>
