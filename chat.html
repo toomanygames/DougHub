@@ -1602,13 +1602,6 @@ async function renderMessages(
 
   if (shouldScrollBottom) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
-
-    // Only the first render gets delayed retries. Later refreshes retain the
-    // existing near-bottom behavior and never pull someone back down after
-    // they have chosen to read older messages.
-    if (lastRenderedMessageSignature === null) {
-      settleInitialChatScroll();
-    }
   }
 }
 
@@ -1715,12 +1708,20 @@ async function loadMessages() {
       messagesEl.scrollTop -
       messagesEl.clientHeight;
 
+    const isInitialRender = lastRenderedMessageSignature === null;
     const shouldScrollBottom =
-      lastRenderedMessageSignature === null ||
+      isInitialRender ||
       distanceFromBottom < 80;
 
     lastRenderedMessageSignature = signature;
     await renderMessages(orderedMessages, shouldScrollBottom);
+
+    // Retry only on entry, since the layout may settle after the first paint.
+    // Upward user scrolling cancels these retries so normal scroll-up behavior
+    // is never locked or overridden.
+    if (isInitialRender && shouldScrollBottom) {
+      settleInitialChatScroll();
+    }
 
     // A message received while this page is open is considered seen.
     if (document.visibilityState === "visible") {
