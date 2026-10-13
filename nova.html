@@ -203,6 +203,34 @@ body{margin:0;min-height:100vh;color:#f8f7ff;background:radial-gradient(ellipse 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
+
+<style id="nova-compact-header">
+/* Compact shared header and hero so Nova's workspace starts sooner. */
+header.top{height:64px;min-height:64px;padding-top:0;padding-bottom:0;gap:14px}
+header.top .logo{font-size:19px;gap:9px}
+header.top .logo-icon{width:34px;height:34px;flex-basis:34px;border-radius:11px}
+header.top .nav{gap:5px}
+header.top .nav a{padding:8px 10px;font-size:12px}
+.wrap{padding-top:30px}
+.hero{min-height:0;padding:clamp(23px,3.2vw,38px);margin-bottom:18px;border-radius:22px;gap:20px}
+.hero h1{font-size:clamp(36px,4.8vw,56px);margin:12px 0}
+.hero p{font-size:15px;line-height:1.7;max-width:610px}
+.hero-actions{margin-top:19px}
+.hero>.pill{font-size:11px;padding:8px 11px}
+.stats{margin-bottom:17px;gap:11px}
+.stat{padding:15px 18px}
+@media(max-width:640px){
+ header.top{height:auto;min-height:0;padding:11px 14px;gap:10px}
+ header.top .logo{font-size:18px}
+ header.top .logo-icon{width:32px;height:32px;flex-basis:32px}
+ .wrap{padding-top:17px}
+ .hero{padding:21px 18px;gap:14px;border-radius:18px}
+ .hero h1{font-size:clamp(34px,8.5vw,44px);margin:10px 0}
+ .hero p{font-size:14px}
+ .hero-actions{margin-top:16px}
+}
+</style>
+
 </head>
 <body>
 <header class="top">
