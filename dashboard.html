@@ -32,6 +32,51 @@ footer{padding:30px 0 0;color:#6f718d;text-align:center;font-size:10px}
 @media(max-width:850px){header{height:auto;min-height:72px;flex-wrap:wrap;padding:12px 18px}.page-shell{grid-template-columns:1fr}.sidebar{position:static;display:flex;align-items:center;gap:5px;overflow-x:auto;padding:8px;border-radius:14px}.side-label,.side-divider,.side-help{display:none}.side-link{flex:0 0 auto;padding:10px}.side-link span:last-child{white-space:nowrap}.content-grid{grid-template-columns:1fr 1fr}.welcome-mark{display:none}}
 @media(max-width:600px){header{padding:11px 12px}.page-shell{padding:17px 12px 35px}.page-heading{align-items:flex-start;flex-direction:column}.heading-actions{width:100%}.welcome{padding:22px 18px;min-height:0}.welcome h2{font-size:29px}.welcome p{font-size:11px}.welcome-actions .btn{flex:1}.section{margin-top:23px}.stat-grid{gap:8px}.stat-card{padding:12px}.stat-value{font-size:23px}.content-grid{grid-template-columns:1fr}.quick-grid{gap:8px}.quick-card{padding:11px;gap:8px}.quick-icon{width:32px;height:32px}.community-toolbar{align-items:stretch;flex-direction:column}.search-box{width:100%}.community-list{grid-template-columns:1fr}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.built-in{padding:10px;gap:8px}.built-in-icon{width:32px;height:32px}.side-link{font-size:11px}.side-icon{width:18px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Dashboard-first layout: clear hierarchy, compact controls, and useful work areas */
+.page-shell{width:min(1540px,100%);padding:26px clamp(16px,2.2vw,32px) 54px;grid-template-columns:224px minmax(0,1fr);gap:24px}
+.sidebar{top:94px;background:linear-gradient(160deg,#0e1229f5,#090b1af5);box-shadow:0 18px 55px #0002}
+.side-link{padding:12px 13px;font-size:12px}
+main{min-width:0}
+.page-heading{align-items:center;margin:2px 0 20px;padding:0 0 17px;border-bottom:1px solid var(--line)}
+.page-heading h1{font-size:clamp(27px,2.6vw,35px);letter-spacing:-1.2px}
+.page-heading p{font-size:12px}
+.crumb{font-size:10px;letter-spacing:.04em}
+.heading-actions .btn{padding:10px 13px}
+.welcome{min-height:0;padding:22px 25px;border-radius:18px;background:radial-gradient(ellipse at 85% 15%,#a855f724,transparent 38%),linear-gradient(110deg,#111831f5,#17112df2 68%,#201137ed);box-shadow:0 18px 50px #0003,inset 0 1px #ffffff09}
+.welcome:before{right:10%;top:-185px;width:280px;height:280px;opacity:.65}
+.welcome-copy{max-width:760px}
+.welcome h2{font-size:clamp(24px,2.5vw,33px);margin:10px 0 7px;letter-spacing:-1px}
+.welcome p{font-size:12px;max-width:650px}
+.welcome-actions{margin-top:14px}
+.welcome-mark{width:86px;height:86px;border-radius:24px;transform:none;background:linear-gradient(145deg,#6366f12b,#a855f729);border-color:#a78bfa36;box-shadow:0 0 45px #8b5cf626,inset 0 1px #ffffff12}
+.welcome-mark span{font-size:44px}
+.section{margin-top:24px}
+.section-head{margin-bottom:12px}
+.section-title{font-size:16px}
+.section-subtitle{font-size:11px}
+.stat-grid{gap:11px}
+.stat-card{position:relative;padding:15px 16px;border-radius:15px;background:linear-gradient(145deg,#11152be8,#0b0d1ef0);transition:transform .18s,border-color .18s}
+.stat-card:hover{transform:translateY(-2px);border-color:#a78bfa38}
+.stat-value{font-size:28px}
+.content-grid{grid-template-columns:minmax(0,1.35fr) minmax(260px,.8fr);gap:14px}
+.panel{border-radius:16px}
+.panel-head{padding:15px 17px}
+.panel-body{padding:13px}
+.activity-item{background:#ffffff04;transition:border-color .18s,background .18s}
+.activity-item:hover{border-color:#a78bfa45;background:#8b5cf610}
+.profile-card{padding:17px}
+.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.quick-card{padding:13px 14px;border-radius:13px;background:linear-gradient(145deg,#11152be8,#0b0d1edb)}
+.community-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.community-card{padding:12px;background:linear-gradient(145deg,#ffffff07,#ffffff02)}
+.built-in-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.auto-dashboard-setting{margin-top:30px;padding:14px 16px;background:#0d1127a8;border-color:#ffffff12;box-shadow:none}
+.auto-dashboard-copy h2{font-size:12px}
+footer{margin-top:28px;padding:18px 0 0;border-top:1px solid var(--line);color:#777b9d;font-size:10px}
+@media(max-width:1150px){.page-shell{grid-template-columns:190px minmax(0,1fr);gap:16px}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){.page-shell{grid-template-columns:1fr}.sidebar{position:static}.content-grid{grid-template-columns:1fr 1fr}.welcome-mark{display:none}}
+@media(max-width:600px){.page-shell{padding:16px 12px 32px}.page-heading{align-items:flex-start}.welcome{padding:20px 17px}.welcome h2{font-size:27px}.stat-grid{gap:8px}.stat-card{padding:12px}.stat-value{font-size:24px}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.community-list{grid-template-columns:1fr}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.auto-dashboard-setting{margin-top:22px}}
 </style>
 </head>
 <body>
@@ -58,27 +103,6 @@ footer{padding:30px 0 0;color:#6f718d;text-align:center;font-size:10px}
       <div><div class="crumb">Workspace / <span>Dashboard</span></div><h1>Dashboard</h1><p>Your personal overview of DougHub, your creations, and what’s happening in the community.</p></div>
       <div class="heading-actions"><a class="btn" href="my-games.html">▦ My content</a><a class="btn primary" href="Scripting/scripting.html">＋ Create a game</a></div>
     </div>
-    <aside class="pin-reminder" aria-label="Pin DougHub instructions">
-      <div class="pin-reminder-icon" aria-hidden="true">📌</div>
-      <div class="pin-reminder-copy">
-        <h2>Remember to pin me!</h2>
-        <p><strong>In Microsoft Edge or Chrome:</strong> right-click this browser tab at the top, then choose <strong>Pin tab</strong>. DougHub will stay tucked at the left of your tabs so it’s easier to find next time.</p>
-        <span class="pin-tip">Tip: You can also press Ctrl + D to bookmark DougHub for quick access.</span>
-      </div>
-    </aside>
-    <section class="auto-dashboard-setting" aria-labelledby="autoDashboardTitle">
-      <div class="auto-dashboard-icon" aria-hidden="true">↗</div>
-      <div class="auto-dashboard-copy">
-        <h2 id="autoDashboardTitle">Open Dashboard automatically</h2>
-        <p>When this is on, opening the DougHub home page while signed in takes you straight to this dashboard.</p>
-        <small>Saved in this browser on this device.</small>
-        <div class="auto-dashboard-status" id="autoDashboardStatus" role="status" aria-live="polite">Automatic dashboard opening is on.</div>
-      </div>
-      <label class="setting-switch" title="Toggle automatic dashboard opening">
-        <input type="checkbox" id="autoDashboardToggle" checked aria-label="Open the dashboard automatically when visiting the home page">
-        <span class="setting-switch-track" aria-hidden="true"></span>
-      </label>
-    </section>
     <section class="welcome">
       <div class="welcome-copy"><div class="eyebrow"><span class="live-dot"></span> YOUR WORKSPACE</div><h2 id="welcomeTitle">Welcome to <span>DougHub.</span></h2><p id="welcomeDescription">Everything you need to keep creating, discover new games, and stay connected with the community.</p><div class="welcome-actions"><a class="btn primary" href="Scripting/scripting.html">＋ Start creating</a><a class="btn" href="douggames.html">Explore games ↗</a></div></div>
       <div class="welcome-mark" aria-hidden="true"><span>D</span></div>
@@ -128,6 +152,19 @@ footer{padding:30px 0 0;color:#6f718d;text-align:center;font-size:10px}
         <a class="built-in" href="Games/racing.html"><span class="built-in-icon">🏎️</span><span><strong>Doug Racing</strong><small>Arcade racing</small></span></a>
         <a class="built-in" href="Games/puzzle.html"><span class="built-in-icon">🧩</span><span><strong>Doug Puzzle</strong><small>Puzzle game</small></span></a>
       </div>
+    </section>
+    <section class="auto-dashboard-setting" aria-labelledby="autoDashboardTitle">
+      <div class="auto-dashboard-icon" aria-hidden="true">↗</div>
+      <div class="auto-dashboard-copy">
+        <h2 id="autoDashboardTitle">Open Dashboard automatically</h2>
+        <p>When this is on, opening the DougHub home page while signed in takes you straight to this dashboard.</p>
+        <small>Saved in this browser on this device.</small>
+        <div class="auto-dashboard-status" id="autoDashboardStatus" role="status" aria-live="polite">Automatic dashboard opening is on.</div>
+      </div>
+      <label class="setting-switch" title="Toggle automatic dashboard opening">
+        <input type="checkbox" id="autoDashboardToggle" checked aria-label="Open the dashboard automatically when visiting the home page">
+        <span class="setting-switch-track" aria-hidden="true"></span>
+      </label>
     </section>
     <footer>DougHub • Your space to play, create, and connect.</footer>
   </main>
