@@ -535,7 +535,7 @@ main {
 }
 
 .message-badge{display:inline-flex;align-items:center;gap:3px;margin-left:4px;padding:2px 6px;border-radius:999px;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.2);font-size:10px;font-weight:800;color:#ddd6fe}.message-row.mine .message-badge{margin-left:0;margin-right:4px}
-.chat-mention{display:inline;color:#60a5fa;font-weight:750;background:rgba(59,130,246,.12);border:1px solid rgba(96,165,250,.18);border-radius:5px;padding:0 3px;white-space:normal;pointer-events:none}
+.chat-mention{display:inline;color:#60a5fa;font-weight:750;background:rgba(59,130,246,.12);border:1px solid rgba(96,165,250,.18);border-radius:5px;padding:0 3px;white-space:normal;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}.chat-mention:hover,.chat-mention:focus-visible{background:rgba(59,130,246,.24);border-color:rgba(96,165,250,.55);outline:none}.chat-profile-backdrop{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,12,.72);backdrop-filter:blur(9px);animation:chatProfileFade .16s ease}.chat-profile-card{position:relative;width:min(410px,100%);max-height:min(80vh,620px);overflow:auto;padding:24px;border:1px solid rgba(129,140,248,.3);border-radius:22px;background:radial-gradient(circle at 90% 0,rgba(99,102,241,.18),transparent 42%),linear-gradient(145deg,#12162e,#080a18);box-shadow:0 28px 90px #0009;color:#f5f5ff;animation:chatProfileIn .2s ease}.chat-profile-close{position:absolute;top:13px;right:13px;width:34px;height:34px;border:1px solid #ffffff1c;border-radius:11px;background:#ffffff0a;color:#e8e8ff;font-size:21px;cursor:pointer}.chat-profile-identity{display:flex;align-items:center;gap:14px;padding:8px 36px 20px 0}.chat-profile-avatar{width:64px;height:64px;flex:0 0 64px;object-fit:cover;border-radius:20px;border:1px solid #a5b4fc55;background:#171a34}.chat-profile-name{min-width:0;font-size:21px;font-weight:850;overflow-wrap:anywhere}.chat-profile-handle{margin-top:4px;color:#60a5fa;font-size:13px;font-weight:750}.chat-profile-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}.chat-profile-badge{padding:5px 8px;border-radius:999px;border:1px solid #a78bfa35;background:#a78bfa14;color:#ddd6fe;font-size:11px;font-weight:800}.chat-profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chat-profile-stat{padding:14px;border:1px solid #ffffff12;border-radius:14px;background:#ffffff06}.chat-profile-stat strong{display:block;font-size:21px;letter-spacing:-.5px}.chat-profile-stat span{display:block;margin-top:4px;color:#a4a7c4;font-size:11px}.chat-profile-footer{margin-top:15px;color:#858aa9;font-size:12px;line-height:1.5}.chat-profile-loading{padding:25px 4px;color:#a4a7c4;text-align:center}@keyframes chatProfileFade{from{opacity:0}to{opacity:1}}@keyframes chatProfileIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 </style>
   <script src="nav.js" defer></script>
 
@@ -1096,8 +1096,7 @@ function hideError() {
 ========================================= */
 
 function renderMessageText(container, text) {
-  // Mentions are purely visual: keep the original message as text nodes and
-  // style @usernames without making them links or triggering notifications.
+  // Mention highlighting is visual; clicking a mention opens the user's profile card.
   const mentionPattern = /@([A-Za-z0-9_]{1,32})/g;
   let lastIndex = 0;
   let match;
@@ -1107,15 +1106,115 @@ function renderMessageText(container, text) {
       container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
     }
 
-    const mention = document.createElement("span");
+    const mention = document.createElement("button");
+    mention.type = "button";
     mention.className = "chat-mention";
     mention.textContent = match[0];
+    mention.setAttribute("aria-label", "View profile for " + match[1]);
+    mention.addEventListener("click", () => openMentionProfile(match[1]));
     container.appendChild(mention);
     lastIndex = match.index + match[0].length;
   }
 
   if (lastIndex < text.length) {
     container.appendChild(document.createTextNode(text.slice(lastIndex)));
+  }
+}
+
+let activeMentionProfileModal = null;
+async function openMentionProfile(username) {
+  if (activeMentionProfileModal) activeMentionProfileModal.remove();
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "chat-profile-backdrop";
+  backdrop.setAttribute("role", "presentation");
+  backdrop.innerHTML = `
+    <section class="chat-profile-card" role="dialog" aria-modal="true" aria-label="Account statistics">
+      <button type="button" class="chat-profile-close" aria-label="Close profile">×</button>
+      <div class="chat-profile-loading">Loading @${escapeHtml(username)}…</div>
+    </section>`;
+  document.body.appendChild(backdrop);
+  activeMentionProfileModal = backdrop;
+
+  const close = () => {
+    if (activeMentionProfileModal === backdrop) activeMentionProfileModal = null;
+    backdrop.remove();
+    document.removeEventListener("keydown", onKeyDown);
+  };
+  const onKeyDown = event => { if (event.key === "Escape") close(); };
+  backdrop.querySelector(".chat-profile-close").addEventListener("click", close);
+  backdrop.addEventListener("click", event => { if (event.target === backdrop) close(); });
+  document.addEventListener("keydown", onKeyDown);
+
+  try {
+    const profileResult = await supabaseClient.from("profiles")
+      .select("id, username, avatar_url, created_at, reward_badges, equipped_badge, is_admin")
+      .ilike("username", username)
+      .limit(1)
+      .maybeSingle();
+
+    if (activeMentionProfileModal !== backdrop) return;
+    if (profileResult.error || !profileResult.data) {
+      backdrop.querySelector(".chat-profile-loading").textContent =
+        "Couldn't find that account. Check the username and try again.";
+      return;
+    }
+
+    const profile = profileResult.data;
+    const countResult = await supabaseClient.from("chat_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", profile.id);
+    const messageCount = typeof countResult.count === "number" ? countResult.count : null;
+    const createdAt = profile.created_at ? new Date(profile.created_at) : null;
+    const validDate = createdAt && !Number.isNaN(createdAt.getTime());
+    const daysOnDougHub = validDate ? Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / 86400000)) : null;
+    const earnedBadges = Array.isArray(profile.reward_badges) ? profile.reward_badges : [];
+    const badgeNames = {summer:"Summer",spring:"Spring",fall:"Fall",winter:"Winter",halloween:"Halloween",christmas:"Christmas"};
+    const badgeLabels = earnedBadges.map(b => badgeNames[b] || String(b)).slice(0, 8);
+    const avatar = profile.avatar_url || "https://doughub.online/DougHub.ico";
+    const card = backdrop.querySelector(".chat-profile-card");
+    card.innerHTML = `
+      <button type="button" class="chat-profile-close" aria-label="Close profile">×</button>
+      <div class="chat-profile-identity">
+        <img class="chat-profile-avatar" alt="" referrerpolicy="no-referrer">
+        <div><div class="chat-profile-name"></div><div class="chat-profile-handle"></div></div>
+      </div>
+      <div class="chat-profile-badges"></div>
+      <div class="chat-profile-stats">
+        <div class="chat-profile-stat"><strong class="chat-profile-message-count">—</strong><span>Community messages</span></div>
+        <div class="chat-profile-stat"><strong class="chat-profile-days">—</strong><span>Days on DougHub</span></div>
+        <div class="chat-profile-stat"><strong class="chat-profile-badge-count">—</strong><span>Earned badges</span></div>
+        <div class="chat-profile-stat"><strong class="chat-profile-role">Member</strong><span>Account role</span></div>
+      </div>
+      <div class="chat-profile-footer"></div>`;
+    card.querySelector(".chat-profile-close").addEventListener("click", close);
+    const img = card.querySelector(".chat-profile-avatar");
+    img.src = avatar;
+    img.onerror = () => { img.onerror = null; img.src = "https://doughub.online/DougHub.ico"; };
+    card.querySelector(".chat-profile-name").textContent = profile.username || username;
+    card.querySelector(".chat-profile-handle").textContent = "@" + (profile.username || username);
+    card.querySelector(".chat-profile-message-count").textContent = messageCount === null ? "—" : messageCount.toLocaleString();
+    card.querySelector(".chat-profile-days").textContent = daysOnDougHub === null ? "—" : daysOnDougHub.toLocaleString();
+    card.querySelector(".chat-profile-badge-count").textContent = earnedBadges.length.toLocaleString();
+    card.querySelector(".chat-profile-role").textContent = profile.is_admin ? "Admin" : "Member";
+    const badges = card.querySelector(".chat-profile-badges");
+    if (badgeLabels.length) {
+      badgeLabels.forEach(label => {
+        const badge = document.createElement("span");
+        badge.className = "chat-profile-badge";
+        badge.textContent = "✦ " + label;
+        badges.appendChild(badge);
+      });
+    } else {
+      badges.remove();
+    }
+    card.querySelector(".chat-profile-footer").textContent =
+      validDate ? "Member since " + createdAt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "Account statistics";
+    card.querySelector(".chat-profile-close").focus();
+  } catch (error) {
+    console.error("Could not load mentioned account stats:", error);
+    const loading = backdrop.querySelector(".chat-profile-loading");
+    if (loading) loading.textContent = "Couldn't load account statistics right now. Please try again.";
   }
 }
 
