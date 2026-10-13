@@ -1708,6 +1708,21 @@ header {
 @media(max-width:900px){.trending-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.trending-panel{padding:16px}.trending-grid{grid-template-columns:1fr}.trending-card{padding:15px}}
 
+
+.game-search-controls{display:flex;align-items:center;gap:10px;width:min(100%,520px)}
+.game-search-controls #gameSearch{flex:1;min-width:140px;width:100%}
+.game-search-controls #gameFilter{flex:0 0 150px;min-width:0;padding:13px 12px;color:#f5f6ff;background:rgba(8,10,26,.9);border:1px solid var(--games-line);border-radius:12px}
+.community-card{position:relative;padding-top:44px}
+.community-favorite{position:absolute;top:12px;right:12px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(177,184,255,.2);border-radius:10px;background:rgba(5,7,20,.72);color:#aeb5d1;font-size:18px;cursor:pointer}
+.community-favorite.is-favorite{color:#fbbf24;border-color:#fbbf2466;background:#fbbf2414}
+.community-favorite:hover{transform:scale(1.06)}
+.trending-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.trending-card{padding:clamp(22px,3vw,32px);min-height:220px}
+.trending-card h3{font-size:clamp(18px,2vw,23px)}
+.trending-card p{font-size:14px}
+.trending-game-icon{font-size:32px}
+.trending-metric strong{font-size:19px}
+@media(max-width:520px){.trending-grid{grid-template-columns:1fr}.game-search-controls{flex-direction:column;align-items:stretch}.game-search-controls #gameFilter{flex-basis:auto;width:100%}}
 </style>
   <script src="nav.js" defer></script>
 
@@ -2082,7 +2097,8 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 
             </div>
 
-            <input
+            <div class="game-search-controls">
+              <input
                 type="search"
                 id="gameSearch"
                 class="search-box"
@@ -2098,7 +2114,13 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
                 data-lpignore="true"
                 data-1p-ignore="true"
                 readonly
-            >
+              >
+              <select id="gameFilter" aria-label="Filter community games">
+                <option value="all">All games</option>
+                <option value="favorites">★ Favorites</option>
+                <option value="new">New games</option>
+              </select>
+            </div>
 
         </div>
 
@@ -2966,6 +2988,23 @@ async function loadCommunityGames() {
 
 function setupCommunitySlider(){const container=document.getElementById("communityGames");const shell=container?.parentElement;if(!container||!shell)return;const left=shell.querySelector(".community-slider-arrow.left");const right=shell.querySelector(".community-slider-arrow.right");const update=()=>{const max=container.scrollWidth-container.clientWidth;if(left)left.disabled=container.scrollLeft<=2;if(right)right.disabled=container.scrollLeft>=max-2};if(left)left.onclick=()=>container.scrollBy({left:-Math.max(container.clientWidth*.82,280),behavior:"smooth"});if(right)right.onclick=()=>container.scrollBy({left:Math.max(container.clientWidth*.82,280),behavior:"smooth"});container.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);requestAnimationFrame(update)}
 
+function getFavoriteGameIds() {
+    try {
+        const ids = JSON.parse(localStorage.getItem("dougHubFavoriteGames") || "[]");
+        return Array.isArray(ids) ? ids.map(String) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function toggleFavoriteGame(gameId) {
+    const id = String(gameId);
+    const ids = getFavoriteGameIds();
+    const next = ids.includes(id) ? ids.filter(item => item !== id) : [...ids, id];
+    localStorage.setItem("dougHubFavoriteGames", JSON.stringify(next));
+    renderCommunityGames();
+}
+
 function renderCommunityGames() {
 
     const container =
@@ -2980,49 +3019,31 @@ function renderCommunityGames() {
 
     const search =
         searchInput
-            ? searchInput.value
-                .toLowerCase()
-                .trim()
+            ? searchInput.value.toLowerCase().trim()
             : "";
+    const filterMode = document.getElementById("gameFilter")?.value || "all";
+    const favoriteIds = getFavoriteGameIds();
+    const newGameCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
-    const filtered =
-        communityGames.filter(
-            function(game) {
-
-                return (
-
-                    (game.title || "")
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    (game.description || "")
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    (game.author || "")
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    (game.category || "")
-                        .toLowerCase()
-                        .includes(search)
-
-                );
-
-            }
-        );
+    const filtered = communityGames.filter(function(game) {
+        const matchesSearch =
+            (game.title || "").toLowerCase().includes(search) ||
+            (game.description || "").toLowerCase().includes(search) ||
+            (game.author || "").toLowerCase().includes(search) ||
+            (game.category || "").toLowerCase().includes(search);
+        const isFavorite = favoriteIds.includes(String(game.id));
+        const createdAt = new Date(game.created_at || 0).getTime();
+        const isNew = Number.isFinite(createdAt) && createdAt >= newGameCutoff;
+        return matchesSearch &&
+            (filterMode !== "favorites" || isFavorite) &&
+            (filterMode !== "new" || isNew);
+    });
 
     if (!filtered.length) {
 
         container.innerHTML =
             `<div class="empty">
-                No community games found.
+                ${filterMode === "favorites" ? "No favorite games yet. Tap the star on a game to save it." : filterMode === "new" ? "No new games from the last 7 days found." : "No community games found."} 
             </div>`;
 
         return;
@@ -3039,6 +3060,8 @@ function renderCommunityGames() {
                             class="community-card"
                             data-game-id="${escapeHtml(game.id)}"
                         >
+
+                            <button type="button" class="community-favorite ${getFavoriteGameIds().includes(String(game.id)) ? "is-favorite" : ""}" aria-label="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}" aria-pressed="${getFavoriteGameIds().includes(String(game.id))}" title="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}">${getFavoriteGameIds().includes(String(game.id)) ? "★" : "☆"}</button>
 
                             <span
                                 class="community-category"
@@ -3092,6 +3115,14 @@ function renderCommunityGames() {
         .forEach(
             function(card) {
 
+                const favoriteButton = card.querySelector(".community-favorite");
+                if (favoriteButton) {
+                    favoriteButton.addEventListener("click", function(event) {
+                        event.stopPropagation();
+                        toggleFavoriteGame(card.dataset.gameId);
+                    });
+                }
+
                 card.addEventListener(
                     "click",
                     function() {
@@ -3117,6 +3148,11 @@ const gameSearch =
     document.getElementById(
         "gameSearch"
     );
+
+const gameFilter = document.getElementById("gameFilter");
+if (gameFilter) {
+    gameFilter.addEventListener("change", renderCommunityGames);
+}
 
 if (gameSearch) {
 
