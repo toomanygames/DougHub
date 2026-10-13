@@ -5,327 +5,134 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050611">
 <title>Dashboard • DougHub</title>
-<link rel="icon" href="DougHub.svg" type="image/x-icon">
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
 <script src="nav.js" defer></script>
 <script src="search-autofill-fix.js" defer></script>
 <style>
-:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--panel2:#10152f;--line:#ffffff14;--muted:#a0a1bb;--purple:#a855f7;--indigo:#6366f1;--green:#86efac}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{visibility:hidden;margin:0;min-height:100vh;color:#f8f7ff;background:radial-gradient(ellipse at 12% 0%,#6366f126,transparent 34%),radial-gradient(ellipse at 88% 8%,#a855f71c,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
-header{height:72px;position:sticky;top:0;z-index:1000;background:#050611dc;backdrop-filter:blur(20px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:22px;padding:0 30px}
-.logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}.logo-icon{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 26px #6366f14d;font-weight:900}
-.nav{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto;min-width:0}.nav-link{display:inline-flex;align-items:center;color:#d9dcf4;font-size:13px;font-weight:700;white-space:nowrap;padding:9px 12px;border:1px solid transparent;border-radius:10px;transition:.18s}.nav-link:hover{background:#ffffff12;color:white;transform:translateY(-1px)}
-.account-area{position:relative;flex-shrink:0}.account-btn{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:12px;color:white;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer;max-width:190px}.account-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;font-weight:800;flex-shrink:0}.account-avatar img{width:100%;height:100%;object-fit:cover}.account-menu{position:absolute;right:0;top:calc(100% + 10px);width:210px;padding:8px;border:1px solid var(--line);border-radius:14px;background:#101127;box-shadow:0 20px 55px #0009;display:none}.account-menu.show{display:block}.account-menu a,.account-menu button{display:block;width:100%;padding:10px 11px;border:0;border-radius:9px;text-align:left;color:#deddf0;background:transparent;cursor:pointer;font-size:13px}.account-menu a:hover,.account-menu button:hover{background:#ffffff0d;color:white}
-.page-shell{width:min(1480px,100%);margin:0 auto;padding:30px clamp(16px,2.5vw,34px) 64px;display:grid;grid-template-columns:218px minmax(0,1fr);gap:26px;align-items:start}.sidebar{position:sticky;top:96px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(155deg,#11152bea,#0b0d1ee8);backdrop-filter:blur(16px);padding:15px}.side-label{padding:9px 10px 11px;color:#777b9d;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.side-link{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid transparent;border-radius:11px;color:#aeb0ca;font-size:12px;font-weight:700;transition:.18s}.side-link:hover{background:#ffffff08;color:white}.side-link.active{color:#fff;background:linear-gradient(100deg,#6366f126,#a855f71b);border-color:#a78bfa2d;box-shadow:inset 3px 0 #a78bfa}.side-icon{width:24px;text-align:center;font-size:16px}.side-divider{height:1px;background:var(--line);margin:12px 4px}.side-help{margin-top:14px;padding:13px;border:1px solid #a78bfa20;border-radius:14px;background:radial-gradient(circle at 100% 0,#8b5cf621,transparent 55%),#ffffff03}.side-help strong{font-size:12px}.side-help p{font-size:11px;line-height:1.6;color:var(--muted);margin:7px 0 10px}.side-help a{color:#c4b5fd;font-size:11px;font-weight:800}
-main{min-width:0}.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:3px 0 22px}.crumb{color:#898aa8;font-size:11px;margin-bottom:10px}.crumb span{color:#c4b5fd}.page-heading h1{margin:0;font-size:clamp(28px,3vw,38px);letter-spacing:-1.4px;line-height:1.1}.page-heading p{margin:9px 0 0;color:var(--muted);font-size:13px;line-height:1.6}.heading-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#ffffff06;color:#f8f7ff;border-radius:11px;padding:11px 14px;font-size:12px;font-weight:800;cursor:pointer;transition:.18s}.btn:hover{transform:translateY(-2px);border-color:#a78bfa66;background:#8b5cf618}.btn.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 8px 25px #6366f133}.btn.small{padding:8px 10px;font-size:11px}
-.welcome{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:208px;padding:29px 31px;border:1px solid #a5b4fc24;border-radius:22px;background:linear-gradient(115deg,#111831ed,#17112de8 65%,#25123be0);box-shadow:0 22px 65px #0003, inset 0 1px #ffffff08}.welcome:before{content:"";position:absolute;z-index:-1;width:260px;height:260px;right:7%;top:-155px;border:1px solid #c4b5fd20;border-radius:50%;box-shadow:0 0 0 34px #a78bfa08,0 0 0 70px #a78bfa06}.welcome:after{content:"";position:absolute;z-index:-1;width:240px;height:160px;right:8%;bottom:-130px;background:#8b5cf6;filter:blur(70px);opacity:.28}.welcome-copy{max-width:640px}.eyebrow{display:flex;align-items:center;gap:8px;color:#c4b5fd;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #86efac}.welcome h2{font-size:clamp(26px,3vw,39px);line-height:1.1;letter-spacing:-1.3px;margin:14px 0 9px}.welcome h2 span{background:linear-gradient(95deg,#a5b4fc,#d8b4fe 70%,#67e8f9);background-clip:text;color:transparent}.welcome p{max-width:560px;color:#b5b4c9;font-size:12px;line-height:1.75;margin:0}.welcome-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:19px}.welcome-mark{width:128px;height:128px;flex-shrink:0;display:grid;place-items:center;border-radius:35px;border:1px solid #ffffff18;background:linear-gradient(145deg,#ffffff0d,#ffffff03);box-shadow:inset 0 1px #ffffff10,0 18px 55px #0002;transform:rotate(4deg)}.welcome-mark span{font-size:62px;font-weight:950;background:linear-gradient(135deg,#a5b4fc,#d8b4fe 65%,#67e8f9);background-clip:text;color:transparent}
-.pin-reminder{display:flex;align-items:flex-start;gap:14px;margin:0 0 20px;padding:16px 18px;border:1px solid #a78bfa45;border-radius:16px;background:linear-gradient(110deg,#6366f119,#a855f716);box-shadow:0 14px 35px #0002;box-shadow:0 12px 35px #0002}.pin-reminder-icon{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;border-radius:12px;background:#a78bfa20;font-size:21px}.pin-reminder-copy{min-width:0;flex:1}.pin-reminder h2{margin:1px 0 6px;font-size:14px}.pin-reminder p{margin:0;color:#b9bad2;font-size:11px;line-height:1.7}.pin-reminder strong{color:#f3e8ff}.pin-reminder .pin-tip{display:block;margin-top:5px;color:#c4b5fd;font-size:10px}.section{margin-top:27px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:13px}.section-title{margin:0;font-size:17px;letter-spacing:-.35px}.section-subtitle{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.5}.section-link{color:#c4b5fd;font-size:11px;font-weight:800;white-space:nowrap}.section-link:hover{color:white}
-.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat-card{min-width:0;padding:16px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#11152bd9,#0b0d1edb);box-shadow:0 10px 30px #0002;backdrop-filter:blur(12px)}.stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.stat-label{color:#a3a4bf;font-size:11px;font-weight:700}.stat-icon{width:33px;height:33px;display:grid;place-items:center;border-radius:10px;background:#818cf81a;font-size:16px}.stat-value{margin-top:13px;font-size:26px;line-height:1;font-weight:850;letter-spacing:-.8px}.stat-foot{margin-top:8px;color:#8587a5;font-size:10px}.status-pill{display:inline-flex;align-items:center;gap:6px;color:#bbf7d0;font-size:10px;font-weight:800;background:#22c55e12;border:1px solid #22c55e24;padding:5px 8px;border-radius:999px}.status-pill:before{content:"";width:5px;height:5px;background:#86efac;border-radius:50%}
-.content-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,.8fr);gap:14px;align-items:stretch}.panel{min-width:0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(150deg,#11152bea,#090b1ee8);backdrop-filter:blur(14px);overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 18px;border-bottom:1px solid var(--line)}.panel-head h3{font-size:13px;margin:0}.panel-head p{font-size:10px;color:var(--muted);margin:5px 0 0}.panel-body{padding:14px 16px}.activity-list{display:grid;gap:9px}.activity-item{display:flex;align-items:center;gap:11px;padding:11px;border:1px solid #ffffff0a;border-radius:12px;background:#ffffff03;min-width:0}.activity-icon{width:38px;height:38px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:linear-gradient(135deg,#6366f12e,#a855f729);font-size:18px}.activity-text{min-width:0;flex:1}.activity-text strong{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.activity-text small{display:block;margin-top:5px;color:var(--muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.activity-arrow{color:#b7b8d5;font-size:16px}.empty{padding:25px 15px;text-align:center;border:1px dashed #ffffff1b;border-radius:13px;color:var(--muted);font-size:11px;line-height:1.8}.empty a{color:#c4b5fd;font-weight:800}.profile-card{padding:19px}.profile-top{display:flex;align-items:center;gap:12px}.profile-avatar{width:49px;height:49px;display:grid;place-items:center;flex-shrink:0;overflow:hidden;border-radius:16px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:20px;font-weight:900}.profile-avatar img{width:100%;height:100%;object-fit:cover}.profile-name{font-size:13px;font-weight:850;overflow-wrap:anywhere}.profile-email{margin-top:4px;color:var(--muted);font-size:10px;overflow-wrap:anywhere}.profile-meta{display:grid;gap:10px;margin-top:18px;padding-top:15px;border-top:1px solid var(--line)}.meta-row{display:flex;justify-content:space-between;gap:12px;font-size:10px}.meta-row span:first-child{color:var(--muted)}.meta-row strong{text-align:right;font-size:10px}
-.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.quick-card{min-width:0;display:flex;align-items:center;gap:12px;padding:15px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#ffffff08,#ffffff03);transition:.18s}.quick-card:hover{transform:translateY(-2px);border-color:#a78bfa55;background:#8b5cf610}.quick-icon{width:39px;height:39px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:#818cf81a;font-size:18px}.quick-card strong{display:block;font-size:11px}.quick-card small{display:block;color:var(--muted);font-size:10px;margin-top:4px;line-height:1.35}
-.community-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.community-toolbar p{margin:0;color:var(--muted);font-size:11px}.search-box{width:min(300px,100%);display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid #ffffff15;border-radius:10px;background:#05061188;color:#aaa9bf}.search-box input{width:100%;min-width:0;outline:0;border:0;background:transparent;color:white;font-size:11px}.community-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.community-card{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid #ffffff0d;border-radius:12px;background:#ffffff03;transition:.18s}.community-card:hover{border-color:#a78bfa55;background:#8b5cf610}.community-icon{width:38px;height:38px;flex-shrink:0;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,#6366f12b,#a855f729);font-size:18px}.community-info{min-width:0;flex:1}.community-info strong{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.community-info small{display:block;margin-top:4px;color:var(--muted);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.community-arrow{color:#c4b5fd;font-size:15px}
-.built-in-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.built-in{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(135deg,#141832,#0b0d1e);transition:.18s}.built-in:hover{transform:translateY(-2px);border-color:#a78bfa55}.built-in-icon{width:37px;height:37px;display:grid;place-items:center;flex-shrink:0;border-radius:11px;background:#ffffff09;font-size:19px}.built-in strong{display:block;font-size:11px}.built-in small{display:block;margin-top:4px;color:var(--muted);font-size:9px}
-footer{padding:30px 0 0;color:#6f718d;text-align:center;font-size:10px}
-.auto-dashboard-setting{display:flex;align-items:center;gap:14px;margin:0 0 20px;padding:16px 18px;border:1px solid #a78bfa32;border-radius:16px;background:linear-gradient(110deg,#6366f116,#a855f711)}.auto-dashboard-icon{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;border:1px solid #a78bfa2d;border-radius:12px;background:#8b5cf61a;font-size:19px}.auto-dashboard-copy{min-width:0;flex:1}.auto-dashboard-copy h2{margin:0;font-size:13px}.auto-dashboard-copy p{margin:5px 0 0;color:#aeb0ca;font-size:11px;line-height:1.65}.auto-dashboard-copy small{display:block;margin-top:4px;color:#898baa;font-size:10px}.auto-dashboard-status{margin-top:4px;color:#c4b5fd;font-size:10px}.setting-switch{position:relative;display:inline-flex;flex:0 0 auto;cursor:pointer}.setting-switch input{position:absolute;width:1px;height:1px;opacity:0}.setting-switch-track{width:48px;height:28px;padding:4px;border:1px solid #ffffff20;border-radius:999px;background:#ffffff12;transition:.2s}.setting-switch-track:after{content:"";display:block;width:18px;height:18px;border-radius:50%;background:#c9c9dc;box-shadow:0 1px 4px #0005;transition:transform .2s,background .2s}.setting-switch input:checked+.setting-switch-track{background:#6366f15c;border-color:#a78bfa85}.setting-switch input:checked+.setting-switch-track:after{transform:translateX(20px);background:#fff}.setting-switch input:focus-visible+.setting-switch-track{outline:2px solid #a5b4fc;outline-offset:3px}@media(max-width:600px){.auto-dashboard-setting{align-items:flex-start;padding:14px}.auto-dashboard-icon{width:34px;height:34px;flex-basis:34px}.setting-switch{margin-top:3px}}
-@media(max-width:1150px){.page-shell{grid-template-columns:190px minmax(0,1fr);gap:16px;padding:20px 18px 45px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.community-list{grid-template-columns:repeat(2,minmax(0,1fr))}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.welcome-mark{width:95px;height:95px;border-radius:27px}.welcome-mark span{font-size:47px}}
-@media(max-width:850px){header{height:auto;min-height:72px;flex-wrap:wrap;padding:12px 18px}.page-shell{grid-template-columns:1fr}.sidebar{position:static;display:flex;align-items:center;gap:5px;overflow-x:auto;padding:8px;border-radius:14px}.side-label,.side-divider,.side-help{display:none}.side-link{flex:0 0 auto;padding:10px}.side-link span:last-child{white-space:nowrap}.content-grid{grid-template-columns:1fr 1fr}.welcome-mark{display:none}}
-@media(max-width:600px){header{padding:11px 12px}.page-shell{padding:17px 12px 35px}.page-heading{align-items:flex-start;flex-direction:column}.heading-actions{width:100%}.welcome{padding:22px 18px;min-height:0}.welcome h2{font-size:29px}.welcome p{font-size:11px}.welcome-actions .btn{flex:1}.section{margin-top:23px}.stat-grid{gap:8px}.stat-card{padding:12px}.stat-value{font-size:23px}.content-grid{grid-template-columns:1fr}.quick-grid{gap:8px}.quick-card{padding:11px;gap:8px}.quick-icon{width:32px;height:32px}.community-toolbar{align-items:stretch;flex-direction:column}.search-box{width:100%}.community-list{grid-template-columns:1fr}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.built-in{padding:10px;gap:8px}.built-in-icon{width:32px;height:32px}.side-link{font-size:11px}.side-icon{width:18px}}
+:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--panel2:#111630;--line:#ffffff14;--muted:#9a9cb8;--text:#f8f7ff;--indigo:#6366f1;--purple:#a855f7;--green:#86efac}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:100px}body{visibility:hidden;margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 10% 0%,#6366f126,transparent 34%),radial-gradient(ellipse at 90% 5%,#a855f71c,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+header{height:72px;position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 clamp(16px,3vw,38px);background:#050611e8;backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}.logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}.logo-icon{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 26px #6366f14d;font-weight:900}.nav{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto;min-width:0}
+.workspace{width:min(1510px,100%);margin:auto;padding:26px clamp(14px,2.5vw,34px) 50px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:start}
+.sidebar{position:sticky;top:94px;padding:13px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(155deg,#11152bea,#0b0d1ee8);backdrop-filter:blur(16px)}.side-label{padding:10px 10px 8px;color:#777b9d;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.side-link{display:flex;align-items:center;gap:11px;margin:3px 0;padding:11px 12px;border:1px solid transparent;border-radius:11px;color:#aeb0ca;font-size:12px;font-weight:700;transition:background .18s,border-color .18s,color .18s}.side-link:hover{background:#ffffff08;color:#fff}.side-link.active{color:#fff;background:linear-gradient(100deg,#6366f126,#a855f71b);border-color:#a78bfa2d;box-shadow:inset 3px 0 #a78bfa}.side-icon{width:26px;height:26px;display:grid;place-items:center;border:1px solid #ffffff12;border-radius:8px;background:#ffffff05;color:#c4b5fd;font-size:10px;font-weight:900}.side-divider{height:1px;background:var(--line);margin:12px 4px}.side-bottom{margin-top:14px;padding:13px;border:1px solid #a78bfa20;border-radius:14px;background:radial-gradient(circle at 100% 0,#8b5cf621,transparent 55%),#ffffff03}.side-bottom strong{font-size:12px}.side-bottom p{margin:6px 0 10px;color:var(--muted);font-size:11px;line-height:1.6}.side-bottom a{font-size:11px;font-weight:800;color:#c4b5fd}
+main{min-width:0}.topline{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:2px 0 22px}.crumb{margin-bottom:7px;color:#8587a4;font-size:10px}.crumb span{color:#c4b5fd}.topline h1{margin:0;font-size:clamp(27px,3vw,36px);letter-spacing:-1.3px;line-height:1.1}.topline p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.65}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:39px;padding:0 13px;border:1px solid var(--line);border-radius:11px;background:#ffffff06;color:#f8f7ff;font-size:11px;font-weight:800;cursor:pointer;transition:transform .18s,border-color .18s,background .18s}.btn:hover{transform:translateY(-2px);border-color:#a78bfa66;background:#8b5cf618}.btn.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 8px 25px #6366f133}.btn.primary:hover{background:linear-gradient(120deg,#7477ff,#b367ff)}
+.hero{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:25px 28px;border:1px solid #a5b4fc24;border-radius:20px;background:radial-gradient(ellipse at 85% 15%,#a855f724,transparent 38%),linear-gradient(110deg,#111831f5,#17112df2 68%,#201137ed);box-shadow:0 18px 50px #0003,inset 0 1px #ffffff09}.hero:before{content:"";position:absolute;z-index:-1;right:12%;top:-175px;width:270px;height:270px;border:1px solid #c4b5fd20;border-radius:50%;box-shadow:0 0 0 34px #a78bfa08,0 0 0 70px #a78bfa06}.hero-copy{min-width:0;max-width:750px}.eyebrow{display:flex;align-items:center;gap:8px;color:#c4b5fd;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #86efac}.hero h2{margin:11px 0 8px;font-size:clamp(24px,2.8vw,35px);letter-spacing:-1.1px;line-height:1.12}.hero h2 span{background:linear-gradient(95deg,#a5b4fc,#d8b4fe 70%,#67e8f9);background-clip:text;color:transparent}.hero p{max-width:610px;margin:0;color:#b5b4c9;font-size:12px;line-height:1.75}.hero-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.hero-side{width:175px;flex:0 0 175px;padding:16px;border:1px solid #ffffff14;border-radius:15px;background:#07091660}.hero-side small{display:block;color:#9698b5;font-size:10px}.hero-side strong{display:block;margin:7px 0 4px;font-size:15px;overflow-wrap:anywhere}.hero-side a{font-size:10px;font-weight:800;color:#c4b5fd}
+.section{margin-top:23px;scroll-margin-top:100px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:12px}.section-title{margin:0;font-size:16px;letter-spacing:-.35px}.section-subtitle{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.55}.section-link{color:#c4b5fd;font-size:11px;font-weight:800;white-space:nowrap}.section-link:hover{color:white}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.stat{min-width:0;padding:15px 16px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#11152be8,#0b0d1ef0);transition:transform .18s,border-color .18s}.stat:hover{transform:translateY(-2px);border-color:#a78bfa38}.stat-label{color:#a3a4bf;font-size:10px;font-weight:750}.stat-value{margin-top:11px;font-size:27px;line-height:1;font-weight:850;letter-spacing:-.8px;font-variant-numeric:tabular-nums}.stat-foot{margin-top:7px;color:#8587a5;font-size:10px}
+.main-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.8fr);gap:14px;align-items:start}.panel{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:17px;background:linear-gradient(150deg,#11152bea,#090b1ee8);backdrop-filter:blur(14px)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 17px;border-bottom:1px solid var(--line)}.panel-head h3{margin:0;font-size:13px}.panel-head p{margin:5px 0 0;color:var(--muted);font-size:10px}.panel-body{padding:13px}.creation-list,.conversation-list{display:grid;gap:8px}.creation{display:flex;align-items:center;gap:11px;min-width:0;padding:11px;border:1px solid #ffffff0b;border-radius:12px;background:#ffffff03;transition:border-color .18s,background .18s}.creation:hover{border-color:#a78bfa40;background:#8b5cf610}.item-mark{width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;border:1px solid #a78bfa26;border-radius:11px;background:linear-gradient(135deg,#6366f12b,#a855f729);color:#ddd6fe;font-size:10px;font-weight:900}.item-copy{min-width:0;flex:1}.item-copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.item-copy small{display:block;margin-top:5px;color:var(--muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item-arrow{color:#b8a5ff;font-size:14px}.empty{padding:24px 14px;border:1px dashed #ffffff1b;border-radius:12px;color:var(--muted);font-size:11px;line-height:1.8;text-align:center}.empty strong{display:block;margin-bottom:4px;color:#f0efff;font-size:12px}.empty a{color:#c4b5fd;font-weight:800}
+.profile{padding:16px}.profile-top{display:flex;align-items:center;gap:11px}.avatar{width:45px;height:45px;display:grid;place-items:center;flex:0 0 45px;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:18px;font-weight:900}.avatar img{width:100%;height:100%;object-fit:cover}.profile-name{font-size:12px;font-weight:850;overflow-wrap:anywhere}.profile-email{margin-top:4px;color:var(--muted);font-size:10px;overflow-wrap:anywhere}.profile-details{display:grid;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}.detail-row{display:flex;justify-content:space-between;gap:12px;font-size:10px}.detail-row span{color:var(--muted)}.detail-row strong{text-align:right;font-size:10px}.profile-actions{display:flex;gap:8px;margin-top:15px}.profile-actions .btn{flex:1}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.quick-card{display:flex;align-items:center;gap:11px;min-width:0;padding:13px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,#11152be8,#0b0d1edb);transition:transform .18s,border-color .18s,background .18s}.quick-card:hover{transform:translateY(-2px);border-color:#a78bfa55;background:#8b5cf610}.quick-mark{width:36px;height:36px;display:grid;place-items:center;flex:0 0 36px;border:1px solid #ffffff12;border-radius:10px;background:#818cf81a;color:#d7d4ff;font-size:9px;font-weight:900}.quick-card strong{display:block;font-size:11px}.quick-card small{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.4}
+.preference{display:flex;align-items:center;gap:13px;padding:15px 17px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#10142bef,#090b19ed)}.preference-mark{width:37px;height:37px;display:grid;place-items:center;flex:0 0 37px;border:1px solid #a78bfa2d;border-radius:11px;background:#8b5cf61a;color:#d7d4ff;font-size:13px;font-weight:900}.preference-copy{min-width:0;flex:1}.preference-copy strong{font-size:12px}.preference-copy p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.6}.preference-status{margin-top:4px;color:#c4b5fd;font-size:10px}.switch{position:relative;display:inline-flex;flex:0 0 auto;cursor:pointer}.switch input{position:absolute;width:1px;height:1px;opacity:0}.switch-track{width:46px;height:27px;padding:3px;border:1px solid #ffffff20;border-radius:999px;background:#ffffff12;transition:.2s}.switch-track:after{content:"";display:block;width:19px;height:19px;border-radius:50%;background:#c9c9dc;transition:transform .2s,background .2s}.switch input:checked+.switch-track{background:#6366f15c;border-color:#a78bfa85}.switch input:checked+.switch-track:after{transform:translateX(19px);background:#fff}.switch input:focus-visible+.switch-track{outline:2px solid #a5b4fc;outline-offset:3px}
+footer{padding:26px 0 0;color:#6f718d;text-align:center;font-size:10px}
+@media(max-width:1150px){.workspace{grid-template-columns:190px minmax(0,1fr);gap:16px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.main-grid{grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr)}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-side{width:150px;flex-basis:150px}}
+@media(max-width:850px){header{height:auto;min-height:72px;flex-wrap:wrap;padding:12px 18px}.workspace{grid-template-columns:1fr;padding-top:18px}.sidebar{position:static;display:flex;align-items:center;gap:4px;overflow-x:auto;padding:8px}.side-label,.side-divider,.side-bottom{display:none}.side-link{flex:0 0 auto;margin:0;padding:8px}.side-link span:last-child{white-space:nowrap}.main-grid{grid-template-columns:1fr 1fr}.hero-side{display:none}}
+@media(max-width:600px){header{padding:11px 12px}.workspace{padding:16px 12px 32px}.topline{align-items:flex-start;flex-direction:column}.top-actions{width:100%}.top-actions .btn{flex:1}.hero{padding:21px 18px}.hero h2{font-size:28px}.hero p{font-size:11px}.hero-actions .btn{flex:1}.stats{gap:8px}.stat{padding:12px}.stat-value{font-size:24px}.main-grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.quick-card{padding:10px;gap:8px}.quick-mark{width:31px;height:31px;flex-basis:31px}.section-title{font-size:17px}.preference{align-items:flex-start;padding:13px}.preference-mark{width:32px;height:32px;flex-basis:32px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-
-/* Dashboard-first layout: clear hierarchy, compact controls, and useful work areas */
-.page-shell{width:min(1540px,100%);padding:26px clamp(16px,2.2vw,32px) 54px;grid-template-columns:224px minmax(0,1fr);gap:24px}
-.sidebar{top:94px;background:linear-gradient(160deg,#0e1229f5,#090b1af5);box-shadow:0 18px 55px #0002}
-.side-link{padding:12px 13px;font-size:12px}
-main{min-width:0}
-.page-heading{align-items:center;margin:2px 0 20px;padding:0 0 17px;border-bottom:1px solid var(--line)}
-.page-heading h1{font-size:clamp(27px,2.6vw,35px);letter-spacing:-1.2px}
-.page-heading p{font-size:12px}
-.crumb{font-size:10px;letter-spacing:.04em}
-.heading-actions .btn{padding:10px 13px}
-.welcome{min-height:0;padding:22px 25px;border-radius:18px;background:radial-gradient(ellipse at 85% 15%,#a855f724,transparent 38%),linear-gradient(110deg,#111831f5,#17112df2 68%,#201137ed);box-shadow:0 18px 50px #0003,inset 0 1px #ffffff09}
-.welcome:before{right:10%;top:-185px;width:280px;height:280px;opacity:.65}
-.welcome-copy{max-width:760px}
-.welcome h2{font-size:clamp(24px,2.5vw,33px);margin:10px 0 7px;letter-spacing:-1px}
-.welcome p{font-size:12px;max-width:650px}
-.welcome-actions{margin-top:14px}
-.welcome-mark{width:86px;height:86px;border-radius:24px;transform:none;background:linear-gradient(145deg,#6366f12b,#a855f729);border-color:#a78bfa36;box-shadow:0 0 45px #8b5cf626,inset 0 1px #ffffff12}
-.welcome-mark span{font-size:44px}
-.section{margin-top:24px}
-.section-head{margin-bottom:12px}
-.section-title{font-size:16px}
-.section-subtitle{font-size:11px}
-.stat-grid{gap:11px}
-.stat-card{position:relative;padding:15px 16px;border-radius:15px;background:linear-gradient(145deg,#11152be8,#0b0d1ef0);transition:transform .18s,border-color .18s}
-.stat-card:hover{transform:translateY(-2px);border-color:#a78bfa38}
-.stat-value{font-size:28px}
-.content-grid{grid-template-columns:minmax(0,1.35fr) minmax(260px,.8fr);gap:14px}
-.panel{border-radius:16px}
-.panel-head{padding:15px 17px}
-.panel-body{padding:13px}
-.activity-item{background:#ffffff04;transition:border-color .18s,background .18s}
-.activity-item:hover{border-color:#a78bfa45;background:#8b5cf610}
-.profile-card{padding:17px}
-.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.quick-card{padding:13px 14px;border-radius:13px;background:linear-gradient(145deg,#11152be8,#0b0d1edb)}
-.community-list{grid-template-columns:repeat(2,minmax(0,1fr))}
-.community-card{padding:12px;background:linear-gradient(145deg,#ffffff07,#ffffff02)}
-.built-in-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.auto-dashboard-setting{margin-top:30px;padding:14px 16px;background:#0d1127a8;border-color:#ffffff12;box-shadow:none}
-.auto-dashboard-copy h2{font-size:12px}
-footer{margin-top:28px;padding:18px 0 0;border-top:1px solid var(--line);color:#777b9d;font-size:10px}
-@media(max-width:1150px){.page-shell{grid-template-columns:190px minmax(0,1fr);gap:16px}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:850px){.page-shell{grid-template-columns:1fr}.sidebar{position:static}.content-grid{grid-template-columns:1fr 1fr}.welcome-mark{display:none}}
-@media(max-width:600px){.page-shell{padding:16px 12px 32px}.page-heading{align-items:flex-start}.welcome{padding:20px 17px}.welcome h2{font-size:27px}.stat-grid{gap:8px}.stat-card{padding:12px}.stat-value{font-size:24px}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.community-list{grid-template-columns:1fr}.built-in-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.auto-dashboard-setting{margin-top:22px}}
-
-/* Shared index.html visual language — keep the dashboard's own workspace layout */
-:root{--bg:#050611;--line:#ffffff14;--muted:#a0a1bb;--indigo:#6366f1;--purple:#a855f7}
-html{scroll-padding-top:100px}
-body{background:radial-gradient(ellipse at 4% 0%,#312e8145,transparent 35%),radial-gradient(ellipse at 92% 9%,#701a7530,transparent 32%),var(--bg)}
-header{height:76px;min-height:76px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,56px);background:#050611dc;border-bottom:1px solid var(--line);backdrop-filter:blur(20px)}
-header .logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}
-header .logo-icon{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 26px #6366f14d;font-weight:950}
-.page-shell{isolation:isolate}
-.sidebar,.panel,.stat-card,.quick-card,.community-card,.built-in,.auto-dashboard-setting{backdrop-filter:blur(16px)}
-.sidebar{border-color:#ffffff12;border-radius:19px;background:linear-gradient(150deg,#10142bef,#090b19ed);box-shadow:0 22px 60px #0003}
-.side-link{border-radius:11px;transition:transform .2s,border-color .2s,background .2s,color .2s}
-.side-link:hover{transform:translateX(2px);border-color:#ffffff10;background:#ffffff09}
-.side-link.active{background:linear-gradient(100deg,#6366f126,#a855f71b);border-color:#a78bfa38;box-shadow:inset 3px 0 #a78bfa,0 0 24px #6366f10c}
-.page-heading{border-bottom-color:#ffffff14}
-.page-heading h1{font-weight:850;letter-spacing:-.055em}
-.page-heading p,.section-subtitle{color:#a0a1bb}
-.crumb span,.section-link,.side-help a{color:#c4b5fd}
-.btn{min-height:43px;padding:0 16px;border:1px solid #ffffff17;border-radius:13px;background:#ffffff06;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
-.btn:hover{transform:translateY(-2px);border-color:#a78bfa70;background:#ffffff0d}
-.btn.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 10px 30px #6366f133}
-.btn.primary:hover{background:linear-gradient(120deg,#7477ff,#b367ff);box-shadow:0 14px 36px #6366f144}
-.welcome{border-color:#ffffff20;border-radius:23px;background:linear-gradient(150deg,#151a37f5,#0b0d1df5);box-shadow:0 32px 80px #0005,0 0 55px #6366f10d,inset 0 1px #ffffff08}
-.welcome:before{border-color:#a5b4fc20;box-shadow:0 0 0 34px #a78bfa06,0 0 0 70px #a78bfa04}
-.section-title{font-size:clamp(20px,2.2vw,25px);font-weight:800;letter-spacing:-.04em}
-.stat-card,.panel,.quick-card,.community-card,.built-in{border-color:#ffffff12;background:linear-gradient(145deg,#10142bef,#090b19ed);box-shadow:inset 0 1px #ffffff04}
-.stat-card{border-radius:17px}
-.stat-card:hover,.quick-card:hover,.community-card:hover,.built-in:hover{transform:translateY(-3px);border-color:#a78bfa55;box-shadow:0 18px 45px #0003,0 0 30px #6366f10b}
-.panel{border-radius:19px;overflow:hidden}
-.panel-head{border-bottom-color:#ffffff12;background:#ffffff03}
-.panel-head h3{font-weight:800;letter-spacing:-.025em}
-.activity-item,.profile-card{border-color:#ffffff12;border-radius:13px;background:#ffffff04}
-.activity-item:hover{transform:translateY(-1px);border-color:#a78bfa55;background:#8b5cf612}
-.quick-card{border-radius:16px;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
-.quick-icon,.built-in-icon{border:1px solid #ffffff12;border-radius:13px;background:linear-gradient(135deg,#6366f126,#a855f71c)}
-.community-card{border-radius:14px;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
-.built-in{border-radius:15px;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
-.search-box{border-color:#ffffff17;border-radius:13px;background:#080a17}
-.search-box:focus-within{border-color:#a78bfa80;box-shadow:0 0 0 3px #8b5cf626}
-.auto-dashboard-setting{border-radius:17px;background:linear-gradient(145deg,#10142bef,#090b19ed);border-color:#ffffff12}
-footer{border-top-color:#ffffff14}
-@media(max-width:850px){header{height:auto;min-height:76px;flex-wrap:wrap;padding:12px 18px}}
-@media(max-width:600px){header{padding:11px 12px}.page-heading h1{font-size:30px}.section-title{font-size:20px}}
-
-
-/* Faster dashboard navigation: one-click jumps to each major section */
-.dashboard-jumps{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:-3px 0 20px;padding:7px;border:1px solid #ffffff12;border-radius:14px;background:#090b19a8}
-.dashboard-jumps a{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid transparent;border-radius:9px;color:#b6b8d0;font-size:11px;font-weight:750;transition:background .18s,border-color .18s,color .18s}
-.dashboard-jumps a:hover{color:#fff;background:#ffffff0b;border-color:#ffffff12}
-.stat-icon,.activity-icon,.quick-icon,.community-icon,.built-in-icon{font-size:10px;font-weight:900;letter-spacing:.01em}
-.side-icon{font-size:10px;font-weight:900;letter-spacing:.01em}
-.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media(max-width:1150px){.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.dashboard-jumps{gap:5px}.dashboard-jumps a{padding:0 8px;font-size:10px}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-
 </style>
 </head>
 <body>
-<header>
-  <a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a>
-  <nav class="nav" aria-label="Main navigation"></nav>
-</header>
-<div class="page-shell">
-  <aside class="sidebar" aria-label="Dashboard shortcuts">
-    <div class="side-label">Workspace</div>
-    <a class="side-link active" href="dashboard.html" aria-current="page"><span class="side-icon">▦</span><span>Dashboard</span></a>
-    <a class="side-link" href="my-games.html"><span class="side-icon">GAME</span><span>My Games &amp; Videos</span></a>
-    <a class="side-link" href="Scripting/scripting.html"><span class="side-icon">⌘</span><span>Create a game</span></a>
-    <div class="side-divider"></div>
-    <div class="side-label">DougHub</div>
-    <a class="side-link" href="douggames.html"><span class="side-icon">PLAY</span><span>Explore games</span></a>
-    <a class="side-link" href="dougforum.html"><span class="side-icon">DF</span><span>DougForum</span></a><a class="side-link" href="chat.html"><span class="side-icon">CHAT</span><span>Community chat</span></a>
-    <a class="side-link" href="dmail.html"><span class="side-icon">MAIL</span><span>DMail</span></a>
-    <a class="side-link" href="settings.html"><span class="side-icon">SET</span><span>Settings</span></a>
-    <div class="side-help"><strong>Ready to build?</strong><p>Turn an idea into your next game.</p><a href="Scripting/scripting.html">Open creator tools ↗</a></div>
-  </aside>
-  <main>
-    <div class="page-heading" id="top">
-      <div><div class="crumb">Workspace / <span>Dashboard</span></div><h1>Dashboard</h1><p>Your personal overview of DougHub, your creations, and what’s happening in the community.</p></div>
-      <div class="heading-actions"><a class="btn" href="my-games.html">▦ My content</a><a class="btn primary" href="Scripting/scripting.html">＋ Create a game</a></div>
-    </div>
-    <nav class="dashboard-jumps" aria-label="Dashboard sections">
-      <a href="#overview">Overview</a><a href="#my-creations-section">My creations</a><a href="#quick-access-section">Quick access</a><a href="#community-games-section">Community</a><a href="#built-in-games-section">Built-in games</a><a href="#preferences">Preferences</a>
-    </nav>
-    <section class="welcome">
-      <div class="welcome-copy"><div class="eyebrow"><span class="live-dot"></span> YOUR WORKSPACE</div><h2 id="welcomeTitle">Welcome to <span>DougHub.</span></h2><p id="welcomeDescription">Everything you need to keep creating, discover new games, and stay connected with the community.</p><div class="welcome-actions"><a class="btn primary" href="Scripting/scripting.html">＋ Start creating</a><a class="btn" href="douggames.html">Explore games ↗</a></div></div>
-      <div class="welcome-mark" aria-hidden="true"><span>D</span></div>
-    </section>
-    <section class="section" id="overview">
-      <div class="section-head"><div><h2 class="section-title">Your overview</h2><p class="section-subtitle">A live snapshot of your account and creator activity.</p></div><span class="status-pill" id="accountStatus">Checking account</span></div>
-      <div class="stat-grid">
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">Published games</span><span class="stat-icon">GAME</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Games published by your account</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">Community games</span><span class="stat-icon">ALL</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Published by DougHub creators</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">DougHub members</span><span class="stat-icon">MEM</span></div><div class="stat-value" id="memberTotal">—</div><div class="stat-foot">People in the community</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-label">New this week</span><span class="stat-icon">NEW</span></div><div class="stat-value" id="recentTotal">—</div><div class="stat-foot">Community games added in 7 days</div></div>
-      </div>
-    </section>
-    <section class="section" id="my-creations-section">
-      <div class="content-grid">
-        <div class="panel">
-          <div class="panel-head"><div><h3>Your recent creations</h3><p>Your latest published games in one place.</p></div><a class="section-link" href="my-games.html">Manage all ↗</a></div>
-          <div class="panel-body"><div class="activity-list" id="myCreations"><div class="empty">Loading your creations…</div></div></div>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><div><h3>Your account</h3><p>Your current DougHub profile.</p></div><a class="section-link" href="settings.html">Settings ↗</a></div>
-          <div class="profile-card">
-            <div class="profile-top"><div class="profile-avatar" id="profileAvatar">?</div><div><div class="profile-name" id="profileName">Loading account…</div><div class="profile-email" id="profileEmail">Checking sign-in</div></div></div>
-            <div class="profile-meta"><div class="meta-row"><span>Member since</span><strong id="memberSince">—</strong></div><div class="meta-row"><span>Account type</span><strong id="accountType">—</strong></div><div class="meta-row"><span>Today</span><strong id="dashboardDate">—</strong></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="section" id="quick-access-section">
-      <div class="section-head"><div><h2 class="section-title">Quick access</h2><p class="section-subtitle">Go straight to a part of DougHub.</p></div></div>
-      <div class="quick-grid">
-        <a class="quick-card" href="douggames.html"><span class="quick-icon">PLAY</span><span><strong>DougGames</strong><small>Play and discover games</small></span></a>
-        <a class="quick-card" href="dougtube.html"><span class="quick-icon">VID</span><span><strong>DougTube</strong><small>Watch community videos</small></span></a>
-        <a class="quick-card" href="douqhub-music.html"><span class="quick-icon">MUSIC</span><span><strong>DougHub Music</strong><small>Explore music posts</small></span></a>
-        <a class="quick-card" href="dougforum.html"><span class="quick-icon">DF</span><span><strong>DougForum</strong><small>Posts, votes, and discussions</small></span></a>
-        <a class="quick-card" href="tools.html"><span class="quick-icon">TOOLS</span><span><strong>DougTools</strong><small>Open your tool collection</small></span></a>
-      </div>
-    </section>
-    <section class="section" id="community-games-section">
-      <div class="section-head"><div><h2 class="section-title">Community games</h2><p class="section-subtitle">Find something new made by a DougHub creator.</p></div><a class="section-link" href="douggames.html">Browse all ↗</a></div>
-      <div class="panel"><div class="panel-body"><div class="community-toolbar"><p id="communitySummary">Loading community creations…</p><label class="search-box"><span>⌕</span><input id="communitySearch" type="search" autocomplete="off" spellcheck="false" placeholder="Search games or creators…" aria-label="Search community games"></label></div><div class="community-list" id="communityList"><div class="empty">Loading games…</div></div></div></div>
-    </section>
-    <section class="section" id="built-in-games-section">
-      <div class="section-head"><div><h2 class="section-title">Play something</h2><p class="section-subtitle">A few built-in games, ready when you are.</p></div><a class="section-link" href="douggames.html">All games ↗</a></div>
-      <div class="built-in-grid">
-        <a class="built-in" href="Games/pig-clicker.html"><span class="built-in-icon">PIG</span><span><strong>Pig Clicker</strong><small>Casual clicker</small></span></a>
-        <a class="built-in" href="Games/rebirth-clicker.html"><span class="built-in-icon">REB</span><span><strong>Rebirth Clicker</strong><small>Progression</small></span></a>
-        <a class="built-in" href="Games/racing.html"><span class="built-in-icon">RACE</span><span><strong>Doug Racing</strong><small>Arcade racing</small></span></a>
-        <a class="built-in" href="Games/puzzle.html"><span class="built-in-icon">ALL</span><span><strong>Doug Puzzle</strong><small>Puzzle game</small></span></a>
-      </div>
-    </section>
-    <section class="auto-dashboard-setting" id="preferences" aria-labelledby="autoDashboardTitle">
-      <div class="auto-dashboard-icon" aria-hidden="true">↗</div>
-      <div class="auto-dashboard-copy">
-        <h2 id="autoDashboardTitle">Open Dashboard automatically</h2>
-        <p>When this is on, opening the DougHub home page while signed in takes you straight to this dashboard.</p>
-        <small>Saved in this browser on this device.</small>
-        <div class="auto-dashboard-status" id="autoDashboardStatus" role="status" aria-live="polite">Automatic dashboard opening is on.</div>
-      </div>
-      <label class="setting-switch" title="Toggle automatic dashboard opening">
-        <input type="checkbox" id="autoDashboardToggle" checked aria-label="Open the dashboard automatically when visiting the home page">
-        <span class="setting-switch-track" aria-hidden="true"></span>
-      </label>
-    </section>
-    <footer>DougHub • Your space to play, create, and connect.</footer>
-  </main>
+<header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<div class="workspace">
+<aside class="sidebar" aria-label="Dashboard navigation">
+ <div class="side-label">Workspace</div>
+ <a class="side-link active" href="#overview" aria-current="page"><span class="side-icon">OV</span><span>Overview</span></a>
+ <a class="side-link" href="#creations"><span class="side-icon">MY</span><span>My creations</span></a>
+ <a class="side-link" href="#community"><span class="side-icon">COM</span><span>Community activity</span></a>
+ <a class="side-link" href="#quick-access"><span class="side-icon">GO</span><span>Quick access</span></a>
+ <div class="side-divider"></div><div class="side-label">DougHub</div>
+ <a class="side-link" href="douggames.html"><span class="side-icon">GAME</span><span>Explore games</span></a>
+ <a class="side-link" href="dougforum.html"><span class="side-icon">DF</span><span>DougForum</span></a>
+ <a class="side-link" href="tools.html"><span class="side-icon">TOOL</span><span>DougTools</span></a>
+ <a class="side-link" href="settings.html"><span class="side-icon">SET</span><span>Settings</span></a>
+ <div class="side-bottom"><strong>Ready to create?</strong><p>Open the creator and turn an idea into a project.</p><a href="Scripting/scripting.html">Open creator tools ↗</a></div>
+</aside>
+<main>
+ <div class="topline" id="overview"><div><div class="crumb">Workspace / <span>Dashboard</span></div><h1>Your dashboard</h1><p id="todayLabel">Your DougHub workspace at a glance.</p></div><div class="top-actions"><a class="btn" href="my-games.html">Manage content</a><a class="btn primary" href="Scripting/scripting.html">+ Create a project</a></div></div>
+ <section class="hero"><div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> YOUR WORKSPACE</div><h2 id="welcomeTitle">Welcome back.</h2><p id="welcomeDescription">Your creations, community conversations, and favorite tools — together in one place.</p><div class="hero-actions"><a class="btn primary" href="Scripting/scripting.html">Start creating ↗</a><a class="btn" href="dougforum.html">Join the discussion</a></div></div><div class="hero-side"><small>Signed in as</small><strong id="heroAccountName">Loading account…</strong><a href="settings.html">Manage your profile ↗</a></div></section>
+ <section class="section" aria-labelledby="statsTitle"><div class="section-head"><div><h2 class="section-title" id="statsTitle">Your overview</h2><p class="section-subtitle">A snapshot of your account and the DougHub community.</p></div><span class="eyebrow" id="accountStatus">Checking account</span></div>
+  <div class="stats">
+   <div class="stat"><div class="stat-label">Your published games</div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Published under your account</div></div>
+   <div class="stat"><div class="stat-label">Community games</div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Shared by DougHub creators</div></div>
+   <div class="stat"><div class="stat-label">DougHub members</div><div class="stat-value" id="memberTotal">—</div><div class="stat-foot">Profiles in the community</div></div>
+   <div class="stat"><div class="stat-label">Games this week</div><div class="stat-value" id="recentTotal">—</div><div class="stat-foot">New community creations</div></div>
+  </div>
+ </section>
+ <div class="main-grid section">
+  <section id="creations" class="panel"><div class="panel-head"><div><h3>Your creations</h3><p>Recently published projects associated with your account.</p></div><a class="section-link" href="my-games.html">Manage all ↗</a></div><div class="panel-body"><div class="creation-list" id="myCreations"><div class="empty">Loading your creations…</div></div></div></section>
+  <section class="panel"><div class="panel-head"><div><h3>Your account</h3><p>Profile and membership details.</p></div><a class="section-link" href="settings.html">Settings ↗</a></div><div class="profile"><div class="profile-top"><div class="avatar" id="profileAvatar">D</div><div><div class="profile-name" id="profileName">Loading profile…</div><div class="profile-email" id="profileEmail">Checking sign-in</div></div></div><div class="profile-details"><div class="detail-row"><span>Member since</span><strong id="memberSince">—</strong></div><div class="detail-row"><span>Account type</span><strong id="accountType">Member</strong></div><div class="detail-row"><span>Today</span><strong id="dashboardDate">—</strong></div></div><div class="profile-actions"><a class="btn" href="settings.html">Edit profile</a><a class="btn" href="my-games.html">My content</a></div></div></section>
+ </div>
+ <section class="section" id="community"><div class="section-head"><div><h2 class="section-title">Community activity</h2><p class="section-subtitle">Recent conversations from DougForum.</p></div><a class="section-link" href="dougforum.html">Open DougForum ↗</a></div><div class="panel"><div class="panel-body"><div class="conversation-list" id="recentForumPosts"><div class="empty">Loading recent discussions…</div></div></div></div></section>
+ <section class="section" id="quick-access"><div class="section-head"><div><h2 class="section-title">Quick access</h2><p class="section-subtitle">Jump directly to the parts of DougHub you use most.</p></div></div><div class="quick-grid">
+  <a class="quick-card" href="douggames.html"><span class="quick-mark">GAME</span><span><strong>DougGames</strong><small>Play and discover games</small></span></a>
+  <a class="quick-card" href="dougforum.html"><span class="quick-mark">DF</span><span><strong>DougForum</strong><small>Posts and discussions</small></span></a>
+  <a class="quick-card" href="chat.html"><span class="quick-mark">CHAT</span><span><strong>Community chat</strong><small>Talk with other members</small></span></a>
+  <a class="quick-card" href="tools.html"><span class="quick-mark">TOOLS</span><span><strong>DougTools</strong><small>Open your tool collection</small></span></a>
+  <a class="quick-card" href="douqhub-music.html"><span class="quick-mark">MUSIC</span><span><strong>DougHub Music</strong><small>Explore music posts</small></span></a>
+  <a class="quick-card" href="dougtube.html"><span class="quick-mark">VIDEO</span><span><strong>DougTube</strong><small>Watch community videos</small></span></a>
+ </div></section>
+ <section class="section"><div class="preference"><span class="preference-mark">AUTO</span><div class="preference-copy"><strong>Open Dashboard automatically</strong><p>When enabled, visiting the homepage while signed in takes you directly to this dashboard. This preference is saved in this browser.</p><div class="preference-status" id="autoDashboardStatus" role="status" aria-live="polite">Checking preference…</div></div><label class="switch" title="Toggle automatic dashboard opening"><input type="checkbox" id="autoDashboardToggle" checked aria-label="Open Dashboard automatically"><span class="switch-track" aria-hidden="true"></span></label></div></section>
+ <footer>DougHub · Your space to play, create, and connect.</footer>
+</main>
 </div>
 <script>
 "use strict";
 const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
 const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null,allCommunityGames=[],myCommunityGames=[];
 const $=id=>document.getElementById(id);
 const AUTO_DASHBOARD_KEY="dh_dashboard_auto_open_v1";
-const autoDashboardToggle=$("autoDashboardToggle");
-const autoDashboardStatus=$("autoDashboardStatus");
-function renderAutoDashboardSetting(){
- const enabled=localStorage.getItem(AUTO_DASHBOARD_KEY)!=="false";
- autoDashboardToggle.checked=enabled;
- autoDashboardStatus.textContent=enabled?"Automatic dashboard opening is on.":"Automatic dashboard opening is off. The homepage will stay visible.";
-}
-renderAutoDashboardSetting();
-autoDashboardToggle.addEventListener("change",()=>{
- const enabled=autoDashboardToggle.checked;
- try{localStorage.setItem(AUTO_DASHBOARD_KEY,String(enabled));}
- catch(error){autoDashboardStatus.textContent="This browser blocked saving the setting.";return;}
- autoDashboardStatus.textContent=enabled?"Saved — DougHub will open your dashboard automatically.":"Saved — DougHub will open the homepage instead.";
-});
+let currentUser=null,allCommunityGames=[],myCommunityGames=[];
 function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
-function gameIcon(game){const c=String(game.category||"").toLowerCase();return c.includes("puzz")?"PUZ":c.includes("rac")?"RACE":c.includes("action")?"ACT":c.includes("sim")?"SIM":"GAME";}
+function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recently":d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:d.getFullYear()!==new Date().getFullYear()?"numeric":undefined});}
+function renderAutoDashboard(){const enabled=localStorage.getItem(AUTO_DASHBOARD_KEY)!=="false";$("autoDashboardToggle").checked=enabled;$("autoDashboardStatus").textContent=enabled?"On — the homepage opens your dashboard automatically.":"Off — the homepage stays on the main page.";}
+try{renderAutoDashboard();}catch(error){$("autoDashboardStatus").textContent="This browser could not read the saved preference.";}
+$("autoDashboardToggle").addEventListener("change",()=>{try{localStorage.setItem(AUTO_DASHBOARD_KEY,String($("autoDashboardToggle").checked));renderAutoDashboard();}catch(error){$("autoDashboardStatus").textContent="This browser blocked saving the preference.";}});
+
 function renderMyCreations(){
  const host=$("myCreations");
- if(!currentUser){host.innerHTML='<div class="empty">Sign in to see your published games here.<br><a href="log-in.html?redirect=dashboard.html">Log in to DougHub ↗</a></div>';return;}
- if(!myCommunityGames.length){host.innerHTML='<div class="empty">No published games yet — your creator journey starts here.<br><a href="Scripting/scripting.html">Create your first game ↗</a></div>';return;}
- host.innerHTML=myCommunityGames.slice(0,4).map(game=>'<a class="activity-item" href="my-games.html"><span class="activity-icon">'+gameIcon(game)+'</span><span class="activity-text"><strong>'+escapeHTML(game.title||"Untitled game")+'</strong><small>'+escapeHTML(game.category||"Community game")+' · '+(game.created_at?new Date(game.created_at).toLocaleDateString():"Published")+'</small></span><span class="activity-arrow">↗</span></a>').join("");
+ if(!myCommunityGames.length){host.innerHTML='<div class="empty"><strong>No published projects yet</strong>Your first creation can start here.<br><a href="Scripting/scripting.html">Create a project ↗</a></div>';return;}
+ host.innerHTML=myCommunityGames.slice(0,5).map(g=>'<a class="creation" href="my-games.html"><span class="item-mark">'+escapeHTML(String(g.category||"GAME").slice(0,4).toUpperCase())+'</span><span class="item-copy"><strong>'+escapeHTML(g.title||"Untitled project")+'</strong><small>'+escapeHTML(g.category||"Community game")+' · '+escapeHTML(dateLabel(g.created_at))+'</small></span><span class="item-arrow">↗</span></a>').join("");
 }
-function renderCommunityGames(){
- const query=$("communitySearch").value.trim().toLowerCase();
- const games=allCommunityGames.filter(game=>[game.title,game.description,game.author,game.category].some(value=>String(value||"").toLowerCase().includes(query))).slice(0,9);
- $("communitySummary").textContent=query?games.length+" matching games":"Latest community creations";
- if(!games.length){$("communityList").innerHTML='<div class="empty">'+(query?'No games match that search. Try another title or creator.':'No community games are available yet.')+'<br><a href="douggames.html">Open DougGames ↗</a></div>';return;}
- $("communityList").innerHTML=games.map(game=>'<a class="community-card" href="douggames.html"><span class="community-icon">'+gameIcon(game)+'</span><span class="community-info"><strong>'+escapeHTML(game.title||"Untitled game")+'</strong><small>'+escapeHTML(game.author||"DougHub creator")+(game.category?" · "+escapeHTML(game.category):"")+'</small></span><span class="community-arrow">↗</span></a>').join("");
+function renderForumPosts(rows,names){
+ const host=$("recentForumPosts");
+ if(!rows.length){host.innerHTML='<div class="empty"><strong>No recent discussions to show</strong>Start a conversation or browse the forum.<br><a href="dougforum.html">Open DougForum ↗</a></div>';return;}
+ host.innerHTML=rows.slice(0,5).map(p=>{const c=p.dougforum_communities||{};return '<a class="creation" href="dougforum.html#post-'+encodeURIComponent(p.id)+'"><span class="item-mark">DF</span><span class="item-copy"><strong>'+escapeHTML(p.title||"Untitled discussion")+'</strong><small>'+escapeHTML(c.name||"DougForum")+' · '+escapeHTML(names[p.author_id]||"DougHub member")+' · '+escapeHTML(dateLabel(p.created_at))+'</small></span><span class="item-arrow">↗</span></a>';}).join("");
 }
-$("communitySearch").addEventListener("input",renderCommunityGames);
 async function loadDashboard(){
- let sessionResult;
- try{
-  sessionResult=await supabaseClient.auth.getSession();
- }catch(error){
-  console.warn("Dashboard session check failed:",error);
-  location.replace("log-in.html?redirect=dashboard.html");
-  return;
- }
- const session=sessionResult?.data?.session||null;
- const sessionError=sessionResult?.error;
+ const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
  if(sessionError)console.warn("Dashboard session check:",sessionError.message);
- currentUser=session?.user||null;
- if(!currentUser){
-  location.replace("log-in.html?redirect=dashboard.html");
-  return;
- }
+ currentUser=sessionData?.session?.user||null;
+ if(!currentUser){location.replace("log-in.html?redirect=dashboard.html");return;}
  document.body.style.visibility="visible";
- const today=new Date();
- $("dashboardDate").textContent=today.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
- if(currentUser){
-  const {data:profile,error:profileError}=await supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle();
-  if(profileError)console.warn("Dashboard profile:",profileError.message);
-  const name=profile?.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
-  $("welcomeTitle").innerHTML='Welcome back, <span>'+escapeHTML(name)+'.</span>';
-  $("welcomeDescription").textContent="Here’s your DougHub workspace — manage your creations, explore the community, and keep building.";
-  $("profileName").textContent=name;
-  $("profileEmail").textContent=currentUser.email||"Signed in";
-  $("profileAvatar").innerHTML=profile?.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
-  $("accountStatus").textContent="Account active";
-  $("memberSince").textContent=currentUser.created_at?new Date(currentUser.created_at).toLocaleDateString(undefined,{month:"short",year:"numeric"}):"Active";
-  $("accountType").textContent=profile?.is_admin===true?"Administrator":"Member";
-  const {data:ownGames,error:ownError}=await supabaseClient.from("community_games").select("id,title,description,author,category,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false}).limit(30);
-  if(ownError){console.warn("Your games could not load:",ownError.message);$("myGameTotal").textContent="—";$("myCreations").innerHTML='<div class="empty">Could not load your games right now.<br><a href="my-games.html">Open My Games ↗</a></div>';}
-  else{myCommunityGames=ownGames||[];$("myGameTotal").textContent=myCommunityGames.length.toLocaleString();renderMyCreations();}
- }else{
-  $("welcomeTitle").innerHTML='Welcome to <span>DougHub.</span>';
-  $("welcomeDescription").textContent="You’re browsing as a guest. Explore games and the community, or sign in to manage your own creations.";
-  $("profileName").textContent="Guest visitor";
-  $("profileEmail").textContent="Not signed in";
-  $("profileAvatar").textContent="G";
-  $("accountStatus").textContent="Guest session";
-  $("memberSince").textContent="Guest";
-  $("accountType").textContent="Guest";
-  $("myGameTotal").textContent="—";
-  renderMyCreations();
- }
- const [gamesResult,membersResult,communityResult,recentResult]=await Promise.all([
+ const now=new Date();
+ $("dashboardDate").textContent=now.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+ $("todayLabel").textContent=now.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})+" · Your DougHub workspace at a glance.";
+ const [profileResult,ownResult,gamesResult,membersResult,communityResult,recentResult,forumResult]=await Promise.all([
+  supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle(),
+  supabaseClient.from("community_games").select("id,title,description,author,category,created_at,creator_id").eq("creator_id",currentUser.id).order("created_at",{ascending:false}).limit(30),
   supabaseClient.from("community_games").select("id,title,description,author,category,created_at,creator_id").order("created_at",{ascending:false}).limit(60),
   supabaseClient.from("profiles").select("id",{count:"exact",head:true}),
   supabaseClient.from("community_games").select("id",{count:"exact",head:true}),
-  supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",new Date(Date.now()-7*86400000).toISOString())
+  supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",new Date(Date.now()-7*86400000).toISOString()),
+  supabaseClient.from("dougforum_posts").select("id,title,author_id,created_at,dougforum_communities(name,slug)").order("created_at",{ascending:false}).limit(5)
  ]);
- if(gamesResult.error){console.warn("Community games:",gamesResult.error.message);$("communitySummary").textContent="Community games could not load";$("communityList").innerHTML='<div class="empty">Could not load the community list. Try opening <a href="douggames.html">DougGames ↗</a>.</div>';}
- else{allCommunityGames=gamesResult.data||[];renderCommunityGames();}
+ if(profileResult.error)console.warn("Dashboard profile:",profileResult.error.message);
+ const profile=profileResult.data||{},name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
+ $("welcomeTitle").innerHTML='Welcome back, <span>'+escapeHTML(name)+'.</span>';
+ $("welcomeDescription").textContent="Pick up where you left off, manage your projects, and see what's happening around DougHub.";
+ $("heroAccountName").textContent=name;$("profileName").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed in";
+ $("profileAvatar").innerHTML=profile.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
+ $("accountStatus").textContent="ACCOUNT ACTIVE";$("memberSince").textContent=currentUser.created_at?new Date(currentUser.created_at).toLocaleDateString(undefined,{month:"short",year:"numeric"}):"Active";$("accountType").textContent=profile.is_admin===true?"Administrator":"Member";
+ if(ownResult.error){console.warn("Your creations:",ownResult.error.message);$("myGameTotal").textContent="—";$("myCreations").innerHTML='<div class="empty"><strong>Could not load your projects</strong><a href="my-games.html">Open My Content ↗</a></div>';}
+ else{myCommunityGames=ownResult.data||[];$("myGameTotal").textContent=myCommunityGames.length.toLocaleString();renderMyCreations();}
+ if(gamesResult.error){console.warn("Community games:",gamesResult.error.message);$("communityTotal").textContent="—";}else{allCommunityGames=gamesResult.data||[];$("communityTotal").textContent=Number(communityResult.count??allCommunityGames.length).toLocaleString();}
  $("memberTotal").textContent=membersResult.error?"—":Number(membersResult.count||0).toLocaleString();
- $("communityTotal").textContent=communityResult.error?"—":Number(communityResult.count||0).toLocaleString();
  $("recentTotal").textContent=recentResult.error?"—":Number(recentResult.count||0).toLocaleString();
+ if(forumResult.error){console.warn("DougForum activity:",forumResult.error.message);$("recentForumPosts").innerHTML='<div class="empty"><strong>Forum activity is unavailable</strong>You can still open DougForum to browse discussions.<br><a href="dougforum.html">Open DougForum ↗</a></div>';}
+ else{const rows=forumResult.data||[],ids=[...new Set(rows.map(p=>p.author_id).filter(Boolean))],names={};if(ids.length){const {data:profiles,error}=await supabaseClient.from("profiles").select("id,username").in("id",ids);if(!error)(profiles||[]).forEach(p=>names[p.id]=p.username||"DougHub member");}renderForumPosts(rows,names);}
 }
-loadDashboard().catch(error=>{console.error("Dashboard failed to initialize:",error);$("accountStatus").textContent="Some data unavailable";$("communitySummary").textContent="Some dashboard data could not load.";});
+loadDashboard().catch(error=>{console.error("Dashboard failed to initialize:",error);document.body.style.visibility="visible";$("accountStatus").textContent="DATA UNAVAILABLE";$("welcomeDescription").textContent="Your dashboard loaded, but some information could not be retrieved. Refresh to try again.";if($("myCreations").textContent.includes("Loading"))$("myCreations").innerHTML='<div class="empty"><strong>Could not load dashboard data</strong>Please refresh the page to try again.</div>';if($("recentForumPosts").textContent.includes("Loading"))$("recentForumPosts").innerHTML='<div class="empty">Community activity could not load.</div>';});
 </script>
 </body>
 </html>
