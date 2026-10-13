@@ -286,6 +286,17 @@
     return window.__dhNavClientPromise;
   }
 
+  function showGuestLogin() {
+    const account = document.querySelector("header .dh-shared-account");
+    if (!account) return;
+    // Guests get a direct sign-in link, never an empty profile dropdown.
+    account.innerHTML = '<a class="account-btn guest-login-link" href="/log-in.html?redirect=' +
+      encodeURIComponent(location.pathname.replace(/^\\//, "") + location.search) +
+      '">Log In <span aria-hidden="true">↗</span></a>';
+    account.dataset.dhGuest = "true";
+    try { sessionStorage.removeItem("dh-account-display-v1"); } catch (_) {}
+  }
+
   async function loadNavAccount() {
     const name = document.getElementById("accountName");
     const avatar = document.getElementById("accountAvatar");
@@ -294,14 +305,12 @@
     if (!name || !avatar) return;
     try {
       const client = await getNavSupabase();
-      if (!client) { name.textContent = "Log In"; avatar.textContent = "?"; return; }
+      if (!client) { showGuestLogin(); return; }
       const { data, error } = await client.auth.getSession();
       if (error) throw error;
       const session = data && data.session;
       if (!session || !session.user) {
-        name.textContent = "Log In";
-        avatar.textContent = "?";
-        try { sessionStorage.removeItem("dh-account-display-v1"); } catch (_) {}
+        showGuestLogin();
         if (adminLink) adminLink.style.display = "none";
         if (feedbackLink) feedbackLink.style.display = "none";
         return;
@@ -331,7 +340,7 @@
       } catch (_) {}
     } catch (error) {
       console.warn("DougHub account display could not load:", error);
-      if (name.textContent === "Loading…" || name.textContent === "Loading...") name.textContent = "Account";
+      if (name.textContent === "Loading…" || name.textContent === "Loading...") showGuestLogin();
     }
   }
 
