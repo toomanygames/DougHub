@@ -1768,7 +1768,7 @@ async function loadUserActivity() {
 
         if (activityStatus) activityStatus.textContent = "Could not refresh presence.";
 
-        activityList.innerHTML = `
+        if (activityList) activityList.innerHTML = `
             <div class="error">
                 ${escapeHtml(error.message)}
             </div>
@@ -4591,6 +4591,10 @@ function applyStaffPermissions(){
   };
   // Remove previously-created role headings so reruns stay clean.
   document.querySelectorAll("#adminArea > .admin-rank-section").forEach(el=>el.remove());
+  // Sort cards by minimum rank so the dashboard reads Helper+ → Admin+ → Developer+ → Owner+.
+  const adminArea=document.getElementById("adminArea");
+  cards.sort((a,b)=>rankForCard(a)-rankForCard(b));
+  cards.forEach(card=>adminArea.appendChild(card));
   const labels={1:"🟢 Helper+ · Community Support",2:"🔵 Admin+ · Moderation & Management",3:"🟣 Developer+ · Technical Tools",4:"🟡 Owner+ · Full Control"};
   let previousGroup=0;
   cards.forEach(card=>{
