@@ -224,6 +224,42 @@ main{padding-top:18px!important;padding-bottom:48px!important}
  .layout{margin-top:6px!important}
 }
 
+
+/* Wide, shallow index/Games-style forum banner. */
+main{padding-top:16px!important}
+.hero{width:100%!important;min-height:0!important;padding:18px 24px 16px!important;margin:0 0 8px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important;text-align:center!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.hero:before,.hero:after,.hero-mark{display:none!important}
+.hero-copy{width:100%!important;max-width:1120px!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.eyebrow{justify-content:center!important;margin:0!important;font-size:10px!important;letter-spacing:.15em!important}
+.hero h1{margin:7px 0 6px!important;font-size:clamp(30px,3.3vw,43px)!important;line-height:1.05!important;letter-spacing:-.055em!important}
+.hero p{max-width:850px!important;margin:0 auto!important;font-size:13px!important;line-height:1.55!important}
+.forum-stats{display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;gap:0!important;margin-top:11px!important;padding:0!important;border:0!important;background:transparent!important}
+.forum-stat{min-width:125px!important;display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:center!important;gap:8px!important;padding:2px 20px!important;border:0!important;border-right:1px solid #ffffff1c!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.forum-stat:last-child{border-right:0!important}
+.forum-stat strong{font-size:17px!important;line-height:1.1!important}
+.forum-stat span{font-size:10px!important;white-space:nowrap!important}
+.hero-actions{display:flex!important;justify-content:center!important;align-items:center!important;gap:8px!important;margin-top:12px!important}
+.hero-actions .button,.hero-actions a.button{min-height:35px!important;padding:0 13px!important;font-size:11px!important;border-radius:10px!important}
+.layout{margin-top:7px!important}
+@media(min-width:1000px){
+ .hero{padding-left:40px!important;padding-right:40px!important}
+ .hero p{max-width:950px!important}
+}
+@media(max-width:700px){
+ main{padding-top:10px!important}
+ .hero{padding:12px 0 10px!important}
+ .eyebrow{font-size:9px!important}
+ .hero h1{font-size:clamp(29px,7.5vw,38px)!important;margin:6px 0!important}
+ .hero p{font-size:12px!important;line-height:1.55!important}
+ .forum-stats{width:100%!important;margin-top:9px!important}
+ .forum-stat{min-width:0!important;flex:1!important;gap:5px!important;padding:2px 7px!important}
+ .forum-stat strong{font-size:16px!important}
+ .forum-stat span{font-size:9px!important}
+ .hero-actions{margin-top:10px!important}
+ .hero-actions .button,.hero-actions a.button{min-height:34px!important;padding:0 10px!important;font-size:10px!important}
+ .layout{margin-top:5px!important}
+}
+
 </style>
 </head>
 <body>
