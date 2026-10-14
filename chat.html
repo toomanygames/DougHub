@@ -1458,17 +1458,17 @@ async function refreshGroupMentionDots() {
     .order("created_at", { ascending: false }).limit(500);
   if (error) { console.debug("Could not check group mentions:", error); return; }
   const seen = readGroupMentionSeen();
-  const username = String(currentUsername || "").trim();
-  const escapedUsername = username.replace(/[.*+?^${}()|[\]\\]/g, "\\  renderChatGroupList();
-}
-function renderChatGroupList() {");
-  const mentionPattern = username ? new RegExp("(^|[^A-Za-z0-9_])@" + escapedUsername + "(?![A-Za-z0-9_])", "i") : null;
+  const username = String(currentUsername || "").trim().toLowerCase();
   const unread = new Set();
   for (const message of data || []) {
-    if (!message.group_id || message.user_id === currentUser.id || !mentionPattern) continue;
+    if (!message.group_id || message.user_id === currentUser.id || !username) continue;
     if (activeChatGroupId === message.group_id && document.visibilityState === "visible") continue;
     if (seen[message.group_id] && new Date(message.created_at).getTime() <= new Date(seen[message.group_id]).getTime()) continue;
-    if (mentionPattern.test(String(message.message || ""))) unread.add(message.group_id);
+    const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
+    let match;
+    while ((match = pattern.exec(String(message.message || ""))) !== null) {
+      if (match[2].toLowerCase() === username) { unread.add(message.group_id); break; }
+    }
   }
   groupListEl.querySelectorAll("[data-group-id]").forEach(button => {
     const groupId = button.getAttribute("data-group-id");
