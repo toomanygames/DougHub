@@ -1286,7 +1286,7 @@ function showGroupDialog(mode, group = null) {
   }
   groupDialogMode = mode;
   groupDialogTitle.textContent = mode === "create" ? "Create a chat group" : "Edit group";
-  groupDialogDescription.textContent = "Choose public for anyone to join, or private for invited members. DougHub admins can access every group.";
+  groupDialogDescription.textContent = "Choose public for anyone to join, or private for invited members.";
   groupNameInput.value = (group?.name || "").slice(0, 30);
   groupNameCount.textContent = groupNameInput.value.length + "/30 characters";
   groupAboutInput.value = group?.description || "";
