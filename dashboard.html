@@ -141,6 +141,12 @@ html{scroll-padding-top:96px}
 @media(max-width:760px){.dashboard-layout{display:flex;flex-direction:column;gap:15px;padding-top:15px}.dashboard-sidebar{position:static;order:0;display:flex;flex-direction:row;align-items:center;gap:5px;width:100%;min-height:0;overflow-x:auto;padding:5px 0 10px;border-right:0;border-bottom:1px solid #ffffff14}.sidebar-label,.sidebar-bottom,.sidebar-settings{display:none}.dashboard-side-link{flex:0 0 auto;min-height:38px;margin:0;padding:0 10px}.dashboard-side-link .ds-icon{width:23px;height:23px;flex-basis:23px}.dashboard-side-link .ds-arrow{display:none}.dashboard-main{width:100%}.dashboard-hero{grid-template-columns:minmax(0,1fr) 190px;gap:4px;min-height:0;padding:5px 0 18px}.dashboard-hero h1{font-size:clamp(30px,6vw,43px)}.dashboard-hero-art{min-height:170px}.hero-glass-card{width:175px}.hero-float-tag{font-size:8px}.orbit-one{width:200px;height:120px}.orbit-two{width:150px;height:150px}}
 @media(max-width:540px){.dashboard-hero{grid-template-columns:1fr}.dashboard-hero-copy{padding:8px 0 0}.dashboard-hero h1{font-size:clamp(35px,9vw,46px)}.dashboard-hero-art{min-height:155px;margin-top:0}.hero-glass-card{width:205px}.hero-float-tag{right:3px;bottom:0}.compact-stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:auto}.stat{min-height:112px}.page-heading{flex-direction:column}.page-heading>.button{width:100%}}
 @media(prefers-reduced-motion:reduce){.hero-glass-card{animation:none}}
+
+/* Keep the desktop dashboard sidebar fixed in place without its own scrollbar. */
+@media(min-width:761px){
+ .dashboard-sidebar{position:sticky;top:96px;height:calc(100vh - 116px);min-height:0;overflow:visible;overflow-y:visible;overscroll-behavior:contain}
+ .dashboard-sidebar::-webkit-scrollbar{display:none}
+}
 </style>
 </head>
 <body>
