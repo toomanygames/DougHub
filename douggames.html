@@ -1835,6 +1835,39 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 @media(max-width:900px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-header{align-items:flex-start}.trending-controls{display:flex;flex-wrap:wrap;gap:7px}}
 @media(max-width:600px){main{width:calc(100% - 24px)}.hero{padding:18px 0 12px}.hero-card{padding:28px 17px;border-radius:18px}.hero h1{font-size:clamp(34px,10vw,44px);letter-spacing:-.055em}.hero-stats{gap:8px;margin-top:18px}.hero-stat{min-width:112px;padding:11px 12px}.hero-stat-number{font-size:22px}.hero-create-button{margin-top:16px}.games-grid{grid-template-columns:1fr}.game-card{min-height:158px;padding:16px}.game-card-wide{grid-column:span 1}.section{padding:19px 0}.section-title{font-size:21px}.section-header{gap:12px}.community-slider-shell{gap:5px}.community-slider-arrow{flex-basis:29px;width:29px;height:32px;font-size:20px}.community-card{flex-basis:min(245px,80vw);min-height:165px}.trending-panel{padding:9px}.trending-controls{width:100%}.trending-tab{flex:1;padding:8px;font-size:10px}.feedback-card{padding:16px}.feedback-bottom{align-items:center;flex-direction:row}#feedbackButton{width:auto}}
 
+
+/* Small, airy index-inspired games intro */
+.games-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(270px,.9fr);align-items:center;gap:clamp(20px,4vw,48px);padding:32px 0 24px;overflow:visible}
+.games-hero-copy{min-width:0}
+.games-hero-eyebrow{display:flex;align-items:center;gap:8px;color:#b6b7d3;font-size:10px;font-weight:900;letter-spacing:.15em}
+.games-hero-eyebrow>span,.games-live-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#70e3b0;box-shadow:0 0 12px #70e3b080}
+.games-hero h1{margin:14px 0 11px;font-size:clamp(34px,4.3vw,53px);font-weight:850;line-height:1.02;letter-spacing:-.065em}
+.games-hero h1 span{color:transparent;background:linear-gradient(95deg,#b9a8ff,#8ba8ff 55%,#70dfd0);background-clip:text;-webkit-background-clip:text}
+.games-hero-copy>p{max-width:460px;margin:0;color:#b2b4cc;font-size:13px;line-height:1.75}
+.games-hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:19px}
+.games-hero-button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:38px;padding:0 13px;border:1px solid #ffffff17;border-radius:10px;background:#ffffff06;color:#f7f5ff;font-size:11px;font-weight:800;transition:transform .18s,border-color .18s,background .18s}
+.games-hero-button:hover{transform:translateY(-2px);border-color:#a78bfa70;background:#ffffff0d}
+.games-hero-button.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 8px 22px #6366f122}
+.games-hero-meta{display:flex;align-items:center;gap:11px;margin-top:17px;color:#8588a7;font-size:10px}
+.games-hero-meta strong{color:#c9c9e2;font-size:11px}
+.games-hero-meta i{width:3px;height:3px;border-radius:50%;background:#666985}
+.games-hero-preview{min-width:0;padding:15px;border:1px solid #ffffff12;border-radius:17px;background:linear-gradient(145deg,#10142bef,#090b19ed);box-shadow:0 15px 35px #0002}
+.games-preview-top{display:flex;align-items:center;gap:7px;color:#a0a1bb;font-size:9px;font-weight:850;letter-spacing:.09em}
+.games-preview-count{margin-left:auto;color:#6f7391;font-size:9px}
+.games-preview-feature{display:flex;align-items:center;gap:12px;margin-top:13px;padding:12px;border:1px solid #ffffff10;border-radius:12px;background:#ffffff04}
+.games-preview-art{display:grid;place-items:center;width:56px;height:56px;flex:0 0 56px;border:1px solid #a78bfa24;border-radius:12px;background:linear-gradient(145deg,#6366f126,#a855f724);font-size:30px}
+.games-preview-feature>div:nth-child(2){display:grid;gap:4px;min-width:0}
+.games-preview-feature small{color:#a5b4fc;font-size:8px;font-weight:900;letter-spacing:.1em}
+.games-preview-feature strong{font-size:14px;letter-spacing:-.3px}
+.games-preview-feature span{color:#8588a7;font-size:10px}
+.games-preview-feature>b{margin-left:auto;color:#a5b4fc;font-size:16px}
+.games-preview-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+.games-preview-mini>div{display:grid;justify-items:center;gap:6px;padding:10px 4px;border:1px solid #ffffff0c;border-radius:10px;background:#ffffff03}
+.games-preview-mini>div span{font-size:18px}
+.games-preview-mini small{color:#a0a1bb;font-size:9px}
+@media(max-width:700px){.games-hero{grid-template-columns:1fr;gap:19px;padding:23px 0 15px}.games-hero h1{font-size:clamp(34px,9vw,44px)}.games-hero-preview{max-width:460px;width:100%}}
+@media(max-width:600px){.games-hero-actions{gap:8px}.games-hero-button{min-height:36px}.games-hero-meta{margin-top:13px}}
+
 </style>
   <script src="nav.js" defer></script>
 
@@ -1992,61 +2025,27 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 
     <!-- BIG TOP SECTION -->
 
-    <section class="hero">
-
-        <div class="hero-card">
-
-            <div class="hero-badge">
-                DougHub Games
-            </div>
-
-            <h1>
-                Play on <span>DougHub</span>
-            </h1>
-
-            <p>
-                Discover games made by Doug and the DougHub community, or make your own and publish it for everyone to play.
-            </p>
-
-            <div class="hero-stats">
-
-                <div class="hero-stat">
-
-                    <div
-                        id="userCount"
-                        class="hero-stat-number"
-                    >
-                        —
-                    </div>
-
-                    <div class="hero-stat-label">
-                        👥 Users
-                    </div>
-
-                </div>
-
-                <div class="hero-stat">
-
-                    <div
-                        id="gameCount"
-                        class="hero-stat-number"
-                    >
-                        6
-                    </div>
-
-                    <div class="hero-stat-label">
-                        🎮 Games
-                    </div>
-
-                </div>
-
-            </div>
-
-            <a href="Scripting/scripting.html" class="hero-create-button">+ Make a Game</a>
-
-        </div>
-
-    </section>
+    <section class="hero games-hero" aria-labelledby="gamesHeroTitle">
+  <div class="games-hero-copy">
+    <div class="games-hero-eyebrow"><span></span> DOUGHUB ARCADE</div>
+    <h1 id="gamesHeroTitle">Ready to <span>play?</span></h1>
+    <p>Discover DougHub games, try community creations, or build a game of your own.</p>
+    <div class="games-hero-actions">
+      <a href="#doug-games" class="games-hero-button primary">Browse games <span>↓</span></a>
+      <a href="Scripting/scripting.html" class="games-hero-button">＋ Make a game</a>
+    </div>
+    <div class="games-hero-meta"><span><strong id="userCount">—</strong> members</span><i></i><span><strong id="gameCount">6</strong> featured games</span></div>
+  </div>
+  <div class="games-hero-preview" aria-hidden="true">
+    <div class="games-preview-top"><span class="games-live-dot"></span> PICK YOUR NEXT GAME <span class="games-preview-count">01 / 04</span></div>
+    <div class="games-preview-feature"><div class="games-preview-art">🐷</div><div><small>FEATURED GAME</small><strong>Pig Clicker</strong><span>Click · Upgrade · Repeat</span></div><b>↗</b></div>
+    <div class="games-preview-mini">
+      <div><span>🏎️</span><small>Racing</small></div>
+      <div><span>🧩</span><small>Puzzles</small></div>
+      <div><span>✨</span><small>Community</small></div>
+    </div>
+  </div>
+</section>
 
 
     <section class="section" id="trendingSection">
@@ -2070,7 +2069,7 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 
     <!-- DOUG'S GAMES -->
 
-    <section class="section">
+    <section class="section" id="doug-games">
 
         <div class="section-header">
 
