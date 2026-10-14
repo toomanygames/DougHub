@@ -153,6 +153,15 @@ html{scroll-padding-top:96px}
  .sidebar-bottom{margin-top:12px}
  .sidebar-settings{margin-top:auto}
 }
+
+/* Balance the sidebar prompt and Settings: restore the prompt's spacing, compact its internals. */
+@media(min-width:761px){
+ .sidebar-bottom{margin-top:28px;padding:11px 12px}
+ .sidebar-bottom-orb{width:27px;height:27px;margin-bottom:8px}
+ .sidebar-bottom p{margin:4px 0 9px;line-height:1.4}
+ .dashboard-sidebar{padding-bottom:10px}
+ .sidebar-settings{margin-top:auto;min-height:38px}
+}
 </style>
 </head>
 <body>
