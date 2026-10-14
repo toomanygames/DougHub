@@ -612,6 +612,13 @@ header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdro
         </div>
       </div>
       <div id="rewardGrid" class="reward-grid"></div>
+      <div class="setting-row" id="staffBadgeSetting" style="display:none;margin-top:12px">
+        <div class="setting-info"><div class="setting-label">Staff Rank Badge</div><div class="setting-help">Show your Helper, Admin, Developer, or Owner badge after your username in Community Chat.</div></div>
+        <div class="setting-control" style="display:flex;align-items:center;gap:10px">
+          <label style="display:flex;align-items:center;gap:8px"><input id="staffBadgeToggle" type="checkbox" style="width:18px;height:18px;accent-color:#8b5cf6"><span id="staffBadgeLabel">Show staff badge</span></label>
+        </div>
+      </div>
+      <div id="staffBadgeNote" class="reward-note" style="display:none"></div>
 
     </section>
 
@@ -1230,7 +1237,7 @@ async function loadSettings() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url, is_admin, username_changed_at, reward_badges, equipped_badge"
+        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge"
       )
       .eq(
         "id",
@@ -1279,6 +1286,7 @@ async function loadSettings() {
 
   updateUsernameCooldown();
   renderRewards();
+  renderStaffBadgeSetting();
 
 }
 
@@ -1883,6 +1891,33 @@ function renderRewards(){
 }
 document.getElementById("badgeSelect").addEventListener("change",async()=>{if(!currentUser||!currentProfile)return;const value=document.getElementById("badgeSelect").value||null;const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);if(error){showStatus("Could not update your badge.","error");return}currentProfile.equipped_badge=value;showStatus(value?"Chat badge updated!":"Chat badge removed.","success");});
 
+
+
+function renderStaffBadgeSetting(){
+  const row=document.getElementById("staffBadgeSetting");
+  const note=document.getElementById("staffBadgeNote");
+  const toggle=document.getElementById("staffBadgeToggle");
+  const role=currentProfile?.staff_role||"none";
+  const labels={helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"};
+  const eligible=!!labels[role];
+  row.style.display=eligible?"flex":"none";
+  note.style.display=eligible?"block":"none";
+  if(!eligible)return;
+  toggle.checked=!!currentProfile.show_staff_badge;
+  document.getElementById("staffBadgeLabel").textContent="Show "+labels[role]+" badge";
+  note.textContent=toggle.checked?"Your "+labels[role]+" badge is enabled in Community Chat.":"Your staff badge is hidden. Turn it on to show it after your username.";
+}
+document.getElementById("staffBadgeToggle")?.addEventListener("change",async()=>{
+  if(!currentUser||!currentProfile)return;
+  const toggle=document.getElementById("staffBadgeToggle");
+  toggle.disabled=true;
+  const {error}=await supabaseClient.from("profiles").update({show_staff_badge:toggle.checked}).eq("id",currentUser.id);
+  toggle.disabled=false;
+  if(error){toggle.checked=!toggle.checked;showStatus("Could not update your staff badge: "+error.message,"error");return;}
+  currentProfile.show_staff_badge=toggle.checked;
+  renderStaffBadgeSetting();
+  showStatus(toggle.checked?"Staff rank badge enabled.":"Staff rank badge hidden.","success");
+});
 
 /* REPLAY THE INTERACTIVE DOUGHUB TUTORIAL */
 const replayTutorialButton = document.getElementById("replayTutorialButton");
