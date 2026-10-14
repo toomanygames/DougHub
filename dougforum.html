@@ -264,7 +264,8 @@ main{padding-top:16px!important}
 /* Keep the community rail anchored while the discussion feed scrolls. */
 @media(min-width:901px){
  .layout{grid-template-columns:225px minmax(0,1fr)!important}
- .side{position:fixed!important;top:104px!important;left:max(18px,calc((100vw - 1250px)/2))!important;width:225px!important;max-height:calc(100vh - 122px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;z-index:30!important;scrollbar-width:thin}
+ .side{position:fixed!important;top:104px!important;left:0!important;width:225px!important;max-height:calc(100vh - 122px)!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;scrollbar-width:none!important;-ms-overflow-style:none!important;z-index:30!important;border-top-left-radius:0!important;border-bottom-left-radius:0!important}
+ .side::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
  .layout>.feed{grid-column:2!important;grid-column-start:2!important}
 }
 @media(max-width:900px){
