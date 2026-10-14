@@ -1906,6 +1906,36 @@ header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdr
 .feedback-section,.feedback-card{background:rgba(13,17,39,.8);border:1px solid var(--dh-line);border-radius:22px}
 .player-window,.modal-box{background:#0d1127;border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 25px 80px #0008}
 
+
+/* Follow-up sizing: roomier Games intro, more compact Trending cards */
+.games-hero{padding:48px 0 34px;gap:clamp(28px,5vw,62px);grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr)}
+.games-hero h1{font-size:clamp(40px,5vw,62px);margin:18px 0 14px}
+.games-hero-copy>p{font-size:14px;line-height:1.8;max-width:510px}
+.games-hero-actions{margin-top:23px}
+.games-hero-button{min-height:41px;padding:0 15px;font-size:12px}
+.games-hero-meta{margin-top:20px;font-size:11px}
+.games-hero-preview{padding:18px;border-radius:19px}
+.games-preview-feature{padding:14px;margin-top:15px}
+.games-preview-art{width:62px;height:62px;flex-basis:62px;font-size:32px}
+.games-preview-feature strong{font-size:15px}
+.games-preview-mini{gap:9px;margin-top:11px}
+.games-preview-mini>div{padding:12px 5px}
+.trending-panel{padding:10px;border-radius:16px}
+.trending-note{margin-bottom:11px;font-size:10px}
+.trending-grid{gap:12px}
+.trending-card{padding:15px;min-height:160px;border-radius:14px}
+.trending-card-top{margin-bottom:9px}
+.trending-rank{min-width:24px;height:24px;font-size:11px}
+.trending-type{font-size:9px}
+.trending-game-icon{font-size:25px;margin-bottom:7px}
+.trending-card h3{font-size:16px;margin:0 0 5px}
+.trending-card p{font-size:12px;line-height:1.45}
+.trending-metrics{gap:8px;margin-top:10px;padding-top:9px}
+.trending-metric{font-size:10px}
+.trending-metric strong{font-size:15px}
+@media(max-width:700px){.games-hero{padding:30px 0 23px;gap:20px;grid-template-columns:1fr}.games-hero h1{font-size:clamp(38px,10vw,50px)}.games-hero-preview{max-width:none}}
+@media(max-width:520px){.games-hero{padding:25px 0 18px}.games-hero-preview{padding:14px}.trending-card{min-height:145px;padding:13px}.trending-card h3{font-size:15px}}
+
 </style>
 </head>
 
