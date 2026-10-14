@@ -1407,7 +1407,8 @@ const dougTubeVideos =
 
 const videoModerationStatus =
     document.getElementById("videoModerationStatus");
-let currentAdminUser = null;\nlet currentAdminRole = "none";
+let currentAdminUser = null;
+let currentAdminRole = "none";
 let allUsers = [];
 let presenceMap = new Map();
 
@@ -1464,7 +1465,9 @@ async function checkAdmin() {
         return false;
     }
 
-    currentAdminRole = profile?.staff_role || (profile?.is_admin ? "admin" : "none");\n\n    if (!profile || profile.is_admin !== true) {
+    currentAdminRole = profile?.staff_role || (profile?.is_admin ? "admin" : "none");
+
+    if (!profile || profile.is_admin !== true) {
 
         loading.innerHTML = `
             <div class="error">
@@ -1537,6 +1540,7 @@ async function loadUsers() {
     populateUserSelects();
 
     renderUsers();
+    renderStaffManager();
 }
 
 
@@ -4756,6 +4760,7 @@ async function startAdminPanel() {
     }
 
     setupAdminQuickNav();
+    setupAdminAccordions();
     setupAdminAuditTracking();
     setupAuditFilters();
     await writeAuditLog("admin_session", "authentication", "Admin panel opened");
