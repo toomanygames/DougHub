@@ -76,7 +76,7 @@
     style.textContent = `
       header {
         display:flex; align-items:center; justify-content:space-between;
-        gap:16px; flex-wrap:wrap; position:relative; z-index:1000;
+        gap:16px; flex-wrap:wrap; position:sticky !important; top:0 !important; z-index:10000 !important; align-self:stretch; isolation:isolate;
       }
       header .nav, header nav[aria-label="Main navigation"] {
         display:flex; align-items:center; justify-content:flex-end;
