@@ -1780,6 +1780,61 @@ footer{color:#777e9d}
 @media(max-width:900px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.game-card-wide{grid-column:span 1}.section-header{align-items:flex-start}.trending-controls{display:flex;flex-wrap:wrap;gap:8px}}
 @media(max-width:600px){main{width:calc(100% - 24px)}.hero{padding-top:22px}.hero-card{border-radius:23px;padding:36px 17px}.hero h1{letter-spacing:-.045em;font-size:clamp(39px,12vw,54px)}.hero-stats{gap:9px}.hero-stat{min-width:125px;padding:15px 12px}.hero-stat-number{font-size:26px}.games-grid{grid-template-columns:1fr}.game-card{min-height:195px}.community-slider-shell{gap:6px}.community-slider-arrow{flex-basis:34px;width:34px;height:38px}.community-card{flex-basis:min(275px,82vw)}.section{padding:18px 0 28px}.trending-panel{padding:11px}.trending-controls{width:100%}.trending-tab{flex:1;padding:9px 10px;font-size:12px}}
 
+
+/* Compact, index-matched sizing: keep the existing layout, just tighten it up. */
+:root{--games-line:#ffffff14;--games-muted:#a0a1bb}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 4% 0%,#312e8145,transparent 35%),radial-gradient(ellipse at 92% 9%,#701a7530,transparent 32%),#050611}
+header{height:76px;min-height:0;padding:0 clamp(16px,4vw,56px);gap:0;background:#050611dc;border-bottom:1px solid #ffffff14;box-shadow:none;backdrop-filter:blur(20px)}
+main{width:min(1240px,calc(100% - 40px))}
+.hero{padding:30px 0 18px}
+.hero-card{padding:34px 28px;border-radius:22px;background:radial-gradient(circle at 85% 10%,#a855f715,transparent 38%),linear-gradient(145deg,#10142bef,#090b19ed);border:1px solid #ffffff14;box-shadow:0 16px 45px #0002,inset 0 1px #ffffff08}
+.hero-card:after{display:none}
+.hero-badge{padding:5px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#6366f118;border-color:#a78bfa30;color:#c4b5fd}
+.hero h1{font-size:clamp(36px,5vw,56px);letter-spacing:-.06em;line-height:1.02;margin:15px 0 12px}
+.hero p{font-size:14px;line-height:1.75;max-width:600px;color:#b4b5cc}
+.hero-stats{gap:10px;margin-top:22px}
+.hero-stat{min-width:125px;padding:13px 18px;border-radius:13px;background:#ffffff05;border-color:#ffffff12;box-shadow:none}
+.hero-stat-number{font-size:24px}
+.hero-stat-label{font-size:11px;margin-top:6px;color:#a0a1bb}
+.hero-create-button{margin-top:20px;min-height:42px;padding:0 17px;border-radius:12px;font-size:12px;box-shadow:0 8px 24px #6366f122}
+.section{padding:24px 0}
+.section-header{margin-bottom:15px}
+.section-title{font-size:23px;letter-spacing:-.04em}
+.section-subtitle{font-size:12px;line-height:1.6;color:#a0a1bb}
+.games-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.game-card{min-height:175px;padding:18px;border-radius:16px;background:linear-gradient(145deg,#10142bef,#090b19ed);border-color:#ffffff12;box-shadow:none}
+.game-card:hover,.community-card:hover,.trending-card:hover{transform:translateY(-3px);border-color:#a78bfa50;box-shadow:0 12px 28px #0003}
+.game-icon{width:42px;height:42px;border-radius:12px;font-size:22px}
+.game-card h3{font-size:16px;margin:13px 0 6px}
+.game-card p{font-size:12px;line-height:1.6;color:#a0a1bb}
+.play-label{left:18px;bottom:14px;font-size:11px}
+.game-search-controls{gap:8px}
+.search-box,#gameFilter{padding:9px 11px;border-radius:10px;font-size:12px;background:#0b0e1d;border-color:#ffffff14}
+.community-games{gap:12px;padding:4px 2px 14px}
+.community-card{flex-basis:245px;min-height:170px;padding:17px;border-radius:16px;background:linear-gradient(145deg,#10142bef,#090b19ed);border-color:#ffffff12;box-shadow:none}
+.community-category{font-size:10px;padding:4px 8px}
+.community-card h3{font-size:15px;margin:11px 0 6px}
+.community-card p{font-size:12px;line-height:1.55;color:#a0a1bb}
+.community-author{font-size:10px;margin-top:11px;color:#8588a7}
+.community-popularity{font-size:11px}
+.community-slider-arrow{flex-basis:34px;width:34px;height:34px;border-radius:11px;font-size:22px}
+.trending-panel{padding:12px;border-radius:17px;background:#ffffff03;border-color:#ffffff12;box-shadow:none}
+.trending-note{font-size:11px;line-height:1.6;color:#a0a1bb}
+.trending-tab{padding:8px 11px;border-radius:10px;font-size:11px;background:#ffffff06;border-color:#ffffff14}
+.feedback-section{padding:12px 0 36px}
+.feedback-card{padding:20px;border-radius:18px;border-color:#ffffff14;background:linear-gradient(145deg,#10142bef,#090b19ed);box-shadow:none;backdrop-filter:none}
+.feedback-card h2{font-size:18px;margin-bottom:5px}
+.feedback-card p{font-size:12px;line-height:1.65;color:#a0a1bb;margin-bottom:13px}
+#feedbackMessage{min-height:95px;padding:12px;border-radius:11px;font-size:12px}
+#feedbackButton{padding:9px 14px;border-radius:10px;font-size:12px;box-shadow:none}
+#feedbackCount,#feedbackStatus{font-size:11px}
+footer{padding:22px 0 32px;color:#747792;font-size:11px}
+.player-window{width:min(1050px,100%);height:min(740px,90vh);border-radius:17px;box-shadow:0 25px 70px #0008}
+.player-header{height:50px;flex-shrink:0}
+.modal-box{padding:21px;border-radius:16px}
+@media(max-width:900px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-header{align-items:flex-start}.trending-controls{display:flex;flex-wrap:wrap;gap:7px}}
+@media(max-width:600px){main{width:calc(100% - 24px)}.hero{padding:18px 0 12px}.hero-card{padding:28px 17px;border-radius:18px}.hero h1{font-size:clamp(34px,10vw,44px);letter-spacing:-.055em}.hero-stats{gap:8px;margin-top:18px}.hero-stat{min-width:112px;padding:11px 12px}.hero-stat-number{font-size:22px}.hero-create-button{margin-top:16px}.games-grid{grid-template-columns:1fr}.game-card{min-height:158px;padding:16px}.game-card-wide{grid-column:span 1}.section{padding:19px 0}.section-title{font-size:21px}.section-header{gap:12px}.community-slider-shell{gap:5px}.community-slider-arrow{flex-basis:29px;width:29px;height:32px;font-size:20px}.community-card{flex-basis:min(245px,80vw);min-height:165px}.trending-panel{padding:9px}.trending-controls{width:100%}.trending-tab{flex:1;padding:8px;font-size:10px}.feedback-card{padding:16px}.feedback-bottom{align-items:center;flex-direction:row}#feedbackButton{width:auto}}
+
 </style>
   <script src="nav.js" defer></script>
 
