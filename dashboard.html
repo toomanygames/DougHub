@@ -24,56 +24,61 @@ main{min-width:0}.page-heading{display:flex;align-items:center;justify-content:s
 @media(max-width:760px){header{height:auto;min-height:62px;flex-wrap:wrap;padding:10px 14px}.layout{grid-template-columns:1fr;padding:15px 12px 30px}.sidebar{position:static;display:flex;min-height:0;gap:4px;overflow-x:auto;padding:5px;border-right:0;border-bottom:1px solid var(--line)}.side-heading,.side-separator{display:none}.side-link{flex:0 0 auto;margin:0;padding:7px 9px}.side-link span:last-child{white-space:nowrap}.content-grid{grid-template-columns:1fr}.lower-grid{grid-template-columns:1fr}.page-heading{align-items:flex-start}.stats{gap:8px}.stat{padding:13px}.stat-value{font-size:24px}}
 @media(max-width:480px){.page-heading{flex-direction:column}.page-heading>.button{width:100%}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:1/-1}.stat-value{margin-top:9px}.shortcuts{grid-template-columns:1fr 1fr}.panel-heading{padding:13px}.account-body{padding:13px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Focused dashboard: fewer sections, clearer priorities, and no duplicate sidebar navigation. */
+.simple-dashboard{width:min(1180px,100%);margin:0 auto;padding:28px clamp(14px,3vw,34px) 42px}
+.dashboard-main{min-width:0}
+.compact-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dashboard-columns{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.8fr);gap:14px;margin-top:16px;align-items:start}
+.dashboard-columns .panel{min-height:100%}
+.dashboard-columns .panel-heading{padding:14px 15px}
+.dashboard-columns .panel-body{padding:9px}
+.dashboard-columns .empty{padding:20px 10px}
+.account-body{padding:15px}
+.details{gap:8px;margin-top:14px;padding-top:12px}
+.quick-panel{margin-top:14px}
+.simple-shortcuts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:12px}
+.simple-shortcut{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0;padding:13px;border:1px solid var(--line);border-radius:12px;background:#ffffff03;transition:transform .18s,border-color .18s,background .18s}
+.simple-shortcut:hover{transform:translateY(-2px);border-color:#a5a6ff40;background:#7778ff0c}
+.simple-shortcut>span{width:33px;height:33px;display:grid;place-items:center;border:1px solid #a78bfa22;border-radius:10px;background:#7778ff14;color:#d8ccff;font-size:13px;font-weight:900}
+.simple-shortcut strong{font-size:11px;overflow-wrap:anywhere}
+.simple-shortcut small{color:var(--muted);font-size:10px}
+.dashboard-preferences{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:#ffffff03}
+.dashboard-preferences strong{font-size:11px}
+.dashboard-preferences p{margin:4px 0;color:var(--muted);font-size:10px;line-height:1.5}
+.dashboard-preferences #autoDashboardStatus{color:#b9baff;font-size:9px}
+@media(max-width:950px){.dashboard-columns{grid-template-columns:1fr}.simple-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.simple-dashboard{padding:18px 12px 30px}.compact-stats{gap:8px}.stat{padding:13px}.stat-value{font-size:24px}.simple-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:9px}.simple-shortcut{padding:11px}.dashboard-preferences{align-items:flex-start}}
 </style>
 </head>
 <body>
 <header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
-<div class="layout">
-<aside class="sidebar" aria-label="Dashboard navigation">
- <div class="side-heading">Workspace</div>
- <a class="side-link active" href="#overview" aria-current="page"><span class="side-icon">01</span><span>Overview</span></a>
- <a class="side-link" href="#creations"><span class="side-icon">02</span><span>My creations</span></a>
- <a class="side-link" href="#activity"><span class="side-icon">03</span><span>Activity</span></a>
- <div class="side-separator"></div>
- <div class="side-heading">Explore</div>
- <a class="side-link" href="douggames.html"><span class="side-icon">G</span><span>DougGames</span></a>
- <a class="side-link" href="tools.html"><span class="side-icon">T</span><span>DougTools</span></a>
- <a class="side-link" href="settings.html"><span class="side-icon">S</span><span>Settings</span></a>
-</aside>
-<main>
- <div class="page-heading" id="overview">
-  <div><div class="kicker" id="todayLabel">WORKSPACE / OVERVIEW</div><h1 id="welcomeTitle">Your dashboard</h1><p>A simple overview of your projects and community.</p></div>
-  <a class="button primary" href="Scripting/scripting.html">＋ Create a project</a>
- </div>
- <section class="stats" aria-label="Account summary">
-  <div class="stat"><div class="stat-top"><span>Your published games</span><span class="stat-icon">ME</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Your creations</div></div>
-  <div class="stat"><div class="stat-top"><span>Community games</span><span class="stat-icon">G</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Shared with everyone</div></div>
-  <div class="stat"><div class="stat-top"><span>DougHub members</span><span class="stat-icon">U</span></div><div class="stat-value" id="memberTotal">—</div><div class="stat-foot">Community accounts</div></div>
- </section>
- <div class="content-grid">
-  <section class="panel" id="creations"><div class="panel-heading"><div><h2>Recent creations</h2><p>Your latest published projects.</p></div><a class="text-link" href="my-games.html">View all ↗</a></div><div class="panel-body"><div class="item-list" id="myCreations"><div class="empty">Loading your projects…</div></div></div></section>
-  <section class="panel"><div class="panel-heading"><div><h2>Your account</h2><p>Profile overview</p></div><a class="text-link" href="settings.html">Settings ↗</a></div><div class="account-body"><div class="identity"><div class="avatar" id="profileAvatar">D</div><div><div class="identity-name" id="profileName">Loading profile…</div><div class="identity-email" id="profileEmail">Checking sign-in</div></div></div><div class="details"><div class="detail"><span>Member since</span><strong id="memberSince">—</strong></div><div class="detail"><span>Account type</span><strong id="accountType">Member</strong></div><div class="detail"><span>New games this week</span><strong id="recentTotal">—</strong></div></div><div class="account-buttons"><a class="button" href="settings.html">Edit profile</a><a class="button" href="my-games.html">My content</a></div></div></section>
- </div>
- <div class="lower-grid" id="activity">
-  <section class="panel"><div class="panel-heading"><div><h2>Community activity</h2><p>Recent discussions from DougForum.</p></div><a class="text-link" href="dougforum.html">Open forum ↗</a></div><div class="panel-body"><div class="item-list" id="recentForumPosts"><div class="empty">Loading recent discussions…</div></div></div></section>
-  <section class="panel"><div class="panel-heading"><div><h2>Quick access</h2><p>Jump back into DougHub.</p></div></div><div class="shortcuts">
-   <a class="shortcut" href="douggames.html"><span class="shortcut-icon">G</span><span><strong>DougGames</strong><small>Play games</small></span></a>
-   <a class="shortcut" href="dougforum.html"><span class="shortcut-icon">F</span><span><strong>DougForum</strong><small>Discussions</small></span></a>
-   <a class="shortcut" href="chat.html"><span class="shortcut-icon">C</span><span><strong>Chat</strong><small>Community chat</small></span></a>
-   <a class="shortcut" href="tools.html"><span class="shortcut-icon">T</span><span><strong>DougTools</strong><small>Useful tools</small></span></a>
-   <a class="shortcut" href="douqhub-music.html"><span class="shortcut-icon">M</span><span><strong>Music</strong><small>Community music</small></span></a>
-   <a class="shortcut" href="DougTube.html"><span class="shortcut-icon">V</span><span><strong>DougTube</strong><small>Community videos</small></span></a>
-   <a class="shortcut" href="Scripting/scripting.html"><span class="shortcut-icon">C</span><span><strong>DougCode</strong><small>Create Community Games</small></span></a>
-   <a class="shortcut" href="dougdrive.html"><span class="shortcut-icon">D</span><span><strong>DougDrive</strong><small>Your files</small></span></a>
-   <a class="shortcut" href="dougbase.html"><span class="shortcut-icon">B</span><span><strong>DougBase</strong><small>Build and manage data</small></span></a>
-   <a class="shortcut" href="nova.html"><span class="shortcut-icon">N</span><span><strong>Nova AI</strong><small>AI workspace</small></span></a>
-   <a class="shortcut" href="DMail.html"><span class="shortcut-icon">M</span><span><strong>DMail</strong><small>Messages and mail</small></span></a>
-   <a class="shortcut" href="Scripting/scripting.html"><span class="shortcut-icon">G</span><span><strong>Easy Game Builder</strong><small>Create a game visually</small></span></a>
-   <a class="shortcut" href="my-games.html"><span class="shortcut-icon">P</span><span><strong>My Games</strong><small>Manage your creations</small></span></a>
-  </div><div class="setting-row"><div class="setting-copy"><strong>Open Dashboard automatically</strong><p>Send me here when I visit the homepage.</p><div class="setting-status" id="autoDashboardStatus" role="status" aria-live="polite">Checking preference…</div></div><label class="switch" title="Toggle automatic dashboard opening"><input type="checkbox" id="autoDashboardToggle" checked aria-label="Open Dashboard automatically"><span class="switch-track" aria-hidden="true"></span></label></div></section>
- </div>
- <footer>DougHub · Your workspace</footer>
-</main>
+<div class="simple-dashboard">
+ <main class="dashboard-main">
+  <div class="page-heading" id="overview">
+   <div><div class="kicker" id="todayLabel">WORKSPACE / OVERVIEW</div><h1 id="welcomeTitle">Your dashboard</h1><p>Your important stuff, all in one place.</p></div>
+   <a class="button primary" href="Scripting/scripting.html">＋ Create a project</a>
+  </div>
+  <section class="stats compact-stats" aria-label="Your activity">
+   <div class="stat"><div class="stat-top"><span>Your published games</span><span class="stat-icon">✦</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Your creations</div></div>
+   <div class="stat"><div class="stat-top"><span>Community games</span><span class="stat-icon">G</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Shared with everyone</div></div>
+  </section>
+  <div class="dashboard-columns">
+   <section class="panel" id="creations"><div class="panel-heading"><div><h2>Recent creations</h2><p>Your latest published projects.</p></div><a class="text-link" href="my-games.html">View all ↗</a></div><div class="panel-body"><div class="item-list" id="myCreations"><div class="empty">Loading your projects…</div></div></div></section>
+   <section class="panel account-panel"><div class="panel-heading"><div><h2>Your account</h2><p>Profile and account details.</p></div><a class="text-link" href="settings.html">Settings ↗</a></div><div class="account-body"><div class="identity"><div class="avatar" id="profileAvatar">D</div><div><div class="identity-name" id="profileName">Loading profile…</div><div class="identity-email" id="profileEmail">Checking sign-in</div></div></div><div class="details"><div class="detail"><span>Member since</span><strong id="memberSince">—</strong></div><div class="detail"><span>Account type</span><strong id="accountType">Member</strong></div></div><div class="account-buttons"><a class="button" href="settings.html">Edit profile</a><a class="button" href="my-games.html">My creations</a></div></div></section>
+  </div>
+  <section class="panel quick-panel"><div class="panel-heading"><div><h2>Quick access</h2><p>Go straight to the places you use most.</p></div><a class="text-link" href="tools.html">All pages &amp; tools ↗</a></div><div class="simple-shortcuts">
+   <a class="simple-shortcut" href="douggames.html"><span>🎮</span><strong>DougGames</strong><small>Play</small></a>
+   <a class="simple-shortcut" href="dougforum.html"><span>DF</span><strong>DougForum</strong><small>Discuss</small></a>
+   <a class="simple-shortcut" href="tools.html"><span>✳</span><strong>DougTools</strong><small>Utilities</small></a>
+   <a class="simple-shortcut" href="nova.html"><span>✧</span><strong>Nova AI</strong><small>Explore ideas</small></a>
+   <a class="simple-shortcut" href="Scripting/scripting.html"><span>⌘</span><strong>DougCode</strong><small>Create</small></a>
+   <a class="simple-shortcut" href="settings.html"><span>⚙</span><strong>Settings</strong><small>Account</small></a>
+  </div></section>
+  <section class="dashboard-preferences" aria-label="Dashboard preference"><div><strong>Open Dashboard automatically</strong><p>Choose whether the homepage sends you here when you are signed in.</p><span id="autoDashboardStatus" role="status" aria-live="polite">Checking preference…</span></div><label class="switch" title="Toggle automatic dashboard opening"><input type="checkbox" id="autoDashboardToggle" checked aria-label="Open Dashboard automatically"><span class="switch-track" aria-hidden="true"></span></label></section>
+  <div hidden aria-hidden="true"><span id="memberTotal">—</span><span id="recentTotal">—</span><div id="recentForumPosts"></div></div>
+  <footer>DougHub · Your workspace</footer>
+ </main>
 </div>
 <script>
 "use strict";
