@@ -147,6 +147,12 @@ html{scroll-padding-top:96px}
  .dashboard-sidebar{position:sticky;top:96px;height:calc(100vh - 116px);min-height:0;overflow:visible;overflow-y:visible;overscroll-behavior:contain}
  .dashboard-sidebar::-webkit-scrollbar{display:none}
 }
+
+/* Move the sidebar idea prompt higher so it sits closer to the navigation. */
+@media(min-width:761px){
+ .sidebar-bottom{margin-top:12px}
+ .sidebar-settings{margin-top:auto}
+}
 </style>
 </head>
 <body>
