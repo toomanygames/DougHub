@@ -4650,7 +4650,8 @@ async function saveStaffRole(){
   finally{button.disabled=false;}
 }
 document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveStaffRole);
-\nfunction setupAdminQuickNav() {
+
+function setupAdminQuickNav() {
     const nav = document.getElementById("adminQuickNavLinks");
     if (!nav) return;
     nav.innerHTML = "";
