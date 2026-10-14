@@ -260,6 +260,16 @@ main{padding-top:16px!important}
  .layout{margin-top:5px!important}
 }
 
+
+/* Keep the community rail anchored while the discussion feed scrolls. */
+@media(min-width:901px){
+ .layout{grid-template-columns:225px minmax(0,1fr)!important}
+ .side{position:fixed!important;top:104px!important;left:max(18px,calc((100vw - 1250px)/2))!important;width:225px!important;max-height:calc(100vh - 122px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;z-index:30!important;scrollbar-width:thin}
+ .layout>.feed{grid-column:2!important;grid-column-start:2!important}
+}
+@media(max-width:900px){
+ .side{position:relative!important;top:auto!important;left:auto!important;width:auto!important;max-height:none!important;overflow:visible!important}
+}
 </style>
 </head>
 <body>
