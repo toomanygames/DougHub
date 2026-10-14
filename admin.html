@@ -876,6 +876,47 @@ input,textarea,select{background:#070918}
 .chat-group-moderation-delete:disabled{opacity:.5;cursor:wait}
 @media(max-width:520px){.chat-group-moderation-row{align-items:flex-start;flex-direction:column}.chat-group-moderation-delete{width:100%}}
 </style>
+<style id="admin-single-page-redesign">
+/* Single-page Admin refresh: stable one-column flow and tidy accordions. */
+:root{--admin-accent:#818cf8;--admin-purple:#c084fc;--admin-border:rgba(148,163,255,.16);--admin-panel:rgba(12,16,36,.88)}
+body{padding:clamp(14px,3vw,34px)!important;background-color:#050711!important}
+.container{width:min(100%,1240px)!important;margin:0 auto!important}
+header{padding:clamp(20px,3vw,32px)!important;margin:0 0 18px!important;border:1px solid var(--admin-border)!important;border-radius:24px!important;background:linear-gradient(125deg,rgba(99,102,241,.17),rgba(168,85,247,.08) 55%,rgba(13,17,39,.9))!important;box-shadow:0 22px 65px #0003!important;align-items:center!important;gap:18px!important}
+.logo{font-size:clamp(25px,4vw,36px)!important;letter-spacing:-.045em!important}
+.subtitle{color:#aeb6d4!important}
+#adminQuickNav{position:sticky;top:8px;z-index:30;margin:0 0 20px;padding:12px 14px;border:1px solid var(--admin-border);border-radius:16px;background:rgba(5,7,17,.92);backdrop-filter:blur(18px);box-shadow:0 12px 35px #0003}
+#adminQuickNavLinks{display:flex;gap:8px;flex-wrap:wrap;overflow:visible;padding:2px}
+#adminQuickNavLinks a{border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.045);border-color:var(--admin-border);transition:background .18s,border-color .18s}
+#adminArea{display:grid;grid-template-columns:minmax(0,1fr)!important;align-items:start!important;gap:12px!important}
+#adminArea>.card{display:flex;flex-direction:column;min-width:0;width:100%;margin:0!important;padding:0!important;overflow:clip;border:1px solid var(--admin-border)!important;border-radius:18px!important;background:linear-gradient(145deg,rgba(15,20,44,.94),rgba(8,11,26,.96))!important;box-shadow:0 12px 36px rgba(0,0,0,.18)!important;transition:border-color .18s,background .18s!important}
+#adminArea>.card:hover{border-color:rgba(129,140,248,.3)!important}
+#adminArea>.card>.admin-card-heading{min-height:64px;padding:17px 20px;gap:14px;cursor:pointer;list-style:none;outline:none}
+#adminArea>.card>.admin-card-heading:hover{background:rgba(129,140,248,.055)}
+#adminArea>.card>.admin-card-heading:focus-visible{outline:2px solid var(--admin-accent);outline-offset:-4px;border-radius:16px}
+#adminArea>.card>.admin-card-heading h2,#adminArea>.card>.admin-card-heading h3{font-size:16px!important;font-weight:850!important;letter-spacing:-.015em;margin:0!important}
+.admin-card-heading>span:first-child{display:flex;align-items:center;min-width:0}
+.admin-card-chevron{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(129,140,248,.08);font-size:17px;transition:transform .24s ease,background .24s ease}
+#adminArea>.card:not(.collapsed) .admin-card-chevron{background:rgba(129,140,248,.15)}
+#adminArea>.card>.admin-card-content{display:block;min-height:0;width:100%;padding:0 20px 20px;overflow:hidden;max-height:none;opacity:1;transition:max-height .28s cubic-bezier(.2,.7,.2,1),opacity .2s ease,padding .2s ease;will-change:max-height}
+#adminArea>.card.collapsed>.admin-card-content{padding-top:0;padding-bottom:0;max-height:0!important;opacity:0;pointer-events:none}
+#adminArea>.card.collapsed .admin-card-chevron{transform:rotate(-90deg)}
+#adminArea>.card .status{margin-bottom:10px}
+#adminArea>.card [id$="List"],#adminArea>.card [id$="Rows"],#adminArea>.card #chatMessages,#adminArea>.card #communityGames,#adminArea>.card #dougTubeVideos,#adminArea>.card #activityList,#adminArea>.card #siteFeatureList{max-height:360px;overflow:auto;overscroll-behavior:contain}
+#adminArea>.card .buttons{flex-wrap:wrap}
+#adminArea>.card input,#adminArea>.card select,#adminArea>.card textarea{max-width:100%}
+#adminArea>.audit-card,#adminArea>#siteFeatureCard,#adminArea>.card:has(#usersList){grid-column:auto!important}
+.admin-section-heading{margin:14px 0 2px!important}
+#loading{max-width:760px;margin:22px auto;padding:22px;border:1px solid var(--admin-border);border-radius:18px;background:var(--admin-panel)}
+@media(max-width:640px){
+ body{padding:10px!important}
+ header{align-items:flex-start!important;border-radius:18px!important;flex-direction:column!important}
+ #adminQuickNavLinks{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}
+ #adminArea>.card>.admin-card-heading{padding:15px 14px;min-height:58px}
+ #adminArea>.card>.admin-card-content{padding-left:14px;padding-right:14px;padding-bottom:15px}
+ .admin-schedule-grid,.staff-rank-grid{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(prefers-reduced-motion:reduce){#adminArea>.card,#adminArea>.card>.admin-card-content,#adminArea>.card .admin-card-chevron{transition:none!important}}
+</style>
 </head>
 
 <body>
@@ -910,16 +951,6 @@ input,textarea,select{background:#070918}
 
 <div id="adminArea" style="display:none;">
 
-<div class="card" id="staffWorkspacesCard">
-  <h2>🧭 Staff Workspaces</h2>
-  <p class="admin-card-help">Open the workspace that matches your staff duties. Each page checks your assigned rank.</p>
-  <div class="buttons">
-    <a class="back-button" href="helper.html">🟢 Helper Desk</a>
-    <a class="back-button" href="admin.html">🔵 Admin Panel</a>
-    <a class="back-button" href="developer.html">🟣 Developer Workspace</a>
-    <a class="back-button" href="owner.html">🟡 Owner Control Room</a>
-  </div>
-</div>
 <div class="card staff-management-card" id="staffManagementCard" style="display:none">
   <h2>🛡️ Staff & Permissions</h2>
   <p class="admin-card-help">Manage the staff ladder. Only the Owner account should be able to change roles. Promotions use the protected staff-role endpoint.</p>
@@ -4611,9 +4642,33 @@ function setupAdminAccordions(){
   });
 }
 function toggleAdminCard(card,title){
+  const content=card.querySelector(":scope > .admin-card-content");
+  if(!content)return;
   const opening=card.classList.contains("collapsed");
-  card.classList.toggle("collapsed",!opening);
-  title.setAttribute("aria-expanded",String(opening));
+  if(opening){
+    card.classList.remove("collapsed");
+    title.setAttribute("aria-expanded","true");
+    content.style.maxHeight=content.scrollHeight+"px";
+    content.style.opacity="1";
+    content.style.pointerEvents="auto";
+    const finishOpen=event=>{
+      if(event.propertyName!=="max-height")return;
+      content.removeEventListener("transitionend",finishOpen);
+      if(!card.classList.contains("collapsed"))content.style.maxHeight="none";
+    };
+    content.addEventListener("transitionend",finishOpen);
+    window.requestAnimationFrame(()=>{if(!card.classList.contains("collapsed"))content.style.maxHeight=content.scrollHeight+"px";});
+  }else{
+    content.style.maxHeight=content.scrollHeight+"px";
+    content.style.opacity="1";
+    content.style.pointerEvents="none";
+    window.requestAnimationFrame(()=>{
+      card.classList.add("collapsed");
+      title.setAttribute("aria-expanded","false");
+      content.style.maxHeight="0px";
+      content.style.opacity="0";
+    });
+  }
 }
 function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
 function renderStaffManager(){
