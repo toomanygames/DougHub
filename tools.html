@@ -209,6 +209,25 @@ body{
   background-size:auto,auto,auto,44px 44px,44px 44px,auto!important;
   background-attachment:fixed!important;
 }
+
+/* Main-page directory: links to the full DougHub workspace. */
+.main-pages-section{margin:0 0 26px;padding:22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#11152be8,#090b19e8);box-shadow:0 16px 45px #00000018}
+.main-pages-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:16px}
+.main-pages-heading .eyebrow{display:inline-flex;margin-bottom:7px}
+.main-pages-heading h2{margin:0;font-size:clamp(22px,2.6vw,30px);letter-spacing:-.04em}
+.main-pages-heading p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+.main-pages-count{padding:7px 10px;border:1px solid #a78bfa2b;border-radius:999px;background:#8b5cf612;color:#d8ccff;font-size:10px;font-weight:800;white-space:nowrap}
+.main-pages-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.main-page-link{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid #ffffff12;border-radius:13px;background:#ffffff03;transition:transform .18s,border-color .18s,background .18s}
+.main-page-link:hover{transform:translateY(-2px);border-color:#a78bfa55;background:linear-gradient(120deg,#6366f117,#a855f710)}
+.main-page-icon{width:34px;height:34px;display:grid;place-items:center;flex:0 0 34px;border:1px solid #a78bfa20;border-radius:10px;background:linear-gradient(135deg,#6366f126,#a855f71b);color:#d8ccff;font-size:13px;font-weight:900}
+.main-page-link>span:nth-child(2){flex:1;min-width:0}
+.main-page-link strong{display:block;font-size:11px;overflow-wrap:anywhere}
+.main-page-link small{display:block;margin-top:4px;color:var(--muted);font-size:9px;line-height:1.35}
+.main-page-link>b{color:#a9a6e9;font-size:12px}
+@media(max-width:1000px){.main-pages-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.main-pages-section{padding:15px}.main-pages-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.main-page-link{padding:10px;gap:8px}.main-page-icon{width:30px;height:30px;flex-basis:30px}}
+@media(max-width:420px){.main-pages-grid{grid-template-columns:1fr}.main-page-link{padding:11px}}
 </style>
 </head>
 <body>
@@ -248,6 +267,27 @@ body{
         </div>
         <div class="tools-float-tag"><span>✧</span> Ready when you are</div>
       </div>
+    </div>
+  </section>
+  <section class="main-pages-section" id="mainPagesDirectory" aria-labelledby="mainPagesHeading">
+    <div class="main-pages-heading"><div><span class="eyebrow">YOUR DOUGHUB SHORTCUTS</span><h2 id="mainPagesHeading">Main pages</h2><p>Jump straight to any of the main spaces on DougHub.</p></div><span class="main-pages-count">16 destinations</span></div>
+    <div class="main-pages-grid">
+      <a class="main-page-link" href="index.html"><span class="main-page-icon">⌂</span><span><strong>Home</strong><small>DougHub homepage</small></span><b>↗</b></a>
+      <a class="main-page-link" href="dashboard.html"><span class="main-page-icon">▦</span><span><strong>Dashboard</strong><small>Your personal workspace</small></span><b>↗</b></a>
+      <a class="main-page-link" href="douggames.html"><span class="main-page-icon">🎮</span><span><strong>DougGames</strong><small>Play games</small></span><b>↗</b></a>
+      <a class="main-page-link" href="tools.html"><span class="main-page-icon">✳</span><span><strong>DougTools</strong><small>Everyday utilities</small></span><b>↗</b></a>
+      <a class="main-page-link" href="nova.html"><span class="main-page-icon">✧</span><span><strong>Nova AI</strong><small>Explore ideas with AI</small></span><b>↗</b></a>
+      <a class="main-page-link" href="chat.html"><span class="main-page-icon">☷</span><span><strong>Community Chat</strong><small>Talk with the community</small></span><b>↗</b></a>
+      <a class="main-page-link" href="dougforum.html"><span class="main-page-icon">DF</span><span><strong>DougForum</strong><small>Posts and discussions</small></span><b>↗</b></a>
+      <a class="main-page-link" href="work.html"><span class="main-page-icon">▤</span><span><strong>DougHub Work</strong><small>Tasks and projects</small></span><b>↗</b></a>
+      <a class="main-page-link" href="Scripting/scripting.html"><span class="main-page-icon">⌘</span><span><strong>DougCode</strong><small>Build and create</small></span><b>↗</b></a>
+      <a class="main-page-link" href="dougbase.html"><span class="main-page-icon">▥</span><span><strong>DougBase</strong><small>Project data tools</small></span><b>↗</b></a>
+      <a class="main-page-link" href="dougdrive.html"><span class="main-page-icon">↗</span><span><strong>DougDrive</strong><small>Your files</small></span><b>↗</b></a>
+      <a class="main-page-link" href="douqhub-music.html"><span class="main-page-icon">♫</span><span><strong>DougHub Music</strong><small>Community music</small></span><b>↗</b></a>
+      <a class="main-page-link" href="DougTube.html"><span class="main-page-icon">▷</span><span><strong>DougTube</strong><small>Community videos</small></span><b>↗</b></a>
+      <a class="main-page-link" href="DMail.html"><span class="main-page-icon">✉</span><span><strong>DMail</strong><small>Your messages</small></span><b>↗</b></a>
+      <a class="main-page-link" href="my-games.html"><span class="main-page-icon">✦</span><span><strong>My Creations</strong><small>Your published projects</small></span><b>↗</b></a>
+      <a class="main-page-link" href="settings.html"><span class="main-page-icon">⚙</span><span><strong>Settings</strong><small>Manage your account</small></span><b>↗</b></a>
     </div>
   </section>
   <section class="tool-lab-feature-wrap" aria-label="Featured tool">
