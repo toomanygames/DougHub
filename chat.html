@@ -535,7 +535,8 @@ main {
 }
 
 .message-badge{display:inline-flex;align-items:center;gap:3px;margin-left:4px;padding:2px 6px;border-radius:999px;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.2);font-size:10px;font-weight:800;color:#ddd6fe}.message-row.mine .message-badge{margin-left:0;margin-right:4px}
-.chat-mention{display:inline;color:#60a5fa;font-weight:750;background:rgba(59,130,246,.12);border:1px solid rgba(96,165,250,.18);border-radius:5px;padding:0 3px;white-space:normal;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}.chat-mention:hover,.chat-mention:focus-visible{background:rgba(59,130,246,.24);border-color:rgba(96,165,250,.55);outline:none}.chat-profile-backdrop{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,12,.72);backdrop-filter:blur(9px);animation:chatProfileFade .16s ease}.chat-profile-card{position:relative;width:min(410px,100%);max-height:min(80vh,620px);overflow:auto;padding:24px;border:1px solid rgba(129,140,248,.3);border-radius:22px;background:radial-gradient(circle at 90% 0,rgba(99,102,241,.18),transparent 42%),linear-gradient(145deg,#12162e,#080a18);box-shadow:0 28px 90px #0009;color:#f5f5ff;animation:chatProfileIn .2s ease}.chat-profile-close{position:absolute;top:13px;right:13px;width:34px;height:34px;border:1px solid #ffffff1c;border-radius:11px;background:#ffffff0a;color:#e8e8ff;font-size:21px;cursor:pointer}.chat-profile-identity{display:flex;align-items:center;gap:14px;padding:8px 36px 20px 0}.chat-profile-avatar{width:64px;height:64px;flex:0 0 64px;object-fit:cover;border-radius:20px;border:1px solid #a5b4fc55;background:#171a34}.chat-profile-name{min-width:0;font-size:21px;font-weight:850;overflow-wrap:anywhere}.chat-profile-handle{margin-top:4px;color:#60a5fa;font-size:13px;font-weight:750}.chat-profile-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}.chat-profile-badge{padding:5px 8px;border-radius:999px;border:1px solid #a78bfa35;background:#a78bfa14;color:#ddd6fe;font-size:11px;font-weight:800}.chat-profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chat-profile-stat{padding:14px;border:1px solid #ffffff12;border-radius:14px;background:#ffffff06}.chat-profile-stat strong{display:block;font-size:21px;letter-spacing:-.5px}.chat-profile-stat span{display:block;margin-top:4px;color:#a4a7c4;font-size:11px}.chat-profile-footer{margin-top:15px;color:#858aa9;font-size:12px;line-height:1.5}.chat-profile-loading{padding:25px 4px;color:#a4a7c4;text-align:center}@keyframes chatProfileFade{from{opacity:0}to{opacity:1}}@keyframes chatProfileIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.chat-mention{display:inline;color:#60a5fa!important;font-weight:650;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;margin:0!important;white-space:normal;cursor:pointer;text-decoration:none;box-shadow:none!important;transition:color .16s}.chat-mention:hover,.chat-mention:focus-visible{color:#93c5fd!important;text-decoration:underline;background:transparent!important;outline:none}.chat-profile-backdrop{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,12,.72);backdrop-filter:blur(9px);animation:chatProfileFade .16s ease}.chat-profile-card{position:relative;width:min(410px,100%);max-height:min(80vh,620px);overflow:auto;padding:24px;border:1px solid rgba(129,140,248,.3);border-radius:22px;background:radial-gradient(circle at 90% 0,rgba(99,102,241,.18),transparent 42%),linear-gradient(145deg,#12162e,#080a18);box-shadow:0 28px 90px #0009;color:#f5f5ff;animation:chatProfileIn .2s ease}.chat-profile-close{position:absolute;top:13px;right:13px;width:34px;height:34px;border:1px solid #ffffff1c;border-radius:11px;background:#ffffff0a;color:#e8e8ff;font-size:21px;cursor:pointer}.chat-profile-identity{display:flex;align-items:center;gap:14px;padding:8px 36px 20px 0}.chat-profile-avatar{width:64px;height:64px;flex:0 0 64px;object-fit:cover;border-radius:20px;border:1px solid #a5b4fc55;background:#171a34}.chat-profile-name{min-width:0;font-size:21px;font-weight:850;overflow-wrap:anywhere}.chat-profile-handle{margin-top:4px;color:#60a5fa;font-size:13px;font-weight:750}.chat-profile-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}.chat-profile-badge{padding:5px 8px;border-radius:999px;border:1px solid #a78bfa35;background:#a78bfa14;color:#ddd6fe;font-size:11px;font-weight:800}.chat-profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chat-profile-stat{padding:14px;border:1px solid #ffffff12;border-radius:14px;background:#ffffff06}.chat-profile-stat strong{display:block;font-size:21px;letter-spacing:-.5px}.chat-profile-stat span{display:block;margin-top:4px;color:#a4a7c4;font-size:11px}.chat-profile-footer{margin-top:15px;color:#858aa9;font-size:12px;line-height:1.5}.chat-profile-loading{padding:25px 4px;color:#a4a7c4;text-align:center}@keyframes chatProfileFade{from{opacity:0}to{opacity:1}}@keyframes chatProfileIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.chat-input-mention-wrap #messageInput{width:100%;min-height:48px;color:transparent!important;-webkit-text-fill-color:transparent!important;background:transparent!important;position:relative;z-index:1}.chat-input-mention-preview{font-size:inherit;line-height:normal}.chat-input-mention-wrap #messageInput::selection{-webkit-text-fill-color:transparent;background:rgba(99,102,241,.22)}
 </style>
   <script src="nav.js" defer></script>
 
@@ -1178,6 +1179,51 @@ const messageForm =
 const messageInput =
   document.getElementById("messageInput");
 
+// Mirror the textarea to color valid mentions blue while typing.
+(function setupMentionComposerPreview() {
+  if (!messageInput || !messageInput.parentElement) return;
+  const wrapper = document.createElement("div");
+  wrapper.className = "chat-input-mention-wrap";
+  wrapper.style.cssText = "position:relative;flex:1 1 220px;min-width:0;display:flex;";
+  messageInput.parentElement.insertBefore(wrapper, messageInput);
+  wrapper.appendChild(messageInput);
+  const preview = document.createElement("div");
+  preview.className = "chat-input-mention-preview";
+  preview.setAttribute("aria-hidden", "true");
+  wrapper.insertBefore(preview, messageInput);
+  Object.assign(messageInput.style, { position:"relative", zIndex:"1", background:"transparent", color:"transparent", caretColor:"#f5f6ff", webkitTextFillColor:"transparent" });
+  Object.assign(preview.style, { position:"absolute", inset:"0", overflow:"hidden", whiteSpace:"pre-wrap", overflowWrap:"anywhere", wordBreak:"break-word", pointerEvents:"none", padding:"13px 15px", color:"#f5f6ff", font:"inherit", lineHeight:"normal", border:"1px solid transparent", borderRadius:"14px" });
+  let revision = 0;
+  async function paint() {
+    const thisRevision = ++revision;
+    const value = messageInput.value;
+    const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
+    const matches = [];
+    let match;
+    while ((match = pattern.exec(value)) !== null) matches.push({start:match.index,end:match.index+match[0].length,username:match[2]});
+    const checked = await Promise.all(matches.map(async item => ({...item,profile:await findChatMentionProfile(item.username)})));
+    if (thisRevision !== revision) return;
+    preview.replaceChildren();
+    let pos = 0;
+    for (const item of checked) {
+      if (!item.profile || item.start < pos) continue;
+      preview.appendChild(document.createTextNode(value.slice(pos,item.start)));
+      const span = document.createElement("span");
+      span.style.color = "#60a5fa";
+      span.textContent = value.slice(item.start,item.end);
+      preview.appendChild(span);
+      pos = item.end;
+    }
+    preview.appendChild(document.createTextNode(value.slice(pos) || (value.endsWith("\n") ? "\u200b" : "")));
+    preview.scrollTop = messageInput.scrollTop;
+    preview.scrollLeft = messageInput.scrollLeft;
+  }
+  messageInput.addEventListener("input", paint);
+  messageInput.addEventListener("scroll", () => { preview.scrollTop=messageInput.scrollTop; preview.scrollLeft=messageInput.scrollLeft; });
+  messageInput.addEventListener("focus", paint);
+  paint();
+})();
+
 // Keep the message field at its original compact height; overflow scrolls inside it.
 
 const emojiPickerToggle = document.getElementById("emojiPickerToggle");
@@ -1530,30 +1576,49 @@ function hideError() {
    HTML SAFETY
 ========================================= */
 
-function renderMessageText(container, text) {
-  // Mention highlighting is visual; clicking a mention opens the user's profile card.
-  const mentionPattern = /@([A-Za-z0-9_]{1,32})/g;
-  let lastIndex = 0;
+const chatMentionProfileCache = new Map();
+
+async function findChatMentionProfile(username) {
+  const key = String(username || "").toLowerCase();
+  if (!key || !/^[a-z0-9_]{1,32}$/.test(key)) return null;
+  if (chatMentionProfileCache.has(key)) return chatMentionProfileCache.get(key);
+  try {
+    const result = await supabaseClient.from("profiles").select("id, username").ilike("username", key).limit(5);
+    if (result.error) throw result.error;
+    const profile = (result.data || []).find(item => String(item.username || "").toLowerCase() === key) || null;
+    chatMentionProfileCache.set(key, profile);
+    return profile;
+  } catch (error) {
+    console.warn("Could not validate chat mention:", error);
+    return null;
+  }
+}
+
+async function renderMessageText(container, text) {
+  const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
+  const matches = [];
   let match;
-
-  while ((match = mentionPattern.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
-    }
-
-    const mention = document.createElement("button");
-    mention.type = "button";
-    mention.className = "chat-mention";
-    mention.textContent = match[0];
-    mention.setAttribute("aria-label", "View profile for " + match[1]);
-    mention.addEventListener("click", () => openMentionProfile(match[1]));
-    container.appendChild(mention);
-    lastIndex = match.index + match[0].length;
+  while ((match = pattern.exec(text)) !== null) {
+    matches.push({ start: match.index + match[1].length, end: match.index + match[0].length, prefixStart: match.index, prefix: match[1], username: match[2] });
   }
-
-  if (lastIndex < text.length) {
-    container.appendChild(document.createTextNode(text.slice(lastIndex)));
+  const checked = await Promise.all(matches.map(async item => ({ ...item, profile: await findChatMentionProfile(item.username) })));
+  if (!container.isConnected) return;
+  container.replaceChildren();
+  let lastIndex = 0;
+  for (const item of checked) {
+    if (!item.profile || item.start < lastIndex) continue;
+    if (item.prefixStart > lastIndex) container.appendChild(document.createTextNode(text.slice(lastIndex, item.prefixStart)));
+    if (item.prefix) container.appendChild(document.createTextNode(item.prefix));
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chat-mention";
+    button.textContent = text.slice(item.start, item.end);
+    button.setAttribute("aria-label", "View profile for " + item.profile.username);
+    button.addEventListener("click", () => openMentionProfile(item.profile.username));
+    container.appendChild(button);
+    lastIndex = item.end;
   }
+  if (lastIndex < text.length) container.appendChild(document.createTextNode(text.slice(lastIndex)));
 }
 
 let activeMentionProfileModal = null;
@@ -1585,17 +1650,19 @@ async function openMentionProfile(username) {
     const profileResult = await supabaseClient.from("profiles")
       .select("id, username, avatar_url, created_at, reward_badges, equipped_badge, is_admin")
       .ilike("username", username)
-      .limit(1)
-      .maybeSingle();
+      .limit(5);
+    const exactProfile = (profileResult.data || []).find(item =>
+      String(item.username || "").toLowerCase() === String(username).toLowerCase()
+    ) || null;
 
     if (activeMentionProfileModal !== backdrop) return;
-    if (profileResult.error || !profileResult.data) {
+    if (profileResult.error || !exactProfile) {
       backdrop.querySelector(".chat-profile-loading").textContent =
         "Couldn't find that account. Check the username and try again.";
       return;
     }
 
-    const profile = profileResult.data;
+    const profile = exactProfile;
     const countResult = await supabaseClient.from("chat_messages")
       .select("id", { count: "exact", head: true })
       .eq("user_id", profile.id);
