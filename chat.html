@@ -849,6 +849,15 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
 .group-name-count{display:block;margin-top:6px;color:#9299b5;text-align:right;font-size:11px}
 @media(max-width:760px){.group-row{grid-template-columns:minmax(0,1fr) 30px}.group-expand{height:38px}}
 </style>
+<style id="community-chat-group-icon-polish">
+.group-kind-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 17px;width:17px;height:17px;margin-right:9px;vertical-align:middle}
+.group-kind-icon svg{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.public-kind{color:#818cf8}.private-kind{color:#c084fc}
+.group-name-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-sidebar .group-pill{display:flex;align-items:center;gap:0}
+.chat-sidebar .group-pill .group-name-label{flex:1}
+#groupDescription{display:none!important}
+</style>
 </head>
 
 </head>
@@ -910,10 +919,9 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
         <div class="group-toolbar" id="groupToolbar">
       <button type="button" class="group-action primary" id="createGroupButton">＋ New group</button>
       <div class="group-list" id="groupList" aria-label="Chat channels">
-        <button type="button" class="group-pill active" data-chat-public="true">🌐 Public Chat</button>
+        <button type="button" class="group-pill active" data-chat-public="true"><span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span class="group-name-label">Public Chat</span></button>
       </div>
     </div>
-    <div class="group-description" id="groupDescription"><strong>Public Chat</strong> · Everyone can read and join the conversation.</div>
     <div class="group-tools" id="groupTools" hidden>
       <button type="button" id="joinGroupButton">Join group</button>
       <button type="button" id="inviteGroupButton">＋ Add people</button>
@@ -1349,7 +1357,6 @@ async function loadChatGroups() {
     groupListEl.querySelector("[data-chat-public]").addEventListener("click", () => selectChatGroup(null));
     createGroupButton.disabled = true;
     groupToolsEl.hidden = true;
-    groupDescriptionEl.innerHTML = "<strong>Public Chat</strong> · Sign in to create or join groups.";
     return;
   }
   createGroupButton.disabled = false;
@@ -1361,7 +1368,22 @@ async function loadChatGroups() {
     showError("Couldn't load chat groups: " + error.message);
     return;
   }
-  visibleChatGroups = data || [];
+  const allGroups = data || [];
+  if (currentUserIsAdmin) {
+    visibleChatGroups = allGroups;
+  } else {
+    const { data: memberships, error: membershipError } = await supabaseClient
+      .from("chat_group_members").select("group_id").eq("user_id", currentUser.id);
+    if (membershipError) {
+      console.error("Could not load group memberships:", membershipError);
+      showError("Couldn't load your chat groups. Please refresh.");
+      return;
+    }
+    const joinedIds = new Set((memberships || []).map(item => item.group_id));
+    visibleChatGroups = allGroups.filter(group =>
+      group.is_public === true || group.created_by === currentUser.id || joinedIds.has(group.id)
+    );
+  }
   renderChatGroupList();
 }
 function renderChatGroupList() {
@@ -1369,7 +1391,7 @@ function renderChatGroupList() {
   const publicButton = document.createElement("button");
   publicButton.type = "button";
   publicButton.className = "group-pill" + (activeChatGroupId === null ? " active" : "");
-  publicButton.textContent = "🌐 Public Chat";
+  publicButton.innerHTML = '<span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span class="group-name-label">Public Chat</span>';
   publicButton.addEventListener("click", () => selectChatGroup(null));
   groupListEl.appendChild(publicButton);
   visibleChatGroups.forEach(group => {
@@ -1378,7 +1400,10 @@ function renderChatGroupList() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "group-pill" + (activeChatGroupId === group.id ? " active" : "");
-    button.innerHTML = (group.is_public ? "🌐 " : "🔒 ") + escapeGroupText(group.name);
+    button.innerHTML = (group.is_public
+      ? '<span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span>'
+      : '<span class="group-kind-icon private-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></span>') +
+      '<span class="group-name-label">' + escapeGroupText(group.name) + '</span>';
     button.title = group.description || group.name;
     button.addEventListener("click", async () => {
       const { data: membership } = await supabaseClient.from("chat_group_members")
@@ -1423,30 +1448,20 @@ async function selectChatGroup(groupId) {
 }
 function renderActiveGroupDetails() {
   if (!activeChatGroupId) {
-    groupDescriptionEl.innerHTML = "<strong>Public Chat</strong> · Everyone can read and join the conversation.";
     groupToolsEl.hidden = true;
     return;
   }
   const group = activeChatGroup;
   if (!group) {
-    groupDescriptionEl.innerHTML = "<strong>Chat group</strong>";
     groupToolsEl.hidden = true;
     return;
   }
   const owner = group.created_by === currentUser?.id;
-  const admin = currentUserIsAdmin;
-  groupDescriptionEl.innerHTML = "<strong>" + escapeGroupText(group.name) + "</strong> · " +
-    (group.is_public ? "Public group — anyone can join." : "Private group — invitation only.");
-  groupToolsEl.hidden = false;
+  groupToolsEl.hidden = !owner;
   joinGroupButton.hidden = true;
-  inviteGroupButton.hidden = !(owner || admin);
-  leaveGroupButton.hidden = owner || admin;
-  deleteGroupButton.hidden = !(owner || admin);
-  if (owner || admin) {
-    joinGroupButton.hidden = false;
-    joinGroupButton.textContent = "✓ Access available";
-    joinGroupButton.disabled = true;
-  }
+  inviteGroupButton.hidden = !owner;
+  leaveGroupButton.hidden = !owner;
+  deleteGroupButton.hidden = !owner;
 }
 joinGroupButton.addEventListener("click", async () => {
   if (!currentUser || !activeChatGroupId || !activeChatGroup) return;
