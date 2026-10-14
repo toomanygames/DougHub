@@ -159,6 +159,36 @@ main{width:min(1540px,calc(100% - 64px))}
  .layout{margin-top:12px}
 }
 @media(prefers-reduced-motion:reduce){.hero:after{filter:none}}
+
+/* Compact DougForum hero: tighter spacing, smaller stats and controls. */
+main{padding-top:24px;padding-bottom:52px}
+.hero{padding:24px 0 18px!important;gap:0!important}
+.hero:after{top:0!important;width:min(560px,82vw)!important;height:175px!important;filter:blur(12px)!important;opacity:.8}
+.hero-copy{max-width:820px!important}
+.eyebrow{font-size:10px!important;letter-spacing:.14em!important}
+.hero h1{font-size:clamp(34px,4.5vw,52px)!important;line-height:1.02!important;margin:12px 0 9px!important;letter-spacing:-.06em!important}
+.hero p{max-width:640px!important;font-size:14px!important;line-height:1.65!important}
+.forum-stats{margin-top:17px!important;gap:0!important}
+.forum-stat{min-width:112px!important;padding:3px 20px!important;gap:4px!important}
+.forum-stat strong{font-size:21px!important}
+.forum-stat span{font-size:10px!important}
+.hero-actions{margin-top:18px!important;gap:9px!important}
+.hero-actions .button,.button{min-height:40px!important;padding:0 15px!important;font-size:12px!important;border-radius:11px!important}
+.layout{margin-top:8px!important}
+@media(max-width:700px){
+ main{padding-top:16px!important;padding-bottom:38px!important}
+ .hero{padding:18px 0 15px!important}
+ .hero h1{font-size:clamp(32px,9vw,42px)!important;margin:10px 0 8px!important}
+ .hero p{font-size:13px!important;line-height:1.65!important}
+ .forum-stats{margin-top:14px!important}
+ .forum-stat{min-width:0!important;padding:3px 10px!important}
+ .forum-stat strong{font-size:18px!important}
+ .forum-stat span{font-size:9px!important}
+ .hero-actions{margin-top:15px!important;gap:8px!important}
+ .hero-actions .button,.button{min-height:38px!important;padding:0 12px!important;font-size:11px!important}
+ .layout{margin-top:6px!important}
+}
+
 </style>
 </head>
 <body>
