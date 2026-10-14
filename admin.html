@@ -4597,7 +4597,7 @@ async function savePageSchedule() {
 
 function setupAdminAccordions(){
   document.querySelectorAll("#adminArea > .card").forEach((card,index)=>{
-    if(card.id==="auditLogCard"||card.dataset.accordionReady==="1")return;
+    if(card.style.display==="none"||card.id==="auditLogCard"||card.dataset.accordionReady==="1")return;
     const heading=card.querySelector(":scope > h2, :scope > h3");
     if(!heading)return;
     card.dataset.accordionReady="1";
@@ -4615,7 +4615,8 @@ function setupAdminAccordions(){
     title.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleAdminCard(card,title);}});
     card.insertBefore(title,card.firstChild);card.appendChild(content);card.classList.add("collapsed");
     title.setAttribute("aria-controls",card.id+"Content");content.id=card.id+"Content";
-    if(index===0){card.classList.remove("collapsed");title.setAttribute("aria-expanded","true");}
+    const firstVisible = ![...document.querySelectorAll("#adminArea > .card")].slice(0,index).some(previous=>previous.style.display!=="none");
+    if(firstVisible){card.classList.remove("collapsed");title.setAttribute("aria-expanded","true");}
   });
 }
 function toggleAdminCard(card,title){
