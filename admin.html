@@ -4661,19 +4661,25 @@ document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveSta
 
 function setupAdminQuickNav() {
     const nav = document.getElementById("adminQuickNavLinks");
-    if (!nav) return;
+    const navBar = document.getElementById("adminQuickNav");
+    if (!nav || !navBar) return;
+    navBar.style.display = "block";
     nav.innerHTML = "";
     document.querySelectorAll("#adminArea > .card").forEach((card,index) => {
         if (card.style.display === "none") return;
         const heading = card.querySelector("h2,h3");
         if (!heading) return;
         if (!card.id) card.id = "adminSection" + index;
+        // Leave room for the sticky quick-jump bar when scrolling to a section.
+        card.style.scrollMarginTop = "112px";
         const link = document.createElement("a");
         link.href = "#" + card.id;
         link.textContent = heading.textContent.replace(/^[^A-Za-z0-9]+/,"").trim() || "Section " + (index+1);
         link.title = "Jump to " + link.textContent;
         link.addEventListener("click", event => {
             event.preventDefault();
+            // Use the section's anchor target; CSS scroll-margin keeps it below the sticky nav.
+            history.replaceState(null, "", "#" + card.id);
             card.scrollIntoView({behavior:"smooth",block:"start"});
         });
         nav.appendChild(link);
