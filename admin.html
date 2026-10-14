@@ -876,6 +876,11 @@ input,textarea,select{background:#070918}
 .chat-group-moderation-delete:disabled{opacity:.5;cursor:wait}
 @media(max-width:520px){.chat-group-moderation-row{align-items:flex-start;flex-direction:column}.chat-group-moderation-delete{width:100%}}
 </style>
+<style id="admin-role-sections">
+.admin-rank-section{scroll-margin-top:100px}
+#adminArea>.card[data-required-rank]{min-width:0}
+@media(max-width:640px){.admin-rank-section{font-size:12px!important;gap:8px!important;margin-top:15px!important}}
+</style>
 </head>
 
 <body>
@@ -1017,6 +1022,7 @@ input,textarea,select{background:#070918}
 <div class="card">
 
     <h2>👥 Users</h2>
+      <div id="activeUsersSummary" class="status" style="margin-top:8px">Refreshing active status…</div>
 
     <div class="status" id="usersStatus">
         Loading users...
@@ -1033,20 +1039,6 @@ input,textarea,select{background:#070918}
     </details>
 
 </div>
-
-<div class="card">
-
-    <h2>📊 User Activity</h2>
-
-    <div class="status" id="activityStatus">
-        Loading activity...
-    </div>
-
-    <div id="activityList"></div>
-
-</div>
-
-<div class="admin-section-heading" aria-hidden="true">🛡️ Account Moderation</div>
 
 <div class="card moderation-card" id="userWarningsCard">
 
@@ -1758,8 +1750,7 @@ function isRecentlyActive(lastSeen) {
 
 async function loadUserActivity() {
 
-    activityStatus.textContent =
-        "Loading activity...";
+    if (activityStatus) activityStatus.textContent = "Refreshing presence…";
 
     const {
         data,
@@ -1775,8 +1766,7 @@ async function loadUserActivity() {
 
         console.error(error);
 
-        activityStatus.textContent =
-            "Could not load activity.";
+        if (activityStatus) activityStatus.textContent = "Could not refresh presence.";
 
         activityList.innerHTML = `
             <div class="error">
@@ -1822,20 +1812,13 @@ async function loadUserActivity() {
 
         });
 
-    activityStatus.textContent =
-        activeUsers.length +
-        " user" +
-        (activeUsers.length === 1 ? "" : "s") +
-        " currently active";
-
-    activityList.innerHTML =
-        "";
+    const activeSummary = document.getElementById("activeUsersSummary");
+    if (activeSummary) activeSummary.textContent = activeUsers.length + " currently active";
+    if (!activityList) return;
+    activityList.innerHTML = "";
 
     if (!allUsers.length) {
-
-        activityList.innerHTML =
-            '<div class="empty">No users found.</div>';
-
+        activityList.innerHTML = '<div class="empty">No users found.</div>';
         return;
     }
 
@@ -4594,30 +4577,46 @@ function toggleAdminCard(card,title){
 }
 function applyStaffPermissions(){
   const role=currentAdminRole||"none";
+  const rank={none:0,helper:1,admin:2,developer:3,owner:4}[role]||0;
   const cards=[...document.querySelectorAll("#adminArea > .card")];
-  const summary={
-    helper:"Helper access: community warnings and group moderation.",
-    admin:"Admin access: account and community moderation. Staff ranks and site-wide controls are reserved for the Owner.",
-    developer:"Developer access: technical projects, site features and audit history.",
-    owner:"Owner access: all administration tools and staff rank management."
+  const rankForCard=card=>{
+    if(card.id==="staffManagementCard") return 4;
+    const h=card.querySelector(":scope > h2, :scope > h3");
+    const title=(h?.textContent||"").toLowerCase();
+    if(/site features|code projects|project|developer/.test(title)) return 3;
+    if(/event banner|page availability|staff & permissions|audit log|audit history/.test(title)) return 4;
+    if(/user warnings|recent warnings|group moderation/.test(title)) return 1;
+    if(/users|ban accounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests/.test(title)) return 2;
+    return 2;
   };
+  // Remove previously-created role headings so reruns stay clean.
+  document.querySelectorAll("#adminArea > .admin-rank-section").forEach(el=>el.remove());
+  const labels={1:"🟢 Helper+ · Community Support",2:"🔵 Admin+ · Moderation & Management",3:"🟣 Developer+ · Technical Tools",4:"🟡 Owner+ · Full Control"};
+  let previousGroup=0;
   cards.forEach(card=>{
-    if(card.id==="staffManagementCard"){card.style.display=role==="owner"?"flex":"none";return;}
-    if(role==="owner"){card.style.display="";return;}
-    const heading=card.querySelector(":scope > h2, :scope > h3, :scope > .admin-card-heading h2, :scope > .admin-card-heading h3");
-    const title=(heading?.textContent||"").toLowerCase();
-    let show=false;
-    if(role==="helper"){
-      show=/warning|group moderation/.test(title);
-    }else if(role==="admin"){
-      show=!/staff|site feature|announcement|page schedule|developer|project management|owner control/.test(title);
-    }else if(role==="developer"){
-      show=/project|code|site feature|audit|activity/.test(title);
+    const required=rankForCard(card);
+    const visible=rank>=required;
+    card.style.display=visible?"":"none";
+    card.dataset.requiredRank=String(required);
+    if(!visible)return;
+    if(required!==previousGroup){
+      const heading=document.createElement("div");
+      heading.className="admin-rank-section";
+      heading.innerHTML='<span>'+labels[required]+'</span><span class="admin-rank-section-line"></span>';
+      heading.style.cssText="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:20px 0 2px;color:#c7d2fe;font-weight:850;font-size:13px;letter-spacing:.025em";
+      const line=heading.querySelector(".admin-rank-section-line");
+      line.style.cssText="height:1px;flex:1;background:linear-gradient(90deg,#818cf855,transparent)";
+      card.parentNode.insertBefore(heading,card);
+      previousGroup=required;
     }
-    card.style.display=show?"":"none";
   });
   const banner=document.getElementById("adminPermissionSummary");
-  if(banner) banner.textContent=summary[role]||"Staff access";
+  if(banner) banner.textContent=({
+    helper:"Helper access: the Helper+ sections below. Higher-rank tools stay hidden.",
+    admin:"Admin access: Helper+ and Admin+ sections below.",
+    developer:"Developer access: Helper+, Admin+ and Developer+ sections below.",
+    owner:"Owner access: every section, including staff ranks and full site controls."
+  })[role]||"Staff access";
 }
 
 function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
