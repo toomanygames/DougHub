@@ -100,11 +100,71 @@ footer{padding:22px 0 0;color:#777b99;font-size:10px;text-align:center}
 @media(max-width:850px){.dashboard-hero{grid-template-columns:minmax(0,1fr) 240px;gap:10px;padding:28px}.dashboard-hero-art{min-height:180px}.dashboard-hero h1{font-size:clamp(32px,5vw,45px)}.simple-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.simple-dashboard{width:calc(100% - 24px);padding:17px 0 30px}.dashboard-hero{grid-template-columns:1fr;min-height:0;padding:25px 21px 18px;border-radius:22px}.dashboard-hero h1{font-size:clamp(34px,9vw,46px);margin-top:15px}.dashboard-hero-copy>p{font-size:12px}.dashboard-hero-actions{margin-top:18px}.dashboard-hero-art{min-height:155px;margin-top:0}.hero-glass-card{width:220px}.orbit-one{width:235px;height:130px}.orbit-two{width:170px;height:170px}.hero-float-tag{right:2px;bottom:0}.compact-stats{gap:8px}.stat{padding:13px}.stat-value{font-size:25px}.dashboard-columns{grid-template-columns:1fr}.simple-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px}.simple-shortcut{padding:12px}.dashboard-preferences{align-items:flex-start}.page-heading{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.dashboard-hero *,.simple-shortcut,.list-item,.button{transition:none!important;animation:none!important}}
+
+/* Real dashboard layout: a persistent workspace rail and a transparent welcome row. */
+html{scroll-padding-top:96px}
+.dashboard-layout{width:min(1540px,100%);display:grid;grid-template-columns:224px minmax(0,1fr);gap:34px;align-items:start;padding:30px clamp(16px,2.5vw,36px) 44px}
+.dashboard-sidebar{position:sticky;top:96px;display:flex;flex-direction:column;min-height:calc(100vh - 120px);padding:12px 10px 14px;border-right:1px solid #ffffff12}
+.sidebar-label{padding:8px 12px 11px;color:#777d9e;font-size:9px;font-weight:900;letter-spacing:.17em}
+.sidebar-label-spaced{margin-top:20px}
+.dashboard-side-link{display:flex;align-items:center;gap:11px;min-height:42px;margin:2px 0;padding:0 11px;border:1px solid transparent;border-radius:11px;color:#a7abc8;font-size:11px;font-weight:750;transition:background .18s,border-color .18s,color .18s}
+.dashboard-side-link:hover{color:#fff;background:#ffffff08}
+.dashboard-side-link.active{color:#f8f7ff;border-color:#8b8cff26;background:linear-gradient(100deg,#6366f126,#a855f711);box-shadow:inset 2px 0 #9697ff}
+.ds-icon{display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border:1px solid #ffffff0b;border-radius:8px;background:#ffffff06;color:#d0ceff;font-size:13px}
+.dashboard-side-link.active .ds-icon{background:#7778ff21;color:#dedbff}
+.ds-arrow{margin-left:auto;color:#777d9e;font-size:11px}
+.sidebar-bottom{position:relative;overflow:hidden;margin:28px 2px 14px;padding:15px 13px;border:1px solid #a78bfa26;border-radius:15px;background:linear-gradient(145deg,#17172f99,#0d1020a6)}
+.sidebar-bottom:after{content:"";position:absolute;width:90px;height:90px;right:-45px;top:-48px;border-radius:50%;background:#a855f72c;filter:blur(4px)}
+.sidebar-bottom-orb{display:grid;place-items:center;width:31px;height:31px;margin-bottom:12px;border:1px solid #c4b5fd38;border-radius:10px;background:linear-gradient(135deg,#6366f133,#a855f733);color:#e9ddff}
+.sidebar-bottom strong{font-size:11px}
+.sidebar-bottom p{margin:5px 0 13px;color:#999dbb;font-size:10px;line-height:1.6}
+.sidebar-bottom>a{display:flex;align-items:center;justify-content:space-between;color:#d1c7ff;font-size:10px;font-weight:850}
+.sidebar-settings{margin-top:auto}
+.dashboard-main{min-width:0}
+.dashboard-hero{grid-template-columns:minmax(0,1fr) minmax(270px,.72fr);min-height:235px;margin:0 0 22px;padding:12px 8px 20px;overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none}
+.dashboard-hero:before,.dashboard-hero:after{display:none}
+.dashboard-hero-copy{padding:10px 0}
+.dashboard-hero h1{margin:16px 0 13px;font-size:clamp(38px,4.2vw,57px);line-height:1.05}
+.dashboard-hero-copy>p{max-width:500px;font-size:13px;line-height:1.8;color:#a9aec9}
+.dashboard-hero-actions{margin-top:23px}
+.dashboard-hero-art{min-height:230px}
+.hero-orbit{border-color:#9d8cff30}
+.orbit-one{width:300px;height:165px}
+.orbit-two{width:225px;height:225px}
+.hero-glass-card{width:min(250px,85%);transform:rotate(-5deg);animation:dashboard-float 6s ease-in-out infinite}
+.hero-glass-icon{width:49px;height:49px;font-size:25px}
+.hero-float-tag{right:0;bottom:8px}
+@keyframes dashboard-float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(-3deg)}}
+.compact-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stat{min-height:122px}
+@media(max-width:1050px){.dashboard-layout{grid-template-columns:190px minmax(0,1fr);gap:22px}.dashboard-sidebar{padding-left:4px;padding-right:8px}.dashboard-hero{grid-template-columns:minmax(0,1fr) 230px}.dashboard-hero-art{min-height:190px}.hero-glass-card{width:205px}.orbit-one{width:240px}.orbit-two{width:185px;height:185px}}
+@media(max-width:760px){.dashboard-layout{display:flex;flex-direction:column;gap:15px;padding-top:15px}.dashboard-sidebar{position:static;order:0;display:flex;flex-direction:row;align-items:center;gap:5px;width:100%;min-height:0;overflow-x:auto;padding:5px 0 10px;border-right:0;border-bottom:1px solid #ffffff14}.sidebar-label,.sidebar-bottom,.sidebar-settings{display:none}.dashboard-side-link{flex:0 0 auto;min-height:38px;margin:0;padding:0 10px}.dashboard-side-link .ds-icon{width:23px;height:23px;flex-basis:23px}.dashboard-side-link .ds-arrow{display:none}.dashboard-main{width:100%}.dashboard-hero{grid-template-columns:minmax(0,1fr) 190px;gap:4px;min-height:0;padding:5px 0 18px}.dashboard-hero h1{font-size:clamp(30px,6vw,43px)}.dashboard-hero-art{min-height:170px}.hero-glass-card{width:175px}.hero-float-tag{font-size:8px}.orbit-one{width:200px;height:120px}.orbit-two{width:150px;height:150px}}
+@media(max-width:540px){.dashboard-hero{grid-template-columns:1fr}.dashboard-hero-copy{padding:8px 0 0}.dashboard-hero h1{font-size:clamp(35px,9vw,46px)}.dashboard-hero-art{min-height:155px;margin-top:0}.hero-glass-card{width:205px}.hero-float-tag{right:3px;bottom:0}.compact-stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:auto}.stat{min-height:112px}.page-heading{flex-direction:column}.page-heading>.button{width:100%}}
+@media(prefers-reduced-motion:reduce){.hero-glass-card{animation:none}}
 </style>
 </head>
 <body>
 <header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
-<div class="simple-dashboard">
+<div class="simple-dashboard dashboard-layout">
+ <aside class="dashboard-sidebar" aria-label="Dashboard sidebar">
+  <div class="sidebar-label">WORKSPACE</div>
+  <a class="dashboard-side-link active" href="#overview"><span class="ds-icon">◫</span><span>Overview</span></a>
+  <a class="dashboard-side-link" href="#activity"><span class="ds-icon">↗</span><span>Activity</span></a>
+  <a class="dashboard-side-link" href="#creations"><span class="ds-icon">✦</span><span>My creations</span></a>
+  <a class="dashboard-side-link" href="#quick-access"><span class="ds-icon">⌘</span><span>Quick access</span></a>
+  <div class="sidebar-label sidebar-label-spaced">EXPLORE</div>
+  <a class="dashboard-side-link" href="douggames.html"><span class="ds-icon">▣</span><span>DougGames</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link" href="dougforum.html"><span class="ds-icon">☷</span><span>DougForum</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link" href="tools.html"><span class="ds-icon">✳</span><span>DougTools</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link" href="nova.html"><span class="ds-icon">✧</span><span>Nova AI</span><span class="ds-arrow">↗</span></a>
+  <div class="sidebar-bottom">
+   <div class="sidebar-bottom-orb">✦</div>
+   <strong>Have an idea?</strong>
+   <p>Turn it into something real.</p>
+   <a href="Scripting/scripting.html">Start creating <span>→</span></a>
+  </div>
+  <a class="dashboard-side-link sidebar-settings" href="settings.html"><span class="ds-icon">⚙</span><span>Settings</span></a>
+ </aside>
  <main class="dashboard-main">
   <section class="dashboard-hero" id="overview" aria-labelledby="welcomeTitle">
    <div class="dashboard-hero-copy">
@@ -115,7 +175,7 @@ footer{padding:22px 0 0;color:#777b99;font-size:10px;text-align:center}
    </div>
    <div class="dashboard-hero-art" aria-hidden="true"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-glass-card"><div class="hero-glass-top"><span></span><span></span><span></span><small>YOUR WORKSPACE</small></div><div class="hero-glass-icon">D</div><div class="hero-glass-lines"><i></i><i></i><i></i></div><div class="hero-glass-bottom"><span>Ideas</span><b>✦</b><span>Create</span><b>↗</b></div></div><div class="hero-float-tag">✦ Made for your next idea</div></div>
   </section>
-  <section class="stats compact-stats" aria-label="Your activity">
+  <section class="stats compact-stats" id="activity" aria-label="Your activity">
    <div class="stat"><div class="stat-top"><span>Your published games</span><span class="stat-icon">✦</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Your creations</div></div>
    <div class="stat"><div class="stat-top"><span>Community games</span><span class="stat-icon">G</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Shared with everyone</div></div>
   </section>
@@ -123,7 +183,7 @@ footer{padding:22px 0 0;color:#777b99;font-size:10px;text-align:center}
    <section class="panel" id="creations"><div class="panel-heading"><div><h2>Recent creations</h2><p>Your latest published projects.</p></div><a class="text-link" href="my-games.html">View all ↗</a></div><div class="panel-body"><div class="item-list" id="myCreations"><div class="empty">Loading your projects…</div></div></div></section>
    <section class="panel account-panel"><div class="panel-heading"><div><h2>Your account</h2><p>Profile and account details.</p></div><a class="text-link" href="settings.html">Settings ↗</a></div><div class="account-body"><div class="identity"><div class="avatar" id="profileAvatar">D</div><div><div class="identity-name" id="profileName">Loading profile…</div><div class="identity-email" id="profileEmail">Checking sign-in</div></div></div><div class="details"><div class="detail"><span>Member since</span><strong id="memberSince">—</strong></div><div class="detail"><span>Account type</span><strong id="accountType">Member</strong></div></div><div class="account-buttons"><a class="button" href="settings.html">Edit profile</a><a class="button" href="my-games.html">My creations</a></div></div></section>
   </div>
-  <section class="panel quick-panel"><div class="panel-heading"><div><h2>Quick access</h2><p>Go straight to the places you use most.</p></div><a class="text-link" href="tools.html">All pages &amp; tools ↗</a></div><div class="simple-shortcuts">
+  <section class="panel quick-panel" id="quick-access"><div class="panel-heading"><div><h2>Quick access</h2><p>Go straight to the places you use most.</p></div><a class="text-link" href="tools.html">All pages &amp; tools ↗</a></div><div class="simple-shortcuts">
    <a class="simple-shortcut" href="douggames.html"><span>🎮</span><strong>DougGames</strong><small>Play</small></a>
    <a class="simple-shortcut" href="dougforum.html"><span>DF</span><strong>DougForum</strong><small>Discuss</small></a>
    <a class="simple-shortcut" href="tools.html"><span>✳</span><strong>DougTools</strong><small>Utilities</small></a>
