@@ -4648,7 +4648,7 @@ async function saveStaffRole(){
   if(target===currentAdminUser.id&&role!=="owner"){status.textContent="The Owner account cannot demote itself.";return;}
   button.disabled=true;status.textContent="Verifying Owner access…";
   try{
-    const {data,error}=await supabaseClient.schema("private").rpc("promote_doughub_staff",{target_user_id:target,desired_role:role,confirmation_password:password});
+    const {data,error}=await supabaseClient.functions.invoke("promote-doughub-staff",{body:{target_user_id:target,desired_role:role,confirmation_password:password}});
     if(error)throw error;
     document.getElementById("staffPassword").value="";
     status.textContent="@"+(data?.username||"Account")+" updated to "+staffRoleLabel(role)+".";
