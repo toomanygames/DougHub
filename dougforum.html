@@ -261,6 +261,18 @@ main{padding-top:16px!important}
 }
 
 
+
+/* Compact the anchored community rail so its full contents fit without scrolling. */
+@media(min-width:901px){
+ .side{padding:9px!important}
+ .side-title{padding:5px 8px!important;font-size:9px!important}
+ .community-nav{gap:3px!important}
+ .community-choice{gap:7px!important;padding:6px 7px!important;font-size:11px!important;border-radius:9px!important}
+ .community-letter{width:26px!important;height:26px!important;flex-basis:26px!important;border-radius:8px!important;font-size:9px!important}
+ .side-note{margin-top:8px!important;padding:9px!important;border-radius:10px!important}
+ .side-note strong{font-size:10px!important}
+ .side-note p{margin-top:4px!important;font-size:9px!important;line-height:1.45!important}
+}
 /* Keep the community rail anchored while the discussion feed scrolls. */
 @media(min-width:901px){
  .layout{grid-template-columns:225px minmax(0,1fr)!important}
