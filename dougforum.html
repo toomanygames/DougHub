@@ -130,6 +130,35 @@ main{width:min(1540px,calc(100% - 64px))}
 @media(min-width:1200px){.post-list{gap:18px}.post{padding:25px}.post h3{font-size:22px}.post-body{font-size:15px}.compose{padding:25px}.compose textarea{min-height:135px}}
 @media(max-width:900px){main{width:calc(100% - 32px)}.layout{grid-template-columns:235px minmax(0,1fr);gap:16px}.community-choice{min-height:49px;padding:8px}.community-letter{width:35px;height:35px;flex-basis:35px}.community-icon{width:18px;height:18px}}
 @media(max-width:700px){main{width:calc(100% - 24px)}.layout{grid-template-columns:1fr}.community-nav{gap:7px}.community-choice{min-height:43px}.community-letter{width:30px;height:30px;flex-basis:30px;border-radius:9px}.community-icon{width:16px;height:16px}.feed-controls{width:100%}}
+
+/* Final hero pass: open, centered homepage-style intro with no enclosing panel. */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;width:100%;padding:clamp(42px,6vw,78px) 0 42px;margin:0 auto;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;position:relative;isolation:isolate}
+.hero:after{content:"";position:absolute;z-index:-1;top:5%;left:50%;width:min(780px,90vw);height:290px;transform:translateX(-50%);pointer-events:none;background:radial-gradient(ellipse at center,rgba(99,102,241,.11),rgba(168,85,247,.055) 38%,transparent 72%);filter:blur(18px)}
+.hero-copy{display:flex;flex-direction:column;align-items:center;width:100%;max-width:1000px}
+.eyebrow{justify-content:center;gap:10px;color:#c4b5fd;font-size:11px;letter-spacing:.18em}
+.hero h1{max-width:100%;margin:22px 0 18px;font-size:clamp(46px,7.2vw,82px);line-height:.98;letter-spacing:-.07em;text-wrap:balance}
+.hero p{max-width:700px;margin:0 auto;color:#b4b5cc;font-size:clamp(15px,1.5vw,18px);line-height:1.85;text-wrap:pretty}
+.forum-stats{justify-content:center;gap:0;margin-top:30px;padding:0;border:0;background:transparent}
+.forum-stat{min-width:145px;justify-content:center;flex-direction:column;align-items:center;gap:5px;padding:4px 28px;border:0;border-right:1px solid #ffffff17;border-radius:0;background:transparent}
+.forum-stat:last-child{border-right:0}
+.forum-stat strong{font-size:25px;line-height:1.1;background:linear-gradient(100deg,#f5f3ff,#c4b5fd);background-clip:text;-webkit-background-clip:text;color:transparent}
+.forum-stat span{font-size:11px;letter-spacing:.035em;color:#9295b2}
+.hero-actions{justify-content:center;margin-top:30px;gap:12px}
+.hero-actions .button{min-height:48px;padding:0 20px}
+.layout{margin-top:18px}
+@media(max-width:700px){
+ .hero{padding:34px 0 28px}
+ .hero h1{font-size:clamp(40px,11vw,56px);margin:18px 0 14px}
+ .hero p{font-size:14px;line-height:1.8;padding:0 3px}
+ .forum-stats{width:100%;margin-top:24px}
+ .forum-stat{min-width:0;flex:1;padding:4px 8px}
+ .forum-stat strong{font-size:22px}
+ .forum-stat span{font-size:10px}
+ .hero-actions{width:100%;margin-top:25px}
+ .hero-actions .button{flex:1;padding:0 12px}
+ .layout{margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){.hero:after{filter:none}}
 </style>
 </head>
 <body>
