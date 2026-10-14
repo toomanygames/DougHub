@@ -1423,84 +1423,65 @@ let allUsers = [];
 let presenceMap = new Map();
 
 
-async function checkAdmin() {
-
-    const {
-        data: { session },
-        error: sessionError
-    } = await supabaseClient.auth.getSession();
-
-    if (sessionError) {
-
-        loading.innerHTML =
-            '<div class="error">Could not check your login.</div>';
-
-        console.error(sessionError);
-
-        return false;
-    }
-
-    if (!session) {
-
-        window.location.href =
-            "log-in.html?redirect=admin.html";
-
-        return false;
-    }
-
-    currentAdminUser =
-        session.user;
-
-    const {
-        data: profile,
-        error: profileError
-    } =
-        await supabaseClient
-            .from("profiles")
-            .select("username,is_admin,staff_role")
-            .eq("id", session.user.id)
-            .maybeSingle();
-
-    if (profileError) {
-
-        console.error(profileError);
-
-        loading.innerHTML = `
-            <div class="error">
-                Could not load your admin profile.<br><br>
-                ${escapeHtml(profileError.message)}
-            </div>
-        `;
-
-        return false;
-    }
-
-    currentAdminRole = profile?.staff_role || (profile?.is_admin ? "admin" : "none");
-
-    if (!profile || profile.is_admin !== true) {
-
-        loading.innerHTML = `
-            <div class="error">
-                Access denied.<br><br>
-                This account is not an admin.
-            </div>
-        `;
-
-        return false;
-    }
-
-    loading.style.display =
-        "none";
-
-    adminArea.style.display =
-        "grid";
-
-    const quickNav = document.getElementById("adminQuickNav");
-    if (quickNav) quickNav.style.display = "block";
-
-    return true;
+function adminCheckWithTimeout(promise, label, ms=12000) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error(label + " timed out. Check your connection, browser tracking prevention, or Supabase availability, then refresh.")), ms))
+    ]);
 }
 
+async function checkAdmin() {
+    loading.innerHTML = "Checking admin permissions…";
+
+    try {
+        const sessionResult = await adminCheckWithTimeout(
+            supabaseClient.auth.getSession(),
+            "Checking your login"
+        );
+
+        if (sessionResult.error) throw sessionResult.error;
+        const session = sessionResult.data?.session;
+
+        if (!session) {
+            loading.innerHTML = 'You are not signed in. <a href="log-in.html?redirect=admin.html" class="back-button">Log in</a>';
+            return false;
+        }
+
+        currentAdminUser = session.user;
+
+        const profileResult = await adminCheckWithTimeout(
+            supabaseClient.from("profiles")
+                .select("username,is_admin,staff_role")
+                .eq("id", session.user.id)
+                .maybeSingle(),
+            "Loading your staff profile"
+        );
+
+        if (profileResult.error) throw profileResult.error;
+        const profile = profileResult.data;
+
+        currentAdminRole = profile?.staff_role || (profile?.is_admin ? "admin" : "none");
+
+        if (!profile || profile.is_admin !== true) {
+            loading.innerHTML = '<div class="error">Access denied.<br><br>This account is not an admin.</div>';
+            return false;
+        }
+
+        loading.style.display = "none";
+        adminArea.style.display = "grid";
+
+        const quickNav = document.getElementById("adminQuickNav");
+        if (quickNav) quickNav.style.display = "block";
+        return true;
+    } catch (error) {
+        console.error("DougHub admin permission check failed:", error);
+        loading.innerHTML = '<div class="error"><strong>Could not finish checking admin permissions.</strong><br><br>' +
+            escapeHtml(error?.message || "Unknown error") +
+            '<br><br><button type="button" class="back-button" onclick="location.reload()">Try again</button> ' +
+            '<a href="index.html" class="back-button">Back to DougHub</a></div>';
+        return false;
+    }
+}
 
 async function loadUsers() {
 
