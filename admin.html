@@ -4595,25 +4595,31 @@ function toggleAdminCard(card,title){
 function applyStaffPermissions(){
   const role=currentAdminRole||"none";
   const cards=[...document.querySelectorAll("#adminArea > .card")];
-  const allowed={
-    helper:new Set(["userWarningsCard","recentWarningsCard","chatGroupModerationCard"]),
-    admin:new Set(["userWarningsCard","recentWarningsCard","banAccountsCard","chatGroupModerationCard","chatRetentionCard","auditLogCard","dougHubMusicModerationCard"]),
-    developer:new Set(["codeProjectsCard","siteFeatureCard","auditLogCard"]),
-    owner:null
-  }[role];
+  const summary={
+    helper:"Helper access: community warnings and group moderation.",
+    admin:"Admin access: account and community moderation. Staff ranks and site-wide controls are reserved for the Owner.",
+    developer:"Developer access: technical projects, site features and audit history.",
+    owner:"Owner access: all administration tools and staff rank management."
+  };
   cards.forEach(card=>{
     if(card.id==="staffManagementCard"){card.style.display=role==="owner"?"flex":"none";return;}
     if(role==="owner"){card.style.display="";return;}
-    card.style.display=allowed&&allowed.has(card.id)?"":"none";
+    const heading=card.querySelector(":scope > h2, :scope > h3, :scope > .admin-card-heading h2, :scope > .admin-card-heading h3");
+    const title=(heading?.textContent||"").toLowerCase();
+    let show=false;
+    if(role==="helper"){
+      show=/warning|group moderation/.test(title);
+    }else if(role==="admin"){
+      show=!/staff|site feature|announcement|page schedule|developer|project management|owner control/.test(title);
+    }else if(role==="developer"){
+      show=/project|code|site feature|audit|activity/.test(title);
+    }
+    card.style.display=show?"":"none";
   });
   const banner=document.getElementById("adminPermissionSummary");
-  if(banner) banner.textContent=({
-    helper:"Helper access: community support and group moderation.",
-    admin:"Admin access: account warnings, bans and community moderation.",
-    developer:"Developer access: code projects and site features.",
-    owner:"Owner access: all administration tools and staff rank management."
-  })[role]||"Staff access";
+  if(banner) banner.textContent=summary[role]||"Staff access";
 }
+
 function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
 function renderStaffManager(){
   const card=document.getElementById("staffManagementCard");
