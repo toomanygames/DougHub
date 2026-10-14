@@ -115,6 +115,21 @@ main{width:min(1380px,calc(100% - 48px));padding:44px 0 76px}
 .comment-avatar{width:27px;height:27px;margin-right:2px}
 @media(max-width:900px){main{width:calc(100% - 32px)}.layout{grid-template-columns:210px minmax(0,1fr);gap:16px}.post{padding:18px}.post h3{font-size:19px}.form-grid{grid-template-columns:1fr 180px}}
 @media(max-width:700px){main{width:calc(100% - 24px);padding-top:24px}.hero{padding:0 0 22px}.hero h1{font-size:clamp(37px,10vw,48px)}.hero p{font-size:14px}.forum-stats{gap:8px}.forum-stat{flex:1;min-width:calc(33.333% - 8px);display:flex;flex-direction:column;gap:3px;padding:10px}.forum-stat strong{font-size:18px}.forum-stat span{font-size:10px}.layout{grid-template-columns:1fr;gap:15px}.side{padding:12px}.community-choice{font-size:12px}.feed-head h2{font-size:23px}.compose{padding:16px}.post{grid-template-columns:38px minmax(0,1fr);gap:10px;padding:13px}.vote{width:31px;height:30px}.post h3{font-size:17px}.post-body{font-size:13px}.post-meta{font-size:10px}.post-avatar{width:25px;height:25px}.comment-avatar{width:24px;height:24px}.comment-meta{flex-wrap:wrap}.button{min-height:45px}}
+
+/* Community navigation: consistent illustrative line icons, never cramped initials. */
+main{width:min(1540px,calc(100% - 64px))}
+.layout{grid-template-columns:290px minmax(0,1fr);gap:28px}
+.community-choice{min-height:58px;gap:13px;padding:11px 12px;font-size:14px}
+.community-letter{width:42px;height:42px;flex:0 0 42px;border-radius:13px;background:linear-gradient(145deg,rgba(99,102,241,.2),rgba(168,85,247,.16));border-color:#a78bfa2b;box-shadow:inset 0 1px #ffffff0b}
+.community-icon{width:20px;height:20px;stroke:#c4b5fd;stroke-width:1.8}
+.community-choice.active .community-letter{background:linear-gradient(145deg,#6366f13b,#a855f72e);border-color:#a78bfa70;box-shadow:0 5px 20px #6366f11a}
+.community-choice.active .community-icon{stroke:#e5ddff}
+.feed-controls{flex:1;min-width:0}
+.feed-head{gap:22px}
+.search{flex:1;width:auto;min-width:170px}
+@media(min-width:1200px){.post-list{gap:18px}.post{padding:25px}.post h3{font-size:22px}.post-body{font-size:15px}.compose{padding:25px}.compose textarea{min-height:135px}}
+@media(max-width:900px){main{width:calc(100% - 32px)}.layout{grid-template-columns:235px minmax(0,1fr);gap:16px}.community-choice{min-height:49px;padding:8px}.community-letter{width:35px;height:35px;flex-basis:35px}.community-icon{width:18px;height:18px}}
+@media(max-width:700px){main{width:calc(100% - 24px)}.layout{grid-template-columns:1fr}.community-nav{gap:7px}.community-choice{min-height:43px}.community-letter{width:30px;height:30px;flex-basis:30px;border-radius:9px}.community-icon{width:16px;height:16px}.feed-controls{width:100%}}
 </style>
 </head>
 <body>
@@ -157,8 +172,23 @@ function score(post){return (post.dougforum_votes||[]).reduce((n,v)=>n+Number(v.
 function displayName(id){return postNames[id]||"DougHub member";}
 function avatarMarkup(url,name,extra=""){const safe=String(url||"");const valid=safe.startsWith("https://")||safe.startsWith("http://");const initial=esc(String(name||"D").trim().charAt(0).toUpperCase()||"D");return `<span class="user-avatar ${extra}">${valid?`<img src="${esc(safe)}" alt="" loading="lazy" onerror="this.remove()">`:""}<span class="avatar-fallback">${initial}</span></span>`;}
 let postNames={},postAvatars={};
+function communityIcon(name){
+ const n=String(name||"").toLowerCase();
+ let paths;
+ if(n==="all"||n.includes("all posts"))paths='<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>';
+ else if(/game|gaming|play/.test(n))paths='<path d="M6.5 9h11a4 4 0 0 1 3.8 5.2l-.7 2.3a2 2 0 0 1-3.3.9L14.5 15h-5l-2.8 2.4a2 2 0 0 1-3.3-.9l-.7-2.3A4 4 0 0 1 6.5 9Z"/><path d="M7 11v4M5 13h4M16.5 12h.01M18.5 14h.01"/>';
+ else if(/help|question|support/.test(n))paths='<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.4 1.6c-1.2 1.1-2 1.3-2 3M12 17h.01"/>';
+ else if(/project|showcase|creation|build|maker|code/.test(n))paths='<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>';
+ else if(/news|announcement|update/.test(n))paths='<path d="M4 11v2a2 2 0 0 0 2 2h2l7 4V5l-7 4H6a2 2 0 0 0-2 2Z"/><path d="m8 15 1.5 4M18 9a4 4 0 0 1 0 6"/>';
+ else if(/idea|suggest|feedback/.test(n))paths='<path d="M9 18h6M10 22h4M8.5 14.5A6 6 0 1 1 15.5 14.5c-.8.6-1.3 1.6-1.5 2.5h-4c-.2-.9-.7-1.9-1.5-2.5Z"/>';
+ else if(/music|song|audio/.test(n))paths='<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>';
+ else if(/art|design|draw/.test(n))paths='<path d="m12 19 7-7 2 2-7 7-3 1 1-3Z"/><path d="M18 13 11 6l-2-2-6 6 2 2M3 20h6"/>';
+ else if(/chat|general|discussion|community/.test(n))paths='<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2v-6.5a8.5 8.5 0 1 1 19-4Z"/><path d="M8 11h8M8 15h5"/>';
+ else paths='<path d="M12 3 14.8 8.7 21 9.6l-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>';
+ return '<svg class="ui-icon community-icon" viewBox="0 0 24 24" aria-hidden="true">'+paths+'</svg>';
+}
 function renderCommunities(){
- const nav=$("communityNav");nav.innerHTML='<button class="community-choice '+(activeCommunity==="all"?"active":"")+'" data-community="all"><span class="community-letter">ALL</span><span>All posts</span></button>'+communities.map(c=>'<button class="community-choice '+(activeCommunity===c.id?"active":"")+'" data-community="'+esc(c.id)+'"><span class="community-letter">'+esc(c.name.slice(0,3).toUpperCase())+'</span><span>'+esc(c.name)+'</span></button>').join("");
+ const nav=$("communityNav");nav.innerHTML='<button class="community-choice '+(activeCommunity==="all"?"active":"")+'" data-community="all"><span class="community-letter">'+communityIcon("all")+'</span><span>All posts</span></button>'+communities.map(c=>'<button class="community-choice '+(activeCommunity===c.id?"active":"")+'" data-community="'+esc(c.id)+'"><span class="community-letter">'+communityIcon(c.slug+" "+c.name)+'</span><span>'+esc(c.name)+'</span></button>').join("");
  const options=communities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");$("postCommunity").innerHTML=options;
  if(activeCommunity!=="all"&&!communities.some(c=>c.id===activeCommunity))activeCommunity="all";
  nav.querySelectorAll("[data-community]").forEach(b=>b.addEventListener("click",()=>{activeCommunity=b.dataset.community;renderCommunities();renderPosts();}));
