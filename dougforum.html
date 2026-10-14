@@ -22,13 +22,42 @@ main{width:min(1250px,calc(100% - 36px));margin:auto;padding:34px 0 58px}.hero{p
 @media(max-width:900px){.layout{grid-template-columns:190px minmax(0,1fr);gap:13px}.side{padding:10px}.feed-controls{flex-wrap:wrap;justify-content:flex-end}.search{width:100%}.hero-mark{width:82px;height:82px;flex-basis:82px}.form-grid{grid-template-columns:1fr 150px}}
 @media(max-width:700px){main{width:calc(100% - 24px);padding-top:18px}.hero{padding:23px 19px;border-radius:19px}.hero h1{font-size:38px}.hero p{font-size:12px}.hero-mark{display:none}.layout{grid-template-columns:1fr}.side{position:static;overflow:hidden}.community-nav{display:flex;overflow-x:auto;padding-bottom:3px}.community-choice{width:auto;flex:0 0 auto;padding:7px 9px}.community-choice span:last-child{white-space:nowrap}.side-title,.side-note{display:none}.feed-head{align-items:flex-start;flex-direction:column}.feed-controls{width:100%;justify-content:stretch}.search{flex:1;width:auto}.select{max-width:140px}.post{grid-template-columns:40px minmax(0,1fr);gap:10px;padding:12px}.vote{width:31px;height:29px}.post h3{font-size:15px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.compose-footer{align-items:flex-start;flex-direction:column}.compose-footer .button{width:100%}.comment-form{flex-direction:column}.comment-form .button{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Shared DougHub atmosphere and crisp line icons instead of button glyphs. */
+html{background:#050611}
+body{background-color:#050611!important;background-image:
+radial-gradient(ellipse 75% 48% at 8% -8%,rgba(79,70,229,.22),transparent 70%),
+radial-gradient(ellipse 58% 42% at 100% 8%,rgba(147,51,234,.16),transparent 68%),
+radial-gradient(ellipse 65% 55% at 50% 110%,rgba(49,46,129,.17),transparent 72%),
+linear-gradient(rgba(165,180,252,.025) 1px,transparent 1px),
+linear-gradient(90deg,rgba(165,180,252,.025) 1px,transparent 1px),
+linear-gradient(180deg,#070817 0%,#050611 48%,#080715 100%)!important;
+background-size:auto,auto,auto,44px 44px,44px 44px,auto!important;background-attachment:fixed!important}
+header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+header .logo-icon{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 28px #6366f144}
+.hero{border-color:#ffffff12;background:linear-gradient(145deg,rgba(13,17,39,.88),rgba(8,10,25,.76));box-shadow:0 28px 80px #0003}
+.side,.post{background:linear-gradient(145deg,rgba(13,17,39,.88),rgba(7,9,22,.9));border-color:#ffffff12}
+.button{min-height:44px;border-radius:12px;font-size:12px}
+.button.primary{background:linear-gradient(120deg,#6366f1,#a855f7)}
+.button.primary:hover{background:linear-gradient(120deg,#7477ff,#b367ff)}
+.ui-icon{width:16px;height:16px;flex:0 0 auto;display:inline-block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.hero-actions .ui-icon{width:15px;height:15px}
+.vote-icon{width:17px;height:17px;stroke-width:2.2}
+.text-button .mini{width:15px;height:15px;color:#c4b5fd}
+.post-link{display:inline-flex;align-items:center;gap:7px}
+.post-actions .text-button{min-height:32px;border:1px solid transparent}
+.post-actions .text-button:hover{border-color:#ffffff10}
+.community-choice.active{background:linear-gradient(100deg,#6366f126,#a855f71b)}
+.field,.select,.search{background:rgba(4,6,17,.78);border-color:#ffffff15}
+.footer{color:#777995}
+@media(max-width:700px){header{padding-left:14px;padding-right:14px}.hero{background:linear-gradient(145deg,rgba(13,17,39,.92),rgba(8,10,25,.88))}}
 </style>
 </head>
 <body>
 <header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
 <main>
 <section class="hero">
- <div class="hero-copy"><div class="eyebrow">THE DOUGHUB COMMUNITY</div><h1>Welcome to <span class="gradient">DougForum.</span></h1><p>A place to share what you're making, ask questions, talk about games, and help shape DougHub. Find your community and join the conversation.</p><div class="hero-actions"><button class="button primary" id="startPost">Create a post <span aria-hidden="true">↗</span></button><a class="button" href="dashboard.html">Back to Dashboard</a></div></div>
+ <div class="hero-copy"><div class="eyebrow">THE DOUGHUB COMMUNITY</div><h1>Welcome to <span class="gradient">DougForum.</span></h1><p>A place to share what you're making, ask questions, talk about games, and help shape DougHub. Find your community and join the conversation.</p><div class="hero-actions"><button class="button primary" id="startPost"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Create a post</button><a class="button" href="dashboard.html"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6M9 12h12M3 5v14"/></svg>Back to Dashboard</a></div></div>
  <div class="hero-mark" aria-hidden="true"><span>DF</span></div>
 </section>
 <div class="layout">
@@ -78,7 +107,7 @@ function renderPosts(){
  $("postList").innerHTML=rows.map(p=>{
   const c=getCommunity(p.community_id),vote=myVote(p),commentsOpen=expandedComments.has(p.id),comments=commentCache.get(p.id)||[];
   const link=p.link_url&&/^https?:\/\//i.test(p.link_url)?'<a class="post-link" href="'+esc(p.link_url)+'" target="_blank" rel="noopener noreferrer">Open linked resource ↗</a>':"";
-  return '<article class="post" id="post-'+esc(p.id)+'"><div class="vote-column"><button class="vote up '+(vote===1?"active":"")+'" data-vote="1" data-post="'+esc(p.id)+'" aria-label="Upvote post" title="Upvote">▲</button><span class="score">'+score(p)+'</span><button class="vote down '+(vote===-1?"active":"")+'" data-vote="-1" data-post="'+esc(p.id)+'" aria-label="Downvote post" title="Downvote">▼</button></div><div class="post-content"><div class="post-meta"><span class="community-tag">d/'+esc(c.slug)+'</span><span>Posted by '+esc(p.authorName||"DougHub member")+'</span><span>·</span><time>'+esc(dateLabel(p.created_at))+'</time></div><h3>'+esc(p.title)+'</h3>'+(p.body?'<div class="post-body">'+esc(p.body)+'</div>':"")+link+'<div class="post-actions"><button class="text-button" data-comments="'+esc(p.id)+'"><span class="mini">▤</span>'+(commentsOpen?"Hide comments":"Comments")+' ('+(p.commentCount||0)+')</button>'+(currentUser?.id===p.author_id?'<button class="text-button" data-delete="'+esc(p.id)+'">Delete post</button>':"")+'</div><div class="comments '+(commentsOpen?"open":"")+'" id="comments-'+esc(p.id)+'"><div class="comment-list">'+(comments.length?comments.map(cm=>'<div class="comment"><div class="comment-meta">'+esc(cm.authorName||"DougHub member")+' · '+esc(dateLabel(cm.created_at))+'</div><div class="comment-body">'+esc(cm.body)+'</div>'+(currentUser?.id===cm.author_id?'<button class="text-button" data-delete-comment="'+esc(cm.id)+'">Delete</button>':"")+'</div>').join(""):'<div class="helper">No comments yet. Start the conversation.</div>')+'</div><form class="comment-form" data-comment-form="'+esc(p.id)+'"><input class="field" name="body" maxlength="5000" required placeholder="'+(currentUser?"Write a comment…":"Sign in to comment")+'" '+(!currentUser?"disabled":"")+'><button class="button" type="submit" '+(!currentUser?"disabled":"")+'>Reply</button></form>'+'</div></div></article>';
+  return '<article class="post" id="post-'+esc(p.id)+'"><div class="vote-column"><button class="vote up '+(vote===1?"active":"")+'" data-vote="1" data-post="'+esc(p.id)+'" aria-label="Upvote post" title="Upvote"><svg class="ui-icon vote-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><span class="score">'+score(p)+'</span><button class="vote down '+(vote===-1?"active":"")+'" data-vote="-1" data-post="'+esc(p.id)+'" aria-label="Downvote post" title="Downvote"><svg class="ui-icon vote-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button></div><div class="post-content"><div class="post-meta"><span class="community-tag">d/'+esc(c.slug)+'</span><span>Posted by '+esc(p.authorName||"DougHub member")+'</span><span>·</span><time>'+esc(dateLabel(p.created_at))+'</time></div><h3>'+esc(p.title)+'</h3>'+(p.body?'<div class="post-body">'+esc(p.body)+'</div>':"")+link+'<div class="post-actions"><button class="text-button" data-comments="'+esc(p.id)+'"><svg class="ui-icon mini" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10h8M8 14h5"/><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-5.5A7.5 7.5 0 1 1 20 11.5Z"/></svg>'+(commentsOpen?"Hide comments":"Comments")+' ('+(p.commentCount||0)+')</button>'+(currentUser?.id===p.author_id?'<button class="text-button" data-delete="'+esc(p.id)+'">Delete post</button>':"")+'</div><div class="comments '+(commentsOpen?"open":"")+'" id="comments-'+esc(p.id)+'"><div class="comment-list">'+(comments.length?comments.map(cm=>'<div class="comment"><div class="comment-meta">'+esc(cm.authorName||"DougHub member")+' · '+esc(dateLabel(cm.created_at))+'</div><div class="comment-body">'+esc(cm.body)+'</div>'+(currentUser?.id===cm.author_id?'<button class="text-button" data-delete-comment="'+esc(cm.id)+'">Delete</button>':"")+'</div>').join(""):'<div class="helper">No comments yet. Start the conversation.</div>')+'</div><form class="comment-form" data-comment-form="'+esc(p.id)+'"><input class="field" name="body" maxlength="5000" required placeholder="'+(currentUser?"Write a comment…":"Sign in to comment")+'" '+(!currentUser?"disabled":"")+'><button class="button" type="submit" '+(!currentUser?"disabled":"")+'>Reply</button></form>'+'</div></div></article>';
  }).join("");
  $("postList").querySelectorAll("[data-vote]").forEach(b=>b.addEventListener("click",()=>castVote(b.dataset.post,Number(b.dataset.vote))));
  $("postList").querySelectorAll("[data-comments]").forEach(b=>b.addEventListener("click",()=>toggleComments(b.dataset.comments)));
