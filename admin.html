@@ -4663,6 +4663,7 @@ document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveSta
     if (!nav) return;
     nav.innerHTML = "";
     document.querySelectorAll("#adminArea > .card").forEach((card,index) => {
+        if (card.style.display === "none") return;
         const heading = card.querySelector("h2,h3");
         if (!heading) return;
         if (!card.id) card.id = "adminSection" + index;
@@ -4759,6 +4760,7 @@ async function startAdminPanel() {
         return;
     }
 
+    renderStaffManager();
     setupAdminQuickNav();
     setupAdminAccordions();
     setupAdminAuditTracking();
