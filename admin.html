@@ -4595,12 +4595,20 @@ function applyStaffPermissions(){
   const adminArea=document.getElementById("adminArea");
   cards.sort((a,b)=>rankForCard(a)-rankForCard(b));
   cards.forEach(card=>adminArea.appendChild(card));
+  // If a permission section has just one visible card, let it use the full row.
+  const visibleCounts={};
+  cards.forEach(card=>{
+    const required=rankForCard(card);
+    if(rank>=required) visibleCounts[required]=(visibleCounts[required]||0)+1;
+    card.style.gridColumn="";
+  });
   const labels={1:"🟢 Helper+ · Community Support",2:"🔵 Admin+ · Moderation & Management",3:"🟣 Developer+ · Technical Tools",4:"🟡 Owner+ · Full Control"};
   let previousGroup=0;
   cards.forEach(card=>{
     const required=rankForCard(card);
     const visible=rank>=required;
     card.style.display=visible?"":"none";
+    card.style.gridColumn=visible&&visibleCounts[required]===1?"1 / -1":"";
     card.dataset.requiredRank=String(required);
     if(!visible)return;
     if(required!==previousGroup){
