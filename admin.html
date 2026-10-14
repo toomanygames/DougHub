@@ -625,6 +625,24 @@ button:disabled {
 #adminArea [id$="List"]::-webkit-scrollbar-track,#adminArea [id$="Rows"]::-webkit-scrollbar-track,#adminArea #chatMessages::-webkit-scrollbar-track,#adminArea #communityGames::-webkit-scrollbar-track,#adminArea #dougTubeVideos::-webkit-scrollbar-track,#adminArea #activityList::-webkit-scrollbar-track,#adminArea #siteFeatureList::-webkit-scrollbar-track{background:#111629;border-radius:9px}
 #adminArea [id$="List"]::-webkit-scrollbar-thumb,#adminArea [id$="Rows"]::-webkit-scrollbar-thumb,#adminArea #chatMessages::-webkit-scrollbar-thumb,#adminArea #communityGames::-webkit-scrollbar-thumb,#adminArea #dougTubeVideos::-webkit-scrollbar-thumb,#adminArea #activityList::-webkit-scrollbar-thumb,#adminArea #siteFeatureList::-webkit-scrollbar-thumb{background:linear-gradient(#818cf8,#a78bfa);border-radius:9px;border:2px solid #111629}
 .admin-card-help{font-size:12px;line-height:1.55;color:#9ca3c8;margin:0 0 13px}
+.staff-rank-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:14px 0}
+.staff-rank-grid>div{display:flex;flex-direction:column;gap:7px;min-width:0;padding:12px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff05}
+.staff-rank-grid span{font-size:11px;line-height:1.4;color:#9ca3c8}
+.rank-helper,.rank-admin,.rank-developer,.rank-owner{width:max-content;max-width:100%;font-size:10px;letter-spacing:.08em;border-radius:7px;padding:5px 7px}
+.rank-helper{color:#86efac;background:#22c55e18}.rank-admin{color:#93c5fd;background:#3b82f618}.rank-developer{color:#c4b5fd;background:#8b5cf618}.rank-owner{color:#fcd34d;background:#f59e0b18}
+.staff-manage-form{border:1px solid #ffffff12;border-radius:14px;padding:14px;background:#05081788}
+.staff-input{width:100%;min-width:0;padding:11px 12px;border:1px solid #ffffff18;border-radius:10px;background:#080b1b;color:#f4f4ff;font:inherit;font-size:13px}
+.staff-current-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.staff-current-item{padding:10px 12px;border:1px solid #ffffff10;border-radius:10px;background:#ffffff04;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}
+.staff-role-pill{font-size:10px;font-weight:900;letter-spacing:.06em;padding:4px 7px;border-radius:7px;background:#6366f122;color:#c4b5fd;white-space:nowrap}
+.admin-card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;user-select:none}
+.admin-card-heading:focus-visible{outline:2px solid #818cf8;outline-offset:4px;border-radius:5px}
+.admin-card-chevron{font-size:18px;color:#a5b4fc;transition:transform .28s ease;flex:0 0 auto}
+#adminArea>.card>.admin-card-content{min-height:0;overflow:hidden;max-height:5000px;opacity:1;transition:max-height .32s ease,opacity .24s ease}
+#adminArea>.card.collapsed>.admin-card-content{max-height:0;opacity:0;pointer-events:none}
+#adminArea>.card.collapsed .admin-card-chevron{transform:rotate(-90deg)}
+#adminArea>.card.collapsed{align-self:start}
+@media(max-width:760px){.staff-rank-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.staff-current-list{grid-template-columns:minmax(0,1fr)}}
 .admin-field-label{display:block;font-size:11px;font-weight:800;color:#c7cbea;margin:11px 0 6px;letter-spacing:.02em}
 #siteAnnouncementCard textarea,#pageScheduleCard textarea,#pageScheduleCard select,#pageScheduleCard input[type="datetime-local"]{width:100%;min-width:0;border:1px solid #ffffff18;border-radius:10px;background:#080b1b;color:#f4f4ff;padding:10px 11px;font:inherit;font-size:13px;outline:none}
 #siteAnnouncementCard textarea:focus,#pageScheduleCard textarea:focus,#pageScheduleCard select:focus,#pageScheduleCard input[type="datetime-local"]:focus{border-color:#818cf8;box-shadow:0 0 0 3px #6366f122}
@@ -654,7 +672,7 @@ button:disabled {
   #adminArea>.audit-card,#adminArea>#siteFeatureCard,#adminArea>.card:has(#usersList),.admin-section-heading{grid-column:1}
   #adminArea>.card{padding:14px}
   #adminQuickNav{top:4px}
-  .admin-schedule-grid{grid-template-columns:minmax(0,1fr)}
+  .admin-schedule-grid{grid-template-columns:minmax(0,1fr)} .staff-rank-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 
@@ -891,6 +909,29 @@ input,textarea,select{background:#070918}
 </div>
 
 <div id="adminArea" style="display:none;">
+
+<div class="card staff-management-card" id="staffManagementCard" style="display:none">
+  <h2>🛡️ Staff & Permissions</h2>
+  <p class="admin-card-help">Manage the staff ladder. Only the Owner account should be able to change roles. Promotions use the protected staff-role endpoint.</p>
+  <div class="staff-rank-grid">
+    <div><b class="rank-helper">HELPER</b><span>Basic community support</span></div>
+    <div><b class="rank-admin">ADMIN</b><span>Community moderation</span></div>
+    <div><b class="rank-developer">DEVELOPER</b><span>Technical and project tools</span></div>
+    <div><b class="rank-owner">OWNER</b><span>Full site control</span></div>
+  </div>
+  <div class="staff-manage-form">
+    <label class="admin-field-label" for="staffTarget">Account</label>
+    <select id="staffTarget" class="staff-input"><option value="">Loading accounts…</option></select>
+    <label class="admin-field-label" for="staffRole">New rank</label>
+    <select id="staffRole" class="staff-input">
+      <option value="none">No staff role</option><option value="helper">Helper</option><option value="admin">Admin</option><option value="developer">Developer</option><option value="owner">Owner</option>
+    </select>
+    <label class="admin-field-label" for="staffPassword">Owner confirmation password</label>
+    <input id="staffPassword" class="staff-input" type="password" autocomplete="off" placeholder="Enter confirmation password">
+    <div class="admin-card-actions"><span id="staffManageStatus" class="status">Owner access required.</span><button id="saveStaffRoleButton" type="button" class="save-button">Update staff rank</button></div>
+  </div>
+  <div class="staff-current-list" id="staffCurrentList"></div>
+</div>
 
 <div class="card" id="siteFeatureCard">
     <h2>⚙️ Site Features</h2>
@@ -1366,7 +1407,7 @@ const dougTubeVideos =
 
 const videoModerationStatus =
     document.getElementById("videoModerationStatus");
-let currentAdminUser = null;
+let currentAdminUser = null;\nlet currentAdminRole = "none";
 let allUsers = [];
 let presenceMap = new Map();
 
@@ -1405,7 +1446,7 @@ async function checkAdmin() {
     } =
         await supabaseClient
             .from("profiles")
-            .select("username,is_admin")
+            .select("username,is_admin,staff_role")
             .eq("id", session.user.id)
             .maybeSingle();
 
@@ -1423,7 +1464,7 @@ async function checkAdmin() {
         return false;
     }
 
-    if (!profile || profile.is_admin !== true) {
+    currentAdminRole = profile?.staff_role || (profile?.is_admin ? "admin" : "none");\n\n    if (!profile || profile.is_admin !== true) {
 
         loading.innerHTML = `
             <div class="error">
@@ -1460,7 +1501,7 @@ async function loadUsers() {
         await supabaseClient
             .from("profiles")
             .select(
-                "id,username,is_admin,is_banned,ban_reason,banned_at,ban_type,suspended_until"
+                "id,username,is_admin,staff_role,is_banned,ban_reason,banned_at,ban_type,suspended_until"
             )
             .order(
                 "username",
@@ -4549,7 +4590,71 @@ async function savePageSchedule() {
     status.textContent = "Saved. " + existing.display_name + " availability updated.";
     await writeAuditLog("admin_action","features","Updated page availability: "+existing.display_name,{pagePath:path,enabled:payload.enabled,closeAt:closeAt,reopenAt:reopenAt});
 }
-function setupAdminQuickNav() {
+
+function setupAdminAccordions(){
+  document.querySelectorAll("#adminArea > .card").forEach((card,index)=>{
+    if(card.id==="auditLogCard"||card.dataset.accordionReady==="1")return;
+    const heading=card.querySelector(":scope > h2, :scope > h3");
+    if(!heading)return;
+    card.dataset.accordionReady="1";
+    const content=document.createElement("div");
+    content.className="admin-card-content";
+    const siblings=[...card.children].filter(el=>el!==heading);
+    siblings.forEach(el=>content.appendChild(el));
+    const title=document.createElement("div");
+    title.className="admin-card-heading";
+    title.tabIndex=0;title.setAttribute("role","button");title.setAttribute("aria-expanded","false");
+    title.innerHTML='<span></span><span class="admin-card-chevron" aria-hidden="true">⌄</span>';
+    title.firstElementChild.appendChild(heading);
+    heading.style.marginBottom="0";
+    title.addEventListener("click",()=>toggleAdminCard(card,title));
+    title.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleAdminCard(card,title);}});
+    card.insertBefore(title,card.firstChild);card.appendChild(content);card.classList.add("collapsed");
+    title.setAttribute("aria-controls",card.id+"Content");content.id=card.id+"Content";
+    if(index===0){card.classList.remove("collapsed");title.setAttribute("aria-expanded","true");}
+  });
+}
+function toggleAdminCard(card,title){
+  const opening=card.classList.contains("collapsed");
+  card.classList.toggle("collapsed",!opening);
+  title.setAttribute("aria-expanded",String(opening));
+}
+function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
+function renderStaffManager(){
+  const card=document.getElementById("staffManagementCard");
+  const select=document.getElementById("staffTarget");
+  const list=document.getElementById("staffCurrentList");
+  if(!card||!select||!list)return;
+  const isOwner=currentAdminRole==="owner";
+  card.style.display=isOwner?"flex":"none";
+  if(!isOwner)return;
+  const previous=select.value;
+  select.innerHTML='<option value="">Choose an account…</option>';
+  allUsers.forEach(user=>{const o=document.createElement("option");o.value=user.id;o.textContent="@"+(user.username||"User")+" · "+staffRoleLabel(user.staff_role||"none");select.appendChild(o);});
+  if(previous&&allUsers.some(u=>u.id===previous))select.value=previous;
+  const staff=allUsers.filter(u=>u.staff_role&&u.staff_role!=="none");
+  list.innerHTML=staff.length?staff.map(u=>'<div class="staff-current-item"><span>@'+escapeHtml(u.username||"User")+'</span><span class="staff-role-pill">'+escapeHtml(staffRoleLabel(u.staff_role).toUpperCase())+'</span></div>').join(""):'<div class="empty">No staff accounts assigned yet.</div>';
+}
+async function saveStaffRole(){
+  const status=document.getElementById("staffManageStatus"),button=document.getElementById("saveStaffRoleButton");
+  const target=document.getElementById("staffTarget").value,role=document.getElementById("staffRole").value,password=document.getElementById("staffPassword").value;
+  if(currentAdminRole!=="owner"){status.textContent="Only the Owner can change staff ranks.";return;}
+  if(!target){status.textContent="Choose an account first.";return;}
+  if(!password){status.textContent="Enter the Owner confirmation password.";return;}
+  if(target===currentAdminUser.id&&role!=="owner"){status.textContent="The Owner account cannot demote itself.";return;}
+  button.disabled=true;status.textContent="Verifying Owner access…";
+  try{
+    const {data,error}=await supabaseClient.schema("private").rpc("promote_doughub_staff",{target_user_id:target,desired_role:role,confirmation_password:password});
+    if(error)throw error;
+    document.getElementById("staffPassword").value="";
+    status.textContent="@"+(data?.username||"Account")+" updated to "+staffRoleLabel(role)+".";
+    await loadUsers();
+    await writeAuditLog("admin_action","users","Changed staff role",{targetUserId:target,role});
+  }catch(error){status.textContent="Could not update role: "+(error.message||"Staff promotion endpoint unavailable.");}
+  finally{button.disabled=false;}
+}
+document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveStaffRole);
+\nfunction setupAdminQuickNav() {
     const nav = document.getElementById("adminQuickNavLinks");
     if (!nav) return;
     nav.innerHTML = "";
