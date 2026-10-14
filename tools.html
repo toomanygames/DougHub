@@ -191,6 +191,24 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 /* Keep the tools intro, but remove the enclosing panel background. */
 .hero-card{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
 .hero-card:before{display:none!important}
+
+/* Full-page ambient backdrop: soft indigo/violet light and a very subtle grid. */
+html{min-height:100%;background:#050611}
+body{
+  position:relative;
+  isolation:isolate;
+  min-height:100vh;
+  background-color:#050611!important;
+  background-image:
+    radial-gradient(ellipse 75% 48% at 8% -8%,rgba(79,70,229,.22),transparent 70%),
+    radial-gradient(ellipse 58% 42% at 100% 8%,rgba(147,51,234,.16),transparent 68%),
+    radial-gradient(ellipse 65% 55% at 50% 110%,rgba(49,46,129,.17),transparent 72%),
+    linear-gradient(rgba(165,180,252,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(165,180,252,.025) 1px,transparent 1px),
+    linear-gradient(180deg,#070817 0%,#050611 48%,#080715 100%)!important;
+  background-size:auto,auto,auto,44px 44px,44px 44px,auto!important;
+  background-attachment:fixed!important;
+}
 </style>
 </head>
 <body>
