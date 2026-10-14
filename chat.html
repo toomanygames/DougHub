@@ -839,6 +839,16 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
 @media(max-height:650px) and (min-width:761px){main{padding-top:6px!important;padding-bottom:7px!important}.chat-top{min-height:54px}.sidebar-heading{padding-top:9px}}
 </style>
 
+<style id="community-chat-group-dropdown-style">
+.group-row{display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:start;gap:3px;width:100%;min-width:0}
+.chat-sidebar .group-row>.group-pill{min-width:0;width:100%;grid-column:1;grid-row:1}
+.group-expand{grid-column:2;grid-row:1;width:30px;height:36px;align-self:center;border:1px solid transparent;border-radius:9px;background:transparent;color:#aeb5d7;font-size:21px;line-height:1;cursor:pointer}
+.group-expand:hover,.group-expand[aria-expanded="true"]{background:#ffffff0b;border-color:#a5b4fc30;color:#fff}
+.group-row>.group-tools{grid-column:1 / -1;display:flex;flex-wrap:wrap;margin:0 0 5px;padding:8px;border:1px solid rgba(177,184,255,.12);border-radius:11px;background:rgba(3,5,16,.45)}
+.group-row>.group-tools[hidden]{display:none}
+.group-name-count{display:block;margin-top:6px;color:#9299b5;text-align:right;font-size:11px}
+@media(max-width:760px){.group-row{grid-template-columns:minmax(0,1fr) 30px}.group-expand{height:38px}}
+</style>
 </head>
 
 </head>
@@ -1039,7 +1049,7 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
     <p id="groupDialogDescription">Create a public group anyone can join, or a private group that only invited members and DougHub admins can access.</p>
     <form id="groupDialogForm">
       <label for="groupNameInput">Group name</label>
-      <input id="groupNameInput" maxlength="60" required placeholder="e.g. Minecraft Builders">
+      <input id="groupNameInput" maxlength="30" required placeholder="e.g. Minecraft Builders"><small id="groupNameCount" class="group-name-count">0/30 characters</small>
       <label for="groupAboutInput">Description (optional)</label>
       <textarea id="groupAboutInput" maxlength="300" placeholder="What is this group for?"></textarea>
       <label for="groupPrivacyInput">Who can join?</label>
@@ -1232,6 +1242,7 @@ let currentAvatarUrl = "";
 let activeChatGroupId = null;
 let activeChatGroup = null;
 let currentUserIsAdmin = false;
+let expandedGroupToolsId = null;
 let visibleChatGroups = [];
 const groupListEl = document.getElementById("groupList");
 const groupDescriptionEl = document.getElementById("groupDescription");
@@ -1240,6 +1251,7 @@ const createGroupButton = document.getElementById("createGroupButton");
 const groupDialogBackdrop = document.getElementById("groupDialogBackdrop");
 const groupDialogForm = document.getElementById("groupDialogForm");
 const groupNameInput = document.getElementById("groupNameInput");
+const groupNameCount = document.getElementById("groupNameCount");
 const groupAboutInput = document.getElementById("groupAboutInput");
 const groupPrivacyInput = document.getElementById("groupPrivacyInput");
 const groupDialogTitle = document.getElementById("groupDialogTitle");
@@ -1275,7 +1287,8 @@ function showGroupDialog(mode, group = null) {
   groupDialogMode = mode;
   groupDialogTitle.textContent = mode === "create" ? "Create a chat group" : "Edit group";
   groupDialogDescription.textContent = "Choose public for anyone to join, or private for invited members. DougHub admins can access every group.";
-  groupNameInput.value = group?.name || "";
+  groupNameInput.value = (group?.name || "").slice(0, 30);
+  groupNameCount.textContent = groupNameInput.value.length + "/30 characters";
   groupAboutInput.value = group?.description || "";
   groupPrivacyInput.value = group?.is_public === false ? "private" : "public";
   groupNameInput.disabled = mode === "edit";
@@ -1290,6 +1303,7 @@ function closeGroupDialog() {
   groupNameInput.disabled = false;
   groupPrivacyInput.disabled = false;
 }
+groupNameInput.addEventListener("input", () => { if (groupNameInput.value.length > 30) groupNameInput.value = groupNameInput.value.slice(0, 30); groupNameCount.textContent = groupNameInput.value.length + "/30 characters"; });
 document.getElementById("cancelGroupDialog").addEventListener("click", closeGroupDialog);
 groupDialogBackdrop.addEventListener("click", event => {
   if (event.target === groupDialogBackdrop) closeGroupDialog();
@@ -1301,9 +1315,9 @@ createGroupButton.addEventListener("click", () => showGroupDialog("create"));
 groupDialogForm.addEventListener("submit", async event => {
   event.preventDefault();
   if (!currentUser) return;
-  const name = groupNameInput.value.trim();
+  const name = groupNameInput.value.trim().slice(0, 30);
   const description = groupAboutInput.value.trim();
-  if (name.length < 2) return showError("Group names must be at least 2 characters.");
+  if (name.length < 2) return showError("Group names must be between 2 and 30 characters.");
   saveGroupDialog.disabled = true;
   saveGroupDialog.textContent = "Saving…";
   try {
@@ -1359,27 +1373,44 @@ function renderChatGroupList() {
   publicButton.addEventListener("click", () => selectChatGroup(null));
   groupListEl.appendChild(publicButton);
   visibleChatGroups.forEach(group => {
+    const row = document.createElement("div");
+    row.className = "group-row";
     const button = document.createElement("button");
     button.type = "button";
     button.className = "group-pill" + (activeChatGroupId === group.id ? " active" : "");
-    button.innerHTML = (group.is_public ? "🌐 " : "🔒 ") + escapeGroupText(group.name) +
-      (currentUserIsAdmin ? ' <small>ADMIN</small>' : "");
+    button.innerHTML = (group.is_public ? "🌐 " : "🔒 ") + escapeGroupText(group.name);
     button.title = group.description || group.name;
     button.addEventListener("click", async () => {
       const { data: membership } = await supabaseClient.from("chat_group_members")
         .select("group_id").eq("group_id", group.id).eq("user_id", currentUser.id).maybeSingle();
-      if (!membership && group.is_public) {
+      if (!membership && (group.is_public || currentUserIsAdmin)) {
         const { error } = await supabaseClient.from("chat_group_members").insert({group_id:group.id,user_id:currentUser.id,role:"member"});
-        if (error) { showError("Couldn't join this group: " + error.message); return; }
-      } else if (!membership && currentUserIsAdmin) {
-        const { error } = await supabaseClient.from("chat_group_members").insert({group_id:group.id,user_id:currentUser.id,role:"member"});
-        if (error) { showError("Admin group access is available, but joining the member list failed: " + error.message); return; }
+        if (error && !String(error.code || "").includes("23505")) { showError("Couldn't join this group: " + error.message); return; }
       }
       await selectChatGroup(group.id);
     });
-    groupListEl.appendChild(button);
+    row.appendChild(button);
+    const arrow = document.createElement("button");
+    arrow.type = "button";
+    arrow.className = "group-expand";
+    arrow.textContent = expandedGroupToolsId === group.id ? "⌄" : "›";
+    arrow.setAttribute("aria-label", (expandedGroupToolsId === group.id ? "Hide" : "Show") + " options for " + group.name);
+    arrow.setAttribute("aria-expanded", String(expandedGroupToolsId === group.id));
+    arrow.addEventListener("click", async event => {
+      event.stopPropagation();
+      if (activeChatGroupId !== group.id) await selectChatGroup(group.id);
+      expandedGroupToolsId = expandedGroupToolsId === group.id ? null : group.id;
+      renderChatGroupList();
+    });
+    row.appendChild(arrow);
+    groupListEl.appendChild(row);
+    if (expandedGroupToolsId === group.id) {
+      groupToolsEl.hidden = false;
+      row.appendChild(groupToolsEl);
+    }
   });
   renderActiveGroupDetails();
+  if (expandedGroupToolsId && !visibleChatGroups.some(group => group.id === expandedGroupToolsId)) expandedGroupToolsId = null;
 }
 async function selectChatGroup(groupId) {
   activeChatGroupId = groupId || null;
@@ -1405,8 +1436,7 @@ function renderActiveGroupDetails() {
   const owner = group.created_by === currentUser?.id;
   const admin = currentUserIsAdmin;
   groupDescriptionEl.innerHTML = "<strong>" + escapeGroupText(group.name) + "</strong> · " +
-    (group.is_public ? "Public group — anyone can join." : "Private group — invitation only.") +
-    (admin ? " Admin access enabled." : "");
+    (group.is_public ? "Public group — anyone can join." : "Private group — invitation only.");
   groupToolsEl.hidden = false;
   joinGroupButton.hidden = true;
   inviteGroupButton.hidden = !(owner || admin);
@@ -1414,7 +1444,7 @@ function renderActiveGroupDetails() {
   deleteGroupButton.hidden = !(owner || admin);
   if (owner || admin) {
     joinGroupButton.hidden = false;
-    joinGroupButton.textContent = "✓ Admin/owner access";
+    joinGroupButton.textContent = "✓ Access available";
     joinGroupButton.disabled = true;
   }
 }
