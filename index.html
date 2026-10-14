@@ -82,7 +82,7 @@ footer{margin-top:75px;border-top:1px solid var(--line);padding:27px 0 32px;colo
 const AUTO_KEY="dh_dashboard_auto_open_v1",URL="https://agsqdqcsmsppcdqxlppj.supabase.co",KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 let client=null;
 function getClient(){if(window.DougHubSupabaseClient)return Promise.resolve(window.DougHubSupabaseClient);return new Promise(resolve=>{let done=false;let timer;const finish=value=>{if(done)return;done=true;window.removeEventListener("douqhub:supabase-ready",ready);clearTimeout(timer);resolve(value||null);};const ready=()=>finish(window.DougHubSupabaseClient||null);window.addEventListener("douqhub:supabase-ready",ready);timer=setTimeout(()=>finish(window.DougHubSupabaseClient||null),6500);if(window.DougHubSupabaseClient)finish(window.DougHubSupabaseClient);});}
-async function checkSession(){client=await getClient();if(!client)return;let session=null;try{const result=await client.auth.getSession();session=result.data&&result.data.session;}catch(error){console.warn("DougHub session check failed:",error);}const signedIn=!!(session&&session.user),ctas=[document.getElementById("primaryCta"),document.getElementById("bottomPrimaryCta")],note=document.getElementById("heroNote");if(signedIn){ctas.forEach(a=>{if(a){a.href="dashboard.html";a.textContent="Open dashboard ↗";}});if(note)note.innerHTML="Welcome back. <strong>Your DougHub workspace is waiting.</strong>";let auto=true;try{auto=localStorage.getItem(AUTO_KEY)!=="false";}catch(_){}if(auto&&!new URLSearchParams(location.search).has("stay")){location.replace("dashboard.html");return;}}else{ctas.forEach(a=>{if(a){a.href="log-in.html?redirect=dashboard.html";a.textContent="Get started ↗";}});}loadCounts();}
+async function checkSession(){client=await getClient();if(!client)return;let session=null;try{const result=await client.auth.getSession();session=result.data&&result.data.session;}catch(error){console.warn("DougHub session check failed:",error);}const signedIn=!!(session&&session.user),ctas=[document.getElementById("primaryCta"),document.getElementById("bottomPrimaryCta")],note=document.getElementById("heroNote");if(signedIn){ctas.forEach(a=>{if(a){a.href="dashboard.html";a.textContent="Open dashboard ↗";}});if(note)note.innerHTML="Welcome back. <strong>Your DougHub workspace is waiting.</strong>";let auto=true;try{auto=localStorage.getItem(AUTO_KEY)!=="false";}catch(_){}if(auto&&!new URLSearchParams(location.search).has("stay")&&!new URLSearchParams(location.search).has("tutorial")){location.replace("dashboard.html");return;}}else{ctas.forEach(a=>{if(a){a.href="log-in.html?redirect=dashboard.html";a.textContent="Get started ↗";}});}loadCounts();}
 async function loadCounts(){if(!client)return;try{const result=await client.from("profiles").select("id",{count:"exact",head:true});if(result.error)return;const count=Number(result.count||0).toLocaleString();["userCount","memberCount"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=count;});}catch(error){console.debug("DougHub member count unavailable.",error);}}
 async function loadAnnouncement(){const banner=document.getElementById("dhEventBanner"),message=document.getElementById("dhEventMessage"),close=document.getElementById("dhEventClose");if(!banner||!message||!close)return;close.addEventListener("click",()=>{banner.classList.remove("show");banner.setAttribute("aria-hidden","true");});try{const response=await fetch(URL+"/rest/v1/site_announcements?select=enabled,message&id=eq.1",{headers:{apikey:KEY,Authorization:"Bearer "+KEY,Accept:"application/json"},cache:"no-store"});if(!response.ok)return;const rows=await response.json(),event=rows&&rows[0];if(!event||event.enabled!==true||!String(event.message||"").trim())return;message.textContent=event.message;banner.classList.add("show");banner.removeAttribute("aria-hidden");}catch(error){console.warn("DougHub announcement could not load.",error);}}
 const feedbackMessage=document.getElementById("feedbackMessage"),feedbackButton=document.getElementById("feedbackButton"),feedbackStatus=document.getElementById("feedbackStatus"),feedbackCount=document.getElementById("feedbackCount");
@@ -115,4 +115,87 @@ if(slider){
 checkSession();loadAnnouncement();
 })();
 </script>
+
+<script>
+/* DougHub homepage walkthrough — built against the current homepage sections. */
+(function(){
+  "use strict";
+  if (window.__dhHomeTutorialInstalled) return;
+  window.__dhHomeTutorialInstalled = true;
+  const KEY = "dh_home_tutorial_completed_v2";
+  const params = new URLSearchParams(location.search);
+  const replay = params.get("tutorial") === "1";
+  let steps = [], index = 0, active = false;
+  const style = document.createElement("style");
+  style.textContent = `
+    #dh-home-tour-card{position:fixed;z-index:2147483647;right:22px;bottom:22px;width:min(410px,calc(100vw - 28px));padding:21px;border:1px solid #a5b4fc66;border-radius:20px;background:rgba(8,11,29,.98);color:#f8f7ff;box-shadow:0 24px 90px #000b;font:14px/1.55 Inter,system-ui,sans-serif}
+    #dh-home-tour-card[hidden]{display:none}
+    #dh-home-tour-card .tour-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:850;color:#c4b5fd}
+    #dh-home-tour-card h2{font-size:21px;line-height:1.2;margin:8px 0}
+    #dh-home-tour-card p{color:#c5c8df;margin:0}
+    #dh-home-tour-card .tour-progress{height:4px;border-radius:9px;background:#ffffff16;margin:16px 0 14px;overflow:hidden}
+    #dh-home-tour-card .tour-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#c084fc);transition:width .2s}
+    #dh-home-tour-card .tour-actions{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    #dh-home-tour-card .tour-actions div{display:flex;gap:7px}
+    #dh-home-tour-card button{border:1px solid #ffffff24;border-radius:10px;padding:9px 12px;background:#ffffff0b;color:#fff;font-weight:800;cursor:pointer}
+    #dh-home-tour-card button:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px}
+    #dh-home-tour-card button.tour-next{background:linear-gradient(120deg,#6366f1,#a855f7);border:0}
+    .dh-home-tour-target{position:relative!important;z-index:2147483645!important;outline:3px solid #c4b5fd!important;outline-offset:5px!important;box-shadow:0 0 0 9999px rgba(2,4,15,.76),0 0 30px #a78bfa!important;border-radius:12px;scroll-margin:110px}
+    @media(max-width:600px){#dh-home-tour-card{right:12px;bottom:12px;padding:17px}.dh-home-tour-target{outline-offset:3px}}
+    @media(prefers-reduced-motion:reduce){#dh-home-tour-card *{transition:none!important}}
+  `;
+  document.head.appendChild(style);
+  const card=document.createElement("section");
+  card.id="dh-home-tour-card";card.hidden=true;card.setAttribute("role","dialog");card.setAttribute("aria-modal","false");card.setAttribute("aria-labelledby","dh-home-tour-title");
+  card.innerHTML='<div class="tour-kicker">DougHub homepage guide <span id="dh-home-tour-count"></span></div><h2 id="dh-home-tour-title">Welcome to DougHub</h2><p id="dh-home-tour-text"></p><div class="tour-progress"><span id="dh-home-tour-progress"></span></div><div class="tour-actions"><button type="button" id="dh-home-tour-skip">Skip tour</button><div><button type="button" id="dh-home-tour-prev">← Back</button><button type="button" class="tour-next" id="dh-home-tour-next">Next →</button></div></div>';
+  document.body.appendChild(card);
+  const definitions=[
+    {selector:"header .nav, header nav[aria-label='Main navigation'], header nav",title:"Find your way around",text:"Use the main navigation to move between Home, Games, Tools, Nova AI and Chat. The active page may be marked in the navigation."},
+    {selector:".hero-copy",title:"Your starting point",text:"This top section introduces DougHub and gives you a quick way to get started. Read the short description, then use the main action if you want to open your workspace."},
+    {selector:".hero-actions",title:"Choose what to do next",text:"These buttons are shortcuts to the next step. You can get started or open the dashboard without searching through the rest of the page."},
+    {selector:".trust-strip",title:"Community at a glance",text:"This strip gives a quick overview of DougHub and its community. Some numbers may take a moment to load."},
+    {selector:"#toolSlider",title:"Explore featured tools",text:"Browse the featured cards for Dashboard, DougTools, DougHub Work, Nova AI, DougBase, DougDrive and DougCode. Use the arrows or dots to change cards, then open the tool from its button."},
+    {selector:".workflow",title:"A simple way to use DougHub",text:"This section explains the basic flow: find a starting point, sign in when you need account features, and return to your dashboard to continue working."},
+    {selector:".bottom-cta",title:"Ready to jump in?",text:"Use these links if you have finished exploring and want to open your dashboard or join the community."},
+    {selector:".feedback",title:"Send feedback",text:"Have an idea or found a bug? Write it in the feedback box and send it to the DougHub team. You need to be signed in for feedback to be submitted."},
+    {selector:"footer .footer-links",title:"More links",text:"The footer has another set of useful links, including Home, Tools, Games, Nova AI, Community and Settings."}
+  ];
+  function buildSteps(){
+    return definitions.map(s=>({...s,el:document.querySelector(s.selector)})).filter(s=>s.el && s.el.getClientRects().length);
+  }
+  function clearTarget(){document.querySelectorAll(".dh-home-tour-target").forEach(el=>el.classList.remove("dh-home-tour-target"));}
+  function finish(skipped){
+    active=false;card.hidden=true;clearTarget();
+    try{localStorage.setItem(KEY,"yes");}catch(_){}
+    if(params.has("tutorial")){params.delete("tutorial");const next=location.pathname+(params.toString()?"?"+params.toString():"")+location.hash;history.replaceState(null,"",next);}
+  }
+  function render(){
+    clearTarget();
+    const step=steps[index];if(!step)return finish(false);
+    document.getElementById("dh-home-tour-title").textContent=step.title;
+    document.getElementById("dh-home-tour-text").textContent=step.text;
+    document.getElementById("dh-home-tour-count").textContent=(index+1)+" of "+steps.length;
+    document.getElementById("dh-home-tour-progress").style.width=((index+1)/steps.length*100)+"%";
+    document.getElementById("dh-home-tour-prev").disabled=index===0;
+    document.getElementById("dh-home-tour-next").textContent=index===steps.length-1?"Finish ✓":"Next →";
+    step.el.classList.add("dh-home-tour-target");
+    step.el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center",inline:"nearest"});
+  }
+  function start(){
+    steps=buildSteps();
+    if(!steps.length)return;
+    index=0;active=true;card.hidden=false;render();
+  }
+  document.getElementById("dh-home-tour-skip").addEventListener("click",()=>finish(true));
+  document.getElementById("dh-home-tour-prev").addEventListener("click",()=>{if(index>0){index--;render();}});
+  document.getElementById("dh-home-tour-next").addEventListener("click",()=>{if(index<steps.length-1){index++;render();}else finish(false);});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&active)finish(true);});
+  window.addEventListener("pageshow",()=>{if(replay)start();});
+  window.addEventListener("load",()=>{
+    let done=false;try{done=localStorage.getItem(KEY)==="yes";}catch(_){}
+    if(replay||!done)window.setTimeout(start,700);
+  });
+})();
+</script>
+
 </body></html>
