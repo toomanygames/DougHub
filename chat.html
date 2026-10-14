@@ -1729,7 +1729,8 @@ async function openMentionProfile(username) {
     const earnedBadges = Array.isArray(profile.reward_badges) ? profile.reward_badges : [];
     const badgeNames = {summer:"Summer",spring:"Spring",fall:"Fall",winter:"Winter",halloween:"Halloween",christmas:"Christmas"};
     const badgeLabels = earnedBadges.map(b => badgeNames[b] || String(b)).slice(0, 8);
-    const avatar = profile.avatar_url || "https://doughub.online/DougHub.ico";
+    // Only show a profile photo when the user actually uploaded one.
+    const avatar = typeof profile.avatar_url === "string" ? profile.avatar_url.trim() : "";
     const card = backdrop.querySelector(".chat-profile-card");
     card.innerHTML = `
       <button type="button" class="chat-profile-close" aria-label="Close profile">×</button>
@@ -1747,8 +1748,16 @@ async function openMentionProfile(username) {
       <div class="chat-profile-footer"></div>`;
     card.querySelector(".chat-profile-close").addEventListener("click", close);
     const img = card.querySelector(".chat-profile-avatar");
-    img.src = avatar;
-    img.onerror = () => { img.onerror = null; img.src = "https://doughub.online/DougHub.ico"; };
+    if (avatar) {
+      img.alt = (profile.username || username) + "'s profile picture";
+      img.src = avatar;
+      img.onerror = () => {
+        img.onerror = null;
+        img.remove();
+      };
+    } else {
+      img.remove();
+    }
     card.querySelector(".chat-profile-name").textContent = profile.username || username;
     card.querySelector(".chat-profile-handle").textContent = "@" + (profile.username || username);
     card.querySelector(".chat-profile-message-count").textContent = messageCount === null ? "—" : messageCount.toLocaleString();
