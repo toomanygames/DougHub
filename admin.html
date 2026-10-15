@@ -739,6 +739,18 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 #adminArea .admin-rank-cards>.card.audit-card{height:auto!important;align-self:stretch!important}
 #adminArea .admin-rank-cards>.card.audit-card #auditRows,#adminArea .admin-rank-cards>.card.audit-card #auditLogRows,#adminArea .admin-rank-cards>.card.audit-card .audit-log-list{max-height:none!important;overflow:visible!important}
 @media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}}
+
+/* Final spacing pass: keep paired tools equal-sized and give Users a full row. */
+#adminArea .admin-rank-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:row!important;align-items:stretch!important;gap:18px!important}
+#adminArea .admin-rank-cards>.card{box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:100%!important;height:100%!important;align-self:stretch!important;padding:20px!important;overflow-wrap:anywhere}
+#adminArea .admin-rank-cards>.card:has(#usersList){grid-column:1/-1!important;min-height:260px!important}
+#adminArea #usersList{max-height:none!important;min-height:120px!important;overflow:visible!important}
+#adminArea .admin-rank-cards>.card:has(#usersList) #bannedUsersList{max-height:none!important;overflow:visible!important}
+#adminArea .admin-rank-cards>.card.audit-card{grid-column:1/-1!important;min-height:320px!important;height:auto!important}
+#adminArea .admin-rank-cards>.card.audit-card #auditLogContent{width:100%;box-sizing:border-box;max-height:none!important;overflow:visible!important}
+#adminArea .admin-rank-cards>.card.audit-card .audit-table-wrap{max-width:100%;overflow-x:auto}
+#adminArea .admin-rank-cards>.card input,#adminArea .admin-rank-cards>.card select,#adminArea .admin-rank-cards>.card textarea{max-width:100%;min-width:0;box-sizing:border-box}
+@media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}#adminArea .admin-rank-cards>.card{height:auto!important;min-height:0!important;padding:16px!important}#adminArea .admin-rank-cards>.card:has(#usersList){min-height:0!important}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
