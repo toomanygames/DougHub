@@ -1081,6 +1081,73 @@
 
 
     /* =========================================
+       GLOBAL OG BADGE DISPLAY
+    ========================================= */
+
+    function initializeOgBadges(client) {
+        const cache = new Map();
+        const selectors = [
+            ".message-username", ".user-name", ".username", ".activity-username",
+            ".warning-username", ".comment-username", ".comment-author", ".video-author",
+            ".author-name", "[data-username]"
+        ].join(",");
+        const style = document.createElement("style");
+        style.textContent = ".dh-og-badge{display:inline-flex;align-items:center;vertical-align:middle;margin-left:6px;padding:2px 6px;border:1px solid rgba(250,204,21,.35);border-radius:6px;background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(249,115,22,.1));color:#fde68a;font:900 10px/1.3 Inter,Arial,sans-serif;letter-spacing:.04em;white-space:nowrap}";
+        document.head.appendChild(style);
+
+        async function decorate(element) {
+            if (!element || element.dataset.dhOgChecked === "true" || element.querySelector(".dh-og-badge")) return;
+            const raw = element.getAttribute("data-username") || element.textContent || "";
+            const username = raw.trim().replace(/^@/, "").trim();
+            if (!/^[a-zA-Z0-9_]{2,32}$/.test(username)) return;
+            element.dataset.dhOgChecked = "true";
+            const key = username.toLowerCase();
+            try {
+                let hasBadge = cache.get(key);
+                if (hasBadge === undefined) {
+                    const { data, error } = await client.from("profiles")
+                        .select("username,reward_badges")
+                        .ilike("username", username)
+                        .limit(5);
+                    if (error) throw error;
+                    const profile = (data || []).find(item => String(item.username || "").toLowerCase() === key);
+                    hasBadge = !!(profile && Array.isArray(profile.reward_badges) && profile.reward_badges.includes("og"));
+                    cache.set(key, hasBadge);
+                }
+                if (hasBadge && element.isConnected && !element.querySelector(".dh-og-badge")) {
+                    const badge = document.createElement("span");
+                    badge.className = "dh-og-badge";
+                    badge.textContent = "★ OG";
+                    badge.title = "Original Member badge";
+                    element.appendChild(badge);
+                }
+            } catch (error) {
+                element.dataset.dhOgChecked = "false";
+                console.debug("Could not load OG badge for username:", error);
+            }
+        }
+
+        function scan(root) {
+            if (root.nodeType === 1 && root.matches && root.matches(selectors)) decorate(root);
+            if (root.querySelectorAll) root.querySelectorAll(selectors).forEach(decorate);
+        }
+        scan(document);
+        const observer = new MutationObserver(records => records.forEach(record => {
+            record.addedNodes.forEach(node => { if (node.nodeType === 1) scan(node); });
+        }));
+        observer.observe(document.body, { childList: true, subtree: true });
+        window.addEventListener("douqhub:og-badges-updated", () => {
+            cache.clear();
+            document.querySelectorAll(selectors).forEach(element => {
+                element.dataset.dhOgChecked = "false";
+                element.querySelectorAll(".dh-og-badge").forEach(badge => badge.remove());
+                decorate(element);
+            });
+        });
+    }
+
+
+    /* =========================================
        INITIALIZE
     ========================================= */
 
@@ -1101,6 +1168,7 @@
             // This avoids creating duplicate GoTrue clients and keeps one session.
             window.DougHubSupabaseClient = supabaseClient;
             window.dispatchEvent(new Event("douqhub:supabase-ready"));
+            initializeOgBadges(supabaseClient);
             startDougHubChatDings(supabaseClient);
 
             createStyles();
