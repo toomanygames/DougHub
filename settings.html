@@ -1882,12 +1882,12 @@ profilePictureInput.addEventListener(
 /* =========================================
    REWARDS
 ========================================= */
-const rewardInfo={summer:["🏖️","Summer Badge"],spring:["🌸","Spring Badge"],fall:["🍂","Fall Badge"],winter:["❄️","Winter Badge"],halloween:["🎃","Halloween Badge"],christmas:["🎄","Christmas Badge"]};
+const rewardInfo={summer:["🏖️","Summer Badge"],spring:["🌸","Spring Badge"],fall:["🍂","Fall Badge"],winter:["❄️","Winter Badge"],halloween:["🎃","Halloween Badge"],christmas:["🎄","Christmas Badge"],og:["★","OG Badge"]};
 function renderRewards(){
   const badges=currentProfile?.reward_badges||[]; const select=document.getElementById("badgeSelect"); const grid=document.getElementById("rewardGrid");
   select.innerHTML='<option value="">No badge</option>';
   Object.entries(rewardInfo).forEach(([key,[icon,name]])=>{const option=document.createElement("option");option.value=key;option.textContent=icon+" "+name;option.disabled=!badges.includes(key)&&!currentProfile?.is_admin;select.appendChild(option);const card=document.createElement("div");card.className="reward-card"+(badges.includes(key)||currentProfile?.is_admin?"":" locked");card.innerHTML='<div class="reward-icon">'+icon+'</div><div class="reward-name">'+name+'</div><div class="reward-help">'+(badges.includes(key)||currentProfile?.is_admin?"Unlocked":"Play this seasonal game")+"</div>";grid.appendChild(card);});
-  select.value=currentProfile?.equipped_badge||""; document.getElementById("badgeNote").textContent=currentProfile?.is_admin?"Admin: all seasonal badges are unlocked.":(badges.length?badges.length+" badge"+(badges.length===1?"":"s")+" earned.":"No badges yet — play a seasonal game!");
+  select.value=currentProfile?.equipped_badge||""; document.getElementById("badgeNote").textContent=currentProfile?.is_admin?"Admin: all seasonal badges are unlocked. OG badges are awarded by staff.":(badges.includes("og")?"OG badge awarded by DougHub staff.":(badges.length?badges.length+" badge"+(badges.length===1?"":"s")+" earned.":"No badges yet — play a seasonal game!"));
 }
 document.getElementById("badgeSelect").addEventListener("change",async()=>{if(!currentUser||!currentProfile)return;const value=document.getElementById("badgeSelect").value||null;const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);if(error){showStatus("Could not update your badge.","error");return}currentProfile.equipped_badge=value;showStatus(value?"Chat badge updated!":"Chat badge removed.","success");});
 
