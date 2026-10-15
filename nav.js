@@ -206,7 +206,7 @@
       account.innerHTML = '<button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false"><div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Loading…</span></button><div id="accountMenu" class="account-menu" aria-hidden="true"><a href="/dashboard.html">Dashboard</a><a href="/my-games.html">My Games &amp; Videos</a><a href="/admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="/inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><a href="/settings.html">Settings</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>';
     }
     account.classList.add("dh-shared-account");
-    const links = [["/index.html","Home"],["/douggames.html","Games"],["/tools.html","Tools"],["/nova.html","✳ Nova AI"],["/chat.html","Chat"]];
+    const links = [["/index.html","Home"],["/douggames.html","Games"],["/tools.html","Tools"],["/nova.html","✳ Nova AI"],["/chat.html","Chat"],["/dougforum.html","Forums"]];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
       const a = document.createElement("a");
