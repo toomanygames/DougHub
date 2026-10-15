@@ -350,6 +350,8 @@ button:disabled {
     word-break: break-word;
 }
 
+.og-badge{display:inline-flex;align-items:center;margin-left:6px;padding:3px 7px;border:1px solid rgba(250,204,21,.35);border-radius:6px;background:linear-gradient(135deg,rgba(250,204,21,.16),rgba(249,115,22,.1));color:#fde68a;font-size:10px;font-weight:900;letter-spacing:.04em}
+
 .admin-badge {
     display: inline-block;
     margin-left: 7px;
@@ -1874,7 +1876,7 @@ async function loadUsers() {
         await supabaseClient
             .from("profiles")
             .select(
-                "id,username,is_admin,staff_role,is_banned,ban_reason,banned_at,ban_type,suspended_until"
+                "id,username,is_admin,staff_role,is_banned,ban_reason,banned_at,ban_type,suspended_until,reward_badges"
             )
             .order(
                 "username",
@@ -1975,6 +1977,30 @@ function populateUserSelects() {
 }
 
 
+async function setOgBadge(user, award, button) {
+    if (!["admin","developer","owner"].includes(currentAdminRole)) {
+        alert("Only Admins, Developers, and Owners can manage OG badges.");
+        return;
+    }
+    const badges = Array.isArray(user.reward_badges) ? [...user.reward_badges] : [];
+    const nextBadges = award ? [...new Set([...badges, "og"])] : badges.filter(badge => badge !== "og");
+    button.disabled = true;
+    button.textContent = award ? "Awarding…" : "Removing…";
+    try {
+        const { error } = await supabaseClient.from("profiles").update({ reward_badges: nextBadges }).eq("id", user.id);
+        if (error) throw error;
+        user.reward_badges = nextBadges;
+        window.dispatchEvent(new Event("douqhub:og-badges-updated"));
+        renderUsers();
+        usersStatus.textContent = (award ? "OG badge awarded to @" : "OG badge removed from @") + (user.username || "User") + ".";
+    } catch (error) {
+        console.error("Could not update OG badge:", error);
+        alert("Couldn't update the OG badge: " + (error.message || "Unknown error"));
+        button.disabled = false;
+        button.textContent = award ? "★ Give OG" : "★ Remove OG";
+    }
+}
+
 function renderUsers() {
     const bannedList = document.getElementById("bannedUsersList");
     const bannedCount = document.getElementById("bannedUsersCount");
@@ -2002,6 +2028,14 @@ function renderUsers() {
             badge.textContent = "ADMIN";
             name.appendChild(badge);
         }
+        const hasOgBadge = Array.isArray(user.reward_badges) && user.reward_badges.includes("og");
+        if (hasOgBadge) {
+            const ogBadge = document.createElement("span");
+            ogBadge.className = "og-badge";
+            ogBadge.textContent = "★ OG";
+            ogBadge.title = "Original Member badge";
+            name.appendChild(ogBadge);
+        }
 
         const info = document.createElement("div");
         info.className = "user-info";
@@ -2025,6 +2059,15 @@ function renderUsers() {
             document.getElementById("banUser").scrollIntoView({behavior:"smooth",block:"center"});
         });
         buttons.appendChild(banButton);
+        if (["admin","developer","owner"].includes(currentAdminRole)) {
+            const ogButton = document.createElement("button");
+            ogButton.type = "button";
+            ogButton.className = hasOgBadge ? "edit-button" : "save-button";
+            ogButton.textContent = hasOgBadge ? "★ Remove OG" : "★ Give OG";
+            ogButton.title = hasOgBadge ? "Remove the OG badge" : "Award the OG badge";
+            ogButton.addEventListener("click", () => setOgBadge(user, !hasOgBadge, ogButton));
+            buttons.appendChild(ogButton);
+        }
         top.appendChild(left);
         top.appendChild(buttons);
         item.appendChild(top);
