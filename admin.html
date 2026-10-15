@@ -1161,6 +1161,39 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
  #adminArea #auditLogCard .audit-collapse-title small{max-width:220px}
 }
 
+
+/* Dedicated moderation panels and a roomier Community Chat message list. */
+#adminArea .admin-rank-cards>.card#dougHubMusicModerationCard{
+  grid-column:1/-1!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#adminArea .admin-rank-cards>.card#dougHubMusicModerationCard>h2{
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:10px;margin-bottom:8px;
+  border-bottom:1px solid rgba(167,139,250,.2);
+}
+#adminArea .admin-rank-cards>.card#dougHubMusicModerationCard #dougHubMusicTracks,
+#adminArea .admin-rank-cards>.card#dougHubMusicModerationCard #dougHubMusicAlbums{
+  width:100%;max-width:100%;min-width:0;box-sizing:border-box;
+}
+#adminArea .admin-rank-cards>.card:has(#chatMessages){
+  grid-column:1/-1!important;width:100%!important;max-width:100%!important;
+}
+#adminArea .admin-rank-cards>.card:has(#chatMessages) #chatMessages{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;
+}
+#adminArea .admin-rank-cards>.card:has(#chatMessages) .admin-scroll-area{
+  scrollbar-gutter:stable;
+}
+@media(max-width:760px){
+  #adminArea .admin-rank-cards>.card#dougHubMusicModerationCard,
+  #adminArea .admin-rank-cards>.card:has(#chatMessages){grid-column:1/-1!important}
+}
+
 </style>
 </head>
 
