@@ -771,6 +771,16 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 #adminArea #auditLogCard .audit-table{width:100%;min-width:680px;border-collapse:collapse}
 #adminArea #auditLogCard .audit-collapse-toggle{width:100%;box-sizing:border-box}
 @media(max-width:600px){#adminArea #auditLogCard #auditLogContent{padding:0 10px 12px!important}}
+
+/* Restore the Users list's internal scrollbar while keeping the section full-width. */
+#adminArea .admin-rank-cards>.card:has(#usersList){grid-column:1/-1!important;min-height:0!important;height:auto!important}
+#adminArea #usersList{height:330px!important;min-height:180px!important;max-height:330px!important;overflow-y:auto!important;overflow-x:hidden!important;padding-right:8px;overscroll-behavior:contain;scrollbar-gutter:stable}
+#adminArea #usersList::-webkit-scrollbar{width:9px}
+#adminArea #usersList::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border-radius:99px}
+#adminArea #usersList::-webkit-scrollbar-thumb{background:rgba(129,140,248,.5);border:2px solid transparent;background-clip:padding-box;border-radius:99px}
+#adminArea #usersList::-webkit-scrollbar-thumb:hover{background:rgba(168,85,247,.7);border:2px solid transparent;background-clip:padding-box}
+#adminArea .admin-rank-cards>.card:has(#usersList) #bannedUsersList{max-height:240px!important;overflow-y:auto!important;overflow-x:hidden!important}
+@media(max-width:760px){#adminArea #usersList{height:300px!important;max-height:300px!important;min-height:160px!important}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
