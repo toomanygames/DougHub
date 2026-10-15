@@ -781,6 +781,70 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 #adminArea #usersList::-webkit-scrollbar-thumb:hover{background:rgba(168,85,247,.7);border:2px solid transparent;background-clip:padding-box}
 #adminArea .admin-rank-cards>.card:has(#usersList) #bannedUsersList{max-height:240px!important;overflow-y:auto!important;overflow-x:hidden!important}
 @media(max-width:760px){#adminArea #usersList{height:300px!important;max-height:300px!important;min-height:160px!important}}
+
+
+/* Polished music moderation cards and full-frame DougTube previews */
+#adminArea #dougHubMusicTracks,
+#adminArea #dougHubMusicAlbums,
+#adminArea #dougTubeVideos{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  align-content:start;align-items:stretch;gap:12px;
+  max-height:680px!important;padding:3px 6px 8px 2px;
+}
+#adminArea #dougHubMusicTracks .video-moderation-item,
+#adminArea #dougHubMusicAlbums .video-moderation-item{
+  min-width:0;margin:0;padding:15px;border:1px solid rgba(129,140,248,.2);
+  border-radius:16px;background:linear-gradient(145deg,rgba(99,102,241,.105),rgba(15,18,39,.8) 55%,rgba(168,85,247,.07));
+  box-shadow:0 8px 22px rgba(0,0,0,.14);transition:border-color .18s,transform .18s,background .18s;
+}
+#adminArea #dougHubMusicTracks .video-moderation-item:hover,
+#adminArea #dougHubMusicAlbums .video-moderation-item:hover{
+  border-color:rgba(167,139,250,.48);background:linear-gradient(145deg,rgba(99,102,241,.15),rgba(15,18,39,.92) 55%,rgba(168,85,247,.1));transform:translateY(-1px);
+}
+#adminArea #dougHubMusicTracks .video-moderation-title,
+#adminArea #dougHubMusicAlbums .video-moderation-title{font-size:17px;line-height:1.3;overflow-wrap:anywhere}
+#adminArea #dougHubMusicTracks .video-moderation-info,
+#adminArea #dougHubMusicAlbums .video-moderation-info{display:flex;flex-wrap:wrap;align-items:center;gap:5px;line-height:1.5}
+#adminArea #dougHubMusicTracks .video-moderation-description,
+#adminArea #dougHubMusicAlbums .video-moderation-description{
+  margin-top:10px;padding:9px 10px;border-left:2px solid rgba(129,140,248,.5);
+  border-radius:0 8px 8px 0;background:rgba(255,255,255,.025);font-size:12px;line-height:1.55;
+}
+#adminArea #dougHubMusicTracks audio{display:block;width:100%;min-width:0;height:42px;margin-top:13px!important;border-radius:9px}
+#adminArea #dougHubMusicTracks .video-moderation-actions,
+#adminArea #dougHubMusicAlbums .video-moderation-actions{padding-top:11px;margin-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+#adminArea #dougHubMusicTracks .video-moderation-actions button,
+#adminArea #dougHubMusicAlbums .video-moderation-actions button{flex:1 1 auto;min-width:90px}
+#adminArea #dougTubeVideos .video-moderation-item{
+  min-width:0;margin:0;padding:15px;border-radius:16px;border:1px solid rgba(129,140,248,.19);
+  background:linear-gradient(145deg,rgba(99,102,241,.08),rgba(12,15,31,.92));
+}
+#adminArea #dougTubeVideos .video-moderation-preview{
+  display:block;width:100%;height:auto;aspect-ratio:16/9;max-height:none;
+  object-fit:contain;object-position:center;margin-top:13px;border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;background:#000;
+}
+#adminArea #dougTubeVideos .video-moderation-title{min-width:0;line-height:1.3;overflow-wrap:anywhere}
+#adminArea #dougTubeVideos .top-row{align-items:flex-start}
+#adminArea #dougTubeVideos .video-moderation-description{line-height:1.55;font-size:13px}
+#adminArea #dougTubeVideos .video-moderation-stats span{
+  padding:6px 9px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(255,255,255,.035);
+}
+#adminArea #dougTubeVideos .video-moderation-actions{padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+#adminArea #dougHubMusicModerationCard>h3{
+  display:flex;align-items:center;gap:8px;margin-top:16px!important;padding-bottom:8px;
+  border-bottom:1px solid rgba(167,139,250,.16);font-size:15px;
+}
+#adminArea #dougHubMusicModerationCard .status{font-size:12px}
+@media(max-width:900px){
+  #adminArea #dougHubMusicTracks,#adminArea #dougHubMusicAlbums,#adminArea #dougTubeVideos{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:520px){
+  #adminArea #dougHubMusicTracks .video-moderation-item,
+  #adminArea #dougHubMusicAlbums .video-moderation-item,
+  #adminArea #dougTubeVideos .video-moderation-item{padding:11px}
+}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
