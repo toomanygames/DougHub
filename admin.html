@@ -705,6 +705,11 @@ button:disabled {
 #adminArea .admin-rank-cards>.card:only-child{grid-column:1/-1}
 .rank-section-toggle:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px;border-radius:5px}
 @media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)}#adminArea{gap:10px}}
+
+/* Fix: every rank heading must span the full Admin panel width. */
+#adminArea>.admin-rank-group{display:block!important;width:100%!important;max-width:none!important;min-width:0;grid-column:1/-1!important;justify-self:stretch;box-sizing:border-box}
+#adminArea>.admin-rank-group>.admin-rank-section{display:flex!important;width:100%!important;max-width:none!important;box-sizing:border-box}
+#adminArea>.admin-rank-group>.admin-rank-cards{width:100%;min-width:0;box-sizing:border-box}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
