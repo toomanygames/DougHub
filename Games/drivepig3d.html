@@ -123,7 +123,7 @@ function update(dt){
  for(let i=coinItems.length-1;i>=0;i--){const o=coinItems[i];o.position.z+=move;o.rotation.y+=dt*2.5;o.rotation.z=Math.sin(performance.now()*.004+o.userData.spin)*.12;if(o.position.z>13){scene.remove(o);coinItems.splice(i,1);continue;}if(Math.abs(o.position.z-player.position.z)<2.2&&Math.abs(o.position.x-player.position.x)<1.55){coins++;score+=180;boost=Math.min(100,boost+7);playBeep(720+coins%5*90,.09);scene.remove(o);coinItems.splice(i,1);if(coins%5===0)toast('🐷 '+coins+' COINS! TURBO CHARGED');}}
  for(const o of decor){o.position.z+=move;if(o.position.z>35)o.position.z-=390;}
  for(const o of world){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.geometry.parameters.depth>100)o.position.z+=move;if(o.position.z>130)o.position.z-=450;}
- const desired=new THREE.Vector3(player.position.x*.42,6.1+(boosting?.25:0),12.5);camera.position.lerp(desired,1-Math.exp(-dt*3.2));camera.lookAt(player.position.x*.25,1.2,-8);
+ const desired=new THREE.Vector3(player.position.x*.42,6.1+(boosting ? 0.25 : 0),12.5);camera.position.lerp(desired,1-Math.exp(-dt*3.2));camera.lookAt(player.position.x*.25,1.2,-8);
  if(shake>0){camera.position.x+=(Math.random()-.5)*shake;camera.position.y+=(Math.random()-.5)*shake;shake=Math.max(0,shake-dt);}
  updateHud();
 }
