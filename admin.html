@@ -1010,6 +1010,51 @@ input,textarea,select{background:#070918}
   #adminArea #chatRetentionCard #saveChatRetentionButton{width:100%;min-width:0}
 }
 
+
+/* Wider retention section and a calmer page gutter so cards never crowd the edges. */
+#adminArea .admin-rank-cards > .card#chatRetentionCard{
+  grid-column:1/-1!important;
+  width:100%;
+  max-width:none;
+}
+#adminArea #chatRetentionCard{
+  padding:16px!important;
+}
+#adminArea #chatRetentionCard .admin-card-help{
+  max-width:100%;
+}
+#adminArea #chatRetentionCard #chatRetentionLimit{
+  max-width:100%!important;
+}
+body{
+  padding:clamp(16px,2.2vw,34px)!important;
+}
+.container{
+  width:100%;
+  max-width:1740px;
+}
+#adminArea{
+  gap:13px!important;
+}
+#adminArea>.card,
+#adminArea .admin-rank-cards>.card{
+  padding:15px!important;
+}
+#adminArea .admin-rank-section{
+  margin-bottom:9px!important;
+  padding:10px 12px!important;
+}
+#adminQuickNav{
+  margin-bottom:14px!important;
+  padding:9px 11px!important;
+}
+@media(max-width:760px){
+  body{padding:14px!important}
+  #adminArea{gap:11px!important}
+  #adminArea>.card,
+  #adminArea .admin-rank-cards>.card{padding:13px!important}
+}
+
 </style>
 </head>
 
