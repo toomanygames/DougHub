@@ -847,6 +847,21 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 
 
 
+
+/* Recent Warnings: wider card and a taller scroll area. */
+#adminArea .admin-rank-cards>.card:has(#warningsList){
+  grid-column:1/-1!important;
+  width:100%!important;
+  max-width:100%!important;
+}
+#adminArea #recentWarningsCard #warningsList{
+  min-height:220px;
+  max-height:440px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:2px 6px 2px 2px;
+}
+
 /* Community Games and DougTube share one card: games use 3/4, moderation uses 1/4. */
 #adminArea .community-games-tube-card{grid-column:1/-1!important;width:100%;max-width:100%;min-width:0}
 .community-games-tube-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(220px,1fr);gap:16px;align-items:start;min-width:0}
