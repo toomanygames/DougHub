@@ -87,6 +87,41 @@ function download(filename,content,type){const blob=new Blob([content],{type});c
 function exportHTML(){saveCurrentFile();const name=($("projectName").value.trim()||"my-project").replace(/[^a-z0-9-_]+/gi,"-").replace(/^-|-$/g,"").slice(0,60)||"my-project";download(name+".html",buildDocument(),"text/html;charset=utf-8");setStatus("Standalone HTML exported");}
 async function copyCurrent(){saveCurrentFile();try{await navigator.clipboard.writeText(files[activeFile]);setStatus("Copied current file");}catch(e){$("codeEditor").focus();$("codeEditor").select();setStatus("Press Ctrl+C to copy the selected code");}}
 async function loadAccount(){const label=$("accountLabel");if(!label)return;try{const client=dbClient||(dbClient=window.supabase?.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"));if(!client){label.textContent="Local project";return;}const {data:{session}}=await client.auth.getSession();if(!session){label.textContent="Local project";return;}const {data}=await client.from("profiles").select("username").eq("id",session.user.id).maybeSingle();label.textContent=data?.username?"@"+data.username:"Signed in";}catch(e){label.textContent="Local project";}}
+async function loadProjectFromUrl(){
+ const id=new URLSearchParams(location.hash.slice(1)).get("project");
+ if(!id)return false;
+ setStatus("Loading saved project…");
+ try{
+  const create=window.supabase?.createClient;
+  if(!create)throw new Error("Supabase is unavailable.");
+  const client=dbClient||(dbClient=create("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"));
+  const result=await client.from("code_projects").select("id,title,html_code,css_code,js_code,files,entry_file,runtime").eq("id",id).maybeSingle();
+  if(result.error)throw result.error;
+  const row=result.data;
+  if(!row)throw new Error("Project not found or permission denied.");
+  const next={...STARTERS};
+  let gotHtml=false,gotCss=false,gotJs=false;
+  const entry=String(row.entry_file||"index.html").toLowerCase();
+  for(const item of (Array.isArray(row.files)?row.files:[])){
+   if(!item||typeof item!=="object")continue;
+   const name=String(item.name||item.filename||"").trim();
+   if(!name)continue;
+   const body=String(item.content??item.code??"");
+   const lower=name.toLowerCase(),ext=lower.split(".").pop();
+   if(ext==="html"&&(!gotHtml||lower===entry)){next.html=body;gotHtml=true;}
+   else if(ext==="css"&&!gotCss){next.css=body;gotCss=true;}
+   else if(ext==="js"&&!gotJs){next.js=body;gotJs=true;}
+   else next[name]=body;
+  }
+  if(!gotHtml&&row.html_code)next.html=row.html_code;
+  if(!gotCss&&row.css_code)next.css=row.css_code;
+  if(!gotJs&&row.js_code)next.js=row.js_code;
+  files=next;blocks=[];activeFile="html";$("projectName").value=row.title||"Untitled project";
+  renderFile();renderLibrary();renderBlocks();updateGenerated();
+  setStatus("Loaded saved project: "+(row.title||"Untitled project"));
+ }catch(err){console.error("DougCode project load failed:",err);setStatus("Couldn't open project: "+(err.message||"Unknown error"),true);}
+ return true;
+}
 $("fileTabs").addEventListener("click",e=>{const btn=e.target.closest(".file-tab");if(btn)switchFile(btn.dataset.file);});
 $("addFileBtn").addEventListener("click",()=>{$("newFileName").value="";$("newFileType").value=".js";$("addFileDialog").showModal();$("newFileName").focus();});
 $("cancelAddFile").addEventListener("click",()=>$("addFileDialog").close());
@@ -153,5 +188,8 @@ $("cancelPublishDialog")?.addEventListener("click",closePublishDialog);
 publishDialog?.addEventListener("click",event=>{if(event.target===publishDialog)closePublishDialog();});
 $("publishGameForm")?.addEventListener("submit",event=>{event.preventDefault();communityPublish();});
 communityInit();
-restore();renderFile();renderLibrary();renderBlocks();updateGenerated();loadAccount();
+renderLibrary();renderBlocks();loadAccount();
+if(!new URLSearchParams(location.hash.slice(1)).get("project")){
+ restore();renderFile();renderLibrary();renderBlocks();updateGenerated();
+}else loadProjectFromUrl();
 })();
