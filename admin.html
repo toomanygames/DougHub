@@ -762,6 +762,15 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 @media(max-width:760px){#adminArea .admin-rank-cards>.card#staffManagementCard,
 #adminArea .admin-rank-cards>.card#siteAnnouncementCard,
 #adminArea .admin-rank-cards>.card#pageScheduleCard{grid-column:1/-1!important}}
+
+/* Repair System Activity Log: reliable open/close behavior after the card was moved into rank sections. */
+#adminArea .admin-rank-cards>.card#auditLogCard{display:block!important;grid-column:1/-1!important;width:100%!important;height:auto!important;min-height:0!important;align-self:stretch!important;overflow:hidden!important}
+#adminArea #auditLogCard #auditLogContent{display:none!important;max-height:none!important;height:auto!important;overflow:visible!important;opacity:1!important;padding:0 18px 18px!important;visibility:visible!important}
+#adminArea #auditLogCard:not(.collapsed) #auditLogContent{display:block!important}
+#adminArea #auditLogCard .audit-table-wrap{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:visible!important}
+#adminArea #auditLogCard .audit-table{width:100%;min-width:680px;border-collapse:collapse}
+#adminArea #auditLogCard .audit-collapse-toggle{width:100%;box-sizing:border-box}
+@media(max-width:600px){#adminArea #auditLogCard #auditLogContent{padding:0 10px 12px!important}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
