@@ -4605,7 +4605,7 @@ function applyStaffPermissions(){
   function renderGroups(){
     adminArea.querySelectorAll(":scope > .admin-rank-section").forEach(node=>node.remove());
     order.forEach((value,index)=>{
-      const visibleCards=groups[value].filter(card=>card.style.display!=="none");
+      const visibleCards=groups[value].filter(card=>rank>0&&rank>=Number(card.dataset.requiredRank));
       if(!visibleCards.length)return;
       const heading=document.createElement("div");
       heading.className="admin-rank-section";
