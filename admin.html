@@ -694,6 +694,14 @@ button:disabled {
 #auditClear:hover{background:#ef444426}
 @media(max-width:600px){.audit-collapse-toggle{padding:14px;gap:8px}.audit-collapse-title{gap:9px}.audit-collapse-title small{max-width:230px}.audit-collapse-right{gap:8px}.audit-live{display:none}#auditLogContent{padding:0 10px 12px}}
 
+
+/* Rank sections: compact, movable, and role-aware. */
+.admin-rank-section{align-self:start;min-width:0}
+.rank-section-toggle:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px;border-radius:5px}
+#adminArea{grid-auto-flow:row dense;align-items:start;gap:12px}
+#adminArea>.card{align-self:start}
+#adminArea>.card[style*="display: none"]{display:none!important}
+@media(max-width:760px){.admin-rank-section{margin-top:7px!important}#adminArea{gap:10px}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
@@ -1021,10 +1029,7 @@ input,textarea,select{background:#070918}
 
 <div class="card">
 
-    <h2>👥 Users</h2>
-      <div id="activeUsersSummary" class="status" style="margin-top:8px">Refreshing active status…</div>
-
-    <div class="status" id="usersStatus">
+    <h2>👥 Users</h2>\n<div class="status" id="usersStatus">
         Loading users...
     </div>
 
@@ -1811,9 +1816,6 @@ async function loadUserActivity() {
             );
 
         });
-
-    const activeSummary = document.getElementById("activeUsersSummary");
-    if (activeSummary) activeSummary.textContent = activeUsers.length + " currently active";
     if (!activityList) return;
     activityList.innerHTML = "";
 
@@ -4562,14 +4564,8 @@ async function savePageSchedule() {
 }
 
 function setupAdminAccordions(){
-  // Keep the original admin dashboard as visible cards rather than hiding every section in dropdowns.
-  document.querySelectorAll("#adminArea > .card").forEach(card=>{
-    card.classList.remove("collapsed");
-    const content=card.querySelector(":scope > .admin-card-content");
-    if(content) content.style.maxHeight="none";
-  });
+  // Rank sections are controlled by applyStaffPermissions.
 }
-
 function toggleAdminCard(card,title){
   const opening=card.classList.contains("collapsed");
   card.classList.toggle("collapsed",!opening);
@@ -4578,57 +4574,85 @@ function toggleAdminCard(card,title){
 function applyStaffPermissions(){
   const role=currentAdminRole||"none";
   const rank={none:0,helper:1,admin:2,developer:3,owner:4}[role]||0;
-  const cards=[...document.querySelectorAll("#adminArea > .card")];
+  const adminArea=document.getElementById("adminArea");
+  if(!adminArea)return;
+  const cards=[...adminArea.querySelectorAll(":scope > .card")];
   const rankForCard=card=>{
-    if(card.id==="staffManagementCard") return 4;
-    const h=card.querySelector(":scope > h2, :scope > h3");
-    const title=(h?.textContent||"").toLowerCase();
-    if(/site features|code projects|project|developer/.test(title)) return 3;
-    if(/event banner|page availability|staff & permissions|audit log|audit history/.test(title)) return 4;
-    if(/user warnings|recent warnings|group moderation/.test(title)) return 1;
-    if(/users|ban accounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests/.test(title)) return 2;
+    const id=(card.id||"").toLowerCase();
+    const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
+    if(/staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard/.test(id))return 4;
+    if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
+    if(/codeprojects|code projects|sitefeaturecard/.test(id))return 3;
+    if(/code projects|developer tools|site features/.test(title))return 3;
+    if(/userwarningscard|recentwarningscard|user warnings|recent warnings|group moderation/.test(id+" "+title))return 1;
+    if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
     return 2;
   };
-  // Remove previously-created role headings so reruns stay clean.
-  document.querySelectorAll("#adminArea > .admin-rank-section").forEach(el=>el.remove());
-  // Sort cards by minimum rank so the dashboard reads Helper+ → Admin+ → Developer+ → Owner+.
-  const adminArea=document.getElementById("adminArea");
-  cards.sort((a,b)=>rankForCard(a)-rankForCard(b));
-  cards.forEach(card=>adminArea.appendChild(card));
-  // If a permission section has just one visible card, let it use the full row.
-  const visibleCounts={};
+  adminArea.querySelectorAll(":scope > .admin-rank-section").forEach(node=>node.remove());
+  const summary=document.getElementById("adminPermissionSummary");
+  const groups={1:[],2:[],3:[],4:[]};
   cards.forEach(card=>{
     const required=rankForCard(card);
-    if(rank>=required) visibleCounts[required]=(visibleCounts[required]||0)+1;
-    card.style.gridColumn="";
+    card.dataset.requiredRank=String(required);
+    card.style.display=(rank>=required && rank>0)?"":"none";
+    groups[required].push(card);
   });
   const labels={1:"🟢 Helper+ · Community Support",2:"🔵 Admin+ · Moderation & Management",3:"🟣 Developer+ · Technical Tools",4:"🟡 Owner+ · Full Control"};
-  let previousGroup=0;
-  cards.forEach(card=>{
-    const required=rankForCard(card);
-    const visible=rank>=required;
-    card.style.display=visible?"":"none";
-    card.style.gridColumn=visible&&visibleCounts[required]===1?"1 / -1":"";
-    card.dataset.requiredRank=String(required);
-    if(!visible)return;
-    if(required!==previousGroup){
+  const names={1:"Helper",2:"Admin",3:"Developer",4:"Owner"};
+  let order=Array.from({length:rank},(_,i)=>rank-i);
+  const collapsed={};
+  order.forEach(value=>collapsed[value]=value!==rank);
+  function renderGroups(){
+    adminArea.querySelectorAll(":scope > .admin-rank-section").forEach(node=>node.remove());
+    order.forEach((value,index)=>{
+      const visibleCards=groups[value].filter(card=>card.style.display!=="none");
+      if(!visibleCards.length)return;
       const heading=document.createElement("div");
       heading.className="admin-rank-section";
-      heading.innerHTML='<span>'+labels[required]+'</span><span class="admin-rank-section-line"></span>';
-      heading.style.cssText="grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:20px 0 2px;color:#c7d2fe;font-weight:850;font-size:13px;letter-spacing:.025em";
-      const line=heading.querySelector(".admin-rank-section-line");
-      line.style.cssText="height:1px;flex:1;background:linear-gradient(90deg,#818cf855,transparent)";
-      card.parentNode.insertBefore(heading,card);
-      previousGroup=required;
-    }
-  });
-  const banner=document.getElementById("adminPermissionSummary");
-  if(banner) banner.textContent=({
-    helper:"Helper access: the Helper+ sections below. Higher-rank tools stay hidden.",
-    admin:"Admin access: Helper+ and Admin+ sections below.",
-    developer:"Developer access: Helper+, Admin+ and Developer+ sections below.",
-    owner:"Owner access: every section, including staff ranks and full site controls."
-  })[role]||"Staff access";
+      heading.dataset.rank=String(value);
+      heading.style.cssText="grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:10px 0 0;padding:12px 14px;border:1px solid rgba(148,163,255,.15);border-radius:13px;background:rgba(13,17,39,.78);color:#c7d2fe;font-weight:850;font-size:13px;letter-spacing:.025em";
+      const label=document.createElement("button");
+      label.type="button";
+      label.className="rank-section-toggle";
+      label.style.cssText="display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-align:left;background:transparent;border:0;padding:0;color:inherit";
+      label.setAttribute("aria-expanded",String(!collapsed[value]));
+      const arrow=document.createElement("span");
+      arrow.textContent=collapsed[value]?"▸":"▾";
+      arrow.style.cssText="font-size:18px;color:#a5b4fc;flex:0 0 auto";
+      const title=document.createElement("span");
+      title.textContent=labels[value];
+      label.append(arrow,title);
+      label.addEventListener("click",()=>{collapsed[value]=!collapsed[value];renderGroups();});
+      heading.appendChild(label);
+      const move=document.createElement("button");
+      move.type="button";
+      move.textContent="↓";
+      move.title="Move "+names[value]+" section down";
+      move.setAttribute("aria-label",move.title);
+      move.disabled=index===order.length-1;
+      move.style.cssText="padding:5px 10px;min-width:34px;font-size:16px";
+      move.addEventListener("click",()=>{
+        if(index>=order.length-1)return;
+        [order[index],order[index+1]]=[order[index+1],order[index]];
+        renderGroups();
+      });
+      heading.appendChild(move);
+      adminArea.appendChild(heading);
+      visibleCards.forEach(card=>{
+        card.style.display=collapsed[value]?"none":"";
+        card.style.gridColumn=(!collapsed[value]&&visibleCards.length===1)?"1 / -1":"";
+        adminArea.appendChild(card);
+      });
+    });
+  }
+  if(summary&&summary.parentElement===adminArea)adminArea.insertBefore(summary,adminArea.firstChild);
+  renderGroups();
+  if(summary)summary.textContent=({
+    helper:"Helper access · Community support tools. Higher-rank tools are restricted.",
+    admin:"Admin access · Helper and moderation tools. Developer and Owner controls are restricted.",
+    developer:"Developer access · Helper, Admin, and technical tools. Owner-only controls are restricted.",
+    owner:"Owner access · All tools and full site control."
+  })[role]||"Staff access required.";
 }
 
 function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
@@ -4788,7 +4812,6 @@ async function startAdminPanel() {
         loadWarnings(),
         loadChatMessages(),
         loadGames(),
-        loadUserActivity(),
         loadDougTubeVideos(),
         loadDougHubMusicModeration(),
         loadDougBaseAccessRequests(),
@@ -4798,15 +4821,6 @@ async function startAdminPanel() {
         loadChatRetentionSettings(),
         loadChatGroupModeration(),
     ]);
-
-    setInterval(
-        function() {
-
-            loadUserActivity();
-
-        },
-        10000
-    );
 
 }
 
