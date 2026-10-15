@@ -967,6 +967,49 @@ input,textarea,select{background:#070918}
 .admin-rank-section{scroll-margin-top:100px}
 #adminArea>.card[data-required-rank]{min-width:0}
 @media(max-width:640px){.admin-rank-section{font-size:12px!important;gap:8px!important;margin-top:15px!important}}
+
+
+/* Retention controls: give the save action enough width to feel like a proper control. */
+#adminArea #chatRetentionCard #saveChatRetentionButton{
+  min-width:220px;
+  min-height:42px;
+  padding:11px 20px;
+  white-space:normal;
+}
+#adminArea #chatRetentionCard #chatRetentionLimit{
+  width:100%!important;
+  max-width:100%!important;
+  min-height:42px;
+  background:rgba(2,4,10,.7);
+  border-color:rgba(255,255,255,.14)!important;
+}
+#adminArea #chatRetentionCard .admin-card-actions{
+  align-items:stretch;
+}
+#adminArea #chatRetentionCard .admin-card-actions .status{
+  align-self:center;
+}
+
+/* Make the Event Banner editor use its card space more fully without enlarging the card. */
+#adminArea #siteAnnouncementCard{
+  min-width:0;
+}
+#adminArea #siteAnnouncementCard #siteEventMessage{
+  display:block;
+  width:100%;
+  min-height:118px;
+  resize:vertical;
+  line-height:1.55;
+  background:rgba(2,4,10,.62);
+}
+#adminArea #siteAnnouncementCard .admin-card-actions{
+  width:100%;
+  align-items:center;
+}
+@media(max-width:760px){
+  #adminArea #chatRetentionCard #saveChatRetentionButton{width:100%;min-width:0}
+}
+
 </style>
 </head>
 
