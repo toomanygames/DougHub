@@ -845,6 +845,41 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
   #adminArea #dougTubeVideos .video-moderation-item{padding:11px}
 }
 
+
+
+/* Community Games + DougTube: a 3/4 and 1/4 split on desktop */
+@media(min-width:1001px){
+  #adminArea .admin-rank-cards{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+  #adminArea .admin-rank-cards>.card{
+    grid-column:span 2;
+    min-width:0;
+  }
+  #adminArea .admin-rank-cards>.card:has(#communityGames){
+    grid-column:span 3!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  #adminArea .admin-rank-cards>.card:has(#dougTubeVideos){
+    grid-column:span 1!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  #adminArea #dougTubeVideos{
+    grid-template-columns:minmax(0,1fr)!important;
+    max-height:680px!important;
+  }
+  #adminArea #dougTubeVideos .video-moderation-item{padding:10px}
+  #adminArea #dougTubeVideos .video-moderation-preview{
+    width:100%;aspect-ratio:16/9;height:auto;max-height:none;object-fit:contain;
+  }
+}
+@media(min-width:761px) and (max-width:1000px){
+  #adminArea .admin-rank-cards>.card:has(#communityGames),
+  #adminArea .admin-rank-cards>.card:has(#dougTubeVideos){grid-column:1/-1!important}
+}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
