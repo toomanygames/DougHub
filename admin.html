@@ -727,6 +727,18 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 #adminQuickNav{border-color:#ffffff14!important;border-radius:15px!important;background:#0b0e1df2!important}
 .back-button{border:1px solid #ffffff17!important;border-radius:12px!important;background:#ffffff07!important}
 @media(max-width:760px){.container{width:calc(100% - 24px)!important}#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:11px!important}#adminArea .admin-rank-cards>.card{padding:15px!important}.container>header{padding:14px!important;gap:12px}}
+
+/* Layout refinement: compact responsive tool grid and a full-length system log. */
+#adminArea>.admin-rank-group{margin-bottom:12px!important}
+#adminArea .admin-rank-cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))!important;grid-auto-flow:dense;align-items:start!important;gap:10px!important}
+#adminArea .admin-rank-cards>.card{height:auto!important;align-self:start!important;margin:0!important}
+#adminArea .admin-rank-cards>.card:only-child{grid-column:1/-1!important}
+#adminArea .admin-rank-cards>.card.audit-card{grid-column:1/-1!important}
+#adminArea .admin-rank-cards>.card #auditLogContent{max-height:none!important;overflow:visible!important}
+#adminArea .admin-rank-cards>.card.audit-card:not(.collapsed) #auditLogContent{max-height:none!important;overflow:visible!important}
+#adminArea .admin-rank-cards>.card.audit-card{height:auto!important;align-self:stretch!important}
+#adminArea .admin-rank-cards>.card.audit-card #auditRows,#adminArea .admin-rank-cards>.card.audit-card #auditLogRows,#adminArea .admin-rank-cards>.card.audit-card .audit-log-list{max-height:none!important;overflow:visible!important}
+@media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
@@ -4630,7 +4642,8 @@ function applyStaffPermissions(){
   const names={1:"Helper",2:"Admin",3:"Developer",4:"Owner"};
   let order=Array.from({length:rank},(_,i)=>rank-i);
   const collapsed={};
-  order.forEach(value=>collapsed[value]=value!==rank);
+  // Show every rank section available to the current role, fully expanded.
+  order.forEach(value=>collapsed[value]=false);
 
   function renderGroups(){
     adminArea.querySelectorAll(":scope > .admin-rank-group").forEach(node=>node.remove());
