@@ -751,6 +751,17 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 #adminArea .admin-rank-cards>.card.audit-card .audit-table-wrap{max-width:100%;overflow-x:auto}
 #adminArea .admin-rank-cards>.card input,#adminArea .admin-rank-cards>.card select,#adminArea .admin-rank-cards>.card textarea{max-width:100%;min-width:0;box-sizing:border-box}
 @media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}#adminArea .admin-rank-cards>.card{height:auto!important;min-height:0!important;padding:16px!important}#adminArea .admin-rank-cards>.card:has(#usersList){min-height:0!important}}
+
+/* Owner tools layout: Staff & Permissions gets a dedicated full-width mini-section; banner and schedule sit evenly beside each other. */
+#adminArea .admin-rank-cards>.card#staffManagementCard{grid-column:1/-1!important;width:100%!important;min-width:0!important;}
+#adminArea .admin-rank-cards>.card#siteAnnouncementCard,
+#adminArea .admin-rank-cards>.card#pageScheduleCard{grid-column:span 1!important;width:100%!important;min-width:0!important;align-self:stretch!important;}
+#adminArea .admin-rank-cards>.card#staffManagementCard .staff-list,
+#adminArea .admin-rank-cards>.card#staffManagementCard .staff-permissions,
+#adminArea .admin-rank-cards>.card#staffManagementCard .admin-table-wrap{max-width:100%;min-width:0;}
+@media(max-width:760px){#adminArea .admin-rank-cards>.card#staffManagementCard,
+#adminArea .admin-rank-cards>.card#siteAnnouncementCard,
+#adminArea .admin-rank-cards>.card#pageScheduleCard{grid-column:1/-1!important}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
