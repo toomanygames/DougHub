@@ -710,6 +710,23 @@ button:disabled {
 #adminArea>.admin-rank-group{display:block!important;width:100%!important;max-width:none!important;min-width:0;grid-column:1/-1!important;justify-self:stretch;box-sizing:border-box}
 #adminArea>.admin-rank-group>.admin-rank-section{display:flex!important;width:100%!important;max-width:none!important;box-sizing:border-box}
 #adminArea>.admin-rank-group>.admin-rank-cards{width:100%;min-width:0;box-sizing:border-box}
+
+/* Admin page visual repair: match the index glass UI and keep rank sections tidy. */
+body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,transparent 35%),radial-gradient(ellipse at 92% 9%,#701a7530,transparent 32%),#050611!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;-webkit-font-smoothing:antialiased}
+.container{width:min(1240px,calc(100% - 40px))!important;max-width:1240px!important;margin:0 auto!important}
+.container>header{position:relative!important;top:auto!important;display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:76px!important;height:auto!important;padding:16px 22px!important;margin:18px 0 16px!important;border:1px solid #ffffff14!important;border-radius:18px!important;background:linear-gradient(145deg,#10142bef,#090b19ed)!important;backdrop-filter:blur(20px)!important}
+#adminArea{display:block;min-width:0;grid-template-columns:none!important;align-items:initial!important;gap:0!important}
+#adminArea>.admin-rank-group{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;grid-column:1/-1!important;justify-self:stretch!important;margin:0 0 20px!important}
+#adminArea>.admin-rank-group>.admin-rank-section{width:100%!important;min-height:48px!important;margin:0 0 12px!important;padding:13px 16px!important;border:1px solid #ffffff16!important;border-radius:14px!important;background:linear-gradient(145deg,#11152bef,#0a0c1bed)!important;box-shadow:0 10px 28px #0002!important}
+#adminArea .admin-rank-cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:start!important;gap:14px!important;width:100%!important;min-width:0!important}
+#adminArea .admin-rank-cards>.card{display:flex;flex-direction:column;min-width:0!important;width:auto!important;max-width:none!important;min-height:0!important;margin:0!important;padding:20px!important;border:1px solid #ffffff12!important;border-radius:18px!important;background:linear-gradient(145deg,#10142bef,#090b19ed)!important;box-shadow:0 16px 40px #0002!important;align-self:start!important}
+#adminArea .admin-rank-cards>.card:only-child{grid-column:1/-1!important}
+#adminArea .admin-rank-cards>.card h2{margin:0 0 8px!important;font-size:16px!important;letter-spacing:-.02em}
+#adminArea .admin-rank-cards>.card .status{color:#a0a1bb!important;font-size:12px!important;line-height:1.6}
+#adminArea .admin-rank-cards>.card .admin-scroll-area,#adminArea .admin-rank-cards>.card [id$="List"],#adminArea .admin-rank-cards>.card [id$="Rows"],#adminArea .admin-rank-cards>.card #chatMessages,#adminArea .admin-rank-cards>.card #communityGames,#adminArea .admin-rank-cards>.card #dougTubeVideos{max-width:100%;min-width:0}
+#adminQuickNav{border-color:#ffffff14!important;border-radius:15px!important;background:#0b0e1df2!important}
+.back-button{border:1px solid #ffffff17!important;border-radius:12px!important;background:#ffffff07!important}
+@media(max-width:760px){.container{width:calc(100% - 24px)!important}#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:11px!important}#adminArea .admin-rank-cards>.card{padding:15px!important}.container>header{padding:14px!important;gap:12px}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
@@ -4719,14 +4736,19 @@ function setupAdminQuickNav() {
     const nav = document.getElementById("adminQuickNavLinks");
     const navBar = document.getElementById("adminQuickNav");
     if (!nav || !navBar) return;
-    navBar.style.display = "block";
     nav.innerHTML = "";
-    document.querySelectorAll("#adminArea > .card").forEach((card,index) => {
-        if (card.style.display === "none") return;
+    // Quick Jump is an Owner-only control; other ranks get a cleaner page.
+    if (currentAdminRole !== "owner") {
+        navBar.style.display = "none";
+        return;
+    }
+    navBar.style.display = "block";
+    const cards = [...document.querySelectorAll("#adminArea .admin-rank-cards > .card")]
+        .filter(card => card.style.display !== "none" && !card.closest(".admin-rank-group")?.querySelector(".admin-rank-section button[aria-expanded='false']"));
+    cards.forEach((card,index) => {
         const heading = card.querySelector("h2,h3");
         if (!heading) return;
         if (!card.id) card.id = "adminSection" + index;
-        // Leave room for the sticky quick-jump bar when scrolling to a section.
         card.style.scrollMarginTop = "112px";
         const link = document.createElement("a");
         link.href = "#" + card.id;
@@ -4734,7 +4756,6 @@ function setupAdminQuickNav() {
         link.title = "Jump to " + link.textContent;
         link.addEventListener("click", event => {
             event.preventDefault();
-            // Use the section's anchor target; CSS scroll-margin keeps it below the sticky nav.
             history.replaceState(null, "", "#" + card.id);
             card.scrollIntoView({behavior:"smooth",block:"start"});
         });
