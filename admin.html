@@ -847,37 +847,21 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 
 
 
-/* Community Games + DougTube: a 3/4 and 1/4 split on desktop */
-@media(min-width:1001px){
-  #adminArea .admin-rank-cards{
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  }
-  #adminArea .admin-rank-cards>.card{
-    grid-column:span 2;
-    min-width:0;
-  }
-  #adminArea .admin-rank-cards>.card:has(#communityGames){
-    grid-column:span 3!important;
-    width:100%!important;
-    max-width:100%!important;
-  }
-  #adminArea .admin-rank-cards>.card:has(#dougTubeVideos){
-    grid-column:span 1!important;
-    width:100%!important;
-    max-width:100%!important;
-  }
-  #adminArea #dougTubeVideos{
-    grid-template-columns:minmax(0,1fr)!important;
-    max-height:680px!important;
-  }
-  #adminArea #dougTubeVideos .video-moderation-item{padding:10px}
-  #adminArea #dougTubeVideos .video-moderation-preview{
-    width:100%;aspect-ratio:16/9;height:auto;max-height:none;object-fit:contain;
-  }
-}
-@media(min-width:761px) and (max-width:1000px){
-  #adminArea .admin-rank-cards>.card:has(#communityGames),
-  #adminArea .admin-rank-cards>.card:has(#dougTubeVideos){grid-column:1/-1!important}
+/* Community Games and DougTube share one card: games use 3/4, moderation uses 1/4. */
+#adminArea .community-games-tube-card{grid-column:1/-1!important;width:100%;max-width:100%;min-width:0}
+.community-games-tube-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(220px,1fr);gap:16px;align-items:start;min-width:0}
+.community-games-pane,.dougtube-moderation-pane{min-width:0}
+.community-games-pane{grid-column:1}
+.dougtube-moderation-pane{grid-column:2;padding-left:14px;border-left:1px solid rgba(255,255,255,.09)}
+.community-games-tube-layout h2{margin-top:0}
+#adminArea #communityGames{max-height:680px}
+#adminArea #dougTubeVideos{display:grid;grid-template-columns:minmax(0,1fr)!important;max-height:680px!important;min-width:0}
+#adminArea #dougTubeVideos .video-moderation-item{padding:10px;min-width:0;overflow:hidden}
+#adminArea #dougTubeVideos .video-moderation-preview{width:100%;aspect-ratio:16/9;height:auto;max-height:none;object-fit:contain}
+@media(max-width:760px){
+  .community-games-tube-layout{grid-template-columns:minmax(0,1fr);gap:20px}
+  .community-games-pane,.dougtube-moderation-pane{grid-column:1}
+  .dougtube-moderation-pane{padding:18px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.09)}
 }
 
 </style>
@@ -1663,16 +1647,19 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 </div>
 
-<div class="card">
-
-    <h2>🎮 Community Games</h2>
-
-    <div class="status" id="gameStatus">
-        Loading...
-    </div>
-
-    <div id="communityGames" class="admin-scroll-area"></div>
-
+<div class="card community-games-tube-card">
+  <div class="community-games-tube-layout">
+    <section class="community-games-pane">
+      <h2>🎮 Community Games</h2>
+      <div class="status" id="gameStatus">Loading...</div>
+      <div id="communityGames" class="admin-scroll-area"></div>
+    </section>
+    <section class="dougtube-moderation-pane">
+      <h2>🎬 DougTube Moderation</h2>
+      <div class="status" id="videoModerationStatus">Loading DougTube videos...</div>
+      <div id="dougTubeVideos" class="admin-scroll-area"></div>
+    </section>
+  </div>
 </div>
 
 
@@ -1687,24 +1674,6 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
   <div class="status" id="musicAlbumModerationStatus">Loading albums…</div>
   <div id="dougHubMusicAlbums" class="admin-scroll-area"></div>
 </div>
-
-<!-- DOUGTUBE MODERATION -->
-
-<div class="card">
-
-    <h2>🎬 DougTube Video Moderation</h2>
-
-    <div
-        class="status"
-        id="videoModerationStatus"
-    >
-        Loading DougTube videos...
-    </div>
-
-    <div id="dougTubeVideos" class="admin-scroll-area"></div>
-
-</div>
-
 
 <div class="card">
 <h2>💻 DougHub Code Projects</h2>
