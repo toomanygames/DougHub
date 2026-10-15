@@ -1087,7 +1087,7 @@
     function initializeOgBadges(client) {
         const cache = new Map();
         const selectors = [
-            ".message-username", ".user-name", ".username", ".activity-username",
+            ".user-name", ".username", ".activity-username",
             ".warning-username", ".comment-username", ".comment-author", ".video-author",
             ".author-name", "[data-username]"
         ].join(",");
