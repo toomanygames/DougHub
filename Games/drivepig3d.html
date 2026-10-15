@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#070914">
+<title>DrivePig3D • DougHub</title>
+<link rel="icon" href="../DougHub.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:dark;--ink:#f7f7ff;--muted:#a4a7c4;--line:#ffffff1c;--glass:#0a0d20d9;--violet:#7777ff;--pink:#e879f9}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b19;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}#scene{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}.vignette{position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,#080b1955 0%,transparent 28%,transparent 65%,#080b1988 100%),radial-gradient(ellipse at center,transparent 35%,#03040a88 100%)}.hud{position:fixed;inset:0;pointer-events:none;padding:clamp(12px,2.5vw,28px);display:flex;flex-direction:column;justify-content:space-between}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.brand,.stat,.iconbtn{border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(16px);box-shadow:0 10px 35px #0002}.brand{border-radius:16px;padding:10px 15px;font-size:12px;font-weight:900;letter-spacing:.16em;color:#d9d9ff}.brand b{font-size:15px;letter-spacing:-.03em;color:white}.stats{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}.stat{min-width:82px;padding:10px 13px;border-radius:14px;text-align:center}.stat span{display:block;font-size:9px;letter-spacing:.13em;color:var(--muted);font-weight:800}.stat strong{display:block;margin-top:3px;font-size:clamp(17px,2vw,24px);font-variant-numeric:tabular-nums}.righttop{display:flex;gap:8px}.iconbtn{pointer-events:auto;border-radius:13px;padding:10px 12px;font-weight:800}.bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}.hint{font-size:12px;color:#d7d9f5;background:#080b19a8;border:1px solid var(--line);border-radius:12px;padding:10px 13px;backdrop-filter:blur(12px)}.boostbox{width:min(240px,36vw);padding:12px;border:1px solid var(--line);background:var(--glass);border-radius:15px}.boosthead{display:flex;justify-content:space-between;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}.boostbar{height:7px;background:#ffffff16;border-radius:9px;overflow:hidden}.boostbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#5eead4,#818cf8,#e879f9);border-radius:9px;transition:width .1s}.overlay{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:18px;background:#03040a65;backdrop-filter:blur(8px)}.hidden{display:none!important}.panel{width:min(610px,100%);max-height:92vh;overflow:auto;padding:clamp(22px,5vw,42px);border-radius:27px;border:1px solid #b8baff2e;background:linear-gradient(145deg,#11152bf2,#080a18f5);box-shadow:0 30px 100px #0009,inset 0 1px #ffffff10}.eyebrow{font-size:10px;font-weight:900;letter-spacing:.2em;color:#a5b4fc}.title{font-size:clamp(42px,8vw,78px);line-height:.88;letter-spacing:-.075em;margin:13px 0 15px;font-weight:1000}.title span{background:linear-gradient(100deg,#fff,#a5b4fc 45%,#e879f9);-webkit-background-clip:text;background-clip:text;color:transparent}.desc{color:var(--muted);font-size:14px;line-height:1.7;max-width:450px}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:23px 0}.feature{padding:13px 10px;border:1px solid var(--line);border-radius:13px;background:#ffffff06}.feature b{display:block;font-size:17px}.feature small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.primary,.secondary{border-radius:13px;padding:13px 18px;font-weight:900;border:1px solid transparent}.primary{background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 9px 30px #6366f133}.secondary{background:#ffffff09;border-color:var(--line)}.primary:hover,.secondary:hover,.iconbtn:hover{filter:brightness(1.14)}.controls{margin-top:20px;color:#8f93b4;font-size:11px;line-height:1.8}.kbd{display:inline-grid;place-items:center;min-width:23px;padding:2px 6px;border:1px solid #ffffff26;border-radius:6px;color:#e7e7ff;background:#ffffff0a;font-weight:900}.touch{position:fixed;z-index:4;left:12px;right:12px;bottom:18px;display:none;justify-content:space-between;pointer-events:none}.touchgroup{display:flex;gap:9px;pointer-events:auto}.touch button{width:58px;height:58px;border-radius:17px;border:1px solid #ffffff30;background:#0a0d20c9;backdrop-filter:blur(12px);font-size:22px;font-weight:900;box-shadow:0 8px 20px #0003}.toast{position:fixed;z-index:8;top:85px;left:50%;transform:translateX(-50%);border:1px solid var(--line);background:#080b19df;padding:9px 14px;border-radius:999px;font-size:12px;font-weight:800;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}@media(max-width:650px){.brand{padding:9px 11px}.brand b{font-size:12px}.stats{gap:5px}.stat{min-width:62px;padding:8px 9px}.stat span{font-size:8px}.stat strong{font-size:16px}.hint{display:none}.touch{display:flex}.bottom{padding-bottom:73px}.boostbox{width:155px}.features{gap:6px}.feature{padding:11px 7px}.feature b{font-size:14px}.feature small{font-size:9px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="DrivePig3D 3D driving game"></canvas><div class="vignette"></div>
+<div class="hud">
+ <div class="top">
+  <div class="brand">DOUGHUB <b> / DRIVEPIG3D</b></div>
+  <div class="stats"><div class="stat"><span>SCORE</span><strong id="score">000000</strong></div><div class="stat"><span>COINS</span><strong id="coins">0</strong></div><div class="stat"><span>SPEED</span><strong><i id="speed" style="font-style:normal">0</i><small style="font-size:10px;color:#a4a7c4"> km/h</small></strong></div></div>
+  <div class="righttop"><button class="iconbtn" id="soundBtn" aria-label="Toggle sound">♫</button><button class="iconbtn" id="pauseBtn" aria-label="Pause game">Ⅱ</button></div>
+ </div>
+ <div class="bottom"><div class="hint"><span class="kbd">A</span> <span class="kbd">D</span> / <span class="kbd">←</span> <span class="kbd">→</span> steer · <span class="kbd">W</span> boost · <span class="kbd">P</span> pause</div><div class="boostbox"><div class="boosthead"><span>⚡ TURBO BOOST</span><span id="boostPct">100%</span></div><div class="boostbar"><i id="boostBar"></i></div></div></div>
+</div>
+<div class="touch"><div class="touchgroup"><button data-drive="left" aria-label="Steer left">◀</button><button data-drive="right" aria-label="Steer right">▶</button></div><div class="touchgroup"><button data-drive="boost" aria-label="Turbo boost">⚡</button></div></div>
+<div class="toast" id="toast"></div>
+<div class="overlay" id="menu">
+ <div class="panel"><div class="eyebrow">A DOUGHUB 3D ARCADE GAME</div><h1 class="title"><span>DRIVEPIG<br>3D</span></h1><p class="desc">Tiny pig. Massive horsepower. Dodge traffic, scoop up golden pig coins, hit the turbo and see how long you can survive the neon highway.</p>
+  <div class="features"><div class="feature"><b>🐷 3D</b><small>Pig-powered ride</small></div><div class="feature"><b>⚡ TURBO</b><small>Charge & boost</small></div><div class="feature"><b>🏆 <span id="bestMenu">0</span></b><small>Personal best</small></div></div>
+  <div class="actions"><button class="primary" id="startBtn">▶ START DRIVING</button><button class="secondary" id="howBtn">HOW TO PLAY</button></div><div class="controls" id="helpText">Steer with <b>A/D</b> or <b>←/→</b>. Hold <b>W</b> or <b>↑</b> to burn turbo. Collect coins and avoid other cars. On mobile, use the on-screen controls.</div>
+ </div>
+</div>
+<div class="overlay hidden" id="pauseMenu"><div class="panel"><div class="eyebrow">PIT STOP</div><h2 class="title"><span>PAUSED</span></h2><p class="desc">Catch your breath, driver. The highway will be waiting.</p><div class="actions"><button class="primary" id="resumeBtn">▶ RESUME</button><button class="secondary" id="restartBtn">↻ RESTART RUN</button><button class="secondary" id="quitBtn">EXIT TO MENU</button></div></div></div>
+<div class="overlay hidden" id="overMenu"><div class="panel"><div class="eyebrow">RUN COMPLETE</div><h2 class="title"><span id="overTitle">CRASHED!</span></h2><p class="desc" id="overDesc">That traffic had other plans.</p><div class="features"><div class="feature"><b id="finalScore">0</b><small>Score</small></div><div class="feature"><b id="finalCoins">0</b><small>Coins collected</small></div><div class="feature"><b id="finalDistance">0 m</b><small>Distance</small></div></div><div class="actions"><button class="primary" id="againBtn">↻ DRIVE AGAIN</button><button class="secondary" id="menuBtn">MAIN MENU</button></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const canvas=$('scene');
+let renderer,scene,camera,clock,player,world=[],traffic=[],coinItems=[],decor=[],running=false,paused=false,gameOver=false,started=false;
+let lane=0,steer=0,speed=28,boost=100,coins=0,distance=0,score=0,best=Number(localStorage.getItem('drivepig3d-best')||0),spawnClock=0,coinClock=0,decorClock=0,shake=0,soundOn=false,audioCtx=null,lastTime=0;
+const keys=new Set(),LANES=[-3.2,0,3.2],ROAD_Z=-8;
+$('bestMenu').textContent=best.toLocaleString();
+function mat(color,roughness=.72,metalness=0){return new THREE.MeshStandardMaterial({color,roughness,metalness});}
+const M={road:mat('#25283b'),stripe:mat('#d9e0ff',.5),white:mat('#f4f6ff'),dark:mat('#171a2a'),pink:mat('#f18bb4'),pig:mat('#ffb5cb'),pigLight:mat('#ffd6e3'),wheel:mat('#10121b'),gold:mat('#ffd166',.25,.7),glass:mat('#7dd3fc',.25,.35),green:mat('#36d399'),red:mat('#fb7185'),blue:mat('#60a5fa'),purple:mat('#a78bfa'),grass:mat('#18243b'),building:mat('#222744'),neon:mat('#8279ff',.3,.2)};
+function box(parent,w,h,d,material,x=0,y=0,z=0){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
+function cylinder(parent,r1,r2,h,material,x,y,z,segments=16){const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),material);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o;}
+function makePigCar(){
+ const g=new THREE.Group();
+ box(g,1.8,.55,3.1,mat('#f05b93',.35,.15),0,.65,0);
+ box(g,1.45,.55,1.4,M.glass,0,1.12,-.22);
+ box(g,1.68,.13,1.05,mat('#ff94bd',.4),0,1.48,-.16);
+ box(g,.75,.12,.38,M.white,0,.75,-1.58);
+ for(const x of [-.88,.88])for(const z of [-.95,.98]){
+  const w=cylinder(g,.39,.39,.22,M.wheel,x,.35,z,18);w.rotation.z=Math.PI/2;
+  cylinder(g,.2,.2,.235,mat('#8d96b8',.3,.65),x,.35,z,12).rotation.z=Math.PI/2;
+ }
+ // Big expressive pig head poking above the windscreen
+ const head=new THREE.Group();head.position.set(0,1.53,.28);g.add(head);
+ const face=new THREE.Mesh(new THREE.SphereGeometry(.57,24,18),M.pig);face.scale.set(1.08,.91,.85);face.castShadow=true;head.add(face);
+ for(const x of [-.35,.35]){const ear=new THREE.Mesh(new THREE.SphereGeometry(.22,16,12),M.pig);ear.scale.set(.68,1.25,.45);ear.position.set(x,.48,-.02);ear.rotation.z=x<0?-.3:.3;head.add(ear);const inner=new THREE.Mesh(new THREE.SphereGeometry(.12,12,8),M.pink);inner.scale.set(.7,1.2,.25);inner.position.set(x,.49,.12);head.add(inner);}
+ const snout=new THREE.Mesh(new THREE.SphereGeometry(.26,20,14),M.pink);snout.scale.set(1.2,.72,.5);snout.position.set(0,-.08,.45);head.add(snout);
+ for(const x of [-.09,.09]){const nostril=new THREE.Mesh(new THREE.SphereGeometry(.035,8,6),M.dark);nostril.position.set(x,-.07,.68);head.add(nostril);}
+ for(const x of [-.22,.22]){const eye=new THREE.Mesh(new THREE.SphereGeometry(.055,12,8),M.dark);eye.position.set(x,.16,.45);head.add(eye);const shine=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),M.white);shine.position.set(x-.012,.18,.49);head.add(shine);}
+ const tail=new THREE.Mesh(new THREE.TorusGeometry(.13,.045,8,16),M.pink);tail.position.set(0,.85,1.57);tail.rotation.x=.5;g.add(tail);
+ g.userData={head,wheels:[]};player=g;player.position.set(0,0,3);scene.add(player);
+ for(const o of player.children)if(o.geometry&&o.geometry.type==='CylinderGeometry')player.userData.wheels.push(o);
+}
+function makeRoad(){
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(220,450),M.grass);ground.rotation.x=-Math.PI/2;ground.position.set(0,-.18,-100);ground.receiveShadow=true;scene.add(ground);world.push(ground);
+ const road=box(scene,11,.16,450,M.road,0,-.08,-100);world.push(road);
+ for(const x of [-5.65,5.65]){const rail=box(scene,.12,.25,450,M.neon,x,.03,-100);world.push(rail);}
+ for(const x of [-1.6,1.6])for(let z=-320;z<130;z+=10){const dash=box(scene,.09,.025,4.4,M.stripe,x,.015,z);world.push(dash);}
+ for(let side of [-1,1])for(let z=-320;z<100;z+=20){const post=box(scene,.13,1.1,.13,M.neon,side*6.6,.45,z);world.push(post);const lamp=new THREE.PointLight(side<0?0x818cf8:0xe879f9,.55,10);lamp.position.set(side*6.6,1.3,z);scene.add(lamp);world.push(lamp);}
+}
+function makeCity(){
+ for(let side of [-1,1])for(let i=0;i<48;i++){const z=-300+i*8+Math.random()*5,h=4+Math.random()*17,w=2+Math.random()*5;const b=box(scene,w,h,w,M.building,side*(11+Math.random()*13),h/2-.15,z);decor.push(b);for(let y=1.4;y<h-.5;y+=2.1)for(let x=-w/2+.4;x<w/2-.3;x+=1){const win=box(scene,.18,.32,.035,Math.random()>.5?M.neon:M.gold,b.position.x+x,y,z-w/2-.03);decor.push(win);}}
+}
+function makeTraffic(z=-100){
+ const g=new THREE.Group(),colors=[M.blue,M.green,M.red,M.purple,mat('#f8fafc')],paint=colors[Math.floor(Math.random()*colors.length)];
+ box(g,1.75,.65,2.9,paint,0,.55,0);box(g,1.35,.58,1.1,M.glass,0,1.05,-.15);
+ for(const x of [-.88,.88])for(const zz of [-.85,.85]){const w=cylinder(g,.31,.31,.18,M.wheel,x,.28,zz,14);w.rotation.z=Math.PI/2;}
+ g.position.set(LANES[Math.floor(Math.random()*3)],0,z);g.userData={lane:Math.round((g.position.x)/3.2),kind:'traffic',phase:Math.random()*6};scene.add(g);traffic.push(g);
+}
+function makeCoin(z=-100,laneIndex=0){
+ const g=new THREE.Group();const coin=new THREE.Mesh(new THREE.TorusGeometry(.42,.13,10,22),M.gold);coin.rotation.y=Math.PI/2;coin.position.y=1.25;g.add(coin);
+ const core=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.07,20),mat('#fff0a6',.2,.65));core.rotation.x=Math.PI/2;core.position.y=1.25;g.add(core);
+ const star=new THREE.Mesh(new THREE.OctahedronGeometry(.13),M.white);star.position.y=1.25;g.add(star);
+ g.position.set(LANES[laneIndex],0,z);g.userData={spin:Math.random()*4};scene.add(g);coinItems.push(g);
+}
+function makeBackdrop(){
+ const sky=new THREE.Mesh(new THREE.SphereGeometry(400,24,16),new THREE.MeshBasicMaterial({color:'#101630',side:THREE.BackSide}));scene.add(sky);
+ const moon=new THREE.Mesh(new THREE.SphereGeometry(5,24,18),new THREE.MeshBasicMaterial({color:'#d9d7ff'}));moon.position.set(-32,27,-100);scene.add(moon);
+ for(let i=0;i<80;i++){const star=new THREE.Mesh(new THREE.SphereGeometry(.12+Math.random()*.12,6,5),new THREE.MeshBasicMaterial({color:Math.random()>.5?'#ffffff':'#a5b4fc'}));star.position.set((Math.random()-.5)*250,12+Math.random()*85,-Math.random()*300);scene.add(star);}
+}
+function init3D(){
+ try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});}catch(e){$('menu').classList.remove('hidden');$('startBtn').disabled=true;$('helpText').textContent='Your browser could not start WebGL. Try updating your browser or enabling hardware acceleration.';return false;}
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.8));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
+ scene=new THREE.Scene();scene.background=new THREE.Color('#101630');scene.fog=new THREE.Fog('#101630',38,185);
+ camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,500);camera.position.set(0,6.1,12.5);camera.lookAt(0,1,-7);
+ scene.add(new THREE.HemisphereLight(0xa9c3ff,0x25213d,2.1));const sun=new THREE.DirectionalLight(0xffe7d2,2.4);sun.position.set(-8,18,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+ makeBackdrop();makeRoad();makeCity();makePigCar();clock=new THREE.Clock();return true;
+}
+function clearRunObjects(){for(const list of [traffic,coinItems])for(const o of list)scene.remove(o);traffic=[];coinItems=[];spawnClock=.3;coinClock=.5;decorClock=0;}
+function updateHud(){ $('score').textContent=Math.floor(score).toString().padStart(6,'0');$('coins').textContent=coins;$('speed').textContent=Math.round(speed*3.6);$('boostPct').textContent=Math.round(boost)+'%';$('boostBar').style.width=boost+'%';}
+function startRun(){if(!renderer)return;clearRunObjects();lane=0;steer=0;speed=28;boost=100;coins=0;distance=0;score=0;shake=0;running=true;paused=false;gameOver=false;started=true;player.position.set(0,0,3);player.rotation.set(0,0,0);$('menu').classList.add('hidden');$('pauseMenu').classList.add('hidden');$('overMenu').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';clock.getDelta();lastTime=performance.now();updateHud();}
+function pauseGame(){if(!running||gameOver)return;paused=!paused;$('pauseMenu').classList.toggle('hidden',!paused);$('pauseBtn').textContent=paused?'▶':'Ⅱ';if(!paused){clock.getDelta();lastTime=performance.now();}}
+function endRun(crash=true){if(gameOver)return;running=false;gameOver=true;const final=Math.floor(score+coins*250+distance*2);score=final;if(final>best){best=final;localStorage.setItem('drivepig3d-best',String(best));$('bestMenu').textContent=best.toLocaleString();} $('overTitle').textContent=crash?'PIG, NOOO!':'NICE RUN!';$('overDesc').textContent=crash?'The traffic won this round. Your next run starts with a full turbo tank.':'Smooth driving, legendary pig.';$('finalScore').textContent=final.toLocaleString();$('finalCoins').textContent=coins;$('finalDistance').textContent=Math.floor(distance)+' m';$('overMenu').classList.remove('hidden');}
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1300);}
+function playBeep(freq=660,duration=.08){if(!soundOn)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=freq;g.gain.value=.06;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.stop(audioCtx.currentTime+duration);}catch(e){}}
+function update(dt){
+ if(!running||paused||gameOver)return;
+ dt=Math.min(dt,.04);
+ const boosting=(keys.has('boost')||keys.has('ArrowUp')||keys.has('w'))&&boost>0;
+ if(boosting){speed=Math.min(57,speed+dt*28);boost=Math.max(0,boost-dt*24);}else{speed+=(31-speed)*Math.min(1,dt*.7);boost=Math.min(100,boost+dt*6.5);}
+ const target=(keys.has('left')||keys.has('ArrowLeft')||keys.has('a')?-1:0)+(keys.has('right')||keys.has('ArrowRight')||keys.has('d')?1:0);
+ steer+=(target-steer)*Math.min(1,dt*8);player.position.x=THREE.MathUtils.clamp(player.position.x+steer*dt*(5.7+speed*.035),-4.1,4.1);player.rotation.z=-steer*.12;player.rotation.y=-steer*.08;
+ player.userData.head.rotation.z=Math.sin(performance.now()*.005)*.035;player.userData.head.rotation.x=boosting?-.08:0;
+ distance+=speed*dt*.9;score+=speed*dt*1.25;
+ spawnClock-=dt;if(spawnClock<=0){makeTraffic(-115-Math.random()*25);spawnClock=Math.max(.48,1.18-distance/5000)*(0.75+Math.random()*.6);}
+ coinClock-=dt;if(coinClock<=0){const li=Math.floor(Math.random()*3);for(let j=0;j<3;j++)makeCoin(-100-j*5,li);coinClock=1.15+Math.random()*1.3;}
+ const move=speed*dt*1.8;
+ for(let i=traffic.length-1;i>=0;i--){const o=traffic[i];o.position.z+=move;o.rotation.y=Math.sin(performance.now()*.001+o.userData.phase)*.025;if(o.position.z>13){scene.remove(o);traffic.splice(i,1);continue;}if(Math.abs(o.position.z-player.position.z)<2.3&&Math.abs(o.position.x-player.position.x)<1.75){playBeep(125,.22);shake=.35;endRun(true);return;}}
+ for(let i=coinItems.length-1;i>=0;i--){const o=coinItems[i];o.position.z+=move;o.rotation.y+=dt*2.5;o.rotation.z=Math.sin(performance.now()*.004+o.userData.spin)*.12;if(o.position.z>13){scene.remove(o);coinItems.splice(i,1);continue;}if(Math.abs(o.position.z-player.position.z)<2.2&&Math.abs(o.position.x-player.position.x)<1.55){coins++;score+=180;boost=Math.min(100,boost+7);playBeep(720+coins%5*90,.09);scene.remove(o);coinItems.splice(i,1);if(coins%5===0)toast('🐷 '+coins+' COINS! TURBO CHARGED');}}
+ for(const o of decor){o.position.z+=move;if(o.position.z>35)o.position.z-=390;}
+ for(const o of world){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.geometry.parameters.depth>100)o.position.z+=move;if(o.position.z>130)o.position.z-=450;}
+ const desired=new THREE.Vector3(player.position.x*.42,6.1+(boosting?.25:0),12.5);camera.position.lerp(desired,1-Math.exp(-dt*3.2));camera.lookAt(player.position.x*.25,1.2,-8);
+ if(shake>0){camera.position.x+=(Math.random()-.5)*shake;camera.position.y+=(Math.random()-.5)*shake;shake=Math.max(0,shake-dt);}
+ updateHud();
+}
+function frame(){requestAnimationFrame(frame);const now=performance.now(),dt=Math.min((now-lastTime)/1000||0,.05);lastTime=now;if(renderer&&scene){update(dt);renderer.render(scene,camera);}}
+function resize(){if(!renderer||!camera)return;camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<650?68:62;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.8));}
+$('startBtn').addEventListener('click',startRun);$('againBtn').addEventListener('click',startRun);$('restartBtn').addEventListener('click',startRun);$('pauseBtn').addEventListener('click',pauseGame);$('resumeBtn').addEventListener('click',pauseGame);$('quitBtn').addEventListener('click',()=>{paused=false;running=false;$('pauseMenu').classList.add('hidden');$('menu').classList.remove('hidden');$('pauseBtn').textContent='Ⅱ';});$('menuBtn').addEventListener('click',()=>{$('overMenu').classList.add('hidden');$('menu').classList.remove('hidden');gameOver=false;});$('howBtn').addEventListener('click',()=>{const h=$('helpText');h.classList.toggle('hidden');$('howBtn').textContent=h.classList.contains('hidden')?'HOW TO PLAY':'HIDE CONTROLS';});$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫ ON':'♫ OFF';if(soundOn)playBeep();});
+window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowleft','arrowright','arrowup',' '].includes(k))e.preventDefault();if(k==='p'||k==='escape'){pauseGame();return;}if(k==='r'&&started){startRun();return;}if(k==='a'||k==='arrowleft')keys.add('left');if(k==='d'||k==='arrowright')keys.add('right');if(k==='w'||k==='arrowup'||k===' ')keys.add('boost');});
+window.addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(k==='a'||k==='arrowleft')keys.delete('left');if(k==='d'||k==='arrowright')keys.delete('right');if(k==='w'||k==='arrowup'||k===' ')keys.delete('boost');});
+document.querySelectorAll('[data-drive]').forEach(b=>{const k=b.dataset.drive;const down=e=>{e.preventDefault();keys.add(k);};const up=e=>{e.preventDefault();keys.delete(k);};b.addEventListener('pointerdown',down);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)pauseGame();});window.addEventListener('resize',resize);
+if(init3D()){resize();frame();$('soundBtn').textContent='♫ OFF';}
+})();
+</script>
+</body>
+</html>
