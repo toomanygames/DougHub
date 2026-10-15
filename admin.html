@@ -1056,6 +1056,63 @@ body{
 }
 
 </style>
+<style id="compact-admin-refresh">
+
+/* Compact admin refresh: smaller controls/cards, with clearer gaps between sections. */
+body{padding:clamp(12px,1.6vw,24px)!important}
+.container{max-width:1880px!important}
+header{gap:12px!important;margin-bottom:18px!important}
+.logo{font-size:25px!important}
+.subtitle{font-size:12px!important;margin-top:3px!important}
+.back-button{padding:8px 11px!important;font-size:12px!important}
+.card{padding:15px!important;margin-bottom:14px!important;border-radius:15px!important}
+.card h2{font-size:16px!important;line-height:1.35}
+#adminArea{gap:17px!important}
+#adminArea>.card{padding:13px!important;border-radius:14px!important}
+#adminArea .card h2{font-size:15px!important;margin-bottom:7px!important}
+#adminArea .admin-rank-cards{gap:15px!important}
+#adminArea .admin-rank-group{margin-bottom:18px!important}
+#adminArea .admin-rank-section{margin-bottom:12px!important;padding:10px 12px!important}
+#adminArea .admin-card-heading{gap:9px!important}
+button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!important}
+.field input,.field textarea,.field select,
+.staff-input,#siteAnnouncementCard textarea,#pageScheduleCard textarea,
+#pageScheduleCard select,#pageScheduleCard input[type="datetime-local"]{
+  padding:8px 10px!important;font-size:12px!important;border-radius:8px!important
+}
+.field{margin-bottom:10px!important}
+.message,.game,.warning-item,.user-item,.activity-item,
+.video-moderation-item{padding:11px!important;margin-bottom:8px!important;border-radius:11px!important}
+#usersList{gap:8px!important}
+#adminQuickNav{margin-bottom:17px!important;padding:9px 11px!important;border-radius:13px!important}
+#adminQuickNavLinks{gap:8px!important}
+#adminQuickNavLinks a{padding:7px 10px!important;font-size:11px!important}
+.admin-card-help{font-size:11px!important;line-height:1.55!important;margin-bottom:10px!important}
+.admin-card-actions{gap:12px!important;margin-top:11px!important}
+.admin-toggle-line{font-size:11px!important;gap:8px!important;margin:9px 0!important}
+.admin-field-label{font-size:10px!important;margin:9px 0 5px!important}
+.staff-rank-grid{gap:11px!important;margin:12px 0!important}
+.staff-rank-grid>div{padding:10px!important;gap:6px!important}
+.staff-manage-form{padding:12px!important}
+.staff-current-list{gap:10px!important}
+.staff-current-item{padding:8px 10px!important}
+#adminArea .admin-scroll-area,
+#adminArea [id$="List"],#adminArea [id$="Rows"],
+#adminArea #chatMessages,#adminArea #communityGames,
+#adminArea #dougTubeVideos,#adminArea #activityList,
+#adminArea #siteFeatureList{max-height:300px}
+@media(max-width:760px){
+  body{padding:12px!important}
+  header{margin-bottom:14px!important}
+  .logo{font-size:23px!important}
+  #adminArea{gap:13px!important}
+  #adminArea>.card{padding:12px!important}
+  #adminArea .admin-rank-cards{gap:12px!important}
+  #adminArea .admin-rank-group{margin-bottom:14px!important}
+  #adminQuickNav{margin-bottom:13px!important}
+}
+
+</style>
 </head>
 
 <body>
