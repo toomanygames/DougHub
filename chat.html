@@ -288,6 +288,8 @@ main {
   font-weight: 800;
 }
 
+.og-message-badge{color:#fde68a!important;border:1px solid rgba(250,204,21,.35);background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(249,115,22,.1));border-radius:6px;padding:2px 6px;font-weight:900}
+
 .message-time {
   color: #777d95;
 }
@@ -2018,13 +2020,16 @@ async function renderMessages(
         "message-header";
 
       const badgeInfo = {summer:["🏖️","Summer"],spring:["🌸","Spring"],fall:["🍂","Fall"],winter:["❄️","Winter"],halloween:["🎃","Halloween"],christmas:["🎄","Christmas"]};
+      badgeInfo.og = ["★","OG"];
       const equipped = profile?.equipped_badge;
-      const badge = equipped && (profile?.reward_badges || []).includes(equipped) ? badgeInfo[equipped] : null;
+      const badge = equipped && equipped !== "og" && (profile?.reward_badges || []).includes(equipped) ? badgeInfo[equipped] : null;
+      const hasOgBadge = (profile?.reward_badges || []).includes("og");
       const staffBadgeInfo = {helper:["HELPER","staff-helper"],admin:["ADMIN","staff-admin"],developer:["DEVELOPER","staff-developer"],owner:["OWNER","staff-owner"]};
       const staffBadge = profile?.show_staff_badge && staffBadgeInfo[profile?.staff_role] ? staffBadgeInfo[profile.staff_role] : null;
       header.innerHTML = `
         <span class="message-username">@${escapeHtml(username)}</span>
         ${badge ? '<span class="message-badge" title="'+escapeHtml(badge[1])+' Badge">'+badge[0]+' '+escapeHtml(badge[1])+'</span>' : ''}
+        ${hasOgBadge ? '<span class="message-badge og-message-badge" title="Original Member badge">★ OG</span>' : ''}
         ${staffBadge ? '<span class="message-badge '+staffBadge[1]+'" title="DougHub Staff: '+staffBadge[0]+'">'+staffBadge[0]+'</span>' : ''}
         <span class="message-time">${formatTime(message.created_at)}</span>
       `;
