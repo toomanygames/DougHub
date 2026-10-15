@@ -695,13 +695,16 @@ button:disabled {
 @media(max-width:600px){.audit-collapse-toggle{padding:14px;gap:8px}.audit-collapse-title{gap:9px}.audit-collapse-title small{max-width:230px}.audit-collapse-right{gap:8px}.audit-live{display:none}#auditLogContent{padding:0 10px 12px}}
 
 
+
 /* Rank sections: compact, movable, and role-aware. */
-.admin-rank-section{align-self:start;min-width:0}
+#adminArea{grid-auto-flow:row;align-items:start;gap:12px}
+#adminArea>.admin-rank-group{grid-column:1/-1;min-width:0;align-self:start}
+#adminArea .admin-rank-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px}
+#adminArea .admin-rank-cards>.card{min-width:0;min-height:0;margin:0;align-self:start}
+#adminArea .admin-rank-cards>.card[style*="display: none"]{display:none!important}
+#adminArea .admin-rank-cards>.card:only-child{grid-column:1/-1}
 .rank-section-toggle:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px;border-radius:5px}
-#adminArea{grid-auto-flow:row dense;align-items:start;gap:12px}
-#adminArea>.card{align-self:start}
-#adminArea>.card[style*="display: none"]{display:none!important}
-@media(max-width:760px){.admin-rank-section{margin-top:7px!important}#adminArea{gap:10px}}
+@media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)}#adminArea{gap:10px}}
 </style>
 <script src="auth-guard.js" data-require-auth="true" data-require-admin="true"></script>
 <style id="doughub-polish">
@@ -922,7 +925,7 @@ input,textarea,select{background:#070918}
 </div>
 
 <div id="adminArea" style="display:none;">
-<div id="adminPermissionSummary" class="admin-card-help" style="padding:12px 16px;border:1px solid #6366f144;border-radius:12px;background:#6366f10c;margin-bottom:12px">Staff permissions load here.</div>
+
 
 <div class="card staff-management-card" id="staffManagementCard" style="display:none">
   <h2>🛡️ Staff & Permissions</h2>
@@ -4577,6 +4580,8 @@ function applyStaffPermissions(){
   const rank={none:0,helper:1,admin:2,developer:3,owner:4}[role]||0;
   const adminArea=document.getElementById("adminArea");
   if(!adminArea)return;
+
+  // Collect cards before rebuilding the rank-group containers.
   const cards=[...adminArea.querySelectorAll(":scope > .card")];
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
@@ -4589,29 +4594,38 @@ function applyStaffPermissions(){
     if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
     return 2;
   };
-  adminArea.querySelectorAll(":scope > .admin-rank-section").forEach(node=>node.remove());
-  const summary=document.getElementById("adminPermissionSummary");
+
+  adminArea.querySelectorAll(":scope > .admin-rank-section,:scope > .admin-rank-group").forEach(node=>node.remove());
   const groups={1:[],2:[],3:[],4:[]};
   cards.forEach(card=>{
     const required=rankForCard(card);
     card.dataset.requiredRank=String(required);
-    card.style.display=(rank>=required && rank>0)?"":"none";
+    card.style.display=(rank>=required&&rank>0)?"":"none";
     groups[required].push(card);
   });
+
   const labels={1:"🟢 Helper+ · Community Support",2:"🔵 Admin+ · Moderation & Management",3:"🟣 Developer+ · Technical Tools",4:"🟡 Owner+ · Full Control"};
   const names={1:"Helper",2:"Admin",3:"Developer",4:"Owner"};
   let order=Array.from({length:rank},(_,i)=>rank-i);
   const collapsed={};
   order.forEach(value=>collapsed[value]=value!==rank);
+
   function renderGroups(){
-    adminArea.querySelectorAll(":scope > .admin-rank-section").forEach(node=>node.remove());
+    adminArea.querySelectorAll(":scope > .admin-rank-group").forEach(node=>node.remove());
     order.forEach((value,index)=>{
       const visibleCards=groups[value].filter(card=>rank>0&&rank>=Number(card.dataset.requiredRank));
       if(!visibleCards.length)return;
+
+      // Keep each heading and its tools inside one grid item so moving a rank
+      // always moves the whole section, never just the heading.
+      const group=document.createElement("section");
+      group.className="admin-rank-group";
+      group.dataset.rank=String(value);
+
       const heading=document.createElement("div");
       heading.className="admin-rank-section";
-      heading.dataset.rank=String(value);
-      heading.style.cssText="grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:10px 0 0;padding:12px 14px;border:1px solid rgba(148,163,255,.15);border-radius:13px;background:rgba(13,17,39,.78);color:#c7d2fe;font-weight:850;font-size:13px;letter-spacing:.025em";
+      heading.style.cssText="display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:12px 14px;border:1px solid rgba(148,163,255,.15);border-radius:13px;background:rgba(13,17,39,.78);color:#c7d2fe;font-weight:850;font-size:13px;letter-spacing:.025em";
+
       const label=document.createElement("button");
       label.type="button";
       label.className="rank-section-toggle";
@@ -4625,6 +4639,7 @@ function applyStaffPermissions(){
       label.append(arrow,title);
       label.addEventListener("click",()=>{collapsed[value]=!collapsed[value];renderGroups();});
       heading.appendChild(label);
+
       const move=document.createElement("button");
       move.type="button";
       move.textContent="↓";
@@ -4638,22 +4653,25 @@ function applyStaffPermissions(){
         renderGroups();
       });
       heading.appendChild(move);
-      adminArea.appendChild(heading);
-      visibleCards.forEach(card=>{
-        card.style.display=collapsed[value]?"none":"";
-        card.style.gridColumn=(!collapsed[value]&&visibleCards.length===1)?"1 / -1":"";
-        adminArea.appendChild(card);
-      });
+      group.appendChild(heading);
+
+      if(!collapsed[value]){
+        const cardsGrid=document.createElement("div");
+        cardsGrid.className="admin-rank-cards";
+        visibleCards.forEach(card=>{
+          card.style.display="";
+          card.style.gridColumn="";
+          cardsGrid.appendChild(card);
+        });
+        group.appendChild(cardsGrid);
+      }else{
+        visibleCards.forEach(card=>{card.style.display="none";});
+      }
+      adminArea.appendChild(group);
     });
   }
-  if(summary&&summary.parentElement===adminArea)adminArea.insertBefore(summary,adminArea.firstChild);
+
   renderGroups();
-  if(summary)summary.textContent=({
-    helper:"Helper access · Community support tools. Higher-rank tools are restricted.",
-    admin:"Admin access · Helper and moderation tools. Developer and Owner controls are restricted.",
-    developer:"Developer access · Helper, Admin, and technical tools. Owner-only controls are restricted.",
-    owner:"Owner access · All tools and full site control."
-  })[role]||"Staff access required.";
 }
 
 function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
