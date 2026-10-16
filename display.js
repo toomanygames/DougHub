@@ -1158,14 +1158,14 @@
             await loadSupabase();
 
 
-            supabaseClient =
-                window.supabase.createClient(
-                    SUPABASE_URL,
-                    SUPABASE_KEY
-                );
+            // Reuse an existing client if another DougHub script initialized it.
+            // Creating a second client with the same auth storage key can race session
+            // reads/writes and trigger the Multiple GoTrueClient warning.
+            supabaseClient = window.DougHubSupabaseClient || window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
 
-            // Share the existing authenticated client with pages that need it.
-            // This avoids creating duplicate GoTrue clients and keeps one session.
             window.DougHubSupabaseClient = supabaseClient;
             window.dispatchEvent(new Event("douqhub:supabase-ready"));
             initializeOgBadges(supabaseClient);
