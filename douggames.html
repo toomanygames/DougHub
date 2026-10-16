@@ -1869,34 +1869,16 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 @media(max-width:600px){.games-hero-actions{gap:8px}.games-hero-button{min-height:36px}.games-hero-meta{margin-top:13px}}
 
 
-/* Drive Pig version selector */
-.drive-pig-switcher{grid-column:1/-1!important;display:flex;align-items:stretch;justify-content:space-between;gap:clamp(20px,4vw,46px);min-height:230px;position:relative;overflow:hidden;padding:clamp(20px,3.5vw,34px)!important;background:radial-gradient(ellipse at 8% 0%,#7777ff20,transparent 46%),linear-gradient(120deg,rgba(17,21,48,.96),rgba(10,12,29,.96))!important}
-.drive-pig-switcher:before{content:"";position:absolute;width:230px;height:230px;border-radius:50%;right:180px;top:-145px;background:#a855f714;filter:blur(5px);pointer-events:none}
-.drive-pig-main{position:relative;z-index:1;min-width:0;flex:1;display:flex;flex-direction:column;align-items:flex-start}
-.drive-pig-main .game-icon{width:52px;height:52px;display:grid;place-items:center;font-size:27px;margin-bottom:14px}
-.drive-pig-version-label,.drive-pig-side-label{font-size:9px;font-weight:900;letter-spacing:.17em;color:#a5b4fc}
-.drive-pig-main h3{font-size:clamp(23px,3vw,31px)!important;margin:7px 0 6px!important;color:#f8f8ff}
-.drive-pig-main p{max-width:500px;font-size:12px!important;line-height:1.7;margin:0 0 15px!important;color:#a0a5bf}
-.drive-pig-play{display:inline-flex;align-items:center;gap:22px;padding:11px 15px;border-radius:11px;background:linear-gradient(115deg,#6366f1,#a855f7);color:white;text-decoration:none;font-size:10px;font-weight:900;letter-spacing:.06em;box-shadow:0 8px 24px #6366f12a;transition:transform .18s,filter .18s}
-.drive-pig-play:hover{transform:translateY(-2px);filter:brightness(1.12)}
-.drive-pig-play span{font-size:16px;line-height:10px}
-.drive-pig-status{display:flex;align-items:center;gap:7px;margin-top:12px;color:#8588a7;font-size:10px}
-.drive-pig-live-dot{width:6px;height:6px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 9px #6ee7b766}
-.drive-pig-side{position:relative;z-index:1;flex:0 0 min(285px,38%);display:flex;flex-direction:column;justify-content:center;padding-left:clamp(16px,2.8vw,30px);border-left:1px solid #ffffff12}
-.drive-pig-side-label{margin:0 0 12px 4px;color:#8588a7}
-.drive-pig-toggle{position:relative;display:grid;gap:5px;padding:5px;border:1px solid #ffffff12;border-radius:15px;background:#0709168a;isolation:isolate}
-.drive-pig-slider{position:absolute;z-index:-1;left:5px;right:5px;top:5px;height:calc((100% - 15px)/2);border:1px solid #a5b4fc35;border-radius:10px;background:linear-gradient(110deg,#6366f12a,#a855f726);box-shadow:inset 0 1px #ffffff09;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
-.drive-pig-toggle[data-selected="racing"] .drive-pig-slider{transform:translateY(calc(100% + 5px))}
-.drive-pig-option{display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:59px;padding:9px 10px;text-align:left;border:1px solid transparent;border-radius:10px;background:transparent;color:#a5a8c4;transition:color .18s,background .18s}
-.drive-pig-option.active{color:#fff}
-.drive-pig-option:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px}
-.drive-pig-option-icon{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border:1px solid #ffffff10;border-radius:10px;background:#ffffff07;font-size:19px}
-.drive-pig-option>span:last-child{display:grid;gap:4px;min-width:0}
-.drive-pig-option b{font-size:11px;white-space:nowrap}
-.drive-pig-option small{font-size:9px;color:#8588a7;white-space:nowrap}
-.drive-pig-option.active small{color:#b8baff}
-.drive-pig-side-foot{margin:11px 0 0 5px;color:#666b8b;font-size:8px;font-weight:800;letter-spacing:.14em}
-@media(max-width:650px){.drive-pig-switcher{gap:16px;min-height:0;flex-direction:column}.drive-pig-main .game-icon{margin-bottom:11px}.drive-pig-side{flex-basis:auto;padding:16px 0 0;border-left:0;border-top:1px solid #ffffff12}.drive-pig-side-label{margin-bottom:8px}.drive-pig-toggle{grid-template-columns:1fr 1fr;gap:4px;padding:4px}.drive-pig-slider{left:4px;right:auto;top:4px;bottom:4px;width:calc((100% - 12px)/2);height:auto;transition:transform .22s cubic-bezier(.2,.8,.2,1)}.drive-pig-toggle[data-selected="racing"] .drive-pig-slider{transform:translateX(calc(100% + 4px))}.drive-pig-option{flex-direction:column;justify-content:center;gap:6px;min-height:85px;padding:9px 3px;text-align:center}.drive-pig-option b{font-size:10px}.drive-pig-option small{font-size:8px}.drive-pig-option-icon{width:31px;height:31px;flex-basis:31px;font-size:17px}.drive-pig-side-foot{display:none}}
+/* Compact standout 2-in-1 Drive Pig tile */
+.drive-pig-switcher{grid-column:auto!important;min-height:0!important;padding:17px!important;display:flex;flex-direction:column;align-items:stretch;gap:10px;position:relative;overflow:hidden;border-color:#8b7bff66!important;background:radial-gradient(ellipse at 95% 0%,#a855f72b,transparent 45%),linear-gradient(145deg,rgba(25,24,62,.98),rgba(10,12,29,.98))!important;box-shadow:0 0 0 1px #8b5cf61c,0 12px 35px #0004}
+.drive-pig-switcher:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#6366f1,#d946ef,#f0abfc);pointer-events:none}
+.drive-pig-topline{display:flex;align-items:center;justify-content:space-between;gap:8px}.drive-pig-topline .game-icon{width:43px;height:43px;display:grid;place-items:center;font-size:23px;margin:0;background:#8b5cf624;border-color:#a78bfa44}
+.drive-pig-twoinone{padding:6px 8px;border-radius:8px;background:linear-gradient(110deg,#6366f13b,#c026d33b);border:1px solid #c4b5fd55;color:#e5ddff;font-size:9px;font-weight:1000;letter-spacing:.08em;white-space:nowrap}.drive-pig-twoinone b{color:#f5d0fe}
+.drive-pig-version-label{font-size:8px;font-weight:900;letter-spacing:.14em;color:#c4b5fd}.drive-pig-switcher h3{margin:0!important;font-size:19px!important;line-height:1.25;color:#fff}.drive-pig-title-tag{font-size:9px;vertical-align:middle;color:#ddd6fe;border:1px solid #a78bfa44;border-radius:5px;padding:3px 5px;letter-spacing:0}.drive-pig-switcher p{margin:0!important;min-height:37px;color:#a0a5bf;font-size:11px!important;line-height:1.55}
+.drive-pig-toggle{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid #ffffff19;border-radius:12px;background:#070916a8;isolation:isolate}.drive-pig-slider{position:absolute;z-index:-1;left:4px;top:4px;bottom:4px;width:calc((100% - 12px)/2);border:1px solid #a5b4fc55;border-radius:8px;background:linear-gradient(110deg,#6366f14a,#a855f745);transition:transform .22s cubic-bezier(.2,.8,.2,1)}.drive-pig-toggle[data-selected="racing"] .drive-pig-slider{transform:translateX(calc(100% + 4px))}
+.drive-pig-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:66px;padding:7px 3px;text-align:center;border:1px solid transparent;border-radius:8px;background:transparent;color:#a5a8c4;cursor:pointer;transition:color .18s}.drive-pig-option.active{color:#fff}.drive-pig-option:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px}.drive-pig-option-icon{display:grid;place-items:center;width:27px;height:27px;border:1px solid #ffffff12;border-radius:8px;background:#ffffff08;font-size:16px}.drive-pig-option>span:last-child{display:grid;gap:3px;min-width:0}.drive-pig-option b{font-size:10px;white-space:nowrap}.drive-pig-option small{font-size:8px;color:#8588a7;white-space:nowrap}.drive-pig-option.active small{color:#c4b5fd}
+.drive-pig-play{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;background:linear-gradient(110deg,#6366f1,#a855f7);color:white;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.06em;box-shadow:0 8px 20px #6366f12b;transition:transform .18s,filter .18s}.drive-pig-play:hover{transform:translateY(-2px);filter:brightness(1.12)}.drive-pig-play span{font-size:15px;line-height:10px}.drive-pig-status{display:flex;align-items:center;gap:6px;color:#8588a7;font-size:9px;line-height:1.4}.drive-pig-live-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 9px #6ee7b766}
+@media(max-width:600px){.drive-pig-switcher{gap:10px;padding:17px!important}.drive-pig-switcher p{min-height:0}.drive-pig-option{min-height:63px}}
 
 </style>
   <script src="nav.js" defer></script>
@@ -2292,28 +2274,18 @@ footer{font-size:12px}
                 </div>
             </a>
 
-            <div class="game-card game-card-wide drive-pig-switcher" id="drivePigSwitcher">
-                <div class="drive-pig-main">
-                    <div class="game-icon" id="drivePigIcon">🐷</div>
-                    <div class="drive-pig-version-label">CHOOSE YOUR DRIVE</div>
-                    <h3 id="drivePigTitle">Drive Pig</h3>
-                    <p id="drivePigDescription">Drive the pig, jump ramps, flip through the air, and try to survive the course.</p>
-                    <a class="drive-pig-play" id="drivePigPlay" href="Games/drive-pig.html">PLAY DRIVE PIG <span>→</span></a>
-                    <div class="drive-pig-status"><span class="drive-pig-live-dot"></span><span id="drivePigStatus">Classic stunt-course adventure</span></div>
+            <div class="game-card drive-pig-switcher" id="drivePigSwitcher">
+                <div class="drive-pig-topline"><div class="game-icon" id="drivePigIcon">🐷</div><span class="drive-pig-twoinone">2 GAMES <b>IN 1</b></span></div>
+                <div class="drive-pig-version-label">ONE BUTTON · TWO RIDES</div>
+                <h3 id="drivePigTitle">Drive Pig <span class="drive-pig-title-tag">2-in-1</span></h3>
+                <p id="drivePigDescription">Pick the classic stunt course or jump into Pig Racing3D.</p>
+                <div class="drive-pig-toggle" role="group" aria-label="Choose a Drive Pig game version">
+                    <span class="drive-pig-slider" id="drivePigSlider"></span>
+                    <button type="button" class="drive-pig-option active" data-drive-version="classic" aria-pressed="true"><span class="drive-pig-option-icon">🐷</span><span><b>Drive Pig</b><small>Classic</small></span></button>
+                    <button type="button" class="drive-pig-option" data-drive-version="racing" aria-pressed="false"><span class="drive-pig-option-icon">🏎️</span><span><b>Pig Racing3D</b><small>3D racer</small></span></button>
                 </div>
-                <div class="drive-pig-side">
-                    <div class="drive-pig-side-label">VERSIONS</div>
-                    <div class="drive-pig-toggle" role="group" aria-label="Choose a Drive Pig game version">
-                        <span class="drive-pig-slider" id="drivePigSlider"></span>
-                        <button type="button" class="drive-pig-option active" data-drive-version="classic" aria-pressed="true">
-                            <span class="drive-pig-option-icon">🐷</span><span><b>Drive Pig</b><small>Classic</small></span>
-                        </button>
-                        <button type="button" class="drive-pig-option" data-drive-version="racing" aria-pressed="false">
-                            <span class="drive-pig-option-icon">🏎️</span><span><b>Pig Racing3D</b><small>3D highway racer</small></span>
-                        </button>
-                    </div>
-                    <div class="drive-pig-side-foot">SWITCH ANYTIME</div>
-                </div>
+                <a class="drive-pig-play" id="drivePigPlay" href="Games/drive-pig.html">PLAY DRIVE PIG <span>→</span></a>
+                <div class="drive-pig-status"><span class="drive-pig-live-dot"></span><span id="drivePigStatus">Classic stunt-course adventure</span></div>
             </div>
 
             <a
