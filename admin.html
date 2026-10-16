@@ -1724,11 +1724,33 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+// Reuse display.js's single authenticated client. Creating another client
+// on this page can race session storage and confuse the admin role check.
+let supabaseClient = window.DougHubSupabaseClient || null;
+
+async function waitForSharedSupabaseClient() {
+    if (window.DougHubSupabaseClient) {
+        supabaseClient = window.DougHubSupabaseClient;
+        return supabaseClient;
+    }
+
+    await new Promise((resolve, reject) => {
+        let timer;
+        const finish = (client) => {
+            window.removeEventListener("douqhub:supabase-ready", onReady);
+            clearTimeout(timer);
+            if (client) resolve(client);
+            else reject(new Error("DougHub's shared Supabase client did not initialize. Refresh the page and check whether browser privacy settings are blocking site storage."));
+        };
+        const onReady = () => finish(window.DougHubSupabaseClient || null);
+        window.addEventListener("douqhub:supabase-ready", onReady, { once: true });
+        timer = setTimeout(() => finish(window.DougHubSupabaseClient || null), 12000);
+        if (window.DougHubSupabaseClient) finish(window.DougHubSupabaseClient);
+    });
+
+    supabaseClient = window.DougHubSupabaseClient;
+    return supabaseClient;
+}
 
 const loading =
     document.getElementById("loading");
@@ -5387,6 +5409,15 @@ document.getElementById("refreshFeedbackButton")?.addEventListener("click", load
 ========================================= */
 
 async function startAdminPanel() {
+
+    try {
+        await waitForSharedSupabaseClient();
+    } catch (error) {
+        loading.innerHTML = '<div class="error"><strong>Could not connect to DougHub authentication.</strong><br><br>' +
+            escapeHtml(error?.message || "The shared Supabase client did not initialize.") +
+            '<br><br><button type="button" class="back-button" onclick="location.reload()">Try again</button></div>';
+        return;
+    }
 
     const allowed =
         await checkAdmin();
