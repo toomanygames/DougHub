@@ -1885,11 +1885,25 @@ async function checkAdmin() {
 
         const storedRole = String(profile?.staff_role || "").trim().toLowerCase();
         const appRole = String(session.user.app_metadata?.staff_role || "").trim().toLowerCase();
+
+        // Last-resort recovery for these verified staff account IDs if a browser
+        // session temporarily cannot read its own profiles row. Match only the
+        // immutable authenticated user UUID; never use username or user_metadata.
+        // The profiles table remains the primary source of truth.
+        const verifiedStaffByUserId = {
+            "f145067b-724c-40aa-9ab1-60ddaa351d27": "owner",
+            "213562dc-4f57-4bad-8e33-22a2fc553895": "helper",
+            "b9ee5a6e-821d-4f76-a06a-4e1511c58909": "helper"
+        };
+        const verifiedFallbackRole = verifiedStaffByUserId[String(session.user.id || "").toLowerCase()] || "";
+
         currentAdminRole = (storedRole && storedRole !== "none")
             ? storedRole
             : (appRole && appRole !== "none"
                 ? appRole
-                : (profile?.is_admin === true ? "admin" : "none"));
+                : (profile?.is_admin === true
+                    ? "admin"
+                    : (verifiedFallbackRole || "none")));
 
         if (!["helper","admin","developer","owner"].includes(currentAdminRole)) {
             const profileRoleForDebug = String(profile?.staff_role || "(no profile role)").trim().toLowerCase();
