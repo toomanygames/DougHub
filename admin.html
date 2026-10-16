@@ -1870,7 +1870,15 @@ async function checkAdmin() {
                 : (profile?.is_admin === true ? "admin" : "none"));
 
         if (!["helper","admin","developer","owner"].includes(currentAdminRole)) {
-            loading.innerHTML = '<div class="error">Access denied.<br><br>This account does not have a recognized staff role. If the Admin Panel button is visible, refresh your session and check the staff role saved in Supabase.</div>';
+            const profileRoleForDebug = String(profile?.staff_role || "(no profile role)").trim().toLowerCase();
+            const appRoleForDebug = String(session.user.app_metadata?.staff_role || "(no app role)").trim().toLowerCase();
+            const profileErrorForDebug = profileResult.error?.message || (profile ? "none" : "Profile row not found for this signed-in account.");
+            loading.innerHTML = '<div class="error"><strong>Access denied: no recognized staff role was found.</strong><br><br>' +
+                'Profile role: <code>' + escapeHtml(profileRoleForDebug) + '</code><br>' +
+                'Trusted app role: <code>' + escapeHtml(appRoleForDebug) + '</code><br>' +
+                'Profile lookup: <code>' + escapeHtml(profileErrorForDebug) + '</code><br>' +
+                'Signed-in account ID: <code>' + escapeHtml(session.user.id) + '</code><br><br>' +
+                'The account menu and Admin Panel were using different role sources. These details show which role is actually saved for this session.</div>';
             return false;
         }
 
