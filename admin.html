@@ -1849,113 +1849,60 @@ function adminCheckWithTimeout(promise, label, ms=12000) {
 }
 
 async function checkAdmin() {
-    loading.textContent = "Checking your signed-in account…";
+    // One entry rule: a signed-in user must have a staff role in their profile.
+    // No metadata guessing, hard-coded account exceptions, or overlapping checks.
     loading.style.display = "block";
+    loading.textContent = "Checking staff access…";
     adminArea.style.display = "none";
-
-    // Verified IDs are a fallback only. The live staff role in profiles is the
-    // normal source so Helper+ staff don't get locked out by an outdated list.
-    const verifiedStaffByUserId = Object.freeze({
-        "f145067b-724c-40aa-9ab1-60ddaa351d27": "owner",
-        "213562dc-4f57-4bad-8e33-22a2fc553895": "helper",
-        "b9ee5a6e-821d-4f76-a06a-4e1511c58909": "helper"
-    });
-
-    const normalizeStaffRole = (value) => {
-        const role = String(value || "").trim().toLowerCase().replace(/[^a-z+]/g, "");
-        if (role === "owner" || role === "owner+") return "owner";
-        if (role === "developer" || role === "developer+") return "developer";
-        if (role === "admin" || role === "admin+") return "admin";
-        if (role === "helper" || role === "helper+") return "helper";
-        return "none";
-    };
+    currentAdminUser = null;
+    currentAdminRole = "none";
 
     try {
-        if (!supabaseClient?.auth) {
-            await waitForSharedSupabaseClient();
-        }
-        if (!supabaseClient?.auth) throw new Error("DougHub authentication did not initialize. Refresh and try again.");
+        await waitForSharedSupabaseClient();
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+        if (sessionError) throw sessionError;
 
-        const sessionResult = await adminCheckWithTimeout(
-            supabaseClient.auth.getSession(),
-            "Checking your login"
-        );
-        if (sessionResult.error) throw sessionResult.error;
-
-        const user = sessionResult.data?.session?.user;
+        const user = sessionData?.session?.user;
         if (!user?.id) {
-            currentAdminUser = null;
-            currentAdminRole = "none";
-            loading.innerHTML = 'You are not signed in. <a href="log-in.html?redirect=admin.html" class="back-button">Log in</a>';
+            location.replace("log-in.html?redirect=admin.html");
+            return false;
+        }
+
+        const { data: profile, error: profileError } = await supabaseClient
+            .from("profiles")
+            .select("id,username,staff_role,is_helper,is_admin,is_developer,is_owner")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        const role = String(profile?.staff_role || "").trim().toLowerCase();
+        const hasStaffRole = ["helper", "admin", "developer", "owner"].includes(role)
+            || profile?.is_helper === true
+            || profile?.is_admin === true
+            || profile?.is_developer === true
+            || profile?.is_owner === true;
+
+        if (!profile || !hasStaffRole) {
+            location.replace("index.html");
             return false;
         }
 
         currentAdminUser = user;
-        const userId = String(user.id).trim().toLowerCase();
-        let role = normalizeStaffRole(user.app_metadata?.staff_role || user.app_metadata?.role);
-        let profileName = user.user_metadata?.username || user.email || "";
-        const roleLevel = { none: 0, helper: 1, admin: 2, developer: 3, owner: 4 };
-        const higherRole = (...roles) => roles
-            .map(normalizeStaffRole)
-            .reduce((best, candidate) =>
-                (roleLevel[candidate] || 0) > (roleLevel[best] || 0) ? candidate : best, "none");
+        currentAdminRole = profile.is_owner === true || role === "owner" ? "owner"
+            : profile.is_developer === true || role === "developer" ? "developer"
+            : profile.is_admin === true || role === "admin" ? "admin"
+            : "helper";
 
-        // Use the same trusted account/role checks that recognize the Owner account,
-        // while also allowing each protected profile flag to act as a fallback.
-        // Choose the highest trusted role found so stale lower-rank metadata cannot
-        // hide an enabled is_admin/is_developer/is_owner flag.
-        try {
-            const profileResult = await adminCheckWithTimeout(
-                supabaseClient.from("profiles")
-                    .select("id,username,is_helper,is_admin,is_developer,is_owner,staff_role")
-                    .eq("id", userId)
-                    .maybeSingle(),
-                "Loading your staff permissions"
-            );
-            if (!profileResult.error && profileResult.data) {
-                const profile = profileResult.data;
-                profileName = profile.username || profileName;
-                const flagRole = profile.is_owner === true ? "owner"
-                    : profile.is_developer === true ? "developer"
-                    : profile.is_admin === true ? "admin"
-                    : profile.is_helper === true ? "helper" : "none";
-                role = higherRole(role, profile.staff_role, flagRole);
-            } else if (profileResult.error) {
-                console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileResult.error);
-            }
-        } catch (profileError) {
-            console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileError);
-        }
-
-        // Verified UUIDs are the final fallback if profile data is unavailable.
-        const verifiedRole = verifiedStaffByUserId[userId] || "none";
-        role = higherRole(role, verifiedRole);
-
-        // Role hierarchy is deliberately light: any valid Helper+ role is admitted.
-        // Higher-risk cards remain hidden by applyStaffPermissions().
-        if (role === "none") {
-            currentAdminRole = "none";
-            loading.innerHTML = '<div class="error"><strong>This account does not have a Helper+ role.</strong><br><br>' +
-                'Signed-in account ID: <code>' + escapeHtml(userId) + '</code><br>' +
-                'Account: ' + escapeHtml(profileName || "Unknown") + '<br><br>' +
-                'Set this account\'s staff_role to helper, admin, developer, or owner in the profiles table, then refresh.</div>';
-            return false;
-        }
-
-        currentAdminRole = role;
         loading.style.display = "none";
         adminArea.style.display = "grid";
         applyStaffPermissions();
-
         const quickNav = document.getElementById("adminQuickNav");
-        if (quickNav) quickNav.style.display = "block";
+        if (quickNav) quickNav.style.display = currentAdminRole === "owner" ? "block" : "none";
         return true;
     } catch (error) {
-        console.error("DougHub admin account check failed:", error);
-        loading.innerHTML = '<div class="error"><strong>Could not verify your signed-in account.</strong><br><br>' +
-            escapeHtml(error?.message || "Unknown error") +
-            '<br><br><button type="button" class="back-button" onclick="location.reload()">Try again</button> ' +
-            '<a href="index.html" class="back-button">Back to DougHub</a></div>';
+        console.error("DougHub staff access check failed:", error);
+        location.replace("index.html");
         return false;
     }
 }
