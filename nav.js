@@ -328,7 +328,7 @@
       }
       const user = session.user;
       let profile = null;
-      const result = await client.from("profiles").select("username,avatar_url,is_admin")
+      const result = await client.from("profiles").select("username,avatar_url,is_admin,staff_role")
         .eq("id", user.id).maybeSingle();
       if (!result.error) profile = result.data;
       const username = profile?.username || user.user_metadata?.username ||
@@ -341,8 +341,23 @@
       } else {
         avatar.textContent = username.slice(0, 1).toUpperCase();
       }
-      if (adminLink) adminLink.style.display = profile?.is_admin ? "" : "none";
-      if (feedbackLink) feedbackLink.style.display = profile?.is_admin ? "" : "none";
+      // Staff roles are authoritative for the shared account menu. Keep the
+      // legacy is_admin flag as a compatibility fallback for older accounts.
+      const storedRole = String(profile?.staff_role || user.app_metadata?.staff_role || user.user_metadata?.staff_role || "").trim().toLowerCase();
+      const staffRole = storedRole && storedRole !== "none"
+        ? storedRole
+        : (profile?.is_admin === true ? "admin" : "none");
+      const staffRank = ({ none: 0, helper: 1, admin: 2, developer: 3, owner: 4 })[staffRole] || 0;
+      if (adminLink) {
+        adminLink.style.display = staffRank >= 1 ? "" : "none";
+        adminLink.href = "/admin.html";
+        adminLink.textContent = "Admin Panel";
+      }
+      if (feedbackLink) {
+        feedbackLink.style.display = staffRank >= 3 ? "" : "none";
+        feedbackLink.href = "/admin.html#feedbackManagementCard";
+        feedbackLink.textContent = "Feedback Inbox";
+      }
       try {
         sessionStorage.setItem("dh-account-display-v1", JSON.stringify({
           name: username, avatarText: profile?.avatar_url ? "" : username.slice(0, 1).toUpperCase(),
