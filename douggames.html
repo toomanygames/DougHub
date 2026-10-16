@@ -3938,12 +3938,12 @@ updateFeedbackCount();
  function selectVersion(key){
   const v=versions[key]||versions.classic;
   toggle.dataset.selected=key;
-  $("drivePigIcon").textContent=v.icon;
-  $("drivePigTitle").textContent=v.title;
-  $("drivePigDescription").textContent=v.description;
-  $("drivePigPlay").href=v.href;
-  $("drivePigPlay").innerHTML=v.button+' <span>→</span>';
-  $("drivePigStatus").textContent=v.status;
+  document.getElementById("drivePigIcon").textContent=v.icon;
+  document.getElementById("drivePigTitle").textContent=v.title;
+  document.getElementById("drivePigDescription").textContent=v.description;
+  document.getElementById("drivePigPlay").href=v.href;
+  document.getElementById("drivePigPlay").innerHTML=v.button+' <span>→</span>';
+  document.getElementById("drivePigStatus").textContent=v.status;
   buttons.forEach(b=>{const active=b.dataset.driveVersion===key;b.classList.toggle("active",active);b.setAttribute("aria-pressed",String(active));});
  }
  buttons.forEach(b=>b.addEventListener("click",()=>selectVersion(b.dataset.driveVersion)));
