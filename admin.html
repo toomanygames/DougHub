@@ -1901,7 +1901,7 @@ async function checkAdmin() {
         try {
             const profileResult = await adminCheckWithTimeout(
                 supabaseClient.from("profiles")
-                    .select("id,username,is_admin,staff_role")
+                    .select("id,username,is_helper,is_admin,is_developer,is_owner,staff_role")
                     .eq("id", userId)
                     .maybeSingle(),
                 "Loading your staff permissions"
@@ -1910,8 +1910,16 @@ async function checkAdmin() {
                 const profile = profileResult.data;
                 profileName = profile.username || profileName;
                 const profileRole = normalizeStaffRole(profile.staff_role);
-                if (profileRole !== "none") role = profileRole;
-                else if (profile.is_admin === true && role === "none") role = "admin";
+                // Explicit staff_role wins. Legacy boolean flags are fallbacks in
+                // descending rank order so older/manual profile setups still work.
+                if (profileRole !== "none") {
+                    role = profileRole;
+                } else if (role === "none") {
+                    if (profile.is_owner === true) role = "owner";
+                    else if (profile.is_developer === true) role = "developer";
+                    else if (profile.is_admin === true) role = "admin";
+                    else if (profile.is_helper === true) role = "helper";
+                }
             } else if (profileResult.error) {
                 console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileResult.error);
             }
