@@ -1894,10 +1894,16 @@ async function checkAdmin() {
         const userId = String(user.id).trim().toLowerCase();
         let role = normalizeStaffRole(user.app_metadata?.staff_role || user.app_metadata?.role);
         let profileName = user.user_metadata?.username || user.email || "";
+        const roleLevel = { none: 0, helper: 1, admin: 2, developer: 3, owner: 4 };
+        const higherRole = (...roles) => roles
+            .map(normalizeStaffRole)
+            .reduce((best, candidate) =>
+                (roleLevel[candidate] || 0) > (roleLevel[best] || 0) ? candidate : best, "none");
 
-        // Ask Supabase for the role attached to this exact authenticated UUID.
-        // If profile RLS or browser privacy blocks the query, keep checking trusted
-        // app metadata and the verified UUID list rather than failing the whole page.
+        // Use the same trusted account/role checks that recognize the Owner account,
+        // while also allowing each protected profile flag to act as a fallback.
+        // Choose the highest trusted role found so stale lower-rank metadata cannot
+        // hide an enabled is_admin/is_developer/is_owner flag.
         try {
             const profileResult = await adminCheckWithTimeout(
                 supabaseClient.from("profiles")
@@ -1909,17 +1915,11 @@ async function checkAdmin() {
             if (!profileResult.error && profileResult.data) {
                 const profile = profileResult.data;
                 profileName = profile.username || profileName;
-                const profileRole = normalizeStaffRole(profile.staff_role);
-                // Explicit staff_role wins. Legacy boolean flags are fallbacks in
-                // descending rank order so older/manual profile setups still work.
-                if (profileRole !== "none") {
-                    role = profileRole;
-                } else if (role === "none") {
-                    if (profile.is_owner === true) role = "owner";
-                    else if (profile.is_developer === true) role = "developer";
-                    else if (profile.is_admin === true) role = "admin";
-                    else if (profile.is_helper === true) role = "helper";
-                }
+                const flagRole = profile.is_owner === true ? "owner"
+                    : profile.is_developer === true ? "developer"
+                    : profile.is_admin === true ? "admin"
+                    : profile.is_helper === true ? "helper" : "none";
+                role = higherRole(role, profile.staff_role, flagRole);
             } else if (profileResult.error) {
                 console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileResult.error);
             }
@@ -1927,9 +1927,9 @@ async function checkAdmin() {
             console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileError);
         }
 
-        // Verified account IDs can still enter even if the role query is blocked.
+        // Verified UUIDs are the final fallback if profile data is unavailable.
         const verifiedRole = verifiedStaffByUserId[userId] || "none";
-        if (role === "none" && verifiedRole !== "none") role = verifiedRole;
+        role = higherRole(role, verifiedRole);
 
         // Role hierarchy is deliberately light: any valid Helper+ role is admitted.
         // Higher-risk cards remain hidden by applyStaffPermissions().
