@@ -5405,6 +5405,14 @@ async function startAdminPanel() {
         loadChatGroupModeration(),
     ]);
 
+    // Account-menu links can open the feedback inbox directly.
+    if (location.hash === "#feedbackManagementCard" && ["developer","owner"].includes(currentAdminRole)) {
+        const feedbackCard = document.getElementById("feedbackManagementCard");
+        if (feedbackCard) {
+            feedbackCard.style.display = "";
+            requestAnimationFrame(() => feedbackCard.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
+    }
 }
 
 
