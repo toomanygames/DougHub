@@ -1853,18 +1853,24 @@ async function checkAdmin() {
             "Loading your staff profile"
         );
 
-        if (profileResult.error) throw profileResult.error;
-        const profile = profileResult.data;
+        // The account dropdown can recognize a server-managed app_metadata role
+        // even when the profiles row is missing or temporarily unreadable. Use
+        // app_metadata only as a trusted fallback; never trust user_metadata.
+        const profile = profileResult.error ? null : profileResult.data;
+        if (profileResult.error) {
+            console.warn("Could not read staff profile; checking trusted app_metadata fallback:", profileResult.error);
+        }
 
-        // A profile may have staff_role="none" by default even when is_admin=true.
-        // Normalize the role and always honor legacy admin accounts as Admin.
         const storedRole = String(profile?.staff_role || "").trim().toLowerCase();
-        currentAdminRole = storedRole && storedRole !== "none"
+        const appRole = String(session.user.app_metadata?.staff_role || "").trim().toLowerCase();
+        currentAdminRole = (storedRole && storedRole !== "none")
             ? storedRole
-            : (profile?.is_admin === true ? "admin" : "none");
+            : (appRole && appRole !== "none"
+                ? appRole
+                : (profile?.is_admin === true ? "admin" : "none"));
 
-        if (!profile || !["helper","admin","developer","owner"].includes(currentAdminRole)) {
-            loading.innerHTML = '<div class="error">Access denied.<br><br>This account is not an admin.</div>';
+        if (!["helper","admin","developer","owner"].includes(currentAdminRole)) {
+            loading.innerHTML = '<div class="error">Access denied.<br><br>This account does not have a recognized staff role. If the Admin Panel button is visible, refresh your session and check the staff role saved in Supabase.</div>';
             return false;
         }
 
