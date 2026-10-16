@@ -632,6 +632,7 @@ button:disabled {
 .staff-rank-grid span{font-size:11px;line-height:1.4;color:#9ca3c8}
 .rank-helper,.rank-admin,.rank-developer,.rank-owner{width:max-content;max-width:100%;font-size:10px;letter-spacing:.08em;border-radius:7px;padding:5px 7px}
 .rank-helper{color:#86efac;background:#22c55e18}.rank-admin{color:#93c5fd;background:#3b82f618}.rank-developer{color:#c4b5fd;background:#8b5cf618}.rank-owner{color:#fcd34d;background:#f59e0b18}
+.staff-rank-help{margin:0;color:var(--muted,#a5accb);font-size:.82rem;line-height:1.45;}
 .staff-manage-form{border:1px solid #ffffff12;border-radius:14px;padding:14px;background:#05081788}
 .staff-input{width:100%;min-width:0;padding:11px 12px;border:1px solid #ffffff18;border-radius:10px;background:#080b1b;color:#f4f4ff;font:inherit;font-size:13px}
 .staff-current-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
@@ -1352,11 +1353,16 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
   <div class="staff-manage-form">
     <label class="admin-field-label" for="staffTarget">Account</label>
     <select id="staffTarget" class="staff-input"><option value="">Loading accounts…</option></select>
-    <label class="admin-field-label" for="staffRole">New rank</label>
+    <label class="admin-field-label" for="staffRole">New rank (promote or demote)</label>
     <select id="staffRole" class="staff-input">
-      <option value="none">No staff role</option><option value="helper">Helper</option><option value="admin">Admin</option><option value="developer">Developer</option><option value="owner">Owner</option>
+      <option value="none">Normal user — remove staff rank</option>
+      <option value="helper">Helper</option>
+      <option value="admin">Admin</option>
+      <option value="developer">Developer</option>
+      <option value="owner">Owner</option>
     </select>
-    <div class="admin-card-actions"><span id="staffManageStatus" class="status">Owner access required.</span><button id="saveStaffRoleButton" type="button" class="save-button">Update staff rank</button></div>
+    <p class="staff-rank-help">Choose any rank to promote or demote the selected account. Choose “Normal user” to remove their staff rank entirely.</p>
+    <div class="admin-card-actions"><span id="staffManageStatus" class="status">Owner access required.</span><button id="saveStaffRoleButton" type="button" class="save-button">Save rank change</button></div>
   </div>
   <div class="staff-current-list" id="staffCurrentList"></div>
 </div>
@@ -5159,7 +5165,7 @@ async function saveStaffRole(){
     if(!savedUser||savedUser.staff_role!==role||savedUser.is_admin!==["admin","developer","owner"].includes(role)){
       throw new Error("The server updated the request, but the refreshed profile does not match. Refresh and check Supabase.");
     }
-    status.textContent="@"+(data.username||savedUser.username||"Account")+" saved as "+staffRoleLabel(role)+" in Supabase.";
+    status.textContent="@"+(data.username||savedUser.username||"Account")+(role==="none"?" demoted to Normal user.":" rank changed to "+staffRoleLabel(role)+".")+" Saved in Supabase.";
     await writeAuditLog("admin_action","users","Changed staff role",{targetUserId:target,role});
   }catch(error){status.textContent="Could not save rank: "+(error.message||"Staff promotion endpoint unavailable.");}
   finally{button.disabled=false;}
