@@ -371,7 +371,9 @@
       }
       // Staff roles are authoritative for the shared account menu. Keep the
       // legacy is_admin flag as a compatibility fallback for older accounts.
-      const storedRole = String(profile?.staff_role || user.app_metadata?.staff_role || user.user_metadata?.staff_role || "").trim().toLowerCase();
+      // Only use server-controlled profile/app metadata for staff access.
+      // user_metadata is user-editable and must never grant a staff link.
+      const storedRole = String(profile?.staff_role || user.app_metadata?.staff_role || "").trim().toLowerCase();
       const staffRole = storedRole && storedRole !== "none"
         ? storedRole
         : (profile?.is_admin === true ? "admin" : "none");
