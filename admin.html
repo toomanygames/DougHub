@@ -1356,8 +1356,6 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
     <select id="staffRole" class="staff-input">
       <option value="none">No staff role</option><option value="helper">Helper</option><option value="admin">Admin</option><option value="developer">Developer</option><option value="owner">Owner</option>
     </select>
-    <label class="admin-field-label" for="staffPassword">Owner confirmation password</label>
-    <input id="staffPassword" class="staff-input" type="password" autocomplete="off" placeholder="Enter confirmation password">
     <div class="admin-card-actions"><span id="staffManageStatus" class="status">Owner access required.</span><button id="saveStaffRoleButton" type="button" class="save-button">Update staff rank</button></div>
   </div>
   <div class="staff-current-list" id="staffCurrentList"></div>
@@ -5145,20 +5143,25 @@ function renderStaffManager(){
 }
 async function saveStaffRole(){
   const status=document.getElementById("staffManageStatus"),button=document.getElementById("saveStaffRoleButton");
-  const target=document.getElementById("staffTarget").value,role=document.getElementById("staffRole").value,password=document.getElementById("staffPassword").value;
+  const target=document.getElementById("staffTarget").value,role=document.getElementById("staffRole").value;
   if(currentAdminRole!=="owner"){status.textContent="Only the Owner can change staff ranks.";return;}
   if(!target){status.textContent="Choose an account first.";return;}
-  if(!password){status.textContent="Enter the Owner confirmation password.";return;}
   if(target===currentAdminUser.id&&role!=="owner"){status.textContent="The Owner account cannot demote itself.";return;}
-  button.disabled=true;status.textContent="Verifying Owner access…";
+  button.disabled=true;status.textContent="Saving rank to Supabase…";
   try{
-    const {data,error}=await supabaseClient.functions.invoke("promote-doughub-staff",{body:{target_user_id:target,desired_role:role,confirmation_password:password}});
+    const {data,error}=await supabaseClient.functions.invoke("promote-doughub-staff",{body:{target_user_id:target,desired_role:role}});
     if(error)throw error;
-    document.getElementById("staffPassword").value="";
-    status.textContent="@"+(data?.username||"Account")+" updated to "+staffRoleLabel(role)+".";
+    if(!data?.ok||data?.verified!==true||data?.staff_role!==role){
+      throw new Error(data?.error||"Supabase did not confirm that the rank was saved.");
+    }
     await loadUsers();
+    const savedUser=allUsers.find(user=>user.id===target);
+    if(!savedUser||savedUser.staff_role!==role||savedUser.is_admin!==["admin","developer","owner"].includes(role)){
+      throw new Error("The server updated the request, but the refreshed profile does not match. Refresh and check Supabase.");
+    }
+    status.textContent="@"+(data.username||savedUser.username||"Account")+" saved as "+staffRoleLabel(role)+" in Supabase.";
     await writeAuditLog("admin_action","users","Changed staff role",{targetUserId:target,role});
-  }catch(error){status.textContent="Could not update role: "+(error.message||"Staff promotion endpoint unavailable.");}
+  }catch(error){status.textContent="Could not save rank: "+(error.message||"Staff promotion endpoint unavailable.");}
   finally{button.disabled=false;}
 }
 document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveStaffRole);
