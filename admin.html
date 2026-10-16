@@ -1997,20 +1997,28 @@ async function setOgBadge(user, award, button) {
         alert("Only Admins, Developers, and Owners can manage OG badges.");
         return;
     }
-    const badges = Array.isArray(user.reward_badges) ? [...user.reward_badges] : [];
-    const nextBadges = award ? [...new Set([...badges, "og"])] : badges.filter(badge => badge !== "og");
+
     button.disabled = true;
     button.textContent = award ? "Awarding…" : "Removing…";
     try {
-        const { error } = await supabaseClient.from("profiles").update({ reward_badges: nextBadges }).eq("id", user.id);
+        // Use a narrowly scoped, server-side function so RLS cannot silently
+        // ignore the update. It verifies staff permissions and changes only OG.
+        const { data, error } = await supabaseClient.rpc("admin_set_og_badge", {
+            target_user_id: user.id,
+            award
+        });
         if (error) throw error;
-        user.reward_badges = nextBadges;
+        if (!Array.isArray(data)) {
+            throw new Error("Supabase did not confirm the saved badge list. Please refresh and try again.");
+        }
+
+        user.reward_badges = data;
         window.dispatchEvent(new Event("douqhub:og-badges-updated"));
         renderUsers();
-        usersStatus.textContent = (award ? "OG badge awarded to @" : "OG badge removed from @") + (user.username || "User") + ".";
+        usersStatus.textContent = (award ? "OG badge awarded to @" : "OG badge removed from @") + (user.username || "User") + ". Saved successfully.";
     } catch (error) {
         console.error("Could not update OG badge:", error);
-        alert("Couldn't update the OG badge: " + (error.message || "Unknown error"));
+        alert("Couldn't save the OG badge: " + (error.message || "Unknown error"));
         button.disabled = false;
         button.textContent = award ? "★ Give OG" : "★ Remove OG";
     }
