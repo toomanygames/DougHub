@@ -1330,6 +1330,16 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 <div id="adminArea" style="display:none;">
 
 
+<div class="card" id="feedbackManagementCard">
+  <h2>📬 Feedback Inbox</h2>
+  <p class="admin-card-help">Review user feedback. Developer+ staff can close items when they have been handled. Closing removes the item from the inbox.</p>
+  <div class="admin-card-actions">
+    <span id="feedbackManagementStatus" class="status">Feedback not loaded yet.</span>
+    <button type="button" id="refreshFeedbackButton">↻ Refresh</button>
+  </div>
+  <div id="feedbackManagementList" class="admin-scroll-area" aria-live="polite"><div class="empty">Loading feedback…</div></div>
+</div>
+
 <div class="card staff-management-card" id="staffManagementCard" style="display:none">
   <h2>🛡️ Staff & Permissions</h2>
   <p class="admin-card-help">Manage the staff ladder. Only the Owner account should be able to change roles. Promotions use the protected staff-role endpoint.</p>
@@ -1840,9 +1850,14 @@ async function checkAdmin() {
         if (profileResult.error) throw profileResult.error;
         const profile = profileResult.data;
 
-        currentAdminRole = profile?.staff_role || (profile?.is_admin ? "admin" : "none");
+        // A profile may have staff_role="none" by default even when is_admin=true.
+        // Normalize the role and always honor legacy admin accounts as Admin.
+        const storedRole = String(profile?.staff_role || "").trim().toLowerCase();
+        currentAdminRole = storedRole && storedRole !== "none"
+            ? storedRole
+            : (profile?.is_admin === true ? "admin" : "none");
 
-        if (!profile || (profile.is_admin !== true && !["helper","admin","developer","owner"].includes(profile.staff_role))) {
+        if (!profile || !["helper","admin","developer","owner"].includes(currentAdminRole)) {
             loading.innerHTML = '<div class="error">Access denied.<br><br>This account is not an admin.</div>';
             return false;
         }
@@ -5017,7 +5032,7 @@ function applyStaffPermissions(){
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
     if(/staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
-    if(/codeprojects|code projects|sitefeaturecard/.test(id))return 3;
+    if(/feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
     if(/userwarningscard|recentwarningscard|user warnings|recent warnings|group moderation/.test(id+" "+title))return 1;
     if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
@@ -5239,6 +5254,68 @@ async function loadChatGroupModeration() {
 }
 document.getElementById("refreshChatGroupsButton")?.addEventListener("click", loadChatGroupModeration);
 
+async function loadFeedback() {
+    const status = document.getElementById("feedbackManagementStatus");
+    const list = document.getElementById("feedbackManagementList");
+    if (!status || !list) return;
+    status.textContent = "Loading feedback…";
+    list.replaceChildren();
+    const { data, error } = await supabaseClient
+        .from("feedback")
+        .select("id,username,message,created_at")
+        .order("created_at", { ascending: false });
+    if (error) {
+        status.textContent = "Could not load feedback: " + (error.message || "Database error");
+        list.innerHTML = '<div class="empty">Feedback could not be loaded. Check staff permissions and refresh.</div>';
+        return;
+    }
+    const items = data || [];
+    status.textContent = items.length + " open item" + (items.length === 1 ? "" : "s");
+    if (!items.length) {
+        list.innerHTML = '<div class="empty">🎉 No open feedback. You are all caught up.</div>';
+        return;
+    }
+    items.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "feedback-admin-item";
+        card.style.cssText = "padding:13px;margin:8px 0;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.025)";
+        const head = document.createElement("div");
+        head.style.cssText = "display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:8px";
+        const who = document.createElement("strong");
+        who.textContent = "@" + (item.username || "Unknown user");
+        who.style.cssText = "font-size:12px;color:#e0e7ff;overflow-wrap:anywhere";
+        const date = document.createElement("time");
+        date.dateTime = item.created_at || "";
+        date.textContent = item.created_at ? new Date(item.created_at).toLocaleString() : "Date unknown";
+        date.style.cssText = "font-size:10px;color:#8d93b3";
+        head.append(who, date);
+        const message = document.createElement("p");
+        message.textContent = item.message || "(Empty feedback)";
+        message.style.cssText = "margin:0 0 12px;color:#d7d9ec;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere";
+        const close = document.createElement("button");
+        close.type = "button";
+        close.textContent = "✓ Close feedback";
+        close.style.cssText = "padding:7px 10px;font-size:11px;background:rgba(34,197,94,.13);border:1px solid rgba(74,222,128,.25);color:#bbf7d0";
+        close.addEventListener("click", async () => {
+            if (!confirm("Close this feedback item? It will be permanently removed from the inbox.")) return;
+            close.disabled = true;
+            close.textContent = "Closing…";
+            const { error: closeError } = await supabaseClient.from("feedback").delete().eq("id", item.id);
+            if (closeError) {
+                status.textContent = "Could not close feedback: " + (closeError.message || "Database error");
+                close.disabled = false;
+                close.textContent = "✓ Close feedback";
+                return;
+            }
+            await writeAuditLog("admin_action", "feedback", "Closed feedback from @" + (item.username || "Unknown user"), { feedbackId: item.id });
+            await loadFeedback();
+        });
+        card.append(head, message, close);
+        list.appendChild(card);
+    });
+}
+document.getElementById("refreshFeedbackButton")?.addEventListener("click", loadFeedback);
+
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -5268,6 +5345,7 @@ async function startAdminPanel() {
         loadDougTubeVideos(),
         loadDougHubMusicModeration(),
         loadDougBaseAccessRequests(),
+        loadFeedback(),
         loadCodeProjects(),
         loadSiteFeatures(),
         loadSiteEvents(),
