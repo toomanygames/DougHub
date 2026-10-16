@@ -1361,7 +1361,9 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
       <option value="developer">Developer</option>
       <option value="owner">Owner</option>
     </select>
-    <p class="staff-rank-help">Choose any rank to promote or demote the selected account. Choose “Normal user” to remove their staff rank entirely.</p>
+    <p class="staff-rank-help">Choose any rank to promote or demote an account. Doug's Owner account is permanently protected and cannot be changed.</p>
+    <label class="admin-field-label" for="staffConfirmPassword">Confirm your Owner password</label>
+    <input id="staffConfirmPassword" class="staff-input" type="password" autocomplete="current-password" placeholder="Enter your password to confirm" required>
     <div class="admin-card-actions"><span id="staffManageStatus" class="status">Owner access required.</span><button id="saveStaffRoleButton" type="button" class="save-button">Save rank change</button></div>
   </div>
   <div class="staff-current-list" id="staffCurrentList"></div>
@@ -2076,16 +2078,24 @@ function renderUsers() {
 
         const buttons = document.createElement("div");
         buttons.className = "buttons";
-        const banButton = document.createElement("button");
-        banButton.className = "ban-button";
-        banButton.type = "button";
-        banButton.textContent = "🚫 Ban";
-        banButton.addEventListener("click", function() {
-            banUser.value = user.id;
-            document.getElementById("banReason").focus();
-            document.getElementById("banUser").scrollIntoView({behavior:"smooth",block:"center"});
-        });
-        buttons.appendChild(banButton);
+        if (user.id === DOUGHUB_OWNER_ID) {
+            const protectedBadge = document.createElement("span");
+            protectedBadge.className = "staff-role-pill";
+            protectedBadge.textContent = "OWNER · PROTECTED";
+            protectedBadge.title = "This account cannot be banned, suspended, demoted, or deleted.";
+            buttons.appendChild(protectedBadge);
+        } else {
+            const banButton = document.createElement("button");
+            banButton.className = "ban-button";
+            banButton.type = "button";
+            banButton.textContent = "🚫 Ban";
+            banButton.addEventListener("click", function() {
+                banUser.value = user.id;
+                document.getElementById("banReason").focus();
+                document.getElementById("banUser").scrollIntoView({behavior:"smooth",block:"center"});
+            });
+            buttons.appendChild(banButton);
+        }
         if (["admin","developer","owner"].includes(currentAdminRole)) {
             const ogButton = document.createElement("button");
             ogButton.type = "button";
@@ -2108,6 +2118,13 @@ function renderUsers() {
             bannedList.innerHTML = '<div class="empty">No banned or suspended users.</div>';
         }
         bannedUsers.forEach(user => {
+            if (user.id === DOUGHUB_OWNER_ID) {
+                const protectedItem = document.createElement("div");
+                protectedItem.className = "user-item";
+                protectedItem.textContent = "Doug's Owner account is protected. No ban, suspension, unban, or deletion controls are available.";
+                bannedList.appendChild(protectedItem);
+                return;
+            }
             const item = document.createElement("div");
             item.className = "user-item";
             const top = document.createElement("div");
@@ -2160,6 +2177,10 @@ function renderUsers() {
 }
 
 async function deleteBannedAccount(userId) {
+    if (userId === DOUGHUB_OWNER_ID) {
+        alert("Doug's Owner account is permanently protected and cannot be deleted.");
+        return;
+    }
     const user = allUsers.find(item => item.id === userId && item.is_banned);
     if (!user) {
         alert("Could not find that banned account. Refresh the list and try again.");
@@ -2496,6 +2517,11 @@ async function banAccount() {
 
     const selectedUser = allUsers.find(user => user.id === userId);
 
+    if (userId === DOUGHUB_OWNER_ID) {
+        alert("Doug's Owner account is permanently protected from bans and suspensions.");
+        return;
+    }
+
     if (!selectedUser) {
         alert("Could not find that user.");
         return;
@@ -2601,6 +2627,11 @@ async function banAccount() {
 
 
 async function unbanAccount(userId) {
+
+    if (userId === DOUGHUB_OWNER_ID) {
+        alert("Doug's Owner account is permanently protected and cannot be unbanned or otherwise moderated here.");
+        return;
+    }
 
     const user =
         allUsers.find(
@@ -5131,6 +5162,7 @@ function applyStaffPermissions(){
   renderGroups();
 }
 
+const DOUGHUB_OWNER_ID = "f145067b-724c-40aa-9ab1-60ddaa351d27";
 function staffRoleLabel(role){return ({none:"No staff role",helper:"Helper",admin:"Admin",developer:"Developer",owner:"Owner"})[role]||"No staff role";}
 function renderStaffManager(){
   const card=document.getElementById("staffManagementCard");
@@ -5142,7 +5174,7 @@ function renderStaffManager(){
   if(!isOwner)return;
   const previous=select.value;
   select.innerHTML='<option value="">Choose an account…</option>';
-  allUsers.forEach(user=>{const o=document.createElement("option");o.value=user.id;o.textContent="@"+(user.username||"User")+" · "+staffRoleLabel(user.staff_role||"none");select.appendChild(o);});
+  allUsers.forEach(user=>{if(user.id===DOUGHUB_OWNER_ID)return;const o=document.createElement("option");o.value=user.id;o.textContent="@"+(user.username||"User")+" · "+staffRoleLabel(user.staff_role||"none");select.appendChild(o);});
   if(previous&&allUsers.some(u=>u.id===previous))select.value=previous;
   const staff=allUsers.filter(u=>u.staff_role&&u.staff_role!=="none");
   list.innerHTML=staff.length?staff.map(u=>'<div class="staff-current-item"><span>@'+escapeHtml(u.username||"User")+'</span><span class="staff-role-pill">'+escapeHtml(staffRoleLabel(u.staff_role).toUpperCase())+'</span></div>').join(""):'<div class="empty">No staff accounts assigned yet.</div>';
@@ -5150,12 +5182,15 @@ function renderStaffManager(){
 async function saveStaffRole(){
   const status=document.getElementById("staffManageStatus"),button=document.getElementById("saveStaffRoleButton");
   const target=document.getElementById("staffTarget").value,role=document.getElementById("staffRole").value;
+  const passwordInput=document.getElementById("staffConfirmPassword");
+  const confirmationPassword=passwordInput?.value||"";
   if(currentAdminRole!=="owner"){status.textContent="Only the Owner can change staff ranks.";return;}
   if(!target){status.textContent="Choose an account first.";return;}
-  if(target===currentAdminUser.id&&role!=="owner"){status.textContent="The Owner account cannot demote itself.";return;}
-  button.disabled=true;status.textContent="Saving rank to Supabase…";
+  if(target===DOUGHUB_OWNER_ID){status.textContent="Doug's Owner account is permanently protected.";return;}
+  if(!confirmationPassword){status.textContent="Enter your Owner password to confirm this change.";passwordInput?.focus();return;}
+  button.disabled=true;status.textContent="Verifying password and saving rank…";
   try{
-    const {data,error}=await supabaseClient.functions.invoke("promote-doughub-staff",{body:{target_user_id:target,desired_role:role}});
+    const {data,error}=await supabaseClient.functions.invoke("promote-doughub-staff",{body:{target_user_id:target,desired_role:role,confirmation_password:confirmationPassword}});
     if(error)throw error;
     if(!data?.ok||data?.verified!==true||data?.staff_role!==role){
       throw new Error(data?.error||"Supabase did not confirm that the rank was saved.");
@@ -5168,7 +5203,7 @@ async function saveStaffRole(){
     status.textContent="@"+(data.username||savedUser.username||"Account")+(role==="none"?" demoted to Normal user.":" rank changed to "+staffRoleLabel(role)+".")+" Saved in Supabase.";
     await writeAuditLog("admin_action","users","Changed staff role",{targetUserId:target,role});
   }catch(error){status.textContent="Could not save rank: "+(error.message||"Staff promotion endpoint unavailable.");}
-  finally{button.disabled=false;}
+  finally{if(passwordInput)passwordInput.value="";button.disabled=false;}
 }
 document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveStaffRole);
 
