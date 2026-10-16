@@ -1853,15 +1853,28 @@ async function checkAdmin() {
     loading.style.display = "block";
     adminArea.style.display = "none";
 
+    // Verified IDs are a fallback only. The live staff role in profiles is the
+    // normal source so Helper+ staff don't get locked out by an outdated list.
+    const verifiedStaffByUserId = Object.freeze({
+        "f145067b-724c-40aa-9ab1-60ddaa351d27": "owner",
+        "213562dc-4f57-4bad-8e33-22a2fc553895": "helper",
+        "b9ee5a6e-821d-4f76-a06a-4e1511c58909": "helper"
+    });
+
+    const normalizeStaffRole = (value) => {
+        const role = String(value || "").trim().toLowerCase().replace(/[^a-z+]/g, "");
+        if (role === "owner" || role === "owner+") return "owner";
+        if (role === "developer" || role === "developer+") return "developer";
+        if (role === "admin" || role === "admin+") return "admin";
+        if (role === "helper" || role === "helper+") return "helper";
+        return "none";
+    };
+
     try {
-        // Authorization is based on the immutable Supabase Auth user UUID.
-        // Do not depend on a profiles SELECT succeeding in order to let known
-        // staff into the panel: browser privacy/RLS errors can break that lookup.
-        const verifiedStaffByUserId = Object.freeze({
-            "f145067b-724c-40aa-9ab1-60ddaa351d27": "owner",
-            "213562dc-4f57-4bad-8e33-22a2fc553895": "helper",
-            "b9ee5a6e-821d-4f76-a06a-4e1511c58909": "helper"
-        });
+        if (!supabaseClient?.auth) {
+            await waitForSharedSupabaseClient();
+        }
+        if (!supabaseClient?.auth) throw new Error("DougHub authentication did not initialize. Refresh and try again.");
 
         const sessionResult = await adminCheckWithTimeout(
             supabaseClient.auth.getSession(),
@@ -1869,49 +1882,59 @@ async function checkAdmin() {
         );
         if (sessionResult.error) throw sessionResult.error;
 
-        const session = sessionResult.data?.session;
-        if (!session?.user?.id) {
+        const user = sessionResult.data?.session?.user;
+        if (!user?.id) {
             currentAdminUser = null;
             currentAdminRole = "none";
             loading.innerHTML = 'You are not signed in. <a href="log-in.html?redirect=admin.html" class="back-button">Log in</a>';
             return false;
         }
 
-        currentAdminUser = session.user;
-        const authenticatedUserId = String(session.user.id).trim().toLowerCase();
+        currentAdminUser = user;
+        const userId = String(user.id).trim().toLowerCase();
+        let role = normalizeStaffRole(user.app_metadata?.staff_role || user.app_metadata?.role);
+        let profileName = user.user_metadata?.username || user.email || "";
 
-        // This ID allowlist is the gate. A profile role, username, user_metadata,
-        // or a client-provided permission value cannot grant access.
-        const matchedStaffRole = verifiedStaffByUserId[authenticatedUserId] || "";
-        if (!matchedStaffRole) {
-            currentAdminRole = "none";
-            loading.innerHTML = '<div class="error"><strong>Access denied: this signed-in account ID is not on the staff allowlist.</strong><br><br>' +
-                'Signed-in account ID: <code>' + escapeHtml(authenticatedUserId) + '</code><br><br>' +
-                'Sign in with the account assigned to DougHub staff, or update the verified staff ID map in admin.html.</div>';
-            return false;
-        }
-
-        // Use the role attached to the verified UUID for the panel's existing
-        // Helper+/Admin+/Owner UI rules. The profile lookup below is cosmetic only.
-        currentAdminRole = matchedStaffRole;
-
+        // Ask Supabase for the role attached to this exact authenticated UUID.
+        // If profile RLS or browser privacy blocks the query, keep checking trusted
+        // app metadata and the verified UUID list rather than failing the whole page.
         try {
             const profileResult = await adminCheckWithTimeout(
                 supabaseClient.from("profiles")
-                    .select("username")
-                    .eq("id", authenticatedUserId)
+                    .select("id,username,is_admin,staff_role")
+                    .eq("id", userId)
                     .maybeSingle(),
-                "Loading your staff profile"
+                "Loading your staff permissions"
             );
-            if (profileResult.error) {
-                console.warn("Staff access verified by user ID; profile display lookup failed:", profileResult.error);
+            if (!profileResult.error && profileResult.data) {
+                const profile = profileResult.data;
+                profileName = profile.username || profileName;
+                const profileRole = normalizeStaffRole(profile.staff_role);
+                if (profileRole !== "none") role = profileRole;
+                else if (profile.is_admin === true && role === "none") role = "admin";
+            } else if (profileResult.error) {
+                console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileResult.error);
             }
         } catch (profileError) {
-            // Profile display is not part of authorization; do not lock out a
-            // verified staff UUID if this optional request is blocked or times out.
-            console.warn("Staff access verified by user ID; skipping unavailable profile lookup:", profileError);
+            console.warn("Staff profile lookup unavailable; trying verified account fallback:", profileError);
         }
 
+        // Verified account IDs can still enter even if the role query is blocked.
+        const verifiedRole = verifiedStaffByUserId[userId] || "none";
+        if (role === "none" && verifiedRole !== "none") role = verifiedRole;
+
+        // Role hierarchy is deliberately light: any valid Helper+ role is admitted.
+        // Higher-risk cards remain hidden by applyStaffPermissions().
+        if (role === "none") {
+            currentAdminRole = "none";
+            loading.innerHTML = '<div class="error"><strong>This account does not have a Helper+ role.</strong><br><br>' +
+                'Signed-in account ID: <code>' + escapeHtml(userId) + '</code><br>' +
+                'Account: ' + escapeHtml(profileName || "Unknown") + '<br><br>' +
+                'Set this account\'s staff_role to helper, admin, developer, or owner in the profiles table, then refresh.</div>';
+            return false;
+        }
+
+        currentAdminRole = role;
         loading.style.display = "none";
         adminArea.style.display = "grid";
         applyStaffPermissions();
