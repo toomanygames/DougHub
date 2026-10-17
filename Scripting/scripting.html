@@ -70,6 +70,16 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 
 
 .bottom-grid,.publish-launch-card,.publish-footnote{display:none!important}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.publish-top-btn{white-space:nowrap}
+.workspace-zoom-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 13px;border-bottom:1px solid var(--dh-line);background:#080a18a8}
+.workspace-zoom-controls label{display:flex;align-items:center;gap:7px;font-size:12px;color:#cbd1e8;font-weight:750}
+.workspace-zoom-controls label strong{color:#c4b5fd;min-width:40px}
+.workspace-zoom-controls input[type=range]{width:min(220px,38vw);accent-color:#8b5cf6}
+#blockWorkspace{min-height:480px;max-height:720px;overflow:auto;padding:18px}
+#blockWorkspace .code-block{transform-origin:top left}
+@media(max-width:600px){.toolbar-actions{width:100%}.toolbar-actions .publish-top-btn{flex:1}.workspace-zoom-controls{gap:8px}#blockWorkspace{min-height:400px;max-height:620px}}
 .mode-switch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #myProjectsBtn{white-space:nowrap}
 .compact-publish-row{display:flex;justify-content:flex-end;margin:8px 0 18px}
@@ -95,7 +105,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   </section>
   <section class="toolbar">
     <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code">⌘ Code editor</button><button class="mode-btn" data-mode="blocks">🧩 Visual blocks</button><button class="btn small" id="myProjectsBtn" type="button">▦ My Projects</button></div>
-    <div class="toolbar-actions"><button class="btn primary" id="runBtn">▶ Run preview</button><button class="btn" id="resetBtn">Reset preview</button><span id="status" role="status">Ready</span></div>
+    <div class="toolbar-actions"><button class="btn primary" id="runBtn">▶ Run preview</button><button class="btn" id="resetBtn">Reset preview</button><button class="btn primary publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button><span id="status" role="status">Ready</span></div>
   </section>
   <section id="codeMode" class="editor-layout">
     <div class="panel code-panel">
@@ -130,13 +140,13 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     </aside>
     <section class="panel workspace-panel">
       <div class="panel-head"><div><span class="panel-kicker">YOUR PROGRAM</span><h2>Block workspace</h2></div><div class="workspace-actions"><button class="btn small" id="generateBtn">Generate JS ↻</button><button class="btn small danger" id="clearBlocksBtn">Clear blocks</button></div></div>
-      <div class="workspace-hint">Blocks run from top to bottom. Add blocks from the library on the left.</div>
+      <div class="workspace-hint">Blocks run from top to bottom. Add blocks from the library on the left.</div><div class="workspace-zoom-controls"><label for="blockZoom">Block size <strong id="blockZoomValue">100%</strong></label><input id="blockZoom" type="range" min="75" max="160" step="5" value="100" aria-label="Block size"><button class="btn small" id="resetBlockZoom" type="button">Reset size</button></div>
       <div id="blockWorkspace" class="block-workspace"><div class="workspace-empty" id="workspaceEmpty"><span>🧩</span><b>Your script starts here</b><p>Add an event or statement block to begin.</p></div></div>
       <div class="generated-bar"><span><b>Generated JavaScript</b><small>Automatically sent to main.js</small></span><button class="btn small" id="viewGeneratedBtn">Open in code editor →</button></div>
       <pre id="generatedCode" class="generated-code">// Your generated JavaScript will appear here.</pre>
     </section>
   </section>
-  <div class="compact-publish-row"><button class="btn primary" id="openPublishDialog" type="button">Publish game ↗</button></div>
+
 
 
 </main>
@@ -164,6 +174,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="publish-dialog-actions"><button class="btn" id="cancelPublishDialog" type="button">Cancel</button><button class="btn primary" id="publishProjectBtn" type="submit">Publish to Community Games ↗</button></div>
   </form>
 </dialog>
-<script src="scripting.js?v=6"></script>
+<script src="scripting.js?v=7"></script>
 </body>
 </html>
