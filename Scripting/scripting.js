@@ -275,4 +275,6 @@ renderLibrary();renderBlocks();loadAccount();
 if(!new URLSearchParams(location.hash.slice(1)).get("project")){
  restore();renderFile();renderLibrary();renderBlocks();updateGenerated();
 }else loadProjectFromUrl();
+// Initialize Blockly only after the library scripts and restored project state are ready.
+initBlockly();
 })();
