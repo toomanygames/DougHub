@@ -258,14 +258,21 @@
       const button = account.querySelector("#accountButton");
       const menu = account.querySelector("#accountMenu");
       const logout = account.querySelector("#logoutButton");
+      // Hover opens the menu temporarily. Clicking pins it open until the
+      // user clicks outside the account area or presses Escape.
+      let clickPinned = false;
       const setOpen = open => {
         menu?.classList.toggle("show", open);
         menu?.setAttribute("aria-hidden", String(!open));
         button?.setAttribute("aria-expanded", String(open));
       };
+      account.addEventListener("mouseenter", () => {
+        if (!clickPinned) setOpen(true);
+      });
+      account.addEventListener("mouseleave", () => {
+        if (!clickPinned) setOpen(false);
+      });
       // Resolve the session before deciding what an account click should do.
-      // This prevents the brief pre-auth "Loading…" button from opening an
-      // account dropdown for guests instead of taking them to the login page.
       // Capture first so legacy page-specific handlers cannot toggle it too.
       button?.addEventListener("click", async event => {
         event.preventDefault();
@@ -282,13 +289,20 @@
           location.href = "/log-in.html?redirect=" + redirect;
           return;
         }
-        setOpen(!menu?.classList.contains("show"));
+        clickPinned = !clickPinned;
+        setOpen(clickPinned || account.matches(":hover"));
       }, true);
       document.addEventListener("click", event => {
-        if (!event.target.closest(".dh-shared-account")) setOpen(false);
+        if (!event.target.closest(".dh-shared-account")) {
+          clickPinned = false;
+          setOpen(false);
+        }
       });
       document.addEventListener("keydown", event => {
-        if (event.key === "Escape") setOpen(false);
+        if (event.key === "Escape") {
+          clickPinned = false;
+          setOpen(false);
+        }
       });
       logout?.addEventListener("click", async event => {
         event.preventDefault();
