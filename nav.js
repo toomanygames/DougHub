@@ -702,8 +702,8 @@
     const style=document.createElement("style");
     style.id="dh-quick-find-style";
     style.textContent=[
-      "#dh-quick-find-launcher{position:fixed;left:18px;bottom:18px;z-index:2147483000;display:flex;gap:9px;align-items:center;padding:11px 15px;border:1px solid #a5b4fc66;border-radius:999px;background:rgba(13,17,39,.97);backdrop-filter:blur(16px);color:#f5f5ff;font:800 13px Arial;box-shadow:0 12px 34px #0006;cursor:pointer}",
-      "#dh-quick-find-launcher:hover{background:#20234b}",
+      "#dh-quick-find-launcher{position:relative;flex:0 0 auto;display:inline-flex;gap:5px;align-items:center;justify-content:center;padding:7px 9px;border:1px solid #a5b4fc44;border-radius:9px;background:#6366f11a;color:#e8e9ff;font:700 12px Arial;white-space:nowrap;cursor:pointer;line-height:1.2}",
+      "#dh-quick-find-launcher:hover{background:#6366f133;border-color:#a5b4fc88}",
       "#dh-quick-find-overlay{position:fixed;inset:0;z-index:2147483002;background:#02040acc;backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:9vh 16px 24px}",
       "#dh-quick-find-overlay.open{display:flex}",
       "#dh-quick-find-dialog{width:min(650px,100%);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #a5b4fc66;border-radius:20px;background:#0b0e20;color:#f5f5ff;box-shadow:0 30px 100px #000a;font:14px/1.5 Arial}",
@@ -722,7 +722,7 @@
       "#dh-quick-find-footer button{border:0;background:none;color:#c4b5fd;font:inherit;cursor:pointer}",
       ".dh-quick-settings{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid #a5b4fc55;border-radius:10px;background:#6366f122;color:#e8e9ff!important;text-decoration:none!important;font:800 12px Arial;white-space:nowrap}",
       ".dh-quick-settings:hover{background:#6366f144!important}",
-      "@media(max-width:600px){#dh-quick-find-launcher{left:12px;bottom:64px;padding:10px 12px}#dh-quick-find-overlay{padding-top:7vh}.dh-qf-category{display:none}}"
+      "@media(max-width:600px){#dh-quick-find-launcher{padding:7px 8px;font-size:11px}#dh-quick-find-overlay{padding-top:7vh}.dh-qf-category{display:none}}"
     ].join("");
     document.head.appendChild(style);
     const pages=[
@@ -743,15 +743,18 @@
       ["Help / Guided tour","#tour","Walk through the controls on this page","Help","❔","tutorial guide help how to"]
     ].map(x=>({title:x[0],url:x[1],desc:x[2],cat:x[3],icon:x[4],tags:x[5]}));
     const launcher=document.createElement("button");
-    launcher.id="dh-quick-find-launcher";launcher.type="button";launcher.textContent="⌕  Find anything  ·  Ctrl K";
+    launcher.id="dh-quick-find-launcher";launcher.type="button";launcher.textContent="⌕ Find";launcher.title="Find anything in DougHub (Ctrl+K or /)";
     launcher.setAttribute("aria-haspopup","dialog");launcher.setAttribute("aria-label","Find any DougHub page or tool");
-    document.body.appendChild(launcher);
     const header=document.querySelector("header");
-    if(header&&!header.querySelector(".dh-quick-settings")){
-      const settings=document.createElement("a");settings.className="dh-quick-settings";settings.href="/settings.html";settings.textContent="⚙ Settings";
-      const nav=header.querySelector(".nav,nav[aria-label='Main navigation']");
-      if(nav){const account=nav.querySelector(".dh-shared-account,.account-area");nav.insertBefore(settings,account||null);}
-      else{settings.style.marginLeft="auto";header.appendChild(settings);}
+    const nav=header&&header.querySelector(".nav,nav[aria-label='Main navigation']");
+    if(nav){
+      const account=nav.querySelector(".dh-shared-account,.account-area");
+      nav.insertBefore(launcher,account||null);
+    }else{
+      launcher.style.position="fixed";
+      launcher.style.right="12px";
+      launcher.style.bottom="12px";
+      document.body.appendChild(launcher);
     }
     const overlay=document.createElement("div");overlay.id="dh-quick-find-overlay";
     const dialog=document.createElement("section");dialog.id="dh-quick-find-dialog";dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");dialog.setAttribute("aria-label","Find anything in DougHub");
