@@ -125,23 +125,23 @@ function generateBlocklyBlock(block){
   const statements=(b,name)=>chain(input(b,name));
   function generateOne(b){
     switch(b.type){
-      case "dh_when_start":return 'document.addEventListener("DOMContentLoaded", async () => {\\n'+statements(b,"DO")+"});\\n";
-      case "dh_log":return "console.log("+q(b.getFieldValue("MESSAGE"))+");\\n";
-      case "dh_alert":return "alert("+q(b.getFieldValue("MESSAGE"))+");\\n";
-      case "dh_set_text":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.textContent = "+q(b.getFieldValue("TEXT"))+";\\n";
-      case "dh_set_background":return "document.body.style.backgroundColor = "+q(b.getFieldValue("COLOUR"))+";\\n";
-      case "dh_move_sprite":return "{ const el=document.querySelector("+q(b.getFieldValue("SELECTOR"))+"); if(el){el.style.position=el.style.position||'absolute';el.style.left="+Number(b.getFieldValue("X"))+"+'px';el.style.top="+Number(b.getFieldValue("Y"))+"+'px';} }\\n";
-      case "dh_add_class":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.classList.add("+q(b.getFieldValue("CLASS"))+");\\n";
-      case "dh_show_hide":return "{const el=document.querySelector("+q(b.getFieldValue("SELECTOR"))+");if(el)el.style.display="+q(b.getFieldValue("ACTION")==="hide"?"none":"")+";}\\n";
-      case "dh_set_colour":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.style.setProperty('color',"+q(b.getFieldValue("COLOUR"))+");\\n";
-      case "dh_set_size":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.style.setProperty('transform','scale("+Math.max(10,Math.min(300,Number(b.getFieldValue("SIZE"))||100))/100+")');\\n";
-      case "dh_create_element":return "{const el=document.createElement("+q(b.getFieldValue("TAG"))+");el.textContent="+q(b.getFieldValue("TEXT"))+";document.body.appendChild(el);}\\n";
-      case "dh_wait":return "await new Promise(resolve=>setTimeout(resolve,"+Math.max(0,Math.min(60000,Number(b.getFieldValue("SECONDS"))*1000||0))+"));\\n";
-      case "controls_repeat_ext":return "for(let repeatIndex=0;repeatIndex<Math.max(0,Math.min(1000,Number("+value(b,"TIMES","5")+ ")||0));repeatIndex++){\\n"+statements(b,"DO")+"}\\n";
-      case "controls_whileUntil":return "while("+value(b,"BOOL","false")+"){\\n"+statements(b,"DO")+"break;\\n}\\n";
-      case "controls_if":{let out="if("+value(b,"IF0","false")+"){\\n"+statements(b,"DO0")+"}";for(let i=1;i<8;i++){if(!b.getInput("IF"+i))break;out+=" else if("+value(b,"IF"+i,"false")+"){\\n"+statements(b,"DO"+i)+"}";}if(b.getInput("ELSE"))out+=" else {\\n"+statements(b,"ELSE")+"}";return out+"\\n";}
-      case "text_print":return "console.log("+value(b,"TEXT","''")+");\\n";
-      default:return "// Unsupported block: "+b.type+"\\n";
+      case "dh_when_start":return 'document.addEventListener("DOMContentLoaded", async () => {\n'+statements(b,"DO")+"});\n";
+      case "dh_log":return "console.log("+q(b.getFieldValue("MESSAGE"))+");\n";
+      case "dh_alert":return "alert("+q(b.getFieldValue("MESSAGE"))+");\n";
+      case "dh_set_text":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.textContent = "+q(b.getFieldValue("TEXT"))+";\n";
+      case "dh_set_background":return "document.body.style.backgroundColor = "+q(b.getFieldValue("COLOUR"))+";\n";
+      case "dh_move_sprite":return "{ const el=document.querySelector("+q(b.getFieldValue("SELECTOR"))+"); if(el){el.style.position=el.style.position||'absolute';el.style.left="+Number(b.getFieldValue("X"))+"+'px';el.style.top="+Number(b.getFieldValue("Y"))+"+'px';} }\n";
+      case "dh_add_class":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.classList.add("+q(b.getFieldValue("CLASS"))+");\n";
+      case "dh_show_hide":return "{const el=document.querySelector("+q(b.getFieldValue("SELECTOR"))+");if(el)el.style.display="+q(b.getFieldValue("ACTION")==="hide"?"none":"")+";}\n";
+      case "dh_set_colour":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.style.setProperty('color',"+q(b.getFieldValue("COLOUR"))+");\n";
+      case "dh_set_size":return "document.querySelector("+q(b.getFieldValue("SELECTOR"))+")?.style.setProperty('transform','scale("+Math.max(10,Math.min(300,Number(b.getFieldValue("SIZE"))||100))/100+")');\n";
+      case "dh_create_element":return "{const el=document.createElement("+q(b.getFieldValue("TAG"))+");el.textContent="+q(b.getFieldValue("TEXT"))+";document.body.appendChild(el);}\n";
+      case "dh_wait":return "await new Promise(resolve=>setTimeout(resolve,"+Math.max(0,Math.min(60000,Number(b.getFieldValue("SECONDS"))*1000||0))+"));\n";
+      case "controls_repeat_ext":return "for(let repeatIndex=0;repeatIndex<Math.max(0,Math.min(1000,Number("+value(b,"TIMES","5")+ ")||0));repeatIndex++){\n"+statements(b,"DO")+"}\n";
+      case "controls_whileUntil":return "while("+value(b,"BOOL","false")+"){\n"+statements(b,"DO")+"break;\n}\n";
+      case "controls_if":{let out="if("+value(b,"IF0","false")+"){\n"+statements(b,"DO0")+"}";for(let i=1;i<8;i++){if(!b.getInput("IF"+i))break;out+=" else if("+value(b,"IF"+i,"false")+"){\n"+statements(b,"DO"+i)+"}";}if(b.getInput("ELSE"))out+=" else {\n"+statements(b,"ELSE")+"}";return out+"\n";}
+      case "text_print":return "console.log("+value(b,"TEXT","''")+");\n";
+      default:return "// Unsupported block: "+b.type+"\n";
     }
   }
   return generateOne(block);
