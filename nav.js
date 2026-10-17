@@ -702,7 +702,7 @@
     const style=document.createElement("style");
     style.id="dh-quick-find-style";
     style.textContent=[
-      "#dh-quick-find-launcher{position:relative;flex:0 0 auto;display:inline-flex;gap:5px;align-items:center;justify-content:center;padding:7px 9px;border:1px solid #a5b4fc44;border-radius:9px;background:#6366f11a;color:#e8e9ff;font:700 12px Arial;white-space:nowrap;cursor:pointer;line-height:1.2}",
+      "#dh-quick-find-launcher{position:relative;flex:0 0 auto;display:inline-flex;gap:5px;align-items:center;justify-content:center;margin-left:10px;padding:7px 11px;border:1px solid #a5b4fc44;border-radius:10px;background:linear-gradient(135deg,#6366f122,#a855f718);color:#e8e9ff;font:700 12px Arial;white-space:nowrap;cursor:pointer;line-height:1.2;box-shadow:inset 0 1px #ffffff08}",
       "#dh-quick-find-launcher:hover{background:#6366f133;border-color:#a5b4fc88}",
       "#dh-quick-find-overlay{position:fixed;inset:0;z-index:2147483002;background:#02040acc;backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:9vh 16px 24px}",
       "#dh-quick-find-overlay.open{display:flex}",
@@ -748,12 +748,11 @@
     const header=document.querySelector("header");
     const nav=header&&header.querySelector(".nav,nav[aria-label='Main navigation']");
     if(nav){
-      // Keep Find visually grouped with the primary navigation links.
-      const novaLink=nav.querySelector('a[href="/nova.html"]');
+      // Keep Find in its own separated utility spot, after the page links and before the account menu.
       const account=nav.querySelector(".dh-shared-account,.account-area");
-      if(novaLink&&novaLink.nextSibling) nav.insertBefore(launcher,novaLink.nextSibling);
-      else if(novaLink) nav.appendChild(launcher);
-      else nav.insertBefore(launcher,account||null);
+      if(account) nav.insertBefore(launcher,account);
+      else nav.appendChild(launcher);
+      launcher.setAttribute("aria-label","Find anything in DougHub");
     }else{
       launcher.style.position="fixed";
       launcher.style.right="12px";
