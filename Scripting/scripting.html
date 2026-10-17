@@ -69,7 +69,24 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 @media(max-width:760px){.my-projects-list{grid-template-columns:1fr}.scene-builder-grid{grid-template-columns:1fr}.scene-stage{min-height:140px}.dougcode-hero{padding:16px}.project-name-card{flex:auto;width:100%}#codeEditor{height:300px}.preview-wrap{height:300px}}
 
 
-.bottom-grid,.publish-launch-card,.publish-footnote{display:none!important}
+.bottom-grid,.publish-launch-card,.publish-footnote,.dougcode-hero{display:none!important}
+.project-name-inline{display:flex;align-items:center;gap:8px;min-width:220px;max-width:300px}
+.project-name-inline label{font-size:11px;color:#c4b5fd;font-weight:800;white-space:nowrap}
+.project-name-inline input{width:100%;min-width:0;padding:8px 10px;font-size:12px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.publish-top-btn{white-space:nowrap}
+.scene-builder{padding:0!important;overflow:hidden}
+.scene-builder-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border:0;border-radius:0;background:linear-gradient(110deg,#11152d,#0a0c1b);color:#f5f6ff;text-align:left;cursor:pointer}
+.scene-builder-toggle:hover{background:linear-gradient(110deg,#191d3d,#101329)}
+.scene-builder-toggle-copy{display:flex;flex-direction:column;gap:4px;min-width:0}
+.scene-builder-toggle-title{font-size:14px;font-weight:850}
+.scene-builder-toggle-help{font-size:11px;font-weight:500;color:#a5aecb;line-height:1.45}
+.scene-builder-chevron{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid #a5b4fc35;border-radius:10px;background:#ffffff08;color:#c4b5fd;font-size:23px;transition:transform .18s ease}
+.scene-builder-toggle[aria-expanded="true"] .scene-builder-chevron{transform:rotate(90deg)}
+.scene-builder-content{padding:14px;border-top:1px solid var(--dh-line)}
+.scene-builder-content[hidden]{display:none!important}
+@media(max-width:600px){.project-name-inline{max-width:none;width:100%}.toolbar-actions{width:100%}.toolbar-actions .publish-top-btn{flex:1}}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .publish-top-btn{white-space:nowrap}
@@ -94,16 +111,9 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   <div class="top-actions"><button class="btn" id="saveBtn">Save project</button><button class="btn" id="downloadBtn">Export HTML</button></div>
 </header>
 <main class="wrap">
-  <section class="page-heading dougcode-hero">
-    <div class="hero-copy">
-      <div class="eyebrow">DOUGHUB CREATOR STUDIO</div>
-      <h1>Make something <span>playable.</span></h1>
-      <p>DougCode is DougHub's game-building workspace. Write code or build with visual blocks, test your game instantly, then share it with the Community Games players.</p>
-      <div class="creator-capabilities"><span>Code editor</span><span>Visual blocks</span><span>Live preview</span><span>Community publishing</span></div>
-    </div>
-    <div class="project-name project-name-card"><label for="projectName">YOUR PROJECT</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"><small>Your work autosaves in this browser.</small></div>
-  </section>
   <section class="toolbar">
+    <div class="project-name-inline"><label for="projectName">Project</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"></div>
+
     <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code">⌘ Code editor</button><button class="mode-btn" data-mode="blocks">🧩 Visual blocks</button><button class="btn small" id="myProjectsBtn" type="button">▦ My Projects</button></div>
     <div class="toolbar-actions"><button class="btn primary" id="runBtn">▶ Run preview</button><button class="btn" id="resetBtn">Reset preview</button><button class="btn primary publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button><span id="status" role="status">Ready</span></div>
   </section>
