@@ -126,6 +126,12 @@
         transform-origin:top right;transition:opacity .18s ease,transform .18s ease,visibility .18s;
         z-index:99999;
       }
+      /* Invisible bridge fills the gap between the account button and dropdown,
+         so the pointer can travel down without triggering mouseleave. */
+      .dh-shared-account .account-menu::before {
+        content:"";position:absolute;left:0;right:0;bottom:100%;height:12px;
+        background:transparent;pointer-events:auto;
+      }
       .dh-shared-account .account-menu.show {
         opacity:1;visibility:visible;transform:translateY(0) scale(1);
       }
