@@ -267,15 +267,30 @@
       // Hover opens the menu temporarily. Clicking pins it open until the
       // user clicks outside the account area or presses Escape.
       let clickPinned = false;
+      let hoverOpenTimer = null;
+      const cancelHoverOpen = () => {
+        if (hoverOpenTimer !== null) {
+          clearTimeout(hoverOpenTimer);
+          hoverOpenTimer = null;
+        }
+      };
       const setOpen = open => {
         menu?.classList.toggle("show", open);
         menu?.setAttribute("aria-hidden", String(!open));
         button?.setAttribute("aria-expanded", String(open));
       };
       account.addEventListener("mouseenter", () => {
-        if (!clickPinned) setOpen(true);
+        if (clickPinned) return;
+        cancelHoverOpen();
+        // A tiny hover-intent delay filters out accidental fly-bys without
+        // making the menu feel slow when someone deliberately points at it.
+        hoverOpenTimer = setTimeout(() => {
+          hoverOpenTimer = null;
+          if (account.matches(":hover") && !clickPinned) setOpen(true);
+        }, 130);
       });
       account.addEventListener("mouseleave", () => {
+        cancelHoverOpen();
         if (!clickPinned) setOpen(false);
       });
       // Resolve the session before deciding what an account click should do.
@@ -301,12 +316,14 @@
       document.addEventListener("click", event => {
         if (!event.target.closest(".dh-shared-account")) {
           clickPinned = false;
+          cancelHoverOpen();
           setOpen(false);
         }
       });
       document.addEventListener("keydown", event => {
         if (event.key === "Escape") {
           clickPinned = false;
+          cancelHoverOpen();
           setOpen(false);
         }
       });
