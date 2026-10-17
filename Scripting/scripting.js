@@ -184,8 +184,12 @@ $("addFileForm").addEventListener("submit",e=>{e.preventDefault();const ext=$("n
 $("codeEditor").addEventListener("input",()=>{saveCurrentFile();});
 $("codeEditor").addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const el=e.currentTarget,start=el.selectionStart,end=el.selectionEnd;el.setRangeText("  ",start,end,"end");saveCurrentFile();}if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runPreview();}});
 document.querySelectorAll(".mode-btn").forEach(btn=>btn.addEventListener("click",()=>setMode(btn.dataset.mode)));
-$("runBtn").addEventListener("click",runPreview);
-$("resetBtn").addEventListener("click",()=>{$("previewFrame").srcdoc="";$("previewEmpty").hidden=false;$("previewStatus").textContent="Preview reset";setStatus("Preview reset");});
+function openPreview(){saveCurrentFile();const d=$("previewDialog");if(d&&typeof d.showModal==="function")d.showModal();else if(d)d.setAttribute("open","");runPreview();}
+$("previewBtn").addEventListener("click",openPreview);
+$("refreshPreviewBtn")?.addEventListener("click",runPreview);
+$("closePreviewBtn")?.addEventListener("click",()=>{const d=$("previewDialog");if(d?.close)d.close();else d?.removeAttribute("open");});
+$("previewDialog")?.addEventListener("click",e=>{if(e.target===$("previewDialog"))$("previewDialog").close();});
+$("resetBtn").addEventListener("click",()=>{$("previewFrame").srcdoc="";$("previewEmpty").hidden=false;$("previewStatus").textContent="Preview reset";setStatus("Preview reset");$("studioMore")?.removeAttribute("open");});
 $("saveBtn").addEventListener("click",saveProject);
 $("downloadBtn").addEventListener("click",exportHTML);
 $("copyCodeBtn").addEventListener("click",copyCurrent);
@@ -201,7 +205,7 @@ blockZoomSlider?.addEventListener("input",()=>applyBlockZoom(blockZoomSlider.val
 $("resetBlockZoom")?.addEventListener("click",()=>applyBlockZoom(100));
 applyBlockZoom(100);
 $("viewGeneratedBtn").addEventListener("click",()=>{if(!blocks.length){setStatus("Add blocks first to generate JavaScript",true);return;}files.js=$("generatedCode").textContent;activeFile="js";renderFile();setMode("code");$("codeEditor").focus();});
-$("openPreviewBtn").addEventListener("click",()=>{saveCurrentFile();const w=window.open("about:blank","_blank");if(!w){setStatus("Allow pop-ups to open the preview",true);return;}w.document.open();w.document.write(buildDocument());w.document.close();setStatus("Preview opened in a new tab");});
+
 
 
 const PROJECTS_KEY="doughub_scripting_projects_v1";
@@ -258,7 +262,7 @@ async function communityPublish(){
 const publishDialog=$("publishGameDialog");
 function openPublishDialog(){if(!publishDialog)return;const title=$("communityTitle");if(title&&!title.value.trim())title.value=$("projectName").value.trim().slice(0,80);if(typeof publishDialog.showModal==="function")publishDialog.showModal();else publishDialog.setAttribute("open","");setTimeout(()=>title?.focus(),50);}
 function closePublishDialog(){if(!publishDialog)return;if(typeof publishDialog.close==="function")publishDialog.close();else publishDialog.removeAttribute("open");}
-$("openPublishDialog")?.addEventListener("click",openPublishDialog);
+$("openPublishDialog")?.addEventListener("click",()=>{document.querySelector(".studio-more")?.removeAttribute("open");openPublishDialog();});
 $("closePublishDialog")?.addEventListener("click",closePublishDialog);
 $("cancelPublishDialog")?.addEventListener("click",closePublishDialog);
 publishDialog?.addEventListener("click",event=>{if(event.target===publishDialog)closePublishDialog();});
