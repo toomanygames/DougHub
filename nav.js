@@ -697,10 +697,107 @@
     document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!card.hidden)close();});
   }
 
+  function installQuickFind() {
+    if (document.getElementById("dh-quick-find-launcher")) return;
+    const style=document.createElement("style");
+    style.id="dh-quick-find-style";
+    style.textContent=[
+      "#dh-quick-find-launcher{position:fixed;left:18px;bottom:18px;z-index:2147483000;display:flex;gap:9px;align-items:center;padding:11px 15px;border:1px solid #a5b4fc66;border-radius:999px;background:rgba(13,17,39,.97);backdrop-filter:blur(16px);color:#f5f5ff;font:800 13px Arial;box-shadow:0 12px 34px #0006;cursor:pointer}",
+      "#dh-quick-find-launcher:hover{background:#20234b}",
+      "#dh-quick-find-overlay{position:fixed;inset:0;z-index:2147483002;background:#02040acc;backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:9vh 16px 24px}",
+      "#dh-quick-find-overlay.open{display:flex}",
+      "#dh-quick-find-dialog{width:min(650px,100%);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #a5b4fc66;border-radius:20px;background:#0b0e20;color:#f5f5ff;box-shadow:0 30px 100px #000a;font:14px/1.5 Arial}",
+      "#dh-quick-find-top{padding:16px;border-bottom:1px solid #ffffff12}",
+      "#dh-quick-find-top label{display:block;margin-bottom:9px;color:#a5b4fc;font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}",
+      "#dh-quick-find-input{width:100%;padding:14px;border:1px solid #ffffff20;border-radius:12px;outline:none;background:#050713;color:white;font:16px Arial;box-sizing:border-box}",
+      "#dh-quick-find-input:focus{border-color:#818cf8;box-shadow:0 0 0 3px #6366f133}",
+      "#dh-quick-find-results{overflow:auto;padding:8px}",
+      ".dh-qf-result{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:11px 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:white;cursor:pointer;font:inherit}",
+      ".dh-qf-result:hover,.dh-qf-result:focus-visible{outline:none;background:#ffffff0d;border-color:#a5b4fc44}",
+      ".dh-qf-icon{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:10px;background:#6366f133;font-size:17px}",
+      ".dh-qf-copy{min-width:0;flex:1}.dh-qf-copy strong,.dh-qf-copy small{display:block}.dh-qf-copy small{margin-top:2px;color:#a4a9c2;font-size:12px}",
+      ".dh-qf-category{font-size:10px;color:#a5b4fc;white-space:nowrap}",
+      "#dh-quick-find-empty{padding:28px 16px;text-align:center;color:#a4a9c2}",
+      "#dh-quick-find-footer{display:flex;justify-content:space-between;gap:12px;padding:11px 15px;border-top:1px solid #ffffff12;color:#9298b4;font-size:11px}",
+      "#dh-quick-find-footer button{border:0;background:none;color:#c4b5fd;font:inherit;cursor:pointer}",
+      ".dh-quick-settings{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid #a5b4fc55;border-radius:10px;background:#6366f122;color:#e8e9ff!important;text-decoration:none!important;font:800 12px Arial;white-space:nowrap}",
+      ".dh-quick-settings:hover{background:#6366f144!important}",
+      "@media(max-width:600px){#dh-quick-find-launcher{left:12px;bottom:64px;padding:10px 12px}#dh-quick-find-overlay{padding-top:7vh}.dh-qf-category{display:none}}"
+    ].join("");
+    document.head.appendChild(style);
+    const pages=[
+      ["Home","/index.html","Start here and explore DougHub","Start","⌂","home homepage explore"],
+      ["Dashboard","/dashboard.html","Your personal workspace and shortcuts","Your space","▦","workspace profile"],
+      ["Settings","/settings.html","Account preferences and site settings","Your space","⚙","settings preferences account"],
+      ["Games","/douggames.html","Browse games and find Game Maker","Play & create","🎮","games play"],
+      ["DougTools","/tools.html","Converters and everyday utilities","Tools","✳","tools converter calculator utilities"],
+      ["Nova AI","/nova.html","Ask questions and explore ideas","Tools","✧","ai assistant questions"],
+      ["DougCode / Game Maker","/dougcode.html","Build projects or make a game","Create","⌘","code coding editor project game maker"],
+      ["Community Chat","/chat.html","Talk with the DougHub community","Community","◌","chat messages conversation"],
+      ["DougForum","/dougforum.html","Browse discussions and ask questions","Community","☷","forum discussions posts"],
+      ["DougHub Music","/douqhub-music.html","Listen to community music","Entertainment","♫","music songs albums audio"],
+      ["DougTube","/dougtube.html","Watch and share videos","Entertainment","▶","youtube video watch"],
+      ["DougDrive","/dougdrive.html","Open your DougDrive files","Your space","▤","drive files storage"],
+      ["My Games & Videos","/my-games.html","Find your saved creations","Your space","▣","uploads creations videos"],
+      ["DMail","/DMail.html","Open direct messages","Community","✉","mail messages"],
+      ["Help / Guided tour","#tour","Walk through the controls on this page","Help","❔","tutorial guide help how to"]
+    ].map(x=>({title:x[0],url:x[1],desc:x[2],cat:x[3],icon:x[4],tags:x[5]}));
+    const launcher=document.createElement("button");
+    launcher.id="dh-quick-find-launcher";launcher.type="button";launcher.textContent="⌕  Find anything  ·  Ctrl K";
+    launcher.setAttribute("aria-haspopup","dialog");launcher.setAttribute("aria-label","Find any DougHub page or tool");
+    document.body.appendChild(launcher);
+    const header=document.querySelector("header");
+    if(header&&!header.querySelector(".dh-quick-settings")){
+      const settings=document.createElement("a");settings.className="dh-quick-settings";settings.href="/settings.html";settings.textContent="⚙ Settings";
+      const nav=header.querySelector(".nav,nav[aria-label='Main navigation']");
+      if(nav){const account=nav.querySelector(".dh-shared-account,.account-area");nav.insertBefore(settings,account||null);}
+      else{settings.style.marginLeft="auto";header.appendChild(settings);}
+    }
+    const overlay=document.createElement("div");overlay.id="dh-quick-find-overlay";
+    const dialog=document.createElement("section");dialog.id="dh-quick-find-dialog";dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");dialog.setAttribute("aria-label","Find anything in DougHub");
+    const top=document.createElement("div");top.id="dh-quick-find-top");
+    const label=document.createElement("label");label.htmlFor="dh-quick-find-input";label.textContent="DougHub Quick Find";
+    const input=document.createElement("input");input.id="dh-quick-find-input";input.type="search";input.placeholder="Search pages, tools, settings…";input.autocomplete="off";input.spellcheck=false;
+    top.append(label,input);
+    const results=document.createElement("div");results.id="dh-quick-find-results";
+    const footer=document.createElement("div");footer.id="dh-quick-find-footer";
+    const hint=document.createElement("span");hint.textContent="↑ ↓ browse · Enter open · Esc close";
+    const tour=document.createElement("button");tour.type="button";tour.textContent="Start page tutorial ↗";footer.append(hint,tour);
+    dialog.append(top,results,footer);overlay.appendChild(dialog);document.body.appendChild(overlay);
+    let selected=0,visible=[];
+    function close(){overlay.classList.remove("open");launcher.focus({preventScroll:true});}
+    function open(){overlay.classList.add("open");input.value="";selected=0;render();requestAnimationFrame(()=>input.focus());}
+    function openPage(p){close();if(p.url==="#tour"){const help=document.getElementById("dh-global-help");if(help)help.click();else location.href="/index.html?tutorial=1";}else location.href=p.url;}
+    function render(){
+      const q=input.value.trim().toLowerCase();
+      visible=pages.filter(p=>(p.title+" "+p.desc+" "+p.cat+" "+p.tags).toLowerCase().includes(q));
+      selected=Math.min(selected,Math.max(0,visible.length-1));results.replaceChildren();
+      if(!visible.length){const empty=document.createElement("div");empty.id="dh-quick-find-empty";empty.textContent="No matches. Try “settings”, “games”, “music” or “chat”.";results.appendChild(empty);return;}
+      visible.forEach((p,i)=>{
+        const b=document.createElement("button");b.type="button";b.className="dh-qf-result";b.style.background=i===selected?"#ffffff0d":"transparent";b.setAttribute("aria-selected",String(i===selected));
+        const icon=document.createElement("span");icon.className="dh-qf-icon";icon.textContent=p.icon;
+        const copy=document.createElement("span");copy.className="dh-qf-copy";const strong=document.createElement("strong");strong.textContent=p.title;const small=document.createElement("small");small.textContent=p.desc;copy.append(strong,small);
+        const cat=document.createElement("span");cat.className="dh-qf-category";cat.textContent=p.cat;b.append(icon,copy,cat);b.addEventListener("click",()=>openPage(p));results.appendChild(b);
+      });
+    }
+    launcher.addEventListener("click",open);
+    input.addEventListener("input",()=>{selected=0;render();});
+    input.addEventListener("keydown",e=>{if(e.key==="ArrowDown"){e.preventDefault();selected=Math.min(selected+1,visible.length-1);render();}else if(e.key==="ArrowUp"){e.preventDefault();selected=Math.max(0,selected-1);render();}else if(e.key==="Enter"&&visible[selected]){e.preventDefault();openPage(visible[selected]);}else if(e.key==="Escape"){e.preventDefault();close();}});
+    overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+    tour.addEventListener("click",()=>{close();const help=document.getElementById("dh-global-help");if(help)help.click();else location.href="/index.html?tutorial=1";});
+    document.addEventListener("keydown",e=>{
+      const active=document.activeElement;const typing=/INPUT|TEXTAREA|SELECT/.test(active?.tagName||"")||active?.isContentEditable;
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();open();}
+      else if(e.key==="/"&&!typing&&!overlay.classList.contains("open")){e.preventDefault();open();}
+      else if(e.key==="Escape"&&overlay.classList.contains("open"))close();
+    });
+  }
+
   function start() {
     addNavStyle();
     installHelpGuide();
     normalizePrimaryNav();
+    installQuickFind();
     startChatNotificationWatcher();
     removeRetiredNavLinks();
     markActiveLinks();
