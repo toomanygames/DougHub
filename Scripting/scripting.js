@@ -75,12 +75,15 @@ function updateLineCount(){const code=$("codeEditor").value;$("lineCount").textC
 function switchFile(file){saveCurrentFile();activeFile=file;renderFile();persist();}
 function saveCurrentFile(){files[activeFile]=$("codeEditor").value;updateLineCount();persist();}
 function buildDocument(){const html=files.html||"";const css=files.css||"";const js=files.js||"";return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<style>\n'+css+'\n</style>\n</head>\n<body>\n'+html+'\n<script>\n'+js.replace(/<\/script/gi,"<\\/script")+'\n</script>\n</body>\n</html>';}
-function runPreview(){saveCurrentFile();const frame=$("previewFrame");frame.srcdoc=buildDocument();$("previewEmpty").hidden=true;$("previewStatus").textContent="Preview refreshed at "+new Date().toLocaleTimeString();setStatus("Preview updated");}
+function runPreview(){saveCurrentFile();updateGenerated();const frame=$("previewFrame");if(frame)frame.srcdoc=buildDocument();if($("previewEmpty"))$("previewEmpty").hidden=true;if($("previewStatus"))$("previewStatus").textContent="Preview refreshed at "+new Date().toLocaleTimeString();setStatus("Preview updated");}
 function setMode(mode){currentMode=mode;document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$("codeMode").hidden=mode!=="code";$("blocksMode").hidden=mode!=="blocks";if(mode==="blocks"){renderLibrary();renderBlocks();}else renderFile();persist();}
 
-function addBlock(type){if(!blocklyWorkspace){setStatus("Blockly is still loading. Refresh and try again.",true);return;}const block=blocklyWorkspace.newBlock(type);block.initSvg();block.render();block.moveBy(24,24);updateGenerated();persist();}
-function renderLibrary(){/* The Blockly toolbox replaces the old custom block library. */}
-function blockCode(block){return generateBlocklyBlock(block);}
+function addBlock(type){const def=BLOCKS.find(b=>b.type===type);if(!def)return;const fields={};def.fields.forEach(([name,value])=>fields[name]=value);blocks.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),type,fields});renderBlocks();updateGenerated();persist();}
+function renderLibrary(){const box=$("blockLibrary");box.innerHTML="";const q=$("blockSearch").value.trim().toLowerCase();const found=BLOCKS.filter(b=>(activeCategory==="all"||b.cat===activeCategory)&&(b.label+" "+b.cat+" "+b.fields.map(x=>x[0]).join(" ")).toLowerCase().includes(q));if(!found.length){box.innerHTML='<div class="block-empty">No blocks match that search.</div>';return;}found.forEach(def=>{const btn=document.createElement("button");btn.type="button";btn.className="scratch-block "+def.cat;btn.textContent=def.label;btn.draggable=true;btn.title="Click or drag this block into your script";btn.addEventListener("click",()=>addBlock(def.type));btn.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",def.type);e.dataTransfer.effectAllowed="copy";});box.appendChild(btn);});}
+function blockCode(block){const def=BLOCKS.find(b=>b.type===block.type);if(!def)return "// Unknown block";const fields={};def.fields.forEach(([name,value])=>fields[name]=value);Object.assign(fields,block.fields||{});try{return def.code(fields);}catch(e){return "// Could not generate this block";}}
+function renderBlocks(){const box=$("blockWorkspace");box.innerHTML="";if(!blocks.length){const empty=document.createElement("div");empty.className="workspace-empty";empty.innerHTML='<span>🧩</span><b>Your script starts here</b><p>Add an event or statement block to begin.</p>';box.appendChild(empty);return;}blocks.forEach((block,index)=>{const def=BLOCKS.find(b=>b.type===block.type);if(!def)return;const row=document.createElement("div");row.className="code-block "+def.cat;row.draggable=true;row.dataset.index=String(index);const title=document.createElement("span");title.textContent=def.label;row.appendChild(title);(def.fields||[]).forEach(([name,defaultValue])=>{const input=document.createElement("input");input.value=(block.fields&&block.fields[name])??defaultValue;input.setAttribute("aria-label",name);input.title=name;input.addEventListener("input",()=>{block.fields=block.fields||{};block.fields[name]=input.value;updateGenerated();persist();});row.appendChild(input);});const remove=document.createElement("button");remove.type="button";remove.className="block-remove";remove.textContent="×";remove.title="Remove block";remove.setAttribute("aria-label","Remove "+def.label);remove.addEventListener("click",()=>{blocks.splice(index,1);renderBlocks();updateGenerated();persist();});row.appendChild(remove);row.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",String(index));e.dataTransfer.setData("application/x-doughub-block","move");row.classList.add("dragging");});row.addEventListener("dragend",()=>row.classList.remove("dragging"));row.addEventListener("dragover",e=>e.preventDefault());row.addEventListener("drop",e=>{e.preventDefault();const moving=Number(e.dataTransfer.getData("text/plain"));if(e.dataTransfer.getData("application/x-doughub-block")==="move"&&Number.isInteger(moving)&&moving!==index&&moving>=0&&moving<blocks.length){const [item]=blocks.splice(moving,1);blocks.splice(index,0,item);renderBlocks();updateGenerated();persist();}});box.appendChild(row);});}
+function updateGenerated(){const code=blocks.map(blockCode).join("\n\n");$("generatedCode").textContent=code||"// Add blocks to generate JavaScript.";if(blocks.length)files.js=code;persist();}
+
 let blocklyWorkspace=null;
 const BLOCKLY_XML_KEY="doughub_dougcode_blockly_xml_v1";
 function initBlockly(){
@@ -184,12 +187,12 @@ $("addFileForm").addEventListener("submit",e=>{e.preventDefault();const ext=$("n
 $("codeEditor").addEventListener("input",()=>{saveCurrentFile();});
 $("codeEditor").addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const el=e.currentTarget,start=el.selectionStart,end=el.selectionEnd;el.setRangeText("  ",start,end,"end");saveCurrentFile();}if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runPreview();}});
 document.querySelectorAll(".mode-btn").forEach(btn=>btn.addEventListener("click",()=>setMode(btn.dataset.mode)));
-function openPreview(){saveCurrentFile();const d=$("previewDialog");if(d&&typeof d.showModal==="function")d.showModal();else if(d)d.setAttribute("open","");runPreview();}
+function openPreview(){saveCurrentFile();runPreview();if(currentMode==="blocks"){const d=$("previewDialog");if(d&&typeof d.showModal==="function")d.showModal();else if(d)d.setAttribute("open","");}}
 $("previewBtn").addEventListener("click",openPreview);
 $("refreshPreviewBtn")?.addEventListener("click",runPreview);
 $("closePreviewBtn")?.addEventListener("click",()=>{const d=$("previewDialog");if(d?.close)d.close();else d?.removeAttribute("open");});
 $("previewDialog")?.addEventListener("click",e=>{if(e.target===$("previewDialog"))$("previewDialog").close();});
-$("resetBtn").addEventListener("click",()=>{$("previewFrame").srcdoc="";$("previewEmpty").hidden=false;$("previewStatus").textContent="Preview reset";setStatus("Preview reset");$("studioMore")?.removeAttribute("open");});
+
 $("saveBtn").addEventListener("click",saveProject);
 $("downloadBtn").addEventListener("click",exportHTML);
 $("copyCodeBtn").addEventListener("click",copyCurrent);
@@ -200,7 +203,7 @@ $("blockCategories")?.addEventListener("click",e=>{const btn=e.target.closest("[
 $("generateBtn").addEventListener("click",()=>{updateGenerated();setStatus("JavaScript generated from blocks");});
 $("clearBlocksBtn").addEventListener("click",()=>{blocks=[];renderBlocks();updateGenerated();setStatus("Block workspace cleared");});
 const blockZoomSlider=$("blockZoom"),blockZoomValue=$("blockZoomValue"),legacyBlockWorkspace=$("blockWorkspace");
-function applyBlockZoom(value){const zoom=Math.max(75,Math.min(160,Number(value)||100));if(legacyBlockWorkspace&&!blocklyWorkspace)legacyBlockWorkspace.style.zoom=zoom+"%";if(blockZoomValue)blockZoomValue.textContent=zoom+"%";if(blockZoomSlider)blockZoomSlider.value=String(zoom);}
+function applyBlockZoom(value){const zoom=Math.max(75,Math.min(160,Number(value)||100));if(legacyBlockWorkspace)legacyBlockWorkspace.style.zoom=zoom+"%";if(blockZoomValue)blockZoomValue.textContent=zoom+"%";if(blockZoomSlider)blockZoomSlider.value=String(zoom);}
 blockZoomSlider?.addEventListener("input",()=>applyBlockZoom(blockZoomSlider.value));
 $("resetBlockZoom")?.addEventListener("click",()=>applyBlockZoom(100));
 applyBlockZoom(100);
@@ -222,7 +225,7 @@ function applySceneToProject(){saveCurrentFile();const markup=scene.sprites.map(
 function escapeHtml(v){return String(v).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]))}
 function escapeAttr(v){return escapeHtml(v).replace(/'/g,"&#39;")}
 try{const saved=JSON.parse(localStorage.getItem("doughub_scripting_scene_v1")||"null");if(saved&&Array.isArray(saved.sprites))scene=saved}catch(_){}
-ensureMyProjects();ensureSceneBuilder();initBlockly();
+ensureMyProjects();ensureSceneBuilder();
 $("myProjectsBtn")?.addEventListener("click",()=>{renderMyProjects();$("myProjectsDialog").showModal()});
 
 /* Community Games publishing: playable output goes to Doug Games' community_games table. */
@@ -262,7 +265,7 @@ async function communityPublish(){
 const publishDialog=$("publishGameDialog");
 function openPublishDialog(){if(!publishDialog)return;const title=$("communityTitle");if(title&&!title.value.trim())title.value=$("projectName").value.trim().slice(0,80);if(typeof publishDialog.showModal==="function")publishDialog.showModal();else publishDialog.setAttribute("open","");setTimeout(()=>title?.focus(),50);}
 function closePublishDialog(){if(!publishDialog)return;if(typeof publishDialog.close==="function")publishDialog.close();else publishDialog.removeAttribute("open");}
-$("openPublishDialog")?.addEventListener("click",()=>{document.querySelector(".studio-more")?.removeAttribute("open");openPublishDialog();});
+$("openPublishDialog")?.addEventListener("click",openPublishDialog);
 $("closePublishDialog")?.addEventListener("click",closePublishDialog);
 $("cancelPublishDialog")?.addEventListener("click",closePublishDialog);
 publishDialog?.addEventListener("click",event=>{if(event.target===publishDialog)closePublishDialog();});
