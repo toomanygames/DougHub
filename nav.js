@@ -755,7 +755,7 @@
     }
     const overlay=document.createElement("div");overlay.id="dh-quick-find-overlay";
     const dialog=document.createElement("section");dialog.id="dh-quick-find-dialog";dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");dialog.setAttribute("aria-label","Find anything in DougHub");
-    const top=document.createElement("div");top.id="dh-quick-find-top");
+    const top=document.createElement("div");top.id="dh-quick-find-top";
     const label=document.createElement("label");label.htmlFor="dh-quick-find-input";label.textContent="DougHub Quick Find";
     const input=document.createElement("input");input.id="dh-quick-find-input";input.type="search";input.placeholder="Search pages, tools, settings…";input.autocomplete="off";input.spellcheck=false;
     top.append(label,input);
