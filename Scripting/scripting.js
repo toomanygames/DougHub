@@ -142,6 +142,11 @@ $("blockWorkspace").addEventListener("dragleave",e=>{if(!e.currentTarget.contain
 $("blockWorkspace").addEventListener("drop",e=>{e.preventDefault();e.currentTarget.classList.remove("drop-target");const type=e.dataTransfer.getData("text/plain");if(e.dataTransfer.getData("application/x-doughub-block")==="move")return;if(BLOCKS.some(b=>b.type===type))addBlock(type);});
 $("generateBtn").addEventListener("click",()=>{updateGenerated();setStatus("JavaScript generated from blocks");});
 $("clearBlocksBtn").addEventListener("click",()=>{blocks=[];renderBlocks();updateGenerated();setStatus("Block workspace cleared");});
+const blockZoomSlider=$("blockZoom"),blockZoomValue=$("blockZoomValue"),blockWorkspace=$("blockWorkspace");
+function applyBlockZoom(value){const zoom=Math.max(75,Math.min(160,Number(value)||100));if(blockWorkspace)blockWorkspace.style.zoom=zoom+"%";if(blockZoomValue)blockZoomValue.textContent=zoom+"%";if(blockZoomSlider)blockZoomSlider.value=String(zoom);}
+blockZoomSlider?.addEventListener("input",()=>applyBlockZoom(blockZoomSlider.value));
+$("resetBlockZoom")?.addEventListener("click",()=>applyBlockZoom(100));
+applyBlockZoom(100);
 $("viewGeneratedBtn").addEventListener("click",()=>{if(!blocks.length){setStatus("Add blocks first to generate JavaScript",true);return;}files.js=$("generatedCode").textContent;activeFile="js";renderFile();setMode("code");$("codeEditor").focus();});
 $("openPreviewBtn").addEventListener("click",()=>{saveCurrentFile();const w=window.open("about:blank","_blank");if(!w){setStatus("Allow pop-ups to open the preview",true);return;}w.document.open();w.document.write(buildDocument());w.document.close();setStatus("Preview opened in a new tab");});
 
