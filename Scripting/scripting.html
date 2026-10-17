@@ -104,6 +104,32 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 @media(max-width:600px){.compact-publish-row{justify-content:stretch}.compact-publish-row .btn{width:100%}}
 
 
+/* Compact toolbar and modal preview */
+.compact-studio-toolbar{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(8,10,24,.9);border:1px solid var(--dh-line);border-radius:15px}
+.studio-toolbar-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
+.compact-studio-toolbar .mode-switch{padding:3px;gap:3px;flex-wrap:nowrap}
+.compact-studio-toolbar .mode-btn{padding:8px 11px;font-size:12px;white-space:nowrap}
+.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{white-space:nowrap}
+.compact-studio-toolbar #status{font-size:10px;color:#a5b4fc;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.studio-more{position:relative}
+.studio-more>summary{list-style:none;cursor:pointer;user-select:none}
+.studio-more>summary::-webkit-details-marker{display:none}
+.studio-more-menu{position:absolute;right:0;top:calc(100% + 7px);z-index:50;display:grid;gap:4px;min-width:165px;padding:6px;border:1px solid #a5b4fc35;border-radius:12px;background:#0b0e20;box-shadow:0 15px 40px #0008}
+.studio-more-menu button{padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#e7e9ff;text-align:left;cursor:pointer;font-size:12px}
+.studio-more-menu button:hover{background:#ffffff10}
+#codeMode{grid-template-columns:minmax(0,1fr)!important}
+#codeMode .preview-panel{display:none!important}
+.preview-dialog{width:min(1200px,calc(100% - 24px));height:min(88vh,900px);max-height:92vh;padding:0;border:1px solid #a5b4fc55;border-radius:20px;background:#080a18;color:#f5f6ff;box-shadow:0 30px 100px #000b;overflow:hidden}
+.preview-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}
+.preview-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 17px;border-bottom:1px solid var(--dh-line);background:linear-gradient(130deg,#6366f11b,#a855f715)}
+.preview-dialog-head h2{font-size:19px;margin:3px 0 0}
+.preview-dialog-actions{display:flex;align-items:center;gap:7px}
+.preview-dialog-content{height:calc(100% - 61px);display:flex;flex-direction:column;padding:12px;gap:8px}
+.preview-dialog-content .preview-wrap{flex:1;min-height:0;height:auto!important}
+.preview-dialog-content .preview-wrap iframe{width:100%;height:100%;border:0;background:white;border-radius:12px}
+.preview-dialog-content .preview-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px}
+.preview-dialog-content .preview-footer{flex:0 0 auto}
+@media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-direction:column;gap:8px}.studio-toolbar-controls{margin-left:0;width:100%;gap:5px}.compact-studio-toolbar .mode-switch{flex:1}.compact-studio-toolbar .mode-btn{flex:1;padding:8px 7px}.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{flex:1}.compact-studio-toolbar #status{max-width:none}.preview-dialog{height:92vh}.preview-dialog-content{padding:8px}}
 /* Blockly-powered visual coding workspace */
 .blocks-layout{grid-template-columns:minmax(0,1fr)!important}
 .toolbox-panel{display:none!important}
@@ -129,11 +155,15 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   <div class="top-actions"><button class="btn" id="saveBtn">Save project</button><button class="btn" id="downloadBtn">Export HTML</button></div>
 </header>
 <main class="wrap">
-  <section class="toolbar">
+  <section class="toolbar compact-studio-toolbar">
     <div class="project-name-inline"><label for="projectName">Project</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"></div>
-
-    <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code">⌘ Code editor</button><button class="mode-btn" data-mode="blocks">🧩 Visual blocks</button><button class="btn small" id="myProjectsBtn" type="button">▦ My Projects</button></div>
-    <div class="toolbar-actions"><button class="btn primary" id="runBtn">▶ Run preview</button><button class="btn" id="resetBtn">Reset preview</button><button class="btn primary publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button><span id="status" role="status">Ready</span></div>
+    <div class="studio-toolbar-controls">
+      <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code">Code</button><button class="mode-btn" data-mode="blocks">Visual blocks</button></div>
+      <button class="btn small" id="myProjectsBtn" type="button">My Projects</button>
+      <button class="btn primary small" id="previewBtn" type="button">Preview</button>
+      <details class="studio-more"><summary class="btn small">More ▾</summary><div class="studio-more-menu"><button type="button" id="resetBtn">Reset preview</button><button type="button" id="openPublishDialog">Publish game ↗</button></div></details>
+    </div>
+    <span id="status" role="status">Ready</span>
   </section>
   <section id="codeMode" class="editor-layout">
     <div class="panel code-panel">
@@ -143,11 +173,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
       <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Source code" wrap="off"></textarea>
       <div class="editor-footer"><span>Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span><button class="text-btn" id="copyCodeBtn">Copy current file</button></div>
     </div>
-    <div class="panel preview-panel">
-      <div class="panel-head"><div><span class="panel-kicker">LIVE OUTPUT</span><h2>Preview</h2></div><button class="btn small" id="openPreviewBtn">Open separately ↗</button></div>
-      <div class="preview-wrap"><iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Write some code, then press Run preview.</span></div></div>
-      <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewStatus">Preview hasn't run yet</span></div>
-    </div>
+
   </section>
   <section id="blocksMode" class="blocks-layout" hidden>
     <aside class="panel toolbox-panel">
@@ -178,6 +204,13 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 
 
 </main>
+<dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewDialogTitle">
+  <div class="preview-dialog-head"><div><span class="panel-kicker">LIVE OUTPUT</span><h2 id="previewDialogTitle">Preview</h2></div><div class="preview-dialog-actions"><button class="btn small" id="refreshPreviewBtn" type="button">Refresh</button><button class="btn small" id="closePreviewBtn" type="button">Close ✕</button></div></div>
+  <div class="preview-dialog-content">
+    <div class="preview-wrap"><iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Click Refresh to run your project.</span></div></div>
+    <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewStatus">Preview hasn't run yet</span></div>
+  </div>
+</dialog>
 <dialog id="addFileDialog" class="add-file-dialog" aria-labelledby="addFileDialogTitle">
 <div class="add-file-head"><h3 id="addFileDialogTitle">Add a project file</h3><div class="muted">Choose a file type, then give it a name.</div></div>
 <form id="addFileForm" class="add-file-body">
@@ -205,6 +238,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 <script src="https://unpkg.com/pxt-blockly@4.0.15/blockly_compressed.js"></script>
 <script src="https://unpkg.com/pxt-blockly@4.0.15/blocks_compressed.js"></script>
 <script src="https://unpkg.com/pxt-blockly@4.0.15/msg/en.js"></script>
-<script src="scripting.js?v=10"></script>
+<script src="scripting.js?v=11"></script>
 </body>
 </html>
