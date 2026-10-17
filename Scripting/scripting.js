@@ -147,7 +147,7 @@ function generateBlocklyBlock(block){
   }
   return generateOne(block);
 }
-function renderBlocks(){if(blocklyWorkspace){updateGenerated();return;}const box=$("blockWorkspace");box.innerHTML='<div class="workspace-empty"><span>🧩</span><b>Blockly is loading</b><p>Refresh if the blocks do not appear.</p></div>';}
+function renderBlocks(){if(!blocklyWorkspace)return;updateGenerated();}
 function updateGenerated(){if(!$("generatedCode"))return;let code="";if(blocklyWorkspace){const tops=blocklyWorkspace.getTopBlocks(true);code=tops.map(generateBlocklyBlock).join("\\n");}else code=blocks.map(blockCode).join("\\n\\n");$("generatedCode").textContent=code||"// Drag blocks into the workspace to generate JavaScript.";if(code)files.js=code;persist();}
 function saveProject(){saveCurrentFile();persist();saveToMyProjects();}
 function download(filename,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
