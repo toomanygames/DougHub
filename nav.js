@@ -84,7 +84,7 @@
       }
       header .nav > a, header nav[aria-label="Main navigation"] > a, header.top>nav.nav>a {
         display:inline-flex; align-items:center; justify-content:center;
-        gap:5px; font-size:13px; line-height:1.25; text-decoration:none !important;
+        gap:5px; font-size:13px; font-weight:800 !important; line-height:1.25; text-decoration:none !important;
         padding:9px 12px !important; border:1px solid transparent;
         border-radius:10px !important; color:#d9dcf4 !important;
         background:transparent; white-space:nowrap;
@@ -748,8 +748,12 @@
     const header=document.querySelector("header");
     const nav=header&&header.querySelector(".nav,nav[aria-label='Main navigation']");
     if(nav){
+      // Keep Find visually grouped with the primary navigation links.
+      const novaLink=nav.querySelector('a[href="/nova.html"]');
       const account=nav.querySelector(".dh-shared-account,.account-area");
-      nav.insertBefore(launcher,account||null);
+      if(novaLink&&novaLink.nextSibling) nav.insertBefore(launcher,novaLink.nextSibling);
+      else if(novaLink) nav.appendChild(launcher);
+      else nav.insertBefore(launcher,account||null);
     }else{
       launcher.style.position="fixed";
       launcher.style.right="12px";
