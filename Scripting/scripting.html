@@ -103,6 +103,24 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .compact-publish-row .btn{padding:10px 16px}
 @media(max-width:600px){.compact-publish-row{justify-content:stretch}.compact-publish-row .btn{width:100%}}
 
+
+/* Blockly-powered visual coding workspace */
+.blocks-layout{grid-template-columns:minmax(0,1fr)!important}
+.toolbox-panel{display:none!important}
+.workspace-panel{min-width:0}
+#blockWorkspace{position:relative;width:100%;height:clamp(460px,65vh,760px);min-height:460px;max-height:none!important;padding:0!important;overflow:hidden;zoom:1!important;background:#080a18;border-radius:0 0 15px 15px}
+#blockWorkspace .blocklySvg{background:transparent!important}
+#blockWorkspace .blocklyMainBackground{stroke:#ffffff12!important}
+#blockWorkspace .blocklyToolboxDiv{background:#0b0e20!important;border-right:1px solid var(--dh-line)!important;color:#e8eaff!important}
+#blockWorkspace .blocklyTreeRow{height:38px!important;margin:4px 6px!important;border-radius:9px!important}
+#blockWorkspace .blocklyTreeLabel{font:700 12px system-ui,sans-serif!important}
+#blockWorkspace .blocklyFlyoutBackground{fill:#10142a!important;fill-opacity:.98!important}
+#blockWorkspace .blocklyText{font-family:system-ui,sans-serif!important}
+#blockWorkspace .blocklyZoom{opacity:.85}
+#blockWorkspace .blocklyTrash{opacity:.85}
+#blockWorkspace .blocklyScrollbarHandle{fill:#8b5cf6!important}
+#blockWorkspace .blocklyWidgetDiv .goog-menu{background:#10142a!important;color:#fff!important}
+@media(max-width:600px){#blockWorkspace{height:62vh;min-height:390px}.workspace-hint{font-size:11px}}
 </style>
 </head>
 <body>
@@ -151,7 +169,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <section class="panel workspace-panel">
       <div class="panel-head"><div><span class="panel-kicker">YOUR PROGRAM</span><h2>Block workspace</h2></div><div class="workspace-actions"><button class="btn small" id="generateBtn">Generate JS ↻</button><button class="btn small danger" id="clearBlocksBtn">Clear blocks</button></div></div>
       <div class="workspace-hint">Blocks run from top to bottom. Add blocks from the library on the left.</div><div class="workspace-zoom-controls"><label for="blockZoom">Block size <strong id="blockZoomValue">100%</strong></label><input id="blockZoom" type="range" min="75" max="160" step="5" value="100" aria-label="Block size"><button class="btn small" id="resetBlockZoom" type="button">Reset size</button></div>
-      <div id="blockWorkspace" class="block-workspace"><div class="workspace-empty" id="workspaceEmpty"><span>🧩</span><b>Your script starts here</b><p>Add an event or statement block to begin.</p></div></div>
+      <div id="blockWorkspace" class="block-workspace" aria-label="Blockly visual coding workspace"><div class="workspace-empty" id="workspaceEmpty"><span>🧩</span><b>Your script starts here</b><p>Drag blocks from the toolbox to build your game logic.</p></div></div>
       <div class="generated-bar"><span><b>Generated JavaScript</b><small>Automatically sent to main.js</small></span><button class="btn small" id="viewGeneratedBtn">Open in code editor →</button></div>
       <pre id="generatedCode" class="generated-code">// Your generated JavaScript will appear here.</pre>
     </section>
@@ -184,6 +202,9 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="publish-dialog-actions"><button class="btn" id="cancelPublishDialog" type="button">Cancel</button><button class="btn primary" id="publishProjectBtn" type="submit">Publish to Community Games ↗</button></div>
   </form>
 </dialog>
-<script src="scripting.js?v=8"></script>
+<script src="https://unpkg.com/pxt-blockly@4.0.15/blockly_compressed.js"></script>
+<script src="https://unpkg.com/pxt-blockly@4.0.15/blocks_compressed.js"></script>
+<script src="https://unpkg.com/pxt-blockly@4.0.15/msg/en.js"></script>
+<script src="scripting.js?v=9"></script>
 </body>
 </html>
