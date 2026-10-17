@@ -157,6 +157,33 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{white-space:nowrap}
 @media(max-width:900px){#codeMode{grid-template-columns:1fr!important}#codeMode .preview-wrap{min-height:260px}#blocksMode{grid-template-columns:1fr!important}}
 @media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-direction:column;gap:8px}.studio-toolbar-controls{margin-left:0;width:100%;gap:5px}.compact-studio-toolbar .mode-switch{flex:1}.compact-studio-toolbar .mode-btn{flex:1;padding:8px 7px}.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{flex:1}.compact-studio-toolbar #status{max-width:none}}
+
+/* Visual blocks repair: full-size Blockly canvas and a visible built-in toolbox */
+#blocksMode{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:12px;align-items:stretch}
+#blocksMode .toolbox-panel{display:none!important}
+#blocksMode .workspace-panel{width:100%;min-width:0;min-height:0}
+#blocksMode .panel-head{flex-wrap:wrap}
+#blocksMode .workspace-hint{line-height:1.5}
+#blockWorkspace{position:relative!important;width:100%!important;height:clamp(560px,72vh,900px)!important;min-height:560px!important;max-height:none!important;overflow:hidden!important;padding:0!important;zoom:1!important;background:#0b1020!important;border-radius:0 0 15px 15px}
+#blockWorkspace .blocklySvg{width:100%!important;height:100%!important;background:#0b1020!important}
+#blockWorkspace .blocklyToolboxDiv{display:block!important;visibility:visible!important;background:#10142a!important;border-right:1px solid #343958!important;color:#f5f6ff!important;min-width:150px}
+#blockWorkspace .blocklyTreeRow{height:38px!important;margin:4px 6px!important;border-radius:9px!important}
+#blockWorkspace .blocklyTreeLabel{font:700 12px system-ui,sans-serif!important;color:#eef0ff!important}
+#blockWorkspace .blocklyFlyout{filter:drop-shadow(0 8px 20px #0005)}
+#blockWorkspace .blocklyFlyoutBackground{fill:#171d38!important;fill-opacity:1!important}
+#blockWorkspace .blocklyMainBackground{stroke:#ffffff18!important}
+#blockWorkspace .blocklyText{font-family:system-ui,sans-serif!important}
+#blockWorkspace .blocklyScrollbarHandle{fill:#8b5cf6!important}
+#blockWorkspace .blocklyZoom,#blockWorkspace .blocklyTrash{opacity:.95}
+#blockWorkspace .blocklyWidgetDiv .goog-menu{background:#10142a!important;color:#fff!important}
+#blockWorkspace .blocklyToolboxDiv .blocklyTreeRow[aria-selected="true"]{background:#343064!important}
+.workspace-zoom-controls input[type=range]{accent-color:#8b5cf6}
+@media(max-width:700px){
+ #blockWorkspace{height:68vh!important;min-height:480px!important}
+ #blockWorkspace .blocklyToolboxDiv{min-width:112px}
+ #blockWorkspace .blocklyTreeLabel{font-size:11px!important}
+}
+
 </style>
 </head>
 <body>
@@ -250,6 +277,10 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="publish-dialog-actions"><button class="btn" id="cancelPublishDialog" type="button">Cancel</button><button class="btn primary" id="publishProjectBtn" type="submit">Publish to Community Games ↗</button></div>
   </form>
 </dialog>
-<script src="scripting.js?v=12"></script>
+<!-- Blockly core + standard block definitions (required for the visual toolbox) -->
+<script src="https://unpkg.com/blockly@11.2.2/blockly.min.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/blocks_compressed.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/msg/en.js"></script>
+<script src="scripting.js?v=13"></script>
 </body>
 </html>
