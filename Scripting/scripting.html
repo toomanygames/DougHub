@@ -221,8 +221,8 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 <dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewDialogTitle">
   <div class="preview-dialog-head"><div><span class="panel-kicker">LIVE OUTPUT</span><h2 id="previewDialogTitle">Preview</h2></div><div class="preview-dialog-actions"><button class="btn small" id="refreshPreviewBtn" type="button">Refresh</button><button class="btn small" id="closePreviewBtn" type="button">Close ✕</button></div></div>
   <div class="preview-dialog-content">
-    <div class="preview-wrap"><iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Click Refresh to run your project.</span></div></div>
-    <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewStatus">Preview hasn't run yet</span></div>
+    <div class="preview-wrap"><iframe id="previewDialogFrame" title="Visual blocks project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewDialogEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Click Preview to run your project.</span></div></div>
+    <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewDialogStatus">Preview hasn't run yet</span></div>
   </div>
 </dialog>
 <dialog id="addFileDialog" class="add-file-dialog" aria-labelledby="addFileDialogTitle">
