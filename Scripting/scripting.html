@@ -111,14 +111,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .compact-studio-toolbar .mode-btn{padding:8px 11px;font-size:12px;white-space:nowrap}
 .compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{white-space:nowrap}
 .compact-studio-toolbar #status{font-size:10px;color:#a5b4fc;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.studio-more{position:relative}
-.studio-more>summary{list-style:none;cursor:pointer;user-select:none}
-.studio-more>summary::-webkit-details-marker{display:none}
-.studio-more-menu{position:absolute;right:0;top:calc(100% + 7px);z-index:50;display:grid;gap:4px;min-width:165px;padding:6px;border:1px solid #a5b4fc35;border-radius:12px;background:#0b0e20;box-shadow:0 15px 40px #0008}
-.studio-more-menu button{padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#e7e9ff;text-align:left;cursor:pointer;font-size:12px}
-.studio-more-menu button:hover{background:#ffffff10}
-#codeMode{grid-template-columns:minmax(0,1fr)!important}
-#codeMode .preview-panel{display:none!important}
 .preview-dialog{width:min(1200px,calc(100% - 24px));height:min(88vh,900px);max-height:92vh;padding:0;border:1px solid #a5b4fc55;border-radius:20px;background:#080a18;color:#f5f6ff;box-shadow:0 30px 100px #000b;overflow:hidden}
 .preview-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}
 .preview-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 17px;border-bottom:1px solid var(--dh-line);background:linear-gradient(130deg,#6366f11b,#a855f715)}
@@ -147,6 +139,24 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 #blockWorkspace .blocklyScrollbarHandle{fill:#8b5cf6!important}
 #blockWorkspace .blocklyWidgetDiv .goog-menu{background:#10142a!important;color:#fff!important}
 @media(max-width:600px){#blockWorkspace{height:62vh;min-height:390px}.workspace-hint{font-size:11px}}
+
+/* Restored original code/visual-blocks workflow */
+#codeMode{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important}
+#codeMode .preview-panel{display:flex!important;flex-direction:column;min-width:0}
+#codeMode .preview-wrap{flex:1;min-height:260px}
+#codeMode .preview-wrap iframe{width:100%;height:100%;min-height:260px;border:0;background:#fff;border-radius:12px}
+#blocksMode{grid-template-columns:minmax(235px,.34fr) minmax(0,1fr)!important;align-items:start}
+#blocksMode .toolbox-panel{min-width:0}
+#blocksMode .workspace-panel{min-width:0}
+#blockWorkspace{height:clamp(330px,52vh,600px);min-height:330px;max-height:none!important;overflow:auto!important;padding:14px!important;zoom:1!important;border-radius:0 0 15px 15px;background:#080a18}
+#blockWorkspace .code-block{transform-origin:top left}
+.mode-switch{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--dh-line);border-radius:12px;background:#070918}
+.compact-studio-toolbar .mode-btn{border:0;padding:9px 13px;border-radius:9px;background:transparent;color:#a4a7c4;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}
+.compact-studio-toolbar .mode-btn.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+.studio-toolbar-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{white-space:nowrap}
+@media(max-width:900px){#codeMode{grid-template-columns:1fr!important}#codeMode .preview-wrap{min-height:260px}#blocksMode{grid-template-columns:1fr!important}}
+@media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-direction:column;gap:8px}.studio-toolbar-controls{margin-left:0;width:100%;gap:5px}.compact-studio-toolbar .mode-switch{flex:1}.compact-studio-toolbar .mode-btn{flex:1;padding:8px 7px}.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{flex:1}.compact-studio-toolbar #status{max-width:none}}
 </style>
 </head>
 <body>
@@ -158,13 +168,13 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   <section class="toolbar compact-studio-toolbar">
     <div class="project-name-inline"><label for="projectName">Project</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"></div>
     <div class="studio-toolbar-controls">
-      <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code">Code</button><button class="mode-btn" data-mode="blocks">Visual blocks</button></div>
+      <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code" type="button">⌘ Code editor</button><button class="mode-btn" data-mode="blocks" type="button">🧩 Visual blocks</button></div>
       <button class="btn small" id="myProjectsBtn" type="button">My Projects</button>
       <button class="btn primary small" id="previewBtn" type="button">Preview</button>
-      <details class="studio-more"><summary class="btn small">More ▾</summary><div class="studio-more-menu"><button type="button" id="resetBtn">Reset preview</button><button type="button" id="openPublishDialog">Publish game ↗</button></div></details>
     </div>
     <span id="status" role="status">Ready</span>
   </section>
+  <div class="compact-publish-row"><button class="btn primary small publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button></div>
   <section id="codeMode" class="editor-layout">
     <div class="panel code-panel">
       <div class="panel-head"><div><span class="panel-kicker">SOURCE FILES</span><h2>Code</h2></div><span class="live-dot">Autosaves locally</span></div>
@@ -174,6 +184,10 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
       <div class="editor-footer"><span>Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span><button class="text-btn" id="copyCodeBtn">Copy current file</button></div>
     </div>
 
+    <div class="panel preview-panel">
+      <div class="panel-head"><div><span class="panel-kicker">LIVE OUTPUT</span><h2>Preview</h2></div><span class="live-dot">Preview updates when you press Preview</span></div>
+      <div class="preview-wrap"><iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Write some code, then press Run preview.</span></div></div>
+      <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewStatus">Preview hasn't run yet</span></div>
   </section>
   <section id="blocksMode" class="blocks-layout" hidden>
     <aside class="panel toolbox-panel">
@@ -235,9 +249,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="publish-dialog-actions"><button class="btn" id="cancelPublishDialog" type="button">Cancel</button><button class="btn primary" id="publishProjectBtn" type="submit">Publish to Community Games ↗</button></div>
   </form>
 </dialog>
-<script src="https://unpkg.com/pxt-blockly@4.0.15/blockly_compressed.js"></script>
-<script src="https://unpkg.com/pxt-blockly@4.0.15/blocks_compressed.js"></script>
-<script src="https://unpkg.com/pxt-blockly@4.0.15/msg/en.js"></script>
-<script src="scripting.js?v=11"></script>
+<script src="scripting.js?v=12"></script>
 </body>
 </html>
