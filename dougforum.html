@@ -444,14 +444,28 @@ async function submitComment(postId,body){
  catch(e){tell("Your comment could not be posted. Please try again.");console.error(e);}
 }
 async function deletePost(id){
- if(!currentUser||!confirm("Delete this post? This also deletes its comments and votes."))return;
- try{const {error}=await db.from("dougforum_posts").delete().eq("id",id).eq("author_id",currentUser.id);if(error)throw error;posts=posts.filter(p=>p.id!==id);renderPosts();tell("Post deleted.");}
- catch(e){tell("The post could not be deleted.");console.error(e);}
+ const post=posts.find(p=>p.id===id);
+ if(!currentUser||!post||!canManagePost(post)||!confirm("Delete this post? This also deletes its comments and votes."))return;
+ try{
+  let q=db.from("dougforum_posts").delete().eq("id",id);
+  if(!isAdminPlus())q=q.eq("author_id",currentUser.id);
+  const {error}=await q;if(error)throw error;
+  posts=posts.filter(p=>p.id!==id);commentCache.delete(id);expandedComments.delete(id);editingPosts.delete(id);renderPosts();tell("Post deleted.");
+ }catch(e){tell("The post could not be deleted. Check your permissions and try again.");console.error(e);}
 }
 async function deleteComment(id){
- if(!currentUser||!confirm("Delete this comment?"))return;
- try{const {error}=await db.from("dougforum_comments").delete().eq("id",id).eq("author_id",currentUser.id);if(error)throw error;for(const postId of expandedComments){await loadComments(postId);}await loadPosts();renderPosts();}
- catch(e){tell("The comment could not be deleted.");console.error(e);}
+ if(!currentUser||!confirm("Remove this comment?"))return;
+ try{
+  const {data:target,error:findError}=await db.from("dougforum_comments").select("id,post_id,author_id").eq("id",id).maybeSingle();
+  if(findError)throw findError;if(!target)throw new Error("Comment not found");
+  const post=posts.find(p=>p.id===target.post_id);
+  if(!post)throw new Error("Post not found");
+  const cached=(commentCache.get(target.post_id)||[]).find(c=>c.id===id);
+  if(!cached||!canDeleteComment(post,cached))throw new Error("You cannot remove this comment.");
+  const {error}=await db.from("dougforum_comments").delete().eq("id",id);if(error)throw error;
+  for(const postId of expandedComments)await loadComments(postId);
+  await loadPosts();renderPosts();tell("Comment removed.");
+ }catch(e){tell("The comment could not be removed. The author may be DougHub staff, or you may not have permission.");console.error(e);}
 }
 $("postForm").addEventListener("submit",async e=>{
  e.preventDefault();clearMessage();if(!currentUser){location.href="log-in.html?redirect=dougforum.html";return;}if(busy)return;
@@ -468,7 +482,7 @@ $("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavi
 (async function init(){
  try{db=await loadClient();if(!db)throw new Error("Supabase client is unavailable");
   const {data,error}=await db.auth.getSession();if(error)throw error;currentUser=data?.session?.user||null;
-  if(currentUser){const {data:profile}=await db.from("profiles").select("username").eq("id",currentUser.id).maybeSingle();currentProfile=profile;$("composeAccount").textContent="Posting as "+(profile?.username||currentUser.email?.split("@")[0]||"member");$("postHelp").textContent="Posts are public. Keep personal details private.";$("publishPost").textContent="Publish post";}
+  if(currentUser){const {data:profile}=await db.from("profiles").select("username,staff_role,is_admin").eq("id",currentUser.id).maybeSingle();currentProfile=profile;$("composeAccount").textContent="Posting as "+(profile?.username||currentUser.email?.split("@")[0]||"member");$("postHelp").textContent="Posts are public. Keep personal details private.";$("publishPost").textContent="Publish post";}
   else{$("composeAccount").innerHTML='<a href="log-in.html?redirect=dougforum.html" style="color:#c4b5fd;font-weight:800">Log in to post</a>';$("postHelp").textContent="You can browse freely. Log in to post, vote, or comment.";$("publishPost").textContent="Log in to post";}
   await loadCommunities();await loadPosts();
  }catch(e){console.error("DougForum initialization failed:",e);$("postList").innerHTML='<div class="empty"><strong>DougForum could not connect</strong>Try refreshing the page. If this continues, the database permissions may need checking.</div>';tell("The forum could not load its data.");}
