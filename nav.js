@@ -625,13 +625,13 @@
     `;
     document.head.appendChild(style);
     const button=document.createElement("button");
-    button.id="dh-global-help";button.type="button";button.textContent="❔ Help";button.setAttribute("aria-haspopup","dialog");
+    button.id="dh-global-help";button.type="button";button.textContent="Take a tour";button.setAttribute("aria-haspopup","dialog");button.setAttribute("aria-label","Take a guided tour of this page");
     document.body.appendChild(button);
     const overlay=document.createElement("div");overlay.id="dh-help-overlay";
     overlay.innerHTML='<svg id="dh-help-line" aria-hidden="true"><path id="dh-help-path"></path></svg>';
     document.body.appendChild(overlay);
     const card=document.createElement("section");card.id="dh-help-card";card.hidden=true;card.setAttribute("role","dialog");card.setAttribute("aria-modal","false");card.setAttribute("aria-label","Page help");
-    card.innerHTML='<div class="dh-help-kicker">DougHub quick guide <span id="dh-help-count"></span></div><h2 id="dh-help-title">Need a hand?</h2><p id="dh-help-text">Choose Next to see the main controls on this page.</p><div class="dh-help-actions"><button id="dh-help-close" type="button">Close</button><div><button id="dh-help-prev" type="button">←</button> <button id="dh-help-next" class="dh-help-next" type="button">Next →</button></div></div>';
+    card.innerHTML='<div class="dh-help-kicker">Guided tour <span id="dh-help-count"></span></div><h2 id="dh-help-title">Need a hand?</h2><p id="dh-help-text">Follow along to learn the main areas and controls on this page. Choose Next to continue.</p><div class="dh-help-actions"><button id="dh-help-close" type="button">Close</button><div><button id="dh-help-prev" type="button">←</button> <button id="dh-help-next" class="dh-help-next" type="button">Next →</button></div></div>';
     document.body.appendChild(card);
     const stepsForPage=()=>{
       const p=location.pathname.toLowerCase();
@@ -725,7 +725,13 @@
       requestAnimationFrame(()=>drawLine(s.el));
     }
     function close(){card.hidden=true;overlay.classList.remove("active");document.querySelectorAll(".dh-help-target").forEach(el=>el.classList.remove("dh-help-target"));}
-    button.addEventListener("click",()=>{steps=stepsForPage();if(!steps.length)steps=[{title:"Welcome to DougHub",text:"Use the page controls to explore. If you need help with a particular feature, look for its label.",el:null}];index=0;card.hidden=false;render();});
+    button.addEventListener("click",()=>{
+      if((location.pathname.replace(/^\\/+/, "").toLowerCase()==="index.html"||location.pathname==="/")&&document.getElementById("dh-home-tour-card")){
+        try{localStorage.removeItem("dh_home_tutorial_completed_v3");}catch(_){}
+        const u=new URL(location.href);u.searchParams.set("tour","1");location.href=u.href;return;
+      }
+      steps=stepsForPage();if(!steps.length)steps=[{title:"Welcome to DougHub",text:"Use the page controls to explore. If you need help with a particular feature, look for its label.",el:null}];index=0;card.hidden=false;render();
+    });
     document.getElementById("dh-help-close").addEventListener("click",close);
     document.getElementById("dh-help-prev").addEventListener("click",()=>{if(index>0){index--;render();}});
     document.getElementById("dh-help-next").addEventListener("click",()=>{if(index<steps.length-1){index++;render();}else close();});
