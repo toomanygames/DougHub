@@ -152,8 +152,7 @@
         max-width: 100% !important;
         margin-left: 0 !important;
         justify-content: flex-start !important;
-        flex-wrap: wrap !important;
-        overflow: visible !important;
+        overflow-x: auto !important;
       }
     }
     @media (max-width: 600px) {
@@ -369,9 +368,7 @@
       html body header > nav,
       html body header > .nav {
         max-width: 100%;
-        overflow: visible;
-        display: flex;
-        flex-wrap: wrap;
+        overflow-x: auto;
         justify-content: flex-start;
         scrollbar-width: none;
       }
