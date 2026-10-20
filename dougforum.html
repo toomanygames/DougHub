@@ -407,7 +407,7 @@ async function loadCommunities(){
  if(error)throw error;communities=data||[];renderCommunities();
 }
 async function loadPosts(){
- const {data,error}=await db.from("dougforum_posts").select("id,community_id,author_id,title,body,link_url,created_at,dougforum_votes(value,user_id),dougforum_comments(count)").order("created_at",{ascending:false}).limit(100);
+ const {data,error}=await db.from("dougforum_posts").select("id,community_id,author_id,title,body,link_url,created_at,updated_at,dougforum_votes(value,user_id),dougforum_comments(count)").order("created_at",{ascending:false}).limit(100);
  if(error)throw error;
  posts=(data||[]).map(p=>({...p,commentCount:p.dougforum_comments?.[0]?.count||0,authorName:""}));
  const ids=[...new Set(posts.map(p=>p.author_id))];
