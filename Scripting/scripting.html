@@ -184,6 +184,8 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
  #blockWorkspace .blocklyTreeLabel{font-size:11px!important}
 }
 
+/* Mode panels must respect the hidden attribute even when they have display styles. */
+#codeMode[hidden],#blocksMode[hidden],#fastMode[hidden]{display:none!important}
 /* Fast Mode: quick game starters, live play area, and community chat drawer */
 .fast-mode-layout{display:grid;gap:16px;margin-top:12px}
 .fast-welcome{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:clamp(20px,3vw,32px);border:1px solid #a5b4fc25;border-radius:22px;background:radial-gradient(ellipse at 8% 0%,#6366f128,transparent 48%),linear-gradient(135deg,#11152d,#090b19);box-shadow:0 18px 50px #0003}
