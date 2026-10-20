@@ -5248,7 +5248,20 @@ async function saveStaffRole(){
     }
     status.textContent="@"+(data.username||savedUser.username||"Account")+(role==="none"?" demoted to Normal user.":" rank changed to "+staffRoleLabel(role)+".")+" Saved in Supabase.";
     await writeAuditLog("admin_action","users","Changed staff role",{targetUserId:target,role});
-  }catch(error){status.textContent="Could not save rank: "+(error.message||"Staff promotion endpoint unavailable.");}
+  }catch(error){
+    let message=error?.message||"Staff promotion endpoint unavailable.";
+    // Supabase FunctionsHttpError keeps the response body in error.context.
+    // Read it so the Owner sees the actual server reason instead of only
+    // "Edge Function returned a non-2xx status code".
+    try{
+      const response=error?.context;
+      if(response&&typeof response.clone==="function"){
+        const payload=await response.clone().json();
+        if(typeof payload?.error==="string"&&payload.error.trim())message=payload.error;
+      }
+    }catch(parseError){console.warn("Could not read staff-rank error response:",parseError);}
+    status.textContent="Could not save rank: "+message;
+  }
   finally{if(passwordInput)passwordInput.value="";button.disabled=false;}
 }
 document.getElementById("saveStaffRoleButton")?.addEventListener("click",saveStaffRole);
