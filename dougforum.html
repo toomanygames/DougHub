@@ -411,7 +411,7 @@ async function loadPosts(){
  if(error)throw error;
  posts=(data||[]).map(p=>({...p,commentCount:p.dougforum_comments?.[0]?.count||0,authorName:""}));
  const ids=[...new Set(posts.map(p=>p.author_id))];
- if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username,avatar_url").in("id",ids);postNames={};postAvatars={};(profiles||[]).forEach(p=>{postNames[p.id]=p.username||"DougHub member";postAvatars[p.id]=p.avatar_url||"";});}
+ if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username,avatar_url,staff_role,is_admin").in("id",ids);postNames={};postAvatars={};postStaff={};(profiles||[]).forEach(p=>{postNames[p.id]=p.username||"DougHub member";postAvatars[p.id]=p.avatar_url||"";postStaff[p.id]=p;});}
  posts.forEach(p=>p.authorName=postNames[p.author_id]||"DougHub member");
  $("statPosts").textContent=posts.length.toLocaleString();$("statCommunities").textContent=communities.length.toLocaleString();$("statReplies").textContent=posts.reduce((n,p)=>n+(p.commentCount||0),0).toLocaleString();
  renderPosts();
@@ -419,8 +419,8 @@ async function loadPosts(){
 async function loadComments(postId){
  const {data,error}=await db.from("dougforum_comments").select("id,post_id,author_id,body,created_at").eq("post_id",postId).order("created_at",{ascending:true});
  if(error)throw error;const rows=data||[],ids=[...new Set(rows.map(c=>c.author_id))],names={};
- if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username,avatar_url").in("id",ids);(profiles||[]).forEach(p=>{names[p.id]=p.username||"DougHub member";names[p.id+"__avatar"]=p.avatar_url||"";});}
- commentCache.set(postId,rows.map(c=>({...c,authorName:names[c.author_id]||"DougHub member",authorAvatar:names[c.author_id+"__avatar"]||""})));
+ if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username,avatar_url,staff_role,is_admin").in("id",ids);(profiles||[]).forEach(p=>{names[p.id]=p.username||"DougHub member";names[p.id+"__avatar"]=p.avatar_url||"";names[p.id+"__staff_role"]=p.staff_role||"";names[p.id+"__is_admin"]=p.is_admin===true?"true":"";});}
+ commentCache.set(postId,rows.map(c=>({...c,authorName:names[c.author_id]||"DougHub member",authorAvatar:names[c.author_id+"__avatar"]||"",staff_role:names[c.author_id+"__staff_role"]||"",is_admin:names[c.author_id+"__is_admin"]==="true"})));
 }
 async function toggleComments(id){
  if(expandedComments.has(id)){expandedComments.delete(id);renderPosts();return;}
