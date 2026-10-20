@@ -657,9 +657,11 @@
           {selector:'main .tool-card,main a[href]',title:"Open a tool",text:"Each tool card or link opens a specific utility. Read its title and short description, open the one that matches your task, and use the fields or buttons shown on that tool."}
         ],
         home:[
-          {selector:'.home-quick-access,.quick-access-grid,#quickAccess',title:"Quick Access shortcuts",text:"These are shortcuts to popular DougHub features. Click a card to open that feature directly instead of finding it through the navigation. If you are not sure where to start, choose the shortcut whose title matches what you want to do."},
-          {selector:'input[type="search"],#searchInput,.search-box',title:"Homepage search",text:"Enter a keyword to find a page, tool or feature. Choose a result from the suggestions; if you do not see the right result, try a shorter keyword."},
-          {selector:'header .nav a[href="/douggames.html"]',title:"Games and Game Maker",text:"Open Games to browse games. Use the Game Maker option there to launch DougCode directly in Game Maker mode."}
+          {selector:"#find",title:"Find your next thing",text:"Search DougHub using a word like games, chat, code or music. Choose a category to narrow the list, then open a card to go straight to that feature."},
+          {selector:"#toolSlider",title:"Featured picks",text:"Use the arrows or dots to browse featured tools. Open any card that catches your eye, or keep scrolling for more ideas."},
+          {selector:".workflow",title:"A simple way to explore",text:"You can learn DougHub one feature at a time. Choose a tool, try it, and return to Home when you want another idea."},
+          {selector:".bottom-cta",title:"Quick next steps",text:"These links take you to your workspace or community. The top navigation and footer are always there to help you find other areas."},
+          {selector:".feedback",title:"Send feedback",text:"Share an idea or report a problem here when signed in. Use the footer to reach more pages."}
         ],
         gameMaker:[
           {selector:'#blockList,.workspace,#editor,textarea',title:"Build area",text:"This is the main area for making your game. Select a tool or block, follow its on-screen settings, and add or edit game logic one small step at a time."},
