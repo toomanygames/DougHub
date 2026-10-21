@@ -728,7 +728,7 @@
     }
     function close(){card.hidden=true;overlay.classList.remove("active");document.querySelectorAll(".dh-help-target").forEach(el=>el.classList.remove("dh-help-target"));}
     button.addEventListener("click",()=>{
-      if((location.pathname.replace(/^\\/+/, "").toLowerCase()==="index.html"||location.pathname==="/")&&document.getElementById("dh-home-tour-card")){
+      if((location.pathname.replace(/^\/+/, "").toLowerCase()==="index.html"||location.pathname==="/")&&document.getElementById("dh-home-tour-card")){
         try{localStorage.removeItem("dh_home_tutorial_completed_v3");}catch(_){}
         const u=new URL(location.href);u.searchParams.set("tour","1");location.href=u.href;return;
       }
