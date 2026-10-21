@@ -144,25 +144,14 @@
         background:rgba(255,255,255,.07);color:white;
       }
       .dh-shared-account .logout { color:#ff7777 !important; }
-      /* Keep the full navigation and account control visible instead of trapping
-         the last items inside a clipped horizontal strip on smaller screens. */
-      @media(max-width:1100px) {
-        header { align-items:flex-start; flex-wrap:wrap !important; }
-        header .nav, header nav[aria-label="Main navigation"] {
-          width:100%; max-width:100%; min-width:0; justify-content:flex-start;
-          gap:6px; flex-wrap:wrap !important; overflow:visible !important;
-        }
-        header .nav > a, header nav[aria-label="Main navigation"] > a {
-          padding:8px 10px !important; font-size:12px;
-        }
+      @media(max-width:900px) {
+        header { align-items:flex-start; }
+        header .nav, header nav[aria-label="Main navigation"] { justify-content:flex-start; gap:6px; }
+        header .nav > a, header nav[aria-label="Main navigation"] > a { padding:8px 10px !important;font-size:12px; }
       }
       @media(max-width:600px) {
         header { gap:10px; }
-        header .nav, header nav[aria-label="Main navigation"] {
-          width:100%; justify-content:flex-start; flex-wrap:wrap !important;
-          overflow:visible !important; row-gap:5px;
-        }
-        .dh-shared-account { margin-left:0; }
+        header .nav, header nav[aria-label="Main navigation"] { width:100%;justify-content:flex-start; }
         .dh-shared-account .account-btn { padding:5px 8px;gap:6px; }
         .dh-shared-account .account-avatar { width:28px;height:28px;flex-basis:28px; }
         .dh-shared-account .account-menu { right:auto;left:0;transform-origin:top left; }
