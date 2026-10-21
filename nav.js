@@ -868,7 +868,7 @@
     }
     const sharedHeader = document.createElement("script");
     sharedHeader.id = "dh-shared-header-script";
-    sharedHeader.src = new URL("header.js?v=2", NAV_SCRIPT_URL).href;
+    sharedHeader.src = new URL("header.js?v=20261021-restore", NAV_SCRIPT_URL).href;
     sharedHeader.onload = function () {
       sharedHeader.dataset.loaded = "true";
       start();
