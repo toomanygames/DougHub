@@ -49,35 +49,21 @@ main>.bottom-cta{margin-top:10px}
 @media(max-width:800px){.hero{padding-top:28px;padding-bottom:18px}.section{padding:20px 0}.tool-slide{min-height:0}.tool-slide-art{min-height:190px}.workflow{gap:20px}}
 @media(max-width:600px){.hero{padding-top:22px;padding-bottom:14px}.finder{padding:8px 0 20px}.section{padding:16px 0}.section-heading{margin-bottom:12px}.tool-slide{padding:20px;gap:14px}.tool-slide-art{min-height:165px}.tool-slider-controls{padding-top:9px}.workflow{padding:17px;gap:16px}.feedback{padding:16px}.finder-head{gap:10px}.finder-head .text-link{font-size:10px;padding:8px}}
 
-/* Featured directory page: preserve the index card artwork in a two-column layout. */
-.featured-page{width:min(1160px,calc(100% - 48px));margin:0 auto;padding:42px 0 64px}
+/* Match the homepage carousel card styling; only the overall layout changes to a compact two-column grid. */
+.featured-page{width:min(1240px,calc(100% - 40px));margin:0 auto;padding:42px 0 64px}
 .featured-page .section-heading{margin-bottom:22px}
 .featured-page .section-heading p{max-width:650px}
 .featured-page .featured-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.featured-page .tool-slide{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.82fr);gap:18px;align-items:center;min-width:0;min-height:290px;padding:24px;border:1px solid #ffffff12;border-radius:20px;overflow:hidden;flex:auto}
-.featured-page .tool-slide-title-row{gap:10px;margin:13px 0 10px}
-.featured-page .tool-slide-icon{width:43px;height:43px;flex-basis:43px;border-radius:13px;font-size:21px}
-.featured-page .tool-slide h3{font-size:clamp(23px,2.5vw,34px)}
-.featured-page .tool-slide p{font-size:12px;line-height:1.7}
-.featured-page .tool-slide-cta{margin-top:16px}
-.featured-page .tool-slide-art{min-width:0;min-height:190px;border-radius:16px}
-.featured-page .art-caption{font-size:8px}
+.featured-page .tool-slide{flex:initial;min-width:0;width:auto}
 .featured-page .featured-order{position:absolute;top:12px;right:13px;color:#ffffff58;font-size:10px;font-weight:900;letter-spacing:.12em}
-.featured-page .tool-slide-copy{min-width:0}
-.featured-page .tool-slide-kicker{font-size:9px;letter-spacing:.1em}
-.featured-page .art-code{padding:12px}
-.featured-page .art-tools{padding:15px}
 .featured-page .tool-slide[aria-hidden="true"]{opacity:1}
-.featured-page .featured-back{display:inline-flex;align-items:center;gap:8px;margin-bottom:22px;color:#c4b5fd;font-size:12px;font-weight:800}
-@media(max-width:850px){.featured-page{width:min(100% - 32px,720px);padding-top:28px}.featured-page .featured-grid{grid-template-columns:1fr;gap:10px}.featured-page .tool-slide{min-height:260px}}
-@media(max-width:500px){.featured-page{width:calc(100% - 24px);padding-top:22px}.featured-page .tool-slide{grid-template-columns:1fr;gap:12px;padding:20px}.featured-page .tool-slide-art{min-height:170px}.featured-page .tool-slide h3{font-size:30px}.featured-page .tool-slide-cta{width:auto}}
+@media(max-width:700px){.featured-page{width:calc(100% - 24px);padding-top:24px}.featured-page .featured-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.featured-page .tool-slide{grid-template-columns:1fr;gap:14px;padding:20px;min-height:0}.featured-page .tool-slide-art{min-height:165px}.featured-page .tool-slide h3{font-size:clamp(23px,5vw,34px)}.featured-page .tool-slide-cta{width:100%}}
 
 </style>
 </head>
 <body>
 <header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
 <main class="featured-page">
-<a class="featured-back" href="index.html">← Back to DougHub</a>
 <section aria-labelledby="featuredTitle">
 <div class="section-heading"><div><p class="section-eyebrow">THE DOUGHUB LINEUP</p><h1 id="featuredTitle" style="margin:0;font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.045em">Find your next thing.</h1><p>Explore the featured tools, projects, and community spaces that make up DougHub. Everything from the homepage showcase, in the same order.</p></div></div>
 <div class="featured-grid">
