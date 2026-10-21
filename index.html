@@ -159,7 +159,7 @@ if(slider){
   if(resetTimer)restartTimer();
  }
  function stopTimer(){if(timer){clearInterval(timer);timer=null;}}
- function restartTimer(){stopTimer();if(reducedMotion||document.hidden)return;timer=setInterval(()=>showSlide(slideIndex+1,false),3500);}
+ function restartTimer(){stopTimer();/* AUTOPLAY TEMPORARILY DISABLED: restore automatic scrolling by putting the original 3500ms setInterval back here. Manual arrows, dots, and swipe navigation remain enabled. */}
  prev.addEventListener("click",()=>showSlide(slideIndex-1));next.addEventListener("click",()=>showSlide(slideIndex+1));
  dots.forEach((dot,i)=>dot.addEventListener("click",()=>showSlide(i)));
  viewport.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){e.preventDefault();showSlide(slideIndex-1);}else if(e.key==="ArrowRight"){e.preventDefault();showSlide(slideIndex+1);}});
@@ -210,7 +210,7 @@ checkSession();loadAnnouncement();
     {selector:"header .nav, header nav[aria-label='Main navigation'], header nav",title:"Your map around DougHub",text:"These links take you to the main parts of the site. You can always return Home, and the Help button stays available if you want another guided look."},
     {selector:".hero-copy",title:"Welcome — start anywhere",text:"This is your starting point. Read the short intro, open your dashboard if you want your own workspace, or scroll down to discover what else DougHub can do."},
     {selector:"#find",title:"Find something fast",text:"Search by a word like games, chat, code or music. The category chips narrow the list, and each card takes you straight to that part of DougHub."},
-    {selector:"#toolSlider",title:"Explore featured picks",text:"Here are a few things worth trying. Use the arrows or dots, or let the cards rotate. Open any featured item that looks interesting."},
+    {selector:"#toolSlider",title:"Explore featured picks",text:"Here are a few things worth trying. Use the arrows or dots to browse the featured cards. Open any featured item that looks interesting."},
     {selector:".workflow",title:"You don't have to learn it all",text:"DougHub is designed for exploring at your own pace. Choose one tool, try it, and come back here whenever you want to find something else."},
     {selector:".bottom-cta",title:"Your next step",text:"Use these shortcuts to open your workspace or join the community. You can also use the top navigation to explore Games, Tools, Nova AI and Chat."},
     {selector:".feedback",title:"Help make DougHub better",text:"Found a problem or have an idea? Send feedback here when you're signed in. The page footer also has useful links."},
