@@ -2197,6 +2197,12 @@ footer{font-size:12px}
         </div>
 
         <div class="games-grid">
+            <a href="Games/professor-panic.html" class="game-card game-card-wide">
+                <div class="game-icon">📚</div>
+                <h3>Professor Panic!</h3>
+                <p>A silly 3D first-person school adventure. Find seven homework pages, survive the world's worst teacher, and escape with the full story.</p>
+                <div class="play-label">PLAY 3D STORY →</div>
+            </a>
 
             <a
                 href="Games/pig-clicker.html"
@@ -2918,7 +2924,7 @@ async function updateGameCount() {
     }
 
     /* Keep this number in one place: these are the built-in games. */
-    const BUILT_IN_GAME_COUNT = 6;
+    const BUILT_IN_GAME_COUNT = 7;
 
     const {
         count,
@@ -2968,6 +2974,7 @@ const BUILTIN_TRENDING_GAMES = {
     "builtin:puzzle": { title: "Doug Puzzle", icon: "🧩", href: "Games/puzzle.html" },
     "builtin:drive-pig": { title: "Drive Pig", icon: "🐷", href: "Games/drive-pig.html" },
     "builtin:smack-n-punch": { title: "Smack 'n Punch", icon: "💥", href: "Games/smack-n-punch.html" }
+    "builtin:professor-panic": { title: "Professor Panic!", icon: "📚", href: "Games/professor-panic.html" },
 };
 let trendingRows = [];
 let trendingSortMode = "plays";
