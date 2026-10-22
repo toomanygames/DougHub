@@ -159,7 +159,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "scripting/scripting.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
@@ -240,7 +240,7 @@
     ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
     ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
 
-    const links = [["/index.html","Home"],["/douggames.html","Games"],["/tools.html","Tools"],["/nova.html","✳ Nova AI"],["/chat.html","Chat"],["/dougforum.html","Forums"]];
+    const links = [["/index.html","Home"],["/douggames.html","Games"],["/Scripting/scripting.html","Create"],["/dougforum.html","Community"],["/tools.html","Tools"]];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
       const a = document.createElement("a");
