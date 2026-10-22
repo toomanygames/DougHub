@@ -770,6 +770,34 @@ document.addEventListener("DOMContentLoaded",function(){
   }
 </style>
 
+
+<style id="settings-anchor-direction-fix">
+  /* Fixed positioning does not release when the page scroll direction changes. */
+  @media(min-width:801px){
+    .settings-layout{position:relative;grid-template-columns:224px minmax(0,1fr)}
+    .settings-sidebar{
+      position:fixed!important;
+      left:max(18px,calc((100vw - 1120px)/2))!important;
+      top:50%!important;
+      transform:translateY(-50%);
+      width:224px;
+      max-height:calc(100vh - 110px);
+      overflow-y:auto;
+      z-index:30;
+    }
+    .settings-content{grid-column:2;min-width:0}
+  }
+  @media(max-width:800px){
+    .settings-sidebar{
+      position:sticky!important;
+      top:66px!important;
+      transform:none!important;
+      width:auto;
+    }
+    .settings-content{grid-column:1}
+  }
+</style>
+
 </head>
 
 <body>
