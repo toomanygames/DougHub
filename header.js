@@ -81,6 +81,24 @@
   const sharedLayoutStyle = document.createElement("style");
   sharedLayoutStyle.id = "dh-header-layout-overrides";
   sharedLayoutStyle.textContent = `
+    /* DougHub's shared slim, modern scrollbar — applied across pages. */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(139, 92, 246, .78) rgba(255, 255, 255, .035);
+    }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-track { background: rgba(255, 255, 255, .025); }
+    *::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #818cf8, #a855f7) padding-box;
+      background-clip: padding-box;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #a5b4fc, #c084fc) padding-box;
+    }
+    *::-webkit-scrollbar-corner { background: transparent; }
+
     html body header {
       display: flex !important;
       box-sizing: border-box !important;
