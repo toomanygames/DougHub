@@ -338,16 +338,16 @@ footer{padding:14px 0 18px}
 .finder-toggle[aria-expanded="true"] .finder-toggle-arrow{transform:rotate(180deg)}
 .finder-toggle-hint{color:#8589a8;font-size:9px;text-align:right}
 #indexFinderContent[hidden]{display:none!important}
-.scroll-nudge{display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:0;border:0;background:transparent;color:#9da2c4;font-size:10px;font-weight:800;letter-spacing:.04em;transition:color .18s,transform .18s}
-.scroll-nudge:hover{color:#e4e2ff;transform:translateY(2px)}
-.scroll-nudge-arrow{display:grid;place-items:center;width:20px;height:20px;color:#c4b5fd;font-size:18px;line-height:1;animation:dhScrollNudge 1.7s ease-in-out infinite}
-@keyframes dhScrollNudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.scroll-nudge{position:fixed;z-index:999;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;width:min(180px,48vw);height:36px;margin:0;padding:0;border:0;background:transparent;color:#c4b5fd;cursor:pointer;transition:color .18s}
+.scroll-nudge:hover{color:#fff}
+.scroll-nudge-arrow{display:block;width:100%;font-size:52px;font-weight:300;line-height:.5;text-align:center;transform:scaleX(1.9);transform-origin:center;animation:dhScrollNudge 1.7s ease-in-out infinite}
+@keyframes dhScrollNudge{0%,100%{translate:0 0}50%{translate:0 4px}}
 @media(max-width:620px){
  .finder-intro{align-items:flex-start}
  .finder-intro-actions{gap:5px}
  .finder-toggle{font-size:10px}
  .finder-toggle-hint{max-width:110px;line-height:1.35}
- .scroll-nudge{margin-top:13px}
+ .scroll-nudge{bottom:8px;width:min(160px,52vw);height:32px}.scroll-nudge-arrow{font-size:46px}
 }
 @media(prefers-reduced-motion:reduce){.scroll-nudge-arrow{animation:none}}
 
@@ -358,7 +358,7 @@ footer{padding:14px 0 18px}
 <main>
 <aside class="announcement" id="dhEventBanner" aria-label="DougHub announcement" aria-live="polite"><span class="announcement-label">DOUGHUB ANNOUNCEMENT</span><span id="dhEventMessage"></span><button class="announcement-close" id="dhEventClose" type="button" aria-label="Dismiss announcement">×</button></aside>
 <section class="hero" aria-labelledby="heroTitle">
-<div class="hero-copy"><div class="eyebrow"><span class="eyebrow-dot"></span> Your community for games and ideas</div><h1 id="heroTitle">Play. Create.<br><span class="gradient-text">Share what you make.</span></h1><p class="hero-description">Discover games, build your own projects with DougCode, and share ideas with the DougHub community. Start with one thing. Explore the rest when you need it.</p><div class="hero-actions"><a class="button button-primary" id="primaryCta" href="log-in.html?redirect=dashboard.html">Get started <span aria-hidden="true">↗</span></a><a class="button" href="#find">Find something <span aria-hidden="true">↓</span></a><a class="button" href="fast-mode.html">Fast Mode <span aria-hidden="true">↗</span></a></div><div class="hero-note" id="heroNote">Free to explore. <strong>Your workspace is ready when you are.</strong></div><a class="scroll-nudge" href="#find" id="heroScrollNudge" aria-label="Scroll down and open Explore DougHub"><span>Scroll to explore</span><span class="scroll-nudge-arrow" aria-hidden="true">↓</span></a></div>
+<div class="hero-copy"><div class="eyebrow"><span class="eyebrow-dot"></span> Your community for games and ideas</div><h1 id="heroTitle">Play. Create.<br><span class="gradient-text">Share what you make.</span></h1><p class="hero-description">Discover games, build your own projects with DougCode, and share ideas with the DougHub community. Start with one thing. Explore the rest when you need it.</p><div class="hero-actions"><a class="button button-primary" id="primaryCta" href="log-in.html?redirect=dashboard.html">Get started <span aria-hidden="true">↗</span></a><a class="button" href="#find">Find something <span aria-hidden="true">↓</span></a><a class="button" href="fast-mode.html">Fast Mode <span aria-hidden="true">↗</span></a></div><div class="hero-note" id="heroNote">Free to explore. <strong>Your workspace is ready when you are.</strong></div><a class="scroll-nudge" href="#find" id="heroScrollNudge" aria-label="Scroll down and open Explore DougHub"><span class="scroll-nudge-arrow" aria-hidden="true">⌄</span></a></div>
 <div class="hero-panel" aria-label="Start with the main DougHub spaces"><div class="panel-top"><span class="panel-kicker">START HERE / DOUGHUB</span><span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end"><span class="panel-status">Ready to explore</span><span style="color:#9296b7;font-size:10px"><strong id="userCount" style="color:#d8b4fe">—</strong> members</span></span></div><h2 class="panel-title">What do you want to do?</h2><p class="panel-description">Three simple places to begin. No need to learn everything at once.</p><div class="panel-links"><a class="panel-link" href="douggames.html"><span class="panel-icon">▶</span><span><strong>Play games</strong><small>Discover games from the community</small></span><span class="panel-arrow">↗</span></a><a class="panel-link" href="Scripting/scripting.html"><span class="panel-icon">{ }</span><span><strong>Create with DougCode</strong><small>Build a project or make a game</small></span><span class="panel-arrow">↗</span></a><a class="panel-link" href="dougforum.html"><span class="panel-icon">☷</span><span><strong>Join the community</strong><small>Share work, ask questions, and discuss</small></span><span class="panel-arrow">↗</span></a></div></div>
 </section>
 <section class="finder" id="find" aria-labelledby="finderTitle">
