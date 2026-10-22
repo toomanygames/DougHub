@@ -338,18 +338,12 @@ footer{padding:14px 0 18px}
 .finder-toggle[aria-expanded="true"] .finder-toggle-arrow{transform:rotate(180deg)}
 .finder-toggle-hint{color:#8589a8;font-size:9px;text-align:right}
 #indexFinderContent[hidden]{display:none!important}
-.scroll-nudge{position:fixed;z-index:999;left:50%;bottom:24px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;width:min(180px,48vw);height:36px;margin:0;padding:0;border:0;background:transparent;color:#c4b5fd;cursor:pointer;transition:color .18s}
-.scroll-nudge:hover{color:#fff}
-.scroll-nudge-arrow{display:block;width:100%;font-size:52px;font-weight:300;line-height:.5;text-align:center;transform:scaleX(1.9);transform-origin:center;animation:dhScrollNudge 1.7s ease-in-out infinite}
-@keyframes dhScrollNudge{0%,100%{translate:0 0}50%{translate:0 4px}}
 @media(max-width:620px){
  .finder-intro{align-items:flex-start}
  .finder-intro-actions{gap:5px}
  .finder-toggle{font-size:10px}
  .finder-toggle-hint{max-width:110px;line-height:1.35}
- .scroll-nudge{bottom:8px;width:min(160px,52vw);height:32px}.scroll-nudge-arrow{font-size:46px}
 }
-@media(prefers-reduced-motion:reduce){.scroll-nudge-arrow{animation:none}}
 
 </style>
 </head>
