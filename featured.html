@@ -61,16 +61,18 @@ main>.bottom-cta{margin-top:10px}
 body{overflow:hidden;background:radial-gradient(ellipse at 8% 0%,#3933a64a,transparent 38%),radial-gradient(ellipse at 92% 12%,#7e22ce30,transparent 34%),radial-gradient(ellipse at 50% 100%,#312e8140,transparent 42%),#050611}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(#8586ff0c 1px,transparent 1px),linear-gradient(90deg,#8586ff0c 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
 .slider{position:relative;width:min(1320px,calc(100vw - 48px));height:min(720px,calc(100vh - 48px));min-height:360px;margin:24px auto;overflow:hidden;border-radius:26px}
-.track{display:flex;flex-direction:row;align-items:stretch;width:100%;height:100%;transition:transform .8s cubic-bezier(.22,.75,.2,1);will-change:transform}
-.track>.tool-slide{flex:0 0 100%;width:100%;height:100%;min-width:0;min-height:0;padding:clamp(18px,3vw,40px);gap:clamp(14px,2.5vw,30px);grid-template-columns:minmax(0,1fr) minmax(0,.9fr);border:1px solid #ffffff12;border-radius:22px}
+.track{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,minmax(0,1fr));grid-auto-columns:25%;width:400%;height:100%;transition:transform .8s cubic-bezier(.22,.75,.2,1);will-change:transform}
+.track>.tool-slide{width:auto;height:auto;min-width:0;min-height:0;padding:clamp(14px,2vw,28px);gap:clamp(10px,1.6vw,22px);grid-template-columns:minmax(0,1fr) minmax(0,.8fr);border:1px solid #ffffff12;border-radius:18px;overflow:hidden}
 .track>.tool-slide .tool-slide-copy{min-width:0}
-.track>.tool-slide .tool-slide-title-row{margin:10px 0 8px}
-.track>.tool-slide h3{font-size:clamp(22px,3vw,40px)}
-.track>.tool-slide p{font-size:clamp(11px,1.15vw,14px);line-height:1.6;margin:0 0 14px}
-.track>.tool-slide .tool-slide-kicker{font-size:9px}
-.track>.tool-slide .tool-slide-icon{width:40px;height:40px;flex-basis:40px;border-radius:12px}
-.track>.tool-slide .tool-slide-art{min-height:0;height:100%;border-radius:16px}
-.track>.tool-slide .tool-slide-cta{padding:9px 13px;font-size:12px}
+.track>.tool-slide .tool-slide-title-row{margin:8px 0 7px}
+.track>.tool-slide h3{font-size:clamp(20px,2.2vw,32px)}
+.track>.tool-slide p{font-size:clamp(10px,.95vw,12px);line-height:1.45;margin:0 0 10px}
+.track>.tool-slide .tool-slide-kicker{font-size:8px}
+.track>.tool-slide .tool-slide-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px}
+.track>.tool-slide .tool-slide-art{min-height:0;height:100%;border-radius:12px}
+.track>.tool-slide .tool-slide-cta{padding:7px 10px;font-size:11px}
+@media(max-width:700px){.slider{width:calc(100vw - 24px);height:calc(100vh - 24px);min-height:360px;margin:12px auto}.track>.tool-slide{grid-template-columns:minmax(0,1fr) minmax(0,.65fr);padding:10px;gap:8px}.track>.tool-slide h3{font-size:clamp(17px,3.2vw,23px)}.track>.tool-slide p{font-size:10px;line-height:1.35}.track>.tool-slide .tool-slide-kicker{font-size:6px}.track>.tool-slide .tool-slide-icon{width:28px;height:28px;flex-basis:28px}.track>.tool-slide .tool-slide-art{display:flex;min-height:0}.track>.tool-slide .art-caption{font-size:6px;left:7px;bottom:6px}}
+@media(max-width:430px){.track>.tool-slide{grid-template-columns:minmax(0,1fr) minmax(0,.55fr);padding:8px;gap:6px}.track>.tool-slide h3{font-size:18px}.track>.tool-slide p{font-size:9px}.track>.tool-slide .tool-slide-cta{padding:6px 7px;font-size:9px}.track>.tool-slide .art-board{width:96%;padding:5px}.track>.tool-slide .art-task{gap:3px;padding:5px 2px}.track>.tool-slide .art-task b{font-size:6px}.track>.tool-slide .art-task small,.track>.tool-slide .art-task em{font-size:5px}.track>.tool-slide .art-mini-card{gap:3px;padding:4px}.track>.tool-slide .art-mini-card strong{font-size:6px}.track>.tool-slide .art-mini-card small{font-size:5px}}
 @media(prefers-reduced-motion:reduce){.track{transition:none}}
 </style>
 </head>
@@ -102,7 +104,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;ba
       </article></div>
 </main>
 <script>
-(()=>{const track=document.getElementById('track');const slides=track.children.length;let index=0;const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;const move=()=>{track.style.transform='translateX(-'+(index*100)+'%)'};if(!reduced)setInterval(()=>{index=(index+1)%slides;move()},3500);window.addEventListener('resize',move)})();
+(()=>{const track=document.getElementById('track');const pages=Math.ceil(track.children.length/2);let index=0;const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;const move=()=>{track.style.transform='translateX(-'+(index*25)+'%)'};if(!reduced)setInterval(()=>{index=(index+1)%pages;move()},3500);window.addEventListener('resize',move)})();
 </script>
 </body>
 </html>
