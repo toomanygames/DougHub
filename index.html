@@ -29,6 +29,60 @@ footer{padding:18px 0 24px;border-top:1px solid var(--line)}.footer-inner{displa
 @media(max-width:620px){header{height:62px;padding:0 15px}header .logo{font-size:18px}header .logo-icon{width:32px;height:32px}.hero{grid-template-columns:1fr;padding:35px 0 28px;gap:23px}.hero h1{font-size:clamp(42px,12vw,60px)}.hero-panel{padding:16px}.hero-actions .button{min-height:41px}.section{padding:27px 0}.finder{padding:24px 0 28px}.finder-head{align-items:flex-start;flex-direction:column;gap:10px}.finder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.finder-card{min-height:101px;padding:11px}.finder-filter{padding:8px 10px}.tool-slide{grid-template-columns:1fr;padding:22px;gap:13px}.tool-slide-art{min-height:145px}.tool-slide p{font-size:11px}.tool-slider-controls{padding:11px 12px}.tool-slider-dots{max-width:58%}.workflow{grid-template-columns:1fr;gap:18px;padding:12px 0}.bottom-cta{margin:16px 0 24px;padding:20px}.bottom-cta-actions{width:100%}.bottom-cta-actions .button{flex:1 1 auto}.feedback-head{align-items:flex-start;flex-direction:column;gap:6px}.footer-inner{align-items:flex-start;flex-direction:column}.footer-links{gap:12px}}
 @media(max-width:380px){main{width:calc(100% - 28px)}.hero-actions .button{flex:1 1 auto}.finder-grid{grid-template-columns:1fr 1fr}.tool-slider-nav{gap:5px}.tool-slider-count{margin-right:1px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Homepage polish: improve readability and spacing on real mobile screens */
+@media(max-width:620px){
+  main{width:calc(100% - 32px)}
+  .hero{padding:42px 0 34px;gap:25px}
+  .eyebrow{font-size:10px;letter-spacing:.11em}
+  .hero h1{font-size:clamp(43px,11.5vw,58px);line-height:1.02;margin:16px 0}
+  .hero-description{font-size:15px;line-height:1.75}
+  .hero-note{font-size:12px;line-height:1.6}
+  .hero-actions{gap:9px;margin-top:22px}
+  .hero-actions .button{font-size:12px;padding:0 12px}
+  .hero-panel{padding:18px;border-radius:18px}
+  .panel-kicker{font-size:9px}
+  .panel-status{font-size:10px}
+  .panel-title{font-size:24px}
+  .panel-description{font-size:13px}
+  .panel-link{padding:13px 11px;gap:10px}
+  .panel-link strong{font-size:13px}
+  .panel-link small{font-size:11px;line-height:1.45}
+  .section-heading h2,.finder h2{font-size:29px}
+  .section-heading p,.finder-subtitle{font-size:14px}
+  .finder{padding:30px 0}
+  .finder-search input{font-size:14px}
+  .finder-filter{font-size:12px;padding:9px 11px}
+  .finder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .finder-card{min-height:118px;padding:13px;border-radius:13px}
+  .finder-icon{width:34px;height:34px;font-size:16px;margin-bottom:10px}
+  .finder-card strong{font-size:13px}
+  .finder-card small{font-size:11px;line-height:1.5}
+  .tool-slide{padding:22px 18px;gap:15px}
+  .tool-slide-kicker{font-size:10px}
+  .tool-slide h3{font-size:27px}
+  .tool-slide p{font-size:13px;line-height:1.7}
+  .tool-slide-art{min-height:150px}
+  .workflow-copy h2{font-size:34px}
+  .workflow-copy>p:not(.section-eyebrow){font-size:14px}
+  .workflow-step{padding:14px}
+  .workflow-step strong{font-size:13px}
+  .workflow-step p{font-size:12px;line-height:1.6}
+  .bottom-cta h2{font-size:27px}
+  .bottom-cta p:not(.section-eyebrow){font-size:13px}
+  .feedback h2{font-size:24px}
+  .feedback-head p{font-size:12px}
+  .feedback textarea{font-size:14px;min-height:110px}
+  .feedback-count,.footer-links{font-size:11px}
+}
+@media(min-width:621px){
+  .hero{padding-top:76px;padding-bottom:64px}
+  .finder{padding-top:42px;padding-bottom:46px}
+  .finder-card{min-height:118px;padding:16px}
+  .finder-card strong{font-size:13px}
+  .finder-card small{font-size:11px}
+  .section{padding-top:48px;padding-bottom:48px}
+}
 </style>
 </head>
 <body>
