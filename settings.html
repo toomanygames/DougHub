@@ -420,7 +420,54 @@ main {
   }
 }
 
-.reward-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.reward-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.045)}.reward-card.locked{opacity:.4}.reward-icon{font-size:27px}.reward-name{margin-top:6px;font-weight:800}.reward-help{margin-top:4px;color:#777d95;font-size:12px}.reward-select{width:100%;height:44px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.06);color:white;padding:0 13px;font:inherit}.reward-note{margin-top:9px;color:#777d95;font-size:12px}
+
+/* Badge collection: data-driven so future admin-created badges can use the same renderer. */
+.reward-showcase{position:relative;margin:18px 0 16px;padding:18px;border:1px solid rgba(167,139,250,.22);border-radius:18px;background:radial-gradient(ellipse at 5% 0,rgba(99,102,241,.18),transparent 58%),linear-gradient(135deg,rgba(24,28,61,.85),rgba(9,12,30,.9));overflow:hidden}
+.reward-showcase:after{content:"";position:absolute;right:-36px;top:-58px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.14),transparent 70%);pointer-events:none}
+.reward-showcase-top{display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;z-index:1}
+.reward-showcase-kicker{color:#a5b4fc;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.reward-showcase-title{margin-top:5px;color:#f4f3ff;font-size:20px;font-weight:850;letter-spacing:-.04em}
+.reward-showcase-copy{margin-top:5px;color:#a4a9c6;font-size:12px;line-height:1.5}
+.reward-count{display:grid;place-items:center;flex:0 0 66px;width:66px;height:66px;border:1px solid #a78bfa3b;border-radius:20px;background:linear-gradient(145deg,#6366f12b,#a855f72b);box-shadow:inset 0 1px #ffffff12}
+.reward-count strong{font-size:21px;line-height:1;color:#f5f3ff}
+.reward-count span{margin-top:4px;color:#b5b8d4;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.reward-progress{height:5px;margin-top:17px;border-radius:999px;background:#ffffff0b;overflow:hidden;position:relative;z-index:1}
+.reward-progress-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#6366f1,#a855f7,#c4b5fd);box-shadow:0 0 16px #8b5cf666;transition:width .3s ease}
+.reward-gallery-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 12px}
+.reward-gallery-title{font-size:14px;font-weight:850;color:#e7e9ff}
+.reward-gallery-subtitle{margin-top:3px;color:#838bab;font-size:11px}
+.reward-filter-group{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.reward-filter{padding:7px 11px;border:1px solid rgba(174,181,255,.12);border-radius:999px;background:#ffffff04;color:#a6acc8;font-size:11px;font-weight:750;cursor:pointer;transition:all .18s}
+.reward-filter:hover{border-color:#a78bfa55;color:#fff}
+.reward-filter.active{border-color:#a78bfa66;background:linear-gradient(110deg,#6366f12c,#a855f72a);color:#f5f3ff;box-shadow:inset 0 1px #ffffff0a}
+.reward-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:11px}
+.reward-card{position:relative;display:flex;flex-direction:column;min-width:0;min-height:188px;padding:13px;border:1px solid rgba(174,181,255,.12);border-radius:16px;background:linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,.015));overflow:hidden;transition:transform .2s,border-color .2s,background .2s,opacity .2s}
+.reward-card:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--badge-accent,linear-gradient(90deg,#6366f1,#a855f7));opacity:.9}
+.reward-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.4);background:linear-gradient(155deg,rgba(99,102,241,.09),rgba(168,85,247,.035))}
+.reward-card.locked{background:rgba(255,255,255,.012);border-style:dashed;border-color:rgba(174,181,255,.09)}
+.reward-card.locked .reward-icon-wrap{filter:grayscale(.75);opacity:.62}
+.reward-card.equipped{border-color:#a78bfa77;background:linear-gradient(145deg,rgba(99,102,241,.15),rgba(168,85,247,.075));box-shadow:inset 0 0 0 1px rgba(167,139,250,.09),0 10px 28px #0002}
+.reward-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.reward-icon-wrap{display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:var(--badge-tint,linear-gradient(145deg,#6366f12b,#a855f72b));box-shadow:inset 0 1px #ffffff12}
+.reward-icon{font-size:29px;line-height:1}
+.reward-rarity{padding:4px 6px;border:1px solid rgba(255,255,255,.09);border-radius:999px;color:#aeb5d3;font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+.reward-name{margin-top:12px;color:#f0f1ff;font-size:12px;font-weight:850;line-height:1.35}
+.reward-help{margin-top:5px;color:#9098b8;font-size:10px;line-height:1.5;flex:1}
+.reward-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:12px}
+.reward-status{display:inline-flex;align-items:center;gap:5px;color:#8f97b5;font-size:9px;font-weight:800}
+.reward-status-dot{width:6px;height:6px;border-radius:50%;background:#666d89}
+.reward-card.unlocked .reward-status{color:#a7f3d0}
+.reward-card.unlocked .reward-status-dot{background:#34d399;box-shadow:0 0 8px #34d39955}
+.reward-card.equipped .reward-status{color:#d8b4fe}
+.reward-card.equipped .reward-status-dot{background:#c084fc;box-shadow:0 0 8px #c084fc88}
+.reward-equip-button{padding:6px 9px;border:1px solid #a78bfa35;border-radius:8px;background:#8b5cf61a;color:#dcd5ff;font-size:9px;font-weight:850;cursor:pointer}
+.reward-equip-button:hover{background:#8b5cf635;border-color:#a78bfa77}
+.reward-equip-button:disabled{cursor:default;opacity:.5}
+.reward-empty{grid-column:1/-1;padding:22px;border:1px dashed rgba(174,181,255,.14);border-radius:14px;color:#969dbb;text-align:center;font-size:12px}
+.reward-select{width:100%;height:40px;border:1px solid rgba(174,181,255,.15);border-radius:10px;background:rgba(4,6,18,.72);color:white;padding:0 12px;font:inherit;font-size:12px}
+.reward-note{margin-top:9px;color:#8d94b4;font-size:11px;line-height:1.55}
+@media(max-width:560px){.reward-showcase{padding:14px}.reward-showcase-title{font-size:18px}.reward-count{width:58px;height:58px;flex-basis:58px;border-radius:17px}.reward-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.reward-card{padding:10px;min-height:178px}.reward-icon-wrap{width:47px;height:47px;border-radius:14px}.reward-icon{font-size:25px}.reward-gallery-head{align-items:flex-start;flex-direction:column}.reward-filter{padding:7px 9px}}
+
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
 <style id="doughub-polish">
@@ -482,6 +529,19 @@ header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdro
 </style>
 
 <style id="settings-redesign-20261022">
+/* Keep the Preferences heading pinned with the settings navigation. */
+.settings-sidebar{position:sticky;top:78px;align-self:start;max-height:calc(100vh - 94px);overflow-y:auto;overscroll-behavior:contain}
+.settings-sidebar-label{position:sticky;top:0;z-index:3;background:linear-gradient(160deg,rgba(17,22,49,.98),rgba(17,22,49,.95));border-radius:8px}
+@media(max-width:800px){
+  .settings-sidebar{position:sticky;top:66px;z-index:10;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;max-height:none;overflow:visible;padding:9px}
+  .settings-sidebar-label{display:block;grid-column:1/-1;padding:5px 7px 7px;background:transparent}
+  .settings-sidebar .settings-nav-link{min-width:0}
+  .settings-sidebar .settings-nav-link strong{white-space:normal}
+  .settings-sidebar .settings-nav-link .settings-nav-icon{flex-basis:27px;width:27px;height:27px}
+  .settings-sidebar-divider,.settings-sidebar-foot{display:none}
+}
+@media(max-width:430px){.settings-sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
   :root{color-scheme:dark;--settings-line:rgba(174,181,255,.12);--settings-muted:#9da4c4;--settings-panel:rgba(13,17,39,.78)}
   html{scroll-behavior:smooth;scroll-padding-top:100px}
   body{background:radial-gradient(ellipse at 10% 0,rgba(99,102,241,.17),transparent 36%),radial-gradient(ellipse at 100% 65%,rgba(168,85,247,.12),transparent 35%),#02040a}
@@ -725,14 +785,31 @@ document.addEventListener("DOMContentLoaded",function(){
 
       <h2 class="section-title">Rewards & Badges</h2>
       <p class="section-description">Earn seasonal badges by playing the seasonal games. Choose which earned badge appears beside your name in Chat.</p>
+      <div class="reward-showcase" aria-live="polite">
+        <div class="reward-showcase-top">
+          <div>
+            <div class="reward-showcase-kicker">Your collection</div>
+            <div class="reward-showcase-title">Badges worth showing off.</div>
+            <div class="reward-showcase-copy">Collect badges, pick your favourite, and show it beside your name in Community Chat.</div>
+          </div>
+          <div class="reward-count"><strong id="rewardCount">0/7</strong><span>Unlocked</span></div>
+        </div>
+        <div class="reward-progress" role="progressbar" aria-label="Badge collection progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" id="rewardProgress"><div class="reward-progress-fill" id="rewardProgressFill"></div></div>
+      </div>
       <div class="setting-row">
-        <div class="setting-info"><div class="setting-label">Chat Badge</div><div class="setting-help">Admins automatically have every badge.</div></div>
+        <div class="setting-info"><div class="setting-label">Displayed chat badge</div><div class="setting-help">Choose the badge people see next to your username. You can change it anytime.</div></div>
         <div class="setting-control" style="display:block">
-          <select id="badgeSelect" class="reward-select"><option value="">No badge</option></select>
+          <select id="badgeSelect" class="reward-select" aria-label="Choose displayed chat badge"><option value="">No badge</option></select>
           <div id="badgeNote" class="reward-note">Loading your rewards...</div>
         </div>
       </div>
-      <div id="rewardGrid" class="reward-grid"></div>
+      <div class="reward-gallery-head"><div><div class="reward-gallery-title">Badge gallery</div><div class="reward-gallery-subtitle" id="rewardGallerySubtitle">Every badge has a story.</div></div></div>
+      <div class="reward-filter-group" id="rewardFilterGroup" role="group" aria-label="Filter badges">
+        <button type="button" class="reward-filter active" data-reward-filter="all" aria-pressed="true">All badges</button>
+        <button type="button" class="reward-filter" data-reward-filter="earned" aria-pressed="false">Unlocked</button>
+        <button type="button" class="reward-filter" data-reward-filter="locked" aria-pressed="false">Locked</button>
+      </div>
+      <div id="rewardGrid" class="reward-grid" aria-live="polite"></div>
       <div class="setting-row" id="staffBadgeSetting" style="display:none;margin-top:12px">
         <div class="setting-info"><div class="setting-label">Staff Rank Badge</div><div class="setting-help">Show your Helper, Admin, Developer, or Owner badge after your username in Community Chat.</div></div>
         <div class="setting-control" style="display:flex;align-items:center;gap:10px">
@@ -2006,14 +2083,92 @@ profilePictureInput.addEventListener(
 /* =========================================
    REWARDS
 ========================================= */
-const rewardInfo={summer:["🏖️","Summer Badge"],spring:["🌸","Spring Badge"],fall:["🍂","Fall Badge"],winter:["❄️","Winter Badge"],halloween:["🎃","Halloween Badge"],christmas:["🎄","Christmas Badge"],og:["★","OG Badge"]};
+/* Badge catalogue metadata is intentionally separate from rendering.
+   Future admin-created badges can be added to this catalogue shape without rebuilding the gallery UI.
+   When the admin badge builder is added, replace/extend this seed catalogue with its Supabase-backed records. */
+const rewardInfo={
+  summer:{icon:"🏖️",name:"Summer Badge",rarity:"Seasonal",description:"A little sunshine for your profile.",unlockHint:"Play the summer seasonal game.",tint:"rgba(251,191,36,.13)",accent:"linear-gradient(90deg,#fbbf24,#fb923c)"},
+  spring:{icon:"🌸",name:"Spring Badge",rarity:"Seasonal",description:"Fresh blooms for a fresh season.",unlockHint:"Play the spring seasonal game.",tint:"rgba(244,114,182,.13)",accent:"linear-gradient(90deg,#f472b6,#c084fc)"},
+  fall:{icon:"🍂",name:"Autumn Badge",rarity:"Seasonal",description:"A collectible for the changing leaves.",unlockHint:"Play the autumn seasonal game.",tint:"rgba(249,115,22,.13)",accent:"linear-gradient(90deg,#f97316,#fbbf24)"},
+  winter:{icon:"❄️",name:"Winter Badge",rarity:"Seasonal",description:"A cool collectible for winter.",unlockHint:"Play the winter seasonal game.",tint:"rgba(96,165,250,.13)",accent:"linear-gradient(90deg,#60a5fa,#a5f3fc)"},
+  halloween:{icon:"🎃",name:"Halloween Badge",rarity:"Limited",description:"A spooky seasonal collectible.",unlockHint:"Earn it during the Halloween event.",tint:"rgba(249,115,22,.13)",accent:"linear-gradient(90deg,#f97316,#a855f7)"},
+  christmas:{icon:"🎄",name:"Christmas Badge",rarity:"Limited",description:"A festive badge for the holidays.",unlockHint:"Earn it during the Christmas event.",tint:"rgba(52,211,153,.13)",accent:"linear-gradient(90deg,#34d399,#f87171)"},
+  og:{icon:"★",name:"OG Badge",rarity:"Legacy",description:"A special badge awarded by DougHub staff.",unlockHint:"Awarded by DougHub staff.",tint:"rgba(250,204,21,.13)",accent:"linear-gradient(90deg,#facc15,#f97316)"}
+};
+let rewardFilter="all";
 function renderRewards(){
-  const badges=currentProfile?.reward_badges||[]; const select=document.getElementById("badgeSelect"); const grid=document.getElementById("rewardGrid");
-  select.innerHTML='<option value="">No badge</option>';
-  Object.entries(rewardInfo).forEach(([key,[icon,name]])=>{const option=document.createElement("option");option.value=key;option.textContent=icon+" "+name;option.disabled=!badges.includes(key)&&!currentProfile?.is_admin;select.appendChild(option);const card=document.createElement("div");card.className="reward-card"+(badges.includes(key)||currentProfile?.is_admin?"":" locked");card.innerHTML='<div class="reward-icon">'+icon+'</div><div class="reward-name">'+name+'</div><div class="reward-help">'+(badges.includes(key)||currentProfile?.is_admin?"Unlocked":"Play this seasonal game")+"</div>";grid.appendChild(card);});
-  select.value=currentProfile?.equipped_badge||""; document.getElementById("badgeNote").textContent=currentProfile?.is_admin?"Admin: all seasonal badges are unlocked. OG badges are awarded by staff.":(badges.includes("og")?"OG badge awarded by DougHub staff.":(badges.length?badges.length+" badge"+(badges.length===1?"":"s")+" earned.":"No badges yet — play a seasonal game!"));
+  const earned=Array.isArray(currentProfile?.reward_badges)?currentProfile.reward_badges:[];
+  const isAdmin=!!currentProfile?.is_admin;
+  const equipped=currentProfile?.equipped_badge||"";
+  const select=document.getElementById("badgeSelect");
+  const grid=document.getElementById("rewardGrid");
+  const entries=Object.entries(rewardInfo);
+  const unlockedCount=entries.filter(([key])=>earned.includes(key)||isAdmin).length;
+  const count=document.getElementById("rewardCount");
+  const progress=document.getElementById("rewardProgress");
+  const progressFill=document.getElementById("rewardProgressFill");
+  count.textContent=unlockedCount+"/"+entries.length;
+  progress.setAttribute("aria-valuemax",String(entries.length));
+  progress.setAttribute("aria-valuenow",String(unlockedCount));
+  progressFill.style.width=(entries.length?unlockedCount/entries.length*100:0)+"%";
+  document.getElementById("rewardGallerySubtitle").textContent=unlockedCount===entries.length?"Collection complete — every current badge is unlocked.":unlockedCount+" of "+entries.length+" badges unlocked. Keep exploring DougHub to collect more.";
+  select.replaceChildren();
+  const none=document.createElement("option");none.value="";none.textContent="No badge";select.appendChild(none);
+  entries.forEach(([key,meta])=>{
+    const unlocked=earned.includes(key)||isAdmin;
+    const option=document.createElement("option");option.value=key;option.textContent=meta.icon+" "+meta.name;option.disabled=!unlocked;select.appendChild(option);
+  });
+  select.value=equipped;
+  if(select.value!==equipped)select.value="";
+  grid.replaceChildren();
+  const visible=entries.filter(([key])=>{const unlocked=earned.includes(key)||isAdmin;return rewardFilter==="all"||(rewardFilter==="earned"&&unlocked)||(rewardFilter==="locked"&&!unlocked);});
+  if(!visible.length){const empty=document.createElement("div");empty.className="reward-empty";empty.textContent=rewardFilter==="earned"?"No badges unlocked yet. Play seasonal games to start your collection.":"Nothing in this collection matches that filter.";grid.appendChild(empty);}
+  visible.forEach(([key,meta])=>{
+    const unlocked=earned.includes(key)||isAdmin;
+    const isEquipped=equipped===key;
+    const card=document.createElement("article");
+    card.className="reward-card "+(unlocked?"unlocked":"locked")+(isEquipped?" equipped":"");
+    card.style.setProperty("--badge-tint",meta.tint);
+    card.style.setProperty("--badge-accent",meta.accent);
+    const top=document.createElement("div");top.className="reward-card-top";
+    const iconWrap=document.createElement("div");iconWrap.className="reward-icon-wrap";
+    const icon=document.createElement("span");icon.className="reward-icon";icon.textContent=meta.icon;icon.setAttribute("aria-hidden","true");iconWrap.appendChild(icon);
+    const rarity=document.createElement("span");rarity.className="reward-rarity";rarity.textContent=meta.rarity;
+    top.append(iconWrap,rarity);
+    const name=document.createElement("div");name.className="reward-name";name.textContent=meta.name;
+    const help=document.createElement("div");help.className="reward-help";help.textContent=unlocked?meta.description:meta.unlockHint;
+    const bottom=document.createElement("div");bottom.className="reward-card-bottom";
+    const status=document.createElement("span");status.className="reward-status";
+    const dot=document.createElement("span");dot.className="reward-status-dot";dot.setAttribute("aria-hidden","true");
+    const statusText=document.createElement("span");statusText.textContent=isEquipped?"EQUIPPED":unlocked?"UNLOCKED":"LOCKED";
+    status.append(dot,statusText);bottom.appendChild(status);
+    if(unlocked){
+      const button=document.createElement("button");button.type="button";button.className="reward-equip-button";button.textContent=isEquipped?"Selected":"Equip";
+      button.disabled=isEquipped;button.setAttribute("aria-label",(isEquipped?"Currently equipped: ":"Equip ")+meta.name);
+      button.addEventListener("click",()=>{select.value=key;select.dispatchEvent(new Event("change",{bubbles:true}));});
+      bottom.appendChild(button);
+    }
+    card.append(top,name,help,bottom);grid.appendChild(card);
+  });
+  document.getElementById("badgeNote").textContent=isAdmin?"Admin access: all current badges are unlocked. Legacy OG badges are awarded by staff.":(earned.includes("og")?"Your OG badge was awarded by DougHub staff.":(earned.length?earned.length+" badge"+(earned.length===1?"":"s")+" earned.":"No badges yet — play a seasonal game to start collecting."));
 }
-document.getElementById("badgeSelect").addEventListener("change",async()=>{if(!currentUser||!currentProfile)return;const value=document.getElementById("badgeSelect").value||null;const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);if(error){showStatus("Could not update your badge.","error");return}currentProfile.equipped_badge=value;showStatus(value?"Chat badge updated!":"Chat badge removed.","success");});
+document.getElementById("rewardFilterGroup").addEventListener("click",event=>{
+  const button=event.target.closest("[data-reward-filter]");if(!button)return;
+  rewardFilter=button.dataset.rewardFilter;
+  document.querySelectorAll("[data-reward-filter]").forEach(item=>{const active=item===button;item.classList.toggle("active",active);item.setAttribute("aria-pressed",String(active));});
+  renderRewards();
+});
+document.getElementById("badgeSelect").addEventListener("change",async()=>{
+  if(!currentUser||!currentProfile)return;
+  const value=document.getElementById("badgeSelect").value||null;
+  const previous=currentProfile.equipped_badge||"";
+  if(value&&!(currentProfile?.is_admin||(currentProfile?.reward_badges||[]).includes(value))){document.getElementById("badgeSelect").value=previous;return;}
+  const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);
+  if(error){document.getElementById("badgeSelect").value=previous;showStatus("Could not update your badge.","error");return;}
+  currentProfile.equipped_badge=value;
+  renderRewards();
+  showStatus(value?"Chat badge updated!":"Chat badge removed.","success");
+});
 
 
 
