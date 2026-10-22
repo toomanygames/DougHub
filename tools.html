@@ -228,6 +228,9 @@ body{
 @media(max-width:1000px){.main-pages-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.main-pages-section{padding:15px}.main-pages-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.main-page-link{padding:10px;gap:8px}.main-page-icon{width:30px;height:30px;flex-basis:30px}}
 @media(max-width:420px){.main-pages-grid{grid-template-columns:1fr}.main-page-link{padding:11px}}
+
+/* Keep the core community spaces distinct from optional tools and workspace pages. */
+.directory-subsection{margin-top:22px}.directory-subheading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 11px}.directory-subheading h3{margin:0;color:#f3f2ff;font-size:15px;letter-spacing:-.025em}.directory-subheading>span{color:#9698bb;font-size:9px;font-weight:900;letter-spacing:.13em}.directory-extras{padding-top:18px;border-top:1px solid #ffffff12}.directory-extras .main-page-link{background:#ffffff02}.directory-extras .main-page-icon{opacity:.85}
 </style>
 </head>
 <body>
@@ -270,24 +273,32 @@ body{
     </div>
   </section>
   <section class="main-pages-section" id="mainPagesDirectory" aria-labelledby="mainPagesHeading">
-    <div class="main-pages-heading"><div><span class="eyebrow">YOUR DOUGHUB SHORTCUTS</span><h2 id="mainPagesHeading">Main pages</h2><p>Jump straight to any of the main spaces on DougHub.</p></div><span class="main-pages-count">16 destinations</span></div>
-    <div class="main-pages-grid">
-      <a class="main-page-link" href="index.html"><span class="main-page-icon">⌂</span><span><strong>Home</strong><small>DougHub homepage</small></span><b>↗</b></a>
-      <a class="main-page-link" href="dashboard.html"><span class="main-page-icon">▦</span><span><strong>Dashboard</strong><small>Your personal workspace</small></span><b>↗</b></a>
-      <a class="main-page-link" href="douggames.html"><span class="main-page-icon">🎮</span><span><strong>DougGames</strong><small>Play games</small></span><b>↗</b></a>
-      <a class="main-page-link" href="tools.html"><span class="main-page-icon">✳</span><span><strong>DougTools</strong><small>Everyday utilities</small></span><b>↗</b></a>
-      <a class="main-page-link" href="nova.html"><span class="main-page-icon">✧</span><span><strong>Nova AI</strong><small>Explore ideas with AI</small></span><b>↗</b></a>
-      <a class="main-page-link" href="chat.html"><span class="main-page-icon">☷</span><span><strong>Community Chat</strong><small>Talk with the community</small></span><b>↗</b></a>
-      <a class="main-page-link" href="dougforum.html"><span class="main-page-icon">DF</span><span><strong>DougForum</strong><small>Posts and discussions</small></span><b>↗</b></a>
-      <a class="main-page-link" href="work.html"><span class="main-page-icon">▤</span><span><strong>DougHub Work</strong><small>Tasks and projects</small></span><b>↗</b></a>
-      <a class="main-page-link" href="Scripting/scripting.html"><span class="main-page-icon">⌘</span><span><strong>DougCode</strong><small>Build and create</small></span><b>↗</b></a>
-      <a class="main-page-link" href="dougbase.html"><span class="main-page-icon">▥</span><span><strong>DougBase</strong><small>Project data tools</small></span><b>↗</b></a>
-      <a class="main-page-link" href="dougdrive.html"><span class="main-page-icon">↗</span><span><strong>DougDrive</strong><small>Your files</small></span><b>↗</b></a>
-      <a class="main-page-link" href="douqhub-music.html"><span class="main-page-icon">♫</span><span><strong>DougHub Music</strong><small>Community music</small></span><b>↗</b></a>
-      <a class="main-page-link" href="DougTube.html"><span class="main-page-icon">▷</span><span><strong>DougTube</strong><small>Community videos</small></span><b>↗</b></a>
-      <a class="main-page-link" href="DMail.html"><span class="main-page-icon">✉</span><span><strong>DMail</strong><small>Your messages</small></span><b>↗</b></a>
-      <a class="main-page-link" href="my-games.html"><span class="main-page-icon">✦</span><span><strong>My Creations</strong><small>Your published projects</small></span><b>↗</b></a>
-      <a class="main-page-link" href="settings.html"><span class="main-page-icon">⚙</span><span><strong>Settings</strong><small>Manage your account</small></span><b>↗</b></a>
+    <div class="main-pages-heading"><div><span class="eyebrow">YOUR DOUGHUB SHORTCUTS</span><h2 id="mainPagesHeading">Find your space</h2><p>Start with the places for playing, creating, and sharing. Everything else stays available below.</p></div><span class="main-pages-count">16 destinations</span></div>
+    <div class="directory-subsection">
+      <div class="directory-subheading"><h3>Play, create &amp; share</h3><span>THE MAIN SPACES</span></div>
+      <div class="main-pages-grid">
+        <a class="main-page-link" href="douggames.html"><span class="main-page-icon">▶</span><span><strong>DougGames</strong><small>Play and discover games</small></span><b>↗</b></a>
+        <a class="main-page-link" href="Scripting/scripting.html"><span class="main-page-icon">{ }</span><span><strong>DougCode</strong><small>Build projects and games</small></span><b>↗</b></a>
+        <a class="main-page-link" href="dougforum.html"><span class="main-page-icon">DF</span><span><strong>DougForum</strong><small>Share creations and discuss</small></span><b>↗</b></a>
+        <a class="main-page-link" href="chat.html"><span class="main-page-icon">☷</span><span><strong>Community Chat</strong><small>Talk with the community</small></span><b>↗</b></a>
+        <a class="main-page-link" href="my-games.html"><span class="main-page-icon">✦</span><span><strong>My Creations</strong><small>Return to your published projects</small></span><b>↗</b></a>
+      </div>
+    </div>
+    <div class="directory-subsection directory-extras">
+      <div class="directory-subheading"><h3>More DougHub spaces</h3><span>EXTRAS &amp; WORKSPACE</span></div>
+      <div class="main-pages-grid">
+        <a class="main-page-link" href="index.html"><span class="main-page-icon">⌂</span><span><strong>Home</strong><small>DougHub homepage</small></span><b>↗</b></a>
+        <a class="main-page-link" href="dashboard.html"><span class="main-page-icon">▦</span><span><strong>Dashboard</strong><small>Your personal workspace</small></span><b>↗</b></a>
+        <a class="main-page-link" href="tools.html"><span class="main-page-icon">✳</span><span><strong>DougTools</strong><small>Everyday utilities</small></span><b>↗</b></a>
+        <a class="main-page-link" href="nova.html"><span class="main-page-icon">✧</span><span><strong>Nova AI</strong><small>Explore ideas with AI</small></span><b>↗</b></a>
+        <a class="main-page-link" href="work.html"><span class="main-page-icon">▤</span><span><strong>DougHub Work</strong><small>Tasks and projects</small></span><b>↗</b></a>
+        <a class="main-page-link" href="dougbase.html"><span class="main-page-icon">▥</span><span><strong>DougBase</strong><small>Project data tools</small></span><b>↗</b></a>
+        <a class="main-page-link" href="dougdrive.html"><span class="main-page-icon">↗</span><span><strong>DougDrive</strong><small>Your files</small></span><b>↗</b></a>
+        <a class="main-page-link" href="douqhub-music.html"><span class="main-page-icon">♫</span><span><strong>DougHub Music</strong><small>Community music</small></span><b>↗</b></a>
+        <a class="main-page-link" href="DougTube.html"><span class="main-page-icon">▷</span><span><strong>DougTube</strong><small>Community videos</small></span><b>↗</b></a>
+        <a class="main-page-link" href="DMail.html"><span class="main-page-icon">✉</span><span><strong>DMail</strong><small>Your messages</small></span><b>↗</b></a>
+        <a class="main-page-link" href="settings.html"><span class="main-page-icon">⚙</span><span><strong>Settings</strong><small>Manage your account</small></span><b>↗</b></a>
+      </div>
     </div>
   </section>
   <section class="tool-lab-feature-wrap" aria-label="Featured tool">
