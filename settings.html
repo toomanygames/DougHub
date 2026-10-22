@@ -630,6 +630,64 @@ header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdro
     .logout-button{width:100%}
   }
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Keep the Preferences heading pinned with the settings navigation. */
+.settings-sidebar{position:sticky;top:78px;align-self:start;max-height:calc(100vh - 94px);overflow-y:auto;overscroll-behavior:contain}
+.settings-sidebar-label{position:sticky;top:0;z-index:3;background:linear-gradient(160deg,rgba(17,22,49,.98),rgba(17,22,49,.95));border-radius:8px}
+@media(max-width:800px){
+  .settings-sidebar{position:sticky;top:66px;z-index:10;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;max-height:none;overflow:visible;padding:9px}
+  .settings-sidebar-label{display:block;grid-column:1/-1;padding:5px 7px 7px;background:transparent}
+  .settings-sidebar .settings-nav-link{min-width:0}
+  .settings-sidebar .settings-nav-link strong{white-space:normal}
+  .settings-sidebar .settings-nav-link .settings-nav-icon{flex-basis:27px;width:27px;height:27px}
+  .settings-sidebar-divider,.settings-sidebar-foot{display:none}
+}
+@media(max-width:430px){.settings-sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Final cascade for the badge gallery, after legacy page polish rules. */
+.reward-showcase{position:relative;margin:18px 0 16px;padding:18px;border:1px solid rgba(167,139,250,.22);border-radius:18px;background:radial-gradient(ellipse at 5% 0,rgba(99,102,241,.18),transparent 58%),linear-gradient(135deg,rgba(24,28,61,.85),rgba(9,12,30,.9));overflow:hidden}
+.reward-showcase:after{content:"";position:absolute;right:-36px;top:-58px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.14),transparent 70%);pointer-events:none}
+.reward-showcase-top{display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;z-index:1}
+.reward-showcase-kicker{color:#a5b4fc;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.reward-showcase-title{margin-top:5px;color:#f4f3ff;font-size:20px;font-weight:850;letter-spacing:-.04em}
+.reward-showcase-copy{margin-top:5px;color:#a4a9c6;font-size:12px;line-height:1.5}
+.reward-count{display:grid;place-items:center;flex:0 0 66px;width:66px;height:66px;border:1px solid #a78bfa3b;border-radius:20px;background:linear-gradient(145deg,#6366f12b,#a855f72b);box-shadow:inset 0 1px #ffffff12}
+.reward-count strong{font-size:21px;line-height:1;color:#f5f3ff}
+.reward-count span{margin-top:4px;color:#b5b8d4;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.reward-progress{height:5px;margin-top:17px;border-radius:999px;background:#ffffff0b;overflow:hidden;position:relative;z-index:1}
+.reward-progress-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#6366f1,#a855f7,#c4b5fd);box-shadow:0 0 16px #8b5cf666;transition:width .3s ease}
+.reward-gallery-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 12px}
+.reward-gallery-title{font-size:14px;font-weight:850;color:#e7e9ff}
+.reward-gallery-subtitle{margin-top:3px;color:#838bab;font-size:11px}
+.reward-filter-group{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.reward-filter{padding:7px 11px;border:1px solid rgba(174,181,255,.12);border-radius:999px;background:#ffffff04;color:#a6acc8;font-size:11px;font-weight:750;cursor:pointer;transition:all .18s}
+.reward-filter:hover{border-color:#a78bfa55;color:#fff}
+.reward-filter.active{border-color:#a78bfa66;background:linear-gradient(110deg,#6366f12c,#a855f72a);color:#f5f3ff;box-shadow:inset 0 1px #ffffff0a}
+.reward-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:11px}
+.reward-card{position:relative;display:flex;flex-direction:column;min-width:0;min-height:188px;padding:13px;border:1px solid rgba(174,181,255,.12);border-radius:16px;background:linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,.015));overflow:hidden;transition:transform .2s,border-color .2s,background .2s,opacity .2s;box-shadow:none}
+.reward-card:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--badge-accent,linear-gradient(90deg,#6366f1,#a855f7));opacity:.9}
+.reward-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.4);background:linear-gradient(155deg,rgba(99,102,241,.09),rgba(168,85,247,.035))}
+.reward-card.locked{background:rgba(255,255,255,.012);border-style:dashed;border-color:rgba(174,181,255,.09)}
+.reward-card.locked .reward-icon-wrap{filter:grayscale(.75);opacity:.62}
+.reward-card.equipped{border-color:#a78bfa77;background:linear-gradient(145deg,rgba(99,102,241,.15),rgba(168,85,247,.075));box-shadow:inset 0 0 0 1px rgba(167,139,250,.09),0 10px 28px #0002}
+.reward-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.reward-icon-wrap{display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:var(--badge-tint,linear-gradient(145deg,#6366f12b,#a855f72b));box-shadow:inset 0 1px #ffffff12}
+.reward-icon{font-size:29px;line-height:1}
+.reward-rarity{padding:4px 6px;border:1px solid rgba(255,255,255,.09);border-radius:999px;color:#aeb5d3;font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+.reward-name{margin-top:12px;color:#f0f1ff;font-size:12px;font-weight:850;line-height:1.35}
+.reward-help{margin-top:5px;color:#9098b8;font-size:10px;line-height:1.5;flex:1}
+.reward-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:12px}
+.reward-status{display:inline-flex;align-items:center;gap:5px;color:#8f97b5;font-size:9px;font-weight:800}
+.reward-status-dot{width:6px;height:6px;border-radius:50%;background:#666d89}
+.reward-card.unlocked .reward-status{color:#a7f3d0}
+.reward-card.unlocked .reward-status-dot{background:#34d399;box-shadow:0 0 8px #34d39955}
+.reward-card.equipped .reward-status{color:#d8b4fe}
+.reward-card.equipped .reward-status-dot{background:#c084fc;box-shadow:0 0 8px #c084fc88}
+.reward-equip-button{padding:6px 9px;border:1px solid #a78bfa35;border-radius:8px;background:#8b5cf61a;color:#dcd5ff;font-size:9px;font-weight:850;cursor:pointer}
+.reward-equip-button:hover{background:#8b5cf635;border-color:#a78bfa77}
+.reward-equip-button:disabled{cursor:default;opacity:.5}
+.reward-empty{grid-column:1/-1;padding:22px;border:1px dashed rgba(174,181,255,.14);border-radius:14px;color:#969dbb;text-align:center;font-size:12px}
+@media(max-width:560px){.reward-showcase{padding:14px}.reward-showcase-title{font-size:18px}.reward-count{width:58px;height:58px;flex-basis:58px;border-radius:17px}.reward-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.reward-card{padding:10px;min-height:178px}.reward-icon-wrap{width:47px;height:47px;border-radius:14px}.reward-icon{font-size:25px}.reward-gallery-head{align-items:flex-start;flex-direction:column}.reward-filter{padding:7px 9px}}
+
 </style>
 <script>
 document.addEventListener("DOMContentLoaded",function(){
