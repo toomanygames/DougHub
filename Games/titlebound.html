@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080611">
+<title>TITLEBOUND — Realms of Fortune</title>
+<script src="../display.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#080611;--panel:rgba(18,15,35,.82);--line:rgba(202,180,255,.15);--muted:#a49bbd;--gold:#ffd98b;--violet:#b49aff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:#f8f4ff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{min-height:100vh;overflow-x:hidden;background:radial-gradient(ellipse at 50% -20%,#34205b 0,transparent 48%),radial-gradient(ellipse at 5% 60%,#17123a 0,transparent 35%),#080611}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:2px solid #f8d89a;outline-offset:3px}
+#sky{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.94}
+.app{position:relative;z-index:1;max-width:1480px;margin:auto;padding:20px 26px 40px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 0 20px;border-bottom:1px solid rgba(255,255,255,.09)}
+.brand{display:flex;align-items:center;gap:12px}.brandmark{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#f9dc9b,#a77bff 68%,#5145a7);box-shadow:0 0 32px #9a70ff45;font-size:22px;color:#160e2b}
+.brand h1{font-size:18px;letter-spacing:.18em;margin:0}.brand small{display:block;color:#a99cc9;letter-spacing:.16em;font-size:9px;margin-top:4px}
+.top-actions{display:flex;gap:9px;align-items:center}.top-pill{border:1px solid var(--line);border-radius:999px;background:#ffffff08;padding:10px 14px;color:#e8dfff;font-size:12px}.top-pill strong{color:var(--gold);font-variant-numeric:tabular-nums}
+.back{color:#c6b9e9;text-decoration:none;font-size:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.9fr);gap:20px;align-items:center;padding:24px 0 18px}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:#cfb4ff}
+.hero h2{font-size:clamp(32px,5vw,64px);line-height:.99;letter-spacing:-.055em;margin:12px 0 14px;max-width:650px}.hero h2 span{background:linear-gradient(100deg,#fff0c1 5%,#d7b8ff 48%,#8de9ff 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:560px;color:#b9b0ce;line-height:1.7;font-size:13px;margin:0}.hero-stats{display:flex;gap:24px;margin-top:21px;flex-wrap:wrap}.stat strong{display:block;font-size:19px;letter-spacing:-.04em}.stat span{font-size:9px;color:#a49bbd;text-transform:uppercase;letter-spacing:.14em}
+.art-card{height:270px;position:relative;border:1px solid rgba(207,181,255,.2);border-radius:24px;overflow:hidden;background:radial-gradient(ellipse at 50% 54%,#7d55c65c 0,transparent 34%),linear-gradient(135deg,#1a1430d9,#0b0b1d);box-shadow:inset 0 1px #ffffff12,0 22px 70px #0005}
+.art-card:before,.art-card:after{content:"";position:absolute;border-radius:50%;border:1px solid #e3d0ff26;left:50%;top:53%;transform:translate(-50%,-50%) rotate(-24deg);width:310px;height:105px;box-shadow:0 0 28px #9c74ff18}
+.art-card:after{transform:translate(-50%,-50%) rotate(58deg);width:260px;height:90px}
+#crystalArt{position:absolute;inset:0;width:100%;height:100%}
+.art-caption{position:absolute;left:18px;bottom:16px;right:18px;display:flex;justify-content:space-between;align-items:end;gap:10px}.art-caption strong{font-size:11px;letter-spacing:.13em;text-transform:uppercase}.art-caption span{font-size:10px;color:#c2b3e8}
+.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:18px;margin-top:12px}
+.panel{border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(26,21,48,.88),rgba(12,11,26,.91));box-shadow:0 18px 50px #0002;overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px 19px;border-bottom:1px solid #ffffff0d}.panel-head h3{margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase}.panel-head p{margin:5px 0 0;color:#9589b3;font-size:10px}.tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #b79bff38;border-radius:999px;padding:6px 9px;color:#d7c5ff;background:#b69aff0b;white-space:nowrap}
+.roll-area{padding:18px}.reveal{position:relative;min-height:246px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:1px solid #d6c1ff24;border-radius:18px;background:radial-gradient(ellipse at center,#39235d99,transparent 58%),linear-gradient(135deg,#121027,#0d0d1b)}
+.reveal:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,transparent 0 32px,#ffffff04 33px 34px);pointer-events:none}
+.reveal-glow{position:absolute;width:180px;height:180px;border-radius:50%;background:#b18aff22;filter:blur(25px);transition:background .4s}
+.reveal-content{position:relative;z-index:1;padding:22px}.sigil{width:58px;height:58px;margin:0 auto 13px;border:1px solid #d8c1ff55;border-radius:19px;display:grid;place-items:center;background:linear-gradient(145deg,#ffffff14,#ffffff02);font-size:28px;box-shadow:0 0 38px #b18aff1c;transform:rotate(-5deg)}
+.reveal-kicker{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#b6a4db}.reveal h4{font-size:clamp(23px,3vw,37px);line-height:1.1;letter-spacing:-.04em;margin:9px 0 8px;text-shadow:0 0 28px #ffffff1a}.reveal p{margin:0;color:#b7adc9;font-size:11px}.rarity{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid currentColor;padding:5px 9px;font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;margin-top:13px;background:#0002}
+.roll-controls{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:13px}.primary{border:1px solid #f5d6a0;border-radius:13px;padding:14px 18px;background:linear-gradient(100deg,#f7d89a,#c7a4ff);color:#1a1028;font-weight:900;font-size:12px;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 7px 26px #c6a1ff1c;transition:transform .16s,filter .16s}.primary:hover{transform:translateY(-2px);filter:brightness(1.08)}.primary:disabled{opacity:.6;cursor:wait;transform:none}.secondary{border:1px solid var(--line);border-radius:13px;background:#ffffff08;padding:12px 15px;font-size:11px;color:#e1d6f9}.roll-note{font-size:10px;color:#9489ad;line-height:1.5;margin:11px 2px 0}.feed{margin-top:14px}.feed-title{font-size:9px;color:#a99cc5;letter-spacing:.16em;text-transform:uppercase;margin:0 0 8px}.recent-list{display:flex;gap:7px;flex-wrap:wrap;min-height:26px}.recent-chip{font-size:9px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#ffffff05;color:#d8cde9;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side-stack{display:flex;flex-direction:column;gap:18px}.currency-panel{padding:16px 18px}.currency-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.currency-row+.currency-row{margin-top:12px;padding-top:12px;border-top:1px solid #ffffff0c}.currency-label{font-size:10px;color:#a89cbd}.currency-value{font-size:19px;font-weight:850;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.currency-value.gold{color:#ffdf9d}.currency-value.blue{color:#94dfff}
+.upgrade-list{padding:11px;display:grid;gap:8px}.upgrade{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px;border:1px solid #ffffff10;border-radius:14px;background:#ffffff04}.upgrade-icon{height:38px;width:38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(145deg,#b18aff20,#f7d89a0d);border:1px solid #bca2ff20;font-size:17px}.upgrade h4{font-size:11px;margin:0 0 4px}.upgrade p{font-size:9px;color:#a99fbc;line-height:1.45;margin:0}.upgrade .level{font-size:9px;color:#d3c4f0;margin-top:5px}.buy{border:1px solid #bba0ff3d;background:#bba0ff12;color:#e9ddff;border-radius:9px;padding:9px 10px;font-size:9px;font-weight:800;white-space:nowrap}.buy:disabled{opacity:.38;cursor:not-allowed}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:5px;border:1px solid var(--line);border-radius:14px;background:#ffffff05;width:max-content;max-width:100%;margin:20px 0 13px}.tab{border:0;border-radius:10px;padding:10px 13px;background:transparent;color:#a99fbd;font-size:10px;font-weight:750}.tab.active{background:linear-gradient(100deg,#f5d89b20,#bca0ff20);color:#fff0d0;box-shadow:inset 0 0 0 1px #c7a5ff22}
+.view{display:none}.view.active{display:block}.collection-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0}.collection-head h3{margin:0;font-size:15px}.collection-head p{margin:5px 0 0;color:#a59ab9;font-size:11px}.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid var(--line);background:#ffffff05;color:#c5b8dc;padding:8px 10px;border-radius:9px;font-size:9px}.filter.active{border-color:#b79bff80;color:#f0ddff;background:#a885ff1c}
+.title-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.title-card{position:relative;min-height:118px;padding:13px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(145deg,#ffffff08,#ffffff02);overflow:hidden}.title-card.locked{opacity:.55;filter:saturate(.5)}.title-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--rarity-color,#b49aff)}.title-card .small-icon{font-size:18px}.title-card h4{font-size:11px;line-height:1.3;margin:8px 0 6px}.title-card small{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--rarity-color,#b49aff)}.title-card .count{position:absolute;right:10px;top:9px;font-size:9px;color:#d5c8e8}
+.tree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.tree-node{padding:16px;border:1px solid #c2a7ff22;border-radius:16px;background:linear-gradient(150deg,#201936d9,#100f20)}.tree-node .node-icon{font-size:24px}.tree-node h4{font-size:12px;margin:10px 0 6px}.tree-node p{font-size:10px;line-height:1.5;color:#a89cbd;min-height:30px;margin:0 0 13px}.tree-node .node-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:9px;color:#c9bbdf}.tree-node button{margin-top:12px;width:100%}
+.toast{position:fixed;z-index:10;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:.25s;padding:12px 17px;border:1px solid #c9adff45;border-radius:13px;background:#19122bee;box-shadow:0 15px 40px #0008;font-size:11px;color:#f4e9ff;max-width:calc(100% - 30px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+.footer{text-align:center;padding:28px 0 0;color:#6f6687;font-size:9px;letter-spacing:.1em}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.13);opacity:1}}.rolling .sigil{animation:pulse .24s infinite}.rolling .reveal-glow{background:#cbb0ff55}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.art-card{height:240px}.workspace{grid-template-columns:1fr}.side-stack{display:grid;grid-template-columns:1fr 1fr}.title-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.app{padding:14px 12px 30px}.topbar{align-items:flex-start}.top-actions{gap:5px;flex-wrap:wrap;justify-content:flex-end}.top-pill{padding:8px 9px;font-size:10px}.back{padding:8px}.brand h1{font-size:14px}.hero{padding-top:18px}.hero h2{font-size:39px}.art-card{height:210px}.side-stack{grid-template-columns:1fr}.title-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tree-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reveal{min-height:220px}.roll-area{padding:11px}.roll-controls{grid-template-columns:1fr}.roll-controls .secondary{min-height:40px}.panel-head{padding:14px}.hero-stats{gap:16px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brandmark">✧</div><div><h1>TITLEBOUND</h1><small>REALMS OF FORTUNE</small></div></div>
+  <div class="top-actions"><div class="top-pill">✦ <strong id="topDust">0</strong> dust</div><div class="top-pill">✧ <strong id="topRolls">0</strong> rolls</div><a class="back" href="../douggames.html">← Games</a></div>
+</header>
+<section class="hero">
+  <div>
+    <div class="eyebrow">✦ A universe of impossible names</div>
+    <h2>Roll your fate.<br><span>Become a legend.</span></h2>
+    <p>Every title is a tiny piece of cosmic history. Roll for legendary names, discover hidden rarities, build your fortune tree, and collect an absurd number of titles. Some are so rare they barely feel real.</p>
+    <div class="hero-stats"><div class="stat"><strong id="totalTitleCount">600+</strong><span>Unique titles</span></div><div class="stat"><strong id="collectedCount">0</strong><span>Discovered</span></div><div class="stat"><strong id="bestRarity">—</strong><span>Best rarity</span></div></div>
+  </div>
+  <div class="art-card"><canvas id="crystalArt"></canvas><div class="art-caption"><div><strong>The Astral Core</strong><br><span>The source of every title</span></div><span>✦ 01 / ∞</span></div></div>
+</section>
+<div class="workspace">
+  <section class="panel">
+    <div class="panel-head"><div><h3>✧ The title forge</h3><p>Reach into the unknown. The next roll could change everything.</p></div><span class="tag" id="rollMode">STANDARD ROLL</span></div>
+    <div class="roll-area">
+      <div class="reveal" id="reveal">
+        <div class="reveal-glow"></div><div class="reveal-content"><div class="sigil" id="revealIcon">✧</div><div class="reveal-kicker" id="revealKicker">YOUR NEXT CHAPTER</div><h4 id="revealTitle">The Unknown</h4><p id="revealDesc">Your story is waiting to be written.</p><div class="rarity" id="revealRarity" style="color:#c7b4e9">UNROLLED</div></div>
+      </div>
+      <div class="roll-controls"><button class="primary" id="rollButton">✦ Roll a title · Free</button><button class="secondary" id="quickRoll">Roll ×5 · 50 dust</button></div>
+      <p class="roll-note">Duplicates turn into Astral Dust. Higher rarities are dramatically harder to find. Luck upgrades improve your odds without making the rarest titles ordinary.</p>
+      <div class="feed"><p class="feed-title">Recent discoveries</p><div class="recent-list" id="recentList"><span class="recent-chip">The stars are listening…</span></div></div>
+    </div>
+  </section>
+  <aside class="side-stack">
+    <section class="panel">
+      <div class="panel-head"><div><h3>Your fortune</h3><p>Every duplicate has a purpose.</p></div><span class="tag">PROFILE</span></div>
+      <div class="currency-panel">
+        <div class="currency-row"><div><div class="currency-label">Astral Dust</div><div class="currency-value gold" id="dustValue">0</div></div><div style="font-size:22px">✦</div></div>
+        <div class="currency-row"><div><div class="currency-label">Total rolls</div><div class="currency-value" id="rollValue">0</div></div><div style="font-size:22px">🎲</div></div>
+        <div class="currency-row"><div><div class="currency-label">Luck multiplier</div><div class="currency-value blue" id="luckValue">×1.00</div></div><div style="font-size:22px">☄</div></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h3>Quick upgrades</h3><p>Spend dust. Bend probability.</p></div><span class="tag">TREE</span></div>
+      <div class="upgrade-list" id="quickUpgrades"></div>
+    </section>
+  </aside>
+</div>
+<nav class="tabs" aria-label="Game sections">
+  <button class="tab active" data-view="collection">▦ Collection</button><button class="tab" data-view="tree">✧ Upgrade tree</button><button class="tab" data-view="codex">☷ Rarity codex</button>
+</nav>
+<section class="view active" id="view-collection">
+  <div class="collection-head"><div><h3>Your title vault</h3><p id="collectionSubtitle">Every discovery is recorded here, forever on this device.</p></div><div class="filters" id="rarityFilters"></div></div>
+  <div class="title-grid" id="titleGrid"></div>
+  <div id="emptyVault" style="display:none;text-align:center;padding:50px 12px;color:#a89cbd">No titles match this filter yet. Roll a few more and see what the stars reveal.</div>
+</section>
+<section class="view" id="view-tree">
+  <div class="collection-head"><div><h3>The Fortune Tree</h3><p>Six branches. Endless upgrades. Every level makes the next discovery a little more possible.</p></div><span class="tag">PERMANENT PROGRESSION</span></div>
+  <div class="tree-grid" id="treeGrid"></div>
+</section>
+<section class="view" id="view-codex">
+  <div class="collection-head"><div><h3>Rarity codex</h3><p>Every title belongs to a rarity. The further down the list, the more the universe starts showing off.</p></div></div>
+  <div class="title-grid" id="codexGrid"></div>
+</section>
+<div class="footer">TITLEBOUND · YOUR FATE IS RANDOM. YOUR PROGRESS IS YOURS.</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const tiers=[
+ {name:"Common",color:"#b7b5c8",chance:55,icon:"✧",dust:2,desc:"A first spark in a very large universe."},
+ {name:"Uncommon",color:"#76e0b1",chance:25,icon:"❖",dust:4,desc:"A little luck has found its way to you."},
+ {name:"Rare",color:"#72b8ff",chance:12,chance2:12,icon:"✦",dust:9,desc:"The stars briefly aligned."},
+ {name:"Epic",color:"#bf8cff",chance:5,dust:20,desc:"A title with a story of its own."},
+ {name:"Legendary",color:"#ffcb69",chance:2.2,dust:55,desc:"People will ask how you got this."},
+ {name:"Mythic",color:"#ff7cae",chance:.65,dust:150,desc:"A name spoken about in whispers."},
+ {name:"Celestial",color:"#79efff",chance:.13,dust:450,desc:"A title forged from starlight."},
+ {name:"Transcendent",color:"#f2edff",chance:.019,dust:1800,desc:"Reality had to make room for this."},
+ {name:"Eternal",color:"#ff8cf4",chance:.001,dust:12000,desc:"The universe remembers this name."}
+];
+const prefixes=["Ashen","Astral","Void","Solar","Lunar","Forgotten","Infinite","Crimson","Silent","Golden","Stormborn","Frostbound","Starforged","Dreaming","Hollow","Radiant","Obsidian","Arcane","Phantom","Ancient","Doomed","Blessed","Rogue","Cosmic","Midnight","Dawnlit","Thunderous","Runic","Lost","Sovereign","Wandering","Royal","Prismatic","Quantum","Eclipsed","Celestial","Unbroken","Whispering","Emerald","Sapphire","Ember","Glitched","Timeless","Reckless","Unseen","Singing","Shattered","Feral","Crowned","Nameless"];
+const cores=["Wanderer","Stargazer","Wayfinder","Dreamer","Sentinel","Alchemist","Explorer","Oracle","Champion","Nomad","Guardian","Trickster","Architect","Voyager","Revenant","Pioneer","Harbinger","Scholar","Duelist","Pilgrim","Conjurer","Titan","Outcast","Keeper","Ranger","Prophet","Smith","Riftwalker","Seeker","Warden","Maverick","Tactician","Collector","Phoenix","Monarch","Specter","Knight","Emperor","Jester","Cartographer","Chronomancer","Paragon","Outrider","Runekeeper","Illusionist","Vanguard","Overseer","Gladiator","Herald","Albatross","Pigeon","Potato","Goober","Loot Goblin","Button Masher","Tax Evader","Soup Wizard","Certified Menace","Unpaid Intern","Last Braincell","Chaos Gremlin","Professional Napper","Keyboard Knight","Goblin Accountant","Cosmic Janitor","Definitely Human","Tiny Disaster","Local Legend","Unsupervised Child","Side Quest","Suspicious Duck","Snack Bandit","Lag Survivor","Pixel Pirate","Void Tourist","Luck Enjoyer","Coin Flip","Plot Twist","Main Character","Background NPC","Secret Boss","Final Form","Overthinker","Speedrunner","Cloud Shepherd","Moon Thief","Star Eater","Reality Bender","Dimension Hopper","Entropy Wrangler","Fate Hacker","Gravity Tourist","Time Borrower","Portal Inspector","Comet Chaser","Nebula Diver","Galaxy Gardener","Quantum Potato","Cosmic Pancake","Doom Scroller","Mildly Powerful Being","Extremely Rare Mistake","The Chosen-ish One","Probably a Wizard","Definitely Not a Mimic","Grandmaster of Nothing","Supreme Sandwich","Chair Enthusiast","Lord of Lost Socks","The Unreasonably Lucky","One More Roll","Oops All Crits","Unskippable Cutscene","Patch Notes Enjoyer","Forbidden Microwave","Ancient Wi-Fi Router","Ruler of Tuesday","The Great Perhaps","Bearer of Snacks","Collector of Dust","Friend of Rocks","Enemy of Doors","Last Online 3 Years Ago","Accidental Demigod","Legendary Lurker","Sentient Loading Screen","Guardian of the Fridge","Intergalactic Landlord","Overqualified Goblin","Unlicensed Time Wizard","The Final Nugget","Maximum Silly","Ultra Instinct Hamster","Supreme Pigeon Council","The One Who Clicks","A Problem for Later","Extremely Polite Menace","Secretly Three Raccoons","Definitely Has a Plan","Certified Star Person","Walking Plot Armor","The Unpaid Chosen One","Oops, All Destiny","The Lore Is Complicated","CEO of Side Quests","The Fourth Wall"];
+const suffixes=["of the First Dawn","of Last Light","Beyond the Veil","of Ten Thousand Suns","of the Lost Realm","the Unwritten","of Broken Time","of Quiet Thunder","of the Deep Void","Without a Shadow","of Endless Summer","the Unremembered","of the Final Star","of Forgotten Kings","of Infinite Soup","of Mild Inconvenience","of the Big Bonk","of Absolutely Nothing","of the Cosmic Pantry","of Eternal Tuesday","of the Tiny Crown","of the Last Braincell","of Unpaid Overtime","of the Astral Sea","of the Hollow Moon","of the Hidden Path","of the Fifth Dimension","of Unreasonable Luck","of the Pigeon Throne","of Maximum Chaos","of the Secret Garden","of Distant Worlds","of the Golden Hour","of Shattered Dreams","of the Unseen Sun","of the Blue Comet","of the Evernight","of Lost Memories","of the Bright Abyss","of the Starfall"];
+const tierForIndex=i=>i<300?0:i<480?1:i<570?2:i<610?3:i<630?4:i<638?5:i<642?6:i<644?7:8;
+const titles=[];
+function addTitle(name,seed){if(titles.some(t=>t.name===name))return;const idx=titles.length;const tier=tierForIndex(idx);titles.push({id:"t"+idx,name,rarity:tier,seed:seed||idx,icon:tiers[tier].icon});}
+prefixes.forEach((p,i)=>cores.forEach((c,j)=>{if(titles.length<600)addTitle(p+" "+c,(i+1)*177+j*29);}));
+while(titles.length<600){const i=titles.length;addTitle(prefixes[i%prefixes.length]+" "+cores[(i*7+13)%cores.length]+" "+suffixes[(i*11+3)%suffixes.length],i*31+7);}
+const upgradeDefs=[
+ {id:"luck",name:"Fortune's Favor",icon:"☄",desc:"Increase the odds of higher-rarity titles.",base:35,max:30,effect:l=>"Luck +"+(l*8)+"%",quick:true},
+ {id:"speed",name:"Swift Ritual",icon:"⏱",desc:"Make rolls quicker and reveal titles faster.",base:45,max:10,effect:l=>"Roll delay −"+Math.min(70,l*7)+"%",quick:true},
+ {id:"dust",name:"Dust Magnet",icon:"✦",desc:"Earn more Astral Dust from duplicates.",base:60,max:20,effect:l=>"Duplicate dust ×"+(1+l*.25).toFixed(2),quick:true},
+ {id:"streak",name:"Fortune Chain",icon:"⛓",desc:"Every few rolls, guarantee a higher tier.",base:90,max:15,effect:l=>"Pity boost every "+Math.max(4,12-l)+" rolls",quick:false},
+ {id:"multi",name:"Echo Chamber",icon:"✧",desc:"Unlock discounted multi-rolls and extra results.",base:125,max:5,effect:l=>l?"Multi-roll bonus "+l:"Unlock ×5 rolls",quick:false},
+ {id:"shiny",name:"Prismatic Lens",icon:"◇",desc:"Improve the odds of finding radiant variants.",base:180,max:20,effect:l=>"Shimmer chance "+(l*1.5)+"%",quick:false}
+];
+const defaultState={dust:0,rolls:0,collection:{},upgrades:{luck:0,speed:0,dust:0,streak:0,multi:0,shiny:0},best:0,recent:[],filter:"All",lastTitle:null};
+let state;
+try{state=Object.assign({},defaultState,JSON.parse(localStorage.getItem("titlebound-save")||"{}"));state.upgrades=Object.assign({},defaultState.upgrades,state.upgrades||{});state.collection=state.collection||{};state.recent=Array.isArray(state.recent)?state.recent:[];}catch(e){state=Object.assign({},defaultState);}
+let rolling=false,filter="All",toastTimer;
+function save(){try{localStorage.setItem("titlebound-save",JSON.stringify(state));}catch(e){}}
+function fmt(n){return Math.floor(n).toLocaleString("en-US");}
+function tierOdds(){let luck=1+(state.upgrades.luck||0)*.08;let pity=(state.upgrades.streak||0)*.08;let weights=tiers.map((t,i)=>t.chance*Math.pow(luck,Math.max(0,i-1)*.78));weights[0]=Math.max(12,weights[0]/(1+(luck-1)*.8));if(state.rolls>0&&state.upgrades.streak&&state.rolls%(Math.max(4,12-state.upgrades.streak))===0){weights[3]+=pity*12;weights[4]+=pity*6;}return weights;}
+function pickTier(){const w=tierOdds();const total=w.reduce((a,b)=>a+b,0);let r=Math.random()*total;for(let i=0;i<w.length;i++){r-=w[i];if(r<=0)return i;}return 0;}
+function titleForTier(tier){const candidates=titles.filter(t=>t.rarity===tier);if(!candidates.length)return titles[Math.floor(Math.random()*titles.length)];return candidates[Math.floor(Math.random()*candidates.length)];}
+function notify(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2300);}
+function rarityColor(t){return tiers[t].color;}
+function luckMult(){return 1+(state.upgrades.luck||0)*.08;}
+function updateStats(){const found=Object.keys(state.collection).length;$("topDust").textContent=fmt(state.dust);$("dustValue").textContent=fmt(state.dust);$("topRolls").textContent=fmt(state.rolls);$("rollValue").textContent=fmt(state.rolls);$("collectedCount").textContent=fmt(found);$("totalTitleCount").textContent=titles.length;$("luckValue").textContent="×"+luckMult().toFixed(2);$("bestRarity").textContent=state.best>=0&&state.rolls?tiers[state.best].name:"—";$("collectionSubtitle").textContent=found+" of "+titles.length+" titles discovered · "+(state.rolls?Math.round(found/titles.length*100):0)+"% of the vault";}
+function renderReveal(t,duplicate,shiny){const tier=tiers[t.rarity];$("revealIcon").textContent=shiny?"✺":tier.icon;$("revealKicker").textContent=duplicate?"DUPLICATE CONVERTED":shiny?"PRISMATIC VARIANT DISCOVERED":"NEW TITLE DISCOVERED";$("revealTitle").textContent=t.name;$("revealDesc").textContent=duplicate?"Already in your vault — converted into Astral Dust.":tier.desc;$("revealRarity").textContent=(shiny?"✦ PRISMATIC · ":"")+tier.name.toUpperCase();$("revealRarity").style.color=tier.color;$("revealRarity").style.borderColor=tier.color;$("reveal").style.setProperty("--rarity-color",tier.color);$("reveal").style.background="radial-gradient(ellipse at center,"+tier.color+"24 0,transparent 60%),linear-gradient(135deg,#121027,#0d0d1b)";$("rollMode").textContent=tier.name.toUpperCase()+" ROLL";if(t.rarity>=5)notify("UNREAL PULL: "+tier.name.toUpperCase()+" — "+t.name);}
+function performRoll(count){if(rolling)return;count=count||1;const cost=count===1?0:50;if(state.dust<cost){notify("Not enough Astral Dust. Roll once or collect duplicates first.");return;}state.dust-=cost;rolling=true;$("rollButton").disabled=true;$("quickRoll").disabled=true;$("reveal").classList.add("rolling");const delay=Math.max(90,330-(state.upgrades.speed||0)*22);let results=[],n=0;function next(){const rarity=pickTier(),t=titleForTier(rarity),duplicate=!!state.collection[t.id],shiny=Math.random()<(state.upgrades.shiny||0)*.0015;state.rolls++;let reward=0;if(duplicate){reward=Math.round(tiers[rarity].dust*(1+(state.upgrades.dust||0)*.25)*(shiny?2:1));state.dust+=reward;state.collection[t.id].count++;state.collection[t.id].last=Date.now();}else{state.collection[t.id]={count:1,first:Date.now(),last:Date.now(),shiny:shiny};}if(shiny&&!duplicate)state.collection[t.id].shiny=true;state.best=Math.max(state.best,rarity);state.lastTitle=t.id;state.recent.unshift({id:t.id,rarity,duplicate,shiny,reward});state.recent=state.recent.slice(0,6);results.push({t,duplicate,shiny,reward});renderReveal(t,duplicate,shiny);updateStats();renderRecent();renderCollection();save();n++;if(n<count){setTimeout(next,Math.max(70,delay*.45));}else{rolling=false;$("rollButton").disabled=false;$("quickRoll").disabled=false;$("reveal").classList.remove("rolling");if(count>1)notify("Five rolls complete. "+results.filter(x=>!x.duplicate).length+" new titles discovered.");} }next();}
+function costFor(u){return Math.floor(u.base*Math.pow(1.58,state.upgrades[u.id]||0));}
+function buyUpgrade(id){const u=upgradeDefs.find(x=>x.id===id);if(!u)return;const level=state.upgrades[id]||0;if(level>=u.max){notify("That branch has reached its current maximum.");return;}const cost=costFor(u);if(state.dust<cost){notify("You need "+fmt(cost-state.dust)+" more Astral Dust.");return;}state.dust-=cost;state.upgrades[id]=level+1;save();renderUpgrades();updateStats();notify(u.name+" upgraded to level "+(level+1)+"!");}
+function upgradeMarkup(u){const l=state.upgrades[u.id]||0,cost=costFor(u),max=l>=u.max;return '<div class="upgrade"><div class="upgrade-icon">'+u.icon+'</div><div><h4>'+u.name+'</h4><p>'+u.desc+'</p><div class="level">LVL '+l+' / '+u.max+' · '+u.effect(l)+'</div></div><button class="buy" data-buy="'+u.id+'" '+(max||state.dust<cost?'disabled':'')+'>'+(max?'MAX':fmt(cost)+' ✦')+'</button></div>';}
+function treeMarkup(u){const l=state.upgrades[u.id]||0,cost=costFor(u),max=l>=u.max;return '<article class="tree-node"><div class="node-icon">'+u.icon+'</div><h4>'+u.name+'</h4><p>'+u.desc+'</p><div class="node-foot"><span>LEVEL '+l+' / '+u.max+'</span><span>'+u.effect(l)+'</span></div><button class="buy" data-buy="'+u.id+'" '+(max||state.dust<cost?'disabled':'')+'>'+(max?'MAX LEVEL':'UPGRADE · '+fmt(cost)+' ✦')+'</button></article>';}
+function renderUpgrades(){$("quickUpgrades").innerHTML=upgradeDefs.filter(u=>u.quick).map(upgradeMarkup).join("");$("treeGrid").innerHTML=upgradeDefs.map(treeMarkup).join("");}
+function renderRecent(){$("recentList").innerHTML=state.recent.length?state.recent.map(x=>{const t=titles.find(y=>y.id===x.id);return '<span class="recent-chip" style="border-color:'+rarityColor(x.rarity)+'55;color:'+rarityColor(x.rarity)+'">'+(x.duplicate?'↻ ':'✦ ')+(t?t.name:"Unknown")+' · '+tiers[x.rarity].name+(x.reward?' +'+x.reward+' dust':'')+'</span>';}).join(""):'<span class="recent-chip">The stars are listening…</span>';}
+function renderFilters(){const names=["All",...tiers.map(t=>t.name),"Undiscovered"];$("rarityFilters").innerHTML=names.map(n=>'<button class="filter '+(filter===n?'active':'')+'" data-filter="'+n+'">'+n+'</button>').join("");}
+function renderCollection(){let arr=titles.filter(t=>filter==="All"||(filter==="Undiscovered"?!state.collection[t.id]:tiers[t.rarity].name===filter));$("titleGrid").innerHTML=arr.map(t=>{const c=state.collection[t.id],tier=tiers[t.rarity];return '<article class="title-card '+(!c?'locked':'')+'" style="--rarity-color:'+tier.color+'"><span class="small-icon">'+(c&&c.shiny?'✺':tier.icon)+'</span>'+(c?'<span class="count">×'+c.count+'</span>':'')+'<h4>'+(c?t.name:"Unknown Title")+'</h4><small>'+(c&&c.shiny?'Prismatic · ':'')+tier.name+'</small></article>';}).join("");$("emptyVault").style.display=arr.length?"none":"block";renderFilters();}
+function renderCodex(){$("codexGrid").innerHTML=tiers.map((t,i)=>'<article class="title-card" style="--rarity-color:'+t.color+'"><span class="small-icon">'+t.icon+'</span><h4>'+t.name+'</h4><small>'+t.chance+'% base weight</small><p style="font-size:10px;color:#a99fbc;line-height:1.5">'+t.desc+'</p></article>').join("");}
+document.addEventListener("click",e=>{const buy=e.target.closest("[data-buy]");if(buy)buyUpgrade(buy.dataset.buy);const f=e.target.closest("[data-filter]");if(f){filter=f.dataset.filter;renderCollection();}const tab=e.target.closest("[data-view]");if(tab){document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===tab));document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+tab.dataset.view));if(tab.dataset.view==="tree")renderUpgrades();}});
+$("rollButton").addEventListener("click",()=>performRoll(1));$("quickRoll").addEventListener("click",()=>performRoll(5));
+function fitCanvas(c){const dpr=Math.min(2.5,window.devicePixelRatio||1),r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));return {ctx:c.getContext("2d"),w:c.width,h:c.height,dpr};}
+const sky=$("sky"),sc=sky.getContext("2d");let stars=[],sw=0,sh=0;
+function resizeSky(){sw=sky.width=window.innerWidth*Math.min(2,window.devicePixelRatio||1);sh=sky.height=window.innerHeight*Math.min(2,window.devicePixelRatio||1);sky.style.width=window.innerWidth+"px";sky.style.height=window.innerHeight+"px";stars=Array.from({length:Math.min(260,Math.floor(window.innerWidth/4))},()=>({x:Math.random()*sw,y:Math.random()*sh,r:Math.random()*1.4+.2,a:Math.random()*.7+.15,p:Math.random()*6.28,s:Math.random()*.0008+.0002}));}
+function drawSky(t){sc.clearRect(0,0,sw,sh);for(const s of stars){const a=s.a*(.65+.35*Math.sin(t*s.s+s.p));sc.globalAlpha=a;sc.fillStyle="#e8dcff";sc.beginPath();sc.arc(s.x,s.y,s.r,0,Math.PI*2);sc.fill();}sc.globalAlpha=1;requestAnimationFrame(drawSky);}
+let art,artCtx,aw=0,ah=0,artStars=[];
+function resizeArt(){const d=fitCanvas($("crystalArt"));artCtx=d.ctx;aw=d.w;ah=d.h;artStars=Array.from({length:70},()=>({x:Math.random()*aw,y:Math.random()*ah,r:Math.random()*1.4+.3,p:Math.random()*6.28}));}
+function poly(ctx,pts,fill,stroke){ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
+function drawArt(t){if(!artCtx)return;const c=artCtx,w=aw,h=ah,cx=w*.5,cy=h*.49,scale=Math.min(w/420,h/270);c.clearRect(0,0,w,h);c.save();c.translate(cx,cy);c.scale(scale,scale);
+const glow=c.createRadialGradient(0,0,5,0,0,115);glow.addColorStop(0,"#b38cff66");glow.addColorStop(.5,"#8357cf25");glow.addColorStop(1,"#7c53c900");c.fillStyle=glow;c.fillRect(-160,-145,320,290);
+for(let i=0;i<artStars.length;i++){const s=artStars[i];c.globalAlpha=.35+.55*(.5+.5*Math.sin(t*.001+s.p));c.fillStyle=i%5===0?"#ffe2a3":"#e9ddff";c.beginPath();c.arc(s.x/Math.max(1,aw)*420-210,s.y/Math.max(1,ah)*270-135,s.r,0,Math.PI*2);c.fill();}c.globalAlpha=1;
+for(let i=0;i<3;i++){c.save();c.rotate(t*.00015*(i%2?1:-1)+i*1.1);c.strokeStyle=["#c6a4ff3c","#8ceaff36","#ffdf9a30"][i];c.lineWidth=1;c.beginPath();c.ellipse(0,0,91+i*15,31+i*7,0,0,Math.PI*2);c.stroke();c.restore();}
+const bob=Math.sin(t*.0015)*4;c.translate(0,bob);
+c.shadowBlur=28;c.shadowColor="#ad86ff99";
+poly(c,[[-31,52],[0,-85],[17,-44],[13,45],[0,67]],"#7454ba","#e4d1ff");poly(c,[[-31,52],[-17,-38],[0,-85],[0,67]],"#b69bff","#eadfff");poly(c,[[-17,-38],[0,-85],[17,-44],[0,3]],"#f5e9ff","#ffffff");poly(c,[[0,3],[17,-44],[13,45],[0,67]],"#7f62ce","#d6c1ff");poly(c,[[-31,52],[0,20],[0,67]],"#4d3991","#a994ff");
+c.shadowBlur=0;poly(c,[[-15,10],[-5,-28],[0,20]],"#ffffff88");poly(c,[[0,20],[9,-22],[8,37]],"#8df0ff88");
+for(let i=0;i<16;i++){const a=t*.0003+i*2.399,rad=64+(i%5)*13,x=Math.cos(a)*rad,y=Math.sin(a)*rad*.65;c.globalAlpha=.4+.6*(.5+.5*Math.sin(t*.003+i));c.fillStyle=i%4===0?"#ffe3a2":i%3===0?"#88edff":"#d5baff";c.beginPath();c.arc(x,y,1+(i%3)*.6,0,Math.PI*2);c.fill();}c.globalAlpha=1;c.restore();requestAnimationFrame(drawArt);}
+resizeSky();resizeArt();requestAnimationFrame(drawSky);requestAnimationFrame(drawArt);window.addEventListener("resize",()=>{resizeSky();resizeArt();});
+renderCodex();renderCollection();renderRecent();renderUpgrades();updateStats();save();
+})();
+</script>
+</body>
+</html>
