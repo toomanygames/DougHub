@@ -134,6 +134,90 @@ body{height:100vh;height:100dvh}
  .upgrade-list{grid-template-columns:1fr}.upgrade p{display:none}
 }
 
+
+/* TITLEBOUND compact, popup-first layout */
+html,body{height:100%;min-height:0;overflow:hidden}
+body{overflow:hidden}
+.app{height:100vh;height:100dvh;min-height:0;max-height:100dvh;overflow:hidden;display:flex;flex-direction:column;gap:9px;padding:12px clamp(10px,2vw,28px)}
+.topbar{flex:0 0 auto;min-height:38px;padding-bottom:7px;gap:10px}
+.brandmark{width:31px;height:31px}
+.brand h1{font-size:13px;letter-spacing:.18em}
+.brand small{font-size:8px}
+.top-actions{gap:6px;flex-wrap:nowrap}
+.top-pill,.back{padding:7px 10px;font-size:10px;white-space:nowrap}
+.menu-button{border:1px solid rgba(190,166,255,.2);background:rgba(115,86,184,.13);border-radius:999px}
+.menu-button:hover{background:rgba(157,117,255,.25);border-color:#9d82e8}
+.hero{flex:0 0 auto;min-height:0;grid-template-columns:minmax(0,1fr) minmax(150px,.32fr);gap:14px;padding:0}
+.hero h2{font-size:clamp(27px,3.5vw,43px);line-height:.98;margin:6px 0 8px}
+.hero p{font-size:11px;line-height:1.45;max-width:720px;margin:0 0 8px}
+.eyebrow{font-size:9px;letter-spacing:.16em}
+.hero-stats{gap:18px;margin-top:8px}
+.stat strong{font-size:15px}
+.stat span{font-size:8px}
+.art-card{height:clamp(76px,13vh,120px);min-height:0}
+.workspace{flex:1 1 auto;min-height:0;grid-template-columns:minmax(0,1fr);gap:0}
+.workspace>.panel{height:100%;min-height:0;display:flex;flex-direction:column}
+.workspace>.side-stack{display:none!important}
+.panel-head{padding:9px 12px;flex:0 0 auto}
+.panel-head h3{font-size:12px}
+.panel-head p{font-size:9px;margin-top:3px}
+.roll-area{padding:10px 12px;gap:8px;flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.reveal{height:auto;min-height:105px;max-height:none;flex:1 1 auto}
+.reveal-content{padding:8px}
+.sigil{width:35px;height:35px;font-size:19px;margin-bottom:5px}
+.reveal-kicker{font-size:8px}
+.reveal h4{font-size:clamp(18px,2.5vw,28px);margin:4px 0}
+.reveal p{font-size:10px;margin:4px 0}
+.rarity{font-size:8px;margin-top:5px;padding:4px 9px}
+.roll-controls{flex:0 0 auto;grid-template-columns:minmax(0,1fr) minmax(110px,.3fr);gap:8px}
+.primary{padding:12px 10px;font-size:11px}
+.secondary{padding:10px;font-size:9px}
+.roll-note{font-size:9px;line-height:1.35;margin:0}
+.feed{flex:0 0 auto;margin-top:0}
+.feed-title{font-size:9px;margin-bottom:5px}
+.recent-list{gap:5px}
+.recent-chip{font-size:9px;padding:5px 8px;max-width:32%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs,.view,.footer{display:none}
+.modal-backdrop{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:clamp(8px,2vw,22px);background:rgba(4,3,13,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modal-backdrop.open{display:flex}
+.modal-window{width:min(1120px,100%);height:min(860px,90vh,90dvh);min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(190,166,255,.25);border-radius:18px;background:linear-gradient(145deg,rgba(22,17,43,.99),rgba(8,8,21,.99));box-shadow:0 30px 100px #000b}
+.modal-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px;border-bottom:1px solid var(--line)}
+.modal-head .eyebrow{margin-bottom:4px}
+.modal-head h2{font-size:18px;margin:0}
+.modal-close{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.04);font-size:24px;line-height:1}
+.modal-body{min-height:0;flex:1 1 auto;overflow:auto;padding:12px}
+.modal-body .tabs{display:flex;position:sticky;top:-12px;z-index:4;gap:5px;padding:0 0 10px;margin:0;background:linear-gradient(rgba(22,17,43,.99),rgba(22,17,43,.92))}
+.modal-body .tab{padding:8px 11px;font-size:10px}
+.modal-body .view{display:none;min-height:0}
+.modal-body .view.active{display:block}
+.modal-body .side-stack{display:none}
+.modal-body.show-fortune .side-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.modal-body .currency-panel{padding:10px}
+.modal-body .currency-row{padding:8px 0}
+.modal-body .upgrade-list{gap:6px}
+.modal-body .upgrade{padding:8px;gap:8px}
+.modal-body .collection-head{gap:12px;align-items:flex-start}
+.vault-tools{min-width:min(560px,60%);display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.title-search{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(5,5,17,.8);color:#f8f4ff;font:inherit;font-size:12px;outline:none}
+.title-search:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #a78bfa22}
+.filters{max-width:100%;flex-wrap:wrap;overflow:visible}
+.filter{font-size:9px;padding:6px 8px}
+.title-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.title-card{min-width:0;padding:11px 10px;min-height:96px}
+.title-card h4{overflow-wrap:anywhere;font-size:11px;line-height:1.25}
+.title-card small{font-size:9px}
+.title-card .count{font-size:9px}
+.player-count{display:block;color:#a99bc5;font-size:8px;margin-top:7px;white-space:nowrap}
+.collection-pagination{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 0 5px;color:var(--muted);font-size:11px}
+.collection-pagination button{border:1px solid var(--line);background:#ffffff08;border-radius:9px;padding:8px 12px;font-size:10px}
+.collection-pagination button:disabled{opacity:.35;cursor:default}
+#view-collection .collection-head p{font-size:10px}
+#view-codex .title-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-height:760px){.app{gap:6px;padding-top:8px;padding-bottom:8px}.hero p{display:none}.hero h2{font-size:clamp(25px,3vw,35px)}.art-card{height:76px}.workspace .panel-head p{display:none}.roll-area{gap:6px}.reveal{min-height:80px}.reveal h4{font-size:21px}.roll-note{display:none}}
+@media(max-height:570px){.hero{display:none}.workspace{min-height:0}.reveal{min-height:70px}.modal-window{height:96vh;height:96dvh}.modal-head{padding:9px 12px}.modal-body{padding:8px}}
+@media(max-width:760px){.app{padding:8px;gap:6px}.hero{grid-template-columns:minmax(0,1fr) 110px}.hero p{display:none}.hero h2{font-size:25px}.art-card{height:75px}.top-actions{gap:4px}.top-pill,.back{padding:6px 7px;font-size:9px}.brand h1{font-size:11px}.brand small{font-size:7px}.hero-stats{gap:9px}.stat strong{font-size:12px}.stat span{font-size:7px}.modal-window{height:94vh;height:94dvh;border-radius:13px}.modal-head{padding:11px 12px}.modal-body{padding:9px}.modal-body .collection-head{flex-direction:column}.vault-tools{width:100%;min-width:0}.title-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.title-card{padding:9px 7px;min-height:88px}.modal-body.show-fortune .side-stack{grid-template-columns:1fr}.modal-body .tabs{top:-9px}}
+@media(max-width:430px){.brand small{display:none}.top-actions .top-pill:not(.menu-button){display:none}.top-actions{margin-left:auto}.menu-button{font-size:8px;padding:6px}.back{font-size:8px}.hero{grid-template-columns:minmax(0,1fr)}.art-card{display:none}.hero h2{font-size:23px}.hero-stats{margin-top:5px}.roll-controls{grid-template-columns:minmax(0,1fr) auto}.secondary{font-size:8px}.recent-chip{max-width:48%}.title-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-body .tab{padding:7px 8px}}
+
 </style>
 </head>
 <body>
@@ -141,14 +225,14 @@ body{height:100vh;height:100dvh}
 <div class="app">
 <header class="topbar">
   <div class="brand"><div class="brandmark">✧</div><div><h1>TITLEBOUND</h1><small>REALMS OF FORTUNE</small></div></div>
-  <div class="top-actions"><div class="top-pill">✦ <strong id="topDust">0</strong> dust</div><div class="top-pill">✧ <strong id="topRolls">0</strong> rolls</div><a class="back" href="../douggames.html">← Games</a></div>
+  <div class="top-actions"><button class="top-pill menu-button" data-open="collection">Vault</button><button class="top-pill menu-button" data-open="upgrades">Upgrades</button><button class="top-pill menu-button" data-open="codex">Codex</button><div class="top-pill">✦ <strong id="topDust">0</strong> dust</div><div class="top-pill">✧ <strong id="topRolls">0</strong> rolls</div><a class="back" href="../douggames.html">← Games</a></div>
 </header>
 <section class="hero">
   <div>
     <div class="eyebrow">✦ A universe of impossible names</div>
     <h2>Roll your fate.<br><span>Become a legend.</span></h2>
     <p>Every title is a tiny piece of cosmic history. Roll for legendary names, discover hidden rarities, build your fortune tree, and collect an absurd number of titles. Some are so rare they barely feel real.</p>
-    <div class="hero-stats"><div class="stat"><strong id="totalTitleCount">650+</strong><span>Unique titles</span></div><div class="stat"><strong id="collectedCount">0</strong><span>Discovered</span></div><div class="stat"><strong id="bestRarity">—</strong><span>Best rarity</span></div></div>
+    <div class="hero-stats"><div class="stat"><strong id="totalTitleCount">100,000</strong><span>Unique titles</span></div><div class="stat"><strong id="collectedCount">0</strong><span>Discovered</span></div><div class="stat"><strong id="bestRarity">—</strong><span>Best rarity</span></div></div>
   </div>
   <div class="art-card"><canvas id="crystalArt"></canvas><div class="art-caption"><div><strong>The Astral Core</strong><br><span>The source of every title</span></div><span>✦ 01 / ∞</span></div></div>
 </section>
@@ -179,12 +263,12 @@ body{height:100vh;height:100dvh}
     </section>
   </aside>
 </div>
-<nav class="tabs" aria-label="Game sections">
+<nav class="tabs" id="gameTabs" aria-label="Game sections">
   <button class="tab active" data-view="collection">▦ Collection</button><button class="tab" data-view="tree">✧ Upgrade tree</button><button class="tab" data-view="codex">☷ Rarity codex</button>
 </nav>
 <section class="view active" id="view-collection">
-  <div class="collection-head"><div><h3>Your title vault</h3><p id="collectionSubtitle">Every discovery is recorded here, forever on this device.</p></div><div class="filters" id="rarityFilters"></div></div>
-  <div class="title-grid" id="titleGrid"></div>
+  <div class="collection-head"><div><h3>Your title vault</h3><p id="collectionSubtitle">Explore the 100,000-title archive and see how many players own each title.</p></div><div class="vault-tools"><input id="titleSearch" class="title-search" type="search" placeholder="Search 100,000 titles…" autocomplete="off"><div class="filters" id="rarityFilters"></div></div></div>
+  <div class="title-grid" id="titleGrid"></div><div class="collection-pagination" id="collectionPagination"></div>
   <div id="emptyVault" style="display:none;text-align:center;padding:50px 12px;color:#a89cbd">No titles match this filter yet. Roll a few more and see what the stars reveal.</div>
 </section>
 <section class="view" id="view-tree">
@@ -197,6 +281,7 @@ body{height:100vh;height:100dvh}
 </section>
 <div class="footer">TITLEBOUND · YOUR FATE IS RANDOM. YOUR PROGRESS IS YOURS.</div>
 </div>
+<div class="modal-backdrop" id="featureModal" aria-hidden="true"><section class="modal-window" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><header class="modal-head"><div><div class="eyebrow">TITLEBOUND ARCHIVE</div><h2 id="modalTitle">Your title vault</h2></div><button class="modal-close" id="closeModal" aria-label="Close popup">×</button></header><div class="modal-body" id="modalBody"></div></section></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 (function(){
@@ -216,11 +301,22 @@ const tiers=[
 const prefixes=["Ashen","Astral","Void","Solar","Lunar","Forgotten","Infinite","Crimson","Silent","Golden","Stormborn","Frostbound","Starforged","Dreaming","Hollow","Radiant","Obsidian","Arcane","Phantom","Ancient","Doomed","Blessed","Rogue","Cosmic","Midnight","Dawnlit","Thunderous","Runic","Lost","Sovereign","Wandering","Royal","Prismatic","Quantum","Eclipsed","Celestial","Unbroken","Whispering","Emerald","Sapphire","Ember","Glitched","Timeless","Reckless","Unseen","Singing","Shattered","Feral","Crowned","Nameless"];
 const cores=["Wanderer","Stargazer","Wayfinder","Dreamer","Sentinel","Alchemist","Explorer","Oracle","Champion","Nomad","Guardian","Trickster","Architect","Voyager","Revenant","Pioneer","Harbinger","Scholar","Duelist","Pilgrim","Conjurer","Titan","Outcast","Keeper","Ranger","Prophet","Smith","Riftwalker","Seeker","Warden","Maverick","Tactician","Collector","Phoenix","Monarch","Specter","Knight","Emperor","Jester","Cartographer","Chronomancer","Paragon","Outrider","Runekeeper","Illusionist","Vanguard","Overseer","Gladiator","Herald","Albatross","Pigeon","Potato","Goober","Loot Goblin","Button Masher","Tax Evader","Soup Wizard","Certified Menace","Unpaid Intern","Last Braincell","Chaos Gremlin","Professional Napper","Keyboard Knight","Goblin Accountant","Cosmic Janitor","Definitely Human","Tiny Disaster","Local Legend","Unsupervised Child","Side Quest","Suspicious Duck","Snack Bandit","Lag Survivor","Pixel Pirate","Void Tourist","Luck Enjoyer","Coin Flip","Plot Twist","Main Character","Background NPC","Secret Boss","Final Form","Overthinker","Speedrunner","Cloud Shepherd","Moon Thief","Star Eater","Reality Bender","Dimension Hopper","Entropy Wrangler","Fate Hacker","Gravity Tourist","Time Borrower","Portal Inspector","Comet Chaser","Nebula Diver","Galaxy Gardener","Quantum Potato","Cosmic Pancake","Doom Scroller","Mildly Powerful Being","Extremely Rare Mistake","The Chosen-ish One","Probably a Wizard","Definitely Not a Mimic","Grandmaster of Nothing","Supreme Sandwich","Chair Enthusiast","Lord of Lost Socks","The Unreasonably Lucky","One More Roll","Oops All Crits","Unskippable Cutscene","Patch Notes Enjoyer","Forbidden Microwave","Ancient Wi-Fi Router","Ruler of Tuesday","The Great Perhaps","Bearer of Snacks","Collector of Dust","Friend of Rocks","Enemy of Doors","Last Online 3 Years Ago","Accidental Demigod","Legendary Lurker","Sentient Loading Screen","Guardian of the Fridge","Intergalactic Landlord","Overqualified Goblin","Unlicensed Time Wizard","The Final Nugget","Maximum Silly","Ultra Instinct Hamster","Supreme Pigeon Council","The One Who Clicks","A Problem for Later","Extremely Polite Menace","Secretly Three Raccoons","Definitely Has a Plan","Certified Star Person","Walking Plot Armor","The Unpaid Chosen One","Oops, All Destiny","The Lore Is Complicated","CEO of Side Quests","The Fourth Wall"];
 const suffixes=["of the First Dawn","of Last Light","Beyond the Veil","of Ten Thousand Suns","of the Lost Realm","the Unwritten","of Broken Time","of Quiet Thunder","of the Deep Void","Without a Shadow","of Endless Summer","the Unremembered","of the Final Star","of Forgotten Kings","of Infinite Soup","of Mild Inconvenience","of the Big Bonk","of Absolutely Nothing","of the Cosmic Pantry","of Eternal Tuesday","of the Tiny Crown","of the Last Braincell","of Unpaid Overtime","of the Astral Sea","of the Hollow Moon","of the Hidden Path","of the Fifth Dimension","of Unreasonable Luck","of the Pigeon Throne","of Maximum Chaos","of the Secret Garden","of Distant Worlds","of the Golden Hour","of Shattered Dreams","of the Unseen Sun","of the Blue Comet","of the Evernight","of Lost Memories","of the Bright Abyss","of the Starfall"];
-const tierForIndex=i=>i<300?0:i<480?1:i<570?2:i<610?3:i<630?4:i<638?5:i<642?6:i<644?7:8;
+const tierForIndex=i=>i<650?(i<300?0:i<480?1:i<570?2:i<610?3:i<630?4:i<638?5:i<642?6:i<644?7:8):i<50650?0:i<75650?1:i<90650?2:i<97650?3:i<99650?4:i<99900?5:i<99970?6:i<99995?7:8;
 const titles=[];
-function addTitle(name,seed){if(titles.some(t=>t.name===name))return;const idx=titles.length;const tier=tierForIndex(idx);titles.push({id:"t"+idx,name,rarity:tier,seed:seed||idx,icon:tiers[tier].icon});}
+const titleNameSet=new Set();
+function addTitle(name,seed){if(titleNameSet.has(name))return;titleNameSet.add(name);const idx=titles.length;const tier=tierForIndex(idx);titles.push({id:"t"+idx,name,rarity:tier,seed:seed||idx,icon:tiers[tier].icon});}
 prefixes.forEach((p,i)=>cores.forEach((c,j)=>{if(titles.length<600)addTitle(p+" "+c,(i+1)*177+j*29);}));
 while(titles.length<650){const i=titles.length;addTitle(prefixes[i%prefixes.length]+" "+cores[(i*7+13)%cores.length]+" "+suffixes[(i*11+3)%suffixes.length],i*31+7);}
+const TARGET_TITLE_COUNT=100000;
+for(let pi=0;pi<prefixes.length&&titles.length<TARGET_TITLE_COUNT;pi++){
+ for(let ci=0;ci<cores.length&&titles.length<TARGET_TITLE_COUNT;ci++){
+  for(let si=0;si<suffixes.length&&titles.length<TARGET_TITLE_COUNT;si++){
+   addTitle(prefixes[pi]+" "+cores[ci]+" "+suffixes[si],(pi+1)*1000000+(ci+1)*1000+si);
+  }
+ }
+}
+const titlesByTier=tiers.map(()=>[]);
+titles.forEach(t=>titlesByTier[t.rarity].push(t));
 const upgradeDefs=[
  {id:"luck",name:"Fortune's Favor",icon:"☄",desc:"Increase the odds of higher-rarity titles.",base:35,max:30,effect:l=>"Luck +"+(l*8)+"%",quick:true},
  {id:"speed",name:"Swift Ritual",icon:"⏱",desc:"Make rolls quicker and reveal titles faster.",base:45,max:10,effect:l=>"Roll delay −"+Math.min(70,l*7)+"%",quick:true},
@@ -232,18 +328,21 @@ const upgradeDefs=[
 const defaultState={dust:0,rolls:0,collection:{},upgrades:{luck:0,speed:0,dust:0,streak:0,multi:0,shiny:0},best:0,recent:[],filter:"All",lastTitle:null};
 let state;
 try{state=Object.assign({},defaultState,JSON.parse(localStorage.getItem("titlebound-save")||"{}"));state.upgrades=Object.assign({},defaultState.upgrades,state.upgrades||{});state.collection=state.collection||{};state.recent=Array.isArray(state.recent)?state.recent:[];}catch(e){state=Object.assign({},defaultState);}
-let rolling=false,filter="All",toastTimer;
+let rolling=false,filter="All",toastTimer,collectionPage=0;
+const PAGE_SIZE=120;
+const playerCounts=Object.create(null);
+let titleboundClient=null,titleboundUserId=null;
 function save(){try{localStorage.setItem("titlebound-save",JSON.stringify(state));}catch(e){}}
 function fmt(n){return Math.floor(n).toLocaleString("en-US");}
 function tierOdds(){let luck=1+(state.upgrades.luck||0)*.08;let pity=(state.upgrades.streak||0)*.08;let weights=tiers.map((t,i)=>t.chance*Math.pow(luck,Math.max(0,i-1)*.78));weights[0]=Math.max(12,weights[0]/(1+(luck-1)*.8));if(state.rolls>0&&state.upgrades.streak&&state.rolls%(Math.max(4,12-state.upgrades.streak))===0){weights[3]+=pity*12;weights[4]+=pity*6;}return weights;}
 function pickTier(){const w=tierOdds();const total=w.reduce((a,b)=>a+b,0);let r=Math.random()*total;for(let i=0;i<w.length;i++){r-=w[i];if(r<=0)return i;}return 0;}
-function titleForTier(tier){const candidates=titles.filter(t=>t.rarity===tier);if(!candidates.length)return titles[Math.floor(Math.random()*titles.length)];return candidates[Math.floor(Math.random()*candidates.length)];}
+function titleForTier(tier){const candidates=titlesByTier[tier]||[];if(!candidates.length)return titles[Math.floor(Math.random()*titles.length)];return candidates[Math.floor(Math.random()*candidates.length)];}
 function notify(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2300);}
 function rarityColor(t){return tiers[t].color;}
 function luckMult(){return 1+(state.upgrades.luck||0)*.08;}
-function updateStats(){const found=Object.keys(state.collection).length;$("topDust").textContent=fmt(state.dust);$("dustValue").textContent=fmt(state.dust);$("topRolls").textContent=fmt(state.rolls);$("rollValue").textContent=fmt(state.rolls);$("collectedCount").textContent=fmt(found);$("totalTitleCount").textContent=titles.length;$("luckValue").textContent="×"+luckMult().toFixed(2);$("bestRarity").textContent=state.best>=0&&state.rolls?tiers[state.best].name:"—";$("collectionSubtitle").textContent=found+" of "+titles.length+" titles discovered · "+(state.rolls?Math.round(found/titles.length*100):0)+"% of the vault";}
-function renderReveal(t,duplicate,shiny){const tier=tiers[t.rarity];$("revealIcon").textContent=shiny?"✺":tier.icon;$("revealKicker").textContent=duplicate?"DUPLICATE CONVERTED":shiny?"PRISMATIC VARIANT DISCOVERED":"NEW TITLE DISCOVERED";$("revealTitle").textContent=t.name;$("revealDesc").textContent=duplicate?"Already in your vault — converted into Astral Dust.":tier.desc;$("revealRarity").textContent=(shiny?"✦ PRISMATIC · ":"")+tier.name.toUpperCase();$("revealRarity").style.color=tier.color;$("revealRarity").style.borderColor=tier.color;$("reveal").style.setProperty("--rarity-color",tier.color);$("reveal").style.background="radial-gradient(ellipse at center,"+tier.color+"24 0,transparent 60%),linear-gradient(135deg,#121027,#0d0d1b)";$("rollMode").textContent=tier.name.toUpperCase()+" ROLL";if(t.rarity>=5)notify("UNREAL PULL: "+tier.name.toUpperCase()+" — "+t.name);}
-function performRoll(count){if(rolling)return;count=count||1;const cost=count===1?0:50;if(state.dust<cost){notify("Not enough Astral Dust. Roll once or collect duplicates first.");return;}state.dust-=cost;rolling=true;$("rollButton").disabled=true;$("quickRoll").disabled=true;$("reveal").classList.add("rolling");const delay=Math.max(90,330-(state.upgrades.speed||0)*22);let results=[],n=0;function next(){const rarity=pickTier(),t=titleForTier(rarity),duplicate=!!state.collection[t.id],shiny=Math.random()<(state.upgrades.shiny||0)*.0015;state.rolls++;let reward=0;if(duplicate){reward=Math.round(tiers[rarity].dust*(1+(state.upgrades.dust||0)*.25)*(shiny?2:1));state.dust+=reward;state.collection[t.id].count++;state.collection[t.id].last=Date.now();}else{state.collection[t.id]={count:1,first:Date.now(),last:Date.now(),shiny:shiny};}if(shiny&&!duplicate)state.collection[t.id].shiny=true;state.best=Math.max(state.best,rarity);state.lastTitle=t.id;state.recent.unshift({id:t.id,rarity,duplicate,shiny,reward});state.recent=state.recent.slice(0,6);results.push({t,duplicate,shiny,reward});renderReveal(t,duplicate,shiny);updateStats();renderRecent();renderCollection();save();n++;if(n<count){setTimeout(next,Math.max(70,delay*.45));}else{rolling=false;$("rollButton").disabled=false;$("quickRoll").disabled=false;$("reveal").classList.remove("rolling");if(count>1)notify("Five rolls complete. "+results.filter(x=>!x.duplicate).length+" new titles discovered.");} }next();}
+function updateStats(){const found=Object.keys(state.collection).length;$("topDust").textContent=fmt(state.dust);$("dustValue").textContent=fmt(state.dust);$("topRolls").textContent=fmt(state.rolls);$("rollValue").textContent=fmt(state.rolls);$("collectedCount").textContent=fmt(found);$("totalTitleCount").textContent=titles.length;$("luckValue").textContent="×"+luckMult().toFixed(2);$("bestRarity").textContent=state.best>=0&&state.rolls?tiers[state.best].name:"—";$("collectionSubtitle").textContent=fmt(found)+" of "+fmt(titles.length)+" titles discovered · "+(state.rolls?Math.round(found/titles.length*100):0)+"% of the vault";}
+function renderReveal(t,duplicate,shiny){const tier=tiers[t.rarity];$("revealIcon").textContent=shiny?"✺":tier.icon;$("revealKicker").textContent=duplicate?"DUPLICATE CONVERTED":shiny?"PRISMATIC VARIANT DISCOVERED":"NEW TITLE DISCOVERED";$("revealTitle").textContent=t.name;$("revealDesc").textContent=(duplicate?"Already in your vault — converted into Astral Dust. ":tier.desc+" ")+fmt(playerCounts[t.id]||0)+" players own this title.";$("revealRarity").textContent=(shiny?"✦ PRISMATIC · ":"")+tier.name.toUpperCase();$("revealRarity").style.color=tier.color;$("revealRarity").style.borderColor=tier.color;$("reveal").style.setProperty("--rarity-color",tier.color);$("reveal").style.background="radial-gradient(ellipse at center,"+tier.color+"24 0,transparent 60%),linear-gradient(135deg,#121027,#0d0d1b)";$("rollMode").textContent=tier.name.toUpperCase()+" ROLL";if(t.rarity>=5)notify("UNREAL PULL: "+tier.name.toUpperCase()+" — "+t.name);}
+function performRoll(count){if(rolling)return;count=count||1;const cost=count===1?0:50;if(state.dust<cost){notify("Not enough Astral Dust. Roll once or collect duplicates first.");return;}state.dust-=cost;rolling=true;$("rollButton").disabled=true;$("quickRoll").disabled=true;$("reveal").classList.add("rolling");const delay=Math.max(90,330-(state.upgrades.speed||0)*22);let results=[],n=0;function next(){const rarity=pickTier(),t=titleForTier(rarity),duplicate=!!state.collection[t.id],shiny=Math.random()<(state.upgrades.shiny||0)*.0015;state.rolls++;let reward=0;if(duplicate){reward=Math.round(tiers[rarity].dust*(1+(state.upgrades.dust||0)*.25)*(shiny?2:1));state.dust+=reward;state.collection[t.id].count++;state.collection[t.id].last=Date.now();}else{state.collection[t.id]={count:1,first:Date.now(),last:Date.now(),shiny:shiny};registerTitleUnlock(t); }if(shiny&&!duplicate)state.collection[t.id].shiny=true;state.best=Math.max(state.best,rarity);state.lastTitle=t.id;state.recent.unshift({id:t.id,rarity,duplicate,shiny,reward});state.recent=state.recent.slice(0,6);results.push({t,duplicate,shiny,reward});renderReveal(t,duplicate,shiny);updateStats();renderRecent();renderCollection();save();n++;if(n<count){setTimeout(next,Math.max(70,delay*.45));}else{rolling=false;$("rollButton").disabled=false;$("quickRoll").disabled=false;$("reveal").classList.remove("rolling");if(count>1)notify("Five rolls complete. "+results.filter(x=>!x.duplicate).length+" new titles discovered.");} }next();}
 function costFor(u){return Math.floor(u.base*Math.pow(1.58,state.upgrades[u.id]||0));}
 function buyUpgrade(id){const u=upgradeDefs.find(x=>x.id===id);if(!u)return;const level=state.upgrades[id]||0;if(level>=u.max){notify("That branch has reached its current maximum.");return;}const cost=costFor(u);if(state.dust<cost){notify("You need "+fmt(cost-state.dust)+" more Astral Dust.");return;}state.dust-=cost;state.upgrades[id]=level+1;save();renderUpgrades();updateStats();notify(u.name+" upgraded to level "+(level+1)+"!");}
 function upgradeMarkup(u){const l=state.upgrades[u.id]||0,cost=costFor(u),max=l>=u.max;return '<div class="upgrade"><div class="upgrade-icon">'+u.icon+'</div><div><h4>'+u.name+'</h4><p>'+u.desc+'</p><div class="level">LVL '+l+' / '+u.max+' · '+u.effect(l)+'</div></div><button class="buy" data-buy="'+u.id+'" '+(max||state.dust<cost?'disabled':'')+'>'+(max?'MAX':fmt(cost)+' ✦')+'</button></div>';}
@@ -251,10 +350,46 @@ function treeMarkup(u){const l=state.upgrades[u.id]||0,cost=costFor(u),max=l>=u.
 function renderUpgrades(){$("quickUpgrades").innerHTML=upgradeDefs.filter(u=>u.quick).map(upgradeMarkup).join("");$("treeGrid").innerHTML=upgradeDefs.map(treeMarkup).join("");}
 function renderRecent(){$("recentList").innerHTML=state.recent.length?state.recent.map(x=>{const t=titles.find(y=>y.id===x.id);return '<span class="recent-chip" style="border-color:'+rarityColor(x.rarity)+'55;color:'+rarityColor(x.rarity)+'">'+(x.duplicate?'↻ ':'✦ ')+(t?t.name:"Unknown")+' · '+tiers[x.rarity].name+(x.reward?' +'+x.reward+' dust':'')+'</span>';}).join(""):'<span class="recent-chip">The stars are listening…</span>';}
 function renderFilters(){const names=["All",...tiers.map(t=>t.name),"Undiscovered"];$("rarityFilters").innerHTML=names.map(n=>'<button class="filter '+(filter===n?'active':'')+'" data-filter="'+n+'">'+n+'</button>').join("");}
-function renderCollection(){let arr=titles.filter(t=>filter==="All"||(filter==="Undiscovered"?!state.collection[t.id]:tiers[t.rarity].name===filter));$("titleGrid").innerHTML=arr.map(t=>{const c=state.collection[t.id],tier=tiers[t.rarity];return '<article class="title-card '+(!c?'locked':'')+'" style="--rarity-color:'+tier.color+'"><span class="small-icon">'+(c&&c.shiny?'✺':tier.icon)+'</span>'+(c?'<span class="count">×'+c.count+'</span>':'')+'<h4>'+(c?t.name:"Unknown Title")+'</h4><small>'+(c&&c.shiny?'Prismatic · ':'')+tier.name+'</small></article>';}).join("");$("emptyVault").style.display=arr.length?"none":"block";renderFilters();}
-function renderCodex(){$("codexGrid").innerHTML=tiers.map((t,i)=>'<article class="title-card" style="--rarity-color:'+t.color+'"><span class="small-icon">'+t.icon+'</span><h4>'+t.name+'</h4><small>'+t.chance+'% base weight</small><p style="font-size:10px;color:#a99fbc;line-height:1.5">'+t.desc+'</p></article>').join("");}
+function esc(value){return String(value).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function renderCollection(){
+ const q=(($("titleSearch")&&$("titleSearch").value)||"").trim().toLowerCase();
+ let matching=titles.filter(t=>(filter==="All"||(filter==="Undiscovered"?!state.collection[t.id]:tiers[t.rarity].name===filter))&&(!q||t.name.toLowerCase().includes(q)));
+ const total=matching.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+ collectionPage=Math.max(0,Math.min(collectionPage,pages-1));
+ const arr=matching.slice(collectionPage*PAGE_SIZE,(collectionPage+1)*PAGE_SIZE);
+ $("titleGrid").innerHTML=arr.map(t=>{const c=state.collection[t.id],tier=tiers[t.rarity],players=playerCounts[t.id]||0;return '<article class="title-card '+(!c?'locked':'')+'" style="--rarity-color:'+tier.color+'"><span class="small-icon">'+(c&&c.shiny?'✺':tier.icon)+'</span>'+(c?'<span class="count">You ×'+c.count+'</span>':'')+'<h4>'+esc(t.name)+'</h4><small>'+(c&&c.shiny?'Prismatic · ':'')+tier.name+(c?' · Unlocked':' · Not unlocked')+'</small><span class="player-count">♙ '+fmt(players)+' player'+(players===1?'':'s')+'</span></article>';}).join("");
+ $("emptyVault").style.display=total?"none":"block";
+ $("collectionPagination").innerHTML='<button data-page="-1" '+(collectionPage===0?'disabled':'')+'>← Previous</button><span>'+fmt(total?collectionPage*PAGE_SIZE+1:0)+'–'+fmt(Math.min((collectionPage+1)*PAGE_SIZE,total))+' of '+fmt(total)+' titles · page '+(collectionPage+1)+' / '+pages+'</span><button data-page="1" '+(collectionPage>=pages-1?'disabled':'')+'>Next →</button>';
+ renderFilters();
+}
+function renderCodex(){$("codexGrid").innerHTML=tiers.map((t,i)=>'<article class="title-card" style="--rarity-color:'+t.color+'"><span class="small-icon">'+t.icon+'</span><h4>'+t.name+'</h4><small>'+t.chance+'% base weight</small><p style="font-size:10px;color:#a99fbc;line-height:1.5">'+t.desc+'</p><p style="font-size:9px;color:#a99fbc">Titles in tier: '+fmt(titlesByTier[i].length)+'</p></article>').join("");}
 document.addEventListener("click",e=>{const buy=e.target.closest("[data-buy]");if(buy)buyUpgrade(buy.dataset.buy);const f=e.target.closest("[data-filter]");if(f){filter=f.dataset.filter;renderCollection();}const tab=e.target.closest("[data-view]");if(tab){document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===tab));document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+tab.dataset.view));if(tab.dataset.view==="tree")renderUpgrades();}});
 $("rollButton").addEventListener("click",()=>performRoll(1));$("quickRoll").addEventListener("click",()=>performRoll(5));
+
+function waitForTitleboundClient(timeoutMs=12000){return new Promise(resolve=>{if(window.DougHubSupabaseClient){resolve(window.DougHubSupabaseClient);return;}let done=false;const finish=value=>{if(done)return;done=true;window.removeEventListener("douqhub:supabase-ready",onReady);clearTimeout(timer);resolve(value||null);};const onReady=()=>finish(window.DougHubSupabaseClient||null);window.addEventListener("douqhub:supabase-ready",onReady);const timer=setTimeout(()=>finish(window.DougHubSupabaseClient||null),timeoutMs);});}
+async function registerTitleUnlockBatch(list){if(!titleboundClient||!titleboundUserId||!list.length)return;const payload=list.map(t=>({id:t.id,name:t.name,rarity:tiers[t.rarity].name}));const {error}=await titleboundClient.rpc("register_titlebound_unlocks",{p_titles:payload});if(error)throw error;}
+async function registerTitleUnlock(t){if(!titleboundClient||!titleboundUserId)return;try{const {error}=await titleboundClient.rpc("register_titlebound_unlocks",{p_titles:[{id:t.id,name:t.name,rarity:tiers[t.rarity].name}]});if(error)throw error;playerCounts[t.id]=(playerCounts[t.id]||0)+1;renderCollection();}catch(e){console.warn("TITLEBOUND ownership count could not sync:",e.message||e);}}
+async function loadTitleboundCounts(){try{titleboundClient=await waitForTitleboundClient();if(!titleboundClient)return;const {data,error}=await titleboundClient.auth.getUser();if(error)throw error;titleboundUserId=data&&data.user?data.user.id:null;
+ if(titleboundUserId){const marker="titlebound-synced-"+titleboundUserId;if(!localStorage.getItem(marker)){const owned=Object.keys(state.collection).map(id=>{const t=titles.find(x=>x.id===id);return t?{id:t.id,name:t.name,rarity:t.rarity}:null;}).filter(Boolean);for(let i=0;i<owned.length;i+=500){await registerTitleUnlockBatch(owned.slice(i,i+500));}localStorage.setItem(marker,"1");}}
+ let offset=0;while(true){const {data:rows,error:countError}=await titleboundClient.from("titlebound_title_counts").select("title_id,player_count").range(offset,offset+999);if(countError)throw countError;(rows||[]).forEach(row=>playerCounts[row.title_id]=Number(row.player_count)||0);if(!rows||rows.length<1000)break;offset+=1000;}
+ renderCollection();if(state.lastTitle){const last=titles.find(t=>t.id===state.lastTitle);if(last)renderReveal(last,false,!!(state.collection[last.id]&&state.collection[last.id].shiny));}
+ }catch(e){console.warn("TITLEBOUND global title counts unavailable:",e.message||e);}}
+function setupFeaturePopups(){
+ const modal=$("featureModal"),body=$("modalBody"),tabs=$("gameTabs"),side=document.querySelector(".side-stack");
+ if(tabs)body.appendChild(tabs);
+ document.querySelectorAll(".view").forEach(view=>body.appendChild(view));
+ if(side)body.appendChild(side);
+ const titleMap={collection:"Your title vault",upgrades:"Upgrade tree & fortune",tree:"Upgrade tree & fortune",codex:"Rarity codex"};
+ function activate(view){document.querySelectorAll(".tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.view===view));document.querySelectorAll(".view").forEach(panel=>panel.classList.toggle("active",panel.id==="view-"+view));body.classList.toggle("show-fortune",view==="tree");$("modalTitle").textContent=titleMap[view]||"Titlebound";if(view==="tree")renderUpgrades();if(view==="collection")renderCollection();}
+ function open(view){activate(view);modal.classList.add("open");modal.setAttribute("aria-hidden","false");document.body.classList.add("titlebound-modal-open");}
+ function close(){modal.classList.remove("open");modal.setAttribute("aria-hidden","true");document.body.classList.remove("titlebound-modal-open");}
+ document.addEventListener("click",e=>{const opener=e.target.closest("[data-open]");if(opener){open(opener.dataset.open==="upgrades"?"tree":opener.dataset.open);return;}const page=e.target.closest("[data-page]");if(page){collectionPage=Math.max(0,collectionPage+Number(page.dataset.page));renderCollection();return;}const tab=e.target.closest("[data-view]");if(tab&&modal.contains(tab)){activate(tab.dataset.view);return;}if(e.target===$("closeModal"))close();if(e.target===modal)close();});
+ $("closeModal").addEventListener("click",close);
+ $("titleSearch").addEventListener("input",()=>{collectionPage=0;renderCollection();});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))close();});
+ activate("collection");
+}
+
 function fitCanvas(c){const dpr=Math.min(2.5,window.devicePixelRatio||1),r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));return {ctx:c.getContext("2d"),w:c.width,h:c.height,dpr};}
 const sky=$("sky"),sc=sky.getContext("2d");let stars=[],sw=0,sh=0;
 function resizeSky(){sw=sky.width=window.innerWidth*Math.min(2,window.devicePixelRatio||1);sh=sky.height=window.innerHeight*Math.min(2,window.devicePixelRatio||1);sky.style.width=window.innerWidth+"px";sky.style.height=window.innerHeight+"px";stars=Array.from({length:Math.min(260,Math.floor(window.innerWidth/4))},()=>({x:Math.random()*sw,y:Math.random()*sh,r:Math.random()*1.4+.2,a:Math.random()*.7+.15,p:Math.random()*6.28,s:Math.random()*.0008+.0002}));}
@@ -272,7 +407,7 @@ poly(c,[[-31,52],[0,-85],[17,-44],[13,45],[0,67]],"#7454ba","#e4d1ff");poly(c,[[
 c.shadowBlur=0;poly(c,[[-15,10],[-5,-28],[0,20]],"#ffffff88");poly(c,[[0,20],[9,-22],[8,37]],"#8df0ff88");
 for(let i=0;i<16;i++){const a=t*.0003+i*2.399,rad=64+(i%5)*13,x=Math.cos(a)*rad,y=Math.sin(a)*rad*.65;c.globalAlpha=.4+.6*(.5+.5*Math.sin(t*.003+i));c.fillStyle=i%4===0?"#ffe3a2":i%3===0?"#88edff":"#d5baff";c.beginPath();c.arc(x,y,1+(i%3)*.6,0,Math.PI*2);c.fill();}c.globalAlpha=1;c.restore();requestAnimationFrame(drawArt);}
 resizeSky();resizeArt();requestAnimationFrame(drawSky);requestAnimationFrame(drawArt);window.addEventListener("resize",()=>{resizeSky();resizeArt();});
-renderCodex();renderCollection();renderRecent();renderUpgrades();updateStats();save();
+renderCodex();renderCollection();renderRecent();renderUpgrades();updateStats();setupFeaturePopups();loadTitleboundCounts();save();
 })();
 </script>
 </body>
