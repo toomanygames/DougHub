@@ -218,6 +218,37 @@ body{overflow:hidden}
 @media(max-width:760px){.app{padding:8px;gap:6px}.hero{grid-template-columns:minmax(0,1fr) 110px}.hero p{display:none}.hero h2{font-size:25px}.art-card{height:75px}.top-actions{gap:4px}.top-pill,.back{padding:6px 7px;font-size:9px}.brand h1{font-size:11px}.brand small{font-size:7px}.hero-stats{gap:9px}.stat strong{font-size:12px}.stat span{font-size:7px}.modal-window{height:94vh;height:94dvh;border-radius:13px}.modal-head{padding:11px 12px}.modal-body{padding:9px}.modal-body .collection-head{flex-direction:column}.vault-tools{width:100%;min-width:0}.title-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.title-card{padding:9px 7px;min-height:88px}.modal-body.show-fortune .side-stack{grid-template-columns:1fr}.modal-body .tabs{top:-9px}}
 @media(max-width:430px){.brand small{display:none}.top-actions .top-pill:not(.menu-button){display:none}.top-actions{margin-left:auto}.menu-button{font-size:8px;padding:6px}.back{font-size:8px}.hero{grid-template-columns:minmax(0,1fr)}.art-card{display:none}.hero h2{font-size:23px}.hero-stats{margin-top:5px}.roll-controls{grid-template-columns:minmax(0,1fr) auto}.secondary{font-size:8px}.recent-chip{max-width:48%}.title-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-body .tab{padding:7px 8px}}
 
+
+/* Slide-out upgrade dock: stays out of the main game layout */
+.upgrade-dock{position:fixed;z-index:9000;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;pointer-events:none}
+.upgrade-dock-toggle{pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:35px;min-height:142px;padding:12px 7px;border:1px solid rgba(185,153,255,.36);border-right:0;border-radius:13px 0 0 13px;background:linear-gradient(180deg,#29204b,#100f24);color:#eee7ff;box-shadow:0 10px 40px #0007;cursor:pointer}
+.dock-toggle-icon{font-size:18px;color:#c4a5ff}
+.dock-toggle-label{font-size:9px;letter-spacing:.13em;writing-mode:vertical-rl;transform:rotate(180deg);font-weight:850}
+.dock-chevron{font-size:18px;line-height:1;color:#b9a3ed;transition:transform .2s}
+.upgrade-dock-panel{pointer-events:auto;width:min(280px,calc(100vw - 45px));height:min(560px,76vh,76dvh);display:flex;flex-direction:column;gap:10px;overflow:hidden;padding:13px;border:1px solid rgba(185,153,255,.3);border-right:0;border-radius:16px 0 0 16px;background:linear-gradient(155deg,rgba(24,19,47,.99),rgba(8,8,20,.99));box-shadow:0 20px 70px #0009;transform:translateX(calc(100% + 1px));opacity:0;visibility:hidden;transition:transform .25s ease,opacity .2s ease,visibility .25s;position:absolute;right:0;top:50%;translate:0 -50%}
+.upgrade-dock.open .upgrade-dock-panel{transform:translateX(0);opacity:1;visibility:visible}
+.upgrade-dock.open .upgrade-dock-toggle{transform:translateX(-280px);transition:transform .25s ease}
+.upgrade-dock-toggle{transition:transform .25s ease}
+.upgrade-dock.open .dock-chevron{transform:rotate(180deg)}
+.upgrade-dock-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.upgrade-dock-head .eyebrow{font-size:8px}
+.upgrade-dock-head h3{font-size:15px;margin:4px 0}
+.upgrade-dock-head p{font-size:10px;color:var(--muted);margin:0;line-height:1.4}
+.dock-close{width:28px;height:28px;border:1px solid var(--line);border-radius:8px;background:#ffffff08;font-size:20px;line-height:1;flex:0 0 auto}
+.dock-dust{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:10px;background:rgba(245,190,90,.08);color:#f5c56c;font-size:12px;flex:0 0 auto}
+.dock-dust span{margin-left:auto;color:var(--muted);font-size:9px}
+.upgrade-dock .upgrade-list{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0;display:flex;flex-direction:column;gap:7px}
+.upgrade-dock .upgrade{grid-template-columns:31px minmax(0,1fr) auto;gap:7px;padding:9px;border-radius:11px;background:rgba(255,255,255,.025)}
+.upgrade-dock .upgrade-icon{width:30px;height:30px;font-size:14px}
+.upgrade-dock .upgrade h4{font-size:10px;margin:0 0 3px}
+.upgrade-dock .upgrade p{display:none}
+.upgrade-dock .upgrade .level{font-size:8px;line-height:1.4}
+.upgrade-dock .upgrade .buy{padding:7px 8px;font-size:9px;min-width:48px}
+.dock-full-tree{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:0 0 auto;padding:10px 11px;border:1px solid rgba(185,153,255,.25);border-radius:10px;background:rgba(139,92,246,.12);font-size:10px;font-weight:750}
+.dock-full-tree span{color:#c4a5ff}
+@media(max-width:600px){.upgrade-dock-panel{height:min(520px,72vh,72dvh);padding:10px;width:min(260px,calc(100vw - 42px))}.upgrade-dock.open .upgrade-dock-toggle{transform:translateX(-260px)}.upgrade-dock-toggle{width:31px;min-height:118px}.dock-toggle-label{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.upgrade-dock-panel,.upgrade-dock-toggle,.dock-chevron{transition:none}}
+
 </style>
 </head>
 <body>
@@ -282,6 +313,7 @@ body{overflow:hidden}
 <div class="footer">TITLEBOUND · YOUR FATE IS RANDOM. YOUR PROGRESS IS YOURS.</div>
 </div>
 <div class="modal-backdrop" id="featureModal" aria-hidden="true"><section class="modal-window" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><header class="modal-head"><div><div class="eyebrow">TITLEBOUND ARCHIVE</div><h2 id="modalTitle">Your title vault</h2></div><button class="modal-close" id="closeModal" aria-label="Close popup">×</button></header><div class="modal-body" id="modalBody"></div></section></div>
+<aside class="upgrade-dock" id="upgradeDock" aria-label="Quick upgrades"><button class="upgrade-dock-toggle" id="upgradeDockToggle" aria-expanded="false" aria-controls="upgradeDockPanel"><span class="dock-toggle-icon">✦</span><span class="dock-toggle-label">UPGRADES</span><span class="dock-chevron">‹</span></button><section class="upgrade-dock-panel" id="upgradeDockPanel"><header class="upgrade-dock-head"><div><span class="eyebrow">SPEND ASTRAL DUST</span><h3>Quick upgrades</h3><p>Small boosts, right at your side.</p></div><button id="upgradeDockClose" class="dock-close" aria-label="Close upgrades">×</button></header><div class="dock-dust">✦ <strong id="dockDust">0</strong><span>Astral Dust</span></div><div class="upgrade-list" id="quickUpgrades"></div><button class="dock-full-tree" data-open="upgrades">Open full upgrade tree <span>↗</span></button></section></aside>
 <div class="toast" id="toast" role="status"></div>
 <script>
 (function(){
@@ -341,7 +373,7 @@ function titleForTier(tier){const candidates=titlesByTier[tier]||[];if(!candidat
 function notify(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2300);}
 function rarityColor(t){return tiers[t].color;}
 function luckMult(){return 1+(state.upgrades.luck||0)*.08;}
-function updateStats(){const found=Object.keys(state.collection).length;$("topDust").textContent=fmt(state.dust);$("dustValue").textContent=fmt(state.dust);$("topRolls").textContent=fmt(state.rolls);$("rollValue").textContent=fmt(state.rolls);$("collectedCount").textContent=fmt(found);$("totalTitleCount").textContent=fmt(titles.length);$("luckValue").textContent="×"+luckMult().toFixed(2);$("bestRarity").textContent=state.best>=0&&state.rolls?tiers[state.best].name:"—";$("collectionSubtitle").textContent=fmt(found)+" of "+fmt(titles.length)+" titles discovered · "+(state.rolls?Math.round(found/titles.length*100):0)+"% of the vault · global counts track signed-in players";}
+function updateStats(){const found=Object.keys(state.collection).length;$("topDust").textContent=fmt(state.dust);if($("dockDust"))$("dockDust").textContent=fmt(state.dust);$("dustValue").textContent=fmt(state.dust);$("topRolls").textContent=fmt(state.rolls);$("rollValue").textContent=fmt(state.rolls);$("collectedCount").textContent=fmt(found);$("totalTitleCount").textContent=fmt(titles.length);$("luckValue").textContent="×"+luckMult().toFixed(2);$("bestRarity").textContent=state.best>=0&&state.rolls?tiers[state.best].name:"—";$("collectionSubtitle").textContent=fmt(found)+" of "+fmt(titles.length)+" titles discovered · "+(state.rolls?Math.round(found/titles.length*100):0)+"% of the vault · global counts track signed-in players";}
 function renderReveal(t,duplicate,shiny){const tier=tiers[t.rarity];$("revealIcon").textContent=shiny?"✺":tier.icon;$("revealKicker").textContent=duplicate?"DUPLICATE CONVERTED":shiny?"PRISMATIC VARIANT DISCOVERED":"NEW TITLE DISCOVERED";$("revealTitle").textContent=t.name;$("revealDesc").textContent=(duplicate?"Already in your vault — converted into Astral Dust. ":tier.desc+" ")+fmt(playerCounts[t.id]||0)+" players own this title.";$("revealRarity").textContent=(shiny?"✦ PRISMATIC · ":"")+tier.name.toUpperCase();$("revealRarity").style.color=tier.color;$("revealRarity").style.borderColor=tier.color;$("reveal").style.setProperty("--rarity-color",tier.color);$("reveal").style.background="radial-gradient(ellipse at center,"+tier.color+"24 0,transparent 60%),linear-gradient(135deg,#121027,#0d0d1b)";$("rollMode").textContent=tier.name.toUpperCase()+" ROLL";if(t.rarity>=5)notify("UNREAL PULL: "+tier.name.toUpperCase()+" — "+t.name);}
 function performRoll(count){if(rolling)return;count=count||1;const cost=count===1?0:50;if(state.dust<cost){notify("Not enough Astral Dust. Roll once or collect duplicates first.");return;}state.dust-=cost;rolling=true;$("rollButton").disabled=true;$("quickRoll").disabled=true;$("reveal").classList.add("rolling");const delay=Math.max(90,330-(state.upgrades.speed||0)*22);let results=[],n=0;function next(){const rarity=pickTier(),t=titleForTier(rarity),duplicate=!!state.collection[t.id],shiny=Math.random()<(state.upgrades.shiny||0)*.0015;state.rolls++;let reward=0;if(duplicate){reward=Math.round(tiers[rarity].dust*(1+(state.upgrades.dust||0)*.25)*(shiny?2:1));state.dust+=reward;state.collection[t.id].count++;state.collection[t.id].last=Date.now();}else{state.collection[t.id]={count:1,first:Date.now(),last:Date.now(),shiny:shiny};registerTitleUnlock(t); }if(shiny&&!duplicate)state.collection[t.id].shiny=true;state.best=Math.max(state.best,rarity);state.lastTitle=t.id;state.recent.unshift({id:t.id,rarity,duplicate,shiny,reward});state.recent=state.recent.slice(0,6);results.push({t,duplicate,shiny,reward});renderReveal(t,duplicate,shiny);updateStats();renderRecent();renderCollection();save();n++;if(n<count){setTimeout(next,Math.max(70,delay*.45));}else{rolling=false;$("rollButton").disabled=false;$("quickRoll").disabled=false;$("reveal").classList.remove("rolling");if(count>1)notify("Five rolls complete. "+results.filter(x=>!x.duplicate).length+" new titles discovered.");} }next();}
 function costFor(u){return Math.floor(u.base*Math.pow(1.58,state.upgrades[u.id]||0));}
@@ -376,7 +408,8 @@ async function loadTitleboundCounts(){try{titleboundClient=await waitForTitlebou
  renderCollection();if(state.lastTitle){const last=titleById.get(state.lastTitle);if(last)renderReveal(last,false,!!(state.collection[last.id]&&state.collection[last.id].shiny));}
  }catch(e){console.warn("TITLEBOUND global title counts unavailable:",e.message||e);}}
 function setupFeaturePopups(){
- const modal=$("featureModal"),body=$("modalBody"),tabs=$("gameTabs"),side=document.querySelector(".side-stack");
+ const modal=$("featureModal"),body=$("modalBody"),tabs=$("gameTabs"),side=document.querySelector(".side-stack"),dock=$("upgradeDock"),dockPanel=$("upgradeDockPanel"),dockToggle=$("upgradeDockToggle");
+ const quickUpgrades=$("quickUpgrades");if(quickUpgrades)dockPanel.insertBefore(quickUpgrades,dockPanel.querySelector(".dock-full-tree"));
  if(tabs)body.appendChild(tabs);
  document.querySelectorAll(".view").forEach(view=>body.appendChild(view));
  if(side)body.appendChild(side);
@@ -388,6 +421,8 @@ function setupFeaturePopups(){
  $("closeModal").addEventListener("click",close);
  $("titleSearch").addEventListener("input",()=>{collectionPage=0;renderCollection();});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))close();});
+ function toggleDock(force){const open=typeof force==="boolean"?force:!dock.classList.contains("open");dock.classList.toggle("open",open);dockToggle.setAttribute("aria-expanded",String(open));}
+ dockToggle.addEventListener("click",()=>toggleDock());$("upgradeDockClose").addEventListener("click",()=>toggleDock(false));
  activate("collection");
 }
 
