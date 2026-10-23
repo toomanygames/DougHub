@@ -229,7 +229,18 @@ body{
 @media(max-width:700px){.main-pages-section{padding:15px}.main-pages-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.main-page-link{padding:10px;gap:8px}.main-page-icon{width:30px;height:30px;flex-basis:30px}}
 @media(max-width:420px){.main-pages-grid{grid-template-columns:1fr}.main-page-link{padding:11px}}
 
-/* Keep the core community spaces distinct from optional tools and workspace pages. */
+/* Keep secondary destinations available without crowding the core spaces. */
+.directory-more{border:1px solid #ffffff12;border-radius:14px;background:#ffffff02;overflow:hidden}
+.directory-more-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:14px 16px}
+.directory-more-summary::-webkit-details-marker{display:none}
+.directory-more-summary>span:first-child{min-width:0}
+.directory-more-summary strong{display:block;color:var(--text);font-size:13px}
+.directory-more-summary small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.5}
+.directory-more-count{display:flex;align-items:center;gap:8px;flex-shrink:0;color:#d8ccff;font-size:11px;font-weight:800}
+.directory-more[open] .directory-more-count span{transform:rotate(180deg)}
+.directory-more-count span{display:inline-block;transition:transform .18s}
+.directory-extras{padding:0 12px 12px}
+.directory-more-summary:focus-visible{outline:2px solid #a78bfa;outline-offset:-3px;border-radius:12px}
 .directory-subsection{margin-top:22px}.directory-subheading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 11px}.directory-subheading h3{margin:0;color:#f3f2ff;font-size:15px;letter-spacing:-.025em}.directory-subheading>span{color:#9698bb;font-size:9px;font-weight:900;letter-spacing:.13em}.directory-extras{padding-top:18px;border-top:1px solid #ffffff12}.directory-extras .main-page-link{background:#ffffff02}.directory-extras .main-page-icon{opacity:.85}
 </style>
 </head>
@@ -273,7 +284,7 @@ body{
     </div>
   </section>
   <section class="main-pages-section" id="mainPagesDirectory" aria-labelledby="mainPagesHeading">
-    <div class="main-pages-heading"><div><span class="eyebrow">YOUR DOUGHUB SHORTCUTS</span><h2 id="mainPagesHeading">Find your space</h2><p>Start with the places for playing, creating, and sharing. Everything else stays available below.</p></div><span class="main-pages-count">16 destinations</span></div>
+    <div class="main-pages-heading"><div><span class="eyebrow">YOUR DOUGHUB SHORTCUTS</span><h2 id="mainPagesHeading">Find your space</h2><p>Start with the places for playing, creating, and sharing. Everything else stays available below.</p></div><span class="main-pages-count">5 CORE SPACES</span></div>
     <div class="directory-subsection">
       <div class="directory-subheading"><h3>Play, create &amp; share</h3><span>THE MAIN SPACES</span></div>
       <div class="main-pages-grid">
@@ -284,7 +295,9 @@ body{
         <a class="main-page-link" href="my-games.html"><span class="main-page-icon">✦</span><span><strong>My Creations</strong><small>Return to your published projects</small></span><b>↗</b></a>
       </div>
     </div>
-    <div class="directory-subsection directory-extras">
+    <details class="directory-more directory-subsection">
+      <summary class="directory-more-summary"><span><strong>More DougHub spaces</strong><small>Optional destinations and workspace features</small></span><span class="directory-more-count">11 more <span aria-hidden="true">⌄</span></span></summary>
+      <div class="directory-extras">
       <div class="directory-subheading"><h3>More DougHub spaces</h3><span>EXTRAS &amp; WORKSPACE</span></div>
       <div class="main-pages-grid">
         <a class="main-page-link" href="index.html"><span class="main-page-icon">⌂</span><span><strong>Home</strong><small>DougHub homepage</small></span><b>↗</b></a>
@@ -299,7 +312,7 @@ body{
         <a class="main-page-link" href="DMail.html"><span class="main-page-icon">✉</span><span><strong>DMail</strong><small>Your messages</small></span><b>↗</b></a>
         <a class="main-page-link" href="settings.html"><span class="main-page-icon">⚙</span><span><strong>Settings</strong><small>Manage your account</small></span><b>↗</b></a>
       </div>
-    </div>
+    </details>
   </section>
   <section class="tool-lab-feature-wrap" aria-label="Featured tool">
     <article class="tool-card tool-lab-feature" data-search="tool lab code tester browser emulator sandbox website link inspector developer">
