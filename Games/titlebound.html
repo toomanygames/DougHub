@@ -50,6 +50,90 @@ button:focus-visible{outline:2px solid #f8d89a;outline-offset:3px}
 @media(max-width:900px){.hero{grid-template-columns:1fr}.art-card{height:240px}.workspace{grid-template-columns:1fr}.side-stack{display:grid;grid-template-columns:1fr 1fr}.title-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.app{padding:14px 12px 30px}.topbar{align-items:flex-start}.top-actions{gap:5px;flex-wrap:wrap;justify-content:flex-end}.top-pill{padding:8px 9px;font-size:10px}.back{padding:8px}.brand h1{font-size:14px}.hero{padding-top:18px}.hero h2{font-size:39px}.art-card{height:210px}.side-stack{grid-template-columns:1fr}.title-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tree-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reveal{min-height:220px}.roll-area{padding:11px}.roll-controls{grid-template-columns:1fr}.roll-controls .secondary{min-height:40px}.panel-head{padding:14px}.hero-stats{gap:16px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* FIT-TO-SCREEN REDESIGN: fixed viewport, compact game dashboard, no page scrolling */
+html,body{width:100%;height:100%;min-height:0;overflow:hidden}
+body{height:100vh;height:100dvh}
+#sky{position:fixed}
+.app{height:100vh;height:100dvh;min-height:0;max-width:1600px;padding:10px 20px 8px;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+.topbar{flex:0 0 auto;padding:0 0 9px;min-height:43px}
+.brandmark{width:34px;height:34px;border-radius:11px;font-size:18px}
+.brand{gap:9px}.brand h1{font-size:15px}.brand small{font-size:8px}
+.top-pill,.back{padding:7px 10px;font-size:10px}
+.hero{flex:0 0 auto;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:14px;padding:3px 0 2px;min-height:0}
+.eyebrow{font-size:9px}.hero h2{font-size:clamp(27px,3vw,43px);margin:6px 0 7px;line-height:.98}
+.hero p{font-size:10px;line-height:1.45;max-width:580px}
+.hero-stats{gap:16px;margin-top:9px}.stat strong{font-size:15px}.stat span{font-size:8px}
+.art-card{height:clamp(105px,17vh,160px);border-radius:17px}
+.art-caption{left:12px;right:12px;bottom:9px}.art-caption strong{font-size:9px}.art-caption span{font-size:8px}
+.workspace{flex:0 0 clamp(255px,38vh,330px);min-height:0;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:10px;margin-top:0}
+.panel{min-height:0;border-radius:16px}
+.panel-head{padding:10px 13px}.panel-head h3{font-size:10px}.panel-head p{font-size:9px;margin-top:3px}.tag{font-size:8px;padding:5px 7px}
+.roll-area{padding:10px}
+.reveal{min-height:0;height:clamp(135px,21vh,190px);border-radius:13px}
+.reveal-content{padding:10px}.sigil{width:40px;height:40px;border-radius:13px;font-size:21px;margin-bottom:7px}
+.reveal-kicker{font-size:8px}.reveal h4{font-size:clamp(19px,2.2vw,29px);margin:5px 0}.reveal p{font-size:9px}.rarity{font-size:8px;margin-top:8px;padding:4px 7px}
+.roll-controls{margin-top:8px;gap:7px}.primary{padding:10px 12px;font-size:10px}.secondary{padding:9px 10px;font-size:9px}
+.roll-note{font-size:8px;line-height:1.35;margin:7px 2px 0}
+.feed{margin-top:7px}.feed-title{font-size:8px;margin-bottom:5px}.recent-list{gap:4px}.recent-chip{font-size:8px;padding:5px 6px}
+.side-stack{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;min-height:0}
+.currency-panel{padding:9px 13px}.currency-row+.currency-row{margin-top:7px;padding-top:7px}
+.currency-label{font-size:8px}.currency-value{font-size:15px}
+.currency-row>div:last-child{font-size:17px!important}
+.upgrade-list{padding:7px;gap:5px;overflow:auto;min-height:0}
+.upgrade{grid-template-columns:30px minmax(0,1fr) auto;gap:7px;padding:7px;border-radius:10px}
+.upgrade-icon{height:29px;width:29px;border-radius:9px;font-size:14px}
+.upgrade h4{font-size:9px;margin-bottom:2px}.upgrade p{font-size:8px;line-height:1.25}
+.upgrade .level{font-size:8px;margin-top:3px}.buy{padding:7px;font-size:8px;border-radius:7px}
+.tabs{flex:0 0 auto;margin:0;padding:3px;gap:4px;border-radius:11px}
+.tab{padding:7px 11px;font-size:9px;border-radius:8px}
+.view{min-height:0;flex:1 1 auto;overflow:hidden}
+.view.active{display:flex;flex-direction:column}
+.collection-head{flex:0 0 auto;margin:0 0 8px;gap:8px}
+.collection-head h3{font-size:12px}.collection-head p{font-size:9px;margin-top:3px}
+.filters{gap:4px}.filter{padding:5px 7px;font-size:8px;border-radius:7px}
+.title-grid{flex:1 1 auto;min-height:0;overflow:auto;align-content:start;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;padding:2px 4px 4px 2px;scrollbar-width:thin;scrollbar-color:#69528f #ffffff08}
+.title-card{min-height:68px;padding:8px;border-radius:9px}.title-card .small-icon{font-size:13px}.title-card h4{font-size:9px;line-height:1.15;margin:4px 0}.title-card small{font-size:7px}.title-card .count{right:6px;top:6px;font-size:7px}
+#view-tree .tree-grid,#view-codex .title-grid{overflow:auto;min-height:0;flex:1;align-content:start;scrollbar-width:thin;scrollbar-color:#69528f #ffffff08}
+.tree-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tree-node{padding:10px;border-radius:12px}.tree-node .node-icon{font-size:18px}.tree-node h4{font-size:10px;margin:5px 0}.tree-node p{font-size:8px;line-height:1.35;min-height:30px;margin-bottom:8px}.tree-node .node-foot{font-size:8px}.tree-node button{margin-top:8px;padding:7px}
+#view-codex .title-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+#view-codex .title-card p{font-size:8px!important;margin:5px 0 0}
+#emptyVault{padding:18px 8px!important;font-size:10px}
+.footer{flex:0 0 auto;padding:0;font-size:7px;line-height:10px}
+.toast{bottom:12px;font-size:10px;padding:9px 13px}
+@media(max-height:760px){
+ .app{padding-top:7px;gap:6px}.hero p{display:none}.hero{grid-template-columns:minmax(0,1fr) minmax(230px,.8fr)}
+ .hero h2{font-size:clamp(25px,3vh,34px)}.hero-stats{margin-top:6px}.art-card{height:clamp(86px,13vh,112px)}
+ .workspace{flex-basis:clamp(235px,39vh,285px)}.reveal{height:clamp(115px,18vh,145px)}
+ .roll-note{display:none}.feed{margin-top:5px}.recent-chip:nth-child(n+4){display:none}
+ .title-grid{grid-template-columns:repeat(7,minmax(0,1fr))}
+}
+@media(max-width:900px){
+ .app{padding-left:12px;padding-right:12px}.workspace{grid-template-columns:minmax(0,1.15fr) minmax(250px,.85fr)}
+ .title-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ .app{gap:6px;padding:7px 8px}.topbar{min-height:35px;padding-bottom:6px}.brand h1{font-size:12px}.brandmark{width:29px;height:29px}
+ .top-pill{font-size:8px;padding:6px 7px}.back{font-size:9px;padding:6px 7px}
+ .hero{grid-template-columns:1fr minmax(100px,.55fr);gap:8px}.hero h2{font-size:clamp(23px,6vw,34px)}.hero p{display:none}.hero-stats{gap:9px}.stat strong{font-size:12px}.stat span{font-size:7px}.art-card{height:95px}
+ .workspace{flex:1 1 auto;min-height:0;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(205px,1.05fr) minmax(110px,.75fr);gap:6px}
+ .workspace>.panel{min-height:0}.workspace>.side-stack{display:none}
+ .reveal{height:clamp(110px,20vh,160px)}.roll-area{padding:8px}.panel-head{padding:8px 10px}.roll-controls{grid-template-columns:1fr auto}
+ .primary{padding:9px 8px;font-size:9px}.secondary{padding:8px;font-size:8px}
+ .tabs{margin-top:0}.tab{padding:7px 8px;font-size:8px}
+ .collection-head{align-items:flex-start;flex-direction:column}.collection-head h3{font-size:11px}.collection-head p{display:none}
+ .filters{max-width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.filter{flex:0 0 auto}
+ .title-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.tree-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#view-codex .title-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .footer{display:none}
+}
+@media(max-height:620px){
+ .hero-stats{display:none}.hero h2{font-size:25px}.art-card{height:76px}.workspace{flex-basis:clamp(205px,38vh,235px)}
+ .reveal{height:105px}.sigil{width:30px;height:30px;font-size:16px;margin-bottom:3px}.reveal h4{font-size:18px}.rarity{margin-top:4px}
+ .currency-panel{display:none}.side-stack{grid-template-rows:minmax(0,1fr)}.workspace{grid-template-columns:minmax(0,1.35fr) minmax(230px,.65fr)}
+ .upgrade-list{grid-template-columns:1fr}.upgrade p{display:none}
+}
+
 </style>
 </head>
 <body>
