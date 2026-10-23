@@ -240,7 +240,7 @@
     ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
     ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
 
-    const links = [["/index.html","Home"],["/douggames.html","Games"],["/Scripting/scripting.html","Create"],["/dougforum.html","Community"],["/tools.html","Tools"]];
+    const links = [["/index.html","Home"],["/douggames.html","Games"],["/Scripting/scripting.html","Create"],["/dougforum.html","Chat"],["/tools.html","Tools"]];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
       const a = document.createElement("a");
