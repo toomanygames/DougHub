@@ -64,7 +64,7 @@ button:focus-visible{outline:2px solid #f8d89a;outline-offset:3px}
     <div class="eyebrow">✦ A universe of impossible names</div>
     <h2>Roll your fate.<br><span>Become a legend.</span></h2>
     <p>Every title is a tiny piece of cosmic history. Roll for legendary names, discover hidden rarities, build your fortune tree, and collect an absurd number of titles. Some are so rare they barely feel real.</p>
-    <div class="hero-stats"><div class="stat"><strong id="totalTitleCount">600+</strong><span>Unique titles</span></div><div class="stat"><strong id="collectedCount">0</strong><span>Discovered</span></div><div class="stat"><strong id="bestRarity">—</strong><span>Best rarity</span></div></div>
+    <div class="hero-stats"><div class="stat"><strong id="totalTitleCount">650+</strong><span>Unique titles</span></div><div class="stat"><strong id="collectedCount">0</strong><span>Discovered</span></div><div class="stat"><strong id="bestRarity">—</strong><span>Best rarity</span></div></div>
   </div>
   <div class="art-card"><canvas id="crystalArt"></canvas><div class="art-caption"><div><strong>The Astral Core</strong><br><span>The source of every title</span></div><span>✦ 01 / ∞</span></div></div>
 </section>
@@ -136,7 +136,7 @@ const tierForIndex=i=>i<300?0:i<480?1:i<570?2:i<610?3:i<630?4:i<638?5:i<642?6:i<
 const titles=[];
 function addTitle(name,seed){if(titles.some(t=>t.name===name))return;const idx=titles.length;const tier=tierForIndex(idx);titles.push({id:"t"+idx,name,rarity:tier,seed:seed||idx,icon:tiers[tier].icon});}
 prefixes.forEach((p,i)=>cores.forEach((c,j)=>{if(titles.length<600)addTitle(p+" "+c,(i+1)*177+j*29);}));
-while(titles.length<600){const i=titles.length;addTitle(prefixes[i%prefixes.length]+" "+cores[(i*7+13)%cores.length]+" "+suffixes[(i*11+3)%suffixes.length],i*31+7);}
+while(titles.length<650){const i=titles.length;addTitle(prefixes[i%prefixes.length]+" "+cores[(i*7+13)%cores.length]+" "+suffixes[(i*11+3)%suffixes.length],i*31+7);}
 const upgradeDefs=[
  {id:"luck",name:"Fortune's Favor",icon:"☄",desc:"Increase the odds of higher-rarity titles.",base:35,max:30,effect:l=>"Luck +"+(l*8)+"%",quick:true},
  {id:"speed",name:"Swift Ritual",icon:"⏱",desc:"Make rolls quicker and reveal titles faster.",base:45,max:10,effect:l=>"Roll delay −"+Math.min(70,l*7)+"%",quick:true},
