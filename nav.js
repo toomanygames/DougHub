@@ -868,7 +868,7 @@
     if (document.getElementById("dh-side-conversations-script")) return;
     const script = document.createElement("script");
     script.id = "dh-side-conversations-script";
-    script.src = new URL("side-conversations.js?v=20261024-quick-chat", NAV_SCRIPT_URL).href;
+    script.src = new URL("side-conversations.js?v=20261024-side-tab-fix", NAV_SCRIPT_URL).href;
     script.async = true;
     document.head.appendChild(script);
   }
