@@ -20,7 +20,7 @@ function styles(){if($("dhsc-style"))return;let s=document.createElement("style"
 #dhsc-quick-dot,#dhsc-tab-dot{display:none;width:8px;height:8px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 0 3px #ff3b5c25,0 0 12px #ff3b5c99}
 #dhsc-quick-dot{position:absolute;right:5px;top:5px}
 #dhsc-quick-toggle.has-unread #dhsc-quick-dot{display:block}
-#dhsc-tab{position:relative}
+/* Keep the launcher fixed to the viewport; never override its fixed positioning. */
 #dhsc-tab-dot{position:absolute;right:5px;top:5px}
 #dhsc-tab.has-unread #dhsc-tab-dot{display:block}
 #dhsc-quick-view{display:none;flex:1;min-height:0;flex-direction:column}
