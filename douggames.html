@@ -1916,6 +1916,27 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 @media(max-width:480px){.games-discovery-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.games-discovery-link,.games-discovery-create{width:100%}.games-discovery-create{grid-column:1/-1}.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.game-card{min-height:205px!important;padding:13px!important}.game-card .game-icon{width:40px!important;height:40px!important;flex-basis:40px}.game-card h3{font-size:14px!important}.game-card p{font-size:11px!important}.game-card .play-label{left:13px;bottom:12px}.drive-pig-switcher{grid-column:span 2!important}}
 @media(prefers-reduced-motion:reduce){.games-discovery-link,.games-discovery-create,.game-card,.community-card,.trending-card{transition:none}}
 
+
+/* COMPACT TRENDING LEADERBOARD */
+#trendingSection{padding-top:8px;padding-bottom:24px}
+#trendingSection .section-header{margin-bottom:12px}
+#trendingSection .section-title{font-size:21px}
+#trendingSection .section-subtitle{font-size:12px}
+#trendingSection .trending-panel{padding:12px;border-radius:16px}
+#trendingSection .trending-note{font-size:11px;line-height:1.4;margin-bottom:9px}
+#trendingSection .trending-grid{gap:8px}
+#trendingSection .trending-card{padding:11px;border-radius:12px}
+#trendingSection .trending-card-top{margin-bottom:7px}
+#trendingSection .trending-rank{min-width:23px;height:23px;font-size:10px}
+#trendingSection .trending-game-icon{font-size:19px;margin-bottom:5px}
+#trendingSection .trending-card h3{font-size:13px;margin-bottom:4px}
+#trendingSection .trending-card p{font-size:11px;line-height:1.35}
+#trendingSection .trending-metrics{gap:8px;margin-top:8px;padding-top:7px}
+#trendingSection .trending-metric{font-size:10px}
+#trendingSection .trending-metric strong{font-size:13px}
+#trendingSection .trending-tab{padding:7px 9px;font-size:11px}
+@media(max-width:520px){#trendingSection .trending-panel{padding:10px}#trendingSection .trending-card{padding:10px}}
+
 </style>
   <script src="nav.js?v=20261024-view-slider" defer></script>
 
@@ -2201,24 +2222,7 @@ footer{font-size:12px}
       <a class="games-discovery-create" href="Scripting/scripting.html">＋ Create a game</a>
     </nav>
 
-    <section class="section" id="trendingSection">
-        <div class="section-header">
-            <div>
-                <h2 class="section-title">🔥 Trending Games</h2>
-                <p class="section-subtitle">A live leaderboard for DougHub games and community creations.</p>
-            </div>
-            <div class="trending-controls" role="group" aria-label="Sort trending games">
-                <button type="button" class="trending-tab active" data-trending-sort="plays">Most played</button>
-                <button type="button" class="trending-tab" data-trending-sort="time">Avg. playtime</button>
-            </div>
-        </div>
-        <div class="trending-panel">
-            <p class="trending-note">Showing only the top two games. Use the tabs to switch between most played and average playtime. Rankings update as people play.</p>
-            <div id="trendingGames" class="trending-grid" aria-live="polite">
-                <div class="trending-empty">Loading live game stats…</div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- DOUG'S GAMES -->
 
@@ -2356,6 +2360,27 @@ footer{font-size:12px}
 
     </section>
 
+
+    <!-- TRENDING GAMES -->
+
+    <section class="section" id="trendingSection">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">🔥 Trending Games</h2>
+                <p class="section-subtitle">A live leaderboard for DougHub games and community creations.</p>
+            </div>
+            <div class="trending-controls" role="group" aria-label="Sort trending games">
+                <button type="button" class="trending-tab active" data-trending-sort="plays">Most played</button>
+                <button type="button" class="trending-tab" data-trending-sort="time">Avg. playtime</button>
+            </div>
+        </div>
+        <div class="trending-panel">
+            <p class="trending-note">Showing only the top two games. Use the tabs to switch between most played and average playtime. Rankings update as people play.</p>
+            <div id="trendingGames" class="trending-grid" aria-live="polite">
+                <div class="trending-empty">Loading live game stats…</div>
+            </div>
+        </div>
+    </section>
 
     <!-- COMMUNITY GAMES -->
 
