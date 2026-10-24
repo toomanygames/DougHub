@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050611">
-<title>Dashboard • DougHub</title>
+<title>Home • DougHub</title>
 <link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
@@ -186,10 +186,10 @@ html{scroll-padding-top:96px}
  <main class="dashboard-main">
   <section class="dashboard-hero" id="overview" aria-labelledby="welcomeTitle">
    <div class="dashboard-hero-copy">
-    <div class="dashboard-eyebrow"><span class="dashboard-live-dot"></span><span id="todayLabel">YOUR DOUGHUB WORKSPACE</span></div>
-    <h1 id="welcomeTitle">Your dashboard</h1>
-    <p>Your space to pick up where you left off, manage your creations, and get to the places you use most.</p>
-    <div class="dashboard-hero-actions"><a class="button button-primary" href="Scripting/scripting.html">＋ Create a project <span aria-hidden="true">↗</span></a><a class="button" href="tools.html">Explore tools <span aria-hidden="true">→</span></a></div>
+    <div class="dashboard-eyebrow"><span class="dashboard-live-dot"></span><span id="todayLabel">YOUR DOUGHUB HOME</span></div>
+    <h1 id="welcomeTitle">Your DougHub home</h1>
+    <p>Your personal starting point for DougHub. Jump back into your creations, discover community games, or head straight to the spaces you use most.</p>
+    <div class="dashboard-hero-actions"><a class="button button-primary" href="Scripting/scripting.html">＋ Create a project <span aria-hidden="true">↗</span></a><a class="button" href="douggames.html">Browse games <span aria-hidden="true">→</span></a></div>
    </div>
    <div class="dashboard-hero-art" aria-hidden="true"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-glass-card"><div class="hero-glass-top"><span></span><span></span><span></span><small>YOUR WORKSPACE</small></div><div class="hero-glass-icon">D</div><div class="hero-glass-lines"><i></i><i></i><i></i></div><div class="hero-glass-bottom"><span>Ideas</span><b>✦</b><span>Create</span><b>↗</b></div></div><div class="hero-float-tag">✦ Made for your next idea</div></div>
   </section>
@@ -209,7 +209,6 @@ html{scroll-padding-top:96px}
    <a class="simple-shortcut" href="Scripting/scripting.html"><span>⌘</span><strong>DougCode</strong><small>Create</small></a>
    <a class="simple-shortcut" href="settings.html"><span>⚙</span><strong>Settings</strong><small>Account</small></a>
   </div></section>
-  <section class="dashboard-preferences" aria-label="Dashboard preference"><div><strong>Open Dashboard automatically</strong><p>Choose whether the homepage sends you here when you are signed in.</p><span id="autoDashboardStatus" role="status" aria-live="polite">Checking preference…</span></div><label class="switch" title="Toggle automatic dashboard opening"><input type="checkbox" id="autoDashboardToggle" checked aria-label="Open Dashboard automatically"><span class="switch-track" aria-hidden="true"></span></label></section>
   <div hidden aria-hidden="true"><span id="memberTotal">—</span><span id="recentTotal">—</span><div id="recentForumPosts"></div></div>
   <footer>DougHub · Your workspace</footer>
  </main>
@@ -220,13 +219,10 @@ const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
 const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
-const AUTO_DASHBOARD_KEY="dh_dashboard_auto_open_v1";
 let currentUser=null,myCommunityGames=[];
 function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recently":d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:d.getFullYear()!==new Date().getFullYear()?"numeric":undefined});}
-function renderAutoDashboard(){const enabled=localStorage.getItem(AUTO_DASHBOARD_KEY)!=="false";$("autoDashboardToggle").checked=enabled;$("autoDashboardStatus").textContent=enabled?"On · Homepage opens your dashboard.":"Off · Homepage stays on the main page.";}
-try{renderAutoDashboard();}catch(error){$("autoDashboardStatus").textContent="Preference unavailable in this browser.";}
-$("autoDashboardToggle").addEventListener("change",()=>{try{localStorage.setItem(AUTO_DASHBOARD_KEY,String($("autoDashboardToggle").checked));renderAutoDashboard();}catch(error){$("autoDashboardStatus").textContent="This browser blocked saving the preference.";}});
+
 function renderMyCreations(){const host=$("myCreations");if(!myCommunityGames.length){host.innerHTML='<div class="empty"><strong>No published projects yet</strong>Your projects will appear here when you publish one.<br><a href="Scripting/scripting.html">Create your first project ↗</a></div>';return;}host.innerHTML=myCommunityGames.slice(0,5).map(g=>'<a class="list-item" href="my-games.html"><span class="item-icon">'+escapeHTML(String(g.category||"GAME").slice(0,3).toUpperCase())+'</span><span class="item-copy"><strong>'+escapeHTML(g.title||"Untitled project")+'</strong><small>'+escapeHTML(g.category||"Community game")+' · '+escapeHTML(dateLabel(g.created_at))+'</small></span><span class="arrow">↗</span></a>').join("");}
 function renderForumPosts(rows,names){const host=$("recentForumPosts");if(!rows.length){host.innerHTML='<div class="empty"><strong>No recent discussions</strong>Start a conversation in the community forum.<br><a href="dougforum.html">Open DougForum ↗</a></div>';return;}host.innerHTML=rows.slice(0,4).map(p=>{const c=p.dougforum_communities||{};return '<a class="list-item" href="dougforum.html#post-'+encodeURIComponent(p.id)+'"><span class="item-icon">DF</span><span class="item-copy"><strong>'+escapeHTML(p.title||"Untitled discussion")+'</strong><small>'+escapeHTML(c.name||"DougForum")+' · '+escapeHTML(names[p.author_id]||"DougHub member")+' · '+escapeHTML(dateLabel(p.created_at))+'</small></span><span class="arrow">↗</span></a>';}).join("");}
 async function loadDashboard(){
@@ -247,7 +243,7 @@ async function loadDashboard(){
  ]);
  if(profileResult.error)console.warn("Dashboard profile:",profileResult.error.message);
  const profile=profileResult.data||{},name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
- $("welcomeTitle").textContent="Welcome back, "+name;
+ $("welcomeTitle").textContent="Welcome back, "+name; document.title="Home · DougHub";
  $("profileName").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed in";
  $("profileAvatar").innerHTML=profile.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
  $("memberSince").textContent=currentUser.created_at?new Date(currentUser.created_at).toLocaleDateString(undefined,{month:"short",year:"numeric"}):"Active";
@@ -259,7 +255,7 @@ async function loadDashboard(){
  $("recentTotal").textContent=recentResult.error?"—":Number(recentResult.count||0).toLocaleString();
  if(forumResult.error){console.warn("DougForum activity:",forumResult.error.message);$("recentForumPosts").innerHTML='<div class="empty"><strong>Forum activity is unavailable</strong><a href="dougforum.html">Open DougForum ↗</a></div>';}else{const rows=forumResult.data||[],ids=[...new Set(rows.map(p=>p.author_id).filter(Boolean))],names={};if(ids.length){const {data:profiles,error}=await supabaseClient.from("profiles").select("id,username").in("id",ids);if(!error)(profiles||[]).forEach(p=>names[p.id]=p.username||"DougHub member");}renderForumPosts(rows,names);}
 }
-loadDashboard().catch(error=>{console.error("Dashboard failed to initialize:",error);document.body.style.visibility="visible";$("welcomeTitle").textContent="Your dashboard";if($("myCreations").textContent.includes("Loading"))$("myCreations").innerHTML='<div class="empty"><strong>Could not load dashboard data</strong>Please refresh to try again.</div>';if($("recentForumPosts").textContent.includes("Loading"))$("recentForumPosts").innerHTML='<div class="empty">Community activity could not load.</div>';});
+loadDashboard().catch(error=>{console.error("Dashboard failed to initialize:",error);document.body.style.visibility="visible";$("welcomeTitle").textContent="Your DougHub home";if($("myCreations").textContent.includes("Loading"))$("myCreations").innerHTML='<div class="empty"><strong>Could not load dashboard data</strong>Please refresh to try again.</div>';if($("recentForumPosts").textContent.includes("Loading"))$("recentForumPosts").innerHTML='<div class="empty">Community activity could not load.</div>';});
 </script>
 </body>
 </html>
