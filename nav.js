@@ -49,13 +49,13 @@
     "douggames.html":"games","games/drive-pig.html":"games","games/dve-pig.html":"games",
     "games/pig-clicker.html":"games","games/pig-clicker-space.html":"games","games/puzzle.html":"games",
     "games/racing.html":"games","games/rebirth-clicker.html":"games","games/smack-n-punch.html":"games",
-    "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","tools.html":"tools","nova.html":"nova",
+    "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","nova.html":"nova",
     "chat.html":"chat","game-creator.html":"community_games","my-games.html":"community_games",
     "dougbase.html":"dougbase","dougbase/index.html":"dougbase","dougbase/login.html":"dougbase",
     "dougcode.html":"dougcode","scripting/scripting.html":"scripting"
   };
   const labels = {
-    games:"DougGames",dougtube:"DougTube",music:"DougHub Music",forum:"DougForum",dmail:"DMail",tools:"DougTools",nova:"Nova AI",
+    games:"DougGames",dougtube:"DougTube",music:"DougHub Music",forum:"DougForum",dmail:"DMail",nova:"Nova AI",
     chat:"Community Chat",community_games:"Community Games",dougbase:"DougBase",
     dougcode:"DougCode",scripting:"Scripting Editor"
   };
@@ -159,7 +159,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "tools.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
@@ -240,7 +240,7 @@
     ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
     ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
 
-    const links = [["/index.html","Home"],["/douggames.html","Games"],["/Scripting/scripting.html","Create"],["/dougforum.html","Chat"],["/tools.html","Tools"]];
+    const links = [["/index.html","Home"],["/douggames.html","Games"],["/Scripting/scripting.html","Create"],["/dougforum.html","Chat"],];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
       const a = document.createElement("a");
@@ -775,7 +775,7 @@
       ["Dashboard","/dashboard.html","Your personal workspace and shortcuts","Your space","▦","workspace profile"],
       ["Settings","/settings.html","Account preferences and site settings","Your space","⚙","settings preferences account"],
       ["Games","/douggames.html","Browse games and find Game Maker","Play & create","🎮","games play"],
-      ["DougTools","/tools.html","Converters and everyday utilities","Tools","✳","tools converter calculator utilities"],
+      
       ["Nova AI","/nova.html","Ask questions and explore ideas","Tools","✧","ai assistant questions"],
       ["DougCode / Game Maker","/dougcode.html","Build projects or make a game","Create","⌘","code coding editor project game maker"],
       ["Community Chat","/chat.html","Talk with the DougHub community","Community","◌","chat messages conversation"],
