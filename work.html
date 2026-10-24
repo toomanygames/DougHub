@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DougHub Work</title>
+<title>DougHub Workspace — DougHub</title>
 <link rel="icon" href="DougHub.svg" type="image/x-icon">
 <script src="display.js"></script>
 <style>
@@ -59,7 +59,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 @media(prefers-reduced-motion:reduce){.workspace-card,.workspace-tab{transition:none}}
 </style></head>
 <body>
-<header><a class="logo" href="index.html"><span class="icon">D</span><span>DougHub <small style="color:#a5b4fc">Work</small></span></a><nav class="nav"><a href="index.html">← Back</a><a href="dougcode.html?from=work">Code</a><a href="dougdrive.html?from=work">Drive</a><a href="dougbase/index.html?from=work">DougBase</a><a href="Scripting/scripting.html?from=work">Scripting</a></nav></header>
+<header><a class="logo" href="index.html"><span class="icon">D</span><span>DougHub <small style="color:#a5b4fc">Workspace</small></span></a><nav class="nav"><a href="index.html">← Back</a><a href="dougcode.html?from=work">Code</a><a href="#files" data-open-workspace="files">Files</a><a href="#databases" data-open-workspace="databases">Databases</a><a href="Scripting/scripting.html?from=work">Scripting</a></nav></header>
 <main class="wrap workspace-wrap">
 <section class="hero workspace-hero">
   <div class="hero-card">
@@ -130,6 +130,7 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
       activate(tabs[next].dataset.panel,true);
     });
   });
+  document.querySelectorAll("[data-open-workspace]").forEach(link=>link.addEventListener("click",event=>{event.preventDefault();activate(link.dataset.openWorkspace,false);}));
   document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>activate(button.dataset.go,false)));
   activate("overview",false);
 })();
