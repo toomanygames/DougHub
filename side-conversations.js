@@ -17,10 +17,10 @@ function styles(){if($("dhsc-style"))return;let s=document.createElement("style"
 @media(max-width:600px){#dhsc-tab{width:29px;height:min(300px,58vh);min-height:180px;font-size:9px}#dhsc-tab[aria-expanded=true]{right:100vw}.dhsc-head{padding:14px 11px 12px}#dhsc-feed{padding:0 9px 12px}#dhsc-compose{padding:10px 10px max(12px,env(safe-area-inset-bottom))}}@media(prefers-reduced-motion:reduce){#dhsc-tab,#dhsc-shade,#dhsc-panel{transition:none}}
 /* Keep the full-height tab on Community Chat; use a compact icon tab everywhere else. */
 body:not(.dhsc-chat-page) #dhsc-tab{width:38px;height:44px;min-height:0;max-height:44px;padding:0;border-radius:12px 0 0 12px;writing-mode:horizontal-tb;letter-spacing:0;font-size:0;gap:0;box-shadow:0 8px 24px #0004}
-body:not(.dhsc-chat-page) #dhsc-tab:hover{width:42px}
-body:not(.dhsc-chat-page) #dhsc-tab span:first-child{font-size:18px;line-height:1}
-body:not(.dhsc-chat-page) #dhsc-tab span:last-child{display:none}
-@media(max-width:600px){body:not(.dhsc-chat-page) #dhsc-tab{width:35px;height:40px;max-height:40px}body:not(.dhsc-chat-page) #dhsc-tab:hover{width:39px}}
+body:not(.dhsc-chat-page) #dhsc-tab:hover,body:not(.dhsc-chat-page) #dhsc-tab:focus-visible{width:174px;height:44px;max-height:44px;padding:0 12px;gap:9px;justify-content:flex-start;font-size:10px;letter-spacing:.06em}
+body:not(.dhsc-chat-page) #dhsc-tab span:first-child{font-size:18px;line-height:1;flex:0 0 auto}
+body:not(.dhsc-chat-page) #dhsc-tab span:last-child{display:inline;white-space:nowrap}
+@media(max-width:600px){body:not(.dhsc-chat-page) #dhsc-tab{width:35px;height:40px;max-height:40px}body:not(.dhsc-chat-page) #dhsc-tab:hover,body:not(.dhsc-chat-page) #dhsc-tab:focus-visible{width:164px;height:42px;max-height:42px}}
 `;document.head.appendChild(s)}
 function ago(v){let n=Math.max(0,Math.floor((Date.now()-new Date(v).getTime())/60000));return n<1?"now":n<60?n+"m":n<1440?Math.floor(n/60)+"h":n<10080?Math.floor(n/1440)+"d":new Date(v).toLocaleDateString()}
 function build(){if($("dhsc-panel"))return;document.body.classList.toggle("dhsc-chat-page",location.pathname.toLowerCase().endsWith("/chat.html"));styles();let tab=document.createElement("button");tab.id="dhsc-tab";tab.type="button";tab.setAttribute("aria-expanded","false");tab.setAttribute("aria-controls","dhsc-panel");tab.innerHTML='<span>◫</span><span>Side-Conversations</span>';tab.title="Open Side-Conversations";
