@@ -94,12 +94,12 @@ body{display:flex;flex-direction:column}
 <section class="workspace-shell" aria-label="Unified workspace">
   <div class="workspace-heading">
     <div><h1 class="workspace-title">Workspace</h1><p>Files, databases, and project tools in one place.</p></div>
-    <a class="workspace-open-link" id="openStandalone" href="dougdrive.html?from=work" target="_blank" rel="noopener">Open this area separately ↗</a>
+
   </div>
   <div class="workspace-tabs" role="tablist" aria-label="Workspace areas">
     <button class="workspace-tab active" id="tab-overview" role="tab" aria-selected="true" aria-controls="panel-overview" data-panel="overview">Overview</button>
-    <button class="workspace-tab" id="tab-files" role="tab" aria-selected="false" aria-controls="panel-files" data-panel="files">Files <span>DougDrive</span></button>
-    <button class="workspace-tab" id="tab-databases" role="tab" aria-selected="false" aria-controls="panel-databases" data-panel="databases">Databases <span>DougBase</span></button>
+    <button class="workspace-tab" id="tab-files" type="button" role="tab" aria-selected="false" data-panel="files">Files <span>DougDrive</span></button>
+    <button class="workspace-tab" id="tab-databases" type="button" role="tab" aria-selected="false" data-panel="databases">Databases <span>DougBase</span></button>
   </div>
   <section class="workspace-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
     <div class="workspace-welcome"><div class="workspace-welcome-mark">W</div><div><h3>Your project home</h3><p>DougDrive handles files. DougBase handles database projects. This workspace brings them together while keeping each tool's existing features.</p></div></div>
@@ -126,9 +126,9 @@ body{display:flex;flex-direction:column}
 (function(){
   const tabs=[...document.querySelectorAll(".workspace-tab")];
   const panels={overview:document.getElementById("panel-overview"),files:document.getElementById("panel-files"),databases:document.getElementById("panel-databases")};
-  const standalone=document.getElementById("openStandalone");
-  const urls={overview:"dougdrive.html?from=work",files:"dougdrive.html?from=work",databases:"dougbase/index.html?from=work"};
+  const urls={overview:"work.html",files:"dougdrive.html?from=work",databases:"dougbase/index.html?from=work"};
   function activate(name,focusTab){
+    if(name==="files"||name==="databases"){window.location.href=urls[name];return;}
     if(!panels[name])return;
     tabs.forEach(tab=>{const active=tab.dataset.panel===name;tab.classList.toggle("active",active);tab.setAttribute("aria-selected",String(active));tab.tabIndex=active?0:-1;});
     Object.entries(panels).forEach(([key,panel])=>{panel.hidden=key!==name;});
@@ -136,8 +136,6 @@ body{display:flex;flex-direction:column}
       const frame=document.getElementById("frame-"+name);
       if(frame&&!frame.src)frame.src=frame.dataset.src;
     }
-    standalone.href=urls[name]||urls.overview;
-    standalone.style.visibility=name==="overview"?"hidden":"visible";
     if(focusTab){const tab=tabs.find(t=>t.dataset.panel===name);if(tab)tab.focus();}
   }
   tabs.forEach((tab,index)=>{
@@ -154,7 +152,7 @@ body{display:flex;flex-direction:column}
     });
   });
   document.querySelectorAll("[data-open-workspace]").forEach(link=>link.addEventListener("click",event=>{event.preventDefault();activate(link.dataset.openWorkspace,false);}));
-  document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>activate(button.dataset.go,false)));
+  document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>{const destination=button.dataset.go;if(urls[destination])window.location.href=urls[destination];}));
   activate("overview",false);
 })();
 </script></body>
