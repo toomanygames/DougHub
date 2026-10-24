@@ -256,6 +256,26 @@
         a.appendChild(dot);
       }
       nav.appendChild(a);
+      // When the homepage preference is enabled, send signed-in users straight
+      // to their Dashboard from the Home nav item instead of loading index first.
+      if (label === "Home") {
+        a.addEventListener("click", async event => {
+          let autoDashboard = true;
+          try { autoDashboard = localStorage.getItem("dh_dashboard_auto_open_v1") !== "false"; } catch (_) {}
+          if (!autoDashboard) return;
+          event.preventDefault();
+          if (a.dataset.dhHomeRouting === "true") return;
+          a.dataset.dhHomeRouting = "true";
+          try {
+            const client = await getNavSupabase();
+            const result = client ? await client.auth.getSession() : null;
+            const session = result && result.data && result.data.session;
+            location.href = session && session.user ? "/dashboard.html" : "/index.html";
+          } catch (_) {
+            location.href = "/index.html";
+          }
+        });
+      }
     });
     nav.appendChild(account);
 
