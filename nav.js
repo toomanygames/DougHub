@@ -886,6 +886,9 @@
     sharedHeader.onerror = start;
     document.head.appendChild(sharedHeader);
   }
+  // Load the side panel independently of shared-header startup. If header.js is delayed,
+  // already present, or its load marker is missing, the side tab must still appear.
+  loadSideConversations();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startAfterSharedHeader);
   else startAfterSharedHeader();
 })();
