@@ -1880,6 +1880,42 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 .drive-pig-play{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;background:linear-gradient(110deg,#6366f1,#a855f7);color:white;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.06em;box-shadow:0 8px 20px #6366f12b;transition:transform .18s,filter .18s}.drive-pig-play:hover{transform:translateY(-2px);filter:brightness(1.12)}.drive-pig-play span{font-size:15px;line-height:10px}.drive-pig-status{display:flex;align-items:center;gap:6px;color:#8588a7;font-size:9px;line-height:1.4}.drive-pig-live-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 9px #6ee7b766}
 @media(max-width:600px){.drive-pig-switcher{gap:10px;padding:17px!important}.drive-pig-switcher p{min-height:0}.drive-pig-option{min-height:63px}}
 
+
+/* Game storefront polish: familiar DougHub glass style, with a more playable arcade layout. */
+.games-discovery-nav{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px;margin:0 0 5px;border:1px solid #ffffff12;border-radius:15px;background:linear-gradient(110deg,#0d1022d9,#080a17d9);box-shadow:0 10px 28px #0002}
+.games-discovery-link,.games-discovery-create{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:0 12px;border:1px solid transparent;border-radius:10px;color:#aeb2ce;font-size:11px;font-weight:800;white-space:nowrap;transition:background .18s,border-color .18s,color .18s,transform .18s}
+.games-discovery-link span{font-size:14px;color:#a5a8ff}
+.games-discovery-link:hover,.games-discovery-link.active{color:#fff;border-color:#a78bfa28;background:#7770e51c}
+.games-discovery-create{margin-left:auto;color:#fff;border-color:#a78bfa30;background:linear-gradient(110deg,#6366f126,#a855f71c)}
+.games-discovery-create:hover{transform:translateY(-1px);background:linear-gradient(110deg,#6366f13b,#a855f735)}
+#trendingSection{padding-top:22px}
+#trendingSection .section-header{align-items:center}
+.trending-card{position:relative;overflow:hidden}
+.trending-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#6366f1,#a855f7,#67e8f9);opacity:.8}
+.trending-card-top,.trending-game-icon,.trending-card h3,.trending-card p,.trending-metrics{position:relative}
+.trending-game-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:12px;border:1px solid #a78bfa2b;border-radius:15px;background:radial-gradient(circle at 30% 20%,#a78bfa2b,transparent 70%),#6366f112}
+.games-grid{align-items:stretch}
+.game-card{display:flex;flex-direction:column;align-items:flex-start;isolation:isolate;min-height:205px!important;padding:19px!important;background:linear-gradient(180deg,#171a35e8 0%,#0b0d1eeF 75%)!important}
+.game-card:before{content:"";position:absolute;z-index:-1;inset:0 0 auto;height:88px;background:radial-gradient(ellipse at 18% 0%,#8b5cf630,transparent 68%),linear-gradient(120deg,#6366f112,#a855f70a);pointer-events:none}
+.game-card:after{content:"";position:absolute;z-index:-1;right:-28px;top:-38px;width:120px;height:120px;border-radius:50%;border:1px solid #a78bfa12;box-shadow:0 0 0 18px #a78bfa05,0 0 0 38px #a78bfa03;pointer-events:none}
+.game-card .game-icon{width:48px!important;height:48px!important;flex:0 0 48px;border-radius:14px!important;background:linear-gradient(145deg,#6366f12c,#a855f71e)!important;box-shadow:0 8px 20px #0002}
+.game-card h3{margin:14px 0 6px!important;font-size:16px!important;line-height:1.35}
+.game-card p{margin:0 0 29px!important;font-size:12px!important;line-height:1.6}
+.game-card .play-label{left:19px;bottom:15px;padding:6px 9px;border:1px solid #a5b4fc22;border-radius:8px;background:#6366f113;color:#c4c7ff;font-size:9px;letter-spacing:.06em}
+.game-card:hover:before{background:radial-gradient(ellipse at 18% 0%,#8b5cf64a,transparent 68%),linear-gradient(120deg,#6366f11a,#a855f712)}
+.drive-pig-switcher{display:flex!important}
+.community-slider-shell{align-items:stretch}
+.community-card{overflow:hidden;background:linear-gradient(180deg,#171a35e8,#0b0d1eef)!important}
+.community-card:after{content:"";position:absolute;z-index:0;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8b5cf6,#6366f1);opacity:.7}
+.community-card>*{position:relative}
+.community-favorite{z-index:2}
+.community-card:hover{background:linear-gradient(180deg,#1c1d40,#0d1024)!important}
+.section-title{display:flex;align-items:center;gap:9px}
+.section-title:before{content:"";width:3px;height:22px;flex:0 0 3px;border-radius:99px;background:linear-gradient(#818cf8,#c084fc)}
+@media(max-width:700px){.games-discovery-nav{gap:5px;padding:7px}.games-discovery-link,.games-discovery-create{min-height:33px;padding:0 9px;font-size:10px}.games-discovery-create{margin-left:0}.game-card{min-height:190px!important}.game-card h3{font-size:15px!important}}
+@media(max-width:480px){.games-discovery-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.games-discovery-link,.games-discovery-create{width:100%}.games-discovery-create{grid-column:1/-1}.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.game-card{min-height:205px!important;padding:13px!important}.game-card .game-icon{width:40px!important;height:40px!important;flex-basis:40px}.game-card h3{font-size:14px!important}.game-card p{font-size:11px!important}.game-card .play-label{left:13px;bottom:12px}.drive-pig-switcher{grid-column:span 2!important}}
+@media(prefers-reduced-motion:reduce){.games-discovery-link,.games-discovery-create,.game-card,.community-card,.trending-card{transition:none}}
+
 </style>
   <script src="nav.js?v=20261024-side-conversations-fix" defer></script>
 
@@ -2156,6 +2192,14 @@ footer{font-size:12px}
   </div>
 </section>
 
+
+    <nav class="games-discovery-nav" aria-label="Browse game sections">
+      <a class="games-discovery-link active" href="#trendingSection"><span>⌁</span> Discover</a>
+      <a class="games-discovery-link" href="#trendingSection"><span>↗</span> Popular</a>
+      <a class="games-discovery-link" href="#doug-games"><span>▣</span> DougHub Originals</a>
+      <a class="games-discovery-link" href="#community-games"><span>◈</span> Community Games</a>
+      <a class="games-discovery-create" href="Scripting/scripting.html">＋ Create a game</a>
+    </nav>
 
     <section class="section" id="trendingSection">
         <div class="section-header">
