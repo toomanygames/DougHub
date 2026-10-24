@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 if(window.__DH_SIDE_CONV__)return;window.__DH_SIDE_CONV__=true;
-const URL="https://agsqdqcsmsppcdqxlppj.supabase.co",KEY="sb_publishable_Oq1WvEHgoHcJmCBGbEnoYQ_BqYA1p52";
+const URL="https://agsqdqcsmsppcdqxlppj.supabase.co",KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let db,user=null,communities=[],posts=[],expanded=new Set(),busy=false,mentionItems=[],mentionIndex=0,mentionRange=null;
 function styles(){if($("dhsc-style"))return;let s=document.createElement("style");s.id="dhsc-style";s.textContent=\`
