@@ -690,7 +690,9 @@ header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdro
 
 </style>
 <style id="homepage-preference-setting">
-.homepage-setting-row{gap:18px}
+.homepage-setting-row{gap:18px;align-items:center}
+.homepage-setting-row .setting-info{width:auto;flex:1 1 auto;min-width:0;flex-shrink:1}
+.homepage-setting-row .setting-help{max-width:680px;line-height:1.65;overflow-wrap:normal;word-break:normal}
 .homepage-setting-status{margin-top:9px;color:#b9baff;font-size:11px;font-weight:700}
 .homepage-switch{position:relative;display:inline-flex;flex:0 0 auto;cursor:pointer}
 .homepage-switch input{position:absolute;width:1px;height:1px;opacity:0}
@@ -699,7 +701,7 @@ header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdro
 .homepage-switch input:checked+.homepage-switch-track{background:#6366f16b;border-color:#a78bfa9c}
 .homepage-switch input:checked+.homepage-switch-track:after{transform:translateX(20px);background:#fff}
 .homepage-switch input:focus-visible+.homepage-switch-track{outline:2px solid #a5b4fc;outline-offset:3px}
-@media(max-width:600px){.homepage-setting-row{align-items:flex-start}.homepage-switch{margin-top:3px}}
+@media(max-width:600px){.homepage-setting-row{align-items:flex-start;gap:14px}.homepage-setting-row .setting-info{flex:1 1 0}.homepage-setting-row .setting-help{font-size:12px;line-height:1.6}.homepage-switch{margin-top:3px}}
 </style>
 <script>
 document.addEventListener("DOMContentLoaded",function(){
