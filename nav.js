@@ -678,7 +678,7 @@
         ]
       };
       let chosen=common.slice();
-      if(p.includes("dougcode")||p.includes("work.html")) chosen=chosen.concat(pageSteps.code);
+      if(p.includes("dougcode")) chosen=chosen.concat(pageSteps.code);
       else if(p.includes("tools")) chosen=chosen.concat(pageSteps.tools);
       else if(p.endsWith("/index.html")||p==="/") chosen=chosen.concat(pageSteps.home);
       else if(p.includes("scripting")||p.includes("game-creator")) chosen=chosen.concat(pageSteps.gameMaker);
