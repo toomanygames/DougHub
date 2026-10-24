@@ -48,29 +48,22 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 </style>
 
 <style id="unified-workspace-styles">
-.workspace-wrap{padding-bottom:70px}.workspace-hero{padding-top:32px}.workspace-hero .hero-card{padding:38px 30px}.workspace-hero h1{font-size:clamp(34px,5vw,54px);margin:10px 0}.workspace-hero p{max-width:720px;margin:0 auto;color:#b2b4ce;line-height:1.7}
+.workspace-wrap{width:min(1440px,calc(100% - 40px));padding-top:24px;padding-bottom:48px}.workspace-topbar{height:60px;padding:0 max(20px,calc((100vw - 1440px)/2));}.workspace-title{font-size:clamp(25px,3vw,34px);letter-spacing:-.04em;margin:0 0 5px}.workspace-hero{padding-top:0}.workspace-hero .hero-card{padding:20px}.workspace-hero h1{font-size:clamp(28px,4vw,40px);margin:8px 0}.workspace-hero p{max-width:720px;margin:0 auto;color:#b2b4ce;line-height:1.7}.workspace-heading{align-items:center;margin-bottom:16px}.workspace-shell{padding:clamp(14px,2vw,24px)}
 .workspace-shell{border:1px solid rgba(177,184,255,.16);border-radius:22px;background:rgba(10,13,31,.78);padding:clamp(16px,3vw,28px);box-shadow:0 24px 70px #0003}
 .workspace-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:22px}.workspace-heading h2{font-size:clamp(22px,3vw,30px);letter-spacing:-.04em;margin:8px 0}.workspace-heading p,.workspace-embed-head p{margin:0;color:#9da3c2;line-height:1.6;font-size:13px}.workspace-open-link,.workspace-embed-head>a{color:#c4b5fd;font-size:12px;font-weight:800;white-space:nowrap}
 .workspace-tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #ffffff12;padding-bottom:14px;margin-bottom:18px}.workspace-tab{display:flex;align-items:center;gap:9px;border:1px solid #ffffff12;border-radius:12px;padding:11px 15px;background:#ffffff04;color:#b7bbd5;font-weight:800;cursor:pointer}.workspace-tab span{font-size:10px;color:#888fb3;font-weight:700}.workspace-tab:hover{background:#6366f116;color:#fff}.workspace-tab.active{background:linear-gradient(135deg,#6366f12a,#a855f72a);border-color:#8b83ff66;color:#fff;box-shadow:inset 0 0 0 1px #8b83ff12}.workspace-panel[hidden]{display:none}
 .workspace-welcome{display:flex;align-items:center;gap:16px;padding:18px;border:1px solid #ffffff10;border-radius:16px;background:linear-gradient(120deg,#6366f111,#a855f70a);margin-bottom:16px}.workspace-welcome-mark,.workspace-card-icon{display:grid;place-items:center;flex:0 0 auto;width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:19px;font-weight:900;color:white;box-shadow:0 8px 25px #6366f125}.workspace-welcome h3,.workspace-embed-head h3{margin:0 0 5px;font-size:18px}.workspace-welcome p{margin:0;color:#aeb3d0;font-size:13px;line-height:1.65}
 .workspace-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.workspace-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:9px;min-width:0;padding:18px;border:1px solid #ffffff12;border-radius:16px;background:linear-gradient(145deg,#11162fdd,#080b1bd9);color:#f5f6ff;cursor:pointer;transition:transform .18s,border-color .18s,background .18s}.workspace-card:hover{transform:translateY(-2px);border-color:#8b83ff70;background:#171938}.workspace-card-icon{width:36px;height:36px;border-radius:11px;font-size:15px}.workspace-card strong{font-size:15px}.workspace-card small{color:#a5abc8;line-height:1.6;font-size:12px}.workspace-card-action{margin-top:3px;color:#c4b5fd;font-size:12px;font-weight:850}.workspace-note{display:flex;gap:9px;align-items:flex-start;color:#969dbb;font-size:11px;line-height:1.6;margin:18px 0 0}.workspace-note span{color:#a5b4fc}
 .workspace-embed-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.workspace-embed-head h3{display:flex;align-items:center;gap:10px}.workspace-embed-head h3 span{font-size:11px;font-weight:700;color:#a5abc8}.workspace-frame{display:block;width:100%;height:clamp(680px,82vh,1100px);border:1px solid #ffffff14;border-radius:14px;background:#070812}
-@media(max-width:650px){.workspace-heading{align-items:flex-start;flex-direction:column}.workspace-open-link{white-space:normal}.workspace-cards{grid-template-columns:1fr}.workspace-hero .hero-card{padding:32px 20px}.workspace-embed-head{align-items:flex-start;flex-direction:column}.workspace-frame{height:76vh;min-height:620px}.workspace-tabs{display:grid;grid-template-columns:1fr}.workspace-tab{justify-content:space-between}}
+@media(max-width:650px){.workspace-wrap{width:calc(100% - 20px);padding-top:14px}.workspace-topbar{padding:0 12px}.workspace-heading{align-items:flex-start;flex-direction:column}.workspace-open-link{white-space:normal}.workspace-cards{grid-template-columns:1fr}.workspace-hero .hero-card{padding:32px 20px}.workspace-embed-head{align-items:flex-start;flex-direction:column}.workspace-frame{height:76vh;min-height:620px}.workspace-tabs{display:grid;grid-template-columns:1fr}.workspace-tab{justify-content:space-between}}
 @media(prefers-reduced-motion:reduce){.workspace-card,.workspace-tab{transition:none}}
 </style></head>
 <body>
-<header><a class="logo" href="index.html"><span class="icon">D</span><span>DougHub <small style="color:#a5b4fc">Workspace</small></span></a><nav class="nav"><a href="index.html">← Back</a><a href="dougcode.html?from=work">Code</a><a href="#files" data-open-workspace="files">Files</a><a href="#databases" data-open-workspace="databases">Databases</a><a href="Scripting/scripting.html?from=work">Scripting</a></nav></header>
+<header class="workspace-topbar"><a class="logo" href="index.html"><span class="icon">D</span><span>DougHub <small style="color:#a5b4fc">Workspace</small></span></a></header>
 <main class="wrap workspace-wrap">
-<section class="hero workspace-hero">
-  <div class="hero-card">
-    <div class="eyebrow">ONE PLACE FOR YOUR PROJECTS</div>
-    <h1>DougHub <span>Workspace</span></h1>
-    <p>Manage your files, databases, and project tools from one place. Your existing files and database projects stay where they are.</p>
-  </div>
-</section>
 <section class="workspace-shell" aria-label="Unified workspace">
   <div class="workspace-heading">
-    <div><span class="eyebrow">YOUR WORKSPACE</span><h2>What are you working on?</h2><p>Switch between your files and databases without hunting through separate pages.</p></div>
+    <div><h1 class="workspace-title">Workspace</h1><p>Files, databases, and project tools in one place.</p></div>
     <a class="workspace-open-link" id="openStandalone" href="dougdrive.html?from=work" target="_blank" rel="noopener">Open this area separately ↗</a>
   </div>
   <div class="workspace-tabs" role="tablist" aria-label="Workspace areas">
