@@ -689,6 +689,18 @@ header{background:rgba(4,5,15,.8);border-bottom:1px solid var(--dh-line);backdro
 @media(max-width:560px){.reward-showcase{padding:14px}.reward-showcase-title{font-size:18px}.reward-count{width:58px;height:58px;flex-basis:58px;border-radius:17px}.reward-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.reward-card{padding:10px;min-height:178px}.reward-icon-wrap{width:47px;height:47px;border-radius:14px}.reward-icon{font-size:25px}.reward-gallery-head{align-items:flex-start;flex-direction:column}.reward-filter{padding:7px 9px}}
 
 </style>
+<style id="homepage-preference-setting">
+.homepage-setting-row{gap:18px}
+.homepage-setting-status{margin-top:9px;color:#b9baff;font-size:11px;font-weight:700}
+.homepage-switch{position:relative;display:inline-flex;flex:0 0 auto;cursor:pointer}
+.homepage-switch input{position:absolute;width:1px;height:1px;opacity:0}
+.homepage-switch-track{width:48px;height:28px;padding:4px;border:1px solid #ffffff24;border-radius:999px;background:#ffffff10;transition:background .18s,border-color .18s}
+.homepage-switch-track:after{content:"";display:block;width:18px;height:18px;border-radius:50%;background:#c9c9dc;transition:transform .18s,background .18s}
+.homepage-switch input:checked+.homepage-switch-track{background:#6366f16b;border-color:#a78bfa9c}
+.homepage-switch input:checked+.homepage-switch-track:after{transform:translateX(20px);background:#fff}
+.homepage-switch input:focus-visible+.homepage-switch-track{outline:2px solid #a5b4fc;outline-offset:3px}
+@media(max-width:600px){.homepage-setting-row{align-items:flex-start}.homepage-switch{margin-top:3px}}
+</style>
 <script>
 document.addEventListener("DOMContentLoaded",function(){
   const links=[...document.querySelectorAll(".settings-nav-link[href^='#']")];
@@ -827,6 +839,7 @@ document.addEventListener("DOMContentLoaded",function(){
       <a class="settings-nav-link" href="#rewardsSettingsSection"><span class="settings-nav-icon">✧</span><span><strong>Rewards & badges</strong><small>Chat appearance</small></span></a>
       <a class="settings-nav-link" href="#loginSettingsSection"><span class="settings-nav-icon">⌁</span><span><strong>Login information</strong><small>Email and password</small></span></a>
       <a class="settings-nav-link" href="#tutorialSettingsSection"><span class="settings-nav-icon">▷</span><span><strong>Tutorial</strong><small>Learn DougHub</small></span></a>
+      <a class="settings-nav-link" href="#homepageSettingsSection"><span class="settings-nav-icon">⌂</span><span><strong>Homepage</strong><small>Startup preference</small></span></a>
       <a class="settings-nav-link" href="#accountSettingsSection"><span class="settings-nav-icon">◈</span><span><strong>Account</strong><small>Account details</small></span></a>
       <div class="settings-sidebar-divider"></div>
       <a class="settings-nav-link danger-link" href="#signOutSettingsSection"><span class="settings-nav-icon">↗</span><span><strong>Sign out</strong><small>End this session</small></span></a>
@@ -1055,6 +1068,22 @@ document.addEventListener("DOMContentLoaded",function(){
     </section>
 
 
+    <section class="settings-section" id="homepageSettingsSection">
+      <h2 class="section-title">Homepage</h2>
+      <p class="section-description">Choose what DougHub opens when you visit the main homepage while you are signed in.</p>
+      <div class="setting-row homepage-setting-row">
+        <div class="setting-info">
+          <div class="setting-label">Open Dashboard automatically</div>
+          <div class="setting-help">When enabled, visiting Home takes you straight to your personal DougHub home. Turn it off to see the public homepage first. You can still open Dashboard from your account menu.</div>
+          <div class="homepage-setting-status" id="homepagePreferenceStatus" role="status" aria-live="polite">Loading preference…</div>
+        </div>
+        <label class="homepage-switch" title="Open Dashboard automatically">
+          <input type="checkbox" id="homepageDashboardToggle" aria-label="Open Dashboard automatically">
+          <span class="homepage-switch-track" aria-hidden="true"></span>
+        </label>
+      </div>
+    </section>
+
     <section class="settings-section" id="tutorialSettingsSection">
       <h2 class="section-title">Tutorial</h2>
       <p class="section-description">Want a guided tour of DougHub again? Replay the interactive walkthrough whenever you need it.</p>
@@ -1151,6 +1180,42 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_KEY
   );
+
+/* Homepage startup preference — shared with index.html. */
+const AUTO_DASHBOARD_KEY = "dh_dashboard_auto_open_v1";
+const homepageDashboardToggle = document.getElementById("homepageDashboardToggle");
+const homepagePreferenceStatus = document.getElementById("homepagePreferenceStatus");
+
+function renderHomepagePreference() {
+  let enabled = true;
+  try {
+    enabled = localStorage.getItem(AUTO_DASHBOARD_KEY) !== "false";
+    homepageDashboardToggle.checked = enabled;
+    homepagePreferenceStatus.textContent = enabled
+      ? "On · Home opens your Dashboard when you are signed in."
+      : "Off · Home opens the public homepage.";
+  } catch (_) {
+    homepagePreferenceStatus.textContent = "This browser blocked access to the saved preference.";
+    homepageDashboardToggle.disabled = true;
+  }
+}
+
+renderHomepagePreference();
+homepageDashboardToggle.addEventListener("change", function () {
+  try {
+    localStorage.setItem(AUTO_DASHBOARD_KEY, String(homepageDashboardToggle.checked));
+    homepagePreferenceStatus.textContent = homepageDashboardToggle.checked
+      ? "Saved · Home will open your Dashboard when you are signed in."
+      : "Saved · Home will open the public homepage.";
+    window.dispatchEvent(new Event("dh:homepage-preference-changed"));
+  } catch (_) {
+    homepagePreferenceStatus.textContent = "Could not save this preference in your browser.";
+    renderHomepagePreference();
+  }
+});
+window.addEventListener("storage", function (event) {
+  if (event.key === AUTO_DASHBOARD_KEY) renderHomepagePreference();
+});
 
 
 const usernameInput =
