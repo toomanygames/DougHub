@@ -3658,10 +3658,11 @@ const feedbackCount =
 
 
 function updateFeedbackCount() {
+    // The feedback form may be omitted on some page layouts.
+    if (!feedbackCount || !feedbackMessage) return;
 
     feedbackCount.textContent =
         `${feedbackMessage.value.length.toLocaleString()} / 2000`;
-
 }
 
 
@@ -3680,6 +3681,9 @@ if (feedbackButton) {
     feedbackButton.addEventListener(
         "click",
         async function() {
+
+            // Safely handle layouts where the feedback form is not present.
+            if (!feedbackMessage || !feedbackStatus) return;
 
             const message =
                 feedbackMessage.value.trim();
