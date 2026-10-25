@@ -23,12 +23,11 @@
       "main.js",
       "preload.js",
       "popup.html",
+      "updater.js",
       "package.json"
     ],
     "win": {
-      "target": [
-        "nsis"
-      ],
+      "target": ["nsis"],
       "artifactName": "DougHub-Quick-Reply-Setup-${version}.${ext}"
     },
     "nsis": {
