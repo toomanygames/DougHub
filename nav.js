@@ -763,12 +763,10 @@
   }
 
   function installQuickFind() {
-    if (document.getElementById("dh-quick-find-launcher")) return;
+    if (document.getElementById("dh-quick-find-overlay")) return;
     const style=document.createElement("style");
     style.id="dh-quick-find-style";
     style.textContent=[
-      "#dh-quick-find-launcher{position:relative;flex:0 0 auto;display:inline-flex;gap:5px;align-items:center;justify-content:center;margin-left:10px;padding:7px 11px;border:1px solid #a5b4fc44;border-radius:10px;background:linear-gradient(135deg,#6366f122,#a855f718);color:#e8e9ff;font:700 12px Arial;white-space:nowrap;cursor:pointer;line-height:1.2;box-shadow:inset 0 1px #ffffff08}",
-      "#dh-quick-find-launcher:hover{background:#6366f133;border-color:#a5b4fc88}",
       "#dh-quick-find-overlay{position:fixed;inset:0;z-index:2147483002;background:#02040acc;backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:9vh 16px 24px}",
       "#dh-quick-find-overlay.open{display:flex}",
       "#dh-quick-find-dialog{width:min(650px,100%);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #a5b4fc66;border-radius:20px;background:#0b0e20;color:#f5f5ff;box-shadow:0 30px 100px #000a;font:14px/1.5 Arial}",
@@ -807,23 +805,6 @@
       ["DMail","/DMail.html","Open direct messages","Community","✉","mail messages"],
       ["Help / Guided tour","#tour","Walk through the controls on this page","Help","❔","tutorial guide help how to"]
     ].map(x=>({title:x[0],url:x[1],desc:x[2],cat:x[3],icon:x[4],tags:x[5]}));
-    const launcher=document.createElement("button");
-    launcher.id="dh-quick-find-launcher";launcher.type="button";launcher.textContent="⌕ Find";launcher.title="Find anything in DougHub (Ctrl+K or /)";
-    launcher.setAttribute("aria-haspopup","dialog");launcher.setAttribute("aria-label","Find any DougHub page or tool");
-    const header=document.querySelector("header");
-    const nav=header&&header.querySelector(".nav,nav[aria-label='Main navigation']");
-    if(nav){
-      // Keep Find in its own separated utility spot, after the page links and before the account menu.
-      const account=nav.querySelector(".dh-shared-account,.account-area");
-      if(account) nav.insertBefore(launcher,account);
-      else nav.appendChild(launcher);
-      launcher.setAttribute("aria-label","Find anything in DougHub");
-    }else{
-      launcher.style.position="fixed";
-      launcher.style.right="12px";
-      launcher.style.bottom="12px";
-      document.body.appendChild(launcher);
-    }
     const overlay=document.createElement("div");overlay.id="dh-quick-find-overlay";
     const dialog=document.createElement("section");dialog.id="dh-quick-find-dialog";dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");dialog.setAttribute("aria-label","Find anything in DougHub");
     const top=document.createElement("div");top.id="dh-quick-find-top";
@@ -836,7 +817,7 @@
     const tour=document.createElement("button");tour.type="button";tour.textContent="Start page tutorial ↗";footer.append(hint,tour);
     dialog.append(top,results,footer);overlay.appendChild(dialog);document.body.appendChild(overlay);
     let selected=0,visible=[];
-    function close(){overlay.classList.remove("open");launcher.focus({preventScroll:true});}
+    function close(){overlay.classList.remove("open");input.blur();}
     function open(){overlay.classList.add("open");input.value="";selected=0;render();requestAnimationFrame(()=>input.focus());}
     function openPage(p){close();if(p.url==="#tour"){const help=document.getElementById("dh-global-help");if(help)help.click();else location.href="/index.html?tutorial=1";}else location.href=p.url;}
     function render(){
