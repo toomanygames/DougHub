@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-windows:
@@ -35,3 +35,11 @@ jobs:
           path: DougHubQuickReply/dist/*.exe
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish easy-download release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: quick-reply-build-${{ github.run_number }}
+          name: DougHub Quick Reply Build ${{ github.run_number }}
+          files: DougHubQuickReply/dist/*.exe
+          make_latest: true
