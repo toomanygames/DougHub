@@ -152,3 +152,131 @@ html[data-dh-theme="autumn"]:not([data-dh-theme="normal"]) :is(button,.button,.b
 html[data-dh-theme="winter"]:not([data-dh-theme="normal"]) :is(button,.button,.btn):not(.button-primary):not(.primary-button):not(.btn-primary):not(.update-button):not(#sendButton) {
   background-color:color-mix(in srgb,#176c9a 22%,var(--season-panel))!important;color:var(--text)!important;
 }
+
+
+/* FINAL GLOBAL PALETTE PASS — catches legacy purple surfaces that use older class names or inline colors. */
+html[data-dh-theme="normal"]{
+  --season-surface:rgba(13,17,39,.92);
+  --season-surface-raised:rgba(20,26,54,.94);
+  --season-surface-soft:rgba(99,102,241,.09);
+  --season-border:rgba(129,140,248,.22);
+  --season-button:linear-gradient(125deg,#4f46e5,#7c3aed);
+  --season-button-text:#fff;
+}
+html[data-dh-theme="spring"]{
+  --season-surface:rgba(17,38,34,.92);
+  --season-surface-raised:rgba(24,55,43,.95);
+  --season-surface-soft:rgba(142,227,173,.11);
+  --season-border:rgba(142,227,173,.26);
+  --season-button:linear-gradient(125deg,#27865a,#65c98d 68%,#e6a9d5);
+  --season-button-text:#071b12;
+}
+html[data-dh-theme="summer"]{
+  --season-surface:rgba(9,24,48,.93);
+  --season-surface-raised:rgba(16,40,70,.96);
+  --season-surface-soft:rgba(101,200,255,.11);
+  --season-border:rgba(101,200,255,.27);
+  --season-button:linear-gradient(115deg,#1769d2 0%,#249be9 65%,#f06b75 100%);
+  --season-button-text:#fff;
+}
+html[data-dh-theme="autumn"]{
+  --season-surface:rgba(31,17,28,.94);
+  --season-surface-raised:rgba(48,24,42,.96);
+  --season-surface-soft:rgba(255,173,85,.11);
+  --season-border:rgba(255,173,85,.28);
+  --season-button:linear-gradient(125deg,#b94b16,#f28b2d 68%,#8a4d8d);
+  --season-button-text:#fff8ed;
+}
+html[data-dh-theme="winter"]{
+  --season-surface:rgba(9,25,43,.94);
+  --season-surface-raised:rgba(16,40,58,.96);
+  --season-surface-soft:rgba(139,217,255,.11);
+  --season-border:rgba(139,217,255,.28);
+  --season-button:linear-gradient(120deg,#176c9a,#58bce8 68%,#d9b968);
+  --season-button-text:#061522;
+}
+
+/* Existing pages use many different names for the same kind of card. Cover them all. */
+html[data-dh-theme] :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"],
+  [class*="widget"],[class*="well"],[class*="section"],[class*="drawer"],
+  [class*="popover"],[class*="dropdown"],[class*="notice"],[class*="callout"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]):not([class*="badge"]):not([class*="button"]):not([class*="btn"]){
+  border-color:var(--season-border)!important;
+  background-color:var(--season-surface)!important;
+}
+html[data-dh-theme] :is(
+  [class*="card"] [class*="inner"],[class*="panel"] [class*="inner"],
+  [class*="card"] [class*="content"],[class*="panel"] [class*="content"],
+  [class*="card"] [class*="body"],[class*="panel"] [class*="body"],
+  [class*="card"] [class*="item"],[class*="panel"] [class*="item"]
+){
+  border-color:var(--season-border)!important;
+}
+html[data-dh-theme]:not([data-dh-theme="normal"]) :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"],
+  [class*="widget"],[class*="well"],[class*="section"],[class*="drawer"],
+  [class*="popover"],[class*="dropdown"],[class*="notice"],[class*="callout"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]):not([class*="badge"]):not([class*="button"]):not([class*="btn"]){
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  box-shadow:0 12px 32px color-mix(in srgb,var(--season-accent) 7%,transparent);
+}
+
+/* Repaint legacy inline-styled purple cards and accent blocks too. */
+html[data-dh-theme="spring"] :is(
+  [style*="#6366f1" i],[style*="#6366f1" i],[style*="#a855f7" i],
+  [style*="99,102,241"],[style*="99, 102, 241"],[style*="168,85,247"],[style*="168, 85, 247"],
+  [style*="129,140,248"],[style*="129, 140, 248"]
+):not(button):not(a):not([class*="icon"]):not([class*="avatar"]){
+  background:linear-gradient(135deg,rgba(39,134,90,.28),rgba(233,168,233,.16))!important;
+  border-color:var(--season-border)!important;
+}
+html[data-dh-theme="summer"] :is(
+  [style*="#6366f1" i],[style*="#a855f7" i],
+  [style*="99,102,241"],[style*="99, 102, 241"],[style*="168,85,247"],[style*="168, 85, 247"],
+  [style*="129,140,248"],[style*="129, 140, 248"]
+):not(button):not(a):not([class*="icon"]):not([class*="avatar"]){
+  background:linear-gradient(135deg,rgba(23,105,210,.3),rgba(240,107,117,.17))!important;
+  border-color:var(--season-border)!important;
+}
+html[data-dh-theme="autumn"] :is(
+  [style*="#6366f1" i],[style*="#a855f7" i],
+  [style*="99,102,241"],[style*="99, 102, 241"],[style*="168,85,247"],[style*="168, 85, 247"],
+  [style*="129,140,248"],[style*="129, 140, 248"]
+):not(button):not(a):not([class*="icon"]):not([class*="avatar"]){
+  background:linear-gradient(135deg,rgba(185,75,22,.3),rgba(138,77,141,.2))!important;
+  border-color:var(--season-border)!important;
+}
+html[data-dh-theme="winter"] :is(
+  [style*="#6366f1" i],[style*="#a855f7" i],
+  [style*="99,102,241"],[style*="99, 102, 241"],[style*="168,85,247"],[style*="168, 85, 247"],
+  [style*="129,140,248"],[style*="129, 140, 248"]
+):not(button):not(a):not([class*="icon"]):not([class*="avatar"]){
+  background:linear-gradient(135deg,rgba(23,108,154,.32),rgba(217,185,104,.16))!important;
+  border-color:var(--season-border)!important;
+}
+
+/* Unify old accent pills, active navigation, and selection outlines with the selected season. */
+html[data-dh-theme] :is(.active,.selected,[aria-selected="true"],[aria-current="page"]):not(a):not(button){
+  border-color:var(--season-border);
+}
+html[data-dh-theme]:not([data-dh-theme="normal"]) :is(
+  .active,.selected,[aria-selected="true"],[aria-current="page"]
+):is(a,button,[role="tab"],[role="option"]){
+  background-color:var(--season-surface-soft)!important;
+  border-color:var(--season-border)!important;
+  color:var(--season-accent)!important;
+}
+html[data-dh-theme] :is(input,textarea,select){
+  accent-color:var(--season-accent);
+}
+html[data-dh-theme="spring"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),textarea,select),
+html[data-dh-theme="summer"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),textarea,select),
+html[data-dh-theme="autumn"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),textarea,select),
+html[data-dh-theme="winter"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),textarea,select){
+  background-color:var(--season-surface)!important;color:var(--text)!important;
+}
+html[data-dh-theme] ::selection{background:color-mix(in srgb,var(--season-accent) 38%,transparent);color:var(--text)}
