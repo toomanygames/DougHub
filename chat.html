@@ -1870,65 +1870,74 @@ function createAvatar(
    LOAD PROFILES
 ========================================= */
 
-async function loadProfiles(
-  userIds
-) {
+// Cache profile/badge lookups so a new chat message doesn't trigger two more
+// database requests for every person in the last page of messages.
+const chatProfileCache = new Map();
+const chatProfilePending = new Map();
+const CHAT_PROFILE_CACHE_MS = 60_000;
 
-  if (!userIds.length) {
-    return {};
-  }
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("profiles")
-      .select(
-        "id, username, avatar_url, is_banned, ban_type, suspended_until, reward_badges, equipped_badge, equipped_badge_style, staff_role, show_staff_badge"
-      )
-      .in(
-        "id",
-        userIds
-      );
-
-  if (error) {
-
-    console.error(
-      "Could not load profiles:",
-      error
-    );
-
-    return {};
-
-  }
-
+async function loadProfiles(userIds) {
+  const ids = [...new Set((userIds || []).filter(Boolean))];
+  if (!ids.length) return {};
+  const now = Date.now();
   const profiles = {};
+  const missing = [];
 
-  (data || []).forEach(profile => {
-    profiles[profile.id] = profile;
+  ids.forEach(id => {
+    const cached = chatProfileCache.get(id);
+    if (cached && now - cached.time < CHAT_PROFILE_CACHE_MS) {
+      profiles[id] = cached.profile;
+    } else if (!chatProfilePending.has(id)) {
+      missing.push(id);
+    }
   });
 
-  // Custom badge metadata is public display data; only the assigned user's
-  // equipped custom badge is attached to their chat profile.
-  const { data: customBadges, error: customBadgeError } = await supabaseClient
-    .from("custom_badges")
-    .select("id,assigned_to,name,icon")
-    .in("assigned_to", userIds);
-  if (customBadgeError) {
-    console.warn("Could not load custom chat badges:", customBadgeError.message);
-  } else {
-    const customById = {};
-    (customBadges || []).forEach(badge => { customById["custom:" + badge.id] = badge; });
-    Object.values(profiles).forEach(profile => {
-      const equipped = profile.equipped_badge;
-      const badge = equipped ? customById[equipped] : null;
-      if (badge && badge.assigned_to === profile.id) profile.custom_badge = badge;
-    });
+  // Share an in-flight profile request between overlapping renders.
+  if (missing.length) {
+    const request = (async () => {
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id, username, avatar_url, is_banned, ban_type, suspended_until, reward_badges, equipped_badge, equipped_badge_style, staff_role, show_staff_badge")
+        .in("id", missing);
+      if (error) {
+        console.error("Could not load profiles:", error);
+        return;
+      }
+
+      const fetched = data || [];
+      const customIds = fetched.map(profile => profile.id);
+      let customById = {};
+      if (customIds.length) {
+        const { data: customBadges, error: customBadgeError } = await supabaseClient
+          .from("custom_badges")
+          .select("id,assigned_to,name,icon")
+          .in("assigned_to", customIds);
+        if (customBadgeError) {
+          console.warn("Could not load custom chat badges:", customBadgeError.message);
+        } else {
+          (customBadges || []).forEach(badge => { customById["custom:" + badge.id] = badge; });
+        }
+      }
+
+      fetched.forEach(profile => {
+        const badge = profile.equipped_badge ? customById[profile.equipped_badge] : null;
+        if (badge && badge.assigned_to === profile.id) profile.custom_badge = badge;
+        chatProfileCache.set(profile.id, { profile, time: Date.now() });
+      });
+    })();
+    missing.forEach(id => chatProfilePending.set(id, request));
+    await request;
+    missing.forEach(id => chatProfilePending.delete(id));
   }
 
+  // Wait for any other render's in-flight lookup for IDs that weren't ours.
+  const pending = ids.map(id => chatProfilePending.get(id)).filter(Boolean);
+  if (pending.length) await Promise.all(pending);
+  ids.forEach(id => {
+    const cached = chatProfileCache.get(id);
+    if (cached) profiles[id] = cached.profile;
+  });
   return profiles;
-
 }
 
 
@@ -2371,7 +2380,7 @@ async function loadMessages() {
   loadingMessages = true;
 
   try {
-    // Fetch the newest 200 messages first, then reverse them for chronological display.
+    // Fetch the newest 100 messages first to keep rendering and scrolling responsive.
     // Ordering ascending before limiting would keep returning the oldest 200 forever.
     let messageQuery = supabaseClient
       .from("chat_messages")
@@ -2381,7 +2390,7 @@ async function loadMessages() {
       : messageQuery.eq("group_id", activeChatGroupId);
     const { data, error } = await messageQuery
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(100);
 
     if (error) {
       showError("Could not load chat messages.");
@@ -2838,8 +2847,14 @@ function startChatRefresh() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "chat_messages" },
         (payload) => {
-          if (payload?.new) notifyIncomingChatMessage(payload.new);
-          if (document.visibilityState === "visible") loadMessages();
+          const incoming = payload?.new;
+          if (!incoming) return;
+          notifyIncomingChatMessage(incoming);
+          // Ignore inserts for other groups; only refresh the currently open conversation.
+          const matchesActiveChat = activeChatGroupId === null
+            ? incoming.group_id == null
+            : incoming.group_id === activeChatGroupId;
+          if (matchesActiveChat && document.visibilityState === "visible") loadMessages();
         }
       )
       .subscribe((status) => {
