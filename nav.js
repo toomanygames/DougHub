@@ -857,7 +857,7 @@
 
   function loadSideConversations() {
     // Keep the arcade page focused on games; hide the global conversation slider there.
-    if (/\/douggames\.html$/i.test(window.location.pathname)) return;
+    if (/\/douggames\.html$/i.test(window.location.pathname) || /\/chat-calls\.html$/i.test(window.location.pathname)) return;
     if (document.getElementById("dh-side-conversations-script")) return;
     const script = document.createElement("script");
     script.id = "dh-side-conversations-script";
