@@ -2247,6 +2247,23 @@ async function enableChatDesktopNotifications() {
 function notifyIncomingChatMessage(row) {
   if (!row || !currentUser || row.user_id === currentUser.id) return;
 
+  // Send incoming messages straight to the optional DougHub desktop app bridge.
+  // This must happen before browser-notification permission and active-tab checks.
+  // Otherwise the app's visible chat window suppresses its own quick-reply popups.
+  if (window.douqhubDesktop && typeof window.douqhubDesktop.incoming === "function") {
+    try {
+      window.douqhubDesktop.incoming({
+        id: String(row.id || ""),
+        user_id: String(row.user_id || ""),
+        username: String(row.username || "Someone").slice(0, 60),
+        message: String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message")).replace(/\\s+/g, " ").slice(0, 240),
+        group_id: row.group_id == null ? null : String(row.group_id)
+      });
+    } catch (error) {
+      console.warn("DougHub desktop quick-reply notification failed:", error);
+    }
+  }
+
   // Only suppress a desktop alert when the user is actively looking at the
   // exact conversation that received the message. Previously, focusing Chat
   // suppressed notifications for every group, making messages in other
