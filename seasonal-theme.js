@@ -31,7 +31,7 @@ function repaintLegacySurfaces(){
    continue;
   }
   const cs=getComputedStyle(el), bg=cs.backgroundColor, image=original.backgroundImage;
-  const purpleBg=isPurple(bg);
+  const purpleBg=isPurple(original.backgroundColor)||isPurple(bg);
   const purpleImage=isPurple(image);
   if(!purpleBg&&!purpleImage)continue;
   if(purpleBg){
