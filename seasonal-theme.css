@@ -100,3 +100,55 @@ html[data-dh-theme="winter"] .dh-seasonal-banner{background-image:url("/assets/s
 .dh-theme-option:has(input[value="autumn"]) .dh-theme-option-card:after{background-image:url("/assets/seasonal-autumn.svg")}
 .dh-theme-option:has(input[value="winter"]) .dh-theme-option-card:after{background-image:url("/assets/seasonal-winter.svg")}
 @media(max-width:650px){html[data-dh-theme]:not([data-dh-theme="normal"]) body{background-size:115% auto,100% 520px,cover!important;background-position:70% top,center top,center!important}.dh-theme-option-card:after{width:45%;opacity:.28}}
+
+
+/* Seasonal surface pass: recolor the actual boxes, not only their outlines. */
+html[data-dh-theme="spring"]:not([data-dh-theme="normal"]) :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]) {
+  border-color:var(--season-line)!important;
+}
+html[data-dh-theme="spring"]:not([data-dh-theme="normal"]) :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]) {
+  background-color:color-mix(in srgb,var(--season-panel) 88%,transparent)!important;
+}
+html[data-dh-theme="summer"]:not([data-dh-theme="normal"]) :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]),
+html[data-dh-theme="autumn"]:not([data-dh-theme="normal"]) :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]),
+html[data-dh-theme="winter"]:not([data-dh-theme="normal"]) :is(
+  [class*="card"],[class*="panel"],[class*="modal"],[class*="popup"],
+  [class*="tile"],[class*="surface"],[class*="dialog"],[class*="box"]
+):not(.dh-seasonal-banner):not(.dh-theme-option-card):not([class*="avatar"]):not([class*="icon"]) {
+  border-color:var(--season-line)!important;
+  background-color:color-mix(in srgb,var(--season-panel) 88%,transparent)!important;
+}
+/* Soft glass on main surfaces, while keeping text crisp and avoiding blur on every child. */
+html[data-dh-theme]:not([data-dh-theme="normal"]) :is(
+  header,.topbar,.navbar,.sidebar,.side-panel,.modal,.modal-content,
+  .popup,.dialog,.settings-card,.tool-card,.game-card,.feature-card,
+  .post-card,.message-card,.workspace-card,.editor-panel
+) {
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+}
+/* Secondary controls inherit the season too, rather than keeping the old purple fill. */
+html[data-dh-theme="spring"]:not([data-dh-theme="normal"]) :is(button,.button,.btn):not(.button-primary):not(.primary-button):not(.btn-primary):not(.update-button):not(#sendButton) {
+  background-color:color-mix(in srgb,#27865a 20%,var(--season-panel))!important;color:var(--text)!important;
+}
+html[data-dh-theme="summer"]:not([data-dh-theme="normal"]) :is(button,.button,.btn):not(.button-primary):not(.primary-button):not(.btn-primary):not(.update-button):not(#sendButton) {
+  background-color:color-mix(in srgb,#1769d2 22%,var(--season-panel))!important;color:var(--text)!important;
+}
+html[data-dh-theme="autumn"]:not([data-dh-theme="normal"]) :is(button,.button,.btn):not(.button-primary):not(.primary-button):not(.btn-primary):not(.update-button):not(#sendButton) {
+  background-color:color-mix(in srgb,#b94b16 22%,var(--season-panel))!important;color:var(--text)!important;
+}
+html[data-dh-theme="winter"]:not([data-dh-theme="normal"]) :is(button,.button,.btn):not(.button-primary):not(.primary-button):not(.btn-primary):not(.update-button):not(#sendButton) {
+  background-color:color-mix(in srgb,#176c9a 22%,var(--season-panel))!important;color:var(--text)!important;
+}
