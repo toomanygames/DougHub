@@ -99,9 +99,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 @media(max-width:600px){.toolbar-actions{width:100%}.toolbar-actions .publish-top-btn{flex:1}.workspace-zoom-controls{gap:8px}#blockWorkspace{min-height:400px;max-height:620px}}
 .mode-switch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #myProjectsBtn{white-space:nowrap}
-.compact-publish-row{display:flex;justify-content:flex-end;margin:8px 0 18px}
-.compact-publish-row .btn{padding:10px 16px}
-@media(max-width:600px){.compact-publish-row{justify-content:stretch}.compact-publish-row .btn{width:100%}}
 
 
 /* Compact toolbar and modal preview */
@@ -109,7 +106,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .studio-toolbar-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
 .compact-studio-toolbar .mode-switch{padding:3px;gap:3px;flex-wrap:nowrap}
 .compact-studio-toolbar .mode-btn{padding:8px 11px;font-size:12px;white-space:nowrap}
-.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{white-space:nowrap}
+.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn,.compact-studio-toolbar .publish-top-btn{white-space:nowrap}
 .compact-studio-toolbar #status{font-size:10px;color:#a5b4fc;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .preview-dialog{width:min(1200px,calc(100% - 24px));height:min(88vh,900px);max-height:92vh;padding:0;border:1px solid #a5b4fc55;border-radius:20px;background:#080a18;color:#f5f6ff;box-shadow:0 30px 100px #000b;overflow:hidden}
 .preview-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}
@@ -214,7 +211,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .fast-chat-head h2{margin:4px 0;font-size:22px}.fast-chat-head p{margin:0;color:#9ca3bf;font-size:11px}.fast-chat-drawer iframe{flex:1;min-height:0;width:100%;border:0;background:#050611}
 .fast-chat-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid #ffffff12;color:#9097b8;font-size:11px}.fast-chat-foot a{color:#c4b5fd;text-decoration:none;font-weight:800}
 @media(max-width:960px){.fast-content-grid{grid-template-columns:1fr}.fast-preview-wrap{height:420px}.fast-preview-wrap iframe{height:100%}}
-@media(max-width:600px){.fast-welcome{align-items:stretch;flex-direction:column}.fast-welcome #fastChatBtn{align-self:flex-start}.fast-template-grid{grid-template-columns:1fr}.fast-template-card{min-height:145px}.fast-tools-row{align-items:flex-start;flex-direction:column}.fast-preview-wrap{height:360px;min-height:360px}.fast-preview-wrap iframe{min-height:360px}}
+@media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-wrap:wrap}.studio-toolbar-controls{width:100%;margin-left:0;justify-content:flex-start}.compact-studio-toolbar #status{max-width:none;flex:1}.compact-studio-toolbar .publish-top-btn{margin-left:auto}}@media(max-width:600px){.fast-welcome{align-items:stretch;flex-direction:column}.fast-welcome #fastChatBtn{align-self:flex-start}.fast-template-grid{grid-template-columns:1fr}.fast-template-card{min-height:145px}.fast-tools-row{align-items:flex-start;flex-direction:column}.fast-preview-wrap{height:360px;min-height:360px}.fast-preview-wrap iframe{min-height:360px}}
 </style>
 </head>
 <body>
@@ -229,10 +226,10 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
       <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code" type="button">⌘ Code</button><button class="mode-btn" data-mode="blocks" type="button">🧩 Blocks</button><button class="mode-btn" data-mode="fast" type="button">⚡ Fast mode</button></div>
       <button class="btn small" id="myProjectsBtn" type="button">My Projects</button>
       <button class="btn primary small" id="previewBtn" type="button">Preview</button>
+      <button class="btn primary small publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button>
     </div>
     <span id="status" role="status">Ready</span>
   </section>
-  <div class="compact-publish-row"><button class="btn primary small publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button></div>
   <section id="fastMode" class="fast-mode-layout" hidden>
   <div class="fast-welcome">
     <div><span class="panel-kicker">DOUGCODE · QUICK START</span><h1>Make something fun. Fast.</h1><p>Pick a starter, customize it, and play instantly. You can switch to Code or Visual Blocks any time.</p></div>
