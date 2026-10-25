@@ -809,7 +809,7 @@ main {
         rgba(168,85,247,0.35);
 }
 
-.community-category {
+.community-card-badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}.community-official-badge{display:inline-flex;align-items:center;padding:4px 7px;border-radius:6px;background:linear-gradient(110deg,#6366f12b,#a855f72b);border:1px solid #a78bfa66;color:#ddd6fe;font-size:9px;font-weight:900;letter-spacing:.07em}.community-card-badges .community-category{margin:0}.community-category {
     display:
         inline-block;
 
@@ -3220,7 +3220,7 @@ async function loadCommunityGames() {
         await supabaseClient
             .from("community_games")
             .select(
-                "id, title, description, author, category, code, created_at, creator_id"
+                "id, title, description, author, category, code, created_at, creator_id, is_official"
             )
             .order(
                 "created_at",
@@ -3346,14 +3346,10 @@ function renderCommunityGames() {
 
                             <button type="button" class="community-favorite ${getFavoriteGameIds().includes(String(game.id)) ? "is-favorite" : ""}" aria-label="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}" aria-pressed="${getFavoriteGameIds().includes(String(game.id))}" title="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}">${getFavoriteGameIds().includes(String(game.id)) ? "★" : "☆"}</button>
 
-                            <span
-                                class="community-category"
-                            >
-                                ${escapeHtml(
-                                    game.category ||
-                                    "Game"
-                                )}
-                            </span>
+                            <div class="community-card-badges">
+                                ${game.is_official ? '<span class="community-official-badge">OFFICIAL DOUGHUB</span>' : ""}
+                                <span class="community-category">${escapeHtml(game.category || "Game")}</span>
+                            </div>
 
                             <h3>
                                 ${escapeHtml(
