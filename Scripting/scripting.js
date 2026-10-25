@@ -272,6 +272,7 @@ $("myProjectsBtn")?.addEventListener("click",()=>{renderMyProjects();$("myProjec
 
 /* Community Games publishing: playable output goes to Doug Games' community_games table. */
 let communityDb=null,communityUser=null,communityUsername="Creator";
+let communityCanPublishOfficial=false;
 function communitySetStatus(message,isError=false){const el=$("communityPublishStatus");if(el){el.textContent=message;el.classList.toggle("error",!!isError);}}
 async function communityInit(){
   const create=window.supabase?.createClient;
@@ -282,9 +283,15 @@ async function communityInit(){
     if(error)throw error;
     communityUser=session?.user||null;
     if(!communityUser){communitySetStatus("Sign in to publish your game to Community Games.",true);return;}
-    const {data:profile}=await communityDb.from("profiles").select("username").eq("id",communityUser.id).maybeSingle();
+    const {data:profile,error:profileError}=await communityDb.from("profiles").select("username,staff_role,is_admin,is_developer,is_owner").eq("id",communityUser.id).maybeSingle();
+    if(profileError)throw profileError;
     communityUsername=profile?.username||communityUser.user_metadata?.username||communityUser.email?.split("@")[0]||"Creator";
-    communitySetStatus("Ready to publish as "+communityUsername+".");
+    const role=String(profile?.staff_role||"").trim().toLowerCase();
+    communityCanPublishOfficial=["admin","developer","owner"].includes(role)||profile?.is_admin===true||profile?.is_developer===true||profile?.is_owner===true;
+    const officialOption=$("officialGameOption");
+    if(officialOption)officialOption.hidden=!communityCanPublishOfficial;
+    if(!communityCanPublishOfficial&&$("publishAsOfficial"))$("publishAsOfficial").checked=false;
+    communitySetStatus("Ready to publish as "+communityUsername+(communityCanPublishOfficial?" · staff publishing enabled":"")+".");
   }catch(e){console.error("Community Games setup failed:",e);communitySetStatus("Couldn't check your sign-in. Refresh and try again.",true);}
 }
 async function communityPublish(){
@@ -296,10 +303,12 @@ async function communityPublish(){
   if(!description){communitySetStatus("Add a short game description before publishing.",true);$("communityDescription").focus();return;}
   const button=$("publishProjectBtn");button.disabled=true;button.textContent="Publishing…";
   try{
-    const payload={title,description,author:communityUsername,category:"Arcade",code:buildDocument(),creator_id:communityUser.id};
+    const wantsOfficial=$("publishAsOfficial")?.checked===true;
+    if(wantsOfficial&&!communityCanPublishOfficial){communitySetStatus("Only Admin, Developer, or Owner staff can publish official DougHub games.",true);return;}
+    const payload={title,description,author:communityUsername,category:"Arcade",code:buildDocument(),creator_id:communityUser.id,is_official:wantsOfficial};
     const {error}=await communityDb.from("community_games").insert(payload);
     if(error)throw error;
-    communitySetStatus("Published! Your game is now in Doug Games → Community Games. It may take a refresh to appear.");
+    communitySetStatus(wantsOfficial?"Published as an official DougHub game! It will be marked in Doug Games → Community Games.":"Published! Your game is now in Doug Games → Community Games. It may take a refresh to appear.");
     setStatus("Game published to Community Games");
   }catch(e){console.error("Community Game publish failed:",e);communitySetStatus("Couldn't publish: "+(e.message||"check your connection and try again"),true);}
   finally{button.disabled=false;button.textContent="Publish to Community Games";}
