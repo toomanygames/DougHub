@@ -2380,9 +2380,14 @@ document.getElementById("badgeSelect").addEventListener("change",async()=>{
   const value=document.getElementById("badgeSelect").value||null;
   const previous=currentProfile.equipped_badge||"";
   if(value&&!(currentProfile?.is_admin||(currentProfile?.reward_badges||[]).includes(value))){document.getElementById("badgeSelect").value=previous;return;}
-  const {error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id);
-  if(error){document.getElementById("badgeSelect").value=previous;showStatus("Could not update your badge.","error");return;}
-  currentProfile.equipped_badge=value;
+  const {data:savedProfile,error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id).select("equipped_badge").maybeSingle();
+  if(error||!savedProfile){
+    document.getElementById("badgeSelect").value=previous;
+    showStatus("Your badge wasn't saved. Check your connection and profile permissions, then try again."+(error&&error.message?" ("+error.message+")":""),"error");
+    return;
+  }
+  currentProfile.equipped_badge=savedProfile.equipped_badge||"";
+  window.dispatchEvent(new Event("douqhub:og-badges-updated"));
   renderRewards();
   showStatus(value?"Chat badge updated!":"Chat badge removed.","success");
 });
