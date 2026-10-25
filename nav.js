@@ -440,14 +440,10 @@
       } else {
         avatar.textContent = username.slice(0, 1).toUpperCase();
       }
-      // Staff roles are authoritative for the shared account menu. Keep the
-      // legacy is_admin flag as a compatibility fallback for older accounts.
-      // Only use server-controlled profile/app metadata for staff access.
-      // user_metadata is user-editable and must never grant a staff link.
-      const storedRole = String(profile?.staff_role || user.app_metadata?.staff_role || "").trim().toLowerCase();
-      const staffRole = storedRole && storedRole !== "none"
-        ? storedRole
-        : (profile?.is_admin === true ? "admin" : "none");
+      // The database staff_role is authoritative. A stale is_admin flag must not
+      // keep a demoted account's Admin Panel link visible.
+      const storedRole = String(profile?.staff_role || "").trim().toLowerCase();
+      const staffRole = ["helper","admin","developer","owner"].includes(storedRole) ? storedRole : "none";
       const staffRank = ({ none: 0, helper: 1, admin: 2, developer: 3, owner: 4 })[staffRole] || 0;
       if (adminLink) {
         adminLink.style.display = staffRank >= 1 ? "" : "none";
