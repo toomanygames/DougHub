@@ -34,19 +34,19 @@ html[data-dh-theme="normal"]{
   --season-accent:#6366f1;--season-accent2:#a855f7;--season-glow:rgba(99,102,241,.18);
   --season-line:rgba(177,184,255,.16);--season-panel:rgba(13,17,39,.92);--season-bg:#050611;--season-muted:#a4abc7
 }
-html[data-dh-theme="spring"] body{
+html[data-dh-theme="spring"]:not([data-dh-theme="normal"]) body{
   background-image:url("/assets/seasonal-spring.svg"),radial-gradient(ellipse at 12% 0%,rgba(102,220,151,.12),transparent 38%),linear-gradient(180deg,#091a14 0%,#07120f 60%,#060d0c 100%)!important;
   background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
 }
-html[data-dh-theme="summer"] body{
+html[data-dh-theme="summer"]:not([data-dh-theme="normal"]) body{
   background-image:url("/assets/seasonal-summer.svg"),radial-gradient(ellipse at 10% 0%,rgba(55,166,255,.13),transparent 38%),linear-gradient(180deg,#07172a 0%,#07111e 62%,#070b13 100%)!important;
   background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
 }
-html[data-dh-theme="autumn"] body{
+html[data-dh-theme="autumn"]:not([data-dh-theme="normal"]) body{
   background-image:url("/assets/seasonal-autumn.svg"),radial-gradient(ellipse at 10% 0%,rgba(255,140,47,.12),transparent 38%),linear-gradient(180deg,#1a1018 0%,#100b12 62%,#09080d 100%)!important;
   background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
 }
-html[data-dh-theme="winter"] body{
+html[data-dh-theme="winter"]:not([data-dh-theme="normal"]) body{
   background-image:url("/assets/seasonal-winter.svg"),radial-gradient(ellipse at 10% 0%,rgba(115,205,255,.13),transparent 38%),linear-gradient(180deg,#091826 0%,#08121d 62%,#070c13 100%)!important;
   background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
 }
