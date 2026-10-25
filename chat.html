@@ -541,7 +541,7 @@ main {
 .chat-mention{display:inline;color:#60a5fa!important;font-weight:650;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;margin:0!important;white-space:normal;cursor:pointer;text-decoration:none;box-shadow:none!important;transition:color .16s}.chat-mention:hover,.chat-mention:focus-visible{color:#93c5fd!important;text-decoration:underline;background:transparent!important;outline:none}.chat-profile-backdrop{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,12,.72);backdrop-filter:blur(9px);animation:chatProfileFade .16s ease}.chat-profile-card{position:relative;width:min(410px,100%);max-height:min(80vh,620px);overflow:auto;padding:24px;border:1px solid rgba(129,140,248,.3);border-radius:22px;background:radial-gradient(circle at 90% 0,rgba(99,102,241,.18),transparent 42%),linear-gradient(145deg,#12162e,#080a18);box-shadow:0 28px 90px #0009;color:#f5f5ff;animation:chatProfileIn .2s ease}.chat-profile-close{position:absolute;top:13px;right:13px;width:34px;height:34px;border:1px solid #ffffff1c;border-radius:11px;background:#ffffff0a;color:#e8e8ff;font-size:21px;cursor:pointer}.chat-profile-identity{display:flex;align-items:center;gap:14px;padding:8px 36px 20px 0}.chat-profile-avatar{width:64px;height:64px;flex:0 0 64px;object-fit:cover;border-radius:20px;border:1px solid #a5b4fc55;background:#171a34}.chat-profile-name{min-width:0;font-size:21px;font-weight:850;overflow-wrap:anywhere}.chat-profile-handle{margin-top:4px;color:#60a5fa;font-size:13px;font-weight:750}.chat-profile-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}.chat-profile-badge{padding:5px 8px;border-radius:999px;border:1px solid #a78bfa35;background:#a78bfa14;color:#ddd6fe;font-size:11px;font-weight:800}.chat-profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chat-profile-stat{padding:14px;border:1px solid #ffffff12;border-radius:14px;background:#ffffff06}.chat-profile-stat strong{display:block;font-size:21px;letter-spacing:-.5px}.chat-profile-stat span{display:block;margin-top:4px;color:#a4a7c4;font-size:11px}.chat-profile-footer{margin-top:15px;color:#858aa9;font-size:12px;line-height:1.5}.chat-profile-loading{padding:25px 4px;color:#a4a7c4;text-align:center}@keyframes chatProfileFade{from{opacity:0}to{opacity:1}}@keyframes chatProfileIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 .chat-input-mention-wrap #messageInput{width:100%;min-height:48px;color:transparent!important;-webkit-text-fill-color:transparent!important;background:transparent!important;position:relative;z-index:1}.chat-input-mention-preview{font-size:inherit;line-height:normal}.chat-input-mention-wrap #messageInput::selection{-webkit-text-fill-color:transparent;background:rgba(99,102,241,.22)}
 </style>
-  <script src="nav.js?v=20261025-palette3" defer></script>
+  <script src="nav.js?v=20261025-group-calls" defer></script>
 
 <script src="search-autofill-fix.js" defer></script>
 
@@ -866,6 +866,7 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
 </style>
 <style id="chat-video-call-entry-style">
 .chat-video-call-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;padding:9px 12px;border:1px solid rgba(129,140,248,.3);border-radius:12px;background:linear-gradient(125deg,rgba(99,102,241,.17),rgba(168,85,247,.12));color:#e9eaff;text-decoration:none;font-size:12px;font-weight:850;white-space:nowrap;box-shadow:0 5px 18px rgba(99,102,241,.08);transition:transform .16s,border-color .16s,background .16s}
+.chat-video-invite-button{font-family:inherit;cursor:pointer}.chat-video-invite-button:disabled{opacity:.55;cursor:wait}.chat-call-invite-link{display:inline-flex;align-items:center;margin:2px 0;padding:5px 9px;border:1px solid rgba(129,140,248,.4);border-radius:8px;background:rgba(99,102,241,.13);color:#c7d2fe;font-weight:800;text-decoration:none}.chat-call-invite-link:hover{background:rgba(99,102,241,.24)}
 .chat-video-call-button:hover{transform:translateY(-1px);border-color:rgba(129,140,248,.65);background:linear-gradient(125deg,rgba(99,102,241,.28),rgba(168,85,247,.2))}
 .chat-video-call-button span{font-size:15px;color:#a5b4fc}
 html[data-dh-theme="spring"] .chat-video-call-button{border-color:rgba(142,227,173,.35);background:linear-gradient(125deg,rgba(39,134,90,.25),rgba(233,168,233,.14))}
@@ -899,6 +900,9 @@ html[data-dh-theme="winter"] .chat-video-call-button{border-color:rgba(139,217,2
       <a class="chat-video-call-button" href="/chat-calls.html" title="Open the separate video calling feature">
         <span aria-hidden="true">▣</span> Video call
       </a>
+      <button class="chat-video-call-button chat-video-invite-button" id="chatVideoInviteButton" type="button" title="Send a group video-call invite to the current chat">
+        <span aria-hidden="true">＋</span> Invite to call
+      </button>
       <label class="chat-ding-setting" for="chatDingToggle" title="Play a short sound when someone sends a community chat message">
         <input id="chatDingToggle" type="checkbox" checked>
         <span>Message dings</span>
@@ -1654,6 +1658,15 @@ async function findChatMentionProfile(username) {
 async function renderMessageText(container, text) {
   const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
   const matches = [];
+  function appendTextWithInviteLinks(value){
+    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-f0-9]{36}/gi;
+    let cursor=0,m;
+    while((m=urlPattern.exec(value))!==null){
+      if(m.index>cursor)container.appendChild(document.createTextNode(value.slice(cursor,m.index)));
+      const link=document.createElement("a");link.href=m[0];link.target="_blank";link.rel="noopener noreferrer";link.className="chat-call-invite-link";link.textContent="Join video call ↗";container.appendChild(link);cursor=m.index+m[0].length;
+    }
+    if(cursor<value.length)container.appendChild(document.createTextNode(value.slice(cursor)));
+  }
   let match;
   while ((match = pattern.exec(text)) !== null) {
     matches.push({ start: match.index + match[1].length, end: match.index + match[0].length, prefixStart: match.index, prefix: match[1], username: match[2] });
@@ -1664,7 +1677,7 @@ async function renderMessageText(container, text) {
   let lastIndex = 0;
   for (const item of checked) {
     if (!item.profile || item.start < lastIndex) continue;
-    if (item.prefixStart > lastIndex) container.appendChild(document.createTextNode(text.slice(lastIndex, item.prefixStart)));
+    if (item.prefixStart > lastIndex) appendTextWithInviteLinks(text.slice(lastIndex, item.prefixStart));
     if (item.prefix) container.appendChild(document.createTextNode(item.prefix));
     const button = document.createElement("button");
     button.type = "button";
@@ -1675,7 +1688,7 @@ async function renderMessageText(container, text) {
     container.appendChild(button);
     lastIndex = item.end;
   }
-  if (lastIndex < text.length) container.appendChild(document.createTextNode(text.slice(lastIndex)));
+  if (lastIndex < text.length) appendTextWithInviteLinks(text.slice(lastIndex));
 }
 
 let activeMentionProfileModal = null;
@@ -2539,6 +2552,22 @@ async function sendMessage() {
 }
 
 
+
+/* Group video-call invitations */
+const chatVideoInviteButton=document.getElementById("chatVideoInviteButton");
+chatVideoInviteButton?.addEventListener("click",async()=>{
+ if(!currentUser){showError("Sign in before inviting people to a video call.");return}
+ if(!supabaseClient){showError("Chat is still connecting. Try again in a moment.");return}
+ chatVideoInviteButton.disabled=true;const oldText=chatVideoInviteButton.textContent;chatVideoInviteButton.textContent="Sending invite…";
+ try{
+  const bytes=new Uint8Array(18);crypto.getRandomValues(bytes);const roomId=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+  const inviteUrl=new URL("/chat-calls.html",location.origin);inviteUrl.searchParams.set("room",roomId);
+  const inviteMessage="📹 Join my DougHub group video call (up to 6 people): "+inviteUrl.href;
+  const {error}=await supabaseClient.from("chat_messages").insert({user_id:currentUser.id,username:currentUsername,message:inviteMessage,attachment_url:null,attachment_type:null,attachment_name:null,attachment_source:null,group_id:activeChatGroupId});
+  if(error)throw error;lastRenderedMessageSignature=null;await loadMessages();showError("Video-call invite sent to this chat. Anyone who can see the message can open the link to join.");chatVideoInviteButton.textContent="Invite sent ✓";setTimeout(()=>chatVideoInviteButton.textContent=oldText,2200);
+ }catch(error){console.error("Could not send video-call invite:",error);showError("Couldn't send the call invite: "+(error?.message||"please try again."));chatVideoInviteButton.textContent=oldText}
+ finally{chatVideoInviteButton.disabled=false}
+});
 messageForm.addEventListener(
   "submit",
   async event => {
