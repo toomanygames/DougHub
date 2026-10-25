@@ -1097,9 +1097,15 @@
 
         async function decorate(element) {
             if (!element || element.dataset.dhOgChecked === "true" || element.querySelector(".dh-og-badge")) return;
-            const raw = element.getAttribute("data-username") || element.textContent || "";
-            const username = raw.trim().replace(/^@/, "").trim();
-            if (!/^[a-zA-Z0-9_]{2,32}$/.test(username)) return;
+            let raw = element.getAttribute("data-username") || "";
+            if (!raw) {
+                const clean = element.cloneNode(true);
+                clean.querySelectorAll(".dh-og-badge,.og-badge,.admin-badge,.message-badge,.staff-role-pill").forEach(node => node.remove());
+                raw = clean.textContent || "";
+            }
+            const usernameMatch = raw.trim().match(/^@?([a-zA-Z0-9_]{2,32})(?:\\b|$)/);
+            if (!usernameMatch) return;
+            const username = usernameMatch[1];
             element.dataset.dhOgChecked = "true";
             const key = username.toLowerCase();
             try {
@@ -1133,7 +1139,7 @@
         }
         scan(document);
         // Badge awards can change while this page remains open. Clear stale lookups
-        // and redecorate existing names when admin/settings broadcasts an update.
+        // and refresh existing names once, avoiding duplicate/racing refresh handlers.
         window.addEventListener("douqhub:og-badges-updated", () => {
             cache.clear();
             document.querySelectorAll(".dh-og-badge").forEach(badge => badge.remove());
@@ -1146,14 +1152,6 @@
             record.addedNodes.forEach(node => { if (node.nodeType === 1) scan(node); });
         }));
         observer.observe(document.body, { childList: true, subtree: true });
-        window.addEventListener("douqhub:og-badges-updated", () => {
-            cache.clear();
-            document.querySelectorAll(selectors).forEach(element => {
-                element.dataset.dhOgChecked = "false";
-                element.querySelectorAll(".dh-og-badge").forEach(badge => badge.remove());
-                decorate(element);
-            });
-        });
     }
 
 
