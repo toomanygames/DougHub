@@ -2256,7 +2256,7 @@ function notifyIncomingChatMessage(row) {
         id: String(row.id || ""),
         user_id: String(row.user_id || ""),
         username: String(row.username || "Someone").slice(0, 60),
-        message: String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message")).replace(/\\s+/g, " ").slice(0, 240),
+        message: String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message")).replace(/\s+/g, " ").slice(0, 240),
         group_id: row.group_id == null ? null : String(row.group_id)
       });
     } catch (error) {
