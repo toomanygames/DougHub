@@ -1636,6 +1636,21 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 </div>
 
+<div class="card" id="customBadgeManagerCard">
+    <h2>Custom Badge Creator</h2>
+    <p class="muted">Create a badge and assign it to a DougHub account. It will appear in that person's Settings under Rewards & Badges.</p>
+    <form id="customBadgeForm" class="admin-form-grid">
+        <label>Recipient username<input id="customBadgeUsername" required maxlength="32" placeholder="Username (without @)" autocomplete="off"></label>
+        <label>Badge name<input id="customBadgeName" required maxlength="32" placeholder="Community Champion"></label>
+        <label>Icon / symbol<input id="customBadgeIcon" required maxlength="8" value="✦" placeholder="✦"></label>
+        <label>Description<input id="customBadgeDescription" maxlength="180" value="A custom DougHub badge." placeholder="Why they received this badge"></label>
+        <label>Badge color<input id="customBadgeColor" type="color" value="#8b5cf6"></label>
+        <div class="buttons"><button type="submit" id="createCustomBadgeButton" class="save-button">Create & Assign Badge</button></div>
+    </form>
+    <div class="status" id="customBadgeStatus">Only Developer+ staff can create and assign custom badges.</div>
+    <div id="customBadgeRecentList"></div>
+</div>
+
 <div class="card moderation-card" id="recentWarningsCard">
 
     <h2>📋 Recent Warnings</h2>
@@ -2059,6 +2074,86 @@ function populateUserSelects() {
 
 }
 
+
+let customBadgeRows = [];
+async function loadCustomBadgeManager() {
+    const card = document.getElementById("customBadgeManagerCard");
+    const status = document.getElementById("customBadgeStatus");
+    const list = document.getElementById("customBadgeRecentList");
+    if (!card || !status || !list) return;
+    const allowed = ["developer", "owner"].includes(currentAdminRole);
+    card.style.display = allowed ? "" : "none";
+    if (!allowed) return;
+    const { data, error } = await supabaseClient.from("custom_badges")
+        .select("id,name,icon,description,assigned_to,created_at")
+        .order("created_at", { ascending: false }).limit(50);
+    if (error) {
+        status.textContent = "Could not load custom badges: " + error.message;
+        return;
+    }
+    customBadgeRows = data || [];
+    const ids = [...new Set(customBadgeRows.map(row => row.assigned_to).filter(Boolean))];
+    const nameMap = {};
+    if (ids.length) {
+        const { data: profiles } = await supabaseClient.from("profiles").select("id,username").in("id", ids);
+        (profiles || []).forEach(p => nameMap[p.id] = p.username || p.id.slice(0, 8));
+    }
+    status.textContent = customBadgeRows.length + " custom badge" + (customBadgeRows.length === 1 ? "" : "s") + " created";
+    list.replaceChildren();
+    if (!customBadgeRows.length) {
+        const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = "No custom badges created yet."; list.appendChild(empty); return;
+    }
+    customBadgeRows.forEach(row => {
+        const item = document.createElement("div"); item.className = "user-item";
+        const title = document.createElement("strong"); title.textContent = row.icon + " " + row.name;
+        const detail = document.createElement("div"); detail.className = "warning-text";
+        detail.textContent = "Assigned to @" + (nameMap[row.assigned_to] || "unknown") + " · " + row.description;
+        const remove = document.createElement("button"); remove.type = "button"; remove.className = "delete-button"; remove.textContent = "Remove badge";
+        remove.addEventListener("click", async () => {
+            if (!confirm("Remove this custom badge from its assigned user?")) return;
+            remove.disabled = true;
+            const { error: deleteError } = await supabaseClient.from("custom_badges").delete().eq("id", row.id);
+            if (deleteError) { alert("Could not remove badge: " + deleteError.message); remove.disabled = false; return; }
+            await loadCustomBadgeManager();
+        });
+        item.append(title, detail, remove); list.appendChild(item);
+    });
+}
+document.getElementById("customBadgeForm")?.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!["developer", "owner"].includes(currentAdminRole)) return;
+    const status = document.getElementById("customBadgeStatus");
+    const button = document.getElementById("createCustomBadgeButton");
+    const username = document.getElementById("customBadgeUsername").value.trim().replace(/^@/, "");
+    const name = document.getElementById("customBadgeName").value.trim();
+    const icon = document.getElementById("customBadgeIcon").value.trim() || "✦";
+    const description = document.getElementById("customBadgeDescription").value.trim() || "A custom DougHub badge.";
+    const color = document.getElementById("customBadgeColor").value || "#8b5cf6";
+    if (!username || !name) return;
+    button.disabled = true; status.textContent = "Finding recipient…";
+    try {
+        const { data: recipient, error: recipientError } = await supabaseClient.from("profiles")
+            .select("id,username").ilike("username", username).limit(2);
+        if (recipientError) throw recipientError;
+        if (!recipient || recipient.length !== 1) throw new Error(recipient?.length ? "That username is not unique. Use the exact username." : "No account found with that username.");
+        const tint = color + "24";
+        const accent = "linear-gradient(90deg," + color + ",#a855f7)";
+        const { error } = await supabaseClient.from("custom_badges").insert({
+            name, icon, description, tint, accent, assigned_to: recipient[0].id, created_by: currentAdminUser.id
+        });
+        if (error) throw error;
+        status.textContent = "Badge created and assigned to @" + recipient[0].username + ". It should now appear in their Settings.";
+        document.getElementById("customBadgeForm").reset();
+        document.getElementById("customBadgeIcon").value = "✦";
+        document.getElementById("customBadgeDescription").value = "A custom DougHub badge.";
+        document.getElementById("customBadgeColor").value = "#8b5cf6";
+        await loadCustomBadgeManager();
+        await writeAuditLog("custom_badge_created", "users", "Created and assigned custom badge: " + name, {recipient: recipient[0].username, icon});
+    } catch (error) {
+        console.error("Custom badge creation failed:", error);
+        status.textContent = "Could not create badge: " + (error.message || "Unknown error");
+    } finally { button.disabled = false; }
+});
 
 async function setOgBadge(user, award, button) {
     if (!["admin","developer","owner"].includes(currentAdminRole)) {
@@ -5248,7 +5343,7 @@ function applyStaffPermissions(){
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
     if(/staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
-    if(/feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
+    if(/custombadgemanagercard|feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
     if(/userwarningscard|recentwarningscard|user warnings|recent warnings|group moderation/.test(id+" "+title))return 1;
     if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
@@ -5588,6 +5683,7 @@ async function startAdminPanel() {
         loadUsers(),
         loadOwnerBanRequests(),
         loadOwnerStaffActivity(),
+        loadCustomBadgeManager(),
         loadWarnings(),
         loadChatMessages(),
         loadGames(),
