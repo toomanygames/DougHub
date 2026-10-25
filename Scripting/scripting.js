@@ -81,6 +81,9 @@ function setMode(mode){currentMode=mode;document.querySelectorAll(".mode-btn").f
 
 function setStudioKind(kind){
   studioKind=kind==="project"?"project":"game";
+  const modeParams=new URLSearchParams(location.search);
+  if(studioKind==="project")modeParams.set("kind","project");else modeParams.delete("kind");
+  history.replaceState(null,"",location.pathname+(modeParams.toString()?"?"+modeParams.toString():"")+location.hash);
   document.querySelectorAll("[data-studio-kind]").forEach(button=>{
     const active=button.dataset.studioKind===studioKind;
     button.classList.toggle("active",active);
