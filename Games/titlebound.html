@@ -249,13 +249,40 @@ body{overflow:hidden}
 @media(max-width:600px){.upgrade-dock-panel{height:min(520px,72vh,72dvh);padding:10px;width:min(260px,calc(100vw - 42px))}.upgrade-dock.open .upgrade-dock-toggle{transform:translateX(-260px)}.upgrade-dock-toggle{width:31px;min-height:118px}.dock-toggle-label{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.upgrade-dock-panel,.upgrade-dock-toggle,.dock-chevron{transition:none}}
 
+
+/* TITLEBOUND ARCADE REDESIGN */
+:root{--bg:#080b18;--panel:#101a2d;--line:#354c71;--muted:#a7bad6;--gold:#ffcf4a;--violet:#b9f34b}
+body{background:#080b18;color:#fff;background-image:radial-gradient(ellipse at 50% 0,#1b3a62 0,transparent 45%),linear-gradient(180deg,#080b18,#101026)}
+.topbar{border-color:#263c59}.brandmark{border-radius:12px;background:#ffcf4a;color:#111827;box-shadow:4px 4px 0 #f97316;font-size:23px}
+.brand h1{letter-spacing:.12em}.brand small{color:#7de3ff}
+.top-pill,.back{border-radius:8px;background:#111e34;border:1px solid #365477;color:#f4f7ff;box-shadow:3px 3px 0 #060a13}
+.top-pill:hover,.back:hover{background:#1a3152;border-color:#71e5ff}
+.hero{padding-top:28px}.eyebrow{color:#ffcf4a;letter-spacing:.17em}
+.hero h2 span{background:none;color:#7de3ff;text-shadow:3px 3px 0 #173e68}
+.art-card{border:2px solid #2d5478;border-radius:12px;background:#101e36;box-shadow:7px 7px 0 #050812}
+.art-card:before,.art-card:after{border-color:#67e8f955;box-shadow:none}
+.panel{border:1px solid #365477;border-radius:12px;background:#101a2d;box-shadow:5px 5px 0 #050812}
+.panel-head{border-color:#263e5e}.panel-head h3{color:#f8d56a}
+.tag{border-radius:5px;background:#263b55;color:#b7f4ff}
+.primary{border-radius:8px;background:#ffcf4a!important;color:#151827!important;border:2px solid #ffed9a;box-shadow:4px 4px 0 #c45b1a;font-weight:1000}
+.primary:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 #c45b1a;filter:none}
+.secondary,.buy,.tab,.filter{border-radius:7px;background:#142642;border:1px solid #3b628a;color:#eaf6ff}
+.secondary:hover,.buy:hover,.tab:hover,.filter:hover{background:#1d3b5f;border-color:#6ce8ff}
+.reveal{border-radius:10px;border:2px solid #426b8f;background:radial-gradient(circle at 50% 30%,#263f6b,#10172c 70%)}
+.reveal-kicker{color:#7de3ff}
+.title-card,.tree-node,.upgrade,.recent-chip{border-radius:8px!important;border-color:#345778!important;background:#14223a!important}
+.title-card:hover,.tree-node:hover{border-color:#ffcf4a!important;transform:translateY(-2px)}
+.title-card.locked{filter:saturate(.5)}.currency-panel,.upgrade-dock-panel{background:#101a2d;border-color:#365477}
+.upgrade-dock-toggle{background:#ffcf4a;color:#111827;border-radius:8px}
+.toast{background:#ffcf4a;color:#111827;border:2px solid #fff0a6;border-radius:8px}
+@media(max-width:700px){.app{padding:12px 13px 30px}.panel{box-shadow:3px 3px 0 #050812}.art-card{box-shadow:4px 4px 0 #050812}}
 </style>
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
 <div class="app">
 <header class="topbar">
-  <div class="brand"><div class="brandmark">✧</div><div><h1>TITLEBOUND</h1><small>REALMS OF FORTUNE</small></div></div>
+  <div class="brand"><div class="brandmark" aria-label="Dice">🎲</div><div><h1>TITLEBOUND</h1><small>REALMS OF FORTUNE</small></div></div>
   <div class="top-actions"><button class="top-pill menu-button" data-open="collection">Vault</button><button class="top-pill menu-button" data-open="upgrades">Upgrades</button><button class="top-pill menu-button" data-open="codex">Codex</button><div class="top-pill">✦ <strong id="topDust">0</strong> dust</div><div class="top-pill">✧ <strong id="topRolls">0</strong> rolls</div><a class="back" href="../douggames.html">← Games</a></div>
 </header>
 <section class="hero">
