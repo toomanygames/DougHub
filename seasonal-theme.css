@@ -25,3 +25,78 @@ html[data-dh-theme]:not([data-dh-theme="normal"]) .card,html[data-dh-theme]:not(
 html[data-dh-theme]:not([data-dh-theme="normal"]) .button-primary,html[data-dh-theme]:not([data-dh-theme="normal"]) .primary-button,html[data-dh-theme]:not([data-dh-theme="normal"]) .btn-primary,html[data-dh-theme]:not([data-dh-theme="normal"]) .update-button,html[data-dh-theme]:not([data-dh-theme="normal"]) #sendButton,html[data-dh-theme]:not([data-dh-theme="normal"]) .tool-slide-cta{background:linear-gradient(135deg,var(--season-accent),var(--season-accent2))!important;border-color:transparent!important;color:#09111a!important;box-shadow:0 8px 24px var(--season-glow)}
 html[data-dh-theme]:not([data-dh-theme="normal"]) .nav a.active,html[data-dh-theme]:not([data-dh-theme="normal"]) .side-link.active{border-color:var(--season-line)!important;background:color-mix(in srgb,var(--season-accent) 13%,transparent)!important;color:var(--season-accent)!important}
 html[data-dh-theme]:not([data-dh-theme="normal"]) input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),html[data-dh-theme]:not([data-dh-theme="normal"]) textarea,html[data-dh-theme]:not([data-dh-theme="normal"]) select{border-color:var(--season-line)!important}
+
+
+/* Seasonal artwork + proper color tokens. These are illustrations, not just hue filters. */
+html[data-dh-theme="normal"]{
+  --bg:#050611;--panel:#0d1127;--panel2:#141a36;--line:rgba(129,140,248,.18);
+  --muted:#a4abc7;--indigo:#6366f1;--purple:#a855f7;--cyan:#67e8f9;--text:#f5f6ff;
+  --season-accent:#6366f1;--season-accent2:#a855f7;--season-glow:rgba(99,102,241,.18);
+  --season-line:rgba(177,184,255,.16);--season-panel:rgba(13,17,39,.92);--season-bg:#050611;--season-muted:#a4abc7
+}
+html[data-dh-theme="spring"] body{
+  background-image:url("/assets/seasonal-spring.svg"),radial-gradient(ellipse at 12% 0%,rgba(102,220,151,.12),transparent 38%),linear-gradient(180deg,#091a14 0%,#07120f 60%,#060d0c 100%)!important;
+  background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
+}
+html[data-dh-theme="summer"] body{
+  background-image:url("/assets/seasonal-summer.svg"),radial-gradient(ellipse at 10% 0%,rgba(55,166,255,.13),transparent 38%),linear-gradient(180deg,#07172a 0%,#07111e 62%,#070b13 100%)!important;
+  background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
+}
+html[data-dh-theme="autumn"] body{
+  background-image:url("/assets/seasonal-autumn.svg"),radial-gradient(ellipse at 10% 0%,rgba(255,140,47,.12),transparent 38%),linear-gradient(180deg,#1a1018 0%,#100b12 62%,#09080d 100%)!important;
+  background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
+}
+html[data-dh-theme="winter"] body{
+  background-image:url("/assets/seasonal-winter.svg"),radial-gradient(ellipse at 10% 0%,rgba(115,205,255,.13),transparent 38%),linear-gradient(180deg,#091826 0%,#08121d 62%,#070c13 100%)!important;
+  background-repeat:no-repeat,no-repeat,no-repeat!important;background-position:right top,center top,center!important;background-size:min(100%,1500px) auto,100% 680px,cover!important
+}
+
+/* Give controls a seasonal finish instead of merely swapping their colors. */
+html[data-dh-theme="normal"] :is(.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  background:linear-gradient(120deg,#4f46e5,#7c3aed)!important;border:1px solid rgba(167,139,250,.42)!important;
+  color:#fff!important;box-shadow:0 5px 18px rgba(99,102,241,.24),inset 0 1px rgba(255,255,255,.14)
+}
+html[data-dh-theme="spring"] :is(button,.button,.btn,.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  border-color:rgba(142,227,173,.48)!important;box-shadow:0 5px 18px rgba(74,190,124,.13),inset 0 1px rgba(255,255,255,.18)
+}
+html[data-dh-theme="spring"] :is(.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  background:linear-gradient(125deg,#27865a,#65c98d 62%,#e6a9d5)!important;color:#071b12!important
+}
+html[data-dh-theme="summer"] :is(button,.button,.btn,.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  border-color:rgba(96,200,255,.48)!important;box-shadow:0 5px 18px rgba(38,151,245,.16),inset 0 1px rgba(255,255,255,.2)
+}
+html[data-dh-theme="summer"] :is(.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  background:linear-gradient(115deg,#1769d2 0%,#249be9 58%,#f06b75 100%)!important;color:#fff!important
+}
+html[data-dh-theme="autumn"] :is(button,.button,.btn,.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  border-color:rgba(255,173,85,.48)!important;box-shadow:0 5px 18px rgba(249,115,22,.15),inset 0 1px rgba(255,255,255,.13)
+}
+html[data-dh-theme="autumn"] :is(.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  background:linear-gradient(125deg,#b94b16,#f28b2d 65%,#8a4d8d)!important;color:#fff8ed!important
+}
+html[data-dh-theme="winter"] :is(button,.button,.btn,.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  border-color:rgba(139,217,255,.5)!important;box-shadow:0 5px 18px rgba(56,166,224,.15),inset 0 1px rgba(255,255,255,.22)
+}
+html[data-dh-theme="winter"] :is(.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  background:linear-gradient(120deg,#176c9a,#58bce8 62%,#d9b968)!important;color:#061522!important
+}
+html[data-dh-theme]:not([data-dh-theme="normal"]) :is(button,.button,.btn,.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta){
+  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease
+}
+html[data-dh-theme]:not([data-dh-theme="normal"]) :is(button,.button,.btn,.button-primary,.primary-button,.btn-primary,.update-button,#sendButton,.tool-slide-cta):hover{
+  filter:brightness(1.08) saturate(1.08);transform:translateY(-1px)
+}
+html[data-dh-theme="normal"] .dh-seasonal-banner{background:linear-gradient(125deg,rgba(79,70,229,.2),rgba(13,17,39,.94) 55%,rgba(124,58,237,.17))}
+html[data-dh-theme="spring"] .dh-seasonal-banner{background-image:url("/assets/seasonal-spring.svg"),linear-gradient(120deg,rgba(24,74,49,.93),rgba(12,31,23,.94));background-position:right center;background-repeat:no-repeat;background-size:auto 180%}
+html[data-dh-theme="summer"] .dh-seasonal-banner{background-image:url("/assets/seasonal-summer.svg"),linear-gradient(120deg,rgba(12,47,91,.94),rgba(8,24,46,.94));background-position:right center;background-repeat:no-repeat;background-size:auto 180%}
+html[data-dh-theme="autumn"] .dh-seasonal-banner{background-image:url("/assets/seasonal-autumn.svg"),linear-gradient(120deg,rgba(76,34,19,.94),rgba(32,17,30,.95));background-position:right center;background-repeat:no-repeat;background-size:auto 180%}
+html[data-dh-theme="winter"] .dh-seasonal-banner{background-image:url("/assets/seasonal-winter.svg"),linear-gradient(120deg,rgba(15,55,79,.94),rgba(9,27,43,.95));background-position:right center;background-repeat:no-repeat;background-size:auto 180%}
+.dh-seasonal-orbit{display:none}
+.dh-theme-option-card{overflow:hidden}
+.dh-theme-option-card:after{content:"";position:absolute;z-index:0;right:0;bottom:0;width:52%;height:100%;background-repeat:no-repeat;background-position:right bottom;background-size:cover;opacity:.42;pointer-events:none;mask-image:linear-gradient(90deg,transparent,#000 60%)}
+.dh-theme-option-card>*{position:relative;z-index:1}
+.dh-theme-option:has(input[value="spring"]) .dh-theme-option-card:after{background-image:url("/assets/seasonal-spring.svg")}
+.dh-theme-option:has(input[value="summer"]) .dh-theme-option-card:after{background-image:url("/assets/seasonal-summer.svg")}
+.dh-theme-option:has(input[value="autumn"]) .dh-theme-option-card:after{background-image:url("/assets/seasonal-autumn.svg")}
+.dh-theme-option:has(input[value="winter"]) .dh-theme-option-card:after{background-image:url("/assets/seasonal-winter.svg")}
+@media(max-width:650px){html[data-dh-theme]:not([data-dh-theme="normal"]) body{background-size:115% auto,100% 520px,cover!important;background-position:70% top,center top,center!important}.dh-theme-option-card:after{width:45%;opacity:.28}}
