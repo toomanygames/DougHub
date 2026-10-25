@@ -5,6 +5,20 @@
   const NAV_SCRIPT_URL = document.currentScript && document.currentScript.src
     ? document.currentScript.src
     : new URL("nav.js", location.href).href;
+  // Load the shared seasonal theme system on every page that uses the shared navigation.
+  (function loadSeasonalExperience(){
+    const root = new URL(".", NAV_SCRIPT_URL);
+    if (!document.querySelector('link[data-dh-seasonal-css]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet"; link.href = new URL("seasonal-theme.css?v=20261025", root).href;
+      link.dataset.dhSeasonalCss = "true"; document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[data-dh-seasonal-js]')) {
+      const script = document.createElement("script");
+      script.src = new URL("seasonal-theme.js?v=20261025", root).href;
+      script.defer = true; script.dataset.dhSeasonalJs = "true"; document.head.appendChild(script);
+    }
+  })();
 
   // Paint the last known account label before any asynchronous Supabase checks
   // finish, so page-to-page navigation does not flash "Log In" for signed-in users.

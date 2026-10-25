@@ -839,6 +839,7 @@ document.addEventListener("DOMContentLoaded",function(){
       <div class="settings-sidebar-label">PREFERENCES</div>
       <a class="settings-nav-link active" href="#profileSettingsSection"><span class="settings-nav-icon">◎</span><span><strong>Profile</strong><small>Public identity</small></span></a>
       <a class="settings-nav-link" href="#rewardsSettingsSection"><span class="settings-nav-icon">✧</span><span><strong>Rewards & badges</strong><small>Chat appearance</small></span></a>
+      <a class="settings-nav-link" href="#themeSettingsSection"><span class="settings-nav-icon">◌</span><span><strong>Seasonal theme</strong><small>Change the whole site</small></span></a>
       <a class="settings-nav-link" href="#loginSettingsSection"><span class="settings-nav-icon">⌁</span><span><strong>Login information</strong><small>Email and password</small></span></a>
       <a class="settings-nav-link" href="#tutorialSettingsSection"><span class="settings-nav-icon">▷</span><span><strong>Tutorial</strong><small>Learn DougHub</small></span></a>
       <a class="settings-nav-link" href="#homepageSettingsSection"><span class="settings-nav-icon">⌂</span><span><strong>Homepage</strong><small>Startup preference</small></span></a>
@@ -993,6 +994,19 @@ document.addEventListener("DOMContentLoaded",function(){
       </div>
       <div id="staffBadgeNote" class="reward-note" style="display:none"></div>
 
+    </section>
+
+    <section class="settings-section" id="themeSettingsSection">
+      <h2 class="section-title">Seasonal experience</h2>
+      <p class="section-description">Choose a holiday-inspired look for the whole DougHub site. Normal is the default. Your choice syncs with your account when signed in.</p>
+      <div class="dh-theme-picker" role="radiogroup" aria-label="DougHub seasonal theme">
+        <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="normal" checked><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#050611"></span><span style="background:#6366f1"></span><span style="background:#a855f7"></span><span style="background:#67e8f9"></span></span><span><span class="dh-theme-option-title">Normal</span><span class="dh-theme-option-copy">Classic dark indigo and purple DougHub.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+        <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="spring"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#102b20"></span><span style="background:#8ee3ad"></span><span style="background:#e9a8e9"></span><span style="background:#f5d9a7"></span></span><span><span class="dh-theme-option-title">Spring · Easter</span><span class="dh-theme-option-copy">Fresh greens, blooming pinks, and soft lilac.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+        <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="summer"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#071b35"></span><span style="background:#65c8ff"></span><span style="background:#ff7f91"></span><span style="background:#f8e8b0"></span></span><span><span class="dh-theme-option-title">Summer · Independence Day</span><span class="dh-theme-option-copy">Electric blue, sunset red, and summer energy.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+        <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="autumn"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#1a0c18"></span><span style="background:#ffad55"></span><span style="background:#c084fc"></span><span style="background:#6c2b28"></span></span><span><span class="dh-theme-option-title">Autumn · Halloween</span><span class="dh-theme-option-copy">Moonlit plum, glowing amber, and spooky details.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+        <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="winter"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#071522"></span><span style="background:#8bd9ff"></span><span style="background:#f4d38a"></span><span style="background:#1f7055"></span></span><span><span class="dh-theme-option-title">Winter · Christmas & New Year</span><span class="dh-theme-option-copy">Frosted blue, evergreen, and warm gold.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+      </div>
+      <div id="seasonalThemeStatus" class="dh-theme-status" role="status" aria-live="polite">Normal theme selected.</div>
     </section>
 
     <section class="settings-section" id="loginSettingsSection">
@@ -1665,7 +1679,7 @@ async function loadSettings() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge, equipped_badge_style"
+        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge, equipped_badge_style, seasonal_theme"
       )
       .eq(
         "id",
@@ -1692,6 +1706,12 @@ async function loadSettings() {
 
   currentProfile =
     profile || {};
+  const savedSeasonalTheme = ["normal","spring","summer","autumn","winter"].includes(currentProfile.seasonal_theme) ? currentProfile.seasonal_theme : "normal";
+  const seasonalRadio = document.querySelector('input[name="seasonalThemeSelect"][value="' + savedSeasonalTheme + '"]');
+  if (seasonalRadio) seasonalRadio.checked = true;
+  window.DougHubSeasonalTheme?.apply(savedSeasonalTheme, true);
+  const seasonalThemeStatus = document.getElementById("seasonalThemeStatus");
+  if (seasonalThemeStatus) seasonalThemeStatus.textContent = savedSeasonalTheme === "normal" ? "Normal theme selected." : (window.DougHubSeasonalTheme?.themes[savedSeasonalTheme]?.name + " theme selected.");
 
 
   const username =
@@ -2416,6 +2436,30 @@ document.getElementById("badgeStyleSelect")?.addEventListener("change",async()=>
   window.dispatchEvent(new Event("douqhub:og-badges-updated"));
   showStatus(value==="icon"?"Badge will show as icon only in chat.":"Badge will show with its name in chat.","success");
 });
+
+document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(input => input.addEventListener("change", async () => {
+  if (!input.checked) return;
+  const value = ["normal","spring","summer","autumn","winter"].includes(input.value) ? input.value : "normal";
+  const status = document.getElementById("seasonalThemeStatus");
+  const previous = ["normal","spring","summer","autumn","winter"].includes(currentProfile?.seasonal_theme) ? currentProfile.seasonal_theme : "normal";
+  window.DougHubSeasonalTheme?.apply(value, true);
+  if (!currentUser || !currentProfile) {
+    if (status) { status.dataset.state = "success"; status.textContent = "Theme saved on this device. Sign in to sync it to your account."; }
+    return;
+  }
+  document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(el => el.disabled = true);
+  try {
+    const { data, error } = await supabaseClient.from("profiles").update({ seasonal_theme: value }).eq("id", currentUser.id).select("seasonal_theme").maybeSingle();
+    if (error || !data) throw error || new Error("No profile row was updated.");
+    currentProfile.seasonal_theme = data.seasonal_theme || value;
+    if (status) { status.dataset.state = "success"; status.textContent = value === "normal" ? "Classic DougHub theme saved to your account." : window.DougHubSeasonalTheme?.themes[value]?.name + " theme saved to your account."; }
+  } catch (error) {
+    window.DougHubSeasonalTheme?.apply(previous, true);
+    const radio = document.querySelector('input[name="seasonalThemeSelect"][value="' + previous + '"]');
+    if (radio) radio.checked = true;
+    if (status) { status.dataset.state = "error"; status.textContent = "Theme couldn't sync; previous theme restored. " + (error?.message || ""); }
+  } finally { document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(el => el.disabled = false); }
+}));
 document.getElementById("badgeSelect").addEventListener("change",async()=>{
   if(!currentUser||!currentProfile)return;
   const value=document.getElementById("badgeSelect").value||null;
