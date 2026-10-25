@@ -2064,7 +2064,19 @@ async function setOgBadge(user, award, button) {
             throw new Error("Supabase did not confirm the saved badge list. Please refresh and try again.");
         }
 
-        user.reward_badges = data;
+        // Confirm the persisted profile value before reporting success.
+        const { data: savedProfile, error: verifyError } = await supabaseClient
+            .from("profiles")
+            .select("reward_badges")
+            .eq("id", user.id)
+            .maybeSingle();
+        if (verifyError) throw verifyError;
+        if (!savedProfile || !Array.isArray(savedProfile.reward_badges)
+            || savedProfile.reward_badges.includes("og") !== award) {
+            throw new Error("The database did not confirm the OG badge change. Please refresh and try again.");
+        }
+
+        user.reward_badges = savedProfile.reward_badges;
         window.dispatchEvent(new Event("douqhub:og-badges-updated"));
         renderUsers();
         usersStatus.textContent = (award ? "OG badge awarded to @" : "OG badge removed from @") + (user.username || "User") + ". Saved successfully.";
