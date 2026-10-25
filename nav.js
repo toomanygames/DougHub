@@ -10,12 +10,12 @@
     const root = new URL(".", NAV_SCRIPT_URL);
     if (!document.querySelector('link[data-dh-seasonal-css]')) {
       const link = document.createElement("link");
-      link.rel = "stylesheet"; link.href = new URL("seasonal-theme.css?v=20261025", root).href;
+      link.rel = "stylesheet"; link.href = new URL("seasonal-theme.css?v=20261025-palette3", root).href;
       link.dataset.dhSeasonalCss = "true"; document.head.appendChild(link);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
       const script = document.createElement("script");
-      script.src = new URL("seasonal-theme.js?v=20261025", root).href;
+      script.src = new URL("seasonal-theme.js?v=20261025-palette3", root).href;
       script.defer = true; script.dataset.dhSeasonalJs = "true"; document.head.appendChild(script);
     }
   })();
@@ -861,7 +861,7 @@
     if (document.getElementById("dh-side-conversations-script")) return;
     const script = document.createElement("script");
     script.id = "dh-side-conversations-script";
-    script.src = new URL("side-conversations.js?v=20261024-view-slider", NAV_SCRIPT_URL).href;
+    script.src = new URL("side-conversations.js?v=20261025-stable-tab", NAV_SCRIPT_URL).href;
     script.async = true;
     document.head.appendChild(script);
   }
