@@ -1714,7 +1714,7 @@ async function openMentionProfile(username) {
     const validDate = createdAt && !Number.isNaN(createdAt.getTime());
     const daysOnDougHub = validDate ? Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / 86400000)) : null;
     const earnedBadges = Array.isArray(profile.reward_badges) ? profile.reward_badges : [];
-    const badgeNames = {summer:"Summer",spring:"Spring",fall:"Fall",winter:"Winter",halloween:"Halloween",christmas:"Christmas"};
+    const badgeNames = {summer:"Summer",spring:"Spring",fall:"Fall",winter:"Winter",halloween:"Halloween",christmas:"Christmas",og:"OG"};
     const badgeLabels = earnedBadges.map(b => badgeNames[b] || String(b)).slice(0, 8);
     // Only show a profile photo when the user actually uploaded one.
     const avatar = typeof profile.avatar_url === "string" ? profile.avatar_url.trim() : "";
