@@ -158,11 +158,12 @@ async function connectRoom(isHost){
   if(!room){room=randomRoom();const u=new URL(location.href);u.searchParams.set("room",room);u.searchParams.set("host","1");history.replaceState({}, "",u);hostMode=true}
   channel=client.channel("dh-video-"+room,{config:{broadcast:{self:false}}});
   channel.on("broadcast",{event:"signal"},({payload})=>{onSignal(payload).catch(e=>{console.error(e);showError(e.message||"A call setup message failed.")})});
+  $("startButton").disabled=true;$("joinButton").disabled=true;
   channel.subscribe(status=>{
-   if(status==="SUBSCRIBED"){subscribed=true;$("endButton").disabled=false;setStatus(hostMode?"Waiting for the other person to join…":"Joining room…");updateRoomUi();if(!hostMode)sendSignal("join").catch(e=>showError(e.message||"Could not join call room."))}
-   else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){subscribed=false;setStatus("Connection unavailable");showError("Could not connect to the call signaling service. Check your connection and try again.")}
+   if(status==="SUBSCRIBED"){subscribed=true;$("endButton").disabled=false;$("startButton").hidden=true;$("joinButton").hidden=true;$("startButton").disabled=false;$("joinButton").disabled=false;setStatus(hostMode?"Waiting for the other person to join…":"Joining room…");updateRoomUi();if(!hostMode)sendSignal("join").catch(e=>showError(e.message||"Could not join call room."))}
+   else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){subscribed=false;setStatus("Connection unavailable");showError("Could not connect to the call signaling service. Check your connection and try again.");$("startButton").hidden=!hostMode;$("joinButton").hidden=hostMode;$("startButton").disabled=false;$("joinButton").disabled=false;const failed=channel;channel=null;if(failed&&client)client.removeChannel(failed).catch(()=>{})}
   });
-  $("startButton").hidden=true;$("joinButton").hidden=true;$("copyInviteButton").hidden=!hostMode;$("inviteRow").hidden=!hostMode;
+  $("copyInviteButton").hidden=!hostMode;$("inviteRow").hidden=!hostMode;
  }catch(e){console.error(e);showError(e.message||"Could not start the call.");setStatus("Not connected");}
 }
 async function cleanup(notify=true){
