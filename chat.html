@@ -2254,7 +2254,7 @@ function notifyIncomingChatMessage(row) {
 
   const author = String(row.username || "Someone").slice(0, 60);
   const rawBody = String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message"));
-  const body = rawBody.replace(/\\s+/g, " ").slice(0, 180);
+  const body = rawBody.replace(/\s+/g, " ").slice(0, 180);
   try {
     const notification = new Notification("DougHub Chat · " + author, {
       body,
