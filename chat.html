@@ -995,6 +995,7 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
         aria-label="Chat message"
       ></textarea>
       <div class="chat-send-actions">
+        <button type="button" id="chatNotificationsButton" class="chat-help-button">🔔 Enable notifications</button>
         <button type="button" id="chatHelpButton" class="chat-help-button" aria-expanded="false" aria-controls="chatHelpPopover">Help</button>
         <button type="submit" id="sendButton">Send</button>
       </div>
@@ -2172,6 +2173,103 @@ async function markChatAsSeen() {
    LOAD MESSAGES
 ========================================= */
 
+/* =========================================
+   DESKTOP / BACKGROUND CHAT NOTIFICATIONS
+========================================= */
+let lastNotifiedChatMessageId = null;
+let notificationPermissionRequested = false;
+
+async function requestChatNotificationPermission() {
+  if (notificationPermissionRequested) return;
+  notificationPermissionRequested = true;
+  if (!("Notification" in window)) {
+    console.info("This browser does not support desktop notifications.");
+    return;
+  }
+  if (Notification.permission === "default") {
+    try {
+      const permission = await Notification.requestPermission();
+      updateChatNotificationButton();
+      if (permission === "granted") showChatToast("Desktop notifications are enabled.");
+    } catch (error) {
+      console.warn("Chat notification permission request was blocked:", error);
+    }
+  }
+  updateChatNotificationButton();
+}
+
+function updateChatNotificationButton() {
+  const button = document.getElementById("chatNotificationsButton");
+  if (!button) return;
+  if (!("Notification" in window)) {
+    button.textContent = "Notifications unsupported";
+    button.disabled = true;
+    return;
+  }
+  button.textContent = Notification.permission === "granted"
+    ? "🔔 Notifications on"
+    : Notification.permission === "denied"
+      ? "🔕 Notifications blocked"
+      : "🔔 Enable notifications";
+  button.disabled = false;
+}
+
+function showChatToast(message) {
+  let toast = document.getElementById("chatNotificationToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "chatNotificationToast";
+    toast.setAttribute("role", "status");
+    toast.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:99999;max-width:min(360px,calc(100vw - 36px));padding:12px 16px;border:1px solid #7777ff;border-radius:12px;background:#15152a;color:#fff;font:13px/1.45 system-ui,sans-serif;box-shadow:0 10px 35px #0006";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.hidden = false;
+  clearTimeout(toast.__hideTimer);
+  toast.__hideTimer = setTimeout(() => { toast.hidden = true; }, 4500);
+}
+
+function notifyIncomingChatMessage(row) {
+  if (!row || !currentUser || row.user_id === currentUser.id) return;
+  if (document.visibilityState === "visible" && document.hasFocus()) return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  if (lastNotifiedChatMessageId === String(row.id)) return;
+  lastNotifiedChatMessageId = String(row.id);
+  const author = String(row.username || "Someone").slice(0, 60);
+  const body = String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message"))
+    .replace(/\s+/g, " ").slice(0, 180);
+  try {
+    const notification = new Notification("DougHub Chat · " + author, {
+      body,
+      tag: "douqhub-chat-" + String(row.group_id || "community"),
+      renotify: true,
+      icon: "https://doughub.online/DougHub.ico"
+    });
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+      if (messageInput) messageInput.focus();
+    };
+  } catch (error) {
+    console.warn("Could not show a desktop chat notification:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("chatNotificationsButton");
+  button?.addEventListener("click", async () => {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "granted") {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "denied") showChatToast("Notifications are blocked. Allow them in your browser's site settings, then reload Chat.");
+      } catch (_) {}
+    }
+    updateChatNotificationButton();
+  });
+  updateChatNotificationButton();
+});
+
 async function loadMessages() {
 
   if (loadingMessages) {
@@ -2647,7 +2745,8 @@ function startChatRefresh() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "chat_messages" },
-        () => {
+        (payload) => {
+          if (payload?.new) notifyIncomingChatMessage(payload.new);
           if (document.visibilityState === "visible") loadMessages();
         }
       )
@@ -2682,6 +2781,7 @@ function startChatRefresh() {
 
 async function startCommunityChat() {
   try {
+    requestChatNotificationPermission();
     supabaseClient = await waitForSharedSupabaseClient();
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
