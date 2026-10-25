@@ -1651,6 +1651,15 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 </div>
 
+<div class="card moderation-card" id="ownerStaffActivityCard">
+    <h2>Owner · Staff Activity & Warnings</h2>
+    <div class="status" id="ownerStaffActivityStatus">Loading staff activity…</div>
+    <div class="admin-scroll-area" id="ownerStaffActivityList"></div>
+    <div class="buttons" style="margin-top:10px">
+        <button type="button" id="refreshOwnerStaffActivity">Refresh activity</button>
+    </div>
+</div>
+
 <div class="card">
 
     <h2>🔐 DougBase Access Requests</h2>
@@ -2979,6 +2988,99 @@ async function loadWarnings() {
 
 }
 
+
+async function loadOwnerStaffActivity() {
+    const card = document.getElementById("ownerStaffActivityCard");
+    const status = document.getElementById("ownerStaffActivityStatus");
+    const list = document.getElementById("ownerStaffActivityList");
+    if (!card || !status || !list || !supabaseClient) return;
+    const isOwner = currentAdminRole === "owner" || currentAdminUser?.id === DOUGHUB_OWNER_ID;
+    card.style.display = isOwner ? "" : "none";
+    if (!isOwner) return;
+    status.textContent = "Loading recent staff activity and warnings…";
+    list.replaceChildren();
+
+    const [warningResult, auditResult] = await Promise.all([
+        supabaseClient.from("user_warnings")
+            .select("id,user_id,sent_by,message,created_at,read_at")
+            .order("created_at", { ascending: false }).limit(100),
+        supabaseClient.from("admin_audit_logs")
+            .select("id,created_at,actor_id,event_type,category,action,page,details")
+            .order("created_at", { ascending: false }).limit(150)
+    ]);
+
+    if (warningResult.error && auditResult.error) {
+        status.textContent = "Could not load staff activity: " + warningResult.error.message + " / " + auditResult.error.message;
+        return;
+    }
+
+    const warnings = warningResult.data || [];
+    const logs = auditResult.data || [];
+    const ids = [...new Set([
+        ...warnings.flatMap(w => [w.user_id, w.sent_by]),
+        ...logs.map(row => row.actor_id)
+    ].filter(Boolean))];
+    const names = {};
+    if (ids.length) {
+        const { data: profiles, error: profilesError } = await supabaseClient
+            .from("profiles").select("id,username,staff_role").in("id", ids);
+        if (!profilesError) (profiles || []).forEach(p => {
+            names[p.id] = (p.username ? "@" + p.username : p.id.slice(0, 8)) +
+                (p.staff_role ? " · " + p.staff_role : "");
+        });
+    }
+
+    const entries = [
+        ...warnings.map(w => ({
+            kind: "warning", time: w.created_at, actor: w.sent_by,
+            action: "Warning sent to " + (names[w.user_id] || "an account"),
+            detail: w.message + (w.read_at ? " · Read by user" : " · Unread")
+        })),
+        ...logs.map(row => ({
+            kind: "audit", time: row.created_at, actor: row.actor_id,
+            action: row.action || "Admin activity",
+            detail: [row.category, row.page, row.details && Object.keys(row.details).length ? JSON.stringify(row.details) : ""].filter(Boolean).join(" · ")
+        }))
+    ].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0, 180);
+
+    status.textContent = entries.length + " recent staff events · " + warnings.length + " warnings · " + logs.length + " audit records";
+    if (!entries.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No staff activity or warnings found yet.";
+        list.appendChild(empty);
+        return;
+    }
+
+    entries.forEach(entry => {
+        const item = document.createElement("article");
+        item.className = "user-item";
+        const top = document.createElement("div");
+        top.className = "top-row";
+        const actor = document.createElement("strong");
+        actor.className = "username";
+        actor.textContent = entry.actor ? (names[entry.actor] || entry.actor) : "Unknown actor (older record)";
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = entry.time ? new Date(entry.time).toLocaleString() : "Unknown time";
+        top.append(actor, time);
+        const action = document.createElement("div");
+        action.className = "warning-username";
+        action.textContent = (entry.kind === "warning" ? "WARNING · " : "ADMIN ACTIVITY · ") + entry.action;
+        const detail = document.createElement("div");
+        detail.className = "warning-text";
+        detail.textContent = entry.detail || "No additional details recorded.";
+        item.append(top, action, detail);
+        list.appendChild(item);
+    });
+}
+document.getElementById("refreshOwnerStaffActivity")?.addEventListener("click", loadOwnerStaffActivity);
+setInterval(() => {
+    if (currentAdminRole === "owner") {
+        loadOwnerStaffActivity();
+        loadOwnerBanRequests();
+    }
+}, 15000);
 
 async function deleteWarning(id) {
 
@@ -5146,7 +5248,7 @@ function applyStaffPermissions(){
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard/.test(id))return 4;
+    if(/staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
     if(/feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
@@ -5487,6 +5589,7 @@ async function startAdminPanel() {
     await Promise.all([
         loadUsers(),
         loadOwnerBanRequests(),
+        loadOwnerStaffActivity(),
         loadWarnings(),
         loadChatMessages(),
         loadGames(),
