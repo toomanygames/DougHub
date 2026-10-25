@@ -1921,12 +1921,9 @@ async function checkAdmin() {
 
         if (profileError) throw profileError;
 
+        // staff_role is authoritative. Legacy boolean flags must never keep a demoted user in Admin.
         const role = String(profile?.staff_role || "").trim().toLowerCase();
-        const hasStaffRole = ["helper", "admin", "developer", "owner"].includes(role)
-            || profile?.is_helper === true
-            || profile?.is_admin === true
-            || profile?.is_developer === true
-            || profile?.is_owner === true;
+        const hasStaffRole = ["helper", "admin", "developer", "owner"].includes(role);
 
         if (!profile || !hasStaffRole) {
             location.replace("index.html");
@@ -1934,10 +1931,7 @@ async function checkAdmin() {
         }
 
         currentAdminUser = user;
-        currentAdminRole = profile.is_owner === true || role === "owner" ? "owner"
-            : profile.is_developer === true || role === "developer" ? "developer"
-            : profile.is_admin === true || role === "admin" ? "admin"
-            : "helper";
+        currentAdminRole = role;
 
         loading.style.display = "none";
         adminArea.style.display = "grid";
