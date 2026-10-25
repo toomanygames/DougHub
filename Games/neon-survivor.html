@@ -81,11 +81,11 @@ addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight
 $('startBtn').onclick=start;$('againBtn').onclick=start;$('pauseBtn').onclick=pause;$('resumeBtn').onclick=pause;$('restartBtn').onclick=start;
 
 /* 2.0 gameplay systems: bosses, credits, permanent lab, extra perks */
-let boss=null,bossAt=42,runCoins=0,orbiters=0,lightning=0,meta={power:0,armor:0,greed:0};
+let boss=null,bossAt=42,runCoins=0,orbiters=0,lightning=0,enemyShots=[],rings=[],meta={power:0,armor:0,greed:0};
 try{meta=Object.assign(meta,JSON.parse(localStorage.getItem('neon-survivor-meta')||'{}'))}catch{}
 let credits=Number(localStorage.getItem('neon-survivor-coins')||0);
 const baseReset=reset;
-reset=function(){baseReset();boss=null;bossAt=42;runCoins=0;orbiters=0;lightning=0;stats.speed*=1+meta.power*.025;stats.damage+=Math.floor(meta.power/4);stats.maxHealth+=meta.armor*10;player.hp=stats.maxHealth;stats.magnet+=meta.greed*16;updateHud()};
+reset=function(){baseReset();boss=null;bossAt=42;runCoins=0;orbiters=0;lightning=0;enemyShots=[];rings=[];stats.speed*=1+meta.power*.025;stats.damage+=Math.floor(meta.power/4);stats.maxHealth+=meta.armor*10;player.hp=stats.maxHealth;stats.magnet+=meta.greed*16;updateHud()};
 const baseHideAll=hideAll;
 hideAll=function(){baseHideAll();$('shop').classList.add('hidden')};
 const oldUpgradeList=upgrades.slice();
@@ -102,6 +102,8 @@ update=function(dt){
  if(!boss&&elapsed>=bossAt)summonBoss();
  oldUpdate(dt);
  if(!running||paused||over)return;
+ for(let i=enemyShots.length-1;i>=0;i--){const q=enemyShots[i];q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;if(Math.hypot(player.x-q.x,player.y-q.y)<player.r+q.r&&invuln<=0){player.hp-=12;invuln=.65;shake=.15;burst(q.x,q.y,'#fb7185',8);enemyShots.splice(i,1);if(player.hp<=0){end();return}}else if(q.life<=0||q.x<-50||q.x>W+50||q.y<-50||q.y>H+50)enemyShots.splice(i,1)}
+ for(let i=rings.length-1;i>=0;i--){rings[i].r+=(rings[i].max-rings[i].r)*Math.min(1,dt*5);rings[i].life-=dt;if(rings[i].life<=0)rings.splice(i,1)}
  if(boss){
   const b=boss,angle=Math.atan2(player.y-b.y,player.x-b.x);
   if(b.y<95)b.y+=b.speed*dt;else{b.phase+=dt;b.x+=Math.cos(angle)*b.speed*.35*dt+Math.sin(b.phase*1.5)*18*dt;b.y+=Math.sin(angle)*b.speed*.35*dt}
@@ -118,6 +120,8 @@ const oldDraw=draw;
 draw=function(){
  oldDraw();
  if(!ctx)return;
+ for(const q of enemyShots){ctx.shadowBlur=16;ctx.shadowColor='#fb7185';ctx.fillStyle='#fb7185';ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0;
+ for(const r of rings){ctx.globalAlpha=clamp(r.life*2,0,1);ctx.strokeStyle=r.color;ctx.lineWidth=3;ctx.beginPath();if(r.lineTo){ctx.moveTo(r.x,r.y);ctx.lineTo(r.lineTo.x,r.lineTo.y)}else ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke()}ctx.globalAlpha=1;
  if(boss){ctx.save();ctx.translate(boss.x,boss.y);ctx.rotate(elapsed*.4);ctx.shadowBlur=30;ctx.shadowColor='#e879f9';ctx.fillStyle='#c026d3';ctx.beginPath();for(let i=0;i<12;i++){const a=i*Math.PI/6,r=i%2?boss.r*.7:boss.r;const x=Math.cos(a)*r,y=Math.sin(a)*r;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.closePath();ctx.fill();ctx.restore()}
  if(orbiters&&player){for(let k=0;k<orbiters;k++){const a=elapsed*2.7+k*Math.PI*2/orbiters;ctx.shadowBlur=16;ctx.shadowColor='#f0abfc';ctx.fillStyle='#f5d0fe';ctx.beginPath();ctx.arc(player.x+Math.cos(a)*45,player.y+Math.sin(a)*45,5,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0}
 };
