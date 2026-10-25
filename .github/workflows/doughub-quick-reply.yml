@@ -24,7 +24,7 @@ jobs:
           cache-dependency-path: DougHubQuickReply/package.json
       - name: Set unique app version for the updater
         working-directory: DougHubQuickReply
-        run: node -e "const fs=require('fs'); const p=require('./package.json'); p.version='1.0.'+process.env.GITHUB_RUN_NUMBER; fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\\n')"
+        run: node -e "const fs=require('fs'); const p=require('./package.json'); p.version='1.0.'+process.env.GITHUB_RUN_NUMBER; fs.writeFileSync('package.json', JSON.stringify(p,null,2))"
       - name: Install dependencies
         working-directory: DougHubQuickReply
         run: npm install
