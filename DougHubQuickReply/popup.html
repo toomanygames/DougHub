@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DougHub message</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101329;color:#f5f6ff;font:14px/1.4 "Segoe UI",system-ui,sans-serif}
+.wrap{height:100vh;padding:16px;border:1px solid #6268ed;border-radius:14px;display:flex;flex-direction:column;gap:9px;box-shadow:0 14px 42px #0008}
+.top{display:flex;align-items:center;gap:10px}.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;font-weight:800}
+.person{min-width:0;flex:1}.person strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sub{font-size:11px;color:#aeb5d7}.iconbtn{background:transparent;color:#cdd1eb;border:0;font-size:20px;cursor:pointer}
+.message{background:#ffffff0b;border:1px solid #ffffff12;border-radius:10px;padding:10px;min-height:46px;max-height:64px;overflow:auto;overflow-wrap:anywhere;color:#e3e6fa}
+textarea{resize:none;width:100%;min-height:54px;max-height:70px;background:#080b18;border:1px solid #34395c;border-radius:9px;color:white;padding:10px;font:inherit;outline:none}textarea:focus{border-color:#818cf8}
+.actions{display:flex;gap:8px}.actions button{border-radius:9px;padding:9px 12px;border:1px solid #34395c;color:#e8eaff;background:#1b203d;cursor:pointer;font-weight:650}.actions .send{background:#6366f1;border-color:#6366f1;color:white;flex:1}.actions button:disabled{opacity:.5;cursor:wait}.status{font-size:11px;color:#fca5a5;min-height:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="logo">D</div>
+    <div class="person"><strong id="sender">DougHub message</strong><div class="sub">DougHub Community Chat</div></div>
+    <button class="iconbtn" id="close" aria-label="Close">×</button>
+  </div>
+  <div class="message" id="message">Loading message…</div>
+  <textarea id="reply" maxlength="1000" placeholder="Write a quick reply…" aria-label="Quick reply"></textarea>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="actions"><button id="open">Open Chat</button><button class="send" id="send">Reply</button></div>
+</div>
+<script>
+let incoming = null;
+const sender = document.getElementById("sender");
+const message = document.getElementById("message");
+const reply = document.getElementById("reply");
+const status = document.getElementById("status");
+const send = document.getElementById("send");
+window.douqhubDesktop.onNotification(data => {
+  incoming = data;
+  sender.textContent = data.username || "Someone";
+  message.textContent = data.message || "Sent a message";
+  reply.focus();
+});
+document.getElementById("close").addEventListener("click", () => window.douqhubDesktop.dismiss());
+document.getElementById("open").addEventListener("click", () => { window.douqhubDesktop.openChat(); window.douqhubDesktop.dismiss(); });
+async function sendReply() {
+  if (!incoming) { status.textContent = "No message selected."; return; }
+  const text = reply.value.trim();
+  if (!text) { status.textContent = "Type a reply first."; reply.focus(); return; }
+  send.disabled = true; status.style.color = "#c7d2fe"; status.textContent = "Sending…";
+  try {
+    const result = await window.douqhubDesktop.sendReply({ text, groupId: incoming.group_id });
+    if (result?.ok) { status.style.color = "#86efac"; status.textContent = "Reply sent"; reply.value = ""; setTimeout(() => window.douqhubDesktop.dismiss(), 700); }
+    else { status.style.color = "#fca5a5"; status.textContent = result?.error || "Reply failed. Open Chat to continue."; }
+  } catch (_) { status.style.color = "#fca5a5"; status.textContent = "Could not send. Open Chat and try again."; }
+  finally { send.disabled = false; }
+}
+send.addEventListener("click", sendReply);
+reply.addEventListener("keydown", event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendReply(); } });
+</script>
+</body>
+</html>
