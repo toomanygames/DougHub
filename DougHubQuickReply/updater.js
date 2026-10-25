@@ -70,7 +70,7 @@ async function checkForUpdates(manual = true) {
       return;
     }
 
-    const match = String(release.tag_name || "").match(/^quick-reply-build-(\\d+)$/);
+    const match = String(release.tag_name || "").match(/^quick-reply-build-(\d+)$/);
     const latestBuild = match ? Number(match[1]) : 0;
     const currentBuild = Number(String(app.getVersion()).split(".").pop()) || 0;
 
@@ -79,14 +79,14 @@ async function checkForUpdates(manual = true) {
       return;
     }
 
-    const asset = (release.assets || []).find(item => /^DougHub-Quick-Reply-Setup-1\\.0\\.\\d+\\.exe$/i.test(item.name));
+    const asset = (release.assets || []).find(item => /^DougHub-Quick-Reply-Setup-1\.0\.\d+\.exe$/i.test(item.name));
     if (!asset || !asset.browser_download_url) throw new Error("The latest stable release does not contain a Windows installer yet.");
 
     const choice = await dialog.showMessageBox({
       type: "info",
       title: "DougHub Quick Reply update",
       message: "DougHub Quick Reply " + latestBuild + " is ready.",
-      detail: "The app will download and install this update automatically, then restart. You do not need to find or download an installer yourself.",
+      detail: "The app will download and install this update for you. You do not need to find or download an installer yourself. You may need to reopen Quick Reply after installation.",
       buttons: ["Update now", "Later"],
       defaultId: 0,
       cancelId: 1
