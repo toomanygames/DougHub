@@ -7,6 +7,10 @@ on:
       - ".github/workflows/doughub-quick-reply.yml"
   workflow_dispatch:
 
+concurrency:
+  group: douqhub-quick-reply-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
