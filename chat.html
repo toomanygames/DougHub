@@ -2260,7 +2260,7 @@ function notifyIncomingChatMessage(row) {
       body,
       tag: "douqhub-chat-" + String(row.group_id || "community"),
       renotify: true,
-      icon: new URL("DougHub.ico", window.location.href).href
+      icon: new URL("favicon.ico", window.location.href).href
     });
     notification.onclick = () => {
       window.focus();
@@ -2830,7 +2830,7 @@ function startChatRefresh() {
 
 async function startCommunityChat() {
   try {
-    requestChatNotificationPermission();
+    // Permission prompts are handled by the desktop notification prompt/button.
     supabaseClient = await waitForSharedSupabaseClient();
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
