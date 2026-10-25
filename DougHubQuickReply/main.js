@@ -28,42 +28,6 @@ function createMainWindow() {
     if (url.startsWith("https://doughub.online/")) shell.openExternal(url);
     return { action: "deny" };
   });
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow.webContents.executeJavaScript(`
-      (() => {
-        let attempts = 0;
-        const attach = () => {
-          attempts++;
-          try {
-            if (typeof notifyIncomingChatMessage === "function" &&
-                !window.__douqhubQuickReplyWrapped) {
-              const originalNotify = notifyIncomingChatMessage;
-              notifyIncomingChatMessage = function(row) {
-                originalNotify(row);
-                try {
-                  if (!row || !row.id || !row.user_id ||
-                      typeof currentUser === "undefined" || !currentUser?.id ||
-                      String(row.user_id) === String(currentUser.id)) return;
-                  window.douqhubDesktop?.incoming({
-                    id: String(row.id),
-                    user_id: String(row.user_id),
-                    username: String(row.username || "Someone").slice(0, 60),
-                    message: String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message")).replace(/\\s+/g, " ").slice(0, 240),
-                    group_id: row.group_id == null ? null : String(row.group_id)
-                  });
-                } catch (e) { console.warn("DougHub Quick Reply popup error:", e); }
-              };
-              window.__douqhubQuickReplyWrapped = true;
-              console.log("DougHub Quick Reply: message notifications connected.");
-              return;
-            }
-          } catch (e) { console.warn("DougHub Quick Reply hook setup error:", e); }
-          if (attempts < 600) window.setTimeout(attach, 1000);
-        };
-        attach();
-      })();
-    `).catch(err => console.warn("Could not attach Quick Reply listener:", err));
-  });
   mainWindow.on("close", event => {
     if (!closing) {
       event.preventDefault();
