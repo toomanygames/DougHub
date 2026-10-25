@@ -1703,6 +1703,7 @@ async function loadSettings() {
 
 
   updateUsernameCooldown();
+  await loadAssignedCustomBadges();
   renderRewards();
   renderStaffBadgeSetting();
 
@@ -2313,14 +2314,27 @@ const rewardInfo={
   og:{icon:"★",name:"OG Badge",rarity:"Legacy",description:"A special badge awarded by DougHub staff.",unlockHint:"Awarded by DougHub staff.",tint:"rgba(250,204,21,.13)",accent:"linear-gradient(90deg,#facc15,#f97316)"}
 };
 let rewardFilter="all";
+let assignedCustomBadges=[];
+async function loadAssignedCustomBadges(){
+  if(!currentUser||!supabaseClient){assignedCustomBadges=[];return;}
+  const {data,error}=await supabaseClient.from("custom_badges").select("id,name,icon,description,tint,accent,created_at").eq("assigned_to",currentUser.id).order("created_at",{ascending:false});
+  if(error){console.warn("Could not load assigned custom badges:",error.message);assignedCustomBadges=[];return;}
+  assignedCustomBadges=data||[];
+}
+function rewardEntries(){
+  const standard=Object.entries(rewardInfo);
+  const custom=assignedCustomBadges.map(b=>["custom:"+b.id,{icon:b.icon||"✦",name:b.name,rarity:"CUSTOM",description:b.description||"A custom DougHub badge assigned to you.",unlockHint:"Assigned by DougHub staff.",tint:b.tint||"rgba(99,102,241,.14)",accent:b.accent||"linear-gradient(90deg,#6366f1,#a855f7)",custom:true}]);
+  return standard.concat(custom);
+}
+function rewardUnlocked(key,earned,isAdmin){return key.startsWith("custom:")?assignedCustomBadges.some(b=>"custom:"+b.id===key):(earned.includes(key)||isAdmin);}
 function renderRewards(){
   const earned=Array.isArray(currentProfile?.reward_badges)?currentProfile.reward_badges:[];
   const isAdmin=!!currentProfile?.is_admin;
   const equipped=currentProfile?.equipped_badge||"";
   const select=document.getElementById("badgeSelect");
   const grid=document.getElementById("rewardGrid");
-  const entries=Object.entries(rewardInfo);
-  const unlockedCount=entries.filter(([key])=>earned.includes(key)||isAdmin).length;
+  const entries=rewardEntries();
+  const unlockedCount=entries.filter(([key])=>rewardUnlocked(key,earned,isAdmin)).length;
   const count=document.getElementById("rewardCount");
   const progress=document.getElementById("rewardProgress");
   const progressFill=document.getElementById("rewardProgressFill");
@@ -2332,13 +2346,13 @@ function renderRewards(){
   select.replaceChildren();
   const none=document.createElement("option");none.value="";none.textContent="No badge";select.appendChild(none);
   entries.forEach(([key,meta])=>{
-    const unlocked=earned.includes(key)||isAdmin;
+    const unlocked=rewardUnlocked(key,earned,isAdmin);
     const option=document.createElement("option");option.value=key;option.textContent=meta.icon+" "+meta.name;option.disabled=!unlocked;select.appendChild(option);
   });
   select.value=equipped;
   if(select.value!==equipped)select.value="";
   grid.replaceChildren();
-  const visible=entries.filter(([key])=>{const unlocked=earned.includes(key)||isAdmin;return rewardFilter==="all"||(rewardFilter==="earned"&&unlocked)||(rewardFilter==="locked"&&!unlocked);});
+  const visible=entries.filter(([key])=>{const unlocked=rewardUnlocked(key,earned,isAdmin);return rewardFilter==="all"||(rewardFilter==="earned"&&unlocked)||(rewardFilter==="locked"&&!unlocked);});
   if(!visible.length){const empty=document.createElement("div");empty.className="reward-empty";empty.textContent=rewardFilter==="earned"?"No badges unlocked yet. Play seasonal games to start your collection.":"Nothing in this collection matches that filter.";grid.appendChild(empty);}
   visible.forEach(([key,meta])=>{
     const unlocked=earned.includes(key)||isAdmin;
@@ -2379,7 +2393,7 @@ document.getElementById("badgeSelect").addEventListener("change",async()=>{
   if(!currentUser||!currentProfile)return;
   const value=document.getElementById("badgeSelect").value||null;
   const previous=currentProfile.equipped_badge||"";
-  if(value&&!(currentProfile?.is_admin||(currentProfile?.reward_badges||[]).includes(value))){document.getElementById("badgeSelect").value=previous;return;}
+  if(value&&!rewardUnlocked(value,Array.isArray(currentProfile?.reward_badges)?currentProfile.reward_badges:[],!!currentProfile?.is_admin)){document.getElementById("badgeSelect").value=previous;return;}
   const {data:savedProfile,error}=await supabaseClient.from("profiles").update({equipped_badge:value}).eq("id",currentUser.id).select("equipped_badge").maybeSingle();
   if(error||!savedProfile){
     document.getElementById("badgeSelect").value=previous;
