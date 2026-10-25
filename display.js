@@ -1132,6 +1132,16 @@
             if (root.querySelectorAll) root.querySelectorAll(selectors).forEach(decorate);
         }
         scan(document);
+        // Badge awards can change while this page remains open. Clear stale lookups
+        // and redecorate existing names when admin/settings broadcasts an update.
+        window.addEventListener("douqhub:og-badges-updated", () => {
+            cache.clear();
+            document.querySelectorAll(".dh-og-badge").forEach(badge => badge.remove());
+            document.querySelectorAll(selectors).forEach(element => {
+                delete element.dataset.dhOgChecked;
+            });
+            scan(document);
+        });
         const observer = new MutationObserver(records => records.forEach(record => {
             record.addedNodes.forEach(node => { if (node.nodeType === 1) scan(node); });
         }));
