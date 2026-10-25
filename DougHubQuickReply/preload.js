@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("douqhubDesktop", {
   incoming: message => ipcRenderer.send("incoming-message", message),
   openChat: () => ipcRenderer.send("open-chat"),
+  checkForUpdates: () => ipcRenderer.send("check-for-updates"),
   dismiss: () => ipcRenderer.send("dismiss-popup"),
   sendReply: payload => ipcRenderer.invoke("send-quick-reply", payload),
   onNotification: callback => {
