@@ -2,6 +2,7 @@
 "use strict";
 const $ = id => document.getElementById(id);
 const STORAGE_KEY = "doughub_scripting_project_v3";
+let studioKind="game";
 let dbClient=null;
 const STARTERS = {
   html: `<main class="app">
@@ -77,6 +78,51 @@ function saveCurrentFile(){files[activeFile]=$("codeEditor").value;updateLineCou
 function buildDocument(){const html=files.html||"";const css=files.css||"";const js=files.js||"";return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<style>\n'+css+'\n</style>\n</head>\n<body>\n'+html+'\n<script>\n'+js.replace(/<\/script/gi,"<\\/script")+'\n</script>\n</body>\n</html>';}
 function runPreview(){saveCurrentFile();if(currentMode==="blocks")updateGenerated();const isBlocks=currentMode==="blocks",isFast=currentMode==="fast";const frame=$(isBlocks?"previewDialogFrame":isFast?"fastPreviewFrame":"previewFrame");if(frame)frame.srcdoc=buildDocument();const empty=$(isBlocks?"previewDialogEmpty":isFast?"fastPreviewEmpty":"previewEmpty");const status=$(isBlocks?"previewDialogStatus":isFast?"fastPreviewStatus":"previewStatus");if(empty)empty.hidden=true;if(status)status.textContent="Preview refreshed at "+new Date().toLocaleTimeString();setStatus("Preview updated");}
 function setMode(mode){currentMode=mode;document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$("codeMode").hidden=mode!=="code";$("blocksMode").hidden=mode!=="blocks";$("fastMode").hidden=mode!=="fast";if(mode==="blocks"){renderLibrary();renderBlocks();if(blocklyWorkspace){requestAnimationFrame(()=>{try{Blockly.svgResize(blocklyWorkspace);}catch(e){console.warn("Blockly resize failed",e);}});}}else if(mode==="code")renderFile();else renderFastStatus();persist();}
+
+function setStudioKind(kind){
+  studioKind=kind==="project"?"project":"game";
+  document.querySelectorAll("[data-studio-kind]").forEach(button=>{
+    const active=button.dataset.studioKind===studioKind;
+    button.classList.toggle("active",active);
+    button.setAttribute("aria-pressed",String(active));
+  });
+  const project=studioKind==="project";
+  $("studioKindHeading").textContent=project?"Projects":"Game Creator";
+  $("studioKindDescription").textContent=project
+    ?"Build websites, apps, tools, experiments, and other coding projects — not just games. All editor, JavaScript, blocks, preview, save, and export tools stay available."
+    :"Build playable games with code, visual blocks, templates, previews, and Community Games publishing.";
+  $("projectName").previousElementSibling.textContent=project?"Project":"Game";
+  $("openPublishDialog").textContent=project?"Publish project ↗":"Publish game ↗";
+  $("codeCommunityProjects").hidden=!project;
+  $("communityTitle").previousElementSibling.childNodes[0].textContent=project?"Project title":"Game title";
+  $("communityDescription").previousElementSibling.childNodes[0].textContent=project?"What does your project do?":"What is your game about?";
+  $("publishDialogTitle").textContent=project?"Publish your project":"Publish your game";
+  $("publishGameDialog").querySelector(".publish-dialog-header .eyebrow").textContent=project?"DOUGCODE · COMMUNITY PROJECTS":"DOUG GAMES · COMMUNITY";
+  $("publishGameDialog").querySelector(".publish-dialog-header p").textContent=project
+    ?"Give your coding project a name and a short description. It will be public and playable as a web project by other DougHub users."
+    :"Give your game a name and a short description. It will be public and playable by other DougHub users.";
+  $("publishProjectBtn").textContent=project?"Publish web project ↗":"Publish to Community Games ↗";
+  $("fastMode").querySelector(".fast-welcome h1").textContent=project?"Make a coding project. Fast.":"Make something fun. Fast.";
+  $("fastMode").querySelector(".fast-welcome p").textContent=project
+    ?"Start from a web-page or blank-project template, then switch to JavaScript or Visual Blocks whenever you want."
+    :"Pick a game starter, customize it, and play instantly. You can switch to Code or Visual Blocks any time.";
+  $("fastMode").querySelector(".fast-games-panel .panel-head h2").textContent=project?"Project starters":"Game starters";
+  $("fastMode").querySelector(".fast-play-panel .panel-head h2").textContent=project?"Project preview":"Live preview";
+  $("fastPreviewFrame").title=project?"Coding project preview":"Game preview";
+  $("fastPreviewEmpty").querySelector("span").textContent=project?"Choose a project template to begin.":"Choose a template to make it playable.";
+  document.querySelectorAll("[data-fast-template]").forEach(button=>{
+    const gameTemplate=["clicker","dodge"].includes(button.dataset.fastTemplate);
+    button.hidden=project&&gameTemplate;
+    const cta=button.querySelector(".fast-template-cta");
+    if(cta&&project)cta.textContent=button.dataset.fastTemplate==="landing"?"Create website ↗":button.dataset.fastTemplate==="quiz"?"Create project ↗":"Start building ↗";
+    else if(cta)cta.textContent=gameTemplate?"Create game ↗":button.dataset.fastTemplate==="landing"?"Create page ↗":"Create project ↗";
+  });
+  $("codeCommunityTitle").placeholder=project?"My coding project":"My awesome project";
+  $("codeCommunityDescription").placeholder=project?"What does this website, app, tool, or program do?":"What does your project do?";
+  $("publishCodeProjectBtn").textContent=project?"Publish Project":"Publish Code Project";
+}
+document.querySelectorAll("[data-studio-kind]").forEach(button=>button.addEventListener("click",()=>setStudioKind(button.dataset.studioKind)));
+
 
 
 const FAST_TEMPLATES={
@@ -314,7 +360,21 @@ async function communityPublish(){
   finally{button.disabled=false;button.textContent="Publish to Community Games";}
 }
 const publishDialog=$("publishGameDialog");
-function openPublishDialog(){if(!publishDialog)return;const title=$("communityTitle");if(title&&!title.value.trim())title.value=$("projectName").value.trim().slice(0,80);if(typeof publishDialog.showModal==="function")publishDialog.showModal();else publishDialog.setAttribute("open","");setTimeout(()=>title?.focus(),50);}
+function openPublishDialog(){
+  if(studioKind==="project"){
+    const section=$("codeCommunityProjects");
+    section.hidden=false;
+    $("codeCommunityTitle").value=$("projectName").value.trim().slice(0,80);
+    section.scrollIntoView({behavior:"smooth",block:"start"});
+    $("codeCommunityTitle").focus({preventScroll:true});
+    return;
+  }
+  if(!publishDialog)return;
+  const title=$("communityTitle");
+  if(title&&!title.value.trim())title.value=$("projectName").value.trim().slice(0,80);
+  if(typeof publishDialog.showModal==="function")publishDialog.showModal();else publishDialog.setAttribute("open","");
+  setTimeout(()=>title?.focus(),50);
+}
 function closePublishDialog(){if(!publishDialog)return;if(typeof publishDialog.close==="function")publishDialog.close();else publishDialog.removeAttribute("open");}
 $("openPublishDialog")?.addEventListener("click",openPublishDialog);
 $("closePublishDialog")?.addEventListener("click",closePublishDialog);
@@ -322,6 +382,7 @@ $("cancelPublishDialog")?.addEventListener("click",closePublishDialog);
 publishDialog?.addEventListener("click",event=>{if(event.target===publishDialog)closePublishDialog();});
 $("publishGameForm")?.addEventListener("submit",event=>{event.preventDefault();communityPublish();});
 communityInit();
+setStudioKind(new URLSearchParams(location.search).get("kind")==="project"?"project":"game");
 renderLibrary();renderBlocks();loadAccount();
 if(!new URLSearchParams(location.hash.slice(1)).get("project")){
  restore();renderFile();renderLibrary();renderBlocks();updateGenerated();
