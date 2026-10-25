@@ -13,6 +13,13 @@
 <script src="../search-autofill-fix.js" defer></script>
 
 <style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+.studio-kind-switch{display:grid;grid-template-columns:minmax(180px,.7fr) minmax(0,1.5fr);gap:16px;align-items:center;margin:10px 0 12px;padding:14px;border:1px solid var(--dh-line);border-radius:16px;background:linear-gradient(120deg,#11152bdc,#080a18ed)}
+.studio-kind-intro{display:grid;gap:5px;min-width:0}.studio-kind-intro>strong{font-size:22px;letter-spacing:-.5px}.studio-kind-intro>span:last-child{font-size:11px;line-height:1.5;color:#aeb6d1;max-width:330px}
+.studio-kind-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.studio-kind-option{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;padding:11px 12px;border:1px solid #ffffff16;border-radius:12px;background:#ffffff04;color:#e8eaff;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}.studio-kind-option:hover{border-color:#a5b4fc65;background:#a5b4fc0b}.studio-kind-option.active{border-color:#a5b4fc99;background:linear-gradient(120deg,#6366f126,#a855f71b);box-shadow:inset 0 0 0 1px #a5b4fc12}.studio-kind-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid #a5b4fc28;border-radius:10px;background:#6366f120;color:#c4b5fd;font-size:13px;font-weight:900}.studio-kind-option>span:last-child{display:grid;gap:4px;min-width:0}.studio-kind-option strong{font-size:12px}.studio-kind-option small{font-size:10px;color:#9ba5c2;line-height:1.4}
+#codeCommunityProjects[hidden]{display:none!important}
+@media(max-width:760px){.studio-kind-switch{grid-template-columns:1fr;gap:10px}.studio-kind-options{grid-template-columns:1fr 1fr}.studio-kind-option{padding:9px}.studio-kind-icon{flex-basis:30px;width:30px;height:30px}}
+@media(max-width:480px){.studio-kind-options{grid-template-columns:1fr}.studio-kind-intro>strong{font-size:20px}}
+
 
 /* Individual inline visual refresh using DougHub's index palette */
 :root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
@@ -220,6 +227,13 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
   <div class="top-actions"><button class="btn" id="saveBtn">Save project</button><button class="btn" id="downloadBtn">Export HTML</button></div>
 </header>
 <main class="wrap">
+  <section class="studio-kind-switch" aria-label="Choose a creator workspace">
+    <div class="studio-kind-intro"><span class="panel-kicker">DOUGCODE STUDIO</span><strong id="studioKindHeading">Game Creator</strong><span id="studioKindDescription">Build playable games with code, visual blocks, templates, previews, and Community Games publishing.</span></div>
+    <div class="studio-kind-options" role="group" aria-label="Creator type">
+      <button type="button" class="studio-kind-option active" data-studio-kind="game" aria-pressed="true"><span class="studio-kind-icon" aria-hidden="true">▶</span><span><strong>Game Creator</strong><small>Make games and interactive experiences</small></span></button>
+      <button type="button" class="studio-kind-option" data-studio-kind="project" aria-pressed="false"><span class="studio-kind-icon" aria-hidden="true">&lt;/&gt;</span><span><strong>Projects</strong><small>Build websites, apps, tools, and code projects</small></span></button>
+    </div>
+  </section>
   <section class="toolbar compact-studio-toolbar">
     <div class="project-name-inline"><label for="projectName">Project</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"></div>
     <div class="studio-toolbar-controls">
@@ -297,7 +311,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 
 
 
-<section class="community-projects-section" id="codeCommunityProjects">
+<section class="community-projects-section" id="codeCommunityProjects" hidden>
     <div class="community-heading">
       <div>
         <div class="eyebrow">MADE BY THE COMMUNITY</div>
@@ -376,6 +390,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="community-preview-bottom"><span id="codeCommunityPreviewAuthor"></span><button class="btn" id="editCodeProjectBtn" type="button" hidden>Edit my project</button></div>
   </dialo
 
-<script src="scripting.js?v=17"></script>
+<script src="scripting.js?v=18"></script>
 </body>
 </html>
