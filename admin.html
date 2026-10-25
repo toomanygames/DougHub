@@ -1295,6 +1295,26 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
   #adminArea .admin-rank-cards>.card:has(#chatMessages){grid-column:1/-1!important}
 }
 
+
+.custom-badge-panel{padding:22px!important;border:1px solid rgba(139,92,246,.24)!important;background:linear-gradient(145deg,rgba(99,102,241,.075),rgba(13,17,39,.7) 58%)!important}
+.custom-badge-heading{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.custom-badge-heading-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,rgba(99,102,241,.25),rgba(168,85,247,.16));border:1px solid rgba(168,85,247,.35);font-size:24px;color:#c4b5fd}
+.custom-badge-eyebrow{font-size:10px;letter-spacing:.16em;font-weight:800;color:#a5b4fc;margin-bottom:4px}
+.custom-badge-heading h2{margin:0 0 4px!important}.custom-badge-heading p{margin:0;color:var(--muted,#9ca3af);font-size:13px}
+.custom-badge-form{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px;padding:16px;border:1px solid rgba(148,163,184,.14);border-radius:15px;background:rgba(2,4,10,.32)}
+.custom-badge-field{min-width:0;display:flex;flex-direction:column;gap:7px;grid-column:span 2}
+.custom-badge-field label{font-size:12px;font-weight:700;color:#cbd5e1}
+.custom-badge-field input:not([type=color]){width:100%;min-width:0;box-sizing:border-box}
+.custom-badge-recipient,.custom-badge-description{grid-column:span 3}
+.custom-badge-color{grid-column:span 1}
+.custom-badge-color input{width:100%;height:40px;padding:4px;border:1px solid rgba(148,163,184,.25);border-radius:10px;background:rgba(15,23,42,.8)}
+.custom-badge-preview{grid-column:span 3;align-self:end;display:flex;align-items:center;gap:9px;min-height:42px;padding:0 12px;border:1px solid rgba(139,92,246,.24);border-radius:11px;background:rgba(99,102,241,.08);color:#e0e7ff;font-weight:700}
+.custom-badge-preview span:first-child{font-size:20px}
+.custom-badge-submit{grid-column:span 3;align-self:end;min-height:42px}
+.custom-badge-existing{margin-top:18px}.custom-badge-existing-title{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a5b4fc;margin-bottom:9px}
+.custom-badge-existing #customBadgeRecentList:empty{display:none}
+@media(max-width:680px){.custom-badge-panel{padding:15px!important}.custom-badge-form{grid-template-columns:repeat(2,minmax(0,1fr));padding:12px}.custom-badge-field,.custom-badge-recipient,.custom-badge-description,.custom-badge-color,.custom-badge-preview,.custom-badge-submit{grid-column:span 2}.custom-badge-heading-icon{width:42px;height:42px;flex-basis:42px}}
+
 </style>
 </head>
 
@@ -1636,20 +1656,23 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 </div>
 
-<div class="card" id="customBadgeManagerCard">
-    <h2>Custom Badge Creator</h2>
-    <p class="muted">Create a badge and assign it to a DougHub account. It will appear in that person's Settings under Rewards & Badges.</p>
-    <form id="customBadgeForm" class="admin-form-grid">
-        <label>Recipient username<input id="customBadgeUsername" required maxlength="32" placeholder="Username (without @)" autocomplete="off"></label>
-        <label>Badge name<input id="customBadgeName" required maxlength="32" placeholder="Community Champion"></label>
-        <label>Icon / symbol<input id="customBadgeIcon" required maxlength="8" value="✦" placeholder="✦"></label>
-        <label>Description<input id="customBadgeDescription" maxlength="180" value="A custom DougHub badge." placeholder="Why they received this badge"></label>
-        <label>Badge color<input id="customBadgeColor" type="color" value="#8b5cf6"></label>
-        <div class="buttons"><button type="submit" id="createCustomBadgeButton" class="save-button">Create & Assign Badge</button></div>
+<section class="card custom-badge-panel" id="customBadgeManagerCard">
+    <div class="custom-badge-heading">
+        <div class="custom-badge-heading-icon">✦</div>
+        <div><div class="custom-badge-eyebrow">DEVELOPER TOOLS</div><h2>Custom badges</h2><p>Create a unique badge and assign it to a member.</p></div>
+    </div>
+    <form id="customBadgeForm" class="custom-badge-form">
+        <div class="custom-badge-field custom-badge-recipient"><label for="customBadgeUsername">Assign to</label><input id="customBadgeUsername" required maxlength="32" placeholder="Username" autocomplete="off"></div>
+        <div class="custom-badge-field"><label for="customBadgeName">Badge name</label><input id="customBadgeName" required maxlength="32" placeholder="Community Champion"></div>
+        <div class="custom-badge-field"><label for="customBadgeIcon">Badge icon</label><input id="customBadgeIcon" required maxlength="8" value="✦" placeholder="✦"></div>
+        <div class="custom-badge-field custom-badge-description"><label for="customBadgeDescription">Description</label><input id="customBadgeDescription" maxlength="180" value="A custom DougHub badge." placeholder="Why they received it"></div>
+        <div class="custom-badge-field custom-badge-color"><label for="customBadgeColor">Accent color</label><input id="customBadgeColor" type="color" value="#8b5cf6" aria-label="Badge accent color"></div>
+        <div class="custom-badge-preview" id="customBadgePreview"><span id="customBadgePreviewIcon">✦</span><span id="customBadgePreviewName">Badge preview</span></div>
+        <button type="submit" id="createCustomBadgeButton" class="save-button custom-badge-submit">Create and assign badge</button>
     </form>
-    <div class="status" id="customBadgeStatus">Only Developer+ staff can create and assign custom badges.</div>
-    <div id="customBadgeRecentList"></div>
-</div>
+    <div class="status" id="customBadgeStatus">Available to Developer+ staff.</div>
+    <div class="custom-badge-existing"><div class="custom-badge-existing-title">Recently created</div><div id="customBadgeRecentList"></div></div>
+</section>
 
 <div class="card moderation-card" id="recentWarningsCard">
 
@@ -1664,15 +1687,6 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
     <div id="warningsList"></div>
 
-</div>
-
-<div class="card moderation-card" id="ownerStaffActivityCard">
-    <h2>Owner · Staff Activity & Warnings</h2>
-    <div class="status" id="ownerStaffActivityStatus">Loading staff activity…</div>
-    <div class="admin-scroll-area" id="ownerStaffActivityList"></div>
-    <div class="buttons" style="margin-top:10px">
-        <button type="button" id="refreshOwnerStaffActivity">Refresh activity</button>
-    </div>
 </div>
 
 <div class="card">
@@ -2119,6 +2133,15 @@ async function loadCustomBadgeManager() {
         item.append(title, detail, remove); list.appendChild(item);
     });
 }
+["customBadgeName","customBadgeIcon","customBadgeColor"].forEach(id=>document.getElementById(id)?.addEventListener("input",()=>{
+    const icon=document.getElementById("customBadgeIcon").value.trim()||"✦";
+    const name=document.getElementById("customBadgeName").value.trim()||"Badge preview";
+    const color=document.getElementById("customBadgeColor").value||"#8b5cf6";
+    document.getElementById("customBadgePreviewIcon").textContent=icon;
+    document.getElementById("customBadgePreviewName").textContent=name;
+    document.getElementById("customBadgePreview").style.borderColor=color+"70";
+    document.getElementById("customBadgePreview").style.background=color+"18";
+}));
 document.getElementById("customBadgeForm")?.addEventListener("submit", async event => {
     event.preventDefault();
     if (!["developer", "owner"].includes(currentAdminRole)) return;
@@ -3081,99 +3104,6 @@ async function loadWarnings() {
 
 }
 
-
-async function loadOwnerStaffActivity() {
-    const card = document.getElementById("ownerStaffActivityCard");
-    const status = document.getElementById("ownerStaffActivityStatus");
-    const list = document.getElementById("ownerStaffActivityList");
-    if (!card || !status || !list || !supabaseClient) return;
-    const isOwner = currentAdminRole === "owner" || currentAdminUser?.id === DOUGHUB_OWNER_ID;
-    card.style.display = isOwner ? "" : "none";
-    if (!isOwner) return;
-    status.textContent = "Loading recent staff activity and warnings…";
-    list.replaceChildren();
-
-    const [warningResult, auditResult] = await Promise.all([
-        supabaseClient.from("user_warnings")
-            .select("id,user_id,sent_by,message,created_at,read_at")
-            .order("created_at", { ascending: false }).limit(100),
-        supabaseClient.from("admin_audit_logs")
-            .select("id,created_at,actor_id,event_type,category,action,page,details")
-            .order("created_at", { ascending: false }).limit(150)
-    ]);
-
-    if (warningResult.error && auditResult.error) {
-        status.textContent = "Could not load staff activity: " + warningResult.error.message + " / " + auditResult.error.message;
-        return;
-    }
-
-    const warnings = warningResult.data || [];
-    const logs = auditResult.data || [];
-    const ids = [...new Set([
-        ...warnings.flatMap(w => [w.user_id, w.sent_by]),
-        ...logs.map(row => row.actor_id)
-    ].filter(Boolean))];
-    const names = {};
-    if (ids.length) {
-        const { data: profiles, error: profilesError } = await supabaseClient
-            .from("profiles").select("id,username,staff_role").in("id", ids);
-        if (!profilesError) (profiles || []).forEach(p => {
-            names[p.id] = (p.username ? "@" + p.username : p.id.slice(0, 8)) +
-                (p.staff_role ? " · " + p.staff_role : "");
-        });
-    }
-
-    const entries = [
-        ...warnings.map(w => ({
-            kind: "warning", time: w.created_at, actor: w.sent_by,
-            action: "Warning sent to " + (names[w.user_id] || "an account"),
-            detail: w.message + (w.read_at ? " · Read by user" : " · Unread")
-        })),
-        ...logs.map(row => ({
-            kind: "audit", time: row.created_at, actor: row.actor_id,
-            action: row.action || "Admin activity",
-            detail: [row.category, row.page, row.details && Object.keys(row.details).length ? JSON.stringify(row.details) : ""].filter(Boolean).join(" · ")
-        }))
-    ].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0, 180);
-
-    status.textContent = entries.length + " recent staff events · " + warnings.length + " warnings · " + logs.length + " audit records";
-    if (!entries.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "No staff activity or warnings found yet.";
-        list.appendChild(empty);
-        return;
-    }
-
-    entries.forEach(entry => {
-        const item = document.createElement("article");
-        item.className = "user-item";
-        const top = document.createElement("div");
-        top.className = "top-row";
-        const actor = document.createElement("strong");
-        actor.className = "username";
-        actor.textContent = entry.actor ? (names[entry.actor] || entry.actor) : "Unknown actor (older record)";
-        const time = document.createElement("span");
-        time.className = "time";
-        time.textContent = entry.time ? new Date(entry.time).toLocaleString() : "Unknown time";
-        top.append(actor, time);
-        const action = document.createElement("div");
-        action.className = "warning-username";
-        action.textContent = (entry.kind === "warning" ? "WARNING · " : "ADMIN ACTIVITY · ") + entry.action;
-        const detail = document.createElement("div");
-        detail.className = "warning-text";
-        detail.textContent = entry.detail || "No additional details recorded.";
-        item.append(top, action, detail);
-        list.appendChild(item);
-    });
-}
-document.getElementById("refreshOwnerStaffActivity")?.addEventListener("click", loadOwnerStaffActivity);
-setInterval(() => {
-    if (currentAdminRole === "owner") {
-        loadOwnerStaffActivity();
-        loadOwnerBanRequests();
-    }
-}, 15000);
 
 async function deleteWarning(id) {
 
@@ -5682,7 +5612,6 @@ async function startAdminPanel() {
     await Promise.all([
         loadUsers(),
         loadOwnerBanRequests(),
-        loadOwnerStaffActivity(),
         loadCustomBadgeManager(),
         loadWarnings(),
         loadChatMessages(),
