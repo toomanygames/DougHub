@@ -864,6 +864,17 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
 .chat-sidebar .group-pill .group-name-label{flex:1}
 #groupDescription{display:none!important}
 </style>
+<style id="chat-video-call-entry-style">
+.chat-video-call-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;padding:9px 12px;border:1px solid rgba(129,140,248,.3);border-radius:12px;background:linear-gradient(125deg,rgba(99,102,241,.17),rgba(168,85,247,.12));color:#e9eaff;text-decoration:none;font-size:12px;font-weight:850;white-space:nowrap;box-shadow:0 5px 18px rgba(99,102,241,.08);transition:transform .16s,border-color .16s,background .16s}
+.chat-video-call-button:hover{transform:translateY(-1px);border-color:rgba(129,140,248,.65);background:linear-gradient(125deg,rgba(99,102,241,.28),rgba(168,85,247,.2))}
+.chat-video-call-button span{font-size:15px;color:#a5b4fc}
+html[data-dh-theme="spring"] .chat-video-call-button{border-color:rgba(142,227,173,.35);background:linear-gradient(125deg,rgba(39,134,90,.25),rgba(233,168,233,.14))}
+html[data-dh-theme="summer"] .chat-video-call-button{border-color:rgba(101,200,255,.35);background:linear-gradient(125deg,rgba(23,105,210,.25),rgba(240,107,117,.14))}
+html[data-dh-theme="autumn"] .chat-video-call-button{border-color:rgba(255,173,85,.35);background:linear-gradient(125deg,rgba(185,75,22,.25),rgba(138,77,141,.16))}
+html[data-dh-theme="winter"] .chat-video-call-button{border-color:rgba(139,217,255,.35);background:linear-gradient(125deg,rgba(23,108,154,.25),rgba(217,185,104,.14))}
+@media(max-width:850px){.chat-video-call-button{padding:8px 10px;font-size:11px}.chat-video-call-button span{display:none}}
+@media(max-width:620px){.chat-video-call-button{padding:7px 8px;font-size:10px}.chat-status{display:none}}
+</style>
 </head>
 
 </head>
@@ -885,6 +896,9 @@ main{width:calc(100% - 28px)!important;max-width:none!important;padding:12px 0 1
         <span class="status-dot"></span>
         <span>Live Chat</span>
       </div>
+      <a class="chat-video-call-button" href="/chat-calls.html" title="Open the separate video calling feature">
+        <span aria-hidden="true">▣</span> Video call
+      </a>
       <label class="chat-ding-setting" for="chatDingToggle" title="Play a short sound when someone sends a community chat message">
         <input id="chatDingToggle" type="checkbox" checked>
         <span>Message dings</span>
