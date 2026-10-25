@@ -31,6 +31,9 @@ jobs:
       - name: Build Windows installer
         working-directory: DougHubQuickReply
         run: npm run dist
+      - name: Create stable latest-download filename
+        working-directory: DougHubQuickReply
+        run: Copy-Item "dist\\DougHub-Quick-Reply-Setup-1.0.$env:GITHUB_RUN_NUMBER.exe" "dist\\DougHub-Quick-Reply-Setup.exe"
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
