@@ -2174,29 +2174,9 @@ async function markChatAsSeen() {
 ========================================= */
 
 /* =========================================
-   DESKTOP / BACKGROUND CHAT NOTIFICATIONS
+   DESKTOP CHAT NOTIFICATIONS
 ========================================= */
 let lastNotifiedChatMessageId = null;
-let notificationPermissionRequested = false;
-
-async function requestChatNotificationPermission() {
-  if (notificationPermissionRequested) return;
-  notificationPermissionRequested = true;
-  if (!("Notification" in window)) {
-    console.info("This browser does not support desktop notifications.");
-    return;
-  }
-  if (Notification.permission === "default") {
-    try {
-      const permission = await Notification.requestPermission();
-      updateChatNotificationButton();
-      if (permission === "granted") showChatToast("Desktop notifications are enabled.");
-    } catch (error) {
-      console.warn("Chat notification permission request was blocked:", error);
-    }
-  }
-  updateChatNotificationButton();
-}
 
 function updateChatNotificationButton() {
   const button = document.getElementById("chatNotificationsButton");
@@ -2204,14 +2184,15 @@ function updateChatNotificationButton() {
   if (!("Notification" in window)) {
     button.textContent = "Notifications unsupported";
     button.disabled = true;
+    button.title = "Use a desktop browser that supports notifications.";
     return;
   }
+  button.disabled = false;
   button.textContent = Notification.permission === "granted"
     ? "🔔 Notifications on"
     : Notification.permission === "denied"
-      ? "🔕 Notifications blocked"
+      ? "🔕 Allow in site settings"
       : "🔔 Enable notifications";
-  button.disabled = false;
 }
 
 function showChatToast(message) {
@@ -2220,30 +2201,66 @@ function showChatToast(message) {
     toast = document.createElement("div");
     toast.id = "chatNotificationToast";
     toast.setAttribute("role", "status");
-    toast.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:99999;max-width:min(360px,calc(100vw - 36px));padding:12px 16px;border:1px solid #7777ff;border-radius:12px;background:#15152a;color:#fff;font:13px/1.45 system-ui,sans-serif;box-shadow:0 10px 35px #0006";
+    toast.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:99999;max-width:360px;padding:12px 16px;border:1px solid #7777ff;border-radius:12px;background:#15152a;color:#fff;font:13px/1.45 system-ui,sans-serif;box-shadow:0 10px 35px #0006";
     document.body.appendChild(toast);
   }
   toast.textContent = message;
   toast.hidden = false;
   clearTimeout(toast.__hideTimer);
-  toast.__hideTimer = setTimeout(() => { toast.hidden = true; }, 4500);
+  toast.__hideTimer = setTimeout(() => { toast.hidden = true; }, 5000);
+}
+
+async function enableChatDesktopNotifications() {
+  if (!("Notification" in window)) {
+    showChatToast("This desktop browser does not support notifications.");
+    return;
+  }
+  if (!window.isSecureContext) {
+    showChatToast("Desktop notifications require DougHub to be opened over HTTPS.");
+    return;
+  }
+  if (Notification.permission === "denied") {
+    showChatToast("Notifications are blocked for DougHub. Click the site-settings icon beside the address bar, allow Notifications, then reload Chat.");
+    updateChatNotificationButton();
+    return;
+  }
+  if (Notification.permission === "granted") {
+    updateChatNotificationButton();
+    showChatToast("Desktop notifications are already enabled. Keep DougHub open in this browser.");
+    return;
+  }
+  try {
+    // Browsers require this to run directly from a real user click.
+    const permission = await Notification.requestPermission();
+    updateChatNotificationButton();
+    if (permission === "granted") {
+      showChatToast("Notifications enabled. You'll be notified when new chat messages arrive while DougHub is open.");
+    } else {
+      showChatToast("Notifications weren't enabled. You can enable them later using the 🔔 button.");
+    }
+  } catch (error) {
+    console.warn("Chat notification permission request failed:", error);
+    showChatToast("Your browser couldn't request notification permission. Check DougHub's site settings.");
+  }
 }
 
 function notifyIncomingChatMessage(row) {
   if (!row || !currentUser || row.user_id === currentUser.id) return;
   if (document.visibilityState === "visible" && document.hasFocus()) return;
   if (!("Notification" in window) || Notification.permission !== "granted") return;
-  if (lastNotifiedChatMessageId === String(row.id)) return;
-  lastNotifiedChatMessageId = String(row.id);
+  const messageId = String(row.id || "");
+  if (!messageId || lastNotifiedChatMessageId === messageId) return;
+  lastNotifiedChatMessageId = messageId;
+
   const author = String(row.username || "Someone").slice(0, 60);
-  const body = String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message"))
-    .replace(/\s+/g, " ").slice(0, 180);
+  const rawBody = String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message"));
+  const body = rawBody.replace(/\\s+/g, " ").slice(0, 180);
   try {
     const notification = new Notification("DougHub Chat · " + author, {
       body,
       tag: "douqhub-chat-" + String(row.group_id || "community"),
       renotify: true,
-      icon: "https://doughub.online/DougHub.ico"
+      icon: new URL("DougHub.ico", window.location.href).href
     });
     notification.onclick = () => {
       window.focus();
@@ -2255,21 +2272,53 @@ function notifyIncomingChatMessage(row) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("chatNotificationsButton");
-  button?.addEventListener("click", async () => {
-    if (!("Notification" in window)) return;
-    if (Notification.permission !== "granted") {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === "denied") showChatToast("Notifications are blocked. Allow them in your browser's site settings, then reload Chat.");
-      } catch (_) {}
-    }
-    updateChatNotificationButton();
-  });
-  updateChatNotificationButton();
-});
+// This script runs after the chat markup, so bind immediately instead of waiting
+// for DOMContentLoaded (which has already fired by the time this code executes).
+const chatNotificationsButton = document.getElementById("chatNotificationsButton");
+chatNotificationsButton?.addEventListener("click", enableChatDesktopNotifications);
+updateChatNotificationButton();
 
+// Show an in-page prompt automatically. The native browser permission prompt must
+// be opened from the user's click, otherwise Chrome/Edge may silently block it.
+(function showDesktopNotificationPrompt() {
+  if (!("Notification" in window) || !window.isSecureContext || Notification.permission !== "default") return;
+  if (sessionStorage.getItem("douqhub-chat-notification-prompt-dismissed") === "yes") return;
+  const prompt = document.createElement("section");
+  prompt.id = "chatNotificationPrompt";
+  prompt.setAttribute("role", "dialog");
+  prompt.setAttribute("aria-label", "Desktop chat notifications");
+  prompt.style.cssText = "position:fixed;right:22px;bottom:22px;z-index:99998;width:min(390px,calc(100vw - 32px));padding:20px;border:1px solid #7478ff;border-radius:16px;background:#101329;color:#f7f7ff;box-shadow:0 18px 60px #000b;font:14px/1.5 system-ui,sans-serif";
+  const heading = document.createElement("strong");
+  heading.textContent = "Get DougHub chat notifications";
+  heading.style.cssText = "display:block;font-size:16px;margin-bottom:6px";
+  const description = document.createElement("p");
+  description.textContent = "Keep up with new messages even when this tab is minimized. DougHub must remain open in your browser.";
+  description.style.cssText = "margin:0 0 14px;color:#c2c6e3";
+  const actions = document.createElement("div");
+  actions.style.cssText = "display:flex;justify-content:flex-end;gap:8px";
+  const later = document.createElement("button");
+  later.type = "button";
+  later.textContent = "Not now";
+  later.style.cssText = "padding:9px 12px;border:1px solid #ffffff26;border-radius:9px;background:#ffffff0a;color:#e5e7eb;cursor:pointer";
+  const enable = document.createElement("button");
+  enable.type = "button";
+  enable.textContent = "Enable notifications";
+  enable.style.cssText = "padding:9px 12px;border:0;border-radius:9px;background:#6366f1;color:white;font-weight:750;cursor:pointer";
+  later.addEventListener("click", () => {
+    sessionStorage.setItem("douqhub-chat-notification-prompt-dismissed", "yes");
+    prompt.remove();
+  });
+  enable.addEventListener("click", async () => {
+    prompt.remove();
+    await enableChatDesktopNotifications();
+    if (Notification.permission === "default") {
+      sessionStorage.setItem("douqhub-chat-notification-prompt-dismissed", "yes");
+    }
+  });
+  actions.append(later, enable);
+  prompt.append(heading, description, actions);
+  document.body.appendChild(prompt);
+})();
 async function loadMessages() {
 
   if (loadingMessages) {
