@@ -2696,6 +2696,8 @@ async function loadOwnerBanRequests() {
     });
 }
 document.getElementById("refreshOwnerBanRequests")?.addEventListener("click", loadOwnerBanRequests);
+// Keep the Owner inbox updated while the Admin panel is open.
+setInterval(() => { if (currentAdminRole === "owner") loadOwnerBanRequests(); }, 15000);
 
 async function unbanAccount(userId) {
 
