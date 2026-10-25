@@ -23,7 +23,10 @@ function createMainWindow() {
       sandbox: true
     }
   });
+  // Keep realtime chat notifications alive while the window is minimized or hidden.
+  mainWindow.webContents.setBackgroundThrottling(false);
   mainWindow.loadURL(CHAT_URL);
+  mainWindow.webContents.on("did-finish-load", installAppToolbar);
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("https://doughub.online/")) shell.openExternal(url);
     return { action: "deny" };
@@ -34,6 +37,56 @@ function createMainWindow() {
       mainWindow.hide();
     }
   });
+}
+
+
+function installAppToolbar() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const url = mainWindow.webContents.getURL();
+  if (!url.startsWith(CHAT_URL)) return;
+
+  mainWindow.webContents.executeJavaScript(`
+    (() => {
+      if (document.getElementById("douqhub-quickreply-appbar")) return true;
+      const style = document.createElement("style");
+      style.id = "douqhub-quickreply-appbar-style";
+      style.textContent = \`
+        html,body{height:100%!important;box-sizing:border-box!important}
+        body{padding-top:42px!important}
+        main{height:calc(100vh - 42px)!important;padding:10px 0!important;width:calc(100% - 20px)!important;max-width:none!important}
+        .chat-container{border-radius:14px!important}
+        .chat-back-button,.dmail-notice,#chatNotificationsButton,#chatHelpButton,#chatHelpPopover{display:none!important}
+        #douqhub-quickreply-appbar{position:fixed;z-index:2147483647;inset:0 0 auto;height:42px;display:flex;align-items:center;gap:10px;padding:0 12px;background:rgba(5,7,19,.98);border-bottom:1px solid rgba(129,140,248,.24);font:12px/1.2 "Segoe UI",system-ui,sans-serif;color:#eef0ff}
+        #douqhub-quickreply-appbar .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:12px;white-space:nowrap}
+        #douqhub-quickreply-appbar .mark{width:23px;height:23px;border-radius:7px;display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#a855f7);color:white;font-size:12px}
+        #douqhub-quickreply-appbar .spacer{flex:1}
+        #douqhub-quickreply-appbar button{border:1px solid #34395c;border-radius:8px;background:#141a31;color:#e7e9ff;padding:6px 10px;font:650 11px "Segoe UI",system-ui,sans-serif;cursor:pointer}
+        #douqhub-quickreply-appbar button:hover{border-color:#818cf8;background:#202747}
+        #douqhub-quickreply-appbar #dq-sign-in{background:#6366f1;border-color:#6366f1;color:#fff}
+        #douqhub-quickreply-appbar .version{color:#8f97bb;font-size:10px;white-space:nowrap}
+        @media(max-width:600px){main{width:calc(100% - 10px)!important;padding:5px 0!important}.chat-top{gap:7px;padding:10px!important}.chat-heading h1{font-size:18px!important}.chat-status,.chat-ding-setting{display:none!important}}
+      \`;
+      document.head.appendChild(style);
+      const bar = document.createElement("div");
+      bar.id = "douqhub-quickreply-appbar";
+      bar.innerHTML = '<div class="brand"><span class="mark">D</span><span>DougHub Quick Reply</span></div><span class="version">Desktop chat</span><span class="spacer"></span><button id="dq-sign-in" type="button">Sign in</button><button id="dq-update" type="button">Check for updates</button>';
+      document.body.appendChild(bar);
+      bar.querySelector("#dq-sign-in").addEventListener("click", () => {
+        window.location.href = "https://doughub.online/log-in.html?redirect=chat.html";
+      });
+      bar.querySelector("#dq-update").addEventListener("click", () => {
+        if (window.douqhubDesktop?.checkForUpdates) window.douqhubDesktop.checkForUpdates();
+      });
+      const syncSignIn = () => {
+        const name = document.getElementById("currentUsername")?.textContent?.trim() || "Guest";
+        const button = bar.querySelector("#dq-sign-in");
+        if (button) button.hidden = name !== "Guest" && name !== "Loading...";
+      };
+      syncSignIn();
+      setInterval(syncSignIn, 1000);
+      return true;
+    })()
+  `).catch(error => console.warn("Could not install Quick Reply toolbar:", error));
 }
 
 function createTray() {
@@ -88,6 +141,7 @@ ipcMain.on("incoming-message", (_event, message) => {
   showReplyPopup(message);
 });
 ipcMain.on("open-chat", () => shell.openExternal(CHAT_URL));
+ipcMain.on("check-for-updates", () => checkForUpdates());
 ipcMain.on("dismiss-popup", () => {
   if (popupWindow && !popupWindow.isDestroyed()) popupWindow.close();
 });
