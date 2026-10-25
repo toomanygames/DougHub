@@ -328,4 +328,122 @@ if(!new URLSearchParams(location.hash.slice(1)).get("project")){
 }else loadProjectFromUrl();
 // Initialize Blockly only after the library scripts and restored project state are ready.
 initBlockly();
+
+/* Community Projects — saved in the existing code_projects table. */
+let codeCommunityDb=null, codeCommunityUser=null, codeCommunityRows=[], selectedCodeCommunityProject=null, editingCodeCommunityId=null;
+function codeCommunitySetStatus(message,isError=false){const el=$("codeCommunityPublishStatus");if(el){el.textContent=message;el.classList.toggle("error",!!isError);}}
+function codeCommunitySafeName(value){return String(value||"my-project").replace(/[^a-z0-9-_]+/gi,"-").replace(/^-|-$/g,"").slice(0,60)||"my-project";}
+function codeCommunityDocument(project){
+  const h=String(project.html_code||"");
+  const c=String(project.css_code||"");
+  const j=String(project.js_code||"").replace(/<\/script/gi,"<\\/script");
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+c+'</style></head><body>'+h+'<script>'+j+'</script></body></html>';
+}
+function codeCommunityAllCode(project){
+  return "// "+String(project.title||"Community Project")+"\n\n/* index.html */\n"+String(project.html_code||"")+"\n\n/* style.css */\n"+String(project.css_code||"")+"\n\n/* main.js */\n"+String(project.js_code||"");
+}
+function codeCommunityCanCopy(p){return !!codeCommunityUser&&p.owner_id===codeCommunityUser.id||!!p.allow_copy;}
+function codeCommunityCanDownload(p){return !!codeCommunityUser&&p.owner_id===codeCommunityUser.id||!!p.allow_download;}
+function codeCommunityRender(){
+  const box=$("codeCommunityProjectSlider"); if(!box)return;
+  const q=String($("codeCommunitySearch").value||"").trim().toLowerCase();
+  const items=codeCommunityRows.filter(p=>!q||String(p.title||"").toLowerCase().includes(q)||String(p.description||"").toLowerCase().includes(q)||String(p.runtime||"web").toLowerCase().includes(q));
+  box.replaceChildren();
+  if(!items.length){const empty=document.createElement("div");empty.className="community-loading";empty.textContent=codeCommunityRows.length?"No projects match that search.":"No public projects yet. Be the first to publish one!";box.appendChild(empty);}
+  items.forEach(p=>{
+    const card=document.createElement("article");card.className="community-project-card";
+    const top=document.createElement("div");
+    const title=document.createElement("h3");title.className="community-project-title";title.textContent=p.title||"Untitled project";
+    const desc=document.createElement("p");desc.className="community-project-description";desc.textContent=p.description||"No description provided.";
+    const tags=document.createElement("div");tags.className="community-project-tags";
+    const runtime=document.createElement("span");runtime.className="community-tag";runtime.textContent=p.runtime||"web";
+    const copy=document.createElement("span");copy.className="community-tag";copy.textContent=p.allow_copy?"↗ Code copying allowed":"🔒 Copying disabled";
+    const download=document.createElement("span");download.className="community-tag";download.textContent=p.allow_download?"↓ Download allowed":"🔒 Download disabled";
+    tags.append(runtime,copy,download);top.append(title,desc,tags);
+    const actions=document.createElement("div");actions.className="community-project-actions";
+    const preview=document.createElement("button");preview.type="button";preview.className="btn primary";preview.textContent="▶ Preview";preview.addEventListener("click",()=>codeCommunityOpenPreview(p));actions.appendChild(preview);
+    if(codeCommunityCanCopy(p)){const b=document.createElement("button");b.type="button";b.className="btn";b.textContent="Copy code";b.addEventListener("click",()=>codeCommunityCopy(p));actions.appendChild(b);}
+    if(codeCommunityCanDownload(p)){const b=document.createElement("button");b.type="button";b.className="btn";b.textContent="Download";b.addEventListener("click",()=>codeCommunityDownload(p));actions.appendChild(b);}
+    if(codeCommunityUser&&p.owner_id===codeCommunityUser.id){const b=document.createElement("button");b.type="button";b.className="btn";b.textContent="Edit";b.addEventListener("click",()=>codeCommunityLoadIntoEditor(p));actions.appendChild(b);}
+    card.append(top,actions);box.appendChild(card);
+  });
+  $("codeCommunityProjectCount").textContent=items.length+" project"+(items.length===1?"":"s");
+}
+async function codeCommunityLoad(){
+  const box=$("codeCommunityProjectSlider");box.innerHTML='<div class="community-loading">Loading community projects…</div>';
+  try{
+    const {data:{session}}=await codeCommunityDb.auth.getSession();codeCommunityUser=session?.user||null;
+    const {data,error}=await codeCommunityDb.from("code_projects").select("id,owner_id,title,description,visibility,allow_copy,allow_download,html_code,css_code,js_code,files,entry_file,runtime,created_at,updated_at").eq("visibility","public").order("updated_at",{ascending:false}).limit(100);
+    if(error)throw error;codeCommunityRows=data||[];codeCommunityRender();
+  }catch(e){console.error("Community Projects failed to load:",e);box.innerHTML='<div class="community-loading">Could not load projects. Please refresh and try again.</div>';$("codeCommunityProjectCount").textContent="Projects unavailable";}
+}
+async function codeCommunityCopy(p){
+  if(!codeCommunityCanCopy(p)){codeCommunitySetStatus("The creator has disabled code copying.",true);return;}
+  try{await navigator.clipboard.writeText(codeCommunityAllCode(p));codeCommunitySetStatus("Project source copied.");}
+  catch(e){const area=document.createElement("textarea");area.value=codeCommunityAllCode(p);area.style.position="fixed";area.style.opacity="0";document.body.appendChild(area);area.select();const ok=document.execCommand("copy");area.remove();codeCommunitySetStatus(ok?"Project source copied.":"Couldn't copy automatically. Please try again.",!ok);}
+}
+function codeCommunityDownload(p){
+  if(!codeCommunityCanDownload(p)){codeCommunitySetStatus("The creator has disabled downloads.",true);return;}
+  const blob=new Blob([codeCommunityDocument(p)],{type:"text/html;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=codeCommunitySafeName(p.title)+".html";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function codeCommunityOpenPreview(p){
+  selectedCodeCommunityProject=p;
+  $("codeCommunityPreviewTitle").textContent=p.title||"Untitled project";
+  $("codeCommunityPreviewDescription").textContent=p.description||"No description provided.";
+  $("codeCommunityPreviewPermissions").textContent=(p.allow_copy?"Code copying allowed":"Code copying disabled")+" · "+(p.allow_download?"Downloads allowed":"Downloads disabled");
+  $("codeCommunityPreviewAuthor").textContent=(p.owner_id===codeCommunityUser?.id?"Your project":"Community project")+" · "+(p.runtime||"web");
+  $("codeCommunityPreviewFrame").srcdoc=codeCommunityDocument(p);
+  $("codeCommunityCopyCodeBtn").hidden=!codeCommunityCanCopy(p);
+  $("codeCommunityDownloadBtn").hidden=!codeCommunityCanDownload(p);
+  $("editCodeProjectBtn").hidden=!(codeCommunityUser&&p.owner_id===codeCommunityUser.id);
+  const dlg=$("codeCommunityPreviewDialog");if(!dlg.open)dlg.showModal();
+}
+function codeCommunityLoadIntoEditor(p){
+  if(!codeCommunityUser||p.owner_id!==codeCommunityUser.id)return;
+  editingCodeCommunityId=p.id;
+  files.html=String(p.html_code||STARTERS.html);files.css=String(p.css_code||STARTERS.css);files.js=String(p.js_code||"");
+  $("projectName").value=p.title||"My Coding Project";$("codeCommunityTitle").value=p.title||"";$("codeCommunityDescription").value=p.description||"";
+  $("codeCommunityAllowCopy").checked=!!p.allow_copy;$("codeCommunityAllowDownload").checked=!!p.allow_download;
+  activeFile="html";renderFile();persist();setMode("code");codeCommunitySetStatus("Editing your published project. Publish again to save changes.");
+  $("codeCommunityProjects").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function codeCommunityPublish(){
+  if(!codeCommunityDb||!codeCommunityUser){codeCommunitySetStatus("Please sign in again, then refresh this page.",true);return;}
+  saveCurrentFile();
+  const title=$("codeCommunityTitle").value.trim()||$("projectName").value.trim();
+  const description=$("codeCommunityDescription").value.trim();
+  if(!title){codeCommunitySetStatus("Add a project title before publishing.",true);$("codeCommunityTitle").focus();return;}
+  const button=$("publishCodeProjectBtn");button.disabled=true;button.textContent="Publishing…";
+  const payload={owner_id:codeCommunityUser.id,title:title.slice(0,80),description:description.slice(0,500),visibility:"public",allow_copy:$("codeCommunityAllowCopy").checked,allow_download:$("codeCommunityAllowDownload").checked,html_code:files.html||"",css_code:files.css||"",js_code:files.js||"",files:[{name:"index.html",type:"html",content:files.html||""},{name:"style.css",type:"css",content:files.css||""},{name:"main.js",type:"js",content:files.js||""}],entry_file:"index.html",runtime:"web"};
+  try{
+    let q=codeCommunityDb.from("code_projects");
+    if(editingCodeCommunityId)q=q.update(payload).eq("id",editingCodeCommunityId).eq("owner_id",codeCommunityUser.id);
+    else q=q.insert(payload);
+    const {data,error}=await q.select("id,owner_id,title,description,visibility,allow_copy,allow_download,html_code,css_code,js_code,files,entry_file,runtime,created_at,updated_at").single();
+    if(error)throw error;
+    editingCodeCommunityId=data.id;selectedCodeCommunityProject=data;
+    $("projectName").value=title;persist();codeCommunitySetStatus("Published! Your project is now in Community Projects.");await codeCommunityLoad();codeCommunityOpenPreview(data);
+  }catch(e){console.error("Project publish failed:",e);codeCommunitySetStatus("Couldn't publish: "+(e.message||"check your connection and try again"),true);}
+  finally{button.disabled=false;button.textContent=editingCodeCommunityId?"Update published project":"Publish to Community Projects";}
+}
+function codeCommunityInit(){
+  const create=window.supabase?.createClient;
+  if(!create){codeCommunitySetStatus("Community Projects could not connect to Supabase.",true);$("codeCommunityProjectSlider").textContent="Community Projects are unavailable right now.";return;}
+  codeCommunityDb=dbClient||(dbClient=create("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"));
+  $("codeCommunitySearch").addEventListener("input",codeCommunityRender);
+  $("refreshCodeProjectsBtn").addEventListener("click",codeCommunityLoad);
+  $("publishCodeProjectBtn").addEventListener("click",codeCommunityPublish);
+  $("codeCommunityPrev").addEventListener("click",()=>$("codeCommunityProjectSlider").scrollBy({left:-500,behavior:"smooth"}));
+  $("codeCommunityNext").addEventListener("click",()=>$("codeCommunityProjectSlider").scrollBy({left:500,behavior:"smooth"}));
+  $("closeCodeProjectPreview").addEventListener("click",()=>$("codeCommunityPreviewDialog").close());
+  $("codeCommunityPreviewDialog").addEventListener("click",e=>{if(e.target===$("codeCommunityPreviewDialog"))$("codeCommunityPreviewDialog").close();});
+  $("codeCommunityCopyCodeBtn").addEventListener("click",()=>selectedCodeCommunityProject&&codeCommunityCopy(selectedCodeCommunityProject));
+  $("codeCommunityDownloadBtn").addEventListener("click",()=>selectedCodeCommunityProject&&codeCommunityDownload(selectedCodeCommunityProject));
+  $("editCodeProjectBtn").addEventListener("click",()=>{if(selectedCodeCommunityProject){$("codeCommunityPreviewDialog").close();codeCommunityLoadIntoEditor(selectedCodeCommunityProject);}});
+  $("codeCommunityTitle").addEventListener("input",()=>{if(!editingCodeCommunityId)$("publishCodeProjectBtn").textContent="Publish to Community Projects";});
+  codeCommunityLoad();
+}
+
+codeCommunityInit();
+
 })();
