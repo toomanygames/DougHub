@@ -2246,7 +2246,16 @@ async function enableChatDesktopNotifications() {
 
 function notifyIncomingChatMessage(row) {
   if (!row || !currentUser || row.user_id === currentUser.id) return;
-  if (document.visibilityState === "visible" && document.hasFocus()) return;
+
+  // Only suppress a desktop alert when the user is actively looking at the
+  // exact conversation that received the message. Previously, focusing Chat
+  // suppressed notifications for every group, making messages in other
+  // conversations appear to "not work".
+  const pageIsActive = document.visibilityState === "visible" && document.hasFocus();
+  const incomingGroupId = row.group_id == null ? null : String(row.group_id);
+  const selectedGroupId = activeChatGroupId == null ? null : String(activeChatGroupId);
+  if (pageIsActive && incomingGroupId === selectedGroupId) return;
+
   if (!("Notification" in window) || Notification.permission !== "granted") return;
   const messageId = String(row.id || "");
   if (!messageId || lastNotifiedChatMessageId === messageId) return;
