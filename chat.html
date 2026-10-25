@@ -2040,7 +2040,7 @@ async function renderMessages(
       const staffBadge = profile?.show_staff_badge && staffBadgeInfo[profile?.staff_role] ? staffBadgeInfo[profile.staff_role] : null;
       header.innerHTML = `
         <span class="message-username">@${escapeHtml(username)}</span>
-        ${badge ? '<span class="message-badge" title="'+escapeHtml(badge[1])+' Badge">'+badge[0]+' '+escapeHtml(badge[1])+'</span>' : ''}
+        ${badge ? '<span class="message-badge" title="'+escapeHtml(badge[1])+' Badge">'+escapeHtml(badge[0])+'</span>' : ''}
         ${hasOgBadge ? '<span class="message-badge og-message-badge" title="Original Member badge">★ OG</span>' : ''}
         ${staffBadge ? '<span class="message-badge '+staffBadge[1]+'" title="DougHub Staff: '+staffBadge[0]+'">'+staffBadge[0]+'</span>' : ''}
         <span class="message-time">${formatTime(message.created_at)}</span>
