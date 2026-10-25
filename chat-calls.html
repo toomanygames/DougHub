@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en" data-dh-theme="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050611">
+<title>DougHub Video Calls</title>
+<link rel="icon" href="/DougHub.ico" type="image/x-icon">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/display.js" defer></script>
+<script src="/nav.js?v=20261025-video-call" defer></script>
+<style>
+:root{color-scheme:dark;--call-line:rgba(177,184,255,.16);--call-panel:rgba(13,17,39,.86);--call-muted:#a4abc7;--call-accent:#818cf8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:radial-gradient(ellipse at 8% 0%,rgba(99,102,241,.18),transparent 38%),radial-gradient(ellipse at 92% 20%,rgba(168,85,247,.12),transparent 36%),#050611;color:#f5f6ff}
+a{color:inherit}
+.call-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px clamp(16px,4vw,44px);border-bottom:1px solid var(--call-line);background:rgba(5,6,17,.76);backdrop-filter:blur(18px)}
+.call-brand{font-weight:900;font-size:17px;text-decoration:none;letter-spacing:-.03em}
+.call-back{padding:9px 12px;border:1px solid var(--call-line);border-radius:10px;text-decoration:none;color:#dfe1fa;background:#ffffff08;font-size:12px;font-weight:800}
+main{width:min(1100px,calc(100% - 28px));margin:0 auto;padding:clamp(22px,5vh,54px) 0 40px}
+.eyebrow{font-size:10px;letter-spacing:.18em;font-weight:900;color:var(--call-accent);text-transform:uppercase}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.04;letter-spacing:-.055em;margin:9px 0 10px}
+.intro{max-width:680px;color:var(--call-muted);font-size:14px;line-height:1.7;margin:0}
+.call-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.75fr);gap:16px;margin-top:26px;align-items:stretch}
+.call-stage,.call-side{border:1px solid var(--call-line);border-radius:22px;background:var(--call-panel);backdrop-filter:blur(14px);box-shadow:0 20px 60px #0003;overflow:hidden}
+.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.video-tile{position:relative;min-width:0;aspect-ratio:4/3;overflow:hidden;border:1px solid #ffffff16;border-radius:15px;background:linear-gradient(145deg,#171a34,#080a17);display:flex;align-items:center;justify-content:center}
+.video-tile video{width:100%;height:100%;object-fit:cover;background:#070913}
+.video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:15px;text-align:center;color:#9ca4c4;font-size:12px;pointer-events:none}
+.video-placeholder strong{color:#eef0ff;font-size:13px}
+.video-placeholder .avatar{width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--call-line);border-radius:16px;background:linear-gradient(135deg,#6366f12b,#a855f72b);font-size:22px}
+.video-label{position:absolute;left:9px;bottom:9px;z-index:2;padding:5px 8px;border:1px solid #ffffff18;border-radius:8px;background:#050611c9;color:#f5f6ff;font-size:10px;font-weight:800;backdrop-filter:blur(10px)}
+.call-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:13px;border-top:1px solid var(--call-line);background:#06081699}
+.call-btn{min-height:40px;padding:0 13px;border:1px solid var(--call-line);border-radius:11px;background:#ffffff08;color:#f4f4ff;font-weight:850;font-size:12px;cursor:pointer}
+.call-btn.primary{background:linear-gradient(125deg,#4f46e5,#7c3aed);border-color:transparent;color:#fff}
+.call-btn.danger{border-color:#f8717155;background:#ef444418;color:#fecaca}
+.call-btn:disabled{opacity:.45;cursor:not-allowed}
+.call-btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+.call-status{margin-left:auto;color:var(--call-muted);font-size:11px;line-height:1.5}
+.call-side{padding:20px;display:flex;flex-direction:column;gap:14px}
+.call-side h2{margin:0;font-size:18px;letter-spacing:-.03em}
+.call-side p{margin:0;color:var(--call-muted);font-size:12px;line-height:1.65}
+.call-actions{display:grid;gap:9px}
+.invite-row{display:flex;gap:7px;min-width:0}
+.invite-row input{min-width:0;width:100%;padding:10px;border:1px solid var(--call-line);border-radius:10px;background:#070918;color:#f5f6ff;font-size:11px}
+.call-note{padding:11px;border:1px solid #fbbf2428;border-radius:12px;background:#fbbf240a;color:#e8d7a2;font-size:11px;line-height:1.6}
+.call-error{display:none;padding:11px;border:1px solid #fb718544;border-radius:12px;background:#ef444414;color:#fecaca;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.call-error.show{display:block}
+.call-footer{padding-top:18px;color:#858ba7;font-size:11px;line-height:1.6}
+@media(max-width:760px){.call-layout{grid-template-columns:1fr}.call-side{order:-1}.video-grid{gap:7px;padding:8px}.video-tile{aspect-ratio:3/4}.call-toolbar{gap:7px}.call-status{flex-basis:100%;margin:2px 0 0}}
+@media(max-width:440px){.call-header{padding:14px}.video-grid{grid-template-columns:1fr}.video-tile{aspect-ratio:16/10}.call-side{padding:16px}}
+</style>
+</head>
+<body>
+<header class="call-header"><a class="call-brand" href="/index.html">DougHub <span style="color:#969cff">/ Video Calls</span></a><a class="call-back" href="/chat.html">← Back to Chat</a></header>
+<main>
+<div class="eyebrow">A separate chat feature</div>
+<h1>Video calls, without leaving DougHub.</h1>
+<p class="intro">Start a private one-to-one call, copy the invite link, and send it in Community Chat or DMail. Calls open in their own space, so regular chat stays uncluttered.</p>
+<div class="call-layout">
+<section class="call-stage" aria-label="Video call">
+<div class="video-grid">
+<div class="video-tile"><video id="localVideo" autoplay playsinline muted></video><div id="localPlaceholder" class="video-placeholder"><span class="avatar">◉</span><strong>Your camera</strong><span>Camera preview appears here</span></div><span class="video-label">You</span></div>
+<div class="video-tile"><video id="remoteVideo" autoplay playsinline></video><div id="remotePlaceholder" class="video-placeholder"><span class="avatar">◎</span><strong>Other person</strong><span>Waiting for them to join</span></div><span class="video-label">Guest</span></div>
+</div>
+<div class="call-toolbar">
+<button class="call-btn primary" id="startButton" type="button">Start a call</button>
+<button class="call-btn primary" id="joinButton" type="button" hidden>Join call</button>
+<button class="call-btn" id="micButton" type="button" disabled>Mute mic</button>
+<button class="call-btn" id="cameraButton" type="button" disabled>Turn camera off</button>
+<button class="call-btn danger" id="endButton" type="button" disabled>End call</button>
+<span id="callStatus" class="call-status" role="status" aria-live="polite">Ready when you are.</span>
+</div>
+</section>
+<aside class="call-side">
+<h2>Call room</h2>
+<p id="roomDescription">Start a call to create an invite link. The person you invite can join from any modern browser.</p>
+<div class="call-actions">
+<button class="call-btn primary" id="copyInviteButton" type="button" hidden>Copy invite link</button>
+<div class="invite-row" id="inviteRow" hidden><input id="inviteLink" readonly aria-label="Call invite link"><button class="call-btn" id="copyLinkButton" type="button">Copy</button></div>
+<button class="call-btn" id="shareChatButton" type="button" onclick="location.href='/chat.html'">Open Community Chat ↗</button>
+</div>
+<div id="callError" class="call-error" role="alert"></div>
+<div class="call-note"><strong>Before you start:</strong> allow camera and microphone access when your browser asks. This first version supports one-to-one calls. Connection depends on your network; some networks may block direct peer-to-peer connections.</div>
+<div class="call-footer">Your camera and microphone stream directly between participants. DougHub uses Supabase Realtime to exchange connection setup messages; video itself is not uploaded to DougHub.</div>
+</aside>
+</div>
+</main>
+<script>
+(function(){
+"use strict";
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+let room=params.get("room")||"",hostMode=params.get("host")==="1",client=null,user=null,channel=null,pc=null,localStream=null,remoteStream=null,remoteUser=null,subscribed=false,ending=false,pendingIce=[];
+const setStatus=s=>{$("callStatus").textContent=s};
+function showError(s){$("callError").textContent=s;$("callError").classList.add("show")}
+function clearError(){$("callError").textContent="";$("callError").classList.remove("show")}
+function updateRoomUi(){
+ $("startButton").hidden=!!room&&!hostMode;
+ $("joinButton").hidden=!(!!room&&!hostMode);
+ $("copyInviteButton").hidden=!(!!room&&hostMode);
+ $("inviteRow").hidden=!(!!room&&hostMode);
+ if(room){const invite=new URL(location.href);invite.search="";invite.searchParams.set("room",room);$("inviteLink").value=invite.href;$("roomDescription").textContent=hostMode?"Your room is ready. Copy the link and send it to one person.":"You have an invite link. Join when you are ready."}
+}
+function randomRoom(){const b=new Uint8Array(18);crypto.getRandomValues(b);return Array.from(b,x=>x.toString(16).padStart(2,"0")).join("")}
+async function getClient(){
+ if(window.DougHubSupabaseClient)return window.DougHubSupabaseClient;
+ await new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;clearTimeout(t);window.removeEventListener("douqhub:supabase-ready",finish);window.DougHubSupabaseClient?resolve():reject(new Error("DougHub sign-in service did not load. Refresh and try again."))};window.addEventListener("douqhub:supabase-ready",finish,{once:true});const t=setTimeout(finish,12000)});
+ return window.DougHubSupabaseClient;
+}
+async function ensureUser(){
+ client=client||await getClient();
+ const result=await client.auth.getSession();user=result.data?.session?.user||null;
+ if(!user){location.href="/log-in.html?redirect="+encodeURIComponent("chat-calls.html"+location.search);throw new Error("Please sign in to use video calls.")}
+}
+function sendSignal(kind,extra={}){
+ if(!channel||!subscribed)return Promise.resolve();
+ return channel.send({type:"broadcast",event:"signal",payload:{kind,from:user.id,room,...extra}});
+}
+async function ensureMedia(){
+ if(localStream)return;
+ if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera and microphone access requires a supported browser on HTTPS.");
+ localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:{width:{ideal:1280},height:{ideal:720},facingMode:"user"}});
+ $("localVideo").srcObject=localStream;$("localPlaceholder").hidden=true;
+ $("micButton").disabled=false;$("cameraButton").disabled=false;$("endButton").disabled=false;
+}
+function makePeer(){
+ if(pc)return pc;
+ pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});
+ remoteStream=new MediaStream();$("remoteVideo").srcObject=remoteStream;
+ pc.ontrack=e=>{e.streams[0]?.getTracks().forEach(t=>{if(!remoteStream.getTracks().some(x=>x.id===t.id))remoteStream.addTrack(t)});$("remotePlaceholder").hidden=remoteStream.getTracks().length>0;setStatus("Connected")};
+ pc.onicecandidate=e=>{if(e.candidate)sendSignal("ice",{candidate:e.candidate.toJSON()}).catch(()=>{})};
+ pc.onconnectionstatechange=()=>{if(!pc)return;if(pc.connectionState==="connected")setStatus("Connected");else if(["failed","disconnected"].includes(pc.connectionState))setStatus("Connection interrupted — try again or restart the call");else if(pc.connectionState==="connecting")setStatus("Connecting…")};
+ localStream?.getTracks().forEach(t=>pc.addTrack(t,localStream));
+ return pc;
+}
+async function flushIce(){if(!pc?.remoteDescription)return;for(const c of pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(c))}catch(e){console.warn("Could not apply queued ICE candidate",e)}}}
+async function onSignal(payload){
+ if(!payload||payload.from===user.id||payload.room!==room)return;
+ if(payload.kind==="join"&&hostMode){
+  if(pc)return;
+  remoteUser=payload.from;setStatus("Guest joined — connecting…");
+  const peer=makePeer(),offer=await peer.createOffer();await peer.setLocalDescription(offer);await sendSignal("offer",{description:peer.localDescription.toJSON()});
+ }else if(payload.kind==="offer"&&!hostMode){
+  if(pc)return;remoteUser=payload.from;const peer=makePeer();await peer.setRemoteDescription(new RTCSessionDescription(payload.description));await flushIce();const answer=await peer.createAnswer();await peer.setLocalDescription(answer);await sendSignal("answer",{description:peer.localDescription.toJSON()});setStatus("Connecting…");
+ }else if(payload.kind==="answer"&&hostMode&&pc&&!pc.currentRemoteDescription){
+  await pc.setRemoteDescription(new RTCSessionDescription(payload.description));await flushIce();setStatus("Connecting…");
+ }else if(payload.kind==="ice"&&payload.candidate&&(!remoteUser||payload.from===remoteUser)){
+  if(!pc||!pc.remoteDescription)pendingIce.push(payload.candidate);else try{await pc.addIceCandidate(new RTCIceCandidate(payload.candidate))}catch(e){console.warn("ICE candidate ignored",e)}
+ }else if(payload.kind==="end"){setStatus("The other person ended the call.");await cleanup(false)}
+}
+async function connectRoom(isHost){
+ clearError();ending=false;hostMode=isHost;updateRoomUi();setStatus("Checking sign-in…");
+ try{
+  await ensureUser();await ensureMedia();
+  if(!room){room=randomRoom();const u=new URL(location.href);u.searchParams.set("room",room);u.searchParams.set("host","1");history.replaceState({}, "",u);hostMode=true}
+  channel=client.channel("dh-video-"+room,{config:{broadcast:{self:false}}});
+  channel.on("broadcast",{event:"signal"},({payload})=>{onSignal(payload).catch(e=>{console.error(e);showError(e.message||"A call setup message failed.")})});
+  channel.subscribe(status=>{
+   if(status==="SUBSCRIBED"){subscribed=true;$("endButton").disabled=false;setStatus(hostMode?"Waiting for the other person to join…":"Joining room…");updateRoomUi();if(!hostMode)sendSignal("join").catch(e=>showError(e.message||"Could not join call room."))}
+   else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){subscribed=false;setStatus("Connection unavailable");showError("Could not connect to the call signaling service. Check your connection and try again.")}
+  });
+  $("startButton").hidden=true;$("joinButton").hidden=true;$("copyInviteButton").hidden=!hostMode;$("inviteRow").hidden=!hostMode;
+ }catch(e){console.error(e);showError(e.message||"Could not start the call.");setStatus("Not connected");}
+}
+async function cleanup(notify=true){
+ if(ending)return;ending=true;
+ if(notify)try{await sendSignal("end")}catch(_){}
+ if(pc){pc.ontrack=null;pc.onicecandidate=null;pc.onconnectionstatechange=null;pc.close();pc=null}
+ if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}
+ if(remoteStream){remoteStream.getTracks().forEach(t=>t.stop());remoteStream=null}
+ $("localVideo").srcObject=null;$("remoteVideo").srcObject=null;$("localPlaceholder").hidden=false;$("remotePlaceholder").hidden=false;
+ $("micButton").disabled=true;$("cameraButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";
+ if(channel&&client){try{await client.removeChannel(channel)}catch(_){}}
+ channel=null;subscribed=false;remoteUser=null;pendingIce=[];setStatus("Call ended.");
+ if(hostMode){$("startButton").hidden=false;$("startButton").textContent="Start again";$("copyInviteButton").hidden=false;$("inviteRow").hidden=false}
+ else{$("joinButton").hidden=false}
+ ending=false;
+}
+$("startButton").addEventListener("click",()=>connectRoom(true));
+$("joinButton").addEventListener("click",()=>connectRoom(false));
+$("endButton").addEventListener("click",()=>cleanup(true));
+$("micButton").addEventListener("click",()=>{if(!localStream)return;const track=localStream.getAudioTracks()[0];if(track){track.enabled=!track.enabled;$("micButton").textContent=track.enabled?"Mute mic":"Unmute mic"}});
+$("cameraButton").addEventListener("click",()=>{if(!localStream)return;const track=localStream.getVideoTracks()[0];if(track){track.enabled=!track.enabled;$("cameraButton").textContent=track.enabled?"Turn camera off":"Turn camera on"}});
+async function copyInvite(){const value=$("inviteLink").value;if(!value)return;try{await navigator.clipboard.writeText(value);setStatus("Invite link copied — paste it into Chat or DMail.")}catch(_){$("inviteLink").focus();$("inviteLink").select();setStatus("Select and copy the invite link.")}}
+$("copyInviteButton").addEventListener("click",copyInvite);$("copyLinkButton").addEventListener("click",copyInvite);
+if(room){updateRoomUi();if(hostMode){$("startButton").hidden=false;$("startButton").textContent="Start / reconnect as host";$("roomDescription").textContent="This is your call room. Start the camera to host it again, or copy the invite link."}else{$("joinButton").hidden=false;$("roomDescription").textContent="You were invited to a one-to-one DougHub video call. Join when you are ready."}}
+window.addEventListener("beforeunload",()=>{try{localStream?.getTracks().forEach(t=>t.stop());pc?.close();if(channel&&client)client.removeChannel(channel)}catch(_){}});
+})();
+</script>
+</body>
+</html>
