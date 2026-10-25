@@ -2,11 +2,12 @@ const https = require("https");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { execFile } = require("child_process");
+const { spawn } = require("child_process");
 const { app, dialog } = require("electron");
 
 const RELEASE_API = "https://api.github.com/repos/toomanygames/DougHub/releases/latest";
 let checking = false;
+let updateInProgress = false;
 
 function getJson(url, redirects = 0) {
   return new Promise((resolve, reject) => {
@@ -45,7 +46,12 @@ function download(url, destination, redirects = 0) {
         return;
       }
       res.pipe(output);
-      output.on("finish", () => output.close(resolve));
+      output.on("finish", () => output.close(() => {
+        fs.stat(destination, (err, stats) => {
+          if (err || !stats.size) return reject(new Error("The downloaded update is empty or incomplete."));
+          resolve();
+        });
+      }));
       output.on("error", reject);
     }).on("error", error => {
       output.close();
@@ -55,11 +61,16 @@ function download(url, destination, redirects = 0) {
 }
 
 async function checkForUpdates(manual = true) {
-  if (checking) return;
+  if (checking || updateInProgress) return;
   checking = true;
   try {
     const release = await getJson(RELEASE_API);
-    const match = String(release.tag_name || "").match(/^quick-reply-build-(\d+)$/);
+    if (release.draft || release.prerelease) {
+      if (manual) dialog.showMessageBox({ type: "info", title: "DougHub Quick Reply", message: "No stable update is available yet." });
+      return;
+    }
+
+    const match = String(release.tag_name || "").match(/^quick-reply-build-(\\d+)$/);
     const latestBuild = match ? Number(match[1]) : 0;
     const currentBuild = Number(String(app.getVersion()).split(".").pop()) || 0;
 
@@ -68,35 +79,47 @@ async function checkForUpdates(manual = true) {
       return;
     }
 
-    const asset = (release.assets || []).find(item => /^DougHub-Quick-Reply-Setup-1\.0\.\d+\.exe$/i.test(item.name));
-    if (!asset || !asset.browser_download_url) throw new Error("The latest release does not contain the Windows installer yet.");
+    const asset = (release.assets || []).find(item => /^DougHub-Quick-Reply-Setup-1\\.0\\.\\d+\\.exe$/i.test(item.name));
+    if (!asset || !asset.browser_download_url) throw new Error("The latest stable release does not contain a Windows installer yet.");
 
     const choice = await dialog.showMessageBox({
       type: "info",
       title: "DougHub Quick Reply update",
-      message: "A new version is available.",
-      detail: "Installed: " + app.getVersion() + "\nLatest build: " + latestBuild + "\n\nDougHub Quick Reply will download the update and restart to install it.",
+      message: "DougHub Quick Reply " + latestBuild + " is ready.",
+      detail: "The app will download and install this update automatically, then restart. You do not need to find or download an installer yourself.",
       buttons: ["Update now", "Later"],
       defaultId: 0,
       cancelId: 1
     });
     if (choice.response !== 0) return;
 
-    const installerPath = path.join(os.tmpdir(), "DougHub-Quick-Reply-Update.exe");
+    updateInProgress = true;
+    const installerPath = path.join(os.tmpdir(), "DougHub-Quick-Reply-Update-" + latestBuild + ".exe");
+    await fs.promises.rm(installerPath, { force: true }).catch(() => {});
     await download(asset.browser_download_url, installerPath);
-    execFile(installerPath, ["/S"], error => {
-      if (error) dialog.showErrorBox("Update could not start", "Please try Check for updates again. " + error.message);
+
+    // Start the silent installer; quit this app promptly so Windows can replace its files.
+    const child = spawn(installerPath, ["/S"], {
+      detached: true,
+      stdio: "ignore",
+      windowsHide: true
     });
-    setTimeout(() => app.quit(), 1200);
+    child.on("error", error => {
+      updateInProgress = false;
+      dialog.showErrorBox("Update could not start", "The update was downloaded, but Windows could not start its installer. Try Check for updates again. " + error.message);
+    });
+    child.unref();
+    setTimeout(() => app.quit(), 400);
   } catch (error) {
-    if (manual) dialog.showMessageBox({ type: "error", title: "Update check failed", message: "Couldn't check for DougHub Quick Reply updates.", detail: error.message });
+    updateInProgress = false;
+    if (manual) dialog.showMessageBox({ type: "error", title: "Update check failed", message: "Couldn't update DougHub Quick Reply.", detail: error.message });
   } finally {
     checking = false;
   }
 }
 
 function setupUpdater() {
-  // Check quietly on launch, then every six hours. A newer build prompts before downloading.
+  // Check on launch and every six hours. The update is downloaded and installed from inside the app.
   setTimeout(() => checkForUpdates(false), 12000);
   setInterval(() => checkForUpdates(false), 6 * 60 * 60 * 1000);
   return () => checkForUpdates(true);
