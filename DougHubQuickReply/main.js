@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, shell, screen } = require("electron");
 const path = require("path");
+const { setupUpdater } = require("./updater");
 
 const CHAT_URL = "https://doughub.online/chat.html";
 let mainWindow = null;
@@ -7,6 +8,7 @@ let popupWindow = null;
 let tray = null;
 let lastMessageIds = new Set();
 let closing = false;
+let checkForUpdates = () => {};
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -27,8 +29,6 @@ function createMainWindow() {
     return { action: "deny" };
   });
   mainWindow.webContents.on("did-finish-load", () => {
-    // Hook the exact callback used by Chat's working realtime subscription.
-    // This avoids creating a second subscription that may be blocked by project settings.
     mainWindow.webContents.executeJavaScript(`
       (() => {
         let attempts = 0;
@@ -57,9 +57,7 @@ function createMainWindow() {
               console.log("DougHub Quick Reply: message notifications connected.");
               return;
             }
-          } catch (e) {
-            console.warn("DougHub Quick Reply hook setup error:", e);
-          }
+          } catch (e) { console.warn("DougHub Quick Reply hook setup error:", e); }
           if (attempts < 600) window.setTimeout(attach, 1000);
         };
         attach();
@@ -81,6 +79,7 @@ function createTray() {
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: "Open DougHub Chat", click: () => openChatWindow() },
     { label: "Check connection", click: () => mainWindow?.webContents.executeJavaScript("location.reload()") },
+    { label: "Check for updates", click: () => checkForUpdates() },
     { type: "separator" },
     { label: "Quit DougHub Quick Reply", click: () => { closing = true; app.quit(); } }
   ]));
@@ -124,11 +123,7 @@ ipcMain.on("incoming-message", (_event, message) => {
   if (!message || !message.id || !message.user_id) return;
   showReplyPopup(message);
 });
-
-ipcMain.on("open-chat", () => {
-  shell.openExternal(CHAT_URL);
-});
-
+ipcMain.on("open-chat", () => shell.openExternal(CHAT_URL));
 ipcMain.on("dismiss-popup", () => {
   if (popupWindow && !popupWindow.isDestroyed()) popupWindow.close();
 });
@@ -138,8 +133,6 @@ ipcMain.handle("send-quick-reply", async (_event, payload) => {
   const groupId = payload?.groupId == null ? null : String(payload.groupId);
   if (!text) return { ok: false, error: "Type a reply first." };
   if (!mainWindow || mainWindow.isDestroyed()) return { ok: false, error: "Open DougHub Quick Reply again." };
-
-  // The insert runs inside the signed-in DougHub page, using its current session.
   const script = `
     (async () => {
       if (!currentUser || !supabaseClient) return { ok: false, error: "Sign in to DougHub in the Quick Reply app first." };
@@ -161,7 +154,7 @@ ipcMain.handle("send-quick-reply", async (_event, payload) => {
   `;
   try {
     return await mainWindow.webContents.executeJavaScript(script, true);
-  } catch (error) {
+  } catch {
     return { ok: false, error: "Could not reach DougHub. Check your connection and sign-in." };
   }
 });
@@ -169,6 +162,7 @@ ipcMain.handle("send-quick-reply", async (_event, payload) => {
 app.whenReady().then(() => {
   createMainWindow();
   createTray();
+  checkForUpdates = setupUpdater();
 });
 app.on("window-all-closed", () => { /* Keep running in the system tray. */ });
 app.on("before-quit", () => { closing = true; });
