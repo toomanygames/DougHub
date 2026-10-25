@@ -1103,7 +1103,7 @@
                 clean.querySelectorAll(".dh-og-badge,.og-badge,.admin-badge,.message-badge,.staff-role-pill").forEach(node => node.remove());
                 raw = clean.textContent || "";
             }
-            const usernameMatch = raw.trim().match(/^@?([a-zA-Z0-9_]{2,32})(?:\\b|$)/);
+            const usernameMatch = raw.trim().match(/^@?([a-zA-Z0-9_]{2,32})(?:\b|$)/);
             if (!usernameMatch) return;
             const username = usernameMatch[1];
             element.dataset.dhOgChecked = "true";
