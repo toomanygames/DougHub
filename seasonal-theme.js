@@ -35,7 +35,7 @@ function repaintLegacySurfaces(){
   const purpleImage=isPurple(image);
   if(!purpleBg&&!purpleImage)continue;
   if(purpleBg){
-   const match=bg.match(/rgba?\(\s*([\d.]+)[, ]+\s*([\d.]+)[, ]+\s*([\d.]+)(?:[, /]+\s*([\d.]+))?/i);
+   const match=String(original.backgroundColor||bg).match(/rgba?\(\s*([\d.]+)[, ]+\s*([\d.]+)[, ]+\s*([\d.]+)(?:[, /]+\s*([\d.]+))?/i);
    const alpha=match&&match[4]!==undefined?Number(match[4]):1;
    el.style.setProperty("background-color",alpha<.42?soft:(alpha<.78?panel:raised),"important");
   }
