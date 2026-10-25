@@ -27,46 +27,40 @@ function createMainWindow() {
     return { action: "deny" };
   });
   mainWindow.webContents.on("did-finish-load", () => {
-    // Subscribe directly to the same authenticated Supabase client used by Chat.
-    // Wait for sign-in to finish; chat.html does not expose a notifyIncomingChatMessage hook.
+    // Hook the exact callback used by Chat's working realtime subscription.
+    // This avoids creating a second subscription that may be blocked by project settings.
     mainWindow.webContents.executeJavaScript(`
       (() => {
-        if (window.__douqhubQuickReplyHooked) return;
-        window.__douqhubQuickReplyHooked = true;
         let attempts = 0;
         const attach = () => {
           attempts++;
           try {
-            if (typeof supabaseClient === "undefined" || !supabaseClient ||
-                typeof currentUser === "undefined" || !currentUser?.id) {
-              if (attempts < 600) window.setTimeout(attach, 1000);
-              return;
-            }
-            const myId = String(currentUser.id);
-            const channel = supabaseClient
-              .channel("douqhub-quick-reply-desktop-" + myId)
-              .on("postgres_changes", {
-                event: "INSERT",
-                schema: "public",
-                table: "chat_messages"
-              }, ({ new: row }) => {
+            if (typeof notifyIncomingChatMessage === "function" &&
+                !window.__douqhubQuickReplyWrapped) {
+              const originalNotify = notifyIncomingChatMessage;
+              notifyIncomingChatMessage = function(row) {
+                originalNotify(row);
                 try {
-                  if (!row || !row.id || String(row.user_id || "") === myId) return;
+                  if (!row || !row.id || !row.user_id ||
+                      typeof currentUser === "undefined" || !currentUser?.id ||
+                      String(row.user_id) === String(currentUser.id)) return;
                   window.douqhubDesktop?.incoming({
                     id: String(row.id),
-                    user_id: String(row.user_id || ""),
+                    user_id: String(row.user_id),
                     username: String(row.username || "Someone").slice(0, 60),
                     message: String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message")).replace(/\\s+/g, " ").slice(0, 240),
                     group_id: row.group_id == null ? null : String(row.group_id)
                   });
-                } catch (e) { console.warn("DougHub Quick Reply notification error:", e); }
-              })
-              .subscribe(status => console.log("DougHub Quick Reply realtime:", status));
-            window.__douqhubQuickReplyChannel = channel;
+                } catch (e) { console.warn("DougHub Quick Reply popup error:", e); }
+              };
+              window.__douqhubQuickReplyWrapped = true;
+              console.log("DougHub Quick Reply: message notifications connected.");
+              return;
+            }
           } catch (e) {
-            console.warn("DougHub Quick Reply could not start realtime:", e);
-            if (attempts < 600) window.setTimeout(attach, 2000);
+            console.warn("DougHub Quick Reply hook setup error:", e);
           }
+          if (attempts < 600) window.setTimeout(attach, 1000);
         };
         attach();
       })();
