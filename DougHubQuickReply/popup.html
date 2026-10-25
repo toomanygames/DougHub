@@ -21,7 +21,7 @@ textarea{resize:none;width:100%;min-height:54px;max-height:70px;background:#080b
     <div class="person"><strong id="sender">DougHub message</strong><div class="sub">DougHub Community Chat</div></div>
     <button class="iconbtn" id="close" aria-label="Close">×</button>
   </div>
-  <div class="message" id="message">Loading message…</div>
+  <div class="message" id="message" title="Click to open DougHub Chat">Loading message…</div>
   <textarea id="reply" maxlength="1000" placeholder="Write a quick reply…" aria-label="Quick reply"></textarea>
   <div class="status" id="status" aria-live="polite"></div>
   <div class="actions"><button id="open">Open Chat</button><button class="send" id="send">Reply</button></div>
@@ -40,6 +40,7 @@ window.douqhubDesktop.onNotification(data => {
   reply.focus();
 });
 document.getElementById("close").addEventListener("click", () => window.douqhubDesktop.dismiss());
+document.getElementById("message").addEventListener("click", () => { window.douqhubDesktop.openChat(); window.douqhubDesktop.dismiss(); });
 document.getElementById("open").addEventListener("click", () => { window.douqhubDesktop.openChat(); window.douqhubDesktop.dismiss(); });
 async function sendReply() {
   if (!incoming) { status.textContent = "No message selected."; return; }
