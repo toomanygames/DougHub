@@ -1530,6 +1530,13 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 </div>
 
+<div class="card moderation-card" id="ownerBanRequestsCard" style="display:none;">
+  <h2>Owner review · Ban requests</h2>
+  <div class="status" id="ownerBanRequestsStatus">Loading requests…</div>
+  <div id="ownerBanRequestsList" class="admin-scroll-area"><div class="empty">Loading…</div></div>
+  <div class="buttons" style="margin-top:10px"><button type="button" id="refreshOwnerBanRequests">Refresh requests</button></div>
+</div>
+
 <div class="card moderation-card" id="banAccountsCard">
 
     <h2>🚫 Ban Accounts</h2>
@@ -2556,133 +2563,139 @@ async function sendWarning() {
 
 
 async function banAccount() {
-
     const userId = banUser.value;
     const type = banType.value;
     const reason = banReason.value.trim();
-
     banResult.style.display = "none";
-
-    if (!userId) {
-        alert("Please select a user.");
-        return;
-    }
-
-    if (!reason) {
-        alert("Please enter a reason.");
-        return;
-    }
-
+    if (!userId) { alert("Please select a user."); return; }
+    if (!reason) { alert("Please enter a reason."); return; }
     const selectedUser = allUsers.find(user => user.id === userId);
-
-    if (userId === DOUGHUB_OWNER_ID) {
-        alert("Doug's Owner account is permanently protected from bans and suspensions.");
-        return;
-    }
-
-    if (!selectedUser) {
-        alert("Could not find that user.");
-        return;
-    }
-
-    if (selectedUser.id === currentAdminUser.id) {
-        alert("You cannot ban or suspend your own admin account.");
-        return;
-    }
-
+    if (userId === DOUGHUB_OWNER_ID) { alert("Doug's Owner account is permanently protected from bans and suspensions."); return; }
+    if (!selectedUser) { alert("Could not find that user."); return; }
+    if (selectedUser.id === currentAdminUser.id) { alert("You cannot ban or suspend your own admin account."); return; }
     let suspendedUntil = null;
-
     if (type === "suspend") {
         const amount = Number(suspendDuration.value);
-
-        if (!Number.isFinite(amount) || amount <= 0) {
-            alert("Please enter a valid suspension length.");
-            return;
-        }
-
-        const multipliers = {
-            minutes: 60 * 1000,
-            hours: 60 * 60 * 1000,
-            days: 24 * 60 * 60 * 1000
-        };
-
-        suspendedUntil = new Date(
-            Date.now() + amount * multipliers[suspendUnit.value]
-        ).toISOString();
+        if (!Number.isFinite(amount) || amount <= 0) { alert("Please enter a valid suspension length."); return; }
+        const multipliers = { minutes: 60000, hours: 3600000, days: 86400000 };
+        suspendedUntil = new Date(Date.now() + amount * multipliers[suspendUnit.value]).toISOString();
     }
-
     const actionName = type === "suspend" ? "suspend" : "ban";
-
-    if (!confirm(
-        "Are you sure you want to " +
-        actionName +
-        " @" +
-        (selectedUser.username || "User") +
-        (type === "suspend"
-            ? " for " + suspendDuration.value + " " + suspendUnit.value + "?"
-            : "?")
-    )) {
-        return;
-    }
-
+    if (!confirm("Are you sure you want to " + actionName + " @" + (selectedUser.username || "User") +
+        (type === "suspend" ? " for " + suspendDuration.value + " " + suspendUnit.value + "?" : "?"))) return;
     banAccountButton.disabled = true;
-    banAccountButton.textContent =
-        type === "suspend" ? "Suspending..." : "Banning...";
-
-    let error = null;
-
+    banAccountButton.textContent = type === "suspend" ? "Submitting…" : "Submitting…";
     try {
-        /*
-         * Keep banned accounts in profiles so they appear in the
-         * Banned & suspended users dropdown and can later be unbanned
-         * or permanently deleted separately.
-         */
-        const result = await supabaseClient
-            .from("profiles")
-            .update({
-                is_banned: true,
-                ban_reason: reason,
-                banned_at: new Date().toISOString(),
-                ban_type: type,
-                suspended_until: suspendedUntil
-            })
-            .eq("id", userId)
-            .select("id");
-
-        error = result.error;
-        if (!error && (!result.data || result.data.length === 0)) {
-            error = new Error("Supabase did not update the profile. Check that your admin account has UPDATE permission on profiles.");
+        const { data, error } = await supabaseClient.rpc("request_staff_ban", {
+            p_target_user_id: userId,
+            p_requested_type: type,
+            p_requested_reason: reason,
+            p_requested_until: suspendedUntil
+        });
+        if (error) throw error;
+        banReason.value = "";
+        banUser.value = "";
+        banResult.className = "success";
+        if (currentAdminRole === "developer") {
+            banResult.textContent = "Request sent to the Owner. The account will NOT be banned unless the Owner approves it.";
+            await loadOwnerBanRequests();
+        } else {
+            banResult.textContent = type === "suspend"
+                ? "Account suspended successfully until " + new Date(suspendedUntil).toLocaleString() + "."
+                : "Account banned successfully.";
+            await loadUsers();
         }
-    } catch (requestError) {
-        error = requestError;
-    }
-
-    banAccountButton.disabled = false;
-    updateBanButton();
-
-    if (error) {
-        console.error(error);
-        banResult.className = "error";
-        banResult.textContent =
-            "Could not " + actionName + " account: " + (error.message || "Request failed. Check your connection and Supabase permissions.");
         banResult.style.display = "block";
-        return;
+    } catch (error) {
+        console.error("Ban request failed:", error);
+        banResult.className = "error";
+        banResult.textContent = "Could not submit " + actionName + " request: " + (error?.message || "Request failed.");
+        banResult.style.display = "block";
+    } finally {
+        banAccountButton.disabled = false;
+        updateBanButton();
     }
-
-    banReason.value = "";
-    banUser.value = "";
-
-    banResult.className = "success";
-    banResult.textContent =
-        type === "suspend"
-            ? "Account suspended successfully until " +
-              new Date(suspendedUntil).toLocaleString() + "."
-            : "Account banned successfully.";
-    banResult.style.display = "block";
-
-    await loadUsers();
 }
 
+async function loadOwnerBanRequests() {
+    const card = document.getElementById("ownerBanRequestsCard");
+    const status = document.getElementById("ownerBanRequestsStatus");
+    const list = document.getElementById("ownerBanRequestsList");
+    if (!card || !status || !list || !supabaseClient) return;
+    const isOwner = currentAdminRole === "owner" || (currentAdminUser && currentAdminUser.id === DOUGHUB_OWNER_ID);
+    card.style.display = isOwner ? "flex" : "none";
+    if (!isOwner) return;
+    status.textContent = "Loading pending requests…";
+    list.replaceChildren();
+    const { data, error } = await supabaseClient
+        .from("staff_ban_requests")
+        .select("id,target_user_id,requested_by,ban_type,reason,suspended_until,created_at,profiles:target_user_id(username),requester:requested_by(username)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+    if (error) {
+        status.textContent = "Could not load requests: " + (error.message || "Database error");
+        return;
+    }
+    const requests = data || [];
+    status.textContent = requests.length + " pending request" + (requests.length === 1 ? "" : "s");
+    if (!requests.length) {
+        list.innerHTML = '<div class="empty">No pending developer ban requests.</div>';
+        return;
+    }
+    requests.forEach(request => {
+        const item = document.createElement("article");
+        item.className = "user-item";
+        const targetName = request.profiles?.username || "Unknown user";
+        const requesterName = request.requester?.username || "Developer";
+        const head = document.createElement("div");
+        head.className = "top-row";
+        const title = document.createElement("strong");
+        title.className = "username";
+        title.textContent = (request.ban_type === "suspend" ? "Suspension request: @" : "Ban request: @") + targetName;
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = new Date(request.created_at).toLocaleString();
+        head.append(title, time);
+        const details = document.createElement("div");
+        details.className = "user-reason";
+        details.textContent = "Requested by @" + requesterName + " · " +
+            (request.ban_type === "suspend" ? "Suspended until " + (request.suspended_until ? new Date(request.suspended_until).toLocaleString() : "unspecified") : "Permanent ban") +
+            "\nReason: " + request.reason;
+        const actions = document.createElement("div");
+        actions.className = "buttons";
+        actions.style.marginTop = "12px";
+        const approve = document.createElement("button");
+        approve.className = "save-button";
+        approve.textContent = "Approve " + (request.ban_type === "suspend" ? "suspension" : "ban");
+        const block = document.createElement("button");
+        block.className = "delete-button";
+        block.textContent = "Block request";
+        async function review(approved) {
+            const verb = approved ? "approve" : "block";
+            if (!confirm("Are you sure you want to " + verb + " this request for @" + targetName + "?")) return;
+            approve.disabled = block.disabled = true;
+            status.textContent = (approved ? "Approving" : "Blocking") + " request…";
+            const { data: result, error: reviewError } = await supabaseClient.rpc("review_staff_ban_request", {
+                request_id: request.id,
+                approve: approved
+            });
+            if (reviewError || !result?.ok) {
+                status.textContent = "Could not review request: " + (reviewError?.message || "Server did not confirm the action.");
+                approve.disabled = block.disabled = false;
+                return;
+            }
+            await writeAuditLog("admin_action", "moderation", (approved ? "Approved" : "Blocked") + " developer " + request.ban_type + " request", { requestId: request.id, targetUserId: request.target_user_id, requestedBy: request.requested_by });
+            await loadOwnerBanRequests();
+            if (approved) await loadUsers();
+        }
+        approve.addEventListener("click", () => review(true));
+        block.addEventListener("click", () => review(false));
+        actions.append(approve, block);
+        item.append(head, details, actions);
+        list.appendChild(item);
+    });
+}
+document.getElementById("refreshOwnerBanRequests")?.addEventListener("click", loadOwnerBanRequests);
 
 async function unbanAccount(userId) {
 
@@ -5471,6 +5484,7 @@ async function startAdminPanel() {
 
     await Promise.all([
         loadUsers(),
+        loadOwnerBanRequests(),
         loadWarnings(),
         loadChatMessages(),
         loadGames(),
