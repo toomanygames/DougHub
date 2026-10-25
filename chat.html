@@ -2282,7 +2282,9 @@ updateChatNotificationButton();
 // be opened from the user's click, otherwise Chrome/Edge may silently block it.
 (function showDesktopNotificationPrompt() {
   if (!("Notification" in window) || !window.isSecureContext || Notification.permission !== "default") return;
-  if (sessionStorage.getItem("douqhub-chat-notification-prompt-dismissed") === "yes") return;
+  try { if (sessionStorage.getItem("douqhub-chat-notification-prompt-dismissed") === "yes") return; } catch (_) { /* Storage may be restricted by browser privacy settings. */ }
+  const showPrompt = () => {
+  if (document.getElementById("chatNotificationPrompt")) return;
   const prompt = document.createElement("section");
   prompt.id = "chatNotificationPrompt";
   prompt.setAttribute("role", "dialog");
@@ -2305,19 +2307,25 @@ updateChatNotificationButton();
   enable.textContent = "Enable notifications";
   enable.style.cssText = "padding:9px 12px;border:0;border-radius:9px;background:#6366f1;color:white;font-weight:750;cursor:pointer";
   later.addEventListener("click", () => {
-    sessionStorage.setItem("douqhub-chat-notification-prompt-dismissed", "yes");
+    try { sessionStorage.setItem("douqhub-chat-notification-prompt-dismissed", "yes"); } catch (_) { /* Storage may be restricted by browser privacy settings. */ }
     prompt.remove();
   });
   enable.addEventListener("click", async () => {
     prompt.remove();
     await enableChatDesktopNotifications();
     if (Notification.permission === "default") {
-      sessionStorage.setItem("douqhub-chat-notification-prompt-dismissed", "yes");
+      try { sessionStorage.setItem("douqhub-chat-notification-prompt-dismissed", "yes"); } catch (_) { /* Storage may be restricted by browser privacy settings. */ }
     }
   });
   actions.append(later, enable);
   prompt.append(heading, description, actions);
   document.body.appendChild(prompt);
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", showPrompt, { once: true });
+  } else {
+    showPrompt();
+  }
 })();
 async function loadMessages() {
 
