@@ -68,7 +68,7 @@ async function checkForUpdates(manual = true) {
       return;
     }
 
-    const asset = (release.assets || []).find(item => item.name === "DougHub-Quick-Reply-Setup-1.0.0.exe");
+    const asset = (release.assets || []).find(item => /^DougHub-Quick-Reply-Setup-1\\.0\\.\\d+\\.exe$/i.test(item.name));
     if (!asset || !asset.browser_download_url) throw new Error("The latest release does not contain the Windows installer yet.");
 
     const choice = await dialog.showMessageBox({
