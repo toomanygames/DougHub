@@ -2629,7 +2629,7 @@ async function loadOwnerBanRequests() {
     list.replaceChildren();
     const { data, error } = await supabaseClient
         .from("staff_ban_requests")
-        .select("id,target_user_id,requested_by,ban_type,reason,suspended_until,created_at,profiles:target_user_id(username),requester:requested_by(username)")
+        .select("id,target_user_id,requested_by,ban_type,reason,suspended_until,created_at,target:profiles!staff_ban_requests_target_user_id_fkey(username),requester:profiles!staff_ban_requests_requested_by_fkey(username)")
         .eq("status", "pending")
         .order("created_at", { ascending: true });
     if (error) {
@@ -2645,7 +2645,7 @@ async function loadOwnerBanRequests() {
     requests.forEach(request => {
         const item = document.createElement("article");
         item.className = "user-item";
-        const targetName = request.profiles?.username || "Unknown user";
+        const targetName = request.target?.username || "Unknown user";
         const requesterName = request.requester?.username || "Developer";
         const head = document.createElement("div");
         head.className = "top-row";
