@@ -469,10 +469,10 @@ function makePeer(id,info){
   try{
    const stats=await pc.getStats(),rows=[];
    stats.forEach(r=>{
-    if(r.type==="outbound-rtp"&&r.kind==="audio"&&!r.isRemote)rows.push({direction:"sent",packets:r.packetsSent||0,bytes:r.bytesSent||0});
-    if(r.type==="inbound-rtp"&&r.kind==="audio"&&!r.isRemote)rows.push({direction:"received",packets:r.packetsReceived||0,bytes:r.bytesReceived||0,packetsLost:r.packetsLost||0});
+    if(r.type==="outbound-rtp"&&!r.isRemote&&(r.kind==="audio"||r.kind==="video"||r.mediaType==="audio"||r.mediaType==="video"))rows.push({direction:"sent",kind:r.kind||r.mediaType,packets:r.packetsSent||0,bytes:r.bytesSent||0,framesEncoded:r.framesEncoded??null});
+    if(r.type==="inbound-rtp"&&!r.isRemote&&(r.kind==="audio"||r.kind==="video"||r.mediaType==="audio"||r.mediaType==="video"))rows.push({direction:"received",kind:r.kind||r.mediaType,packets:r.packetsReceived||0,bytes:r.bytesReceived||0,packetsLost:r.packetsLost||0,framesDecoded:r.framesDecoded??null});
    });
-   console.info("DougHub audio RTP stats:",{participant:id,connection:pc.connectionState,ice:pc.iceConnectionState,stats:rows});
+   console.info("DougHub audio/video RTP stats:",{participant:id,connection:pc.connectionState,ice:pc.iceConnectionState,senders:[{kind:"audio",track:state.audioSender?.track?.readyState,enabled:state.audioSender?.track?.enabled},{kind:"video",track:state.videoSender?.track?.readyState,enabled:state.videoSender?.track?.enabled}],stats:rows});
   }catch(e){console.warn("DougHub audio stats unavailable:",id,e)}
  },4000);
  state.audioStatsTimer=audioStatsTimer;
@@ -492,6 +492,8 @@ function makePeer(id,info){
  const audioTransceiver=pc.addTransceiver("audio",{direction:"sendrecv"});
  state.audioSender=audioTransceiver.sender;
  const videoTransceiver=pc.addTransceiver("video",{direction:"sendrecv"});
+ state.videoSender=videoTransceiver.sender;
+ if(localVideo)console.info("DougHub camera captured:",{state:localVideo.readyState,enabled:localVideo.enabled,muted:localVideo.muted,settings:localVideo.getSettings?.()});
  if(localAudio){localAudio.enabled=true;console.info("DougHub microphone captured:",{state:localAudio.readyState,enabled:localAudio.enabled,muted:localAudio.muted,settings:localAudio.getSettings?.()})}
  state.mediaReady=Promise.all([audioTransceiver.sender.replaceTrack(localAudio),videoTransceiver.sender.replaceTrack(localVideo)]).then(()=>{
   if(localAudio&&audioTransceiver.sender.track!==localAudio)throw new Error("Microphone track was not attached to the WebRTC sender");
