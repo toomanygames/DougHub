@@ -774,6 +774,9 @@
 
   function installQuickFind() {
     if (document.getElementById("dh-quick-find-overlay")) return;
+    // The optional header launcher is not present on every page; keyboard shortcuts
+    // (Ctrl/Cmd+K or /) still open Quick Find when it is absent.
+    const launcher = document.getElementById("dh-quick-find-launcher");
     const style=document.createElement("style");
     style.id="dh-quick-find-style";
     style.textContent=[
@@ -842,7 +845,7 @@
         const cat=document.createElement("span");cat.className="dh-qf-category";cat.textContent=p.cat;b.append(icon,copy,cat);b.addEventListener("click",()=>openPage(p));results.appendChild(b);
       });
     }
-    launcher.addEventListener("click",open);
+    if (launcher) launcher.addEventListener("click",open);
     input.addEventListener("input",()=>{selected=0;render();});
     input.addEventListener("keydown",e=>{if(e.key==="ArrowDown"){e.preventDefault();selected=Math.min(selected+1,visible.length-1);render();}else if(e.key==="ArrowUp"){e.preventDefault();selected=Math.max(0,selected-1);render();}else if(e.key==="Enter"&&visible[selected]){e.preventDefault();openPage(visible[selected]);}else if(e.key==="Escape"){e.preventDefault();close();}});
     overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
