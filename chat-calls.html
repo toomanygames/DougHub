@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050611">
 <title>DougHub Video Calls</title>
-<link rel="icon" href="/DougHub.ico" type="image/x-icon">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23080910%22/%3E%3Cpath d=%22M18 14h16a18 18 0 0 1 0 36H18z%22 fill=%22%23818cf8%22/%3E%3C/svg%3E" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/display.js" defer></script>
 <script src="/nav.js?v=20261025-call-audio-unlock" defer></script>
@@ -148,10 +148,24 @@ main{width:100%;height:calc(100dvh - 52px);min-height:0;margin:0;padding:clamp(5
 .call-toolbar .call-btn.primary:hover:not(:disabled){background:#2c9461}
 .call-toolbar .call-btn.danger:hover:not(:disabled){background:#ec4c5d}
 .call-toolbar .call-btn:disabled{opacity:.35}
-.call-toolbar #micButton::before{content:"♩";font-size:21px;font-weight:500}
-.call-toolbar #enableSoundButton::before{content:"◖";font-size:22px;font-weight:700}
+.call-toolbar #micButton::before{content:"🎙";font-size:19px;font-weight:500}
+.call-toolbar #enableSoundButton::before{content:"🔊";font-size:17px;font-weight:700}
 .call-toolbar #cameraButton::before{content:"▣";font-size:20px;font-weight:700}
 .call-toolbar #invitePeopleButton::before{content:"+";font-size:25px;font-weight:400}
+ .call-toolbar #helpButton{font-size:17px;font-weight:900}
+ .call-toolbar .call-btn.is-off{background:#383a44!important;border-color:#5a5d68!important;color:#fff}
+ .call-toolbar #micButton.is-off::before{content:"🎙̸"}
+ .call-toolbar #cameraButton.is-off::before{content:"▧"}
+ .call-toolbar #enableSoundButton.is-off::before{content:"🔇"}
+ .call-help-popup[hidden]{display:none!important}
+ .call-help-popup{position:absolute;z-index:20;right:14px;bottom:76px;width:min(360px,calc(100% - 28px));max-height:min(65dvh,420px);overflow:auto;padding:14px;border:1px solid #ffffff20;border-radius:16px;background:#11131df7;box-shadow:0 20px 70px #000a;color:#f5f6ff}
+ .call-help-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
+ .call-help-close{width:30px;height:30px;border:0;border-radius:50%;background:#ffffff12;color:white;font-size:20px;cursor:pointer}
+ .call-help-popup ul{display:grid;gap:10px;margin:12px 0 0;padding-left:18px;color:#c2c6d6;font-size:11px;line-height:1.55}
+ .call-help-popup li strong{color:#fff}
+ .video-grid:has(.video-tile:only-child){grid-template-columns:minmax(0,min(100%,720px));justify-content:center;align-content:center;overflow:hidden}
+ .video-grid:has(.video-tile:only-child) .video-tile{width:100%;max-height:calc(100dvh - 230px);min-height:0;aspect-ratio:16/9}
+ .call-note,.call-footer{display:none!important}
 .call-toolbar #micButton[disabled]::before,.call-toolbar #enableSoundButton[disabled]::before,.call-toolbar #cameraButton[disabled]::before{opacity:.8}
 #startButton,#joinButton{width:auto;min-width:105px;padding:0 17px;border-radius:999px;font-size:12px}
 #fullscreenButton{width:auto;padding:0 14px;border-radius:999px;font-size:11px}
@@ -259,7 +273,8 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 <button class="call-btn" id="enableSoundButton" type="button" disabled>Enable sound</button>
 <button class="call-btn" id="cameraButton" type="button" disabled>Turn camera off</button>
 <button class="call-btn" id="invitePeopleButton" type="button" hidden>Invite people</button>
-<button class="call-btn" id="fullscreenButton" type="button" aria-label="Enter full screen">⛶ Full screen</button>
+<button class="call-btn" id="fullscreenButton" type="button" aria-label="Enter full screen" title="Enter full screen">⛶ Full screen</button>
+ <button class="call-btn" id="helpButton" type="button" aria-label="Call tips" aria-expanded="false" aria-controls="callHelpPopup" title="Call tips">?</button>
 <button class="call-btn danger" id="endButton" type="button" disabled>End call</button>
 <span id="roomCount" class="room-count">Up to 6 people</span>
 <span id="callStatus" class="call-status" role="status" aria-live="polite">Ready when you are.</span>
@@ -286,8 +301,10 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
   <button class="call-btn" id="closeInviteButton" type="button">Close</button>
 </div>
 <div id="callError" class="call-error" role="alert"></div>
-<div class="call-note"><strong>Before you start:</strong> allow microphone access when asked. DougHub requests microphone and camera separately, so camera problems should not stop your mic. Up to six people can join. Some networks block direct peer-to-peer media and require a TURN relay.</div>
-<div class="call-footer">Audio and video are sent directly between participants; DougHub uses Supabase Realtime for room presence and connection setup.</div>
+<div id="callHelpPopup" class="call-help-popup" role="dialog" aria-label="Video call tips" hidden>
+ <div class="call-help-head"><strong>Call tips</strong><button id="closeHelpPopup" class="call-help-close" type="button" aria-label="Close tips">×</button></div>
+ <ul><li><strong>Microphone:</strong> green means on; dark means muted. If nobody hears you, use the mic button to retry.</li><li><strong>Camera:</strong> green means on; dark means off. You can still talk with the camera off.</li><li><strong>Sound:</strong> turn participant audio on, then check your computer volume.</li><li><strong>Invite:</strong> use the people button to select DougHub users or copy the room link.</li><li><strong>Connection:</strong> everyone should join the same room link. If audio fails, leave and rejoin.</li><li><strong>Privacy:</strong> leaving the page ends your camera and microphone session.</li></ul>
+</div>
 </section>
 </div>
 </main>
@@ -541,10 +558,11 @@ async function connectRoom(){if(joining||subscribed)return;joining=true;clearErr
  })}catch(e){console.error(e);showError(e.message||"Could not join the call.");setStatus("Not connected");joining=false}}
 async function cleanup(notify=true){if(ending)return;ending=true;if(notify&&subscribed&&channel)try{await channel.send({type:"broadcast",event:"signal",payload:{kind:"leave",from:user?.id,room}})}catch(_){}const old=channel;channel=null;subscribed=false;for(const st of peers.values()){if(st.recoveryTimer)clearTimeout(st.recoveryTimer);if(st.audioStatsTimer)clearInterval(st.audioStatsTimer);st.pc.ontrack=null;st.pc.onicecandidate=null;st.pc.close()}peers.clear();participants.clear();pendingIce.clear();if(old&&client)try{await client.removeChannel(old)}catch(_){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}remoteCameraHidden.clear();remoteCameraOn.clear();$("localVideo").onplaying=null;$("localVideo").onloadeddata=null;$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());$("micButton").disabled=true;$("cameraButton").disabled=true;$("enableSoundButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("startButton").hidden=!!room;$("joinButton").hidden=!room;updateRoomUi();setStatus("Left the call.");$("roomCount").textContent="0 / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent="0 / "+MAX_PARTICIPANTS+" people";ending=false;joining=false}
 $("startButton").addEventListener("click",connectRoom);$("joinButton").addEventListener("click",connectRoom);$("endButton").addEventListener("click",()=>cleanup(true));
-$("micButton").addEventListener("click",async()=>{const t=localStream?.getAudioTracks()[0];if(!t||t.readyState!=="live"){await retryMicrophone();return}const button=$("micButton");button.disabled=true;try{await syncPeerMicrophones(t);t.enabled=!t.enabled;button.textContent=t.enabled?"Mute mic":"Unmute mic";if(t.enabled){try{await t.applyConstraints({echoCancellation:true,noiseSuppression:true,autoGainControl:true})}catch(_){}setStatus("Microphone enabled and reconnected to participant audio.");clearError()}else setStatus("Your microphone is muted.")}catch(e){console.error("Could not reconnect microphone senders:",e);showError("Your mic works on this computer, but DougHub could not attach it to every call connection. Leave and rejoin the call. "+(e.message||""));button.textContent="Retry mic"}finally{button.disabled=false}});
-$("cameraButton").addEventListener("click",()=>{const t=localStream?.getVideoTracks()[0];if(t){t.enabled=!t.enabled;$("cameraButton").textContent=t.enabled?"Turn camera off":"Turn camera on";$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent=t.enabled?"Waiting for camera picture…":"Your camera is off";if(t.enabled){const video=$("localVideo");video.play?.().catch(()=>{});if(video.videoWidth>0&&video.videoHeight>0)$("localPlaceholder").hidden=false}for(const id of peers.keys())sendSignal("camera_state",id,{hidden:!t.enabled}).catch(()=>{})}});
-$("fullscreenButton").addEventListener("click",async()=>{const stage=document.querySelector(".call-stage");try{if(document.fullscreenElement){await document.exitFullscreen()}else if(stage.requestFullscreen){await stage.requestFullscreen()}else{showError("Full screen is not supported by this browser. Try the browser's full-screen control.");return}}catch(e){showError("Couldn't enter full screen. Your browser may require a direct tap on the full-screen button.")}});
-document.addEventListener("fullscreenchange",()=>{$("fullscreenButton").textContent=document.fullscreenElement?"⛶ Exit full screen":"⛶ Full screen";$("fullscreenButton").setAttribute("aria-label",document.fullscreenElement?"Exit full screen":"Enter full screen")});
+$("micButton").addEventListener("click",async()=>{const t=localStream?.getAudioTracks()[0];if(!t||t.readyState!=="live"){await retryMicrophone();return}const button=$("micButton");button.disabled=true;try{await syncPeerMicrophones(t);t.enabled=!t.enabled;button.textContent=t.enabled?"Mute mic":"Unmute mic";button.classList.toggle("is-off",!t.enabled);button.setAttribute("aria-pressed",String(t.enabled));button.title=t.enabled?"Microphone on — click to mute":"Microphone muted — click to unmute";if(t.enabled){try{await t.applyConstraints({echoCancellation:true,noiseSuppression:true,autoGainControl:true})}catch(_){}setStatus("Microphone enabled and reconnected to participant audio.");clearError()}else setStatus("Your microphone is muted.")}catch(e){console.error("Could not reconnect microphone senders:",e);showError("Your mic works on this computer, but DougHub could not attach it to every call connection. Leave and rejoin the call. "+(e.message||""));button.textContent="Retry mic"}finally{button.disabled=false}});
+$("cameraButton").addEventListener("click",()=>{const t=localStream?.getVideoTracks()[0];if(t){t.enabled=!t.enabled;$("cameraButton").textContent=t.enabled?"Turn camera off":"Turn camera on";$("cameraButton").classList.toggle("is-off",!t.enabled);$("cameraButton").setAttribute("aria-pressed",String(t.enabled));$("cameraButton").title=t.enabled?"Camera on — click to turn off":"Camera off — click to turn on";$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent=t.enabled?"Waiting for camera picture…":"Your camera is off";if(t.enabled){const video=$("localVideo");video.play?.().catch(()=>{});if(video.videoWidth>0&&video.videoHeight>0)$("localPlaceholder").hidden=false}for(const id of peers.keys())sendSignal("camera_state",id,{hidden:!t.enabled}).catch(()=>{})}});
+$("helpButton").addEventListener("click",()=>{const p=$("callHelpPopup"),open=p.hidden;p.hidden=!open;$("helpButton").setAttribute("aria-expanded",String(open));if(open)$("closeHelpPopup").focus()});$("closeHelpPopup").addEventListener("click",()=>{$("callHelpPopup").hidden=true;$("helpButton").setAttribute("aria-expanded","false");$("helpButton").focus()});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("callHelpPopup").hidden){$("callHelpPopup").hidden=true;$("helpButton").setAttribute("aria-expanded","false")}});
+ $("fullscreenButton").addEventListener("click",async()=>{const stage=document.querySelector(".call-stage");try{if(document.fullscreenElement){await document.exitFullscreen()}else if(stage.requestFullscreen){await stage.requestFullscreen()}else{showError("Full screen is not supported by this browser. Try the browser's full-screen control.");return}}catch(e){showError("Couldn't enter full screen. Your browser may require a direct tap on the full-screen button.")}});
+document.addEventListener("fullscreenchange",()=>{$("fullscreenButton").textContent=document.fullscreenElement?"⛶ Exit full screen":"⛶ Full screen";$("fullscreenButton").setAttribute("aria-label",document.fullscreenElement?"Exit full screen":"Enter full screen");$("fullscreenButton").title=document.fullscreenElement?"Exit full screen":"Enter full screen"});
 async function copyInvite(){const v=$("inviteLink").value;if(!v)return;try{await navigator.clipboard.writeText(v);setStatus("Call invite link copied.")}catch(_){$("inviteLink").focus();$("inviteLink").select();setStatus("Select and copy the invite link.")}}
 $("copyLinkButton").addEventListener("click",copyInvite);
 $("invitePeopleButton").addEventListener("click",()=>{
