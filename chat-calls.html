@@ -8,7 +8,7 @@
 <link rel="icon" href="/DougHub.ico" type="image/x-icon">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/display.js" defer></script>
-<script src="/nav.js?v=20261025-call-audio-gif-fix" defer></script>
+<script src="/nav.js?v=20261025-call-audio-track-fix" defer></script>
 <style>
 :root{color-scheme:dark;--call-line:rgba(177,184,255,.16);--call-panel:rgba(13,17,39,.86);--call-muted:#a4abc7;--call-accent:#818cf8}
 *{box-sizing:border-box}
@@ -194,11 +194,21 @@ function makePeer(id,info){
   else if(!state.stream.getTracks().some(x=>x.id===e.track.id))state.stream.addTrack(e.track);
   const t=tile();
   if(t){
-   const video=t.querySelector("video"),audio=t.querySelector("audio");video.srcObject=state.stream;
-   audio.srcObject=new MediaStream(state.stream.getAudioTracks());
+   const video=t.querySelector("video"),audio=t.querySelector("audio");
+   video.srcObject=state.stream;
+   audio.muted=false;audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
+   // Attach the received audio track directly as soon as WebRTC delivers it.
+   if(e.track.kind==="audio"){
+    e.track.enabled=true;
+    audio.srcObject=new MediaStream([e.track]);
+    e.track.onunmute=()=>{audio.play?.().catch(()=>setStatus("Audio playback is blocked. Tap the participant tile to hear them."))};
+    audio.play?.().catch(()=>setStatus("Audio playback is blocked. Tap the participant tile to hear them."));
+   }else{
+    audio.srcObject=new MediaStream(state.stream.getAudioTracks());
+   }
    video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
-   if(audio.srcObject.getAudioTracks().length)audio.play?.().catch(()=>{setStatus("Audio playback is blocked. Tap the participant tile to hear them.")});
-   const resumePlayback=()=>{video.play?.().catch(()=>{});audio.play?.().catch(()=>{})};t.addEventListener("click",resumePlayback);
+   const resumePlayback=()=>{video.play?.().catch(()=>{});audio.play?.().catch(()=>{})};
+   if(!t.dataset.mediaResumeBound){t.addEventListener("click",resumePlayback);t.dataset.mediaResumeBound="1"}
    video.onplaying=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};video.onloadeddata=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};
    const ph=t.querySelector(".video-placeholder");const hasVideo=state.stream.getVideoTracks().some(track=>track.readyState==="live"&&track.enabled);if(hasVideo&&!remoteCameraHidden.has(id))remoteCameraOn.add(id);else remoteCameraOn.delete(id);if(ph){const visible=hasVideo&&!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0;ph.hidden=visible;if(!visible){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
    const label=t.querySelector("[data-label]");
@@ -234,7 +244,11 @@ function makePeer(id,info){
  const localVideo=localStream?.getVideoTracks()[0]||null;
  const audioTransceiver=pc.addTransceiver("audio",{direction:"sendrecv"});
  const videoTransceiver=pc.addTransceiver("video",{direction:"sendrecv"});
- state.mediaReady=Promise.all([audioTransceiver.sender.replaceTrack(localAudio),videoTransceiver.sender.replaceTrack(localVideo)]).catch(e=>{console.warn("Sender track setup failed",e);throw e});
+ if(localAudio){localAudio.enabled=true;console.info("DougHub microphone captured:",{state:localAudio.readyState,enabled:localAudio.enabled,muted:localAudio.muted,settings:localAudio.getSettings?.()})}
+ state.mediaReady=Promise.all([audioTransceiver.sender.replaceTrack(localAudio),videoTransceiver.sender.replaceTrack(localVideo)]).then(()=>{
+  if(localAudio&&audioTransceiver.sender.track!==localAudio)throw new Error("Microphone track was not attached to the WebRTC sender");
+  console.info("DougHub microphone sender ready:",{track:!!audioTransceiver.sender.track,enabled:audioTransceiver.sender.track?.enabled,connection:pc.connectionState});
+ }).catch(e=>{console.error("Sender track setup failed",e);throw e});
  if(videoTransceiver.sender?.getParameters&&videoTransceiver.sender?.setParameters){
   const params=videoTransceiver.sender.getParameters();params.encodings=params.encodings?.length?params.encodings:[{}];
   params.encodings[0].maxBitrate=450000;params.encodings[0].maxFramerate=24;
