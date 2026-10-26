@@ -906,7 +906,7 @@ html[data-dh-theme="winter"] .chat-video-call-button{border-color:rgba(139,217,2
       <button class="chat-video-call-button chat-video-invite-button" id="chatVideoInviteButton" type="button" title="Send a group video-call invite to the current chat">
         <span aria-hidden="true">＋</span> Invite to call
       </button>
-      <span class="chat-notification-hint" title="Use the bell beside each chat to mute its alerts">Chat alerts are controlled per chat</span>
+      <span class="chat-notification-hint" title="Unread chats show a red dot; group alerts can be muted">Chat alerts are controlled per chat</span>
 
       <div
         class="username-display"
@@ -1478,7 +1478,7 @@ function renderChatGroupList() {
   const publicButton=document.createElement("button");publicButton.type="button";publicButton.dataset.chatKey="public";
   publicButton.className="group-pill"+(activeChatGroupId===null?" active":"");
   publicButton.innerHTML='<span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span class="group-name-label">Public Chat</span>';
-  publicButton.addEventListener("click",()=>selectChatGroup(null));publicRow.append(publicButton,makeChatBell(null));groupListEl.appendChild(publicRow);
+  publicButton.addEventListener("click",()=>selectChatGroup(null));publicRow.appendChild(publicButton);groupListEl.appendChild(publicRow);
   visibleChatGroups.forEach(group => {
     const row = document.createElement("div");
     row.className = "group-row";
