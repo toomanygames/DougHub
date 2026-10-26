@@ -1493,7 +1493,7 @@ async function loadChatGroups() {
     return;
   }
   const allGroups = data || [];
-  if (currentUserIsAdmin) {
+  if (currentUserIsHelper || currentUserIsAdmin) {
     visibleChatGroups = allGroups;
   } else {
     const { data: memberships, error: membershipError } = await supabaseClient
@@ -1600,6 +1600,7 @@ async function selectChatGroup(groupId) {
   messageInput.placeholder = activeChatGroup ? "Message " + activeChatGroup.name + "…" : "Type a message…";
   if(currentUser)markChatRead(activeChatGroupId);
   renderChatGroupList();
+  renderActiveGroupDetails();
   await loadMessages();
   await loadChatFeaturePanels();
   await refreshGroupMentionDots();
@@ -2099,7 +2100,9 @@ async function renderMessages(
         messagesEl.appendChild(divider);
         previousDayKey = dayKey;
       }
-      const consecutiveSameUser = previousMessage && previousMessage.user_id === message.user_id && dayKey === (new Date(previousMessage.created_at).getFullYear() + "-" + new Date(previousMessage.created_at).getMonth() + "-" + new Date(previousMessage.created_at).getDate()) && (messageDate.getTime() - new Date(previousMessage.created_at).getTime()) <= 5 * 60 * 1000;
+      const previousDate = previousMessage ? new Date(previousMessage.created_at) : null;
+      const previousDay = previousDate ? previousDate.getFullYear() + "-" + previousDate.getMonth() + "-" + previousDate.getDate() : "";
+      const consecutiveSameUser = previousMessage && previousMessage.user_id === message.user_id && dayKey === previousDay;
       previousMessage = message;
 
       const mine =
@@ -2784,8 +2787,8 @@ async function sendMessage() {
     console.error("Unexpected Community Chat send error:", error);
     showError("Could not send your message: " + (error?.message || "Network connection failed. Please try again."));
   } finally {
-    sendButton.disabled = false;
-    messageInput.disabled = false;
+    sendButton.disabled = !!(activeChatGroup?.staff_only_write && !currentUserIsHelper);
+    messageInput.disabled = !!(activeChatGroup?.staff_only_write && !currentUserIsHelper);
     messageInput.focus();
   }
 
