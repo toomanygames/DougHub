@@ -280,3 +280,10 @@ html[data-dh-theme="winter"] :is(input:not([type="checkbox"]):not([type="radio"]
   background-color:var(--season-surface)!important;color:var(--text)!important;
 }
 html[data-dh-theme] ::selection{background:color-mix(in srgb,var(--season-accent) 38%,transparent);color:var(--text)}
+
+/* Custom theme: colors are supplied by the palette controls in Settings. */
+html[data-dh-theme="custom"]{--season-bg:var(--bg,#080a16);--season-accent:var(--indigo,#6366f1);--season-accent2:var(--purple,#a855f7);--season-panel:var(--panel,#11152b);--season-line:color-mix(in srgb,var(--season-accent) 25%,transparent);--season-glow:color-mix(in srgb,var(--season-accent) 22%,transparent);--season-muted:var(--muted,#b7bdd4)}
+html[data-dh-theme="custom"] body{background-color:var(--season-bg)!important;background-image:radial-gradient(ellipse at 8% 0%,var(--season-glow),transparent 39%),radial-gradient(ellipse at 94% 14%,color-mix(in srgb,var(--season-accent2) 14%,transparent),transparent 34%)!important}
+html[data-dh-theme="custom"] :is(header,.top,.topbar,.top-bar,.navbar,.app-header){border-color:var(--season-line)!important;background:color-mix(in srgb,var(--season-bg) 88%,transparent)!important}
+html[data-dh-theme="custom"] :is(.card,.panel,.tool-card,.game-card,.feature-card,.stat-card,.settings-card,.section-card,.content-card,.post-card,.message-card,.workspace-card,.editor-panel){border-color:var(--season-line)!important}
+html[data-dh-theme="custom"] :is(a:hover,.nav a:hover){color:var(--season-accent)!important}
