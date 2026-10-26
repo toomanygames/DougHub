@@ -472,7 +472,9 @@ function makePeer(id,info){
     if(r.type==="outbound-rtp"&&!r.isRemote&&(r.kind==="audio"||r.kind==="video"||r.mediaType==="audio"||r.mediaType==="video"))rows.push({direction:"sent",kind:r.kind||r.mediaType,packets:r.packetsSent||0,bytes:r.bytesSent||0,framesEncoded:r.framesEncoded??null});
     if(r.type==="inbound-rtp"&&!r.isRemote&&(r.kind==="audio"||r.kind==="video"||r.mediaType==="audio"||r.mediaType==="video"))rows.push({direction:"received",kind:r.kind||r.mediaType,packets:r.packetsReceived||0,bytes:r.bytesReceived||0,packetsLost:r.packetsLost||0,framesDecoded:r.framesDecoded??null});
    });
-   console.info("DougHub audio/video RTP stats:",{participant:id,connection:pc.connectionState,ice:pc.iceConnectionState,senders:[{kind:"audio",track:state.audioSender?.track?.readyState,enabled:state.audioSender?.track?.enabled},{kind:"video",track:state.videoSender?.track?.readyState,enabled:state.videoSender?.track?.enabled}],stats:rows});
+   const report={participant:id,connection:pc.connectionState,ice:pc.iceConnectionState,signaling:pc.signalingState,senders:[{kind:"audio",track:state.audioSender?.track?.readyState||null,enabled:state.audioSender?.track?.enabled??null,muted:state.audioSender?.track?.muted??null,id:state.audioSender?.track?.id||null},{kind:"video",track:state.videoSender?.track?.readyState||null,enabled:state.videoSender?.track?.enabled??null,muted:state.videoSender?.track?.muted??null,id:state.videoSender?.track?.id||null}],localTracks:(localStream?.getTracks()||[]).map(t=>({kind:t.kind,state:t.readyState,enabled:t.enabled,muted:t.muted})),stats:rows};
+   // JSON string keeps the diagnostic readable instead of collapsing it to "Object" in DevTools.
+   console.info("DougHub audio/video RTP stats: "+JSON.stringify(report));
   }catch(e){console.warn("DougHub audio stats unavailable:",id,e)}
  },4000);
  state.audioStatsTimer=audioStatsTimer;
@@ -493,8 +495,8 @@ function makePeer(id,info){
  state.audioSender=audioTransceiver.sender;
  const videoTransceiver=pc.addTransceiver("video",{direction:"sendrecv"});
  state.videoSender=videoTransceiver.sender;
- if(localVideo)console.info("DougHub camera captured:",{state:localVideo.readyState,enabled:localVideo.enabled,muted:localVideo.muted,settings:localVideo.getSettings?.()});
- if(localAudio){localAudio.enabled=true;console.info("DougHub microphone captured:",{state:localAudio.readyState,enabled:localAudio.enabled,muted:localAudio.muted,settings:localAudio.getSettings?.()})}
+ if(localVideo)console.info("DougHub camera captured: "+JSON.stringify({state:localVideo.readyState,enabled:localVideo.enabled,muted:localVideo.muted,settings:localVideo.getSettings?.()}));
+ if(localAudio){localAudio.enabled=true;console.info("DougHub microphone captured: "+JSON.stringify({state:localAudio.readyState,enabled:localAudio.enabled,muted:localAudio.muted,settings:localAudio.getSettings?.()}))}
  state.mediaReady=Promise.all([audioTransceiver.sender.replaceTrack(localAudio),videoTransceiver.sender.replaceTrack(localVideo)]).then(()=>{
   if(localAudio&&audioTransceiver.sender.track!==localAudio)throw new Error("Microphone track was not attached to the WebRTC sender");
   console.info("DougHub microphone sender ready:",{track:!!audioTransceiver.sender.track,enabled:audioTransceiver.sender.track?.enabled,connection:pc.connectionState});
@@ -534,7 +536,7 @@ async function syncPeerMedia(){
   if(state.audioSender&&state.audioSender.track!==audio){await state.audioSender.replaceTrack(audio);if(state.audioSender.track!==audio)throw new Error("Microphone could not be attached to a participant connection.")}
   if(state.videoSender&&state.videoSender.track!==video){await state.videoSender.replaceTrack(video);if(state.videoSender.track!==video)throw new Error("Camera could not be attached to a participant connection.")}
  }));
- console.info("DougHub media tracks synced:",{audio:!!audio,audioState:audio?.readyState,audioEnabled:audio?.enabled,video:!!video,videoState:video?.readyState,videoEnabled:video?.enabled,peerCount:peers.size});
+ console.info("DougHub media tracks synced: "+JSON.stringify({audio:!!audio,audioState:audio?.readyState,audioEnabled:audio?.enabled,video:!!video,videoState:video?.readyState,videoEnabled:video?.enabled,peerCount:peers.size}));
 }
 async function syncPeerMicrophones(track=localStream?.getAudioTracks()[0]){
  if(!track)return;
