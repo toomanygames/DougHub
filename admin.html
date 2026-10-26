@@ -1315,6 +1315,22 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 .custom-badge-existing #customBadgeRecentList:empty{display:none}
 @media(max-width:680px){.custom-badge-panel{padding:15px!important}.custom-badge-form{grid-template-columns:repeat(2,minmax(0,1fr));padding:12px}.custom-badge-field,.custom-badge-recipient,.custom-badge-description,.custom-badge-color,.custom-badge-preview,.custom-badge-submit{grid-column:span 2}.custom-badge-heading-icon{width:42px;height:42px;flex-basis:42px}}
 
+
+/* New chat-feature moderation panels */
+#adminArea .admin-feature-list{display:flex;flex-direction:column;gap:9px;margin-top:12px;min-width:0}
+.admin-feature-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px;border:1px solid rgba(148,163,184,.16);border-radius:13px;background:rgba(5,8,22,.46);min-width:0}
+.admin-feature-meta{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.admin-feature-title{font-weight:800;color:#eef0ff;overflow-wrap:anywhere}
+.admin-feature-detail{font-size:12px;line-height:1.5;color:#a8b0ca;overflow-wrap:anywhere;white-space:pre-wrap}
+.admin-feature-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex:0 0 auto}
+.admin-feature-actions button{padding:8px 11px;border-radius:9px;border:1px solid rgba(148,163,184,.2);background:rgba(99,102,241,.13);color:#e4e7ff;font-size:12px;font-weight:800;cursor:pointer}
+.admin-feature-actions button.danger{border-color:#fb718544;background:#ef444414;color:#fecaca}
+.admin-feature-actions button:disabled{opacity:.55;cursor:wait}
+.admin-feature-chip{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:3px 7px;border-radius:7px;background:rgba(99,102,241,.13);border:1px solid rgba(129,140,248,.18);color:#c7d2fe;font-size:10px;font-weight:850;letter-spacing:.04em}
+.chat-group-write-toggle{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:#c7d2fe;font-weight:750}
+.chat-group-write-toggle input{accent-color:#8b5cf6}
+@media(max-width:600px){.admin-feature-row{flex-direction:column}.admin-feature-actions{width:100%}.admin-feature-actions button{flex:1}}
+
 </style>
 </head>
 
@@ -1424,6 +1440,21 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
   <div id="chatGroupModerationList" class="chat-group-moderation-list"></div>
 </div>
 
+
+
+<div class="card" id="chatPollModerationCard">
+  <h2>📊 Chat Polls</h2>
+  <p class="admin-card-help">Review polls across Community Chat and groups. Admin+ can close an active poll at any time; closed polls remain visible with their results.</p>
+  <div class="admin-card-actions"><span id="chatPollModerationStatus" class="status">Loading polls…</span><button type="button" id="refreshChatPollsButton" class="save-button">↻ Refresh polls</button></div>
+  <div id="chatPollModerationList" class="admin-feature-list" aria-live="polite"><div class="empty">Loading polls…</div></div>
+</div>
+
+<div class="card" id="chatPinnedModerationCard">
+  <h2>📌 Pinned Chat Messages</h2>
+  <p class="admin-card-help">Review Helper+ pins and remove pins that are outdated or inappropriate. Removing a pin does not delete its message.</p>
+  <div class="admin-card-actions"><span id="chatPinnedModerationStatus" class="status">Loading pinned messages…</span><button type="button" id="refreshChatPinsButton" class="save-button">↻ Refresh pins</button></div>
+  <div id="chatPinnedModerationList" class="admin-feature-list" aria-live="polite"><div class="empty">Loading pins…</div></div>
+</div>
 
 <div class="card admin-event-card" id="siteAnnouncementCard">
   <h2>📣 Event Banner</h2>
@@ -5453,6 +5484,137 @@ document.getElementById("schedulePageEnabled")?.addEventListener("change",functi
 
 
 
+
+async function loadChatPollModeration() {
+    const status = document.getElementById("chatPollModerationStatus");
+    const list = document.getElementById("chatPollModerationList");
+    if (!status || !list || !supabaseClient) return;
+    if (!["admin", "developer", "owner"].includes(currentAdminRole)) {
+        status.textContent = "Admin+ access required.";
+        list.replaceChildren();
+        return;
+    }
+    status.textContent = "Loading polls…";
+    list.replaceChildren();
+    const { data: polls, error } = await supabaseClient.from("chat_polls")
+        .select("id,group_id,created_by,question,options,is_closed,created_at")
+        .order("created_at", { ascending: false }).limit(100);
+    if (error) {
+        status.textContent = "Could not load polls: " + (error.message || "Database error");
+        return;
+    }
+    const items = polls || [];
+    const groupIds = [...new Set(items.map(p => p.group_id).filter(Boolean))];
+    const groupMap = new Map();
+    if (groupIds.length) {
+        const { data: groups } = await supabaseClient.from("chat_groups").select("id,name").in("id", groupIds);
+        (groups || []).forEach(g => groupMap.set(g.id, g.name || "Group"));
+    }
+    const pollIds = items.map(p => p.id);
+    const voteCounts = new Map();
+    if (pollIds.length) {
+        const { data: votes } = await supabaseClient.from("chat_poll_votes").select("poll_id").in("poll_id", pollIds);
+        (votes || []).forEach(v => voteCounts.set(v.poll_id, (voteCounts.get(v.poll_id) || 0) + 1));
+    }
+    status.textContent = items.length + " poll" + (items.length === 1 ? "" : "s") + " · " + items.filter(p => !p.is_closed).length + " open";
+    if (!items.length) {
+        const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = "No polls have been created yet."; list.appendChild(empty); return;
+    }
+    items.forEach(poll => {
+        const row = document.createElement("article"); row.className = "admin-feature-row";
+        const meta = document.createElement("div"); meta.className = "admin-feature-meta";
+        const title = document.createElement("div"); title.className = "admin-feature-title"; title.textContent = poll.question || "Untitled poll";
+        const chip = document.createElement("span"); chip.className = "admin-feature-chip"; chip.textContent = poll.is_closed ? "CLOSED" : "OPEN";
+        const details = document.createElement("div"); details.className = "admin-feature-detail";
+        const options = Array.isArray(poll.options) ? poll.options : [];
+        details.textContent = (poll.group_id ? (groupMap.get(poll.group_id) || "Chat group") : "Community Chat") +
+            " · " + (voteCounts.get(poll.id) || 0) + " vote(s) · " + options.length + " options · " +
+            new Date(poll.created_at).toLocaleString();
+        const optionLine = document.createElement("div"); optionLine.className = "admin-feature-detail";
+        optionLine.textContent = options.map((o, i) => (i + 1) + ". " + String(o)).join("   ");
+        meta.append(title, chip, details, optionLine);
+        const actions = document.createElement("div"); actions.className = "admin-feature-actions";
+        if (!poll.is_closed) {
+            const close = document.createElement("button"); close.type = "button"; close.className = "danger"; close.textContent = "Close poll";
+            close.addEventListener("click", async () => {
+                if (!confirm('Close the poll "' + (poll.question || "Untitled poll") + '" now? People will no longer be able to vote.')) return;
+                close.disabled = true; close.textContent = "Closing…";
+                try {
+                    const { error: updateError } = await supabaseClient.from("chat_polls").update({ is_closed: true }).eq("id", poll.id);
+                    if (updateError) throw updateError;
+                    await writeAuditLog("admin_action", "chat", "Closed chat poll: " + (poll.question || "Untitled poll"), { pollId: poll.id, groupId: poll.group_id });
+                    await loadChatPollModeration();
+                } catch (e) {
+                    status.textContent = "Could not close poll: " + (e.message || "Database error");
+                    close.disabled = false; close.textContent = "Close poll";
+                }
+            });
+            actions.appendChild(close);
+        }
+        row.append(meta, actions); list.appendChild(row);
+    });
+}
+document.getElementById("refreshChatPollsButton")?.addEventListener("click", loadChatPollModeration);
+
+async function loadPinnedMessageModeration() {
+    const status = document.getElementById("chatPinnedModerationStatus");
+    const list = document.getElementById("chatPinnedModerationList");
+    if (!status || !list || !supabaseClient) return;
+    status.textContent = "Loading pinned messages…";
+    list.replaceChildren();
+    const { data: pins, error } = await supabaseClient.from("chat_pinned_messages")
+        .select("id,group_id,message_id,pinned_by,created_at").order("created_at", { ascending: false }).limit(100);
+    if (error) {
+        status.textContent = "Could not load pins: " + (error.message || "Database error");
+        return;
+    }
+    const items = pins || [];
+    status.textContent = items.length + " pinned message" + (items.length === 1 ? "" : "s");
+    if (!items.length) {
+        const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = "No messages are currently pinned."; list.appendChild(empty); return;
+    }
+    const messageIds = [...new Set(items.map(p => p.message_id).filter(Boolean))];
+    const groupIds = [...new Set(items.map(p => p.group_id).filter(Boolean))];
+    const messageMap = new Map(), groupMap = new Map();
+    if (messageIds.length) {
+        const { data: messages } = await supabaseClient.from("chat_messages").select("id,username,message,created_at").in("id", messageIds);
+        (messages || []).forEach(m => messageMap.set(m.id, m));
+    }
+    if (groupIds.length) {
+        const { data: groups } = await supabaseClient.from("chat_groups").select("id,name").in("id", groupIds);
+        (groups || []).forEach(g => groupMap.set(g.id, g.name || "Group"));
+    }
+    items.forEach(pin => {
+        const row = document.createElement("article"); row.className = "admin-feature-row";
+        const meta = document.createElement("div"); meta.className = "admin-feature-meta";
+        const msg = messageMap.get(pin.message_id);
+        const title = document.createElement("div"); title.className = "admin-feature-title";
+        title.textContent = msg ? "@" + (msg.username || "User") : "Message unavailable";
+        const body = document.createElement("div"); body.className = "admin-feature-detail";
+        body.textContent = msg ? (msg.message || "[Attachment only]") : "The original message may have been deleted.";
+        const details = document.createElement("div"); details.className = "admin-feature-detail";
+        details.textContent = (pin.group_id ? (groupMap.get(pin.group_id) || "Chat group") : "Community Chat") + " · Pinned " + new Date(pin.created_at).toLocaleString();
+        meta.append(title, body, details);
+        const actions = document.createElement("div"); actions.className = "admin-feature-actions";
+        const unpin = document.createElement("button"); unpin.type = "button"; unpin.className = "danger"; unpin.textContent = "Unpin";
+        unpin.addEventListener("click", async () => {
+            if (!confirm("Remove this pin? The original chat message will remain.")) return;
+            unpin.disabled = true; unpin.textContent = "Removing…";
+            try {
+                const { error: deleteError } = await supabaseClient.from("chat_pinned_messages").delete().eq("id", pin.id);
+                if (deleteError) throw deleteError;
+                await writeAuditLog("admin_action", "chat", "Removed pinned chat message", { pinId: pin.id, messageId: pin.message_id, groupId: pin.group_id });
+                await loadPinnedMessageModeration();
+            } catch (e) {
+                status.textContent = "Could not remove pin: " + (e.message || "Database error");
+                unpin.disabled = false; unpin.textContent = "Unpin";
+            }
+        });
+        actions.appendChild(unpin); row.append(meta, actions); list.appendChild(row);
+    });
+}
+document.getElementById("refreshChatPinsButton")?.addEventListener("click", loadPinnedMessageModeration);
+
 async function loadChatGroupModeration() {
     const status = document.getElementById("chatGroupModerationStatus");
     const list = document.getElementById("chatGroupModerationList");
@@ -5461,7 +5623,7 @@ async function loadChatGroupModeration() {
     list.replaceChildren();
     const { data, error } = await supabaseClient
         .from("chat_groups")
-        .select("id,name,is_public,created_by,created_at")
+        .select("id,name,is_public,staff_only_write,created_by,created_at")
         .order("created_at", { ascending: false });
     if (error) {
         status.textContent = "Could not load groups: " + (error.message || "Database error");
@@ -5483,9 +5645,38 @@ async function loadChatGroupModeration() {
         name.textContent = group.name || "Unnamed group";
         const sub = document.createElement("div");
         sub.className = "chat-group-moderation-sub";
-        sub.textContent = (group.is_public ? "Public group" : "Private group") + " · Created " +
+        sub.textContent = (group.is_public ? "Public group" : "Private group") + (group.staff_only_write ? " · Helper+ write" : " · Members can write") + " · Created " +
             new Date(group.created_at).toLocaleDateString();
         meta.append(name, sub);
+        const writeToggle = document.createElement("label");
+        writeToggle.className = "chat-group-write-toggle";
+        const writeCheckbox = document.createElement("input");
+        writeCheckbox.type = "checkbox";
+        writeCheckbox.checked = !!group.staff_only_write;
+        const writeLabel = document.createElement("span");
+        writeLabel.textContent = "Only Helper+ can write (keep group public)";
+        writeToggle.append(writeCheckbox, writeLabel);
+        writeCheckbox.addEventListener("change", async () => {
+            const enabled = writeCheckbox.checked;
+            writeCheckbox.disabled = true;
+            try {
+                const { error: updateError } = await supabaseClient.from("chat_groups")
+                    .update({ staff_only_write: enabled, is_public: enabled ? true : group.is_public })
+                    .eq("id", group.id);
+                if (updateError) throw updateError;
+                group.staff_only_write = enabled;
+                if (enabled) group.is_public = true;
+                sub.textContent = (group.is_public ? "Public group" : "Private group") + (enabled ? " · Helper+ write" : " · Members can write") + " · Created " + new Date(group.created_at).toLocaleDateString();
+                await writeAuditLog("admin_action", "chat", enabled ? "Enabled Helper+ only writing for chat group: " + (group.name || "Unnamed group") : "Disabled Helper+ only writing for chat group: " + (group.name || "Unnamed group"), { groupId: group.id });
+                status.textContent = "Updated writing permissions for " + (group.name || "group") + ".";
+            } catch (updateError) {
+                writeCheckbox.checked = !!group.staff_only_write;
+                status.textContent = "Could not update group writing permissions: " + (updateError.message || "Database error");
+            } finally {
+                writeCheckbox.disabled = false;
+            }
+        });
+        meta.appendChild(writeToggle);
         const remove = document.createElement("button");
         remove.type = "button";
         remove.className = "chat-group-moderation-delete";
@@ -5619,6 +5810,8 @@ async function startAdminPanel() {
         loadSiteEvents(),
         loadChatRetentionSettings(),
         loadChatGroupModeration(),
+        loadChatPollModeration(),
+        loadPinnedMessageModeration(),
     ]);
 
     // Account-menu links can open the feedback inbox directly.
