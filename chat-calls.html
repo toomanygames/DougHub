@@ -221,7 +221,7 @@ $("copyInviteButton").addEventListener("click",copyInvite);$("copyLinkButton").a
 function releaseCallMedia(){try{localStream?.getTracks().forEach(t=>t.stop());localStream=null;for(const st of peers.values())st.pc.close();if(channel&&client)client.removeChannel(channel)}catch(_){}}
 window.addEventListener("pagehide",releaseCallMedia);
 window.addEventListener("beforeunload",releaseCallMedia);
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&localStream){const video=localStream.getVideoTracks();video.forEach(t=>t.stop());if(video.length){$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Camera stopped while DougHub is in the background";$("cameraButton").disabled=true;$("cameraButton").textContent="Camera stopped"}}});
+// Keep camera and microphone active when the user switches browser tabs. Media is still released on pagehide/beforeunload when leaving this page.
 })();
 </script>
 </body>
