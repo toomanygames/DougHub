@@ -8,7 +8,7 @@
 <link rel="icon" href="/DougHub.ico" type="image/x-icon">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/display.js" defer></script>
-<script src="/nav.js?v=20261025-call-drawer-mic" defer></script>
+<script src="/nav.js?v=20261025-call-audio-gif-fix" defer></script>
 <style>
 :root{color-scheme:dark;--call-line:rgba(177,184,255,.16);--call-panel:rgba(13,17,39,.86);--call-muted:#a4abc7;--call-accent:#818cf8}
 *{box-sizing:border-box}
@@ -100,7 +100,7 @@ h1{font-size:clamp(28px,5vw,46px);line-height:1.04;letter-spacing:-.055em;margin
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search),MAX_PARTICIPANTS=6;
-let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",channel=null,localStream=null,subscribed=false,joining=false,ending=false,isOwner=false;
+let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",channel=null,localStream=null,subscribed=false,joining=false,ending=false;
 const remoteCameraHidden=new Set(),remoteCameraOn=new Set();
 const peers=new Map(),participants=new Map(),pendingIce=new Map();
 const setStatus=s=>{$("callStatus").textContent=s};
@@ -116,9 +116,22 @@ async function ensureMedia(){
  if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera and microphone access requires a supported browser on HTTPS.");
  let audioTrack=null,videoTrack=null,audioError=null,videoError=null;
  try{
-  const audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+  let audioStream;
+  try{
+   audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+  }catch(firstError){
+   audioError=firstError;
+   // Some browsers/devices reject one of the optional processing constraints. Retry with the default device settings.
+   audioStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+  }
   audioTrack=audioStream.getAudioTracks()[0]||null;
- }catch(e){audioError=e;console.warn("Microphone access failed:",e)}
+  if(audioTrack){
+   audioTrack.enabled=true;
+   audioTrack.onended=()=>{if(localStream?.getAudioTracks().includes(audioTrack)){$("micButton").disabled=true;$("micButton").textContent="Mic disconnected";showError("Your microphone disconnected. Leave and rejoin the call, then check browser/device microphone settings.")}};
+   audioTrack.onmute=()=>setStatus("Your microphone was muted by the device or browser.");
+   audioTrack.onunmute=()=>setStatus("Your microphone is active.");
+  }
+ }catch(e){audioError=e;console.warn("Microphone access failed after fallback:",e)}
  try{
   const videoStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{width:{ideal:640,max:1280},height:{ideal:360,max:720},frameRate:{ideal:24,max:30},facingMode:"user"}});
   videoTrack=videoStream.getVideoTracks()[0]||null;
