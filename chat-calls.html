@@ -194,8 +194,8 @@ async function ensureMedia(){
  $("localPlaceholder").hidden=false;
  $("localPlaceholder").querySelector("span:last-child").textContent=videoTrack?"Waiting for camera picture…":"Camera unavailable — you can still talk";
  const localVideo=$("localVideo");const showLocalFallback=()=>{const track=localStream?.getVideoTracks()[0];const visible=!!track&&track.enabled&&track.readyState==="live"&&localVideo.videoWidth>0&&localVideo.videoHeight>0;if(!visible){$("localPlaceholder").hidden=false;if(track?.enabled&&track.readyState==="live")$("localPlaceholder").querySelector("span:last-child").textContent="Waiting for camera picture…"}else $("localPlaceholder").hidden=true};localVideo.onplaying=showLocalFallback;localVideo.onloadeddata=showLocalFallback;localVideo.onerror=()=>{$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Camera picture unavailable"};localVideo.play?.().then(showLocalFallback).catch(showLocalFallback);
- $("micButton").disabled=!audioTrack;$("cameraButton").disabled=!videoTrack;$("enableSoundButton").disabled=false;$("endButton").disabled=false;
- $("micButton").textContent=audioTrack?"Mute mic":"Mic unavailable";
+ $("micButton").disabled=false;$("cameraButton").disabled=!videoTrack;$("enableSoundButton").disabled=false;$("endButton").disabled=false;
+ $("micButton").textContent=audioTrack?"Mute mic":"Enable mic";
  $("cameraButton").textContent=videoTrack?"Turn camera off":"Camera unavailable";
  $("localVideoLabel").textContent=username+" (you)";
  if(!audioTrack)showError("Your camera connected, but no microphone is available. Check the selected microphone and browser permission settings.");
@@ -248,7 +248,7 @@ function makePeer(id,info){
   {urls:"stun:stun.l.google.com:19302"},
   {urls:"stun:stun1.l.google.com:19302"}
  ]});
- const state={pc,info,stream:new MediaStream(),makingOffer:false,recoveryTimer:null,restartAttempts:0,mediaReady:Promise.resolve()};
+ const state={pc,info,stream:new MediaStream(),makingOffer:false,recoveryTimer:null,restartAttempts:0,mediaReady:Promise.resolve(),audioSender:null};
  peers.set(id,state);
  const tile=()=>document.getElementById("participant-"+id);
  pc.ontrack=e=>{
@@ -324,6 +324,7 @@ function makePeer(id,info){
  const localAudio=localStream?.getAudioTracks()[0]||null;
  const localVideo=localStream?.getVideoTracks()[0]||null;
  const audioTransceiver=pc.addTransceiver("audio",{direction:"sendrecv"});
+ state.audioSender=audioTransceiver.sender;
  const videoTransceiver=pc.addTransceiver("video",{direction:"sendrecv"});
  if(localAudio){localAudio.enabled=true;console.info("DougHub microphone captured:",{state:localAudio.readyState,enabled:localAudio.enabled,muted:localAudio.muted,settings:localAudio.getSettings?.()})}
  state.mediaReady=Promise.all([audioTransceiver.sender.replaceTrack(localAudio),videoTransceiver.sender.replaceTrack(localVideo)]).then(()=>{
@@ -366,7 +367,7 @@ async function reconcile(){if(!user||!channel)return;const next=unpackPresence()
 async function connectRoom(){if(joining||subscribed)return;joining=true;clearError();ending=false;setStatus("Checking sign-in…");try{await ensureUser();await ensureMedia();if(!room){room=randomRoom();const u=new URL(location.href);u.search="";u.searchParams.set("room",room);history.replaceState({}, "",u);updateRoomUi()}channel=client.channel("dh-video-v2-"+room,{config:{broadcast:{self:false},presence:{key:user.id}}});channel.on("broadcast",{event:"signal"},({payload})=>onSignal(payload).catch(e=>{console.error("Call signaling error",e);showError(e.message||"A call setup message failed.")}));channel.on("presence",{event:"sync"},()=>reconcile().catch(e=>{console.error(e);showError("Couldn't update room participants.")}));channel.on("presence",{event:"join"},()=>reconcile().catch(console.error));channel.on("presence",{event:"leave"},()=>reconcile().catch(console.error));channel.subscribe(async status=>{if(status==="SUBSCRIBED"){try{subscribed=true;const current=unpackPresence();if(current.size>=MAX_PARTICIPANTS&&!current.has(user.id)){showError("This room is full (maximum "+MAX_PARTICIPANTS+" people).");await cleanup(false);return}await channel.track({user_id:user.id,username,avatar_url:avatarUrl,joined_at:new Date().toISOString()});$("startButton").hidden=true;$("joinButton").hidden=true;$("endButton").disabled=false;updateRoomUi();setStatus("Joining room…");await reconcile()}catch(e){showError(e.message||"Couldn't join this room.");setStatus("Couldn't join")}finally{joining=false}}else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){subscribed=false;setStatus("Connection unavailable");showError("Couldn't connect to the call room. Check your connection and try again.");joining=false}})}catch(e){console.error(e);showError(e.message||"Could not join the call.");setStatus("Not connected");joining=false}}
 async function cleanup(notify=true){if(ending)return;ending=true;if(notify&&subscribed&&channel)try{await channel.send({type:"broadcast",event:"signal",payload:{kind:"leave",from:user?.id,room}})}catch(_){}const old=channel;channel=null;subscribed=false;for(const st of peers.values()){if(st.recoveryTimer)clearTimeout(st.recoveryTimer);if(st.audioStatsTimer)clearInterval(st.audioStatsTimer);st.pc.ontrack=null;st.pc.onicecandidate=null;st.pc.close()}peers.clear();participants.clear();pendingIce.clear();if(old&&client)try{await client.removeChannel(old)}catch(_){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}remoteCameraHidden.clear();remoteCameraOn.clear();$("localVideo").onplaying=null;$("localVideo").onloadeddata=null;$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());$("micButton").disabled=true;$("cameraButton").disabled=true;$("enableSoundButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("startButton").hidden=!!room;$("joinButton").hidden=!room;updateRoomUi();setStatus("Left the call.");$("roomCount").textContent="0 / "+MAX_PARTICIPANTS+" people";ending=false;joining=false}
 $("startButton").addEventListener("click",connectRoom);$("joinButton").addEventListener("click",connectRoom);$("endButton").addEventListener("click",()=>cleanup(true));
-$("micButton").addEventListener("click",async()=>{const t=localStream?.getAudioTracks()[0];if(!t)return;if(t.readyState!=="live"){showError("Your microphone track has ended. Leave and rejoin the call, then check browser microphone permissions.");return}t.enabled=!t.enabled;$("micButton").textContent=t.enabled?"Mute mic":"Unmute mic";if(t.enabled){try{await t.applyConstraints({echoCancellation:true,noiseSuppression:true,autoGainControl:true})}catch(_){}setStatus("Microphone enabled.")}else setStatus("Your microphone is muted.")});
+$("micButton").addEventListener("click",async()=>{const t=localStream?.getAudioTracks()[0];if(!t){await retryMicrophone();return}if(t.readyState!=="live"){showError("Your microphone track has ended. Leave and rejoin the call, then check browser microphone permissions.");return}t.enabled=!t.enabled;$("micButton").textContent=t.enabled?"Mute mic":"Unmute mic";if(t.enabled){try{await t.applyConstraints({echoCancellation:true,noiseSuppression:true,autoGainControl:true})}catch(_){}setStatus("Microphone enabled.")}else setStatus("Your microphone is muted.")});
 $("cameraButton").addEventListener("click",()=>{const t=localStream?.getVideoTracks()[0];if(t){t.enabled=!t.enabled;$("cameraButton").textContent=t.enabled?"Turn camera off":"Turn camera on";$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent=t.enabled?"Waiting for camera picture…":"Your camera is off";if(t.enabled){const video=$("localVideo");video.play?.().catch(()=>{});if(video.videoWidth>0&&video.videoHeight>0)$("localPlaceholder").hidden=false}for(const id of peers.keys())sendSignal("camera_state",id,{hidden:!t.enabled}).catch(()=>{})}});
 $("fullscreenButton").addEventListener("click",async()=>{const stage=document.querySelector(".call-stage");try{if(document.fullscreenElement){await document.exitFullscreen()}else if(stage.requestFullscreen){await stage.requestFullscreen()}else{showError("Full screen is not supported by this browser. Try the browser's full-screen control.");return}}catch(e){showError("Couldn't enter full screen. Your browser may require a direct tap on the full-screen button.")}});
 document.addEventListener("fullscreenchange",()=>{$("fullscreenButton").textContent=document.fullscreenElement?"⛶ Exit full screen":"⛶ Full screen";$("fullscreenButton").setAttribute("aria-label",document.fullscreenElement?"Exit full screen":"Enter full screen")});
@@ -397,6 +398,28 @@ $("inviteUserForm").addEventListener("submit",async event=>{
  }finally{button.disabled=false}
 });
 if(room)updateRoomUi();
+async function retryMicrophone(){
+ if(!localStream){showError("Join the call before enabling your microphone.");return}
+ const button=$("micButton");button.disabled=true;button.textContent="Enabling mic…";
+ try{
+  let stream;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false})}
+  catch(firstError){stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false})}
+  const track=stream.getAudioTracks()[0];
+  if(!track)throw new Error("No microphone track was returned by the browser.");
+  track.enabled=true;
+  track.onended=()=>{if(localStream?.getAudioTracks().includes(track)){button.textContent="Enable mic";showError("Your microphone disconnected. Try Enable mic again or check your device settings.")}};
+  track.onmute=()=>setStatus("Your microphone is muted by the browser or device.");
+  track.onunmute=()=>setStatus("Your microphone is active.");
+  localStream.getAudioTracks().forEach(old=>{localStream.removeTrack(old);old.stop()});
+  localStream.addTrack(track);
+  await Promise.all([...peers.values()].map(st=>st.audioSender?st.audioSender.replaceTrack(track).catch(e=>{console.warn("Could not replace microphone for peer",e)}):Promise.resolve()));
+  button.disabled=false;button.textContent="Mute mic";clearError();setStatus("Microphone enabled and connected.");
+ }catch(e){
+  console.error("Microphone retry failed:",e);button.disabled=false;button.textContent="Enable mic";
+  showError(e.name==="NotAllowedError"?"Microphone permission is blocked. Allow microphone access in your browser's site settings, then choose Enable mic again.":e.message||"Could not enable the microphone.");
+ }
+}
 function releaseCallMedia(){try{localStream?.getTracks().forEach(t=>t.stop());localStream=null;for(const st of peers.values())st.pc.close();if(channel&&client)client.removeChannel(channel)}catch(_){}}
 window.addEventListener("pagehide",releaseCallMedia);
 window.addEventListener("beforeunload",releaseCallMedia);
