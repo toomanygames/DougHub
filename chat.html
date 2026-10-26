@@ -2652,7 +2652,7 @@ async function loadChatFeaturePanels() {
   if (!pinResult.error && pinResult.data && pinResult.data.length) {
     // Show only the newest pin. "Unpin all" also clears any duplicate rows
     // created by the older implementation.
-    const { data: pinnedMessages } = await supabaseClient.from("chat_messages").select("id,username,message,attachment_name").eq("id", pin.message_id).limit(1);
+    const { data: pinnedMessages } = await supabaseClient.from("chat_messages").select("id,username,message,attachment_name").eq("id", pinResult.data[0].message_id).limit(1);
     const message = pinnedMessages?.[0];
     const label = document.createElement("strong"); label.textContent = "Pinned"; pinsPanel.appendChild(label);
     if (message) {
