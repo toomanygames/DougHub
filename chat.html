@@ -1640,7 +1640,8 @@ toggleStaffWriteButton?.addEventListener("click", async () => {
   const { error } = await supabaseClient.from("chat_groups").update(nextValue ? { staff_only_write: true, is_public: true } : { staff_only_write: false }).eq("id", activeChatGroupId);
   if (error) return showError("Could not update group writing mode: " + error.message);
   activeChatGroup.staff_only_write = nextValue;
-  visibleChatGroups = visibleChatGroups.map(group => group.id === activeChatGroupId ? { ...group, staff_only_write: nextValue } : group);
+  if (nextValue) activeChatGroup.is_public = true;
+  visibleChatGroups = visibleChatGroups.map(group => group.id === activeChatGroupId ? { ...group, staff_only_write: nextValue, is_public: nextValue ? true : group.is_public } : group);
   renderActiveGroupDetails();
   showError(nextValue ? "Staff-only writing enabled. The public can still view this group." : "Everyone can now write in this group.");
 });
