@@ -387,8 +387,21 @@ function renderParticipants(){
   }
   const label=tile.querySelector("[data-label]");if(label)label.textContent=info.username||"Participant";
   const st=tile.querySelector(".video-placeholder strong");if(st)st.textContent=info.username||"Participant";
+  // Tracks can arrive before the participant tile is created. Always bind any
+  // already-received tracks here too, otherwise ontrack has nowhere to attach them.
+  const video=tile.querySelector("video"),audio=tile.querySelector("audio"),peerState=peers.get(id);
+  if(peerState?.stream){
+   if(video&&video.srcObject!==peerState.stream)video.srcObject=peerState.stream;
+   const audioTrack=peerState.stream.getAudioTracks().find(track=>track.readyState==="live");
+   const attachedAudio=audio?.srcObject?.getAudioTracks?.()[0];
+   if(audioTrack&&audio&&attachedAudio?.id!==audioTrack.id)audio.srcObject=new MediaStream([audioTrack]);
+   if(audio){audio.muted=false;audio.volume=Number(tile.querySelector(".participant-volume input")?.value??100)/100;}
+   if(video?.srcObject===peerState.stream)video.play?.().catch(err=>console.warn("DougHub remote video playback blocked:",{participant:id,error:String(err)}));
+   if(audioTrack&&audio){audio.play?.().catch(err=>console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)}));}
+   if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===peerState.stream,audioBound:audio?.srcObject?.getAudioTracks?.()[0]?.id===audioTrack?.id}));
+  }
   const ph=tile.querySelector(".video-placeholder");
-  if(ph){const video=tile.querySelector("video");const hasPicture=!!video&&video.videoWidth>0&&video.videoHeight>0&&remoteCameraOn.has(id)&&!remoteCameraHidden.has(id);ph.hidden=hasPicture;if(!hasPicture){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
+  if(ph){const hasPicture=!!video&&video.videoWidth>0&&video.videoHeight>0&&remoteCameraOn.has(id)&&!remoteCameraHidden.has(id);ph.hidden=hasPicture;if(!hasPicture){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
  }
  [...grid.querySelectorAll(".video-tile:not(.local-video-tile)")].forEach(t=>{if(!participants.has(t.id.slice(12)))t.remove()});
  $("roomCount").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";
@@ -422,6 +435,7 @@ function makePeer(id,info){
   if(stream)stream.getTracks().forEach(t=>{if(!state.stream.getTracks().some(x=>x.id===t.id))state.stream.addTrack(t)});
   else if(!state.stream.getTracks().some(x=>x.id===e.track.id))state.stream.addTrack(e.track);
   const t=tile();
+  console.info("DougHub remote track received: "+JSON.stringify({participant:id,kind:e.track.kind,state:e.track.readyState,enabled:e.track.enabled,muted:e.track.muted,streamTrackCount:state.stream.getTracks().length,tileExists:!!t}));
   if(t){
    const video=t.querySelector("video"),audio=t.querySelector("audio");
    video.srcObject=state.stream;
