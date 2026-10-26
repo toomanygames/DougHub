@@ -913,6 +913,31 @@ html[data-dh-theme="winter"] .chat-video-call-button{border-color:rgba(139,217,2
 @media(max-width:850px){.chat-video-call-button{padding:8px 10px;font-size:11px}.chat-video-call-button span{display:none}}
 @media(max-width:620px){.chat-video-call-button{padding:7px 8px;font-size:10px}.chat-status{display:none}}
 </style>
+
+<style id="douqhub-full-width-chat-fix">
+/* Final override: keep Community Chat full-width after all legacy responsive rules. */
+html, body { width:100% !important; max-width:100% !important; }
+main {
+  display:flex !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:12px 12px 14px !important;
+  box-sizing:border-box !important;
+}
+.chat-container {
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+}
+@media (max-width:700px) {
+  main { padding:7px !important; }
+}
+</style>
+
 </head>
 
 </head>
