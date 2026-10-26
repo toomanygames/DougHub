@@ -938,6 +938,7 @@ main {
 }
 </style>
 
+<style id="chat-features-style">.chat-feature-bar{padding:8px 14px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(8,10,25,.48)}.chat-feature-actions{display:flex;gap:8px;flex-wrap:wrap}.chat-feature-actions button,.chat-feature-panel button{border:1px solid rgba(165,180,252,.22);background:rgba(99,102,241,.12);color:#e0e7ff;border-radius:10px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer}.chat-feature-panel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#cbd0e5}.chat-feature-panel[hidden],.chat-feature-actions button[hidden]{display:none}.chat-pinned-item,.chat-poll-card,.chat-game-card{border:1px solid rgba(165,180,252,.16);background:rgba(255,255,255,.035);border-radius:11px;padding:8px 10px}.chat-poll-card,.chat-game-card{display:flex;flex-direction:column;gap:7px;min-width:min(260px,100%);max-width:100%}.chat-poll-options{display:flex;flex-wrap:wrap;gap:5px}.chat-game-board{display:grid;grid-template-columns:repeat(3,38px);gap:4px}.chat-game-board button{height:38px;padding:0;font-size:18px}.message-pin-button{border:0;background:transparent;color:#9da7cb;cursor:pointer;font-size:11px;padding:2px 5px}.message-date-divider{align-self:center;padding:5px 11px;border:1px solid rgba(255,255,255,.08);border-radius:20px;color:#929bb8;font-size:11px;background:rgba(255,255,255,.035);margin:5px 0}.group-tools #toggleStaffWriteButton{border:1px solid rgba(251,191,36,.3);color:#fde68a}</style>
 </head>
 
 </head>
@@ -991,6 +992,7 @@ main {
       <button type="button" id="inviteGroupButton">＋ Add people</button>
       <button type="button" id="leaveGroupButton" class="danger">Leave group</button>
       <button type="button" id="deleteGroupButton" class="danger">Delete group</button>
+      <button type="button" id="toggleStaffWriteButton" hidden>Enable staff-only writing</button>
     </div>
       </aside>
       <section class="chat-main-panel" aria-label="Selected conversation">
@@ -999,6 +1001,10 @@ main {
       id="errorBox"
     ></div>
 
+    <section class="chat-feature-bar" aria-label="Chat tools">
+      <div class="chat-feature-actions"><button type="button" id="createPollButton" hidden>＋ Create poll</button><button type="button" id="startTicTacToeButton" hidden>＋ Start Tic-Tac-Toe</button></div>
+      <div id="pinnedMessagesPanel" class="chat-feature-panel" hidden></div><div id="chatPollsPanel" class="chat-feature-panel" hidden></div><div id="chatGamesPanel" class="chat-feature-panel" hidden></div>
+    </section>
     <div
       class="messages"
       id="messages"
