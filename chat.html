@@ -3248,6 +3248,24 @@ function startChatRefresh() {
           if (matchesActiveChat && document.visibilityState === "visible") loadMessages();
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "chat_group_members", filter: "user_id=eq." + currentUser.id },
+        async () => {
+          // A group owner may have just invited this user. Refresh access without requiring a page reload.
+          await loadChatGroups();
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "chat_group_members", filter: "user_id=eq." + currentUser.id },
+        async () => {
+          await loadChatGroups();
+          if (activeChatGroupId && !visibleChatGroups.some(group => group.id === activeChatGroupId)) {
+            await selectChatGroup(null);
+          }
+        }
+      )
       .subscribe((status) => {
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
           console.warn("Community Chat Realtime status:", status);
@@ -3259,6 +3277,11 @@ function startChatRefresh() {
 
   window.__douqhubChatRefreshInterval = window.setInterval(async () => {
     if (document.visibilityState !== "visible") return;
+    // Re-check memberships too: private group invites still appear if Realtime isn't enabled for this table.
+    await loadChatGroups();
+    if (activeChatGroupId && !visibleChatGroups.some(group => group.id === activeChatGroupId)) {
+      await selectChatGroup(null);
+    }
     await loadMessages();
     await loadChatFeaturePanels();
     await refreshGroupMentionDots();
