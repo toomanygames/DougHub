@@ -4,7 +4,12 @@ spring:{name:"Spring",holiday:"Easter · Spring",title:"A fresh season to create
 summer:{name:"Summer",holiday:"Summer · Independence Day",title:"Make some noise this summer.",description:"Electric blues, sunset reds, and an energetic summer-arcade atmosphere.",icon:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'><circle cx='12' cy='12' r='4'/><path d='M12 2v2m0 16v2M4.9 4.9l1.5 1.5m11.2 11.2 1.5 1.5M2 12h2m16 0h2M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5'/></svg>"},
 autumn:{name:"Autumn",holiday:"Autumn · Halloween",title:"Welcome to the darker side.",description:"Moonlit plum, glowing amber, and a Halloween atmosphere across your DougHub pages.",icon:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'><path d='M12 3v3c-5-2-9 2-9 7a8 8 0 0 0 18 0c0-5-4-9-9-7Z'/><path d='M8 12h.01M16 12h.01M9 16c2 1 4 1 6 0'/></svg>"},
 winter:{name:"Winter",holiday:"Winter · Christmas & New Year",title:"A little winter wonder.",description:"Frosted blues, evergreen tones, warm gold highlights, and a festive winter-night look.",icon:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'><path d='M12 2v20M4 7l16 10M4 17 20 7M8 4l4 2 4-2M8 20l4-2 4 2'/></svg>"}};
-const valid=v=>Object.hasOwn(themes,v)?v:"normal";function stored(){try{return valid(localStorage.getItem(KEY)||"normal")}catch(_){return"normal"}}const paletteOriginals=new WeakMap();
+const PALETTE_KEY="doughub-custom-palette-v1";
+const defaultPalette={bg:"#080a16",accent:"#6366f1",accent2:"#a855f7",panel:"#11152b"};
+const valid=v=>Object.hasOwn(themes,v)||v==="custom"?v:"normal";
+function readPalette(){try{const p=JSON.parse(localStorage.getItem(PALETTE_KEY)||"null");const clean={};for(const k of Object.keys(defaultPalette)){const v=p&&p[k];clean[k]=typeof v==="string"&&/^#[0-9a-f]{6}$/i.test(v)?v:defaultPalette[k]}return clean}catch(_){return {...defaultPalette}}}
+function savePalette(p){const clean={};for(const k of Object.keys(defaultPalette)){clean[k]=typeof p?.[k]==="string"&&/^#[0-9a-f]{6}$/i.test(p[k])?p[k]:defaultPalette[k]}try{localStorage.setItem(PALETTE_KEY,JSON.stringify(clean))}catch(_){}return clean}
+function stored(){try{return valid(localStorage.getItem(KEY)||"normal")}catch(_){return"normal"}}const paletteOriginals=new WeakMap();
 function repaintLegacySurfaces(){
  const mode=valid(document.documentElement.dataset.dhTheme||stored());
  const root=getComputedStyle(document.documentElement);
@@ -45,4 +50,30 @@ function repaintLegacySurfaces(){
 }
 let repaintQueued=false;
 function queueLegacyRepaint(){if(repaintQueued)return;repaintQueued=true;requestAnimationFrame(()=>{repaintQueued=false;repaintLegacySurfaces()})}
-function render(){document.getElementById("dh-seasonal-banner")?.remove();queueLegacyRepaint();}function apply(v,save){v=valid(v);document.documentElement.dataset.dhTheme=v;const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=({normal:"#050611",spring:"#081611",summer:"#06101f",autumn:"#130b13",winter:"#06101b"})[v];if(save!==false)try{localStorage.setItem(KEY,v)}catch(_){}render(v);document.dispatchEvent(new CustomEvent("douqhub:seasonal-theme-changed",{detail:{theme:v}}));return v}function client(){try{if(typeof supabaseClient!=="undefined"&&supabaseClient)return supabaseClient}catch(_){}return null}async function sync(){const c=client();if(!c||!c.auth||!c.from)return;try{const a=await c.auth.getUser(),u=a?.data?.user;if(!u)return;const r=await c.from("profiles").select("seasonal_theme").eq("id",u.id).maybeSingle();if(!r.error&&r.data){const v=valid(r.data.seasonal_theme);apply(v,false);try{localStorage.setItem(KEY,v)}catch(_){}}}catch(e){console.debug("Seasonal preference sync unavailable:",e?.message||e)}}window.DougHubSeasonalTheme={themes,getTheme:()=>valid(document.documentElement.dataset.dhTheme||stored()),apply,refresh:()=>render(valid(document.documentElement.dataset.dhTheme||stored()))};apply(stored(),false);if(!window.__dhLegacyPaletteObserver){window.__dhLegacyPaletteObserver=new MutationObserver(()=>queueLegacyRepaint());window.__dhLegacyPaletteObserver.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden"]});}window.addEventListener("load",queueLegacyRepaint,{once:true});if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{render(valid(document.documentElement.dataset.dhTheme||stored()));sync()},{once:true});else{render(valid(document.documentElement.dataset.dhTheme||stored()));sync()}})();
+function render(){document.getElementById("dh-seasonal-banner")?.remove();queueLegacyRepaint();}function apply(v,save){
+ v=valid(v);const root=document.documentElement;root.dataset.dhTheme=v;
+ const palette=readPalette();
+ if(v==="custom"){
+  root.style.setProperty("--season-bg",palette.bg);
+  root.style.setProperty("--season-accent",palette.accent);
+  root.style.setProperty("--season-accent2",palette.accent2);
+  root.style.setProperty("--season-panel",palette.panel);
+  root.style.setProperty("--season-glow","color-mix(in srgb, "+palette.accent+" 22%, transparent)");
+  root.style.setProperty("--season-line","color-mix(in srgb, "+palette.accent+" 24%, transparent)");
+  root.style.setProperty("--season-muted","#b7bdd4");
+  root.style.setProperty("--bg",palette.bg);
+  root.style.setProperty("--panel",palette.panel);
+  root.style.setProperty("--panel2","color-mix(in srgb, "+palette.panel+" 78%, "+palette.accent+")");
+  root.style.setProperty("--line","color-mix(in srgb, "+palette.accent+" 24%, transparent)");
+  root.style.setProperty("--muted","#b7bdd4");
+  root.style.setProperty("--indigo",palette.accent);
+  root.style.setProperty("--purple",palette.accent2);
+  root.style.setProperty("--cyan",palette.accent2);
+ }else{
+  ["--season-bg","--season-accent","--season-accent2","--season-glow","--season-line","--season-panel","--season-muted"].forEach(k=>root.style.removeProperty(k));
+  ["--bg","--panel","--panel2","--line","--muted","--indigo","--purple","--cyan"].forEach(k=>root.style.removeProperty(k));
+ }
+ const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=v==="custom"?palette.bg:({normal:"#050611",spring:"#081611",summer:"#06101f",autumn:"#130b13",winter:"#06101b"})[v];
+ if(save!==false)try{localStorage.setItem(KEY,v)}catch(_){}
+ render(v);document.dispatchEvent(new CustomEvent("douqhub:seasonal-theme-changed",{detail:{theme:v,palette}}));return v
+}function client(){try{if(typeof supabaseClient!=="undefined"&&supabaseClient)return supabaseClient}catch(_){}return null}async function sync(){const c=client();if(!c||!c.auth||!c.from)return;try{const a=await c.auth.getUser(),u=a?.data?.user;if(!u)return;const r=await c.from("profiles").select("seasonal_theme").eq("id",u.id).maybeSingle();if(!r.error&&r.data){const v=valid(r.data.seasonal_theme);apply(v,false);try{localStorage.setItem(KEY,v)}catch(_){}}}catch(e){console.debug("Seasonal preference sync unavailable:",e?.message||e)}}window.DougHubSeasonalTheme={themes,getTheme:()=>valid(document.documentElement.dataset.dhTheme||stored()),getPalette:readPalette,savePalette,apply,refresh:()=>render(valid(document.documentElement.dataset.dhTheme||stored()))};apply(stored(),false);if(!window.__dhLegacyPaletteObserver){window.__dhLegacyPaletteObserver=new MutationObserver(()=>queueLegacyRepaint());window.__dhLegacyPaletteObserver.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden"]});}window.addEventListener("load",queueLegacyRepaint,{once:true});if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{render(valid(document.documentElement.dataset.dhTheme||stored()));sync()},{once:true});else{render(valid(document.documentElement.dataset.dhTheme||stored()));sync()}})();
