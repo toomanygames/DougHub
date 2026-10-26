@@ -146,7 +146,7 @@ function renderParticipants(){
   let tile=document.getElementById("participant-"+id);
   if(!tile){
    tile=document.createElement("div");tile.className="video-tile";tile.id="participant-"+id;
-   const v=document.createElement("video");v.autoplay=true;v.playsInline=true;
+   const v=document.createElement("video");v.autoplay=true;v.playsInline=true;v.muted=true;const remoteAudio=document.createElement("audio");remoteAudio.autoplay=true;remoteAudio.playsInline=true;remoteAudio.setAttribute("aria-label","Participant audio");remoteAudio.style.display="none";
    const ph=document.createElement("div");ph.className="video-placeholder";
    const av=document.createElement("span");av.className="avatar";
    if(info.avatar_url){const img=document.createElement("img");img.src=info.avatar_url;img.alt=(info.username||"Participant")+" profile picture";av.appendChild(img)}else av.textContent=(info.username||"P").slice(0,1).toUpperCase();
@@ -154,8 +154,8 @@ function renderParticipants(){
    const sm=document.createElement("span");sm.textContent="Connecting…";ph.append(av,st,sm);
    const label=document.createElement("span");label.className="video-label";label.dataset.label=id;label.textContent=info.username||"Participant";
    const volume=document.createElement("label");volume.className="participant-volume";volume.innerHTML='<span>Volume</span><input type="range" min="0" max="100" value="100" aria-label="Local volume for participant">';
-   volume.querySelector("input").addEventListener("input",e=>{v.volume=Number(e.target.value)/100});
-   tile.append(v,ph,label,volume);grid.appendChild(tile);
+   volume.querySelector("input").addEventListener("input",e=>{const level=Number(e.target.value)/100;v.volume=level;remoteAudio.volume=level});
+   tile.append(v,remoteAudio,ph,label,volume);grid.appendChild(tile);
   }
   const label=tile.querySelector("[data-label]");if(label)label.textContent=info.username||"Participant";
   const st=tile.querySelector(".video-placeholder strong");if(st)st.textContent=info.username||"Participant";
@@ -181,8 +181,12 @@ function makePeer(id,info){
   else if(!state.stream.getTracks().some(x=>x.id===e.track.id))state.stream.addTrack(e.track);
   const t=tile();
   if(t){
-   const video=t.querySelector("video");video.srcObject=state.stream;
-   video.play?.().catch(()=>{setStatus("Tap a participant video to enable audio/video playback.")});video.onplaying=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};video.onloadeddata=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};video.addEventListener("click",()=>video.play?.().catch(()=>{}));
+   const video=t.querySelector("video"),audio=t.querySelector("audio");video.srcObject=state.stream;
+   audio.srcObject=new MediaStream(state.stream.getAudioTracks());
+   video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
+   if(audio.srcObject.getAudioTracks().length)audio.play?.().catch(()=>{setStatus("Audio playback is blocked. Tap the participant tile to hear them.")});
+   const resumePlayback=()=>{video.play?.().catch(()=>{});audio.play?.().catch(()=>{})};t.addEventListener("click",resumePlayback);
+   video.onplaying=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};video.onloadeddata=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};
    const ph=t.querySelector(".video-placeholder");const hasVideo=state.stream.getVideoTracks().some(track=>track.readyState==="live"&&track.enabled);if(hasVideo&&!remoteCameraHidden.has(id))remoteCameraOn.add(id);else remoteCameraOn.delete(id);if(ph){const visible=hasVideo&&!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0;ph.hidden=visible;if(!visible){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
    const label=t.querySelector("[data-label]");
    if(label&&state.stream.getAudioTracks().length&&!label.textContent.includes(" · mic"))label.textContent=(info.username||"Participant")+" · mic";
