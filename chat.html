@@ -1601,6 +1601,7 @@ async function selectChatGroup(groupId) {
   if(currentUser)markChatRead(activeChatGroupId);
   renderChatGroupList();
   await loadMessages();
+  await loadChatFeaturePanels();
   await refreshGroupMentionDots();
 }
 
@@ -2509,6 +2510,133 @@ function notifyIncomingChatMessage(row) {
     showPrompt();
   }
 })();
+async function loadChatFeaturePanels() {
+  if (!supabaseClient) return;
+  const pollButton = document.getElementById("createPollButton");
+  const gameButton = document.getElementById("startTicTacToeButton");
+  const pinsPanel = document.getElementById("pinnedMessagesPanel");
+  const pollsPanel = document.getElementById("chatPollsPanel");
+  const gamesPanel = document.getElementById("chatGamesPanel");
+  pollButton.hidden = !currentUserIsHelper;
+  gameButton.hidden = !currentUserIsHelper;
+  const scopeGroup = query => activeChatGroupId === null ? query.is("group_id", null) : query.eq("group_id", activeChatGroupId);
+
+  const pinResult = await scopeGroup(supabaseClient.from("chat_pinned_messages").select("message_id,created_at").order("created_at", { ascending: false }).limit(5));
+  pinsPanel.replaceChildren();
+  if (!pinResult.error && pinResult.data && pinResult.data.length) {
+    const ids = pinResult.data.map(row => row.message_id);
+    const { data: pinnedMessages } = await supabaseClient.from("chat_messages").select("id,username,message,attachment_name").in("id", ids);
+    const byId = new Map((pinnedMessages || []).map(row => [row.id, row]));
+    const label = document.createElement("strong"); label.textContent = "Pinned"; pinsPanel.appendChild(label);
+    pinResult.data.forEach(pin => {
+      const message = byId.get(pin.message_id);
+      if (!message) return;
+      const item = document.createElement("span"); item.className = "chat-pinned-item";
+      item.textContent = (message.username || "Member") + ": " + (message.message || message.attachment_name || "Attachment").slice(0, 90);
+      pinsPanel.appendChild(item);
+    });
+    pinsPanel.hidden = pinsPanel.childElementCount === 0;
+  } else pinsPanel.hidden = true;
+
+  const pollResult = await scopeGroup(supabaseClient.from("chat_polls").select("id,question,options,is_closed,created_at").order("created_at", { ascending: false }).limit(5));
+  pollsPanel.replaceChildren();
+  if (!pollResult.error && pollResult.data && pollResult.data.length) {
+    for (const poll of pollResult.data) {
+      const card = document.createElement("div"); card.className = "chat-poll-card";
+      const heading = document.createElement("strong"); heading.textContent = poll.question + (poll.is_closed ? " · Closed" : ""); card.appendChild(heading);
+      const { data: votes } = await supabaseClient.from("chat_poll_votes").select("option_index,user_id").eq("poll_id", poll.id);
+      const options = document.createElement("div"); options.className = "chat-poll-options";
+      (Array.isArray(poll.options) ? poll.options : []).forEach((option, index) => {
+        const button = document.createElement("button"); button.type = "button";
+        const count = (votes || []).filter(vote => vote.option_index === index).length;
+        const myVote = (votes || []).some(vote => vote.user_id === currentUser?.id && vote.option_index === index);
+        button.textContent = (myVote ? "✓ " : "") + String(option) + " · " + count;
+        button.disabled = !currentUser || poll.is_closed;
+        button.addEventListener("click", async () => {
+          const { error } = await supabaseClient.from("chat_poll_votes").upsert({ poll_id: poll.id, user_id: currentUser.id, option_index: index }, { onConflict: "poll_id,user_id" });
+          if (error) return showError("Couldn't submit vote: " + error.message);
+          await loadChatFeaturePanels();
+        });
+        options.appendChild(button);
+      });
+      card.appendChild(options);
+      if (currentUserIsHelper && !poll.is_closed) {
+        const close = document.createElement("button"); close.type = "button"; close.textContent = "Close poll";
+        close.addEventListener("click", async () => {
+          const { error } = await supabaseClient.from("chat_polls").update({ is_closed: true }).eq("id", poll.id);
+          if (error) return showError("Couldn't close poll: " + error.message);
+          await loadChatFeaturePanels();
+        });
+        card.appendChild(close);
+      }
+      pollsPanel.appendChild(card);
+    }
+    pollsPanel.hidden = false;
+  } else pollsPanel.hidden = true;
+
+  const gameResult = await scopeGroup(supabaseClient.from("chat_games").select("id,player_x,player_o,board,next_turn,status,created_at").in("status", ["waiting", "active"]).order("created_at", { ascending: false }).limit(1));
+  gamesPanel.replaceChildren();
+  if (!gameResult.error && gameResult.data && gameResult.data.length) {
+    const game = gameResult.data[0];
+    const card = document.createElement("div"); card.className = "chat-game-card";
+    const heading = document.createElement("strong"); heading.textContent = "Tic-Tac-Toe · " + (game.status === "waiting" ? "Waiting for a player" : "Game in progress"); card.appendChild(heading);
+    if (game.status === "waiting" && currentUser && currentUser.id !== game.player_x && !game.player_o) {
+      const join = document.createElement("button"); join.type = "button"; join.textContent = "Join game as O";
+      join.addEventListener("click", async () => {
+        const { error } = await supabaseClient.from("chat_games").update({ player_o: currentUser.id, status: "active" }).eq("id", game.id).is("player_o", null);
+        if (error) return showError("Couldn't join the game: " + error.message);
+        await loadChatFeaturePanels();
+      });
+      card.appendChild(join);
+    }
+    const board = document.createElement("div"); board.className = "chat-game-board";
+    const cells = Array.isArray(game.board) ? game.board : Array(9).fill(null);
+    cells.forEach((cell, index) => {
+      const button = document.createElement("button"); button.type = "button"; button.textContent = cell || "·";
+      const isMyTurn = currentUser && (game.next_turn === "X" ? currentUser.id === game.player_x : currentUser.id === game.player_o);
+      button.disabled = game.status !== "active" || !isMyTurn || !!cell;
+      button.addEventListener("click", async () => {
+        if (!currentUser || cell) return;
+        const nextBoard = cells.slice(); nextBoard[index] = game.next_turn;
+        const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        const won = lines.some(line => line.every(i => nextBoard[i] === game.next_turn));
+        const draw = !won && nextBoard.every(Boolean);
+        const nextStatus = won ? (game.next_turn === "X" ? "x_won" : "o_won") : draw ? "draw" : "active";
+        const { error } = await supabaseClient.from("chat_games").update({ board: nextBoard, next_turn: game.next_turn === "X" ? "O" : "X", status: nextStatus }).eq("id", game.id).eq("next_turn", game.next_turn);
+        if (error) return showError("Couldn't save that move: " + error.message);
+        await loadChatFeaturePanels();
+      });
+      board.appendChild(button);
+    });
+    card.appendChild(board);
+    gamesPanel.appendChild(card); gamesPanel.hidden = false;
+  } else gamesPanel.hidden = true;
+}
+
+document.getElementById("createPollButton").addEventListener("click", async () => {
+  if (!currentUserIsHelper || !currentUser) return;
+  const question = prompt("What is the poll question? (240 characters max)");
+  if (!question || !question.trim()) return;
+  const rawOptions = prompt("Enter 2–6 answer options, separated by commas:");
+  if (!rawOptions) return;
+  const options = rawOptions.split(",").map(value => value.trim()).filter(Boolean).slice(0, 6);
+  if (options.length < 2) return showError("A poll needs at least two answer options.");
+  const { error } = await supabaseClient.from("chat_polls").insert({ group_id: activeChatGroupId, created_by: currentUser.id, question: question.trim().slice(0, 240), options });
+  if (error) return showError("Couldn't create poll: " + error.message);
+  await loadChatFeaturePanels();
+});
+
+document.getElementById("startTicTacToeButton").addEventListener("click", async () => {
+  if (!currentUserIsHelper || !currentUser) return;
+  const query = activeChatGroupId === null ? supabaseClient.from("chat_games").select("id").is("group_id", null) : supabaseClient.from("chat_games").select("id").eq("group_id", activeChatGroupId);
+  const { data: runningGames, error: findError } = await query.in("status", ["waiting", "active"]).limit(1);
+  if (findError) return showError("Couldn't check for an existing game: " + findError.message);
+  if (runningGames && runningGames.length) return showError("There's already a Tic-Tac-Toe game running in this chat. Finish it before starting another.");
+  const { error } = await supabaseClient.from("chat_games").insert({ group_id: activeChatGroupId, created_by: currentUser.id, player_x: currentUser.id, game_type: "tic_tac_toe", board: Array(9).fill(null), next_turn: "X", status: "waiting" });
+  if (error) return showError("Couldn't start Tic-Tac-Toe: " + error.message);
+  await loadChatFeaturePanels();
+}
+
 async function loadMessages() {
 
   if (loadingMessages) {
@@ -2915,6 +3043,7 @@ async function loadAccount() {
       "Guest";
 
     await loadMessages();
+    await loadChatFeaturePanels();
     startChatRefresh();
 
     return;
@@ -2978,6 +3107,7 @@ async function loadAccount() {
     currentUsername;
 
   await loadMessages();
+  await loadChatFeaturePanels();
 
   /* Opening Community Chat clears the homepage red dot. */
   await markChatAsSeen();
@@ -3028,6 +3158,7 @@ function startChatRefresh() {
   window.__douqhubChatRefreshInterval = window.setInterval(async () => {
     if (document.visibilityState !== "visible") return;
     await loadMessages();
+    await loadChatFeaturePanels();
     await refreshGroupMentionDots();
   }, 15000);
 
