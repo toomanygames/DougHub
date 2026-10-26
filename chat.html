@@ -2100,6 +2100,9 @@ async function renderMessages(
   messages,
   shouldScrollBottom = false
 ) {
+  // Rebuilding the list must not reset the reader's position when they are
+  // browsing older messages. Capture it before touching the DOM.
+  const previousScrollTop = messagesEl.scrollTop;
 
   if (!messages.length) {
 
@@ -2336,6 +2339,9 @@ async function renderMessages(
 
   if (shouldScrollBottom) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
+  } else {
+    // Preserve the scroll position when the user is reading history.
+    messagesEl.scrollTop = previousScrollTop;
   }
 }
 
@@ -2832,9 +2838,9 @@ async function sendMessage() {
     pendingAttachment = null;
     attachmentStatus.textContent = "";
     showAttachmentPreview(null);
-    // Force the next load to render the new row even if the server timestamp
-    // matches a previous poll's result.
-    lastRenderedMessageSignature = null;
+    // The changed message signature naturally triggers a render. Do not reset
+    // it to null here: that falsely marks this as a first load and yanks readers
+    // who are scrolled up straight to the bottom.
     await loadMessages();
   } catch (error) {
     console.error("Unexpected Community Chat send error:", error);
@@ -2860,7 +2866,7 @@ chatVideoInviteButton?.addEventListener("click",async()=>{
   const inviteUrl=new URL("/chat-calls.html",location.origin);inviteUrl.searchParams.set("room",roomId);
   const inviteMessage="📹 Join my DougHub group video call (up to 6 people): "+inviteUrl.href;
   const {error}=await supabaseClient.from("chat_messages").insert({user_id:currentUser.id,username:currentUsername,message:inviteMessage,attachment_url:null,attachment_type:null,attachment_name:null,attachment_source:null,group_id:activeChatGroupId});
-  if(error)throw error;lastRenderedMessageSignature=null;await loadMessages();showError("Video-call invite sent to this chat. Anyone who can see the message can open the link to join.");chatVideoInviteButton.textContent="Invite sent ✓";setTimeout(()=>chatVideoInviteButton.textContent=oldText,2200);
+  if(error)throw error;await loadMessages();showError("Video-call invite sent to this chat. Anyone who can see the message can open the link to join.");chatVideoInviteButton.textContent="Invite sent ✓";setTimeout(()=>chatVideoInviteButton.textContent=oldText,2200);
  }catch(error){console.error("Could not send video-call invite:",error);showError("Couldn't send the call invite: "+(error?.message||"please try again."));chatVideoInviteButton.textContent=oldText}
  finally{chatVideoInviteButton.disabled=false}
 });
