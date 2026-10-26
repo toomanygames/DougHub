@@ -1891,15 +1891,11 @@ function escapeHtml(text) {
 ========================================= */
 
 function formatTime(dateString) {
-
-  const date =
-    new Date(dateString);
-
-  return date.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit"
-  });
-
+  const date = new Date(dateString);
+  if (Date.now() - date.getTime() > 2 * 24 * 60 * 60 * 1000) {
+    return date.toLocaleDateString([], { month: "short", day: "numeric", year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined });
+  }
+  return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
 
@@ -2080,11 +2076,30 @@ async function renderMessages(
       userIds
     );
 
-  messagesEl.innerHTML =
-    "";
+  messagesEl.innerHTML = "";
+  let previousDayKey = "";
+  let previousMessage = null;
+  let pinnedIds = new Set();
+  if (currentUser) {
+    let pinQuery = supabaseClient.from("chat_pinned_messages").select("message_id");
+    pinQuery = activeChatGroupId === null ? pinQuery.is("group_id", null) : pinQuery.eq("group_id", activeChatGroupId);
+    const { data: pinnedRows, error: pinLoadError } = await pinQuery;
+    if (pinLoadError) console.warn("Could not load pinned messages:", pinLoadError.message);
+    pinnedIds = new Set((pinnedRows || []).map(item => item.message_id));
+  }
 
-  messages.forEach(
-    message => {
+  messages.forEach(message => {
+      const messageDate = new Date(message.created_at);
+      const dayKey = messageDate.getFullYear() + "-" + messageDate.getMonth() + "-" + messageDate.getDate();
+      if (dayKey !== previousDayKey) {
+        const divider = document.createElement("div");
+        divider.className = "message-date-divider";
+        divider.textContent = messageDate.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: messageDate.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined });
+        messagesEl.appendChild(divider);
+        previousDayKey = dayKey;
+      }
+      const consecutiveSameUser = previousMessage && previousMessage.user_id === message.user_id && dayKey === (new Date(previousMessage.created_at).getFullYear() + "-" + new Date(previousMessage.created_at).getMonth() + "-" + new Date(previousMessage.created_at).getDate()) && (messageDate.getTime() - new Date(previousMessage.created_at).getTime()) <= 5 * 60 * 1000;
+      previousMessage = message;
 
       const mine =
         !!currentUser &&
@@ -2148,12 +2163,34 @@ async function renderMessages(
       const staffBadgeInfo = {helper:["HELPER","staff-helper"],admin:["ADMIN","staff-admin"],developer:["DEVELOPER","staff-developer"],owner:["OWNER","staff-owner"]};
       const staffBadge = profile?.show_staff_badge && staffBadgeInfo[profile?.staff_role] ? staffBadgeInfo[profile.staff_role] : null;
       header.innerHTML = `
-        <span class="message-username">@${escapeHtml(username)}</span>
+        <span class="message-username">${consecutiveSameUser ? "" : "@" + escapeHtml(username)}</span>
         ${badge ? '<span class="message-badge" title="'+escapeHtml(badge[1])+' Badge">'+escapeHtml(badge[0])+(profile?.equipped_badge_style === "icon" ? "" : " "+escapeHtml(badge[1]))+'</span>' : ''}
         ${hasOgBadge ? '<span class="message-badge og-message-badge" title="Original Member badge">★ OG</span>' : ''}
         ${staffBadge ? '<span class="message-badge '+staffBadge[1]+'" title="DougHub Staff: '+staffBadge[0]+'">'+staffBadge[0]+'</span>' : ''}
-        <span class="message-time">${formatTime(message.created_at)}</span>
+        <span class="message-time">${consecutiveSameUser ? "" : formatTime(message.created_at)}</span>
       `;
+
+      if (currentUserIsHelper) {
+        const pinButton = document.createElement("button");
+        pinButton.type = "button";
+        pinButton.className = "message-pin-button";
+        pinButton.textContent = pinnedIds.has(message.id) ? "Unpin" : "Pin";
+        pinButton.setAttribute("aria-label", (pinnedIds.has(message.id) ? "Unpin" : "Pin") + " message");
+        pinButton.addEventListener("click", async () => {
+          if (!currentUser) return;
+          if (pinnedIds.has(message.id)) {
+            const { error } = await supabaseClient.from("chat_pinned_messages").delete().eq("message_id", message.id);
+            if (error) return showError("Could not unpin message: " + error.message);
+          } else {
+            const { error } = await supabaseClient.from("chat_pinned_messages").insert({ group_id: activeChatGroupId, message_id: message.id, pinned_by: currentUser.id });
+            if (error) return showError("Could not pin message: " + error.message);
+          }
+          lastRenderedMessageSignature = null;
+          await loadMessages();
+          await loadChatFeaturePanels();
+        });
+        header.appendChild(pinButton);
+      }
 
       const bubble =
         document.createElement(
