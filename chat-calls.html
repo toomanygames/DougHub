@@ -441,11 +441,12 @@ function makePeer(id,info){
   console.info("DougHub remote track received: "+JSON.stringify({participant:id,kind:e.track.kind,state:e.track.readyState,enabled:e.track.enabled,muted:e.track.muted,streamTrackCount:state.stream.getTracks().length,tileExists:!!t}));
   if(t){
    const video=t.querySelector("video"),audio=t.querySelector("audio");
-   video.srcObject=state.stream;
-   audio.muted=false;audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
-   // Bind the audio sink to the same persistent stream as video. The video
-   // element remains muted, so only this audio element outputs participant sound.
-   audio.srcObject=state.stream;
+   // Assign each media element's stream only when it actually changes.
+   // Reassigning srcObject for the second arriving track interrupts an active
+   // play() request (AbortError), which can leave playback unreliable.
+   if(video.srcObject!==state.stream)video.srcObject=state.stream;
+   if(audio.srcObject!==state.stream)audio.srcObject=state.stream;
+   video.muted=true;
    audio.muted=false;
    audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
    if(e.track.kind==="audio"){
