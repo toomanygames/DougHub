@@ -2563,17 +2563,11 @@ async function loadChatFeaturePanels() {
   pollButton.hidden = !currentUserIsHelper;
   const scopeGroup = query => activeChatGroupId === null ? query.is("group_id", null) : query.eq("group_id", activeChatGroupId);
 
-  const pinResult = await scopeGroup(supabaseClient.from("chat_pinned_messages").select("message_id,created_at").order("created_at", { ascending: false }).limit(5));
+  const pinResult = await scopeGroup(supabaseClient.from("chat_pinned_messages").select("message_id,created_at").order("created_at", { ascending: false }).limit(1));
   pinsPanel.replaceChildren();
   if (!pinResult.error && pinResult.data && pinResult.data.length) {
-    // Heal any old duplicate pins left by earlier versions: retain only the newest.
-    const pins = pinResult.data;
-    if (pins.length > 1) {
-      const staleIds = pins.slice(1).map(row => row.message_id);
-      const { error: cleanupError } = await scopeGroup(supabaseClient.from("chat_pinned_messages").delete().in("message_id", staleIds));
-      if (cleanupError) console.warn("Could not clean up duplicate pins:", cleanupError.message);
-    }
-    const pin = pins[0];
+    // Show only the newest pin. "Unpin all" also clears any duplicate rows
+    // created by the older implementation.
     const { data: pinnedMessages } = await supabaseClient.from("chat_messages").select("id,username,message,attachment_name").eq("id", pin.message_id).limit(1);
     const message = pinnedMessages?.[0];
     const label = document.createElement("strong"); label.textContent = "Pinned"; pinsPanel.appendChild(label);
