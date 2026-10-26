@@ -1254,6 +1254,13 @@ messagesEl.addEventListener("wheel", event => {
   if (event.deltaY < 0) cancelInitialChatScroll();
 }, { passive: true });
 
+// If the user scrolls all the way back to the newest message, resume normal
+// follow-the-bottom behavior for newly arriving messages.
+messagesEl.addEventListener("scroll", () => {
+  const distance = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
+  if (distance <= 4) chatUserScrolledUp = false;
+}, { passive: true });
+
 let chatTouchStartY = null;
 messagesEl.addEventListener("touchstart", event => {
   chatTouchStartY = event.touches?.[0]?.clientY ?? null;
