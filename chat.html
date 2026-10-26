@@ -1234,13 +1234,20 @@ function markChatRead(groupId,timestamp=new Date().toISOString()) {
 const messagesEl =
   document.getElementById("messages");
 
-// The initial message list can change height after the first paint (for example,
-// when attachment images load). Retry the initial bottom position briefly, but
-// cancel immediately if the user starts scrolling upward.
+// Do not let the browser restore an old scroll position after refresh; chat
+// should open at the newest message every time.
+try {
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+} catch (_) {}
+
+// Initial layout can settle late (fonts/images). Retry the initial bottom
+// position briefly, but stop as soon as the user deliberately scrolls upward.
 let initialChatScrollCancelled = false;
+let chatUserScrolledUp = false;
 
 function cancelInitialChatScroll() {
   initialChatScrollCancelled = true;
+  chatUserScrolledUp = true;
 }
 
 messagesEl.addEventListener("wheel", event => {
@@ -1265,13 +1272,20 @@ messagesEl.addEventListener("keydown", event => {
   }
 });
 
+// Also detect dragging the native scrollbar, which doesn't always produce a
+// wheel/touch event. Only cancel when the pointer is over the scrollbar gutter.
+messagesEl.addEventListener("pointerdown", event => {
+  if (event.clientX >= messagesEl.getBoundingClientRect().right - 18) {
+    cancelInitialChatScroll();
+  }
+}, { passive: true });
+
 function settleInitialChatScroll() {
   const scrollToBottom = () => {
     if (initialChatScrollCancelled || !messagesEl.isConnected) return;
     messagesEl.scrollTop = messagesEl.scrollHeight;
   };
 
-  // Wait for layout, then re-check after late content/layout changes.
   requestAnimationFrame(() => {
     scrollToBottom();
     window.setTimeout(scrollToBottom, 100);
@@ -2714,9 +2728,14 @@ async function loadMessages() {
       messagesEl.clientHeight;
 
     const isInitialRender = lastRenderedMessageSignature === null;
+    if (isInitialRender) {
+      // A fresh page load or conversation switch always starts at the bottom.
+      initialChatScrollCancelled = false;
+      chatUserScrolledUp = false;
+    }
     const shouldScrollBottom =
       isInitialRender ||
-      distanceFromBottom < 80;
+      (!chatUserScrolledUp && distanceFromBottom < 80);
 
     lastRenderedMessageSignature = signature;
     await renderMessages(orderedMessages, shouldScrollBottom);
