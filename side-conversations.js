@@ -75,7 +75,41 @@ async function loadQuickMessages(show){if(!db||!$("dhsc-quick-messages"))return;
 function renderQuickMessages(){const box=$("dhsc-quick-messages");if(!box)return;const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML=quickMessages.length?quickMessages.map(m=>'<article class="dhsc-quick-msg '+(m.user_id===user?.id?"mine":"")+'"><div class="dhsc-quick-meta"><strong>'+esc(m.username||"DougHub member")+'</strong><span>'+esc(ago(m.created_at))+'</span></div><div class="dhsc-quick-text">'+esc(m.message||"")+'</div></article>').join(""):'<div id="dhsc-quick-empty">No messages yet. Say hello!<br><a href="/chat.html">Open full Community Chat ↗</a></div>';if(nearBottom||box.scrollTop===0)box.scrollTop=box.scrollHeight}
 async function sendQuickMessage(e){e.preventDefault();const input=$("dhsc-quick-input"),button=$("dhsc-quick-send"),message=input.value.trim();if(!message||quickBusy)return;if(!user){location.href="/log-in.html?redirect="+encodeURIComponent(location.pathname.slice(1)+location.search);return}if(message.length>1000)return;quickBusy=true;button.disabled=true;button.textContent="Sending…";try{let profile=await db.from("profiles").select("username").eq("id",user.id).maybeSingle();const username=profile.data?.username||user.user_metadata?.username||user.email?.split("@")[0]||"DougHub member";let r=await db.from("chat_messages").insert({user_id:user.id,username,message,attachment_url:null,attachment_type:null,attachment_name:null,attachment_source:null,group_id:null});if(r.error)throw r.error;input.value="";await loadQuickMessages(true)}catch(e){console.warn("Quick Chat send:",e);alert(e.message||"Could not send message. Please try again.")}finally{quickBusy=false;button.disabled=false;button.textContent="Send";input.focus()}}
 
-async function setupDb(){if(!window.supabase?.createClient)await new Promise((ok,no)=>{let s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=ok;s.onerror=no;document.head.appendChild(s)});db=window.supabase.createClient(URL,KEY);let r=await db.auth.getSession();user=r.data?.session?.user||null}
+async function setupDb(){
+  // display.js owns the page-wide authenticated Supabase client. Reuse it
+  // rather than creating another GoTrueClient with the same auth storage key.
+  if(window.DougHubSupabaseClient) db=window.DougHubSupabaseClient;
+  else {
+    // nav.js can load this panel before display.js has finished initializing.
+    // Wait for its ready event so both scripts don't create competing clients.
+    db=await new Promise((resolve,reject)=>{
+      let settled=false;
+      const finish=client=>{
+        if(settled)return;
+        settled=true;
+        clearTimeout(timer);
+        window.removeEventListener("douqhub:supabase-ready",onReady);
+        if(client)resolve(client);else reject(new Error("DougHub's shared database client did not initialize."));
+      };
+      const onReady=()=>finish(window.DougHubSupabaseClient||null);
+      window.addEventListener("douqhub:supabase-ready",onReady);
+      const timer=setTimeout(()=>{
+        if(window.DougHubSupabaseClient){finish(window.DougHubSupabaseClient);return;}
+        // Fallback for pages where the shared display controller isn't present.
+        if(!window.supabase?.createClient){finish(null);return;}
+        try{
+          const client=window.supabase.createClient(URL,KEY);
+          window.DougHubSupabaseClient=client;
+          window.dispatchEvent(new Event("douqhub:supabase-ready"));
+          finish(client);
+        }catch(error){if(!settled){settled=true;window.removeEventListener("douqhub:supabase-ready",onReady);reject(error);}}
+      },8000);
+      if(window.DougHubSupabaseClient)finish(window.DougHubSupabaseClient);
+    });
+  }
+  const r=await db.auth.getSession();
+  user=r.data?.session?.user||null;
+}
 async function init(){build();try{await setupDb();await loadCommunities();await loadPosts();if(!document.body.classList.contains("dhsc-chat-page")){await loadQuickMessages();quickPolling=window.setInterval(()=>{if(document.visibilityState==="visible")loadQuickMessages(false)},5000);}}catch(e){console.warn("Side-Conversations init:",e);$("dhsc-feed").innerHTML='<div class="dhsc-status">Could not connect. Try refreshing, or open <a href="/dougforum.html">DougForum</a>.</div>'}}
 async function loadCommunities(){let r=await db.from("dougforum_communities").select("id,slug,name").order("name");if(r.error)throw r.error;communities=r.data||[];let sel=$("dhsc-compose").querySelector('[name=community]');sel.innerHTML='<option value="">Choose a community…</option>'+communities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");let d=communities.find(c=>/general/i.test(c.name+" "+c.slug));if(d)sel.value=d.id;else if(communities[0])sel.value=communities[0].id}
 async function loadPosts(show){if(!db||!$("dhsc-feed"))return;if(show)$("dhsc-feed").innerHTML='<div class="dhsc-status">Refreshing conversations…</div>';try{let r=await db.from("dougforum_posts").select("id,community_id,author_id,title,body,link_url,created_at,dougforum_comments(count)").order("created_at",{ascending:false}).limit(50);if(r.error)throw r.error;let rows=r.data||[],ids=[...new Set(rows.map(p=>p.author_id).filter(Boolean))],cids=[...new Set(rows.map(p=>p.community_id).filter(Boolean))];let [pr,cr]=await Promise.all([ids.length?db.from("profiles").select("id,username,avatar_url").in("id",ids):Promise.resolve({data:[]}),cids.length?db.from("dougforum_communities").select("id,name,slug").in("id",cids):Promise.resolve({data:[]})]);let pm=Object.fromEntries((pr.data||[]).map(p=>[p.id,p])),cm=Object.fromEntries((cr.data||[]).map(c=>[c.id,c]));posts=rows.map(p=>({...p,author:pm[p.author_id]||{username:"DougHub member"},community:cm[p.community_id]||null,count:p.dougforum_comments?.[0]?.count||0}));render()}catch(e){console.warn("Side-Conversations load:",e);$("dhsc-feed").innerHTML='<div class="dhsc-status">Could not load conversations. Try again or open <a href="/dougforum.html">DougForum</a>.</div>'}}
