@@ -394,12 +394,14 @@ function renderParticipants(){
   if(peerState?.stream){
    if(video&&video.srcObject!==peerState.stream)video.srcObject=peerState.stream;
    const audioTrack=peerState.stream.getAudioTracks().find(track=>track.readyState==="live");
-   const attachedAudio=audio?.srcObject?.getAudioTracks?.()[0];
-   if(audioTrack&&audio&&attachedAudio?.id!==audioTrack.id)audio.srcObject=new MediaStream([audioTrack]);
+   // Keep both elements bound to the same persistent remote stream. The video
+   // element is muted; the audio sink plays its audio track without racing
+   // against later ontrack events or replacing the stream object.
+   if(audio&&audio.srcObject!==peerState.stream)audio.srcObject=peerState.stream;
    if(audio){audio.muted=false;audio.volume=Number(tile.querySelector(".participant-volume input")?.value??100)/100;}
    if(video?.srcObject===peerState.stream)video.play?.().catch(err=>console.warn("DougHub remote video playback blocked:",{participant:id,error:String(err)}));
    if(audioTrack&&audio){audio.play?.().catch(err=>console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)}));}
-   if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===peerState.stream,audioBound:audio?.srcObject?.getAudioTracks?.()[0]?.id===audioTrack?.id}));
+   if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===peerState.stream,audioBound:audio?.srcObject===peerState.stream,audioTrackCount:audio?.srcObject?.getAudioTracks?.().length||0}));
   }
   const ph=tile.querySelector(".video-placeholder");
   if(ph){const hasPicture=!!video&&video.videoWidth>0&&video.videoHeight>0&&remoteCameraOn.has(id)&&!remoteCameraHidden.has(id);ph.hidden=hasPicture;if(!hasPicture){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
@@ -441,19 +443,21 @@ function makePeer(id,info){
    const video=t.querySelector("video"),audio=t.querySelector("audio");
    video.srcObject=state.stream;
    audio.muted=false;audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
-   // Never replace the audio element's source when a video track arrives.
-   // WebRTC may deliver video after audio; overwriting srcObject here can silence the call.
+   // Bind the audio sink to the same persistent stream as video. The video
+   // element remains muted, so only this audio element outputs participant sound.
+   audio.srcObject=state.stream;
+   audio.muted=false;
+   audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
    if(e.track.kind==="audio"){
-    audio.srcObject=new MediaStream([e.track]);
-    console.info("DougHub remote audio track received:",{participant:id,readyState:e.track.readyState,muted:e.track.muted,enabled:e.track.enabled});
+    console.info("DougHub remote audio track received: "+JSON.stringify({participant:id,readyState:e.track.readyState,muted:e.track.muted,enabled:e.track.enabled,streamAudioTracks:state.stream.getAudioTracks().length}));
     e.track.onunmute=()=>{
-     console.info("DougHub remote audio unmuted:",{participant:id,readyState:e.track.readyState});
-     audio.play?.().catch(err=>{console.warn("Remote audio playback blocked:",err);setStatus("Audio is received, but playback is blocked. Tap the participant tile or check device output.")});
+     console.info("DougHub remote audio unmuted: "+JSON.stringify({participant:id,readyState:e.track.readyState}));
+     audio.play?.().catch(err=>{console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)});setStatus("Audio is received, but playback is blocked. Tap Enable sound.")});
     };
     e.track.onmute=()=>console.warn("DougHub remote audio track muted:",id);
-    audio.onplaying=()=>console.info("DougHub remote audio is playing:",id);
+    audio.onplaying=()=>console.info("DougHub remote audio is playing: "+id);
     audio.onerror=()=>console.warn("DougHub remote audio element error:",audio.error);
-    audio.play?.().catch(err=>{console.warn("Remote audio playback blocked:",err);setStatus("Audio is received, but playback is blocked. Tap the participant tile or check device output.")});
+    audio.play?.().catch(err=>{console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)});setStatus("Audio is received, but playback is blocked. Tap Enable sound.")});
    }
    video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
    const resumePlayback=()=>{video.play?.().catch(()=>{});audio.muted=false;audio.play?.().catch(err=>{console.warn("Participant audio playback still blocked:",err);setStatus("Tap Enable sound to allow participant audio.")})};
