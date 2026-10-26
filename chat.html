@@ -1612,13 +1612,42 @@ function renderChatGroupList() {
       '<span class="group-name-label">' + escapeGroupText(group.name) + '</span>';
     button.title = group.description || group.name;
     button.addEventListener("click", async () => {
-      const { data: membership } = await supabaseClient.from("chat_group_members")
-        .select("group_id").eq("group_id", group.id).eq("user_id", currentUser.id).maybeSingle();
-      if (!membership && (group.is_public || currentUserIsAdmin)) {
-        const { error } = await supabaseClient.from("chat_group_members").insert({group_id:group.id,user_id:currentUser.id,role:"member"});
-        if (error && !String(error.code || "").includes("23505")) { showError("Couldn't join this group: " + error.message); return; }
+      if (!currentUser || !supabaseClient) {
+        showError("Sign in to join a chat group.");
+        return;
       }
-      await selectChatGroup(group.id);
+      button.disabled = true;
+      try {
+        const { data: membership, error: membershipError } = await supabaseClient
+          .from("chat_group_members").select("group_id")
+          .eq("group_id", group.id).eq("user_id", currentUser.id).maybeSingle();
+        if (membershipError) {
+          console.error("Could not check group membership:", membershipError);
+          showError("Couldn't check access to " + group.name + ". Refresh and try again.");
+          return;
+        }
+        if (!membership) {
+          if (!group.is_public && group.created_by !== currentUser.id && !currentUserIsAdmin && !currentUserIsHelper) {
+            showError("This is a private group. Ask its owner to invite you.");
+            return;
+          }
+          const { error: joinError } = await supabaseClient.from("chat_group_members").upsert(
+            { group_id: group.id, user_id: currentUser.id, role: group.created_by === currentUser.id ? "owner" : "member" },
+            { onConflict: "group_id,user_id", ignoreDuplicates: true });
+          if (joinError) {
+            console.error("Could not join group:", joinError);
+            showError("Couldn't join " + group.name + ": " + joinError.message);
+            return;
+          }
+        }
+        hideError();
+        await selectChatGroup(group.id);
+      } catch (error) {
+        console.error("Unexpected group join error:", error);
+        showError("Couldn't open " + group.name + ". Check your connection and try again.");
+      } finally {
+        button.disabled = false;
+      }
     });
     row.appendChild(button);
     row.appendChild(makeChatBell(group.id));
@@ -1700,13 +1729,24 @@ toggleStaffWriteButton?.addEventListener("click", async () => {
 
 joinGroupButton.addEventListener("click", async () => {
   if (!currentUser || !activeChatGroupId || !activeChatGroup) return;
-  const { data: membership } = await supabaseClient.from("chat_group_members")
+  const { data: membership, error: membershipCheckError } = await supabaseClient.from("chat_group_members")
     .select("group_id").eq("group_id", activeChatGroupId).eq("user_id", currentUser.id).maybeSingle();
+  if (membershipCheckError) return showError("Couldn't check group membership: " + membershipCheckError.message);
   if (!membership) {
-    const { error } = await supabaseClient.from("chat_group_members").insert({group_id:activeChatGroupId,user_id:currentUser.id,role:currentUserIsAdmin?"member":"member"});
-    if (error) return showError("Couldn't join group: " + error.message);
+    const { error } = await supabaseClient.from("chat_group_members").upsert(
+      {group_id:activeChatGroupId,user_id:currentUser.id,role:activeChatGroup.created_by===currentUser.id?"owner":"member"},
+      {onConflict:"group_id,user_id",ignoreDuplicates:true}
+    );
+    if (error) {
+      console.error("Explicit group join failed:", error);
+      return showError("Couldn't join group: " + error.message);
+    }
   }
-  renderActiveGroupDetails();
+  hideError();
+  const joinedGroupId = activeChatGroupId;
+  await loadChatGroups();
+  await selectChatGroup(joinedGroupId);
+
 });
 inviteGroupButton.addEventListener("click", async () => {
   if (!currentUser || !activeChatGroupId || !activeChatGroup) return;
