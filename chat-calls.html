@@ -181,14 +181,20 @@ function makePeer(id,info){
   }else if(pc.connectionState==="failed")recoverPeer(id,"Peer connection failed");
   else if(pc.connectionState==="connecting")setStatus("Connecting to "+(info.username||"participant")+"…");
  };
- localStream?.getTracks().forEach(track=>{
-  const sender=pc.addTrack(track,localStream);
-  if(track.kind==="video"&&sender?.getParameters&&sender?.setParameters){
-   const params=sender.getParameters();params.encodings=params.encodings?.length?params.encodings:[{}];
-   params.encodings[0].maxBitrate=450000;params.encodings[0].maxFramerate=24;
-   sender.setParameters(params).catch(e=>console.debug("Using default video bitrate",e));
-  }
- });
+ // Always create media sections in the same order on every peer (audio, then video).
+ // This prevents renegotiation/ICE-restart offers from changing SDP m-line order when
+ // one participant has only a microphone or only a camera.
+ const localAudio=localStream?.getAudioTracks()[0]||null;
+ const localVideo=localStream?.getVideoTracks()[0]||null;
+ const audioTransceiver=pc.addTransceiver("audio",{direction:"sendrecv"});
+ const videoTransceiver=pc.addTransceiver("video",{direction:"sendrecv"});
+ audioTransceiver.sender.replaceTrack(localAudio).catch(e=>console.warn("Audio sender setup failed",e));
+ videoTransceiver.sender.replaceTrack(localVideo).catch(e=>console.warn("Video sender setup failed",e));
+ if(videoTransceiver.sender?.getParameters&&videoTransceiver.sender?.setParameters){
+  const params=videoTransceiver.sender.getParameters();params.encodings=params.encodings?.length?params.encodings:[{}];
+  params.encodings[0].maxBitrate=450000;params.encodings[0].maxFramerate=24;
+  videoTransceiver.sender.setParameters(params).catch(e=>console.debug("Using default video bitrate",e));
+ }
  renderParticipants();return state;
 }
 async function recoverPeer(id,reason){
