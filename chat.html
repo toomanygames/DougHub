@@ -1181,14 +1181,30 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
 
-// Reuse display.js's single authenticated client instead of creating a
-// second GoTrueClient with the same browser storage key.
+// Reuse display.js's single authenticated client. If its asynchronous startup
+// has not run yet, create the shared client here and publish it so display.js
+// will reuse the same instance rather than leaving Chat stuck on a startup race.
 let supabaseClient = window.DougHubSupabaseClient || null;
 
-function waitForSharedSupabaseClient(timeoutMs = 15000) {
-  if (window.DougHubSupabaseClient) {
-    return Promise.resolve(window.DougHubSupabaseClient);
+function getOrCreateSharedSupabaseClient() {
+  if (window.DougHubSupabaseClient) return window.DougHubSupabaseClient;
+  if (!window.supabase || typeof window.supabase.createClient !== "function") return null;
+
+  try {
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.DougHubSupabaseClient = client;
+    supabaseClient = client;
+    window.dispatchEvent(new Event("douqhub:supabase-ready"));
+    return client;
+  } catch (error) {
+    console.warn("Community Chat could not create the shared Supabase client yet.", error);
+    return null;
   }
+}
+
+function waitForSharedSupabaseClient(timeoutMs = 15000) {
+  const existing = getOrCreateSharedSupabaseClient();
+  if (existing) return Promise.resolve(existing);
 
   return new Promise((resolve, reject) => {
     let finished = false;
@@ -1198,16 +1214,17 @@ function waitForSharedSupabaseClient(timeoutMs = 15000) {
       window.removeEventListener("douqhub:supabase-ready", onReady);
       clearTimeout(timer);
       if (client) resolve(client);
-      else reject(new Error("DougHub's shared Supabase client did not initialize."));
+      else reject(new Error("Supabase's browser library did not load or the shared client could not be initialized."));
     };
-    const onReady = () => finish(window.DougHubSupabaseClient || null);
+    const onReady = () => finish(getOrCreateSharedSupabaseClient());
     window.addEventListener("douqhub:supabase-ready", onReady);
-    const timer = setTimeout(
-      () => finish(window.DougHubSupabaseClient || null),
-      timeoutMs
-    );
+    const timer = setTimeout(() => {
+      const client = getOrCreateSharedSupabaseClient();
+      finish(client);
+    }, timeoutMs);
     // Check again after registering in case initialization completed in between.
-    if (window.DougHubSupabaseClient) finish(window.DougHubSupabaseClient);
+    const client = getOrCreateSharedSupabaseClient();
+    if (client) finish(client);
   });
 }
 
@@ -2718,8 +2735,10 @@ pollsDrawerBackdrop.addEventListener("click", () => setPollsDrawerOpen(false));
 document.addEventListener("keydown", event => {
   if (event.key === "Escape" && !pollsDrawer.classList.contains("is-hidden")) setPollsDrawerOpen(false);
 });
-// The drawer starts open on every page load, including refreshes.
+// Open poll results on every fresh page load and browser restore, regardless
+// of a previous close action or the browser's back/forward cache.
 setPollsDrawerOpen(true);
+window.addEventListener("pageshow", () => setPollsDrawerOpen(true));
 
 document.getElementById("createPollButton").addEventListener("click", async () => {
   if (!currentUserIsHelper || !currentUser) return;
