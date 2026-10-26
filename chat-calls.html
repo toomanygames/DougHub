@@ -64,7 +64,96 @@ h1{font-size:clamp(28px,5vw,46px);line-height:1.04;letter-spacing:-.055em;margin
 @media(max-width:760px){.call-layout{grid-template-columns:1fr}.call-side{order:-1}.video-grid{gap:7px;padding:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}.video-tile{aspect-ratio:3/4}.call-toolbar{gap:7px}.call-status{flex-basis:100%;margin:2px 0 0}}
 @media(max-width:440px){.call-header{padding:14px}.video-grid{grid-template-columns:1fr}.video-tile{aspect-ratio:16/10}.call-side{padding:16px}}
 
-/* Full-page call layout: keep the video grid as the main focus and avoid page scrolling. */
+/* DougHub Calls — app-like, edge-to-edge layout */
+html,body{height:100%;height:100dvh;min-height:0;overflow:hidden}
+body{display:flex;flex-direction:column;background:radial-gradient(ellipse at 10% -10%,#4f46e526,transparent 45%),radial-gradient(ellipse at 100% 10%,#9333ea16,transparent 36%),#050611}
+.call-header{height:52px;min-height:52px;padding:0 clamp(12px,2.5vw,28px);flex-shrink:0;border-bottom:1px solid #a5b4fc19;background:#070916d9;backdrop-filter:blur(22px)}
+.call-brand{font-size:15px;letter-spacing:-.045em}
+.call-brand span{color:#a5b4fc!important;font-weight:750}
+.call-back{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-color:#a5b4fc24;background:#ffffff05;color:#d9dcf7;transition:background .18s,border-color .18s}
+.call-back:hover{background:#818cf81a;border-color:#818cf85e}
+main{width:100%;height:calc(100dvh - 52px);min-height:0;margin:0;padding:clamp(5px,1.2vh,12px) clamp(5px,1vw,12px);display:flex;flex-direction:column;overflow:hidden}
+.eyebrow,h1,.intro{display:none}
+.call-layout{display:flex;flex:1;min-height:0;min-width:0;margin:0;gap:0}
+.call-stage{position:relative;display:flex;flex:1;min-width:0;min-height:0;flex-direction:column;border:1px solid #a5b4fc20;border-radius:18px;background:linear-gradient(160deg,#11152bfa,#080a18fa 58%);box-shadow:0 18px 70px #0006;overflow:hidden}
+.call-stage:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,#6366f111,transparent 48%);z-index:0}
+.stage-topbar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;padding:10px 14px;border-bottom:1px solid #a5b4fc14;background:#080a18a8}
+.stage-heading{display:flex;align-items:center;gap:10px;min-width:0}
+.stage-live-dot{width:8px;height:8px;flex-shrink:0;border-radius:50%;background:#818cf8;box-shadow:0 0 0 4px #818cf81a}
+.stage-heading-text{min-width:0}
+.stage-heading-title{font-size:12px;font-weight:900;letter-spacing:-.01em;color:#f2f3ff}
+.stage-heading-subtitle{margin-top:2px;font-size:10px;color:#929ab9}
+.room-count{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #a5b4fc20;border-radius:9px;background:#ffffff04;color:#d0d4f2;font-size:10px;font-weight:750;white-space:nowrap}
+.video-grid{position:relative;z-index:1;display:grid;flex:1;min-height:0;min-width:0;overflow:auto;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(6px,1vw,12px);padding:clamp(8px,1.2vw,14px);align-content:center;justify-items:stretch}
+.video-tile{aspect-ratio:16/9;max-height:calc(100dvh - 190px);min-height:120px;border:1px solid #a5b4fc1c;border-radius:14px;background:radial-gradient(ellipse at 50% 30%,#25294a,#0a0c1a 72%);box-shadow:0 8px 24px #0002;transition:border-color .18s,background .18s}
+.video-tile video{background:#070913}
+.video-tile:has(video:playing){border-color:#818cf839}
+.video-placeholder{gap:9px;color:#9da5c5;font-size:11px}
+.video-placeholder strong{font-size:13px;font-weight:850}
+.video-placeholder .avatar{width:52px;height:52px;border-radius:17px;background:linear-gradient(135deg,#6366f133,#a855f72b);box-shadow:0 8px 30px #0003}
+.video-label{left:10px;bottom:10px;padding:6px 9px;border:1px solid #ffffff18;border-radius:9px;background:#050611d9;font-size:10px;backdrop-filter:blur(14px)}
+.call-toolbar{position:relative;z-index:1;display:flex;flex-shrink:0;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px;padding:10px 12px;border-top:1px solid #a5b4fc18;background:#070916ed}
+.call-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 12px;border:1px solid #a5b4fc25;border-radius:10px;background:#ffffff06;color:#edf0ff;font-weight:800;font-size:11px;white-space:nowrap;transition:transform .16s,border-color .16s,background .16s}
+.call-btn:hover:not(:disabled){transform:translateY(-1px);filter:none;border-color:#a5b4fc66;background:#818cf815}
+.call-btn:focus-visible,.call-back:focus-visible,.invite-link-input:focus-visible,.invite-controls input:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px}
+.call-btn.primary{background:linear-gradient(125deg,#4f46e5,#7c3aed);border-color:#8b86ff66;color:#fff;box-shadow:0 5px 18px #4f46e522}
+.call-btn.primary:hover:not(:disabled){background:linear-gradient(125deg,#5b55f3,#8b45f1)}
+.call-btn.danger{border-color:#f8717144;background:#ef444414;color:#fecaca}
+.call-btn:disabled{opacity:.42;cursor:not-allowed}
+.call-status{display:inline-flex;align-items:center;justify-content:center;min-width:0;max-width:100%;margin:0;padding:6px 9px;border:1px solid #a5b4fc16;border-radius:9px;background:#ffffff03;color:#aeb5d3;font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+.call-side{display:none!important}
+.invite-panel{position:relative;z-index:2;display:none;flex-shrink:0;gap:9px;padding:12px 14px;border-top:1px solid #a5b4fc20;background:#090b1bd9}
+.invite-panel.open{display:grid}
+.invite-panel-title{font-size:13px;font-weight:900;letter-spacing:-.02em}
+.invite-panel-help,.invite-feedback{font-size:11px;color:#9da5c5;line-height:1.5}
+.invite-controls{display:grid;grid-template-columns:minmax(150px,1fr) auto;gap:8px}
+.invite-controls input,.invite-link-input{width:100%;min-width:0;min-height:38px;padding:9px 11px;border:1px solid #a5b4fc24;border-radius:10px;background:#050713;color:#f5f6ff;font-size:12px}
+.invite-controls input::placeholder{color:#777f9f}
+.invite-link-row{display:flex;gap:8px;min-width:0}
+.invite-feedback:empty{display:none}
+.invite-feedback.error{color:#fda4af}
+.invite-feedback.success{color:#86efac}
+.call-error{flex-shrink:0;margin:6px 10px 0;padding:9px 11px;border-radius:10px;font-size:11px}
+.call-note,.call-footer{flex-shrink:0;margin:0;padding:5px 12px;color:#858ba7;font-size:9px;line-height:1.4}
+.call-note{border-top:1px solid #a5b4fc10;background:#fbbf2406;color:#b8b5a1}
+.call-footer{padding-bottom:8px}
+.call-stage:fullscreen{width:100vw;height:100vh;height:100dvh;border:0;border-radius:0;background:#050611}
+.call-stage:fullscreen .stage-topbar{padding:12px 18px}
+.call-stage:fullscreen .video-grid{grid-template-columns:repeat(auto-fit,minmax(min(42vw,520px),1fr));padding:clamp(12px,2vw,24px)}
+.call-stage:fullscreen .video-tile{aspect-ratio:16/9;max-height:calc(100dvh - 170px)}
+.call-stage:fullscreen .call-toolbar{padding:14px 18px calc(14px + env(safe-area-inset-bottom))}
+.participant-volume{background:#050611e8;border-color:#ffffff20}
+.participant-volume input{accent-color:#818cf8}
+@media(max-width:760px){
+ .call-header{height:48px;min-height:48px;padding:0 10px}
+ main{height:calc(100dvh - 48px);padding:5px}
+ .call-stage{border-radius:13px}
+ .stage-topbar{padding:8px 10px}
+ .stage-heading-title{font-size:11px}
+ .stage-heading-subtitle{font-size:9px}
+ .video-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:6px;padding:7px}
+ .video-tile{aspect-ratio:16/10;max-height:none;min-height:105px}
+ .call-toolbar{gap:6px;padding:8px}
+ .call-btn{min-height:36px;padding:0 10px;font-size:10px}
+ .call-status{flex-basis:100%;order:10}
+ .invite-panel{padding:10px;gap:8px}
+ .invite-controls{grid-template-columns:minmax(0,1fr) auto}
+ .call-note,.call-footer{padding:4px 8px;font-size:8px}
+ .participant-volume{right:5px;top:5px;padding:4px;font-size:9px}
+ .participant-volume input{width:55px}
+}
+@media(max-width:420px){
+ .call-brand{font-size:13px}
+ .call-back{padding:6px 8px;font-size:10px}
+ .stage-topbar{align-items:flex-start}
+ .room-count{font-size:9px;padding:5px 7px}
+ .video-grid{grid-template-columns:1fr}
+ .video-tile{aspect-ratio:16/10}
+ .call-btn{padding:0 8px}
+ .invite-link-row{flex-wrap:wrap}
+ .invite-link-row .invite-link-input{flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 html,body{height:100%;height:100dvh;min-height:0;overflow:hidden}
 .call-header{height:54px;min-height:54px;padding:0 16px;flex-shrink:0}
 main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12px 12px;display:flex;flex-direction:column;overflow:hidden}
@@ -112,6 +201,7 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 <p class="intro">Start a room and invite people directly. Up to six people can join.</p>
 <div class="call-layout">
 <section class="call-stage" aria-label="Video call">
+<div class="stage-topbar"><div class="stage-heading"><span class="stage-live-dot" aria-hidden="true"></span><div class="stage-heading-text"><div class="stage-heading-title">DougHub Call Room</div><div class="stage-heading-subtitle">Private audio and video · Up to 6 people</div></div></div><span id="roomCountTop" class="room-count">Ready to connect</span></div>
 <div class="video-grid" id="videoGrid"><div class="video-tile local-video-tile" id="localTile"><video id="localVideo" autoplay playsinline muted></video><div id="localPlaceholder" class="video-placeholder"><span class="avatar">◉</span><strong>Your camera</strong><span>Join to turn on your camera</span></div><span class="video-label" id="localVideoLabel">You</span></div></div>
 <div class="call-toolbar">
 <button class="call-btn primary" id="startButton" type="button">Start a call</button>
@@ -129,7 +219,8 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
   <div class="invite-panel-title">Invite people to this call</div>
   <div class="invite-panel-help">Enter a DougHub username to send the room link privately through DMail. They must be signed in to join.</div>
   <form id="inviteUserForm" class="invite-controls">
-    <input id="inviteUsername" type="text" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="DougHub username" aria-label="DougHub username" required>
+    <input id="inviteUsername" type="text" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" list="inviteUserSuggestions" placeholder="Search DougHub username" aria-label="DougHub username" required>
+    <datalist id="inviteUserSuggestions"></datalist>
     <button class="call-btn primary" id="sendUserInviteButton" type="submit">Send invite</button>
   </form>
   <div id="inviteFeedback" class="invite-feedback" role="status" aria-live="polite"></div>
@@ -225,7 +316,7 @@ function renderParticipants(){
   if(ph){const video=tile.querySelector("video");const hasPicture=!!video&&video.videoWidth>0&&video.videoHeight>0&&remoteCameraOn.has(id)&&!remoteCameraHidden.has(id);ph.hidden=hasPicture;if(!hasPicture){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
  }
  [...grid.querySelectorAll(".video-tile:not(.local-video-tile)")].forEach(t=>{if(!participants.has(t.id.slice(12)))t.remove()});
- $("roomCount").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";
+ $("roomCount").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";
 }
 async function enableRemoteSound(){
  const audios=[...document.querySelectorAll("#videoGrid audio")];
@@ -365,7 +456,7 @@ async function onSignal(p){if(!p||p.room!==room||p.from===user.id||p.to!==user.i
 function unpackPresence(){const state=channel?.presenceState?.()||{},out=new Map();Object.values(state).flat().forEach(p=>{if(p?.user_id)out.set(p.user_id,{user_id:p.user_id,username:p.username||"Participant",avatar_url:p.avatar_url||"",joined_at:p.joined_at||""})});return out}
 async function reconcile(){if(!user||!channel)return;const next=unpackPresence();if(next.size>MAX_PARTICIPANTS){const allowed=[...next.values()].sort((a,b)=>String(a.joined_at).localeCompare(String(b.joined_at))||a.user_id.localeCompare(b.user_id)).slice(0,MAX_PARTICIPANTS);if(!allowed.some(p=>p.user_id===user.id)){showError("This room is full (maximum "+MAX_PARTICIPANTS+" people).");setStatus("Room full");await cleanup(false);return}}participants.clear();next.forEach((v,k)=>participants.set(k,v));for(const id of [...remoteCameraHidden])if(!next.has(id))remoteCameraHidden.delete(id);for(const id of [...remoteCameraOn])if(!next.has(id))remoteCameraOn.delete(id);renderParticipants();for(const [id,info] of participants)if(id!==user.id)await startOffer(id,info);for(const [id,st] of [...peers])if(!participants.has(id)){st.pc.close();if(st.audioStatsTimer)clearInterval(st.audioStatsTimer);peers.delete(id);pendingIce.delete(id);document.getElementById("participant-"+id)?.remove()}if(participants.size<=1)setStatus("Waiting for others to join…")}
 async function connectRoom(){if(joining||subscribed)return;joining=true;clearError();ending=false;setStatus("Checking sign-in…");try{await ensureUser();await ensureMedia();if(!room){room=randomRoom();const u=new URL(location.href);u.search="";u.searchParams.set("room",room);history.replaceState({}, "",u);updateRoomUi()}channel=client.channel("dh-video-v2-"+room,{config:{broadcast:{self:false},presence:{key:user.id}}});channel.on("broadcast",{event:"signal"},({payload})=>onSignal(payload).catch(e=>{console.error("Call signaling error",e);showError(e.message||"A call setup message failed.")}));channel.on("presence",{event:"sync"},()=>reconcile().catch(e=>{console.error(e);showError("Couldn't update room participants.")}));channel.on("presence",{event:"join"},()=>reconcile().catch(console.error));channel.on("presence",{event:"leave"},()=>reconcile().catch(console.error));channel.subscribe(async status=>{if(status==="SUBSCRIBED"){try{subscribed=true;const current=unpackPresence();if(current.size>=MAX_PARTICIPANTS&&!current.has(user.id)){showError("This room is full (maximum "+MAX_PARTICIPANTS+" people).");await cleanup(false);return}await channel.track({user_id:user.id,username,avatar_url:avatarUrl,joined_at:new Date().toISOString()});$("startButton").hidden=true;$("joinButton").hidden=true;$("endButton").disabled=false;updateRoomUi();setStatus("Joining room…");await reconcile()}catch(e){showError(e.message||"Couldn't join this room.");setStatus("Couldn't join")}finally{joining=false}}else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){subscribed=false;setStatus("Connection unavailable");showError("Could not connect to the call room. Check your connection and try again. If this keeps happening, refresh the page and rejoin.");joining=false}})}catch(e){console.error(e);showError(e.message||"Could not join the call.");setStatus("Not connected");joining=false}}
-async function cleanup(notify=true){if(ending)return;ending=true;if(notify&&subscribed&&channel)try{await channel.send({type:"broadcast",event:"signal",payload:{kind:"leave",from:user?.id,room}})}catch(_){}const old=channel;channel=null;subscribed=false;for(const st of peers.values()){if(st.recoveryTimer)clearTimeout(st.recoveryTimer);if(st.audioStatsTimer)clearInterval(st.audioStatsTimer);st.pc.ontrack=null;st.pc.onicecandidate=null;st.pc.close()}peers.clear();participants.clear();pendingIce.clear();if(old&&client)try{await client.removeChannel(old)}catch(_){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}remoteCameraHidden.clear();remoteCameraOn.clear();$("localVideo").onplaying=null;$("localVideo").onloadeddata=null;$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());$("micButton").disabled=true;$("cameraButton").disabled=true;$("enableSoundButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("startButton").hidden=!!room;$("joinButton").hidden=!room;updateRoomUi();setStatus("Left the call.");$("roomCount").textContent="0 / "+MAX_PARTICIPANTS+" people";ending=false;joining=false}
+async function cleanup(notify=true){if(ending)return;ending=true;if(notify&&subscribed&&channel)try{await channel.send({type:"broadcast",event:"signal",payload:{kind:"leave",from:user?.id,room}})}catch(_){}const old=channel;channel=null;subscribed=false;for(const st of peers.values()){if(st.recoveryTimer)clearTimeout(st.recoveryTimer);if(st.audioStatsTimer)clearInterval(st.audioStatsTimer);st.pc.ontrack=null;st.pc.onicecandidate=null;st.pc.close()}peers.clear();participants.clear();pendingIce.clear();if(old&&client)try{await client.removeChannel(old)}catch(_){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}remoteCameraHidden.clear();remoteCameraOn.clear();$("localVideo").onplaying=null;$("localVideo").onloadeddata=null;$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());$("micButton").disabled=true;$("cameraButton").disabled=true;$("enableSoundButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("startButton").hidden=!!room;$("joinButton").hidden=!room;updateRoomUi();setStatus("Left the call.");$("roomCount").textContent="0 / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent="0 / "+MAX_PARTICIPANTS+" people";ending=false;joining=false}
 $("startButton").addEventListener("click",connectRoom);$("joinButton").addEventListener("click",connectRoom);$("endButton").addEventListener("click",()=>cleanup(true));
 $("micButton").addEventListener("click",async()=>{const t=localStream?.getAudioTracks()[0];if(!t){await retryMicrophone();return}if(t.readyState!=="live"){showError("Your microphone track has ended. Leave and rejoin the call, then check browser microphone permissions.");return}t.enabled=!t.enabled;$("micButton").textContent=t.enabled?"Mute mic":"Unmute mic";if(t.enabled){try{await t.applyConstraints({echoCancellation:true,noiseSuppression:true,autoGainControl:true})}catch(_){}setStatus("Microphone enabled.")}else setStatus("Your microphone is muted.")});
 $("cameraButton").addEventListener("click",()=>{const t=localStream?.getVideoTracks()[0];if(t){t.enabled=!t.enabled;$("cameraButton").textContent=t.enabled?"Turn camera off":"Turn camera on";$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent=t.enabled?"Waiting for camera picture…":"Your camera is off";if(t.enabled){const video=$("localVideo");video.play?.().catch(()=>{});if(video.videoWidth>0&&video.videoHeight>0)$("localPlaceholder").hidden=false}for(const id of peers.keys())sendSignal("camera_state",id,{hidden:!t.enabled}).catch(()=>{})}});
@@ -382,7 +473,7 @@ $("inviteUserForm").addEventListener("submit",async event=>{
  const button=$("sendUserInviteButton"),feedback=$("inviteFeedback");
  button.disabled=true;feedback.className="invite-feedback";feedback.textContent="Finding that user…";
  try{
-  const {data:matches,error:lookupError}=await client.from("profiles").select("id,username").eq("username",targetName).limit(2);
+  const {data:matches,error:lookupError}=await client.from("profiles").select("id,username").ilike("username",targetName).limit(2);
   if(lookupError)throw lookupError;
   const recipient=(matches||[]).find(p=>p.id!==user.id);
   if(!recipient)throw new Error((matches||[]).some(p=>p.id===user.id)?"You cannot invite yourself.":"No matching DougHub username was found. Check the spelling and try again.");
@@ -398,6 +489,20 @@ $("inviteUserForm").addEventListener("submit",async event=>{
  }finally{button.disabled=false}
 });
 if(room)updateRoomUi();
+let inviteSearchTimer=null;
+$("inviteUsername").addEventListener("input",()=>{
+ clearTimeout(inviteSearchTimer);
+ const q=$("inviteUsername").value.trim();
+ const list=$("inviteUserSuggestions");list.replaceChildren();
+ if(q.length<2||!client||!user)return;
+ inviteSearchTimer=setTimeout(async()=>{
+  try{
+   const {data,error}=await client.from("profiles").select("username").ilike("username",q+"%").neq("id",user.id).order("username").limit(8);
+   if(error)throw error;
+   (data||[]).forEach(profile=>{if(!profile.username)return;const option=document.createElement("option");option.value=profile.username;list.appendChild(option)});
+  }catch(error){console.debug("Call invite username suggestions unavailable:",error)}
+ },180);
+});
 async function retryMicrophone(){
  if(!localStream){showError("Join the call before enabling your microphone.");return}
  const button=$("micButton");button.disabled=true;button.textContent="Enabling mic…";
