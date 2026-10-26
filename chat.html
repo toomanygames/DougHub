@@ -1121,7 +1121,7 @@ function waitForSharedSupabaseClient(timeoutMs = 15000) {
 ========================================= */
 
 const CHAT_ALERTS_KEY = "douqhub_chat_alert_preferences_v2";
-const CHAT_SEEN_KEY = "douqhub_chat_seen_timestamps_v2";
+const CHAT_GROUP_READ_KEY = "douqhub_chat_seen_timestamps_v2";
 function readChatAlertMap(key) { try { return JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch (_) { return {}; } }
 function chatKey(groupId) { return groupId == null ? "public" : String(groupId); }
 function isChatMuted(groupId) { return readChatAlertMap(CHAT_ALERTS_KEY)[chatKey(groupId)] === true; }
@@ -1131,8 +1131,8 @@ function setChatMuted(groupId, muted) {
   renderChatGroupList();refreshGroupMentionDots();
 }
 function markChatRead(groupId,timestamp=new Date().toISOString()) {
-  const seen=readChatAlertMap(CHAT_SEEN_KEY);seen[chatKey(groupId)]=timestamp;
-  try { localStorage.setItem(CHAT_SEEN_KEY,JSON.stringify(seen)); } catch (_) {}
+  const seen=readChatAlertMap(CHAT_GROUP_READ_KEY);seen[chatKey(groupId)]=timestamp;
+  try { localStorage.setItem(CHAT_GROUP_READ_KEY,JSON.stringify(seen)); } catch (_) {}
 }
 
 const messagesEl =
