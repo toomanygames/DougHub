@@ -1372,6 +1372,7 @@ let currentAvatarUrl = "";
 let activeChatGroupId = null;
 let activeChatGroup = null;
 let currentUserIsAdmin = false;
+let currentUserIsHelper = false;
 let expandedGroupToolsId = null;
 let visibleChatGroups = [];
 const groupListEl = document.getElementById("groupList");
@@ -1391,6 +1392,7 @@ const joinGroupButton = document.getElementById("joinGroupButton");
 const inviteGroupButton = document.getElementById("inviteGroupButton");
 const leaveGroupButton = document.getElementById("leaveGroupButton");
 const deleteGroupButton = document.getElementById("deleteGroupButton");
+const toggleStaffWriteButton = document.getElementById("toggleStaffWriteButton");
 let groupDialogMode = "create";
 
 let loadingMessages = false;
@@ -1483,7 +1485,7 @@ async function loadChatGroups() {
   }
   createGroupButton.disabled = false;
   const { data, error } = await supabaseClient.from("chat_groups")
-    .select("id,name,description,is_public,created_by,created_at")
+    .select("id,name,description,is_public,staff_only_write,created_by,created_at")
     .order("created_at", { ascending: false });
   if (error) {
     console.error("Could not load chat groups:", error);
@@ -1605,6 +1607,10 @@ async function selectChatGroup(groupId) {
 function renderActiveGroupDetails() {
   if (!activeChatGroupId) {
     groupToolsEl.hidden = true;
+    messageInput.disabled = false;
+    sendButton.disabled = false;
+    messageInput.placeholder = "Type a message…";
+    if (toggleStaffWriteButton) toggleStaffWriteButton.hidden = true;
     return;
   }
   const group = activeChatGroup;
@@ -1613,12 +1619,30 @@ function renderActiveGroupDetails() {
     return;
   }
   const owner = group.created_by === currentUser?.id;
-  groupToolsEl.hidden = !owner;
+  groupToolsEl.hidden = !(owner || currentUserIsHelper || currentUserIsAdmin);
   joinGroupButton.hidden = true;
   inviteGroupButton.hidden = !owner;
   leaveGroupButton.hidden = !owner;
   deleteGroupButton.hidden = !owner;
+  if (toggleStaffWriteButton) {
+    toggleStaffWriteButton.hidden = !currentUserIsAdmin;
+    toggleStaffWriteButton.textContent = group.staff_only_write ? "Allow everyone to write" : "Enable staff-only writing";
+  }
+  messageInput.disabled = !!group.staff_only_write && !currentUserIsHelper;
+  sendButton.disabled = !!group.staff_only_write && !currentUserIsHelper;
+  messageInput.placeholder = group.staff_only_write && !currentUserIsHelper ? "Only Helper+ can write in this group" : "Message " + group.name + "…";
 }
+toggleStaffWriteButton?.addEventListener("click", async () => {
+  if (!currentUserIsAdmin || !activeChatGroupId || !activeChatGroup) return;
+  const nextValue = !activeChatGroup.staff_only_write;
+  const { error } = await supabaseClient.from("chat_groups").update({ staff_only_write: nextValue }).eq("id", activeChatGroupId);
+  if (error) return showError("Could not update group writing mode: " + error.message);
+  activeChatGroup.staff_only_write = nextValue;
+  visibleChatGroups = visibleChatGroups.map(group => group.id === activeChatGroupId ? { ...group, staff_only_write: nextValue } : group);
+  renderActiveGroupDetails();
+  showError(nextValue ? "Staff-only writing enabled. The public can still view this group." : "Everyone can now write in this group.");
+});
+
 joinGroupButton.addEventListener("click", async () => {
   if (!currentUser || !activeChatGroupId || !activeChatGroup) return;
   const { data: membership } = await supabaseClient.from("chat_group_members")
@@ -2528,6 +2552,7 @@ async function loadMessages() {
 ========================================= */
 
 async function sendMessage() {
+  if (activeChatGroup?.staff_only_write && !currentUserIsHelper) { showError("Only Helper+ can send messages in this group."); return; }
 
   const text = messageInput.value.trim();
 
@@ -2846,6 +2871,7 @@ async function loadAccount() {
     currentUsername = "Guest";
     currentAvatarUrl = "";
     currentUserIsAdmin = false;
+    currentUserIsHelper = false;
     await loadChatGroups();
 
     currentUsernameEl.textContent =
@@ -2868,7 +2894,7 @@ async function loadAccount() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url, reward_badges, equipped_badge, is_admin"
+        "username, avatar_url, reward_badges, equipped_badge, is_admin, staff_role, is_helper, is_developer, is_owner"
       )
       .eq(
         "id",
@@ -2905,7 +2931,9 @@ async function loadAccount() {
   currentAvatarUrl =
     profile?.avatar_url ||
     "";
-  currentUserIsAdmin = profile?.is_admin === true;
+  const rank = String(profile?.staff_role || "").toLowerCase();
+  currentUserIsHelper = ["helper", "admin", "developer", "owner"].includes(rank) || profile?.is_helper === true || profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
+  currentUserIsAdmin = ["admin", "developer", "owner"].includes(rank) || profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
   await loadChatGroups();
 
   currentUsernameEl.textContent =
