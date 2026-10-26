@@ -114,6 +114,49 @@ main{width:100%;height:calc(100dvh - 52px);min-height:0;margin:0;padding:clamp(5
 .invite-feedback:empty{display:none}
 .invite-feedback.error{color:#fda4af}
 .invite-feedback.success{color:#86efac}
+.invite-directory{display:grid;gap:8px;min-height:0}
+.invite-directory-head,.invite-directory-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.invite-directory-head strong{font-size:12px;color:#f5f6ff}.invite-directory-head span,.invite-directory-actions span{font-size:10px;color:#9da5c5}
+.invite-directory-search{width:100%;min-height:38px;padding:9px 11px;border:1px solid #a5b4fc24;border-radius:11px;background:#050713;color:#f5f6ff;font:12px Inter,system-ui,sans-serif}
+.invite-user-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:6px;max-height:min(30dvh,240px);overflow:auto;padding:2px;overscroll-behavior:contain}
+.invite-user-option{display:flex;align-items:center;gap:9px;min-width:0;padding:8px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff04;cursor:pointer;text-align:left}
+.invite-user-option:has(input:checked){border-color:#818cf866;background:#818cf817}
+.invite-user-option input{accent-color:#818cf8;flex-shrink:0}
+.invite-user-avatar{width:32px;height:32px;flex-shrink:0;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,#6366f144,#a855f744);color:#f5f6ff;font-size:11px;font-weight:900}
+.invite-user-avatar img{width:100%;height:100%;object-fit:cover}
+.invite-user-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:800;color:#eef0ff}
+.invite-empty{padding:12px;color:#9da5c5;font-size:11px}
+.invite-directory-actions .call-btn{min-height:35px}
+@media(max-width:600px){.invite-user-list{grid-template-columns:1fr;max-height:24dvh}.invite-controls{grid-template-columns:minmax(0,1fr)}}
+/* FaceTime-inspired call surface: spacious dark stage, floating controls and rounded participant tiles. */
+.call-stage{border-radius:24px;background:#050609;border-color:#ffffff16;box-shadow:0 24px 80px #0008}
+.stage-topbar{padding:12px 16px;background:#08090ee8;border-bottom-color:#ffffff10}
+.stage-heading-title{font-size:13px}.stage-heading-subtitle{color:#9a9daa}
+.stage-live-dot{background:#34d399;box-shadow:0 0 0 4px #34d39918}
+.room-count{border-radius:999px;background:#ffffff08;border-color:#ffffff14;color:#e8e9f0}
+.video-grid{gap:clamp(8px,1.3vw,16px);padding:clamp(10px,1.6vw,20px);grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));background:radial-gradient(ellipse at 50% 45%,#191b2b44,transparent 70%)}
+.video-tile{border-radius:20px;border-color:#ffffff14;background:#171821;box-shadow:0 12px 35px #0004}
+.video-tile video{background:#11131b}
+.video-placeholder .avatar{border-radius:50%;width:64px;height:64px;background:#383b4b;border:2px solid #ffffff20}
+.video-label{left:12px;bottom:12px;border-radius:999px;padding:7px 11px;background:#08090bd9;border-color:#ffffff1a;font-size:11px}
+.participant-volume{border-radius:999px;background:#08090be8}
+.call-toolbar{gap:10px;padding:13px 14px calc(13px + env(safe-area-inset-bottom));background:#090a10f5;border-top-color:#ffffff10}
+.call-toolbar .call-btn{width:46px;height:46px;min-height:46px;padding:0;border-radius:50%;font-size:0;gap:0;background:#252732;border-color:#ffffff12;color:#f8f8fb}
+.call-toolbar .call-btn.primary{background:#247a50;border-color:#36a66f;color:#fff}
+.call-toolbar .call-btn.danger{background:#d83e4e;border-color:#e75b69;color:#fff}
+.call-toolbar .call-btn:hover:not(:disabled){transform:translateY(-2px);background:#383b48}
+.call-toolbar .call-btn.primary:hover:not(:disabled){background:#2c9461}
+.call-toolbar .call-btn.danger:hover:not(:disabled){background:#ec4c5d}
+.call-toolbar .call-btn:disabled{opacity:.35}
+#startButton,#joinButton{width:auto;min-width:105px;padding:0 17px;border-radius:999px;font-size:12px}
+#fullscreenButton{width:auto;padding:0 14px;border-radius:999px;font-size:11px}
+#endButton{width:auto;min-width:82px;padding:0 16px;border-radius:999px;font-size:12px}
+#roomCount{font-size:10px}
+.call-status{font-size:10px}
+.invite-panel{background:#0d0f18f5;border-top-color:#ffffff12}
+.invite-controls input,.invite-link-input,.invite-directory-search{border-radius:12px;background:#11131d;border-color:#ffffff18}
+@media(max-width:600px){.call-toolbar{gap:7px;padding:10px 8px calc(10px + env(safe-area-inset-bottom))}.call-toolbar .call-btn{width:42px;height:42px;min-height:42px}.video-grid{grid-template-columns:1fr}.video-tile{aspect-ratio:4/3;max-height:none}}
+
 .call-error{flex-shrink:0;margin:6px 10px 0;padding:9px 11px;border-radius:10px;font-size:11px}
 .call-note,.call-footer{flex-shrink:0;margin:0;padding:5px 12px;color:#858ba7;font-size:9px;line-height:1.4}
 .call-note{border-top:1px solid #a5b4fc10;background:#fbbf2406;color:#b8b5a1}
@@ -224,6 +267,12 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
     <datalist id="inviteUserSuggestions"></datalist>
     <button class="call-btn primary" id="sendUserInviteButton" type="submit">Send invite</button>
   </form>
+  <div class="invite-directory">
+    <div class="invite-directory-head"><strong>DougHub users</strong><span id="inviteUserCount">Loading users…</span></div>
+    <input id="inviteDirectorySearch" class="invite-directory-search" type="search" placeholder="Search all users…" autocomplete="off" aria-label="Search all DougHub users">
+    <div id="inviteUserList" class="invite-user-list" role="group" aria-label="Select users to invite"><div class="invite-empty">Load the user list by opening this panel.</div></div>
+    <div class="invite-directory-actions"><span id="inviteSelectedCount">0 selected</span><button class="call-btn primary" id="sendSelectedInvitesButton" type="button" disabled>Invite selected</button></div>
+  </div>
   <div id="inviteFeedback" class="invite-feedback" role="status" aria-live="polite"></div>
   <div class="invite-link-row">
     <input id="inviteLink" class="invite-link-input" readonly aria-label="Call invite link">
@@ -244,6 +293,8 @@ const $=id=>document.getElementById(id),params=new URLSearchParams(location.sear
 let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",channel=null,localStream=null,subscribed=false,joining=false,ending=false;
 const remoteCameraHidden=new Set(),remoteCameraOn=new Set();
 const peers=new Map(),participants=new Map(),pendingIce=new Map();
+let inviteDirectoryUsers=[],inviteDirectoryLoaded=false,inviteDirectoryBusy=false;
+const selectedInviteUsers=new Set();
 const setStatus=s=>{$("callStatus").textContent=s};
 function showError(s){$("callError").textContent=s;$("callError").classList.add("show")}
 function clearError(){$("callError").textContent="";$("callError").classList.remove("show")}
@@ -490,8 +541,70 @@ $("fullscreenButton").addEventListener("click",async()=>{const stage=document.qu
 document.addEventListener("fullscreenchange",()=>{$("fullscreenButton").textContent=document.fullscreenElement?"⛶ Exit full screen":"⛶ Full screen";$("fullscreenButton").setAttribute("aria-label",document.fullscreenElement?"Exit full screen":"Enter full screen")});
 async function copyInvite(){const v=$("inviteLink").value;if(!v)return;try{await navigator.clipboard.writeText(v);setStatus("Call invite link copied.")}catch(_){$("inviteLink").focus();$("inviteLink").select();setStatus("Select and copy the invite link.")}}
 $("copyLinkButton").addEventListener("click",copyInvite);
-$("invitePeopleButton").addEventListener("click",()=>{$("invitePanel").classList.toggle("open");if($("invitePanel").classList.contains("open"))$("inviteUsername").focus()});
+$("invitePeopleButton").addEventListener("click",()=>{
+ $("invitePanel").classList.toggle("open");
+ if($("invitePanel").classList.contains("open")){
+  $("inviteUsername").focus();
+  loadInviteDirectory().catch(error=>{console.error("Could not load call invite directory:",error);$("inviteUserList").innerHTML='<div class="invite-empty">Could not load users. Check your connection and try again.</div>';$("inviteUserCount").textContent="Unavailable"});
+ }
+});
 $("closeInviteButton").addEventListener("click",()=>$("invitePanel").classList.remove("open"));
+function renderInviteDirectory(){
+ const q=$("inviteDirectorySearch").value.trim().toLowerCase();
+ const visible=inviteDirectoryUsers.filter(p=>(p.username||"DougHub user").toLowerCase().includes(q));
+ const list=$("inviteUserList");list.replaceChildren();
+ if(!visible.length){const empty=document.createElement("div");empty.className="invite-empty";empty.textContent=q?"No users match that search.":"No other users were found.";list.appendChild(empty)}
+ visible.forEach(profile=>{
+  const label=document.createElement("label");label.className="invite-user-option";
+  const checkbox=document.createElement("input");checkbox.type="checkbox";checkbox.checked=selectedInviteUsers.has(profile.id);checkbox.setAttribute("aria-label","Invite "+(profile.username||"DougHub user"));
+  checkbox.addEventListener("change",()=>{if(checkbox.checked)selectedInviteUsers.add(profile.id);else selectedInviteUsers.delete(profile.id);renderInviteDirectorySelection()});
+  const avatar=document.createElement("span");avatar.className="invite-user-avatar";
+  if(profile.avatar_url){const img=document.createElement("img");img.src=profile.avatar_url;img.alt="";img.loading="lazy";img.onerror=()=>{avatar.textContent=(profile.username||"D").slice(0,1).toUpperCase()};avatar.appendChild(img)}else avatar.textContent=(profile.username||"D").slice(0,1).toUpperCase();
+  const name=document.createElement("span");name.className="invite-user-name";name.textContent=profile.username||"DougHub user";
+  label.append(checkbox,avatar,name);list.appendChild(label);
+ });
+ $("inviteUserCount").textContent=inviteDirectoryUsers.length+" users";
+ renderInviteDirectorySelection();
+}
+function renderInviteDirectorySelection(){
+ const count=selectedInviteUsers.size;
+ $("inviteSelectedCount").textContent=count+" selected";
+ $("sendSelectedInvitesButton").disabled=!count||inviteDirectoryBusy;
+}
+async function loadInviteDirectory(){
+ if(inviteDirectoryLoaded||inviteDirectoryBusy)return;
+ inviteDirectoryBusy=true;$("inviteUserCount").textContent="Loading users…";$("inviteUserList").innerHTML='<div class="invite-empty">Loading DougHub users…</div>';
+ try{
+  const all=[];let start=0,batchSize=500;
+  while(true){
+   const {data,error}=await client.from("profiles").select("id,username,avatar_url").order("username").range(start,start+batchSize-1);
+   if(error)throw error;
+   const rows=data||[];all.push(...rows);
+   if(rows.length<batchSize||start>=5000)break;
+   start+=batchSize;
+  }
+  inviteDirectoryUsers=all.filter(p=>p.id!==user?.id&&p.username).filter((p,i,a)=>a.findIndex(x=>x.id===p.id)===i);
+  inviteDirectoryLoaded=true;renderInviteDirectory();
+ }finally{inviteDirectoryBusy=false;renderInviteDirectorySelection()}
+}
+$("inviteDirectorySearch").addEventListener("input",renderInviteDirectory);
+$("sendSelectedInvitesButton").addEventListener("click",async()=>{
+ if(!user||!room||!selectedInviteUsers.size||inviteDirectoryBusy)return;
+ const button=$("sendSelectedInvitesButton"),feedback=$("inviteFeedback");
+ const selected=inviteDirectoryUsers.filter(p=>selectedInviteUsers.has(p.id));
+ inviteDirectoryBusy=true;button.disabled=true;button.textContent="Sending…";feedback.className="invite-feedback";feedback.textContent="Sending "+selected.length+" invite"+(selected.length===1?"":"s")+"…";
+ try{
+  const message="You have been invited to a DougHub video call by "+username+". Join here: "+roomUrl();
+  const rows=selected.map(p=>({sender_id:user.id,receiver_id:p.id,message,image_url:null}));
+  const {error}=await client.from("direct_messages").insert(rows);
+  if(error)throw error;
+  selectedInviteUsers.clear();
+  feedback.className="invite-feedback success";feedback.textContent="Invite sent to "+selected.length+" user"+(selected.length===1?"":"s")+" through DMail.";
+  renderInviteDirectory();
+ }catch(error){
+  console.error("Could not send selected call invites:",error);feedback.className="invite-feedback error";feedback.textContent=error.message||"Could not send invites. Check DMail permissions and try again.";
+ }finally{inviteDirectoryBusy=false;button.textContent="Invite selected";renderInviteDirectorySelection()}
+});
 $("inviteUserForm").addEventListener("submit",async event=>{
  event.preventDefault();
  const targetName=$("inviteUsername").value.trim();
