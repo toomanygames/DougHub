@@ -563,3 +563,33 @@ hr { border-color: rgba(177,184,255,.12); }
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
   textarea, select { max-width: 100%; }
 }
+
+
+/* DougHub shared theme tokens and consistent controls.
+   Page layouts remain owned by each page; colors and common surfaces are centralized here. */
+html[data-dh-theme] {
+  --dh-bg: var(--bg, var(--season-bg, #050611));
+  --dh-panel: var(--panel, var(--season-panel, rgba(14,18,41,.82)));
+  --dh-panel-raised: var(--panel2, var(--season-panel, #11152b));
+  --dh-accent: var(--indigo, var(--season-accent, #6366f1));
+  --dh-accent-2: var(--purple, var(--season-accent2, #a855f7));
+  --dh-line: var(--line, var(--season-line, rgba(177,184,255,.14)));
+  --dh-muted-text: var(--muted, var(--season-muted, #a4abc7));
+}
+html[data-dh-theme="custom"] body {
+  background-color: var(--dh-bg) !important;
+  background-image: radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--dh-accent) 18%, transparent), transparent 39%),
+                    radial-gradient(ellipse at 94% 14%, color-mix(in srgb, var(--dh-accent-2) 14%, transparent), transparent 34%) !important;
+}
+html[data-dh-theme="custom"] :is(header,.top,.topbar,.top-bar,.navbar,.app-header) {
+  border-color: var(--dh-line) !important;
+  background-color: color-mix(in srgb, var(--dh-bg) 88%, transparent) !important;
+}
+html[data-dh-theme="custom"] :is(button,.btn,.button,[role="button"],.primary,.primary-button,.update-button,.send-button) {
+  border-color: color-mix(in srgb, var(--dh-accent) 38%, var(--dh-line));
+}
+html[data-dh-theme="custom"] :is(.card,.panel,.tool-card,.game-card,.feature-card,.stat-card,.settings-card,.section-card,.content-card,.post-card,.message-card,.workspace-card,.editor-panel,[class*="modal"],[class*="popup"],[class*="drawer"]) {
+  border-color: var(--dh-line);
+}
+html[data-dh-theme="custom"] :is(a:hover,button:hover:not(:disabled),.nav a:hover) { color: var(--dh-accent) !important; }
+html[data-dh-theme="custom"] :is(input,textarea,select) { accent-color: var(--dh-accent); }
