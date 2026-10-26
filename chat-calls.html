@@ -56,7 +56,7 @@ h1{font-size:clamp(28px,5vw,46px);line-height:1.04;letter-spacing:-.055em;margin
 <main>
 <div class="eyebrow">DOUGHUB · LIVE ROOMS</div>
 <h1>Video calls with your group.</h1>
-<p class="intro">Start a room, share one invite link in Community Chat, and have up to six people join. Everyone gets their own video tile.</p>
+<p class="intro">Start a room, share one invite link in Community Chat, and have up to six people join. Video quality adapts better to group calls, and the app will attempt to recover dropped connections.</p>
 <div class="call-layout">
 <section class="call-stage" aria-label="Video call">
 <div class="video-grid" id="videoGrid"><div class="video-tile local-video-tile" id="localTile"><video id="localVideo" autoplay playsinline muted></video><div id="localPlaceholder" class="video-placeholder"><span class="avatar">◉</span><strong>Your camera</strong><span>Join to turn on your camera</span></div><span class="video-label" id="localVideoLabel">You</span></div></div>
@@ -78,7 +78,7 @@ h1{font-size:clamp(28px,5vw,46px);line-height:1.04;letter-spacing:-.055em;margin
 <button class="call-btn" id="shareChatButton" type="button" onclick="location.href='/chat.html'">Open Community Chat ↗</button>
 </div>
 <div id="callError" class="call-error" role="alert"></div>
-<div class="call-note"><strong>Before you start:</strong> allow camera and microphone access when your browser asks. Supports up to 6 people per room. Group calls connect participants directly to each other, so performance depends on your device and network. Some networks may block direct peer-to-peer connections.</div>
+<div class="call-note"><strong>Before you start:</strong> allow camera and microphone access when your browser asks. Camera and microphone are requested separately, so camera problems should not stop your mic. Supports up to 6 people, but lower video quality may be needed on slower devices. Some networks block direct peer-to-peer media; a TURN relay is needed for those networks.</div>
 <div class="call-footer">Your camera and microphone stream directly between participants. DougHub uses Supabase Realtime for room presence and connection setup; video itself is not uploaded to DougHub. Share room links only with people you want in the call.</div>
 </aside>
 </div>
@@ -97,17 +97,109 @@ function roomUrl(){const u=new URL(location.href);u.search="";u.searchParams.set
 function updateRoomUi(){const yes=!!room;$("startButton").hidden=yes;$("joinButton").hidden=!yes;$("copyInviteButton").hidden=!yes;$("inviteRow").hidden=!yes;if(yes){$("inviteLink").value=roomUrl();$("roomDescription").textContent="Room link ready. Copy it or use Invite in Community Chat. Up to six people can join."}}
 async function getClient(){if(window.DougHubSupabaseClient)return window.DougHubSupabaseClient;await new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;clearTimeout(t);window.removeEventListener("douqhub:supabase-ready",finish);window.DougHubSupabaseClient?resolve():reject(new Error("DougHub sign-in service did not load. Refresh and try again."))};window.addEventListener("douqhub:supabase-ready",finish,{once:true});const t=setTimeout(finish,12000)});return window.DougHubSupabaseClient}
 async function ensureUser(){client=client||await getClient();const result=await client.auth.getSession();user=result.data?.session?.user||null;if(!user){location.href="/log-in.html?redirect="+encodeURIComponent("chat-calls.html"+location.search);throw new Error("Please sign in to use video calls.")}const {data}=await client.from("profiles").select("username").eq("id",user.id).maybeSingle();username=data?.username||user.user_metadata?.username||user.email?.split("@")[0]||"DougHub user"}
-async function ensureMedia(){if(localStream)return;if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera and microphone access requires a supported browser on HTTPS.");localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:{width:{ideal:960},height:{ideal:540},facingMode:"user"}});$("localVideo").srcObject=localStream;$("localPlaceholder").hidden=true;$("micButton").disabled=false;$("cameraButton").disabled=false;$("endButton").disabled=false;$("localVideoLabel").textContent=username+" (you)"}
+async function ensureMedia(){
+ if(localStream)return;
+ if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera and microphone access requires a supported browser on HTTPS.");
+ let audioTrack=null,videoTrack=null,audioError=null,videoError=null;
+ try{
+  const audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+  audioTrack=audioStream.getAudioTracks()[0]||null;
+ }catch(e){audioError=e;console.warn("Microphone access failed:",e)}
+ try{
+  const videoStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{width:{ideal:640,max:1280},height:{ideal:360,max:720},frameRate:{ideal:24,max:30},facingMode:"user"}});
+  videoTrack=videoStream.getVideoTracks()[0]||null;
+ }catch(e){videoError=e;console.warn("Camera access failed:",e)}
+ if(!audioTrack&&!videoTrack){
+  const reason=audioError?.name==="NotAllowedError"||videoError?.name==="NotAllowedError"?"Camera and microphone permissions were blocked. Allow them in your browser's site settings, then try again.":(audioError?.message||videoError?.message||"No camera or microphone could be opened.");
+  throw new Error(reason);
+ }
+ localStream=new MediaStream([...(audioTrack?[audioTrack]:[]),...(videoTrack?[videoTrack]:[])]);
+ $("localVideo").srcObject=localStream;
+ $("localPlaceholder").hidden=!!videoTrack;
+ if(!videoTrack)$("localPlaceholder").querySelector("span:last-child").textContent="Camera unavailable — you can still talk";
+ $("micButton").disabled=!audioTrack;$("cameraButton").disabled=!videoTrack;$("endButton").disabled=false;
+ $("micButton").textContent=audioTrack?"Mute mic":"Mic unavailable";
+ $("cameraButton").textContent=videoTrack?"Turn camera off":"Camera unavailable";
+ $("localVideoLabel").textContent=username+" (you)";
+ if(!audioTrack)showError("Your camera connected, but no microphone is available. Check the selected microphone and browser permission settings.");
+ if(!videoTrack&&!audioTrack)throw new Error("No camera or microphone could be opened.");
+}
 function renderParticipants(){const grid=$("videoGrid");for(const [id,info] of participants){if(id===user?.id)continue;let tile=document.getElementById("participant-"+id);if(!tile){tile=document.createElement("div");tile.className="video-tile";tile.id="participant-"+id;const v=document.createElement("video");v.autoplay=true;v.playsInline=true;const ph=document.createElement("div");ph.className="video-placeholder";const av=document.createElement("span");av.className="avatar";av.textContent="◎";const st=document.createElement("strong");st.textContent=info.username||"Participant";const sm=document.createElement("span");sm.textContent="Connecting…";ph.append(av,st,sm);const label=document.createElement("span");label.className="video-label";label.dataset.label=id;label.textContent=info.username||"Participant";tile.append(v,ph,label);grid.appendChild(tile)}else{const label=tile.querySelector("[data-label]");if(label)label.textContent=info.username||"Participant";const st=tile.querySelector(".video-placeholder strong");if(st)st.textContent=info.username||"Participant"}}[...grid.querySelectorAll(".video-tile:not(.local-video-tile)")].forEach(t=>{if(!participants.has(t.id.slice(12)))t.remove()});$("roomDescription").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people in this room. Share the invite link to add someone."}
 function sendSignal(kind,to,extra={}){if(!channel||!subscribed)return Promise.resolve();return channel.send({type:"broadcast",event:"signal",payload:{kind,from:user.id,to,room,...extra}})}
-function makePeer(id,info){if(peers.has(id))return peers.get(id);const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]}),state={pc,info,stream:new MediaStream(),makingOffer:false};peers.set(id,state);const tile=()=>document.getElementById("participant-"+id);pc.ontrack=e=>{const stream=e.streams?.[0];if(stream)stream.getTracks().forEach(t=>{if(!state.stream.getTracks().some(x=>x.id===t.id))state.stream.addTrack(t)});else if(!state.stream.getTracks().some(x=>x.id===e.track.id))state.stream.addTrack(e.track);const t=tile();if(t){t.querySelector("video").srcObject=state.stream;t.querySelector(".video-placeholder").hidden=state.stream.getTracks().length>0}setStatus("Connected · "+peers.size+" other participant"+(peers.size===1?"":"s"))};pc.onicecandidate=e=>{if(e.candidate)sendSignal("ice",id,{candidate:e.candidate.toJSON()}).catch(()=>{})};pc.onconnectionstatechange=()=>{if(!peers.has(id))return;if(pc.connectionState==="connected"){const p=tile()?.querySelector(".video-placeholder span:last-child");if(p)p.textContent="Connected";setStatus("Connected · "+peers.size+" other participant"+(peers.size===1?"":"s"))}else if(pc.connectionState==="failed"){const p=tile()?.querySelector(".video-placeholder span:last-child");if(p)p.textContent="Connection failed";setStatus("Some connections failed — check the network")}else if(pc.connectionState==="connecting")setStatus("Connecting to "+(info.username||"participant")+"…")};localStream?.getTracks().forEach(t=>pc.addTrack(t,localStream));renderParticipants();return state}
+function makePeer(id,info){
+ if(peers.has(id))return peers.get(id);
+ const pc=new RTCPeerConnection({iceServers:[
+  {urls:"stun:stun.l.google.com:19302"},
+  {urls:"stun:stun1.l.google.com:19302"}
+ ]});
+ const state={pc,info,stream:new MediaStream(),makingOffer:false,recoveryTimer:null,restartAttempts:0};
+ peers.set(id,state);
+ const tile=()=>document.getElementById("participant-"+id);
+ pc.ontrack=e=>{
+  const stream=e.streams?.[0];
+  if(stream)stream.getTracks().forEach(t=>{if(!state.stream.getTracks().some(x=>x.id===t.id))state.stream.addTrack(t)});
+  else if(!state.stream.getTracks().some(x=>x.id===e.track.id))state.stream.addTrack(e.track);
+  const t=tile();
+  if(t){
+   const video=t.querySelector("video");video.srcObject=state.stream;
+   video.play?.().catch(()=>{setStatus("Tap the participant video to enable playback.")});
+   const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=state.stream.getTracks().some(track=>track.kind==="video"&&track.readyState==="live");
+   const label=t.querySelector("[data-label]");
+   if(label&&state.stream.getAudioTracks().length&&!label.textContent.includes(" · mic"))label.textContent=(info.username||"Participant")+" · mic";
+  }
+  setStatus("Connected · "+peers.size+" other participant"+(peers.size===1?"":"s"));
+ };
+ pc.onicecandidate=e=>{if(e.candidate)sendSignal("ice",id,{candidate:e.candidate.toJSON()}).catch(()=>{})};
+ pc.oniceconnectionstatechange=()=>{
+  if(!peers.has(id))return;
+  const ice=pc.iceConnectionState;
+  if(ice==="failed")recoverPeer(id,"ICE connection failed");
+  else if(ice==="disconnected"){
+   if(state.recoveryTimer)clearTimeout(state.recoveryTimer);
+   state.recoveryTimer=setTimeout(()=>{if(peers.has(id)&&pc.iceConnectionState==="disconnected")recoverPeer(id,"Connection dropped")},3500);
+  }else if(ice==="connected"||ice==="completed"){
+   if(state.recoveryTimer){clearTimeout(state.recoveryTimer);state.recoveryTimer=null}
+   state.restartAttempts=0;
+  }
+ };
+ pc.onconnectionstatechange=()=>{
+  if(!peers.has(id))return;
+  if(pc.connectionState==="connected"){
+   const p=tile()?.querySelector(".video-placeholder span:last-child");if(p)p.textContent="Connected";
+   setStatus("Connected · "+peers.size+" other participant"+(peers.size===1?"":"s"));
+  }else if(pc.connectionState==="failed")recoverPeer(id,"Peer connection failed");
+  else if(pc.connectionState==="connecting")setStatus("Connecting to "+(info.username||"participant")+"…");
+ };
+ localStream?.getTracks().forEach(track=>{
+  const sender=pc.addTrack(track,localStream);
+  if(track.kind==="video"&&sender?.getParameters&&sender?.setParameters){
+   const params=sender.getParameters();params.encodings=params.encodings?.length?params.encodings:[{}];
+   params.encodings[0].maxBitrate=450000;params.encodings[0].maxFramerate=24;
+   sender.setParameters(params).catch(e=>console.debug("Using default video bitrate",e));
+  }
+ });
+ renderParticipants();return state;
+}
+async function recoverPeer(id,reason){
+ const state=peers.get(id);if(!state||ending||!user||user.id.localeCompare(id)>=0)return;
+ if(state.recoveryTimer){clearTimeout(state.recoveryTimer);state.recoveryTimer=null}
+ if(state.restartAttempts>=3){setStatus("Connection to "+(state.info.username||"participant")+" is unstable. Try rejoining the call.");return}
+ state.restartAttempts++;
+ try{
+  setStatus("Restoring connection to "+(state.info.username||"participant")+"…");
+  state.pc.restartIce();
+  const offer=await state.pc.createOffer({iceRestart:true});
+  await state.pc.setLocalDescription(offer);
+  await sendSignal("offer",id,{description:state.pc.localDescription.toJSON(),iceRestart:true});
+ }catch(e){console.warn("ICE recovery failed:",reason,e);setStatus("Trying to restore the call…")}
+}
 async function flushIce(id){const state=peers.get(id);if(!state?.pc.remoteDescription)return;for(const c of pendingIce.get(id)||[])try{await state.pc.addIceCandidate(new RTCIceCandidate(c))}catch(e){console.warn("Queued ICE candidate failed",e)}pendingIce.delete(id)}
-async function startOffer(id,info){if(!user||user.id.localeCompare(id)>=0)return;const state=makePeer(id,info);if(state.makingOffer||state.pc.localDescription)return;state.makingOffer=true;try{const offer=await state.pc.createOffer();await state.pc.setLocalDescription(offer);await sendSignal("offer",id,{description:state.pc.localDescription.toJSON()})}finally{state.makingOffer=false}}
+async function startOffer(id,info){if(!user||user.id.localeCompare(id)>=0)return;const state=makePeer(id,info);if(state.makingOffer||state.pc.localDescription)return;state.makingOffer=true;try{const offer=await state.pc.createOffer();await state.pc.setLocalDescription(offer);await sendSignal("offer",id,{description:state.pc.localDescription.toJSON()})}catch(e){console.warn("Initial offer failed",e);showError("Couldn't start a connection to "+(info.username||"participant")+". Try leaving and rejoining the room.")}finally{state.makingOffer=false}}
 async function onSignal(p){if(!p||p.room!==room||p.from===user.id||p.to!==user.id)return;const id=p.from,info=participants.get(id)||{user_id:id,username:"Participant"};if(!participants.has(id))participants.set(id,info);if(p.kind==="offer"){const st=makePeer(id,info);if(st.pc.signalingState!=="stable")return;await st.pc.setRemoteDescription(new RTCSessionDescription(p.description));await flushIce(id);const ans=await st.pc.createAnswer();await st.pc.setLocalDescription(ans);await sendSignal("answer",id,{description:st.pc.localDescription.toJSON()});setStatus("Connecting to "+(info.username||"participant")+"…")}else if(p.kind==="answer"){const st=peers.get(id);if(!st||st.pc.signalingState!=="have-local-offer")return;await st.pc.setRemoteDescription(new RTCSessionDescription(p.description));await flushIce(id)}else if(p.kind==="ice"&&p.candidate){const st=peers.get(id);if(!st||!st.pc.remoteDescription){const a=pendingIce.get(id)||[];a.push(p.candidate);pendingIce.set(id,a)}else try{await st.pc.addIceCandidate(new RTCIceCandidate(p.candidate))}catch(e){console.warn("ICE candidate ignored",e)}}}
 function unpackPresence(){const state=channel?.presenceState?.()||{},out=new Map();Object.values(state).flat().forEach(p=>{if(p?.user_id)out.set(p.user_id,{user_id:p.user_id,username:p.username||"Participant",joined_at:p.joined_at||""})});return out}
 async function reconcile(){if(!user||!channel)return;const next=unpackPresence();if(next.size>MAX_PARTICIPANTS){const allowed=[...next.values()].sort((a,b)=>String(a.joined_at).localeCompare(String(b.joined_at))||a.user_id.localeCompare(b.user_id)).slice(0,MAX_PARTICIPANTS);if(!allowed.some(p=>p.user_id===user.id)){showError("This room is full (maximum "+MAX_PARTICIPANTS+" people).");setStatus("Room full");await cleanup(false);return}}participants.clear();next.forEach((v,k)=>participants.set(k,v));renderParticipants();for(const [id,info] of participants)if(id!==user.id)await startOffer(id,info);for(const [id,st] of [...peers])if(!participants.has(id)){st.pc.close();peers.delete(id);pendingIce.delete(id);document.getElementById("participant-"+id)?.remove()}if(participants.size<=1)setStatus("Waiting for others to join…")}
 async function connectRoom(){if(joining||subscribed)return;joining=true;clearError();ending=false;setStatus("Checking sign-in…");try{await ensureUser();await ensureMedia();if(!room){room=randomRoom();const u=new URL(location.href);u.search="";u.searchParams.set("room",room);history.replaceState({}, "",u);updateRoomUi()}channel=client.channel("dh-video-v2-"+room,{config:{broadcast:{self:false},presence:{key:user.id}}});channel.on("broadcast",{event:"signal"},({payload})=>onSignal(payload).catch(e=>{console.error("Call signaling error",e);showError(e.message||"A call setup message failed.")}));channel.on("presence",{event:"sync"},()=>reconcile().catch(e=>{console.error(e);showError("Couldn't update room participants.")}));channel.on("presence",{event:"join"},()=>reconcile().catch(console.error));channel.on("presence",{event:"leave"},()=>reconcile().catch(console.error));channel.subscribe(async status=>{if(status==="SUBSCRIBED"){try{subscribed=true;const current=unpackPresence();if(current.size>=MAX_PARTICIPANTS&&!current.has(user.id)){showError("This room is full (maximum "+MAX_PARTICIPANTS+" people).");await cleanup(false);return}await channel.track({user_id:user.id,username,joined_at:new Date().toISOString()});$("startButton").hidden=true;$("joinButton").hidden=true;$("endButton").disabled=false;setStatus("Joining room…");await reconcile()}catch(e){showError(e.message||"Couldn't join this room.");setStatus("Couldn't join")}finally{joining=false}}else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){subscribed=false;setStatus("Connection unavailable");showError("Couldn't connect to the call room. Check your connection and try again.");joining=false}})}catch(e){console.error(e);showError(e.message||"Could not join the call.");setStatus("Not connected");joining=false}}
-async function cleanup(notify=true){if(ending)return;ending=true;if(notify&&subscribed&&channel)try{await channel.send({type:"broadcast",event:"signal",payload:{kind:"leave",from:user?.id,room}})}catch(_){}const old=channel;channel=null;subscribed=false;for(const st of peers.values()){st.pc.ontrack=null;st.pc.onicecandidate=null;st.pc.close()}peers.clear();participants.clear();pendingIce.clear();if(old&&client)try{await client.removeChannel(old)}catch(_){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());$("micButton").disabled=true;$("cameraButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("startButton").hidden=!!room;$("joinButton").hidden=!room;setStatus("Left the call.");$("roomDescription").textContent=room?"Room link is still available. Join again whenever you're ready.":"Start a room to create an invite link.";ending=false;joining=false}
+async function cleanup(notify=true){if(ending)return;ending=true;if(notify&&subscribed&&channel)try{await channel.send({type:"broadcast",event:"signal",payload:{kind:"leave",from:user?.id,room}})}catch(_){}const old=channel;channel=null;subscribed=false;for(const st of peers.values()){if(st.recoveryTimer)clearTimeout(st.recoveryTimer);st.pc.ontrack=null;st.pc.onicecandidate=null;st.pc.close()}peers.clear();participants.clear();pendingIce.clear();if(old&&client)try{await client.removeChannel(old)}catch(_){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}$("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());$("micButton").disabled=true;$("cameraButton").disabled=true;$("endButton").disabled=true;$("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("startButton").hidden=!!room;$("joinButton").hidden=!room;setStatus("Left the call.");$("roomDescription").textContent=room?"Room link is still available. Join again whenever you're ready.":"Start a room to create an invite link.";ending=false;joining=false}
 $("startButton").addEventListener("click",connectRoom);$("joinButton").addEventListener("click",connectRoom);$("endButton").addEventListener("click",()=>cleanup(true));
 $("micButton").addEventListener("click",()=>{const t=localStream?.getAudioTracks()[0];if(t){t.enabled=!t.enabled;$("micButton").textContent=t.enabled?"Mute mic":"Unmute mic"}});
 $("cameraButton").addEventListener("click",()=>{const t=localStream?.getVideoTracks()[0];if(t){t.enabled=!t.enabled;$("cameraButton").textContent=t.enabled?"Turn camera off":"Turn camera on"}});
