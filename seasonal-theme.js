@@ -15,9 +15,10 @@ function repaintLegacySurfaces(){
  const root=getComputedStyle(document.documentElement);
  const accent=root.getPropertyValue("--season-accent").trim()||"#818cf8";
  const accent2=root.getPropertyValue("--season-accent2").trim()||"#c084fc";
- const soft=mode==="spring"?"rgba(142,227,173,.13)":mode==="summer"?"rgba(101,200,255,.13)":mode==="autumn"?"rgba(255,173,85,.13)":"rgba(139,217,255,.13)";
- const panel=mode==="spring"?"rgba(17,38,34,.94)":mode==="summer"?"rgba(9,24,48,.94)":mode==="autumn"?"rgba(31,17,28,.95)":"rgba(9,25,43,.95)";
- const raised=mode==="spring"?"rgba(24,55,43,.96)":mode==="summer"?"rgba(16,40,70,.96)":mode==="autumn"?"rgba(48,24,42,.96)":"rgba(16,40,58,.96)";
+ const custom=mode==="custom"?readPalette():null;
+ const soft=mode==="custom"?"color-mix(in srgb, "+custom.accent+" 13%, transparent)":mode==="spring"?"rgba(142,227,173,.13)":mode==="summer"?"rgba(101,200,255,.13)":mode==="autumn"?"rgba(255,173,85,.13)":"rgba(139,217,255,.13)";
+ const panel=mode==="custom"?custom.panel:mode==="spring"?"rgba(17,38,34,.94)":mode==="summer"?"rgba(9,24,48,.94)":mode==="autumn"?"rgba(31,17,28,.95)":"rgba(9,25,43,.95)";
+ const raised=mode==="custom"?"color-mix(in srgb, "+custom.panel+" 78%, "+custom.accent+")":mode==="spring"?"rgba(24,55,43,.96)":mode==="summer"?"rgba(16,40,70,.96)":mode==="autumn"?"rgba(48,24,42,.96)":"rgba(16,40,58,.96)";
  const isPurple=(s)=>/(?:#(?:6366f1|6d5dfc|7c3aed|8b5cf6|a855f7|818cf8|a78bfa|7c3aed)|rgba?\(\s*(?:99\s*,\s*102\s*,\s*241|124\s*,\s*58\s*,\s*237|168\s*,\s*85\s*,\s*247|129\s*,\s*140\s*,\s*248|139\s*,\s*92\s*,\s*246))/i.test(s||"");
  const rgb=hex=>{const h=String(hex).replace("#","");return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)].join(",")};
  const replaceRgb=(s,re,hex)=>String(s||"").replace(re,(all,a)=>{const v=rgb(hex);return /^rgba/i.test(all)?"rgba("+v+","+(a===undefined?"1":a)+")":"rgb("+v+")"});
