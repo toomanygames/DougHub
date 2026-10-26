@@ -488,6 +488,12 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.12
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#6366f1,#a855f7);border-radius:999px;border:2px solid rgba(2,4,10,.55)}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#818cf8,#c084fc)}
 @media(max-width:700px){body{background-image:radial-gradient(circle at 50% 0%,rgba(99,102,241,.14),transparent 38%),#02040a}}
+
+.dh-custom-palette{margin-top:14px;padding:16px;border:1px solid var(--season-line,#ffffff1c);border-radius:16px;background:rgba(255,255,255,.025)}
+.dh-custom-palette[hidden]{display:none!important}.dh-custom-palette-heading{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}.dh-custom-palette-heading span{color:#a4abc7}
+.dh-custom-color-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.dh-custom-color{display:flex;flex-direction:column;gap:8px;min-width:0;padding:10px;border:1px solid #ffffff14;border-radius:12px;background:#ffffff04;font-size:11px;color:#c6cbe0}.dh-custom-color input[type=color]{width:100%;height:42px;padding:3px;border:1px solid #ffffff20;border-radius:9px;background:#0a0d1c;cursor:pointer}
+.dh-custom-palette-preview{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding:12px;border:1px solid #ffffff18;border-radius:12px;background:#080a16;color:#f5f6ff}.dh-custom-palette-preview span{font-size:10px;opacity:.75}.dh-custom-palette-preview b{margin-right:auto;font-size:14px}.dh-custom-palette-preview button{padding:8px 10px;border:1px solid #ffffff20;border-radius:9px;background:#ffffff0a;color:inherit;cursor:pointer}
+@media(max-width:650px){.dh-custom-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>  <script src="nav.js?v=20261024-side-conversations-fix" defer></script>
 
 <script src="search-autofill-fix.js" defer></script>
@@ -1005,6 +1011,17 @@ document.addEventListener("DOMContentLoaded",function(){
         <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="summer"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#071b35"></span><span style="background:#65c8ff"></span><span style="background:#ff7f91"></span><span style="background:#f8e8b0"></span></span><span><span class="dh-theme-option-title">Summer · Independence Day</span><span class="dh-theme-option-copy">Electric blue, sunset red, and summer energy.</span></span><span class="dh-theme-option-check">✓</span></span></label>
         <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="autumn"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#1a0c18"></span><span style="background:#ffad55"></span><span style="background:#c084fc"></span><span style="background:#6c2b28"></span></span><span><span class="dh-theme-option-title">Autumn · Halloween</span><span class="dh-theme-option-copy">Moonlit plum, glowing amber, and spooky details.</span></span><span class="dh-theme-option-check">✓</span></span></label>
         <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="winter"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#071522"></span><span style="background:#8bd9ff"></span><span style="background:#f4d38a"></span><span style="background:#1f7055"></span></span><span><span class="dh-theme-option-title">Winter · Christmas & New Year</span><span class="dh-theme-option-copy">Frosted blue, evergreen, and warm gold.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+        <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="custom"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#080a16"></span><span style="background:#6366f1"></span><span style="background:#a855f7"></span><span style="background:#11152b"></span></span><span><span class="dh-theme-option-title">Custom palette</span><span class="dh-theme-option-copy">Choose your own background, accent, secondary, and panel colors.</span></span><span class="dh-theme-option-check">✓</span></span></label>
+      </div>
+      <div class="dh-custom-palette" id="customPaletteControls" hidden>
+        <div class="dh-custom-palette-heading"><strong>Your color palette</strong><span>Changes apply across DougHub on this device.</span></div>
+        <div class="dh-custom-color-grid">
+          <label class="dh-custom-color"><span>Background</span><input type="color" id="customThemeBg" value="#080a16"></label>
+          <label class="dh-custom-color"><span>Main accent</span><input type="color" id="customThemeAccent" value="#6366f1"></label>
+          <label class="dh-custom-color"><span>Secondary accent</span><input type="color" id="customThemeAccent2" value="#a855f7"></label>
+          <label class="dh-custom-color"><span>Panel / cards</span><input type="color" id="customThemePanel" value="#11152b"></label>
+        </div>
+        <div class="dh-custom-palette-preview" id="customPalettePreview"><span>Preview</span><b>DougHub</b><button type="button" id="resetCustomPalette">Reset palette</button></div>
       </div>
       <div id="seasonalThemeStatus" class="dh-theme-status" role="status" aria-live="polite">Normal theme selected.</div>
     </section>
@@ -1706,12 +1723,12 @@ async function loadSettings() {
 
   currentProfile =
     profile || {};
-  const savedSeasonalTheme = ["normal","spring","summer","autumn","winter"].includes(currentProfile.seasonal_theme) ? currentProfile.seasonal_theme : "normal";
+  const savedSeasonalTheme = ["normal","spring","summer","autumn","winter","custom"].includes(currentProfile.seasonal_theme) ? currentProfile.seasonal_theme : (window.DougHubSeasonalTheme?.getTheme() || "normal");
   const seasonalRadio = document.querySelector('input[name="seasonalThemeSelect"][value="' + savedSeasonalTheme + '"]');
   if (seasonalRadio) seasonalRadio.checked = true;
   window.DougHubSeasonalTheme?.apply(savedSeasonalTheme, true);
   const seasonalThemeStatus = document.getElementById("seasonalThemeStatus");
-  if (seasonalThemeStatus) seasonalThemeStatus.textContent = savedSeasonalTheme === "normal" ? "Normal theme selected." : (window.DougHubSeasonalTheme?.themes[savedSeasonalTheme]?.name + " theme selected.");
+  if (seasonalThemeStatus) seasonalThemeStatus.textContent = savedSeasonalTheme === "custom" ? "Custom palette selected." : (savedSeasonalTheme === "normal" ? "Normal theme selected." : (window.DougHubSeasonalTheme?.themes[savedSeasonalTheme]?.name + " theme selected."));
 
 
   const username =
@@ -2435,11 +2452,27 @@ document.getElementById("badgeStyleSelect")?.addEventListener("change",async()=>
   showStatus(value==="icon"?"Badge will show as icon only in chat.":"Badge will show with its name in chat.","success");
 });
 
+function syncCustomPaletteInputs(){
+  const p=window.DougHubSeasonalTheme?.getPalette?.()||{bg:"#080a16",accent:"#6366f1",accent2:"#a855f7",panel:"#11152b"};
+  [["customThemeBg","bg"],["customThemeAccent","accent"],["customThemeAccent2","accent2"],["customThemePanel","panel"]].forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=p[key]});
+  const preview=document.getElementById("customPalettePreview");
+  if(preview){preview.style.background=p.bg;preview.style.borderColor=p.accent+"88";preview.style.color="#f5f6ff";preview.querySelector("b").style.color=p.accent;preview.querySelector("button").style.borderColor=p.accent+"88"}
+  const controls=document.getElementById("customPaletteControls");if(controls)controls.hidden=window.DougHubSeasonalTheme?.getTheme()!=="custom";
+}
+function updateCustomPalette(){
+  const p={bg:document.getElementById("customThemeBg").value,accent:document.getElementById("customThemeAccent").value,accent2:document.getElementById("customThemeAccent2").value,panel:document.getElementById("customThemePanel").value};
+  window.DougHubSeasonalTheme?.savePalette(p);window.DougHubSeasonalTheme?.apply("custom",true);syncCustomPaletteInputs();
+  const status=document.getElementById("seasonalThemeStatus");if(status){status.dataset.state="success";status.textContent="Custom palette applied across DougHub on this device."}
+}
+syncCustomPaletteInputs();
+["customThemeBg","customThemeAccent","customThemeAccent2","customThemePanel"].forEach(id=>document.getElementById(id)?.addEventListener("input",updateCustomPalette));
+document.getElementById("resetCustomPalette")?.addEventListener("click",()=>{window.DougHubSeasonalTheme?.savePalette({bg:"#080a16",accent:"#6366f1",accent2:"#a855f7",panel:"#11152b"});syncCustomPaletteInputs();updateCustomPalette()});
 document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(input => input.addEventListener("change", async () => {
   if (!input.checked) return;
-  const value = ["normal","spring","summer","autumn","winter"].includes(input.value) ? input.value : "normal";
+  const value = ["normal","spring","summer","autumn","winter","custom"].includes(input.value) ? input.value : "normal";
+  const customControls=document.getElementById("customPaletteControls");if(customControls)customControls.hidden=value!=="custom";
   const status = document.getElementById("seasonalThemeStatus");
-  const previous = ["normal","spring","summer","autumn","winter"].includes(currentProfile?.seasonal_theme) ? currentProfile.seasonal_theme : "normal";
+  const previous = ["normal","spring","summer","autumn","winter","custom"].includes(currentProfile?.seasonal_theme) ? currentProfile.seasonal_theme : "normal";
   window.DougHubSeasonalTheme?.apply(value, true);
   if (!currentUser || !currentProfile) {
     if (status) { status.dataset.state = "success"; status.textContent = "Theme saved on this device. Sign in to sync it to your account."; }
@@ -2450,11 +2483,12 @@ document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(input => 
     const { data, error } = await supabaseClient.from("profiles").update({ seasonal_theme: value }).eq("id", currentUser.id).select("seasonal_theme").maybeSingle();
     if (error || !data) throw error || new Error("No profile row was updated.");
     currentProfile.seasonal_theme = data.seasonal_theme || value;
-    if (status) { status.dataset.state = "success"; status.textContent = value === "normal" ? "Classic DougHub theme saved to your account." : window.DougHubSeasonalTheme?.themes[value]?.name + " theme saved to your account."; }
+    if (status) { status.dataset.state = "success"; status.textContent = value === "custom" ? "Custom theme selected. Your color palette is saved on this device." : (value === "normal" ? "Classic DougHub theme saved to your account." : window.DougHubSeasonalTheme?.themes[value]?.name + " theme saved to your account."); }
   } catch (error) {
     window.DougHubSeasonalTheme?.apply(previous, true);
     const radio = document.querySelector('input[name="seasonalThemeSelect"][value="' + previous + '"]');
     if (radio) radio.checked = true;
+    if (customControls) customControls.hidden = previous !== "custom";
     if (status) { status.dataset.state = "error"; status.textContent = "Theme couldn't sync; previous theme restored. " + (error?.message || ""); }
   } finally { document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(el => el.disabled = false); }
 }));
