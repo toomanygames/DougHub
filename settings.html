@@ -845,7 +845,7 @@ document.addEventListener("DOMContentLoaded",function(){
       <div class="settings-sidebar-label">PREFERENCES</div>
       <a class="settings-nav-link active" href="#profileSettingsSection"><span class="settings-nav-icon">◎</span><span><strong>Profile</strong><small>Public identity</small></span></a>
       <a class="settings-nav-link" href="#rewardsSettingsSection"><span class="settings-nav-icon">✧</span><span><strong>Rewards & badges</strong><small>Chat appearance</small></span></a>
-      <a class="settings-nav-link" href="#themeSettingsSection"><span class="settings-nav-icon">◌</span><span><strong>Seasonal theme</strong><small>Change the whole site</small></span></a>
+      <a class="settings-nav-link" href="#themeSettingsSection"><span class="settings-nav-icon">◌</span><span><strong>Website appearance</strong><small>Style and color palette</small></span></a>
       <a class="settings-nav-link" href="#loginSettingsSection"><span class="settings-nav-icon">⌁</span><span><strong>Login information</strong><small>Email and password</small></span></a>
       <a class="settings-nav-link" href="#tutorialSettingsSection"><span class="settings-nav-icon">▷</span><span><strong>Tutorial</strong><small>Learn DougHub</small></span></a>
       <a class="settings-nav-link" href="#homepageSettingsSection"><span class="settings-nav-icon">⌂</span><span><strong>Homepage</strong><small>Startup preference</small></span></a>
@@ -1003,8 +1003,8 @@ document.addEventListener("DOMContentLoaded",function(){
     </section>
 
     <section class="settings-section" id="themeSettingsSection">
-      <h2 class="section-title">Seasonal experience</h2>
-      <p class="section-description">Choose a holiday-inspired look for the whole DougHub site. Normal is the default. Your choice syncs with your account when signed in.</p>
+      <h2 class="section-title">Website appearance</h2>
+      <p class="section-description">Choose a site-wide style or build your own color palette. Your selected style syncs with your account; custom colors are saved on this device.</p>
       <div class="dh-theme-picker" role="radiogroup" aria-label="DougHub seasonal theme">
         <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="normal" checked><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#050611"></span><span style="background:#6366f1"></span><span style="background:#a855f7"></span><span style="background:#67e8f9"></span></span><span><span class="dh-theme-option-title">Normal</span><span class="dh-theme-option-copy">Classic dark indigo and purple DougHub.</span></span><span class="dh-theme-option-check">✓</span></span></label>
         <label class="dh-theme-option"><input type="radio" name="seasonalThemeSelect" value="spring"><span class="dh-theme-option-card"><span class="dh-theme-swatch"><span style="background:#102b20"></span><span style="background:#8ee3ad"></span><span style="background:#e9a8e9"></span><span style="background:#f5d9a7"></span></span><span><span class="dh-theme-option-title">Spring · Easter</span><span class="dh-theme-option-copy">Fresh greens, blooming pinks, and soft lilac.</span></span><span class="dh-theme-option-check">✓</span></span></label>
@@ -2465,6 +2465,7 @@ function updateCustomPalette(){
   const status=document.getElementById("seasonalThemeStatus");if(status){status.dataset.state="success";status.textContent="Custom palette applied across DougHub on this device."}
 }
 syncCustomPaletteInputs();
+window.addEventListener("douqhub:seasonal-theme-changed",syncCustomPaletteInputs);
 ["customThemeBg","customThemeAccent","customThemeAccent2","customThemePanel"].forEach(id=>document.getElementById(id)?.addEventListener("input",updateCustomPalette));
 document.getElementById("resetCustomPalette")?.addEventListener("click",()=>{window.DougHubSeasonalTheme?.savePalette({bg:"#080a16",accent:"#6366f1",accent2:"#a855f7",panel:"#11152b"});syncCustomPaletteInputs();updateCustomPalette()});
 document.querySelectorAll('input[name="seasonalThemeSelect"]').forEach(input => input.addEventListener("change", async () => {
