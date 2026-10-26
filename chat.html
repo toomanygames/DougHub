@@ -2213,17 +2213,27 @@ async function renderMessages(
         pinButton.textContent = pinnedIds.has(message.id) ? "Unpin" : "Pin";
         pinButton.setAttribute("aria-label", (pinnedIds.has(message.id) ? "Unpin" : "Pin") + " message");
         pinButton.addEventListener("click", async () => {
-          if (!currentUser) return;
-          if (pinnedIds.has(message.id)) {
-            const { error } = await supabaseClient.from("chat_pinned_messages").delete().eq("message_id", message.id);
-            if (error) return showError("Could not unpin message: " + error.message);
-          } else {
-            const { error } = await supabaseClient.from("chat_pinned_messages").insert({ group_id: activeChatGroupId, message_id: message.id, pinned_by: currentUser.id });
-            if (error) return showError("Could not pin message: " + error.message);
+          if (!currentUser || pinButton.disabled) return;
+          pinButton.disabled = true;
+          const groupScope = query => activeChatGroupId === null ? query.is("group_id", null) : query.eq("group_id", activeChatGroupId);
+          try {
+            if (pinnedIds.has(message.id)) {
+              const { error } = await supabaseClient.from("chat_pinned_messages").delete().eq("message_id", message.id);
+              if (error) return showError("Could not unpin message: " + error.message);
+            } else {
+              // A chat can have only one pinned message. Clear the current group's
+              // previous pin before inserting the new one, preventing duplicates.
+              const { error: clearError } = await groupScope(supabaseClient.from("chat_pinned_messages").delete());
+              if (clearError) return showError("Could not replace pinned message: " + clearError.message);
+              const { error } = await supabaseClient.from("chat_pinned_messages").insert({ group_id: activeChatGroupId, message_id: message.id, pinned_by: currentUser.id });
+              if (error) return showError("Could not pin message: " + error.message);
+            }
+            lastRenderedMessageSignature = null;
+            await loadMessages();
+            await loadChatFeaturePanels();
+          } finally {
+            pinButton.disabled = false;
           }
-          lastRenderedMessageSignature = null;
-          await loadMessages();
-          await loadChatFeaturePanels();
         });
         header.appendChild(pinButton);
       }
@@ -2556,17 +2566,40 @@ async function loadChatFeaturePanels() {
   const pinResult = await scopeGroup(supabaseClient.from("chat_pinned_messages").select("message_id,created_at").order("created_at", { ascending: false }).limit(5));
   pinsPanel.replaceChildren();
   if (!pinResult.error && pinResult.data && pinResult.data.length) {
-    const ids = pinResult.data.map(row => row.message_id);
-    const { data: pinnedMessages } = await supabaseClient.from("chat_messages").select("id,username,message,attachment_name").in("id", ids);
-    const byId = new Map((pinnedMessages || []).map(row => [row.id, row]));
+    // Heal any old duplicate pins left by earlier versions: retain only the newest.
+    const pins = pinResult.data;
+    if (pins.length > 1) {
+      const staleIds = pins.slice(1).map(row => row.message_id);
+      const { error: cleanupError } = await scopeGroup(supabaseClient.from("chat_pinned_messages").delete().in("message_id", staleIds));
+      if (cleanupError) console.warn("Could not clean up duplicate pins:", cleanupError.message);
+    }
+    const pin = pins[0];
+    const { data: pinnedMessages } = await supabaseClient.from("chat_messages").select("id,username,message,attachment_name").eq("id", pin.message_id).limit(1);
+    const message = pinnedMessages?.[0];
     const label = document.createElement("strong"); label.textContent = "Pinned"; pinsPanel.appendChild(label);
-    pinResult.data.forEach(pin => {
-      const message = byId.get(pin.message_id);
-      if (!message) return;
+    if (message) {
       const item = document.createElement("span"); item.className = "chat-pinned-item";
       item.textContent = (message.username || "Member") + ": " + (message.message || message.attachment_name || "Attachment").slice(0, 90);
       pinsPanel.appendChild(item);
-    });
+    }
+    if (currentUserIsHelper) {
+      const unpinAllButton = document.createElement("button");
+      unpinAllButton.type = "button";
+      unpinAllButton.textContent = "Unpin all";
+      unpinAllButton.addEventListener("click", async () => {
+        if (unpinAllButton.disabled || !confirm("Unpin the current message from this chat?")) return;
+        unpinAllButton.disabled = true;
+        const { error } = await scopeGroup(supabaseClient.from("chat_pinned_messages").delete());
+        if (error) {
+          unpinAllButton.disabled = false;
+          return showError("Could not unpin all messages: " + error.message);
+        }
+        lastRenderedMessageSignature = null;
+        await loadMessages();
+        await loadChatFeaturePanels();
+      });
+      pinsPanel.appendChild(unpinAllButton);
+    }
     pinsPanel.hidden = pinsPanel.childElementCount === 0;
   } else pinsPanel.hidden = true;
 
