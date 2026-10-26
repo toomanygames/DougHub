@@ -27,6 +27,8 @@ h1{font-size:clamp(28px,5vw,46px);line-height:1.04;letter-spacing:-.055em;margin
 .video-tile{position:relative;min-width:0;aspect-ratio:4/3;overflow:hidden;border:1px solid #ffffff16;border-radius:15px;background:linear-gradient(145deg,#171a34,#080a17);display:flex;align-items:center;justify-content:center}
 .video-tile video{width:100%;height:100%;object-fit:cover;background:#070913}
 .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:15px;text-align:center;color:#9ca4c4;font-size:12px;pointer-events:none}
+/* Explicitly honor hidden on camera placeholders; display:flex otherwise overrides the browser's hidden style. */
+.video-placeholder[hidden]{display:none!important}
 .video-placeholder strong{color:#eef0ff;font-size:13px}
 .video-placeholder .avatar{width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--call-line);border-radius:16px;background:linear-gradient(135deg,#6366f12b,#a855f72b);font-size:22px}
 .video-placeholder .avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
