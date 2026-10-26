@@ -1446,16 +1446,20 @@ async function loadChatGroups() {
 }
 async function refreshGroupMentionDots() {
   if(!currentUser||!supabaseClient||!groupListEl)return;
-  const seen=readChatAlertMap(CHAT_SEEN_KEY),groups=visibleChatGroups.filter(g=>g&&g.id).map(g=>g.id);
-  let query=supabaseClient.from("chat_messages").select("id,group_id,user_id,created_at").order("created_at",{ascending:false}).limit(500);
-  query=groups.length?query.or("group_id.is.null,group_id.in.("+groups.join(",")+")"):query.is("group_id","null");
-  const {data,error}=await query;if(error){console.debug("Could not refresh chat unread indicators:",error);return;}
+  const seen=readChatAlertMap(CHAT_GROUP_READ_KEY);
+  const conversations=[{id:null,key:"public"},...visibleChatGroups.filter(g=>g&&g.id).map(g=>({id:g.id,key:String(g.id)}))];
   const unread=new Set();
-  for(const m of data||[]){
-    if(!m||m.user_id===currentUser.id||isChatMuted(m.group_id))continue;
-    if(activeChatGroupId===m.group_id&&document.visibilityState==="visible")continue;
-    const stamp=seen[chatKey(m.group_id)];if(!stamp||new Date(m.created_at).getTime()>new Date(stamp).getTime())unread.add(chatKey(m.group_id));
-  }
+  await Promise.all(conversations.map(async conversation=>{
+    if(isChatMuted(conversation.id))return;
+    let query=supabaseClient.from("chat_messages").select("created_at").neq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(1);
+    query=conversation.id==null?query.is("group_id","null"):query.eq("group_id",conversation.id);
+    const {data,error}=await query;
+    if(error){console.debug("Could not refresh unread state for chat:",error);return;}
+    const latest=data&&data[0];if(!latest)return;
+    if(activeChatGroupId===conversation.id&&document.visibilityState==="visible")return;
+    const stamp=seen[conversation.key];
+    if(!stamp||new Date(latest.created_at).getTime()>new Date(stamp).getTime())unread.add(conversation.key);
+  }));
   groupListEl.querySelectorAll("[data-chat-key]").forEach(button=>{
     const key=button.dataset.chatKey,existing=button.querySelector(".chat-group-unread-dot");
     if(unread.has(key)){if(!existing){const dot=document.createElement("span");dot.className="chat-group-unread-dot";dot.setAttribute("aria-label","Unread messages");dot.title="Unread messages";button.appendChild(dot);}}
@@ -1463,7 +1467,7 @@ async function refreshGroupMentionDots() {
   });
 }
 function makeChatBell(groupId) {
-  const muted=isChatMuted(groupId),button=document.createElement("button");button.type="button";button.className="chat-bell";button.textContent=muted?"🔕":"♧";
+  const muted=isChatMuted(groupId),button=document.createElement("button");button.type="button";button.className="chat-bell";button.textContent=muted?"🔕":"🔔";
   button.setAttribute("aria-pressed",String(muted));const name=groupId==null?"Public Chat":(visibleChatGroups.find(g=>g.id===groupId)?.name||"this group");
   button.setAttribute("aria-label",(muted?"Unmute":"Mute")+" notifications for "+name);button.title=muted?"Muted — click to enable alerts":"Notifications on — click to mute";
   button.addEventListener("click",e=>{e.stopPropagation();setChatMuted(groupId,!muted);});return button;
