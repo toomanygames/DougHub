@@ -8,14 +8,19 @@
   // Load the shared seasonal theme system on every page that uses the shared navigation.
   (function loadSeasonalExperience(){
     const root = new URL(".", NAV_SCRIPT_URL);
+    if (!document.querySelector('link[data-dh-shared-css]')) {
+      const shared = document.createElement("link");
+      shared.rel = "stylesheet"; shared.href = new URL("douqhub-theme.css?v=20261026-shared", root).href;
+      shared.dataset.dhSharedCss = "true"; document.head.appendChild(shared);
+    }
     if (!document.querySelector('link[data-dh-seasonal-css]')) {
       const link = document.createElement("link");
-      link.rel = "stylesheet"; link.href = new URL("seasonal-theme.css?v=20261025-palette3", root).href;
+      link.rel = "stylesheet"; link.href = new URL("seasonal-theme.css?v=20261026-custom-palette", root).href;
       link.dataset.dhSeasonalCss = "true"; document.head.appendChild(link);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
       const script = document.createElement("script");
-      script.src = new URL("seasonal-theme.js?v=20261025-palette3", root).href;
+      script.src = new URL("seasonal-theme.js?v=20261026-custom-palette", root).href;
       script.defer = true; script.dataset.dhSeasonalJs = "true"; document.head.appendChild(script);
     }
   })();
