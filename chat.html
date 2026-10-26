@@ -2638,7 +2638,7 @@ document.getElementById("startTicTacToeButton").addEventListener("click", async 
   const { error } = await supabaseClient.from("chat_games").insert({ group_id: activeChatGroupId, created_by: currentUser.id, player_x: currentUser.id, game_type: "tic_tac_toe", board: Array(9).fill(null), next_turn: "X", status: "waiting" });
   if (error) return showError("Couldn't start Tic-Tac-Toe: " + error.message);
   await loadChatFeaturePanels();
-}
+});
 
 async function loadMessages() {
 
