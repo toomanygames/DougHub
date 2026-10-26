@@ -884,11 +884,11 @@ document.addEventListener("DOMContentLoaded",function(){
             <input
               type="file"
               id="profilePictureInput"
-              accept="image/png,image/jpeg,image/webp"
+              accept="image/gif,image/png,image/jpeg,image/webp"
             >
 
             <div class="upload-help">
-              PNG, JPG, or WebP • Max 2MB
+              GIF, PNG, JPG, or WebP • Max 2MB
             </div>
 
           </div>
@@ -2171,7 +2171,8 @@ profilePictureInput.addEventListener(
       "png",
       "jpg",
       "jpeg",
-      "webp"
+      "webp",
+      "gif"
     ];
 
 
@@ -2182,7 +2183,7 @@ profilePictureInput.addEventListener(
     ) {
 
       showStatus(
-        "Please use PNG, JPG, or WebP.",
+        "Please use GIF, PNG, JPG, or WebP.",
         "error"
       );
 
