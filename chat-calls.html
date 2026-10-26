@@ -197,14 +197,19 @@ function makePeer(id,info){
    const video=t.querySelector("video"),audio=t.querySelector("audio");
    video.srcObject=state.stream;
    audio.muted=false;audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
-   // Attach the received audio track directly as soon as WebRTC delivers it.
+   // Never replace the audio element's source when a video track arrives.
+   // WebRTC may deliver video after audio; overwriting srcObject here can silence the call.
    if(e.track.kind==="audio"){
-    e.track.enabled=true;
     audio.srcObject=new MediaStream([e.track]);
-    e.track.onunmute=()=>{audio.play?.().catch(()=>setStatus("Audio playback is blocked. Tap the participant tile to hear them."))};
-    audio.play?.().catch(()=>setStatus("Audio playback is blocked. Tap the participant tile to hear them."));
-   }else{
-    audio.srcObject=new MediaStream(state.stream.getAudioTracks());
+    console.info("DougHub remote audio track received:",{participant:id,readyState:e.track.readyState,muted:e.track.muted,enabled:e.track.enabled});
+    e.track.onunmute=()=>{
+     console.info("DougHub remote audio unmuted:",{participant:id,readyState:e.track.readyState});
+     audio.play?.().catch(err=>{console.warn("Remote audio playback blocked:",err);setStatus("Audio is received, but playback is blocked. Tap the participant tile or check device output.")});
+    };
+    e.track.onmute=()=>console.warn("DougHub remote audio track muted:",id);
+    audio.onplaying=()=>console.info("DougHub remote audio is playing:",id);
+    audio.onerror=()=>console.warn("DougHub remote audio element error:",audio.error);
+    audio.play?.().catch(err=>{console.warn("Remote audio playback blocked:",err);setStatus("Audio is received, but playback is blocked. Tap the participant tile or check device output.")});
    }
    video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
    const resumePlayback=()=>{video.play?.().catch(()=>{});audio.play?.().catch(()=>{})};
