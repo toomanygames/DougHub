@@ -1637,7 +1637,7 @@ function renderActiveGroupDetails() {
 toggleStaffWriteButton?.addEventListener("click", async () => {
   if (!currentUserIsAdmin || !activeChatGroupId || !activeChatGroup) return;
   const nextValue = !activeChatGroup.staff_only_write;
-  const { error } = await supabaseClient.from("chat_groups").update({ staff_only_write: nextValue }).eq("id", activeChatGroupId);
+  const { error } = await supabaseClient.from("chat_groups").update(nextValue ? { staff_only_write: true, is_public: true } : { staff_only_write: false }).eq("id", activeChatGroupId);
   if (error) return showError("Could not update group writing mode: " + error.message);
   activeChatGroup.staff_only_write = nextValue;
   visibleChatGroups = visibleChatGroups.map(group => group.id === activeChatGroupId ? { ...group, staff_only_write: nextValue } : group);
