@@ -541,7 +541,7 @@ main {
 .chat-mention{display:inline;color:#60a5fa!important;font-weight:650;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;margin:0!important;white-space:normal;cursor:pointer;text-decoration:none;box-shadow:none!important;transition:color .16s}.chat-mention:hover,.chat-mention:focus-visible{color:#93c5fd!important;text-decoration:underline;background:transparent!important;outline:none}.chat-profile-backdrop{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,12,.72);backdrop-filter:blur(9px);animation:chatProfileFade .16s ease}.chat-profile-card{position:relative;width:min(410px,100%);max-height:min(80vh,620px);overflow:auto;padding:24px;border:1px solid rgba(129,140,248,.3);border-radius:22px;background:radial-gradient(circle at 90% 0,rgba(99,102,241,.18),transparent 42%),linear-gradient(145deg,#12162e,#080a18);box-shadow:0 28px 90px #0009;color:#f5f5ff;animation:chatProfileIn .2s ease}.chat-profile-close{position:absolute;top:13px;right:13px;width:34px;height:34px;border:1px solid #ffffff1c;border-radius:11px;background:#ffffff0a;color:#e8e8ff;font-size:21px;cursor:pointer}.chat-profile-identity{display:flex;align-items:center;gap:14px;padding:8px 36px 20px 0}.chat-profile-avatar{width:64px;height:64px;flex:0 0 64px;object-fit:cover;border-radius:20px;border:1px solid #a5b4fc55;background:#171a34}.chat-profile-name{min-width:0;font-size:21px;font-weight:850;overflow-wrap:anywhere}.chat-profile-handle{margin-top:4px;color:#60a5fa;font-size:13px;font-weight:750}.chat-profile-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}.chat-profile-badge{padding:5px 8px;border-radius:999px;border:1px solid #a78bfa35;background:#a78bfa14;color:#ddd6fe;font-size:11px;font-weight:800}.chat-profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chat-profile-stat{padding:14px;border:1px solid #ffffff12;border-radius:14px;background:#ffffff06}.chat-profile-stat strong{display:block;font-size:21px;letter-spacing:-.5px}.chat-profile-stat span{display:block;margin-top:4px;color:#a4a7c4;font-size:11px}.chat-profile-footer{margin-top:15px;color:#858aa9;font-size:12px;line-height:1.5}.chat-profile-loading{padding:25px 4px;color:#a4a7c4;text-align:center}@keyframes chatProfileFade{from{opacity:0}to{opacity:1}}@keyframes chatProfileIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 .chat-input-mention-wrap #messageInput{width:100%;min-height:48px;color:transparent!important;-webkit-text-fill-color:transparent!important;background:transparent!important;position:relative;z-index:1}.chat-input-mention-preview{font-size:inherit;line-height:normal}.chat-input-mention-wrap #messageInput::selection{-webkit-text-fill-color:transparent;background:rgba(99,102,241,.22)}
 </style>
-  <script src="nav.js?v=20261025-group-calls" defer></script>
+  <script src="nav.js?v=20261025-chat-bells" defer></script>
 
 <script src="search-autofill-fix.js" defer></script>
 
@@ -570,9 +570,12 @@ header{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdr
 .brand-icon{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 25px #6366f133}
 .chat-container{background:rgba(13,17,39,.76);border:1px solid var(--dh-line);border-radius:26px;box-shadow:0 24px 80px #0004;overflow:hidden}
 .chat-top{background:rgba(255,255,255,.025);border-bottom:1px solid var(--dh-line)}
-.chat-ding-setting{display:inline-flex;align-items:center;gap:8px;margin-left:auto;color:var(--dh-muted,#aab0d0);font-size:13px;cursor:pointer;user-select:none}
-.chat-ding-setting input{width:16px;height:16px;accent-color:#818cf8;cursor:pointer}
-@media(max-width:520px){.chat-ding-setting{margin-left:0}.chat-top{flex-wrap:wrap;gap:10px}}
+.chat-notification-hint{margin-left:auto;color:#777f9f;font-size:11px}
+.chat-bell{flex:0 0 31px;width:31px;height:31px;padding:0;border:1px solid rgba(177,184,255,.14);border-radius:9px;background:rgba(255,255,255,.035);color:#aab0d0;cursor:pointer;font-size:14px}
+.chat-bell[aria-pressed="true"]{color:#c4b5fd;border-color:#8b5cf655;background:#8b5cf61c}
+.chat-group-unread-dot{display:inline-block;flex:0 0 8px;width:8px;height:8px;margin-left:auto;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef444477}
+.group-row>.group-pill{flex:1;min-width:0}.group-row>.chat-bell{align-self:center}
+@media(max-width:520px){.chat-notification-hint{display:none}.chat-top{flex-wrap:wrap;gap:10px}}
 .messages{background:transparent}
 .composer{background:rgba(6,8,22,.78);border-top:1px solid var(--dh-line)}
 .composer textarea,.composer input{background:#080a19;border:1px solid var(--dh-line);border-radius:14px}
@@ -903,10 +906,7 @@ html[data-dh-theme="winter"] .chat-video-call-button{border-color:rgba(139,217,2
       <button class="chat-video-call-button chat-video-invite-button" id="chatVideoInviteButton" type="button" title="Send a group video-call invite to the current chat">
         <span aria-hidden="true">＋</span> Invite to call
       </button>
-      <label class="chat-ding-setting" for="chatDingToggle" title="Play a short sound when someone sends a community chat message">
-        <input id="chatDingToggle" type="checkbox" checked>
-        <span>Message dings</span>
-      </label>
+      <span class="chat-notification-hint" title="Use the bell beside each chat to mute its alerts">Chat alerts are controlled per chat</span>
 
       <div
         class="username-display"
@@ -1120,18 +1120,20 @@ function waitForSharedSupabaseClient(timeoutMs = 15000) {
    COMMUNITY CHAT ELEMENTS
 ========================================= */
 
-/* Chat message sound preference: shared by DougHub tabs on this browser. */
-(function setupChatDingToggle() {
-  const key = "douqhub_chat_dings_enabled";
-  const toggle = document.getElementById("chatDingToggle");
-  if (!toggle) return;
-  try { toggle.checked = localStorage.getItem(key) !== "false"; }
-  catch (_) { toggle.checked = true; }
-  toggle.addEventListener("change", () => {
-    try { localStorage.setItem(key, toggle.checked ? "true" : "false"); } catch (_) {}
-    window.dispatchEvent(new Event("douqhub:chat-ding-setting-changed"));
-  });
-})();
+const CHAT_ALERTS_KEY = "douqhub_chat_alert_preferences_v2";
+const CHAT_SEEN_KEY = "douqhub_chat_seen_timestamps_v2";
+function readChatAlertMap(key) { try { return JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch (_) { return {}; } }
+function chatKey(groupId) { return groupId == null ? "public" : String(groupId); }
+function isChatMuted(groupId) { return readChatAlertMap(CHAT_ALERTS_KEY)[chatKey(groupId)] === true; }
+function setChatMuted(groupId, muted) {
+  const prefs=readChatAlertMap(CHAT_ALERTS_KEY);prefs[chatKey(groupId)]=!!muted;
+  try { localStorage.setItem(CHAT_ALERTS_KEY,JSON.stringify(prefs)); } catch (_) {}
+  renderChatGroupList();refreshGroupMentionDots();
+}
+function markChatRead(groupId,timestamp=new Date().toISOString()) {
+  const seen=readChatAlertMap(CHAT_SEEN_KEY);seen[chatKey(groupId)]=timestamp;
+  try { localStorage.setItem(CHAT_SEEN_KEY,JSON.stringify(seen)); } catch (_) {}
+}
 
 const messagesEl =
   document.getElementById("messages");
@@ -1442,61 +1444,37 @@ async function loadChatGroups() {
   renderChatGroupList();
   await refreshGroupMentionDots();
 }
-const GROUP_MENTION_SEEN_KEY = "douqhub_group_mention_seen_v1";
-function readGroupMentionSeen() {
-  try { return JSON.parse(localStorage.getItem(GROUP_MENTION_SEEN_KEY + ":" + (currentUser?.id || "guest")) || "{}") || {}; }
-  catch (_) { return {}; }
-}
-function writeGroupMentionSeen(groupId, timestamp = new Date().toISOString()) {
-  if (!currentUser || !groupId) return;
-  const state = readGroupMentionSeen();
-  state[groupId] = timestamp;
-  try { localStorage.setItem(GROUP_MENTION_SEEN_KEY + ":" + currentUser.id, JSON.stringify(state)); } catch (_) {}
-}
 async function refreshGroupMentionDots() {
-  if (!currentUser || !supabaseClient || !visibleChatGroups.length) return;
-  const groups = visibleChatGroups.filter(group => group && group.id);
-  if (!groups.length) return;
-  const { data, error } = await supabaseClient.from("chat_messages")
-    .select("id,group_id,user_id,message,created_at")
-    .in("group_id", groups.map(group => group.id))
-    .order("created_at", { ascending: false }).limit(500);
-  if (error) { console.debug("Could not check group mentions:", error); return; }
-  const seen = readGroupMentionSeen();
-  const username = String(currentUsername || "").trim().toLowerCase();
-  const unread = new Set();
-  for (const message of data || []) {
-    if (!message.group_id || message.user_id === currentUser.id || !username) continue;
-    if (activeChatGroupId === message.group_id && document.visibilityState === "visible") continue;
-    if (seen[message.group_id] && new Date(message.created_at).getTime() <= new Date(seen[message.group_id]).getTime()) continue;
-    const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
-    let match;
-    while ((match = pattern.exec(String(message.message || ""))) !== null) {
-      if (match[2].toLowerCase() === username) { unread.add(message.group_id); break; }
-    }
+  if(!currentUser||!supabaseClient||!groupListEl)return;
+  const seen=readChatAlertMap(CHAT_SEEN_KEY),groups=visibleChatGroups.filter(g=>g&&g.id).map(g=>g.id);
+  let query=supabaseClient.from("chat_messages").select("id,group_id,user_id,created_at").order("created_at",{ascending:false}).limit(500);
+  query=groups.length?query.or("group_id.is.null,group_id.in.("+groups.join(",")+")"):query.is("group_id","null");
+  const {data,error}=await query;if(error){console.debug("Could not refresh chat unread indicators:",error);return;}
+  const unread=new Set();
+  for(const m of data||[]){
+    if(!m||m.user_id===currentUser.id||isChatMuted(m.group_id))continue;
+    if(activeChatGroupId===m.group_id&&document.visibilityState==="visible")continue;
+    const stamp=seen[chatKey(m.group_id)];if(!stamp||new Date(m.created_at).getTime()>new Date(stamp).getTime())unread.add(chatKey(m.group_id));
   }
-  groupListEl.querySelectorAll("[data-group-id]").forEach(button => {
-    const groupId = button.getAttribute("data-group-id");
-    const existing = button.querySelector(".chat-group-unread-dot");
-    if (unread.has(groupId)) {
-      if (!existing) {
-        const dot = document.createElement("span");
-        dot.className = "chat-group-unread-dot";
-        dot.setAttribute("aria-label", "Unread mention");
-        dot.title = "You've been mentioned in this group";
-        button.appendChild(dot);
-      }
-    } else if (existing) existing.remove();
+  groupListEl.querySelectorAll("[data-chat-key]").forEach(button=>{
+    const key=button.dataset.chatKey,existing=button.querySelector(".chat-group-unread-dot");
+    if(unread.has(key)){if(!existing){const dot=document.createElement("span");dot.className="chat-group-unread-dot";dot.setAttribute("aria-label","Unread messages");dot.title="Unread messages";button.appendChild(dot);}}
+    else if(existing)existing.remove();
   });
+}
+function makeChatBell(groupId) {
+  const muted=isChatMuted(groupId),button=document.createElement("button");button.type="button";button.className="chat-bell";button.textContent=muted?"🔕":"♧";
+  button.setAttribute("aria-pressed",String(muted));const name=groupId==null?"Public Chat":(visibleChatGroups.find(g=>g.id===groupId)?.name||"this group");
+  button.setAttribute("aria-label",(muted?"Unmute":"Mute")+" notifications for "+name);button.title=muted?"Muted — click to enable alerts":"Notifications on — click to mute";
+  button.addEventListener("click",e=>{e.stopPropagation();setChatMuted(groupId,!muted);});return button;
 }
 function renderChatGroupList() {
   groupListEl.replaceChildren();
-  const publicButton = document.createElement("button");
-  publicButton.type = "button";
-  publicButton.className = "group-pill" + (activeChatGroupId === null ? " active" : "");
-  publicButton.innerHTML = '<span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span class="group-name-label">Public Chat</span>';
-  publicButton.addEventListener("click", () => selectChatGroup(null));
-  groupListEl.appendChild(publicButton);
+  const publicRow=document.createElement("div");publicRow.className="group-row";
+  const publicButton=document.createElement("button");publicButton.type="button";publicButton.dataset.chatKey="public";
+  publicButton.className="group-pill"+(activeChatGroupId===null?" active":"");
+  publicButton.innerHTML='<span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span class="group-name-label">Public Chat</span>';
+  publicButton.addEventListener("click",()=>selectChatGroup(null));publicRow.append(publicButton,makeChatBell(null));groupListEl.appendChild(publicRow);
   visibleChatGroups.forEach(group => {
     const row = document.createElement("div");
     row.className = "group-row";
@@ -1504,6 +1482,7 @@ function renderChatGroupList() {
     button.type = "button";
     button.className = "group-pill" + (activeChatGroupId === group.id ? " active" : "");
     button.dataset.groupId = group.id;
+    button.dataset.chatKey = String(group.id);
     button.innerHTML = (group.is_public
       ? '<span class="group-kind-icon public-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span>'
       : '<span class="group-kind-icon private-kind" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></span>') +
@@ -1519,6 +1498,7 @@ function renderChatGroupList() {
       await selectChatGroup(group.id);
     });
     row.appendChild(button);
+    row.appendChild(makeChatBell(group.id));
     const arrow = document.createElement("button");
     arrow.type = "button";
     arrow.className = "group-expand";
@@ -1547,7 +1527,7 @@ async function selectChatGroup(groupId) {
   lastRenderedMessageSignature = null;
   messagesEl.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>Loading messages…</div>';
   messageInput.placeholder = activeChatGroup ? "Message " + activeChatGroup.name + "…" : "Type a message…";
-  if (activeChatGroupId && currentUser) writeGroupMentionSeen(activeChatGroupId);
+  if(currentUser)markChatRead(activeChatGroupId);
   renderChatGroupList();
   await loadMessages();
   await refreshGroupMentionDots();
@@ -2292,7 +2272,8 @@ async function enableChatDesktopNotifications() {
 }
 
 function notifyIncomingChatMessage(row) {
-  if (!row || !currentUser || row.user_id === currentUser.id) return;
+  if(!row||!currentUser||row.user_id===currentUser.id)return;
+  if(isChatMuted(row.group_id))return;
 
   // Send incoming messages straight to the optional DougHub desktop app bridge.
   // This must happen before browser-notification permission and active-tab checks.
@@ -2893,6 +2874,7 @@ function startChatRefresh() {
           const incoming = payload?.new;
           if (!incoming) return;
           notifyIncomingChatMessage(incoming);
+          refreshGroupMentionDots();
           // Ignore inserts for other groups; only refresh the currently open conversation.
           const matchesActiveChat = activeChatGroupId === null
             ? incoming.group_id == null
