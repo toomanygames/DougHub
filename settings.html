@@ -888,7 +888,7 @@ document.addEventListener("DOMContentLoaded",function(){
             >
 
             <div class="upload-help">
-              GIF, PNG, JPG, or WebP • Max 2MB
+              Animated GIF, PNG, JPG, or WebP • Max 2MB
             </div>
 
           </div>
@@ -2166,21 +2166,16 @@ profilePictureInput.addEventListener(
         .pop()
         .toLowerCase();
 
+    const allowedExtensions = ["png", "jpg", "jpeg", "webp", "gif"];
+    const mimeByExtension = {
+      png: "image/png",
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      webp: "image/webp",
+      gif: "image/gif"
+    };
 
-    const allowedExtensions = [
-      "png",
-      "jpg",
-      "jpeg",
-      "webp",
-      "gif"
-    ];
-
-
-    if (
-      !allowedExtensions.includes(
-        extension
-      )
-    ) {
+    if (!allowedExtensions.includes(extension)) {
 
       showStatus(
         "Please use GIF, PNG, JPG, or WebP.",
@@ -2226,8 +2221,10 @@ profilePictureInput.addEventListener(
             upsert:
               true,
 
+            // Keep the correct image MIME type even when the browser reports an empty type.
+            // GIF is uploaded unchanged (never canvas-converted), so animated frames are preserved.
             contentType:
-              file.type
+              mimeByExtension[extension]
           }
         );
 
