@@ -1171,6 +1171,49 @@ body{background:radial-gradient(circle at 0 0,#24104f66,transparent 36%),radial-
 .notice,.dmail-notice{background:#6366f114;border:1px solid #818cf133;border-radius:14px;color:#b9bdd8}
 
 </style>
+<style id="dmail-2026-remake">
+:root{--dm-bg:#050711;--dm-surface:rgba(13,17,39,.82);--dm-border:rgba(166,174,255,.14);--dm-muted:#9ca5c5;--dm-glow:rgba(99,102,241,.16)}
+html,body{background:radial-gradient(ellipse at 12% 0%,rgba(99,102,241,.2),transparent 36%),radial-gradient(ellipse at 90% 85%,rgba(168,85,247,.13),transparent 34%),#050711!important;color:#f5f6ff!important}
+.app{gap:0!important;background:transparent!important}
+.topbar{height:64px!important;flex-basis:64px!important;padding:0 clamp(14px,2.5vw,32px)!important;background:rgba(5,7,18,.82)!important;border-bottom:1px solid var(--dm-border)!important;box-shadow:0 12px 40px #0002!important;backdrop-filter:blur(24px)!important}
+.logo{font-size:21px!important;letter-spacing:-.8px!important}
+.logo-icon{width:38px!important;height:38px!important;border-radius:12px!important;box-shadow:0 8px 28px #6366f12b!important}
+.main{height:calc(100vh - 64px)!important;gap:14px!important;padding:14px!important;overflow:hidden!important}
+.sidebar{width:218px!important;flex:0 0 218px!important;padding:15px!important;border:1px solid var(--dm-border)!important;border-radius:18px!important;background:rgba(8,11,27,.8)!important;box-shadow:0 16px 45px #0002!important;backdrop-filter:blur(18px)!important}
+.compose-button{min-height:44px!important;padding:11px 13px!important;border-radius:12px!important;box-shadow:0 10px 26px #6366f129!important;font-size:13px!important}
+.nav{margin-top:15px!important;gap:4px!important}
+.nav-button{min-height:39px!important;padding:10px 11px!important;border:1px solid transparent!important;border-radius:10px!important;color:#aeb5d2!important;font-size:12px!important;transition:background .16s,border-color .16s,transform .16s!important}
+.nav-button:hover{background:#ffffff09!important;border-color:#ffffff0d!important;transform:translateX(2px)}
+.nav-button.active{color:#f8f8ff!important;background:linear-gradient(100deg,#6366f12b,#a855f714)!important;border-color:#818cf82c!important;box-shadow:inset 2px 0 #818cf8!important}
+.user-box{margin-top:auto!important;border:1px solid var(--dm-border)!important;border-radius:12px!important;background:#ffffff05!important}
+.content{min-width:0!important;min-height:0!important;margin:0!important;border:1px solid var(--dm-border)!important;border-radius:18px!important;background:rgba(8,11,26,.72)!important;box-shadow:0 18px 55px #0003!important;overflow:hidden!important}
+.content-header{min-height:68px!important;padding:15px 20px!important;background:rgba(13,17,39,.62)!important;border-bottom:1px solid var(--dm-border)!important}
+.content-title{font-size:21px!important;font-weight:900!important;letter-spacing:-.7px!important}
+.mail-subtitle{font-size:11px!important;color:var(--dm-muted)!important}
+.notice,.dmail-notice{margin:10px 12px 0!important;padding:9px 12px!important;border-radius:11px!important;background:#6366f10c!important;border-color:#818cf822!important;font-size:11px!important}
+.mail-layout{min-width:0!important;background:transparent!important}
+.user-list{width:280px!important;flex-basis:280px!important;background:rgba(4,7,19,.2)!important;border-right:1px solid var(--dm-border)!important}
+.list-toolbar{background:rgba(10,13,30,.86)!important;border-bottom:1px solid var(--dm-border)!important;backdrop-filter:blur(18px)!important}
+.search-box input{border-radius:10px!important;background:#ffffff06!important;border-color:var(--dm-border)!important}
+.user-item{margin:5px 7px!important;padding:11px!important;border:1px solid transparent!important;border-radius:12px!important;transition:background .16s,border-color .16s!important}
+.user-item:hover{background:#ffffff07!important;border-color:#ffffff0e!important}
+.user-item.active,.user-item.selected{background:linear-gradient(110deg,#6366f121,#a855f70b)!important;border-color:#818cf82c!important}
+.chat{background:transparent!important}
+.chat-header{min-height:66px!important;padding:13px 18px!important;background:rgba(13,17,39,.5)!important;border-bottom:1px solid var(--dm-border)!important}
+.messages{padding:18px!important;scrollbar-color:#6366f155 transparent!important}
+.message{border:1px solid #ffffff10!important;border-radius:15px!important;box-shadow:0 6px 22px #00012!important;line-height:1.55!important}
+.message.sent,.message.outgoing,.message.own{background:linear-gradient(135deg,#4338ca,#6d45bf)!important;border-color:#a5b4fc35!important}
+.message.received,.message.incoming{background:rgba(23,28,52,.9)!important;border-color:var(--dm-border)!important}
+.composer{padding:12px!important;background:rgba(8,11,26,.88)!important;border-top:1px solid var(--dm-border)!important}
+.composer-inner{gap:8px!important;padding:5px!important;border:1px solid var(--dm-border)!important;border-radius:14px!important;background:#ffffff04!important}
+.composer textarea,.composer input{min-width:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.send-button{min-height:42px!important;border-radius:10px!important;background:linear-gradient(120deg,#6366f1,#8b5cf6)!important}
+.modal{border:1px solid var(--dm-border)!important;background:rgba(13,17,39,.97)!important;backdrop-filter:blur(20px)!important}
+button,input,textarea,select{accent-color:#818cf8}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #a5b4fc!important;outline-offset:2px}
+@media(max-width:850px){.main{gap:9px!important;padding:9px!important}.sidebar{width:190px!important;flex-basis:190px!important;padding:11px!important}.user-list{width:250px!important;flex-basis:250px!important}}
+@media(max-width:650px){.main{padding:8px!important;gap:8px!important}.sidebar{width:100%!important;flex:0 0 auto!important;max-height:155px!important;padding:10px!important;border-radius:14px!important}.compose-button{width:auto!important;min-width:135px!important;padding:9px 12px!important}.nav{margin-top:8px!important;flex-direction:row!important;flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:3px!important}.nav-button{flex:0 0 auto!important;min-height:34px!important;padding:8px 10px!important}.content{border-radius:14px!important}.user-list{width:100%!important;flex:0 0 135px!important;max-height:135px!important}.content-header{padding:11px 13px!important;min-height:56px!important}.content-title{font-size:18px!important}.chat-header{min-height:54px!important;padding:9px 12px!important}.messages{padding:10px!important}.composer{padding:8px!important}}
+</style>
 </head>
 
 <body>
