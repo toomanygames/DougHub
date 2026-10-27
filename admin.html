@@ -5893,7 +5893,7 @@ startAdminPanel();
     say(data.enabled?"Enabled site-wide · weekdays, 9 AM–3 PM in each visitor’s local time":"Disabled site-wide · turn it back on here anytime");
   }
   async function startOwnerControl(){
-    if(started||String(window.currentAdminRole||"").toLowerCase()!=="owner")return;
+    if(started||String(typeof currentAdminRole!=="undefined"?currentAdminRole:"").toLowerCase()!=="owner")return;
     started=true;card.style.display="flex";
     try{await loadSetting();}
     catch(e){toggle.disabled=true;say("Could not load setting: "+(e?.message||"Unknown error"));started=false;}
@@ -5906,7 +5906,7 @@ startAdminPanel();
     busy=true;const desired=toggle.checked;toggle.disabled=true;say("Saving site-wide setting…");
     try{
       await waitForClient();
-      const {data,error}=await supabaseClient.from("site_feature_flags").update({enabled:desired,updated_at:new Date().toISOString(),updated_by:window.currentAdminUser?.id||null}).eq("feature_key",FLAG).select("enabled").maybeSingle();
+      const {data,error}=await supabaseClient.from("site_feature_flags").update({enabled:desired,updated_at:new Date().toISOString(),updated_by:(typeof currentAdminUser!=="undefined"?currentAdminUser?.id:null)}).eq("feature_key",FLAG).select("enabled").maybeSingle();
       if(error)throw error;
       if(!data)throw new Error("No setting was updated. Check Owner permissions for Site Features.");
       toggle.checked=!!data.enabled;
