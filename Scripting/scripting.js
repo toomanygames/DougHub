@@ -344,7 +344,7 @@ async function communityInit(){
   }catch(e){console.error("Community Games setup failed:",e);communitySetStatus("Couldn't check your sign-in. Refresh and try again.",true);}
 }
 async function communityPublish(){
-  if(!communityDb||!communityUser){communitySetStatus("Please sign in, then refresh DougCode before publishing.",true);return;}
+  if(!communityDb||!communityUser){communitySetStatus("Your project is saved locally in this browser. Sign in to publish it to Community Games.",true);return;}
   saveCurrentFile();
   const title=($("communityTitle").value.trim()||$("projectName").value.trim()).slice(0,80);
   const description=$("communityDescription").value.trim().slice(0,500);
@@ -472,7 +472,7 @@ function codeCommunityLoadIntoEditor(p){
   $("codeCommunityProjects").scrollIntoView({behavior:"smooth",block:"start"});
 }
 async function codeCommunityPublish(){
-  if(!codeCommunityDb||!codeCommunityUser){codeCommunitySetStatus("Please sign in again, then refresh this page.",true);return;}
+  if(!codeCommunityDb||!codeCommunityUser){codeCommunitySetStatus("Your project is saved locally in this browser. Sign in to publish it to Community Projects.",true);return;}
   saveCurrentFile();
   const title=$("codeCommunityTitle").value.trim()||$("projectName").value.trim();
   const description=$("codeCommunityDescription").value.trim();
