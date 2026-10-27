@@ -315,7 +315,7 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search),MAX_PARTICIPANTS=6;
 console.info("DougHub call diagnostics loaded. Watch for captured tracks, sent/received RTP, remote track received/attached, and playback warnings.");
-let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",channel=null,localStream=null,subscribed=false,joining=false,ending=false;
+let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",channel=null,localStream=null,meeting=null,subscribed=false,joining=false,ending=false;
 const remoteCameraHidden=new Set(),remoteCameraOn=new Set();
 const peers=new Map(),participants=new Map(),pendingIce=new Map();
 const fallbackIceServers=[
