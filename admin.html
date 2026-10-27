@@ -1420,7 +1420,7 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
     <h2>⚙️ Site Features</h2>
     <div class="status" id="siteFeatureStatus">Loading feature settings...</div>
     <p style="color:#a7aec9;font-size:13px;line-height:1.6;margin:0 0 15px">
-        Turn DougHub sections on or off. Disabled features show a friendly unavailable page when someone opens them directly or clicks their navigation link. DMail and DougTube stay off the main navigation.
+        Turn DougHub features on or off. Page Availability controls navigation buttons only: a disabled destination redirects to DougHub home, while direct URLs remain accessible. DMail and DougTube stay off the main navigation.
     </p>
     <div id="siteFeatureList"></div>
 </div>
@@ -1478,7 +1478,7 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 <div class="card admin-schedule-card" id="pageScheduleCard">
   <h2>🗓️ Page Availability</h2>
-  <p class="admin-card-help">Turn a page off immediately or schedule when it closes and reopens. Times use your browser’s local time.</p>
+  <p class="admin-card-help">Turn a page’s navigation buttons off immediately or schedule when they redirect to DougHub home. Direct URLs remain accessible. Times use your browser’s local time.</p>
   <label class="admin-field-label" for="schedulePageSelect">Page</label>
   <select id="schedulePageSelect"><option value="">Loading pages…</option></select>
   <div class="admin-schedule-state"><label class="admin-toggle-line"><input id="schedulePageEnabled" type="checkbox" checked><span>Page is available</span></label><span id="scheduleStatePill" class="schedule-state-pill">Loading…</span></div>
