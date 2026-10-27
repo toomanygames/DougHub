@@ -611,7 +611,7 @@
   function normalizeSchedulePath(value) {
     try {
       const url = new URL(value, location.href);
-      return url.pathname.replace(/^\\/+/, "").toLowerCase() || "index.html";
+      return url.pathname.split("/").filter(Boolean).join("/").toLowerCase() || "index.html";
     } catch (_) { return ""; }
   }
 
