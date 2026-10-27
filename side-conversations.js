@@ -111,18 +111,33 @@ async function setupDb(){
   user=r.data?.session?.user||null;
 }
 async function applyWeekdaySchedule(){
-  // Show the conversation sidebar only on weekdays from 9:00 AM through 2:59 PM,
-  // using each visitor's local time. This affects visibility, not badge display.
-  const styleId="dhsc-weekday-schedule-v1";
-  function update(){
-    const now=new Date(),day=now.getDay(),hour=now.getHours();
-    const inWindow=day>=1&&day<=5&&hour>=9&&hour<15;
+  // Global enable flag + weekday schedule. Poll so an Owner can turn it back on
+  // without refreshing and the change reaches already-open pages.
+  const styleId="dhsc-weekday-schedule-v2";
+  let globallyEnabled=true,lastCheck=0,checking=false;
+  function updateVisibility(){
+    const now=new Date(),day=now.getDay(),minutes=now.getHours()*60+now.getMinutes();
+    const inWindow=day>=1&&day<=5&&minutes>=540&&minutes<900;
     let style=document.getElementById(styleId);
     if(!style){style=document.createElement("style");style.id=styleId;document.head.appendChild(style);}
-    style.textContent=inWindow?"":"#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:none!important;}";
+    style.textContent=(globallyEnabled&&inWindow)?"":"#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:none!important;}#dhsc-panel.open,#dhsc-shade.open{visibility:hidden!important;}";
   }
-  update();
-  window.setInterval(update,60000);
+  async function checkGlobalFlag(){
+    if(checking||Date.now()-lastCheck<10000)return;
+    checking=true;lastCheck=Date.now();
+    try{
+      const response=await fetch(URL+"/rest/v1/site_feature_flags?select=enabled&feature_key=eq.side_conversations",{headers:{apikey:KEY,Authorization:"Bearer "+KEY,Accept:"application/json"},cache:"no-store"});
+      if(response.ok){
+        const rows=await response.json();
+        globallyEnabled=!rows.length||rows[0].enabled!==false;
+      }
+    }catch(error){console.warn("Could not check Side-Conversations setting; keeping last known state.",error);}
+    finally{checking=false;updateVisibility();}
+  }
+  updateVisibility();
+  await checkGlobalFlag();
+  window.setInterval(()=>{checkGlobalFlag();updateVisibility();},5000);
+  window.addEventListener("storage",event=>{if(event.key==="dh-side-conversations-global-updated"){lastCheck=0;checkGlobalFlag();}});
 }
 function init(){build();applyWeekdaySchedule();try{await setupDb();await loadCommunities();await loadPosts();if(!document.body.classList.contains("dhsc-chat-page")){await loadQuickMessages();quickPolling=window.setInterval(()=>{if(document.visibilityState==="visible")loadQuickMessages(false)},5000);}}catch(e){console.warn("Side-Conversations init:",e);$("dhsc-feed").innerHTML='<div class="dhsc-status">Could not connect. Try refreshing, or open <a href="/dougforum.html">DougForum</a>.</div>'}}
 async function loadCommunities(){let r=await db.from("dougforum_communities").select("id,slug,name").order("name");if(r.error)throw r.error;communities=r.data||[];let sel=$("dhsc-compose").querySelector('[name=community]');sel.innerHTML='<option value="">Choose a community…</option>'+communities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");let d=communities.find(c=>/general/i.test(c.name+" "+c.slug));if(d)sel.value=d.id;else if(communities[0])sel.value=communities[0].id}
