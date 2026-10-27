@@ -5307,7 +5307,9 @@ function applyStaffPermissions(){
   if(!adminArea)return;
 
   // Collect cards before rebuilding the rank-group containers.
-  const cards=[...adminArea.querySelectorAll(":scope > .card")];
+  const preferenceCard=document.getElementById("adminUiPreferenceCard");
+  if(preferenceCard){preferenceCard.style.display=rank>=4?"flex":"none";adminArea.insertBefore(preferenceCard,adminArea.firstChild);}
+  const cards=[...adminArea.querySelectorAll(":scope > .card")].filter(card=>card!==preferenceCard);
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
@@ -5883,6 +5885,8 @@ startAdminPanel();
   try{disabled=localStorage.getItem(KEY)==="true";}catch(_){}
   toggle.checked=disabled;
   document.body.classList.toggle("dh-admin-side-panel-disabled",disabled);
+  const preferenceCard=document.getElementById("adminUiPreferenceCard");
+  if(preferenceCard){preferenceCard.style.display="none";const showWhenOwner=()=>{if(typeof currentAdminRole!=="undefined"&&currentAdminRole==="owner"){preferenceCard.style.display="flex";return true;}return false;};if(!showWhenOwner()){const timer=setInterval(()=>{if(showWhenOwner())clearInterval(timer);},250);setTimeout(()=>clearInterval(timer),30000);}}
   toggle.addEventListener("change",function(){
     document.body.classList.toggle("dh-admin-side-panel-disabled",toggle.checked);
     try{localStorage.setItem(KEY,toggle.checked?"true":"false");}catch(_){}
