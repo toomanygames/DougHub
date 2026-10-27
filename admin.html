@@ -882,6 +882,15 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
   .dougtube-moderation-pane{padding:18px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.09)}
 }
 
+
+/* Admin-only control for the global side-conversations slide-out. */
+body.dh-admin-side-panel-disabled #dhsc-tab,
+body.dh-admin-side-panel-disabled #dhsc-shade,
+body.dh-admin-side-panel-disabled #dhsc-panel,
+body.dh-admin-side-panel-disabled #dhsc-mentions{display:none!important;}
+.admin-ui-preference{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 18px;margin:0 0 18px;border:1px solid #6366f155;border-radius:14px;background:linear-gradient(120deg,#11152b,#090b18);}
+.admin-ui-preference-copy{min-width:0}.admin-ui-preference-copy strong{display:block;font-size:15px;margin-bottom:5px}.admin-ui-preference-copy p{margin:0;color:#a7aec9;font-size:12px;line-height:1.5}.admin-ui-preference label{display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;font-size:13px;font-weight:700}.admin-ui-preference input{width:18px;height:18px;accent-color:#818cf8;cursor:pointer}
+@media(max-width:600px){.admin-ui-preference{align-items:flex-start;flex-direction:column}}
 </style>
 <!-- Admin access is checked once by checkAdmin() below using the shared Supabase client and all staff roles. -->
 <style id="doughub-polish">
@@ -1365,6 +1374,12 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 </div>
 
 <div id="adminArea" style="display:none;">
+
+<div class="admin-ui-preference" id="adminUiPreferenceCard">
+  <div class="admin-ui-preference-copy"><strong>Admin page preferences</strong><p>Hide the global side conversation slide-out tab and panel while you are using the Admin Panel. This preference is saved in this browser and does not change it for other users.</p></div>
+  <label for="disableAdminSidePanel"><input id="disableAdminSidePanel" type="checkbox"> Disable side panel</label>
+</div>
+
 
 
 <div class="card" id="feedbackManagementCard">
@@ -5854,6 +5869,22 @@ startAdminPanel();
  launch.addEventListener("click",async()=>{back.hidden=false;await load();});
  }
  const timer=setInterval(()=>{if(typeof currentAdminRole!=="undefined"&&currentAdminRole==="owner"){clearInterval(timer);install();}},400);setTimeout(()=>clearInterval(timer),60000);
+})();
+</script>
+
+<script id="admin-ui-preferences">
+(function(){
+  const KEY="dh-admin-disable-side-panel-v1";
+  const toggle=document.getElementById("disableAdminSidePanel");
+  if(!toggle)return;
+  let disabled=false;
+  try{disabled=localStorage.getItem(KEY)==="true";}catch(_){}
+  toggle.checked=disabled;
+  document.body.classList.toggle("dh-admin-side-panel-disabled",disabled);
+  toggle.addEventListener("change",function(){
+    document.body.classList.toggle("dh-admin-side-panel-disabled",toggle.checked);
+    try{localStorage.setItem(KEY,toggle.checked?"true":"false");}catch(_){}
+  });
 })();
 </script>
 </body>
