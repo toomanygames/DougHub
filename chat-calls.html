@@ -700,7 +700,7 @@ function bindSdkParticipant(participant,isLocal){
   }
  };
  participant.on("stream-enabled",attach);
- participant.on("stream-disabled",stream=>{if(stream?.kind==="video"){const v=tile.querySelector("video");if(v)v.srcObject=null;if(ph){ph.hidden=false;const h=ph.querySelector("span:last-child");if(h)h.textContent="Camera is off"}}if(stream?.kind==="audio"&&!isLocal){const a=tile.querySelector("audio");if(a)a.srcObject=null}});
+ participant.on("stream-disabled",stream=>{if(stream?.kind==="video"){const v=tile.querySelector("video");if(v)v.srcObject=null;const placeholder=tile.querySelector(".video-placeholder");if(placeholder){placeholder.hidden=false;const h=placeholder.querySelector("span:last-child");if(h)h.textContent="Camera is off"}}if(stream?.kind==="audio"&&!isLocal){const a=tile.querySelector("audio");if(a)a.srcObject=null}});
  if(participant.streams?.values)for(const s of participant.streams.values())attach(s);
 }
 async function cleanup(notify=true){
