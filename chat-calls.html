@@ -347,6 +347,26 @@ async function loadIceServers(){
 let inviteDirectoryUsers=[],inviteDirectoryLoaded=false,inviteDirectoryBusy=false;
 const selectedInviteUsers=new Set();
 const setStatus=s=>{$("callStatus").textContent=s};
+const remotePlayRequests=new WeakMap();
+function playRemoteMedia(media,participant,kind){
+ if(!media?.isConnected||!media.srcObject||(!media.paused&&!media.ended))return;
+ if(remotePlayRequests.has(media))return;
+ let result;
+ try{result=media.play()}catch(error){
+  if(error?.name!=="AbortError"&&media.isConnected)console.warn("DougHub remote "+kind+" playback blocked:",{participant,error:String(error)});
+  return;
+ }
+ if(!result?.then)return;
+ let request;
+ request=result.catch(error=>{
+  // AbortError commonly means a newer media update interrupted playback; it is not an autoplay-permission failure.
+  if(error?.name!=="AbortError"&&media.isConnected){
+   console.warn("DougHub remote "+kind+" playback blocked:",{participant,error:String(error)});
+   if(kind==="audio")setStatus("Audio is received, but playback is blocked. Tap Enable sound.");
+  }
+ }).finally(()=>{if(remotePlayRequests.get(media)===request)remotePlayRequests.delete(media)});
+ remotePlayRequests.set(media,request);
+}
 function showError(s){$("callError").textContent=s;$("callError").classList.add("show")}
 function clearError(){$("callError").textContent="";$("callError").classList.remove("show")}
 function randomRoom(){const b=new Uint8Array(18);crypto.getRandomValues(b);return Array.from(b,x=>x.toString(16).padStart(2,"0")).join("")}
@@ -428,7 +448,7 @@ function renderParticipants(){
    if(audio&&audio.srcObject!==audioStream)audio.srcObject=audioStream;
    if(audio){audio.muted=false;audio.volume=Number(tile.querySelector(".participant-volume input")?.value??100)/100;}
    if(video?.srcObject===videoStream)video.play?.().catch(err=>console.warn("DougHub remote video playback blocked:",{participant:id,error:String(err)}));
-   if(audioTrack&&audio){audio.play?.().catch(err=>console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)}));}
+   if(audioTrack&&audio)playRemoteMedia(audio,id,"audio");
    if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===videoStream,audioBound:audio?.srcObject===audioStream,audioTrackCount:audio?.srcObject?.getAudioTracks?.().length||0,videoWidth:video?.videoWidth||0,videoHeight:video?.videoHeight||0,videoReadyState:video?.readyState??0,audioPaused:audio?.paused??true,audioMuted:audio?.muted??true,audioVolume:audio?.volume??0}));
   }
   const ph=tile.querySelector(".video-placeholder");
@@ -493,7 +513,7 @@ function makePeer(id,info){
     console.info("DougHub remote audio track received: "+JSON.stringify({participant:id,readyState:e.track.readyState,muted:e.track.muted,enabled:e.track.enabled,streamAudioTracks:state.stream.getAudioTracks().length}));
     e.track.onunmute=()=>{
      console.info("DougHub remote audio unmuted: "+JSON.stringify({participant:id,readyState:e.track.readyState}));
-     audio.play?.().catch(err=>{console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)});setStatus("Audio is received, but playback is blocked. Tap Enable sound.")});
+     playRemoteMedia(audio,id,"audio");
     };
     e.track.onmute=()=>console.warn("DougHub remote audio track muted:",id);
     audio.onplaying=()=>console.info("DougHub remote audio is playing: "+id);
@@ -501,7 +521,7 @@ function makePeer(id,info){
     audio.play?.().catch(err=>{console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)});setStatus("Audio is received, but playback is blocked. Tap Enable sound.")});
    }
    video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
-   const resumePlayback=()=>{video.play?.().catch(()=>{});audio.muted=false;audio.play?.().catch(err=>{console.warn("Participant audio playback still blocked:",err);setStatus("Tap Enable sound to allow participant audio.")})};
+   const resumePlayback=()=>{video.play?.().catch(()=>{});audio.muted=false;playRemoteMedia(audio,id,"audio")};
    if(!t.dataset.mediaResumeBound){t.addEventListener("click",resumePlayback);t.dataset.mediaResumeBound="1"}
    const updateRemoteVideo=()=>{const ready=video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0&&!remoteCameraHidden.has(id);if(ready)remoteCameraOn.add(id);else remoteCameraOn.delete(id);const placeholder=t.querySelector(".video-placeholder");if(placeholder)placeholder.hidden=ready;console.info("DougHub remote video render: "+JSON.stringify({participant:id,readyState:video.readyState,width:video.videoWidth,height:video.videoHeight,paused:video.paused,trackState:state.stream.getVideoTracks()[0]?.readyState,trackMuted:state.stream.getVideoTracks()[0]?.muted,placeholderHidden:placeholder?.hidden}))};video.onplaying=updateRemoteVideo;video.onloadeddata=updateRemoteVideo;video.oncanplay=updateRemoteVideo;video.onresize=updateRemoteVideo;const remoteVideoTrack=state.stream.getVideoTracks()[0];if(remoteVideoTrack){remoteVideoTrack.onunmute=()=>{video.play?.().then(updateRemoteVideo).catch(err=>console.warn("DougHub remote video playback blocked: "+JSON.stringify({participant:id,error:String(err)})))};remoteVideoTrack.onmute=updateRemoteVideo;}
    const ph=t.querySelector(".video-placeholder");const hasVideo=state.stream.getVideoTracks().some(track=>track.readyState==="live"&&track.enabled);if(hasVideo&&!remoteCameraHidden.has(id))remoteCameraOn.add(id);else remoteCameraOn.delete(id);if(ph){const visible=hasVideo&&!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0;ph.hidden=visible;if(!visible){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
