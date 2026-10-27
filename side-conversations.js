@@ -110,7 +110,22 @@ async function setupDb(){
   const r=await db.auth.getSession();
   user=r.data?.session?.user||null;
 }
-async function init(){build();try{await setupDb();await loadCommunities();await loadPosts();if(!document.body.classList.contains("dhsc-chat-page")){await loadQuickMessages();quickPolling=window.setInterval(()=>{if(document.visibilityState==="visible")loadQuickMessages(false)},5000);}}catch(e){console.warn("Side-Conversations init:",e);$("dhsc-feed").innerHTML='<div class="dhsc-status">Could not connect. Try refreshing, or open <a href="/dougforum.html">DougForum</a>.</div>'}}
+async function applyWeekdaySchedule(){
+  // Show the conversation sidebar only on weekdays from 9:00 AM through 2:59 PM,
+  // using each visitor's local time. This affects visibility, not badge display.
+  const styleId="dhsc-weekday-schedule-v1";
+  function update(){
+    const now=new Date(),day=now.getDay(),hour=now.getHours();
+    const inWindow=day>=1&&day<=5&&hour>=9&&hour<15;
+    let style=document.getElementById(styleId);
+    if(!style){style=document.createElement("style");style.id=styleId;document.head.appendChild(style);}
+    style.textContent=inWindow?"#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:;}" :
+      "#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:none!important;}";
+  }
+  update();
+  window.setInterval(update,60000);
+}
+function init(){build();applyWeekdaySchedule();try{await setupDb();await loadCommunities();await loadPosts();if(!document.body.classList.contains("dhsc-chat-page")){await loadQuickMessages();quickPolling=window.setInterval(()=>{if(document.visibilityState==="visible")loadQuickMessages(false)},5000);}}catch(e){console.warn("Side-Conversations init:",e);$("dhsc-feed").innerHTML='<div class="dhsc-status">Could not connect. Try refreshing, or open <a href="/dougforum.html">DougForum</a>.</div>'}}
 async function loadCommunities(){let r=await db.from("dougforum_communities").select("id,slug,name").order("name");if(r.error)throw r.error;communities=r.data||[];let sel=$("dhsc-compose").querySelector('[name=community]');sel.innerHTML='<option value="">Choose a community…</option>'+communities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");let d=communities.find(c=>/general/i.test(c.name+" "+c.slug));if(d)sel.value=d.id;else if(communities[0])sel.value=communities[0].id}
 async function loadPosts(show){if(!db||!$("dhsc-feed"))return;if(show)$("dhsc-feed").innerHTML='<div class="dhsc-status">Refreshing conversations…</div>';try{let r=await db.from("dougforum_posts").select("id,community_id,author_id,title,body,link_url,created_at,dougforum_comments(count)").order("created_at",{ascending:false}).limit(50);if(r.error)throw r.error;let rows=r.data||[],ids=[...new Set(rows.map(p=>p.author_id).filter(Boolean))],cids=[...new Set(rows.map(p=>p.community_id).filter(Boolean))];let [pr,cr]=await Promise.all([ids.length?db.from("profiles").select("id,username,avatar_url").in("id",ids):Promise.resolve({data:[]}),cids.length?db.from("dougforum_communities").select("id,name,slug").in("id",cids):Promise.resolve({data:[]})]);let pm=Object.fromEntries((pr.data||[]).map(p=>[p.id,p])),cm=Object.fromEntries((cr.data||[]).map(c=>[c.id,c]));posts=rows.map(p=>({...p,author:pm[p.author_id]||{username:"DougHub member"},community:cm[p.community_id]||null,count:p.dougforum_comments?.[0]?.count||0}));render()}catch(e){console.warn("Side-Conversations load:",e);$("dhsc-feed").innerHTML='<div class="dhsc-status">Could not load conversations. Try again or open <a href="/dougforum.html">DougForum</a>.</div>'}}
 function bodyHtml(s){return esc(s||"").replace(/(^|[\s(])@([a-zA-Z0-9_]{2,32})/g,'$1<a href="/chat.html" title="Open Community Chat">@\$2</a>').replace(/(^|[\s(])#([a-zA-Z0-9][a-zA-Z0-9_-]{0,55})/g,(all,prefix,name)=>prefix+'<a class="dhsc-game" href="/douggames.html" title="Browse games">#'+esc(name.trim().replace(/_/g, ' '))+'</a>')}
