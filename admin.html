@@ -5872,56 +5872,48 @@ startAdminPanel();
 
 <script id="admin-ui-preferences">
 (function(){
-  const FLAG="side_conversations";
-  const toggle=document.getElementById("disableAdminSidePanel");
-  const card=document.getElementById("adminUiPreferenceCard");
-  const status=document.getElementById("adminSidePanelStatus");
+  const FLAG="side_conversations",toggle=document.getElementById("disableAdminSidePanel"),card=document.getElementById("adminUiPreferenceCard"),status=document.getElementById("adminSidePanelStatus");
   if(!toggle||!card)return;
-  // This is a global setting in Supabase, not a browser-only preference.
-  toggle.checked=true;
   toggle.disabled=true;
-  if(status)status.textContent="Checking global setting…";
+  const say=m=>{if(status)status.textContent=m;};
+  let busy=false,started=false;
+  async function waitForClient(){
+    for(let i=0;i<100;i++){
+      if(typeof supabaseClient!=="undefined"&&supabaseClient?.from&&supabaseClient?.auth)return;
+      await new Promise(r=>setTimeout(r,200));
+    }
+    throw new Error("Admin database connection did not become ready. Reopen Admin and try again.");
+  }
   async function loadSetting(){
-    if(typeof supabaseClient==="undefined"||!supabaseClient?.from)return false;
+    await waitForClient();
     const {data,error}=await supabaseClient.from("site_feature_flags").select("enabled").eq("feature_key",FLAG).maybeSingle();
     if(error)throw error;
     if(!data)throw new Error("The Side-Conversations feature flag is missing.");
-    toggle.checked=!!data.enabled;
-    toggle.disabled=false;
-    document.body.classList.toggle("dh-admin-side-panel-disabled",!data.enabled);
-    if(status)status.textContent=data.enabled?"Enabled site-wide · weekdays, 9 AM–3 PM local time":"Disabled site-wide · turn it back on here anytime";
-    return true;
+    toggle.checked=!!data.enabled;toggle.disabled=false;
+    say(data.enabled?"Enabled site-wide · weekdays, 9 AM–3 PM in each visitor’s local time":"Disabled site-wide · turn it back on here anytime");
   }
-  function revealOwnerCard(){
-    if(typeof currentAdminRole!=="undefined"&&String(currentAdminRole).toLowerCase()==="owner"){
-      card.style.display="flex";
-      loadSetting().catch(error=>{toggle.disabled=false;if(status)status.textContent="Could not load setting: "+(error?.message||"Unknown error");});
-      return true;
-    }
-    return false;
+  async function startOwnerControl(){
+    if(started||String(window.currentAdminRole||"").toLowerCase()!=="owner")return;
+    started=true;card.style.display="flex";
+    try{await loadSetting();}
+    catch(e){toggle.disabled=true;say("Could not load setting: "+(e?.message||"Unknown error"));started=false;}
   }
-  if(!revealOwnerCard()){
-    const timer=setInterval(()=>{if(revealOwnerCard())clearInterval(timer);},250);
-    setTimeout(()=>clearInterval(timer),60000);
-  }
-  toggle.addEventListener("change",async function(){
-    if(toggle.disabled)return;
-    const desired=toggle.checked;
-    toggle.disabled=true;
-    if(status)status.textContent="Saving site-wide setting…";
+  const roleTimer=setInterval(startOwnerControl,250);
+  startOwnerControl();
+  setTimeout(()=>clearInterval(roleTimer),120000);
+  toggle.addEventListener("change",async()=>{
+    if(toggle.disabled||busy)return;
+    busy=true;const desired=toggle.checked;toggle.disabled=true;say("Saving site-wide setting…");
     try{
-      if(typeof supabaseClient==="undefined"||!supabaseClient?.from)throw new Error("Admin database connection is not ready.");
-      const {data,error}=await supabaseClient.from("site_feature_flags").update({enabled:desired,updated_at:new Date().toISOString(),updated_by:currentAdminUser?.id||null}).eq("feature_key",FLAG).select("enabled").maybeSingle();
+      await waitForClient();
+      const {data,error}=await supabaseClient.from("site_feature_flags").update({enabled:desired,updated_at:new Date().toISOString(),updated_by:window.currentAdminUser?.id||null}).eq("feature_key",FLAG).select("enabled").maybeSingle();
       if(error)throw error;
       if(!data)throw new Error("No setting was updated. Check Owner permissions for Site Features.");
       toggle.checked=!!data.enabled;
-      document.body.classList.toggle("dh-admin-side-panel-disabled",!data.enabled);
       try{localStorage.setItem("dh-side-conversations-global-updated",String(Date.now()));}catch(_){}
-      if(status)status.textContent=data.enabled?"Side-Conversations is ON site-wide. It appears weekdays from 9 AM to 3 PM local time.":"Side-Conversations is OFF site-wide. You can turn it back on here without refreshing.";
-    }catch(error){
-      toggle.checked=!desired;
-      if(status)status.textContent="Could not save: "+(error?.message||"Unknown error");
-    }finally{toggle.disabled=false;}
+      say(data.enabled?"Side-Conversations is ON site-wide. It appears weekdays from 9 AM to 3 PM in each visitor’s local time.":"Side-Conversations is OFF site-wide. You can turn it back on here without refreshing.");
+    }catch(e){toggle.checked=!desired;say("Could not save: "+(e?.message||"Unknown error"));}
+    finally{busy=false;toggle.disabled=false;}
   });
 })();
 </script>
