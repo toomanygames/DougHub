@@ -404,7 +404,12 @@ function renderParticipants(){
    if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===peerState.stream,audioBound:audio?.srcObject===peerState.stream,audioTrackCount:audio?.srcObject?.getAudioTracks?.().length||0}));
   }
   const ph=tile.querySelector(".video-placeholder");
-  if(ph){const hasPicture=!!video&&video.videoWidth>0&&video.videoHeight>0&&remoteCameraOn.has(id)&&!remoteCameraHidden.has(id);ph.hidden=hasPicture;if(!hasPicture){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
+  // The browser can fire loadeddata/playing before ontrack finishes binding
+  // handlers. Derive visibility from the actual decoded video dimensions every
+  // render, rather than relying only on a previously-fired event.
+  const hasPicture=!!video&&video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0&&!remoteCameraHidden.has(id);
+  if(hasPicture)remoteCameraOn.add(id);else remoteCameraOn.delete(id);
+  if(ph){ph.hidden=hasPicture;if(!hasPicture){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
  }
  [...grid.querySelectorAll(".video-tile:not(.local-video-tile)")].forEach(t=>{if(!participants.has(t.id.slice(12)))t.remove()});
  $("roomCount").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";
@@ -463,7 +468,7 @@ function makePeer(id,info){
    video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
    const resumePlayback=()=>{video.play?.().catch(()=>{});audio.muted=false;audio.play?.().catch(err=>{console.warn("Participant audio playback still blocked:",err);setStatus("Tap Enable sound to allow participant audio.")})};
    if(!t.dataset.mediaResumeBound){t.addEventListener("click",resumePlayback);t.dataset.mediaResumeBound="1"}
-   video.onplaying=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};video.onloadeddata=()=>{if(!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0){remoteCameraOn.add(id);const ph=t.querySelector(".video-placeholder");if(ph)ph.hidden=true}};
+   const updateRemoteVideo=()=>{const ready=video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0&&!remoteCameraHidden.has(id);if(ready)remoteCameraOn.add(id);else remoteCameraOn.delete(id);const placeholder=t.querySelector(".video-placeholder");if(placeholder)placeholder.hidden=ready;console.info("DougHub remote video render: "+JSON.stringify({participant:id,readyState:video.readyState,width:video.videoWidth,height:video.videoHeight,paused:video.paused,trackState:state.stream.getVideoTracks()[0]?.readyState,trackMuted:state.stream.getVideoTracks()[0]?.muted,placeholderHidden:placeholder?.hidden}))};video.onplaying=updateRemoteVideo;video.onloadeddata=updateRemoteVideo;video.oncanplay=updateRemoteVideo;video.onresize=updateRemoteVideo;const remoteVideoTrack=state.stream.getVideoTracks()[0];if(remoteVideoTrack){remoteVideoTrack.onunmute=()=>{video.play?.().then(updateRemoteVideo).catch(err=>console.warn("DougHub remote video playback blocked: "+JSON.stringify({participant:id,error:String(err)})))};remoteVideoTrack.onmute=updateRemoteVideo;}
    const ph=t.querySelector(".video-placeholder");const hasVideo=state.stream.getVideoTracks().some(track=>track.readyState==="live"&&track.enabled);if(hasVideo&&!remoteCameraHidden.has(id))remoteCameraOn.add(id);else remoteCameraOn.delete(id);if(ph){const visible=hasVideo&&!remoteCameraHidden.has(id)&&video.videoWidth>0&&video.videoHeight>0;ph.hidden=visible;if(!visible){const sm=ph.querySelector("span:last-child");if(sm)sm.textContent=remoteCameraHidden.has(id)?"Camera turned off by the room owner":"Waiting for camera picture…"}}
    const label=t.querySelector("[data-label]");
    if(label&&state.stream.getAudioTracks().length&&!label.textContent.includes(" · mic"))label.textContent=(info.username||"Participant")+" · mic";
