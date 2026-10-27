@@ -445,12 +445,18 @@ function makePeer(id,info){
   // sink share a stream whose tracks arrive at different times.
   const receivedTrack=e.track;
   if(!state.stream.getTracks().some(x=>x.id===receivedTrack.id))state.stream.addTrack(receivedTrack);
-  const kindStream=receivedTrack.kind==="video"?state.videoStream:state.audioStream;
-  if(!kindStream.getTracks().some(x=>x.id===receivedTrack.id))kindStream.addTrack(receivedTrack);
+  // iPad/iPhone Safari can fail to refresh a media element when its srcObject
+  // is a MediaStream that was attached while empty and populated afterwards.
+  // Bind a fresh, already-populated stream as each remote track arrives.
+  if(receivedTrack.kind==="video")state.videoStream=new MediaStream([receivedTrack]);
+  else if(receivedTrack.kind==="audio")state.audioStream=new MediaStream([receivedTrack]);
   const t=tile();
   console.info("DougHub remote track received: "+JSON.stringify({participant:id,kind:e.track.kind,state:e.track.readyState,enabled:e.track.enabled,muted:e.track.muted,streamTrackCount:state.stream.getTracks().length,tileExists:!!t}));
   if(t){
    const video=t.querySelector("video"),audio=t.querySelector("audio");
+   // Explicit WebKit inline playback attributes are important on iPad Safari.
+   video.playsInline=true;video.setAttribute("playsinline","");video.setAttribute("webkit-playsinline","");
+   audio.playsInline=true;audio.setAttribute("playsinline","");
    // Assign each media element's stream only when it actually changes.
    // Reassigning srcObject for the second arriving track interrupts an active
    // play() request (AbortError), which can leave playback unreliable.
