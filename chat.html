@@ -1844,7 +1844,7 @@ async function renderMessageText(container, text) {
   const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
   const matches = [];
   function appendTextWithInviteLinks(value){
-    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-f0-9]{36}/gi;
+    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+/gi;
     let cursor=0,m;
     while((m=urlPattern.exec(value))!==null){
       if(m.index>cursor)container.appendChild(document.createTextNode(value.slice(cursor,m.index)));
@@ -2943,7 +2943,11 @@ chatVideoInviteButton?.addEventListener("click",async()=>{
  if(!supabaseClient){showError("Chat is still connecting. Try again in a moment.");return}
  chatVideoInviteButton.disabled=true;const oldText=chatVideoInviteButton.textContent;chatVideoInviteButton.textContent="Sending invite…";
  try{
-  const bytes=new Uint8Array(18);crypto.getRandomValues(bytes);const roomId=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+  // Create the room with VideoSDK first; locally generated IDs are not valid VideoSDK room IDs.
+  const roomResult=await supabaseClient.functions.invoke("videosdk-room",{body:{}});
+  if(roomResult.error)throw new Error(roomResult.data?.error||roomResult.error.message||"VideoSDK could not create a call room.");
+  const roomId=roomResult.data?.roomId;
+  if(typeof roomId!=="string"||!roomId.trim())throw new Error(roomResult.data?.error||"VideoSDK returned an invalid room ID.");
   const inviteUrl=new URL("/chat-calls.html",location.origin);inviteUrl.searchParams.set("room",roomId);
   const inviteMessage="📹 Join my DougHub group video call (up to 6 people): "+inviteUrl.href;
   const {error}=await supabaseClient.from("chat_messages").insert({user_id:currentUser.id,username:currentUsername,message:inviteMessage,attachment_url:null,attachment_type:null,attachment_name:null,attachment_source:null,group_id:activeChatGroupId});
