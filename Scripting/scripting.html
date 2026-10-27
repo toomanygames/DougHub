@@ -7,7 +7,7 @@
 <link rel="icon" href="../DougHub.svg" type="image/x-icon">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../display.js"></script>
-<script src="../auth-guard.js" data-require-auth="true"></script>
+<!-- DougCode is usable without an account; publishing still requires sign-in. -->
 <script src="../nav.js?v=20261024-side-conversations-fix" defer></script>
 <link rel="stylesheet" href="scripting.css?v=5">
 <script src="../search-autofill-fix.js" defer></script>
@@ -270,7 +270,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 </section>
 <section id="codeMode" class="editor-layout">
     <div class="panel code-panel">
-      <div class="panel-head"><div><span class="panel-kicker">SOURCE FILES</span><h2>Code</h2></div><span class="live-dot">Autosaves locally</span></div>
+      <div class="panel-head"><div><span class="panel-kicker">SOURCE FILES</span><h2>Code</h2></div><span class="live-dot">Autosaves in this browser · no account needed</span></div>
       <div class="file-tabs" id="fileTabs" role="tablist" aria-label="Project files"><button class="file-tab active" data-file="html">index.html</button><button class="file-tab" data-file="css">style.css</button><button class="file-tab" data-file="js">main.js</button></div>
       <div class="file-add-row"><button class="btn small" id="addFileBtn" type="button">＋ Add file</button><span class="file-add-hint">Add more source files to your project</span></div><div class="editor-caption"><span id="activeFileLabel">index.html</span><span id="lineCount">1 line</span></div>
       <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Source code" wrap="off"></textarea>
@@ -390,6 +390,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="community-preview-bottom"><span id="codeCommunityPreviewAuthor"></span><button class="btn" id="editCodeProjectBtn" type="button" hidden>Edit my project</button></div>
   </dialo
 
-<script src="scripting.js?v=18"></script>
+<script src="scripting.js?v=19"></script>
 </body>
 </html>
