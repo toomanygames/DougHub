@@ -2463,7 +2463,11 @@ async function markChatAsSeen() {
 /* =========================================
    DESKTOP CHAT NOTIFICATIONS
 ========================================= */
-let lastNotifiedChatMessageId = null;
+// Realtime can deliver a delayed/replayed INSERT after a reconnect. Track recent
+// message IDs and reject stale rows so old messages cannot trigger a surprise ding.
+const notifiedChatMessageIds = new Set();
+const MAX_TRACKED_CHAT_NOTIFICATIONS = 500;
+const MAX_NOTIFICATION_AGE_MS = 2 * 60 * 1000;
 
 function updateChatNotificationButton() {
   const button = document.getElementById("chatNotificationsButton");
@@ -2535,6 +2539,20 @@ function notifyIncomingChatMessage(row) {
   if(!row||!currentUser||row.user_id===currentUser.id)return;
   if(isChatMuted(row.group_id))return;
 
+  const messageId = String(row.id || "");
+  if (!messageId || notifiedChatMessageIds.has(messageId)) return;
+  const createdAt = Date.parse(row.created_at || "");
+  const age = Date.now() - createdAt;
+  // Only notify for a recent, real message. This filters delayed/replayed events
+  // from a Realtime reconnect, including messages that arrived before this tab
+  // was ready to notify.
+  if (!Number.isFinite(createdAt) || age > MAX_NOTIFICATION_AGE_MS || age < -30000) return;
+  notifiedChatMessageIds.add(messageId);
+  if (notifiedChatMessageIds.size > MAX_TRACKED_CHAT_NOTIFICATIONS) {
+    const oldestId = notifiedChatMessageIds.values().next().value;
+    notifiedChatMessageIds.delete(oldestId);
+  }
+
   // Send incoming messages straight to the optional DougHub desktop app bridge.
   // This must happen before browser-notification permission and active-tab checks.
   // Otherwise the app's visible chat window suppresses its own quick-reply popups.
@@ -2562,10 +2580,6 @@ function notifyIncomingChatMessage(row) {
   if (pageIsActive && incomingGroupId === selectedGroupId) return;
 
   if (!("Notification" in window) || Notification.permission !== "granted") return;
-  const messageId = String(row.id || "");
-  if (!messageId || lastNotifiedChatMessageId === messageId) return;
-  lastNotifiedChatMessageId = messageId;
-
   const author = String(row.username || "Someone").slice(0, 60);
   const rawBody = String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message"));
   const body = rawBody.replace(/\s+/g, " ").slice(0, 180);
