@@ -392,16 +392,17 @@ function renderParticipants(){
   // already-received tracks here too, otherwise ontrack has nowhere to attach them.
   const video=tile.querySelector("video"),audio=tile.querySelector("audio"),peerState=peers.get(id);
   if(peerState?.stream){
-   if(video&&video.srcObject!==peerState.stream)video.srcObject=peerState.stream;
-   const audioTrack=peerState.stream.getAudioTracks().find(track=>track.readyState==="live");
-   // Keep both elements bound to the same persistent remote stream. The video
-   // element is muted; the audio sink plays its audio track without racing
-   // against later ontrack events or replacing the stream object.
-   if(audio&&audio.srcObject!==peerState.stream)audio.srcObject=peerState.stream;
+   const videoStream=peerState.videoStream||new MediaStream(peerState.stream.getVideoTracks());
+   const audioStream=peerState.audioStream||new MediaStream(peerState.stream.getAudioTracks());
+   if(video&&video.srcObject!==videoStream)video.srcObject=videoStream;
+   const audioTrack=audioStream.getAudioTracks().find(track=>track.readyState==="live");
+   // Separate persistent streams prevent video rendering and audible playback
+   // from interfering when audio and video tracks arrive separately.
+   if(audio&&audio.srcObject!==audioStream)audio.srcObject=audioStream;
    if(audio){audio.muted=false;audio.volume=Number(tile.querySelector(".participant-volume input")?.value??100)/100;}
-   if(video?.srcObject===peerState.stream)video.play?.().catch(err=>console.warn("DougHub remote video playback blocked:",{participant:id,error:String(err)}));
+   if(video?.srcObject===videoStream)video.play?.().catch(err=>console.warn("DougHub remote video playback blocked:",{participant:id,error:String(err)}));
    if(audioTrack&&audio){audio.play?.().catch(err=>console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)}));}
-   if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===peerState.stream,audioBound:audio?.srcObject===peerState.stream,audioTrackCount:audio?.srcObject?.getAudioTracks?.().length||0}));
+   if(peerState.stream.getTracks().length)console.info("DougHub remote media attached: "+JSON.stringify({participant:id,tracks:peerState.stream.getTracks().map(track=>({kind:track.kind,state:track.readyState,enabled:track.enabled,muted:track.muted})),videoBound:video?.srcObject===videoStream,audioBound:audio?.srcObject===audioStream,audioTrackCount:audio?.srcObject?.getAudioTracks?.().length||0,videoWidth:video?.videoWidth||0,videoHeight:video?.videoHeight||0,videoReadyState:video?.readyState??0,audioPaused:audio?.paused??true,audioMuted:audio?.muted??true,audioVolume:audio?.volume??0}));
   }
   const ph=tile.querySelector(".video-placeholder");
   // The browser can fire loadeddata/playing before ontrack finishes binding
@@ -435,13 +436,17 @@ function makePeer(id,info){
   {urls:"stun:stun.l.google.com:19302"},
   {urls:"stun:stun1.l.google.com:19302"}
  ]});
- const state={pc,info,stream:new MediaStream(),makingOffer:false,recoveryTimer:null,restartAttempts:0,mediaReady:Promise.resolve(),audioSender:null,videoSender:null};
+ const state={pc,info,stream:new MediaStream(),videoStream:new MediaStream(),audioStream:new MediaStream(),makingOffer:false,recoveryTimer:null,restartAttempts:0,mediaReady:Promise.resolve(),audioSender:null,videoSender:null};
  peers.set(id,state);
  const tile=()=>document.getElementById("participant-"+id);
  pc.ontrack=e=>{
-  const stream=e.streams?.[0];
-  if(stream)stream.getTracks().forEach(t=>{if(!state.stream.getTracks().some(x=>x.id===t.id))state.stream.addTrack(t)});
-  else if(!state.stream.getTracks().some(x=>x.id===e.track.id))state.stream.addTrack(e.track);
+  // Keep a combined diagnostic stream, but bind audio and video separately.
+  // Some browsers behave poorly when a muted video element and audible audio
+  // sink share a stream whose tracks arrive at different times.
+  const receivedTrack=e.track;
+  if(!state.stream.getTracks().some(x=>x.id===receivedTrack.id))state.stream.addTrack(receivedTrack);
+  const kindStream=receivedTrack.kind==="video"?state.videoStream:state.audioStream;
+  if(!kindStream.getTracks().some(x=>x.id===receivedTrack.id))kindStream.addTrack(receivedTrack);
   const t=tile();
   console.info("DougHub remote track received: "+JSON.stringify({participant:id,kind:e.track.kind,state:e.track.readyState,enabled:e.track.enabled,muted:e.track.muted,streamTrackCount:state.stream.getTracks().length,tileExists:!!t}));
   if(t){
@@ -449,8 +454,8 @@ function makePeer(id,info){
    // Assign each media element's stream only when it actually changes.
    // Reassigning srcObject for the second arriving track interrupts an active
    // play() request (AbortError), which can leave playback unreliable.
-   if(video.srcObject!==state.stream)video.srcObject=state.stream;
-   if(audio.srcObject!==state.stream)audio.srcObject=state.stream;
+   if(video.srcObject!==state.videoStream)video.srcObject=state.videoStream;
+   if(audio.srcObject!==state.audioStream)audio.srcObject=state.audioStream;
    video.muted=true;
    audio.muted=false;
    audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
