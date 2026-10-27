@@ -633,10 +633,32 @@ async function syncPeerMicrophones(track=localStream?.getAudioTracks()[0]){
 async function onSignal(p){if(!p||p.room!==room||p.from===user.id||p.to!==user.id)return;if(p.kind==="camera_state"){if(p.hidden){remoteCameraHidden.add(p.from);remoteCameraOn.delete(p.from)}else{remoteCameraHidden.delete(p.from);remoteCameraOn.add(p.from)}const tile=document.getElementById("participant-"+p.from),ph=tile?.querySelector(".video-placeholder"),video=tile?.querySelector("video");if(ph){const visible=!p.hidden&&!!video&&video.videoWidth>0&&video.videoHeight>0;ph.hidden=visible;const sm=ph.querySelector("span:last-child");if(sm&&!visible)sm.textContent=p.hidden?"Camera turned off by the room owner":"Waiting for camera picture…"}return}if(p.kind==="restart-needed"){await recoverPeer(p.from,p.reason||"Remote participant requested ICE restart");return}const id=p.from,info=participants.get(id)||{user_id:id,username:"Participant"};if(!participants.has(id))participants.set(id,info);if(p.kind==="offer"){const st=makePeer(id,info);await st.mediaReady;await syncPeerMedia();if(st.pc.signalingState!=="stable")return;await st.pc.setRemoteDescription(new RTCSessionDescription(p.description));await flushIce(id);const ans=await st.pc.createAnswer();await st.pc.setLocalDescription(ans);await sendSignal("answer",id,{description:st.pc.localDescription.toJSON()});setStatus("Connecting to "+(info.username||"participant")+"…")}else if(p.kind==="answer"){const st=peers.get(id);if(!st||st.pc.signalingState!=="have-local-offer")return;await st.pc.setRemoteDescription(new RTCSessionDescription(p.description));await flushIce(id)}else if(p.kind==="ice"&&p.candidate){const st=peers.get(id);if(!st||!st.pc.remoteDescription){const a=pendingIce.get(id)||[];a.push(p.candidate);pendingIce.set(id,a)}else try{await st.pc.addIceCandidate(new RTCIceCandidate(p.candidate))}catch(e){console.warn("ICE candidate ignored",e)}}}
 function unpackPresence(){const state=channel?.presenceState?.()||{},out=new Map();Object.values(state).flat().forEach(p=>{if(p?.user_id)out.set(p.user_id,{user_id:p.user_id,username:p.username||"Participant",avatar_url:p.avatar_url||"",joined_at:p.joined_at||""})});return out}
 async function reconcile(){if(!user||!channel)return;const next=unpackPresence();if(next.size>MAX_PARTICIPANTS){const allowed=[...next.values()].sort((a,b)=>String(a.joined_at).localeCompare(String(b.joined_at))||a.user_id.localeCompare(b.user_id)).slice(0,MAX_PARTICIPANTS);if(!allowed.some(p=>p.user_id===user.id)){showError("This room is full (maximum "+MAX_PARTICIPANTS+" people).");setStatus("Room full");await cleanup(false);return}}participants.clear();next.forEach((v,k)=>participants.set(k,v));for(const id of [...remoteCameraHidden])if(!next.has(id))remoteCameraHidden.delete(id);for(const id of [...remoteCameraOn])if(!next.has(id))remoteCameraOn.delete(id);renderParticipants();for(const [id,info] of participants)if(id!==user.id)await startOffer(id,info);for(const [id,st] of [...peers])if(!participants.has(id)){st.pc.close();if(st.audioStatsTimer)clearInterval(st.audioStatsTimer);peers.delete(id);pendingIce.delete(id);document.getElementById("participant-"+id)?.remove()}if(participants.size<=1)setStatus("Waiting for others to join…")}
+async function ensureVideoSDK(){
+ if(window.VideoSDK)return window.VideoSDK;
+ const urls=[
+  "https://sdk.videosdk.live/js-sdk/1.2.1/videosdk.js",
+  "https://sdk.videosdk.live/js-sdk/1.2.0/videosdk.js",
+  "https://sdk.videosdk.live/js-sdk/1.1.1/videosdk.js"
+ ];
+ let lastError=null;
+ for(const url of urls){
+  try{
+   await new Promise((resolve,reject)=>{
+    const script=document.createElement("script");
+    script.src=url;script.async=true;
+    script.onload=()=>window.VideoSDK?resolve():reject(new Error("SDK script loaded but did not expose window.VideoSDK"));
+    script.onerror=()=>reject(new Error("Could not load "+url));
+    document.head.appendChild(script);
+   });
+   if(window.VideoSDK)return window.VideoSDK;
+  }catch(error){lastError=error;console.warn("VideoSDK CDN attempt failed:",url,error)}
+ }
+ throw new Error("VideoSDK's JavaScript library could not load. Check whether your browser or network is blocking sdk.videosdk.live. "+(lastError?.message||""));
+}
 async function connectRoom(){
  if(joining||subscribed)return;joining=true;clearError();ending=false;setStatus("Checking sign-in…");
  try{
-  await ensureUser();if(!window.VideoSDK)throw new Error("VideoSDK did not load. Refresh and try again.");
+  await ensureUser();await ensureVideoSDK();
   let data;
   if(!room){
    setStatus("Creating a secure call room…");
