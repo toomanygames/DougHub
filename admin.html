@@ -884,10 +884,6 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 
 
 /* Admin-only control for the global side-conversations slide-out. */
-body.dh-admin-side-panel-disabled #dhsc-tab,
-body.dh-admin-side-panel-disabled #dhsc-shade,
-body.dh-admin-side-panel-disabled #dhsc-panel,
-body.dh-admin-side-panel-disabled #dhsc-mentions{display:none!important;}
 .admin-ui-preference{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 18px;margin:0 0 18px;border:1px solid #6366f155;border-radius:14px;background:linear-gradient(120deg,#11152b,#090b18);}
 .admin-ui-preference-copy{min-width:0}.admin-ui-preference-copy strong{display:block;font-size:15px;margin-bottom:5px}.admin-ui-preference-copy p{margin:0;color:#a7aec9;font-size:12px;line-height:1.5}.admin-ui-preference label{display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;font-size:13px;font-weight:700}.admin-ui-preference input{width:18px;height:18px;accent-color:#818cf8;cursor:pointer}
 @media(max-width:600px){.admin-ui-preference{align-items:flex-start;flex-direction:column}}
@@ -1376,8 +1372,8 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 <div id="adminArea" style="display:none;">
 
 <div class="card admin-ui-preference" id="adminUiPreferenceCard">
-  <div class="admin-ui-preference-copy"><strong>Admin page preferences</strong><p>Hide the global side conversation slide-out tab and panel while you are using the Admin Panel. This preference is saved in this browser and does not change it for other users.</p></div>
-  <label for="disableAdminSidePanel"><input id="disableAdminSidePanel" type="checkbox"> Disable side panel</label>
+  <div class="admin-ui-preference-copy"><strong>Side-Conversations · Global control</strong><p>Turn the sidebar on or off for everyone. When enabled, it appears automatically Monday–Friday from 9:00 AM to 3:00 PM in each visitor’s local time. The setting updates without a page refresh.</p><div id="adminSidePanelStatus" class="status" aria-live="polite">Checking global setting…</div></div>
+  <label for="disableAdminSidePanel"><input id="disableAdminSidePanel" type="checkbox" checked disabled> Enable for everyone</label>
 </div>
 
 
@@ -5876,20 +5872,56 @@ startAdminPanel();
 
 <script id="admin-ui-preferences">
 (function(){
-  // v3 resets the old hidden-panel preference so the conversation sidebar is
-  // available by default. The visible Owner control can turn it off again.
-  const KEY="dh-admin-disable-side-panel-v4";
+  const FLAG="side_conversations";
   const toggle=document.getElementById("disableAdminSidePanel");
-  if(!toggle)return;
-  let disabled=false;
-  try{disabled=localStorage.getItem(KEY)==="true";}catch(_){}
-  toggle.checked=disabled;
-  document.body.classList.toggle("dh-admin-side-panel-disabled",disabled);
-  const preferenceCard=document.getElementById("adminUiPreferenceCard");
-  if(preferenceCard){preferenceCard.style.display="none";const showWhenOwner=()=>{if(typeof currentAdminRole!=="undefined"&&currentAdminRole==="owner"){preferenceCard.style.display="flex";return true;}return false;};if(!showWhenOwner()){const timer=setInterval(()=>{if(showWhenOwner())clearInterval(timer);},250);setTimeout(()=>clearInterval(timer),30000);}}
-  toggle.addEventListener("change",function(){
-    document.body.classList.toggle("dh-admin-side-panel-disabled",toggle.checked);
-    try{localStorage.setItem(KEY,toggle.checked?"true":"false");}catch(_){}
+  const card=document.getElementById("adminUiPreferenceCard");
+  const status=document.getElementById("adminSidePanelStatus");
+  if(!toggle||!card)return;
+  // This is a global setting in Supabase, not a browser-only preference.
+  toggle.checked=true;
+  toggle.disabled=true;
+  if(status)status.textContent="Checking global setting…";
+  async function loadSetting(){
+    if(typeof supabaseClient==="undefined"||!supabaseClient?.from)return false;
+    const {data,error}=await supabaseClient.from("site_feature_flags").select("enabled").eq("feature_key",FLAG).maybeSingle();
+    if(error)throw error;
+    if(!data)throw new Error("The Side-Conversations feature flag is missing.");
+    toggle.checked=!!data.enabled;
+    toggle.disabled=false;
+    document.body.classList.toggle("dh-admin-side-panel-disabled",!data.enabled);
+    if(status)status.textContent=data.enabled?"Enabled site-wide · weekdays, 9 AM–3 PM local time":"Disabled site-wide · turn it back on here anytime";
+    return true;
+  }
+  function revealOwnerCard(){
+    if(typeof currentAdminRole!=="undefined"&&String(currentAdminRole).toLowerCase()==="owner"){
+      card.style.display="flex";
+      loadSetting().catch(error=>{toggle.disabled=false;if(status)status.textContent="Could not load setting: "+(error?.message||"Unknown error");});
+      return true;
+    }
+    return false;
+  }
+  if(!revealOwnerCard()){
+    const timer=setInterval(()=>{if(revealOwnerCard())clearInterval(timer);},250);
+    setTimeout(()=>clearInterval(timer),60000);
+  }
+  toggle.addEventListener("change",async function(){
+    if(toggle.disabled)return;
+    const desired=toggle.checked;
+    toggle.disabled=true;
+    if(status)status.textContent="Saving site-wide setting…";
+    try{
+      if(typeof supabaseClient==="undefined"||!supabaseClient?.from)throw new Error("Admin database connection is not ready.");
+      const {data,error}=await supabaseClient.from("site_feature_flags").update({enabled:desired,updated_at:new Date().toISOString(),updated_by:currentAdminUser?.id||null}).eq("feature_key",FLAG).select("enabled").maybeSingle();
+      if(error)throw error;
+      if(!data)throw new Error("No setting was updated. Check Owner permissions for Site Features.");
+      toggle.checked=!!data.enabled;
+      document.body.classList.toggle("dh-admin-side-panel-disabled",!data.enabled);
+      try{localStorage.setItem("dh-side-conversations-global-updated",String(Date.now()));}catch(_){}
+      if(status)status.textContent=data.enabled?"Side-Conversations is ON site-wide. It appears weekdays from 9 AM to 3 PM local time.":"Side-Conversations is OFF site-wide. You can turn it back on here without refreshing.";
+    }catch(error){
+      toggle.checked=!desired;
+      if(status)status.textContent="Could not save: "+(error?.message||"Unknown error");
+    }finally{toggle.disabled=false;}
   });
 })();
 </script>
