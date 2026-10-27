@@ -119,8 +119,7 @@ async function applyWeekdaySchedule(){
     const inWindow=day>=1&&day<=5&&hour>=9&&hour<15;
     let style=document.getElementById(styleId);
     if(!style){style=document.createElement("style");style.id=styleId;document.head.appendChild(style);}
-    style.textContent=inWindow?"#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:;}" :
-      "#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:none!important;}";
+    style.textContent=inWindow?"":"#dhsc-tab,#dhsc-shade,#dhsc-panel,#dhsc-mentions{display:none!important;}";
   }
   update();
   window.setInterval(update,60000);
