@@ -649,7 +649,7 @@
   function installPageScheduleButtonGuards() {
     if (document.documentElement.dataset.dhPageButtonGuards === "true") return;
     document.documentElement.dataset.dhPageButtonGuards = "true";
-    document.addEventListener("click", async event => {
+    document.addEventListener("click", event => {
       const control = event.target instanceof Element
         ? event.target.closest("a[href],button[data-href],button[data-url],[role='button'][data-href],[role='button'][data-url]")
         : null;
@@ -662,8 +662,10 @@
       if (target.origin !== location.origin) return;
       const targetPath = normalizeSchedulePath(target.href);
       if (!targetPath) return;
-      const cache = await refreshPageScheduleButtonGuards();
-      const page = cache.get(targetPath);
+      // The cache is populated on startup and refreshed periodically. If it
+      // has not loaded yet, fail open rather than breaking normal navigation.
+      if (!pageScheduleLoadedAt) return;
+      const page = pageScheduleCache.get(targetPath);
       if (!scheduleIsClosed(page)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
