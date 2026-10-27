@@ -2160,6 +2160,11 @@ async function renderMessages(
   // Rebuilding the list must not reset the reader's position when they are
   // browsing older messages. Capture it before touching the DOM.
   const previousScrollTop = messagesEl.scrollTop;
+  // Build the replacement off-screen, then swap it in once. Clearing the live
+  // scroller first makes browsers clamp scrollTop to zero, causing the visible
+  // jump up and back down on every incoming message.
+  const renderedContent = document.createDocumentFragment();
+  messagesEl.style.overflowAnchor = "none";
 
   if (!messages.length) {
 
@@ -2191,7 +2196,7 @@ async function renderMessages(
       userIds
     );
 
-  messagesEl.innerHTML = "";
+  // Keep the currently displayed messages in place while profile and pin data load.
   let previousDayKey = "";
   let previousMessage = null;
   let pinnedIds = new Set();
@@ -2210,7 +2215,7 @@ async function renderMessages(
         const divider = document.createElement("div");
         divider.className = "message-date-divider";
         divider.textContent = messageDate.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: messageDate.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined });
-        messagesEl.appendChild(divider);
+        renderedContent.appendChild(divider);
         previousDayKey = dayKey;
       }
       const previousDate = previousMessage ? new Date(previousMessage.created_at) : null;
@@ -2387,18 +2392,21 @@ async function renderMessages(
 
       }
 
-      messagesEl.appendChild(
+      renderedContent.appendChild(
         row
       );
 
     }
   );
 
+  // Commit all new rows in one operation to avoid the temporary zero-height
+  // scroll range that caused the chat to jump upward before returning down.
+  messagesEl.replaceChildren(renderedContent);
   if (shouldScrollBottom) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   } else {
-    // Preserve the scroll position when the user is reading history.
-    messagesEl.scrollTop = previousScrollTop;
+    // Preserve the reader's position when they are browsing older messages.
+    messagesEl.scrollTop = Math.min(previousScrollTop, Math.max(0, messagesEl.scrollHeight - messagesEl.clientHeight));
   }
 }
 
