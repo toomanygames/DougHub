@@ -1375,7 +1375,7 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 
 <div id="adminArea" style="display:none;">
 
-<div class="admin-ui-preference" id="adminUiPreferenceCard">
+<div class="card admin-ui-preference" id="adminUiPreferenceCard">
   <div class="admin-ui-preference-copy"><strong>Admin page preferences</strong><p>Hide the global side conversation slide-out tab and panel while you are using the Admin Panel. This preference is saved in this browser and does not change it for other users.</p></div>
   <label for="disableAdminSidePanel"><input id="disableAdminSidePanel" type="checkbox"> Disable side panel</label>
 </div>
@@ -5311,7 +5311,7 @@ function applyStaffPermissions(){
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
+    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
     if(/custombadgemanagercard|feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
@@ -5874,7 +5874,9 @@ startAdminPanel();
 
 <script id="admin-ui-preferences">
 (function(){
-  const KEY="dh-admin-disable-side-panel-v2";
+  // v3 resets the old hidden-panel preference so the conversation sidebar is
+  // available by default. The visible Owner control can turn it off again.
+  const KEY="dh-admin-disable-side-panel-v3";
   const toggle=document.getElementById("disableAdminSidePanel");
   if(!toggle)return;
   let disabled=false;
