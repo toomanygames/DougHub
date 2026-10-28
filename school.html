@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050611">
+<meta name="description" content="DougHub School Mode: a focused space for learning to code and building coding projects.">
+<title>School Mode • DougHub</title>
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--line:#ffffff15;--muted:#a4abc7;--indigo:#6366f1;--purple:#a855f7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 10% 0%,#4f46e52b,transparent 38%),radial-gradient(ellipse at 90% 8%,#9333ea1c,transparent 34%),var(--bg);color:#f5f6ff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:inherit;text-decoration:none}button{font:inherit}
+.topbar{height:66px;padding:0 clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);background:#050611d9;backdrop-filter:blur(18px);position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:11px;font-weight:850;letter-spacing:-.4px}.brand-mark{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--indigo),var(--purple));font-weight:900}.top-actions{display:flex;gap:8px;align-items:center}.top-link{padding:9px 12px;border:1px solid var(--line);border-radius:10px;color:#d8dbf5;font-size:12px;font-weight:750;background:#ffffff06}.top-link.primary{background:linear-gradient(120deg,#6366f1,#8b5cf6);border-color:transparent;color:white}
+main{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:clamp(28px,5vw,58px) 0 48px}.hero{position:relative;overflow:hidden;padding:clamp(24px,5vw,48px);border:1px solid #a5b4fc26;border-radius:25px;background:linear-gradient(115deg,#111735e8,#0b0d20e8);box-shadow:0 24px 80px #0003}.hero:after{content:"</>";position:absolute;right:4%;top:4%;font:900 clamp(70px,13vw,150px)/1 ui-monospace,monospace;color:#a5b4fc0b;pointer-events:none}.eyebrow{color:#c4b5fd;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.hero h1{position:relative;z-index:1;margin:13px 0 12px;font-size:clamp(36px,6vw,62px);letter-spacing:-.06em;line-height:1.02}.hero p{position:relative;z-index:1;max-width:620px;color:#b4bad3;line-height:1.75;font-size:14px;margin:0}.hero-actions{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:#ffffff08;color:#f4f4ff;font-size:12px;font-weight:850;transition:transform .15s,border-color .15s}.btn:hover{transform:translateY(-2px);border-color:#a5b4fc80}.btn.primary{background:linear-gradient(120deg,#6366f1,#8b5cf6);border-color:transparent}.section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:32px 0 13px}.section-head h2{margin:0;font-size:20px;letter-spacing:-.04em}.section-head p{margin:5px 0 0;color:var(--muted);font-size:12px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{display:flex;flex-direction:column;min-height:180px;padding:19px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#11152bde,#090b19e8);transition:transform .16s,border-color .16s}.card:hover{transform:translateY(-3px);border-color:#a5b4fc65}.card-icon{display:grid;place-items:center;width:37px;height:37px;border-radius:11px;background:#818cf81c;border:1px solid #a5b4fc2b;color:#c4b5fd;font:800 13px ui-monospace,monospace}.card h3{margin:15px 0 6px;font-size:15px}.card p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}.card .card-link{margin-top:auto;padding-top:16px;color:#c4b5fd;font-size:11px;font-weight:850}.lesson-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.lesson{padding:17px;border:1px solid var(--line);border-radius:16px;background:#0d1127a8}.lesson-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.lesson h3{font-size:14px;margin:0}.lesson small{color:#a5b4fc;font-size:10px;font-weight:800}.lesson p{font-size:12px;line-height:1.65;color:var(--muted);margin:9px 0 12px}.code-sample{position:relative;padding:13px;border:1px solid #a5b4fc20;border-radius:11px;background:#050711;font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;color:#dbeafe;white-space:pre-wrap;overflow-wrap:anywhere}.copy{position:absolute;right:7px;top:7px;border:1px solid #ffffff1b;border-radius:7px;padding:5px 7px;background:#ffffff0b;color:#dfe2ff;font-size:10px;cursor:pointer}.footer-note{text-align:center;margin-top:27px;color:#747d9c;font-size:11px;line-height:1.7}
+@media(max-width:760px){.cards{grid-template-columns:1fr}.card{min-height:150px}.lesson-grid{grid-template-columns:1fr}.topbar{height:58px}.top-link{padding:8px 9px;font-size:11px}.brand{font-size:13px}.hero{border-radius:20px}.section-head{align-items:start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="school.html" aria-label="School Mode home"><span class="brand-mark">{ }</span><span>DougHub <span style="color:#a5b4fc">School Mode</span></span></a>
+<nav class="top-actions" aria-label="School Mode navigation"><a class="top-link" href="Scripting/scripting.html">DougCode</a><a class="top-link" href="index.html">Exit School Mode</a></nav>
+</header>
+<main>
+<section class="hero">
+<div class="eyebrow">A focused coding space</div>
+<h1>Learn. Build.<br><span style="background:linear-gradient(100deg,#a5b4fc,#d8b4fe 55%,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent">Make it yours.</span></h1>
+<p>School Mode keeps DougHub focused on programming and coding projects. No chat feed, no games section—just tools for writing code, learning concepts, and making projects.</p>
+<div class="hero-actions"><a class="btn primary" href="Scripting/scripting.html">Open coding workspace ↗</a><a class="btn" href="Scripting/scripting.html#codeCommunityProjects">Explore code projects</a></div>
+</section>
+<div class="section-head"><div><h2>Your coding workspace</h2><p>Go straight to the part of coding you want to work on.</p></div></div>
+<section class="cards" aria-label="Coding tools">
+<a class="card" href="Scripting/scripting.html"><span class="card-icon">{ }</span><h3>DougCode Studio</h3><p>Write code, use visual blocks, preview your work, and build a project of your own.</p><span class="card-link">Start coding ↗</span></a>
+<a class="card" href="Scripting/scripting.html#codeCommunityProjects"><span class="card-icon">↗</span><h3>Code Project Library</h3><p>Explore coding projects shared by the community and get ideas for what to build next.</p><span class="card-link">Browse code projects ↗</span></a>
+<a class="card" href="my-games.html"><span class="card-icon">{"{"}</span><h3>Published work</h3><p>Manage your published creations from DougHub's creator tools.</p><span class="card-link">View your creations ↗</span></a>
+</section>
+<div class="section-head"><div><h2>Quick coding notes</h2><p>Small examples you can copy into DougCode and experiment with.</p></div></div>
+<section class="lesson-grid" aria-label="Coding examples">
+<article class="lesson"><div class="lesson-top"><h3>JavaScript: variables</h3><small>01 · BASICS</small></div><p>Store a value in a variable, then use it in your program.</p><div class="code-sample"><button class="copy" type="button" data-copy="const projectName = 'My first project';\nconsole.log(projectName);">Copy</button><code>const projectName = 'My first project';<br>console.log(projectName);</code></div></article>
+<article class="lesson"><div class="lesson-top"><h3>JavaScript: functions</h3><small>02 · REUSABLE CODE</small></div><p>Put a set of instructions in a function so you can run them whenever you need.</p><div class="code-sample"><button class="copy" type="button" data-copy="function greet(name) {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet('coder'));">Copy</button><code>function greet(name) {<br>  return `Hello, ${name}!`;<br>}<br>console.log(greet('coder'));</code></div></article>
+</section>
+<p class="footer-note">School Mode is a focused view of DougHub's coding tools and project resources. Chat and games are intentionally left out of this mode.</p>
+</main>
+<script>
+document.querySelectorAll("[data-copy]").forEach(button=>button.addEventListener("click",async()=>{const original=button.textContent;try{await navigator.clipboard.writeText(button.dataset.copy);button.textContent="Copied";}catch{button.textContent="Select code to copy";}setTimeout(()=>button.textContent=original,1500)}));
+</script>
+</body>
+</html>
