@@ -1025,17 +1025,8 @@ main {
     ></div>
 
     <section class="chat-feature-bar" aria-label="Chat tools">
-      <div class="chat-feature-actions">
-        <button type="button" id="togglePollsDrawerButton" aria-controls="pollsDrawer" aria-expanded="true">Hide polls</button>
-        <button type="button" id="createPollButton" hidden>＋ Create poll</button>
-      </div>
       <div id="pinnedMessagesPanel" class="chat-feature-panel" hidden></div>
     </section>
-    <div id="pollsDrawerBackdrop" class="polls-drawer-backdrop"></div>
-    <aside id="pollsDrawer" class="polls-drawer" aria-label="Chat polls">
-      <div class="polls-drawer-header"><div><strong>Chat polls</strong><span>Vote and see results</span></div><button type="button" id="closePollsDrawerButton" aria-label="Close polls">×</button></div>
-      <div id="chatPollsPanel" class="chat-feature-panel polls-drawer-content"></div>
-    </aside>
     <div
       class="messages"
       id="messages"
@@ -2666,10 +2657,7 @@ function notifyIncomingChatMessage(row) {
 })();
 async function loadChatFeaturePanels() {
   if (!supabaseClient) return;
-  const pollButton = document.getElementById("createPollButton");
   const pinsPanel = document.getElementById("pinnedMessagesPanel");
-  const pollsPanel = document.getElementById("chatPollsPanel");
-  pollButton.hidden = !currentUserIsHelper;
   const scopeGroup = query => activeChatGroupId === null ? query.is("group_id", null) : query.eq("group_id", activeChatGroupId);
 
   const pinResult = await scopeGroup(supabaseClient.from("chat_pinned_messages").select("message_id,created_at").order("created_at", { ascending: false }).limit(1));
@@ -2706,77 +2694,8 @@ async function loadChatFeaturePanels() {
     pinsPanel.hidden = pinsPanel.childElementCount === 0;
   } else pinsPanel.hidden = true;
 
-  const pollResult = await scopeGroup(supabaseClient.from("chat_polls").select("id,question,options,is_closed,created_at").order("created_at", { ascending: false }).limit(20));
-  pollsPanel.replaceChildren();
-  if (!pollResult.error && pollResult.data && pollResult.data.length) {
-    for (const poll of pollResult.data) {
-      const card = document.createElement("div"); card.className = "chat-poll-card";
-      const heading = document.createElement("strong"); heading.textContent = poll.question + (poll.is_closed ? " · Closed" : ""); card.appendChild(heading);
-      const { data: votes } = await supabaseClient.from("chat_poll_votes").select("option_index,user_id").eq("poll_id", poll.id);
-      const options = document.createElement("div"); options.className = "chat-poll-options";
-      (Array.isArray(poll.options) ? poll.options : []).forEach((option, index) => {
-        const button = document.createElement("button"); button.type = "button";
-        const count = (votes || []).filter(vote => vote.option_index === index).length;
-        const myVote = (votes || []).some(vote => vote.user_id === currentUser?.id && vote.option_index === index);
-        button.textContent = (myVote ? "✓ " : "") + String(option) + " · " + count;
-        button.disabled = !currentUser || poll.is_closed;
-        button.addEventListener("click", async () => {
-          const { error } = await supabaseClient.from("chat_poll_votes").upsert({ poll_id: poll.id, user_id: currentUser.id, option_index: index }, { onConflict: "poll_id,user_id" });
-          if (error) return showError("Couldn't submit vote: " + error.message);
-          await loadChatFeaturePanels();
-        });
-        options.appendChild(button);
-      });
-      card.appendChild(options);
-      if (currentUserIsAdmin && !poll.is_closed) {
-        const close = document.createElement("button"); close.type = "button"; close.textContent = "Close poll";
-        close.addEventListener("click", async () => {
-          if (!confirm("Close this poll now? People will no longer be able to vote.")) return;
-          const { error } = await supabaseClient.from("chat_polls").update({ is_closed: true }).eq("id", poll.id);
-          if (error) return showError("Couldn't close poll: " + error.message);
-          await loadChatFeaturePanels();
-        });
-        card.appendChild(close);
-      }
-      pollsPanel.appendChild(card);
-    }
-  }
-}
 
-const pollsDrawer = document.getElementById("pollsDrawer");
-const pollsDrawerBackdrop = document.getElementById("pollsDrawerBackdrop");
-const togglePollsDrawerButton = document.getElementById("togglePollsDrawerButton");
-const closePollsDrawerButton = document.getElementById("closePollsDrawerButton");
-function setPollsDrawerOpen(open) {
-  pollsDrawer.classList.toggle("is-hidden", !open);
-  pollsDrawerBackdrop.classList.toggle("is-hidden", !open);
-  togglePollsDrawerButton.textContent = open ? "Hide polls" : "Show polls";
-  togglePollsDrawerButton.setAttribute("aria-expanded", String(open));
-  pollsDrawer.setAttribute("aria-hidden", String(!open));
 }
-togglePollsDrawerButton.addEventListener("click", () => setPollsDrawerOpen(pollsDrawer.classList.contains("is-hidden")));
-closePollsDrawerButton.addEventListener("click", () => setPollsDrawerOpen(false));
-pollsDrawerBackdrop.addEventListener("click", () => setPollsDrawerOpen(false));
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !pollsDrawer.classList.contains("is-hidden")) setPollsDrawerOpen(false);
-});
-// Open poll results on every fresh page load and browser restore, regardless
-// of a previous close action or the browser's back/forward cache.
-setPollsDrawerOpen(true);
-window.addEventListener("pageshow", () => setPollsDrawerOpen(true));
-
-document.getElementById("createPollButton").addEventListener("click", async () => {
-  if (!currentUserIsHelper || !currentUser) return;
-  const question = prompt("What is the poll question? (240 characters max)");
-  if (!question || !question.trim()) return;
-  const rawOptions = prompt("Enter 2–6 answer options, separated by commas:");
-  if (!rawOptions) return;
-  const options = rawOptions.split(",").map(value => value.trim()).filter(Boolean).slice(0, 6);
-  if (options.length < 2) return showError("A poll needs at least two answer options.");
-  const { error } = await supabaseClient.from("chat_polls").insert({ group_id: activeChatGroupId, created_by: currentUser.id, question: question.trim().slice(0, 240), options });
-  if (error) return showError("Couldn't create poll: " + error.message);
-  await loadChatFeaturePanels();
-});
 
 async function loadMessages() {
 
