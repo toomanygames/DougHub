@@ -315,7 +315,7 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 <div id="callError" class="call-error" role="alert"></div>
 <div id="callHelpPopup" class="call-help-popup" role="dialog" aria-label="Video call tips" hidden>
  <div class="call-help-head"><strong>Call tips</strong><button id="closeHelpPopup" class="call-help-close" type="button" aria-label="Close tips">×</button></div>
- <ul><li><strong>Microphone:</strong> green means on; dark means muted. If nobody hears you, use the mic button to retry.</li><li><strong>Camera:</strong> green means on; dark means off. You can still talk with the camera off.</li><li><strong>Sound:</strong> turn participant audio on, then check your computer volume.</li><li><strong>Invite:</strong> use the people button to select DougHub users or copy the room link.</li><li><strong>Connection:</strong> everyone should join the same room link. If audio fails, leave and rejoin.</li><li><strong>Privacy:</strong> leaving the page ends your camera and microphone session.</li></ul>
+ <ul><li><strong>Microphone:</strong> green means on; dark means muted. If nobody hears you, use the mic button to retry.</li><li><strong>Camera:</strong> green means on; dark means off. You can still talk with the camera off.</li><li><strong>Sound:</strong> use the speaker-shaped volume button to adjust each participant locally.</li><li><strong>Invite:</strong> use the people button to select DougHub users or copy the room link.</li><li><strong>Connection:</strong> everyone should join the same room link. If audio fails, leave and rejoin.</li><li><strong>Privacy:</strong> leaving the page ends your camera and microphone session.</li></ul>
 </div>
 </section>
 </div>
@@ -373,7 +373,7 @@ function playRemoteMedia(media,participant,kind){
   // AbortError commonly means a newer media update interrupted playback; it is not an autoplay-permission failure.
   if(error?.name!=="AbortError"&&media.isConnected){
    console.warn("DougHub remote "+kind+" playback blocked:",{participant,error:String(error)});
-   if(kind==="audio")setStatus("Audio is received, but playback is blocked. Tap Enable sound.");
+   if(kind==="audio")setStatus("Audio playback is blocked by your browser. Check site audio permissions and device output volume.");
   }
  }).finally(()=>{if(remotePlayRequests.get(media)===request)remotePlayRequests.delete(media)});
  remotePlayRequests.set(media,request);
@@ -528,7 +528,7 @@ function makePeer(id,info){
     e.track.onmute=()=>console.warn("DougHub remote audio track muted:",id);
     audio.onplaying=()=>console.info("DougHub remote audio is playing: "+id);
     audio.onerror=()=>console.warn("DougHub remote audio element error:",audio.error);
-    audio.play?.().catch(err=>{console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)});setStatus("Audio is received, but playback is blocked. Tap Enable sound.")});
+    audio.play?.().catch(err=>{console.warn("DougHub remote audio playback blocked:",{participant:id,error:String(err)});setStatus("Audio playback is blocked by your browser. Check site audio permissions and device output volume.")});
    }
    video.play?.().catch(()=>{setStatus("Tap the participant tile to start media playback.")});
    const resumePlayback=()=>{video.play?.().catch(()=>{});audio.muted=false;playRemoteMedia(audio,id,"audio")};
@@ -727,7 +727,7 @@ function bindSdkParticipant(participant,isLocal){
    if(isLocal){localStream=localStream||new MediaStream();if(!localStream.getTracks().some(t=>t.id===stream.track.id))localStream.addTrack(stream.track);$("cameraButton").textContent="Turn camera off";$("cameraButton").classList.add("is-on");$("cameraButton").classList.remove("is-off")}
   }else if(stream.kind==="audio"){
    if(isLocal){localStream=localStream||new MediaStream();if(!localStream.getTracks().some(t=>t.id===stream.track.id))localStream.addTrack(stream.track);$("micButton").textContent="Mute mic";$("micButton").classList.add("is-on");$("micButton").classList.remove("is-off")}
-   else{audio.srcObject=ms;audio.volume=Number(tile.querySelector(".participant-volume input")?.value||100)/100;audio.muted=false;audio.play?.().catch(()=>setStatus("Tap Enable sound to hear participants."))}
+   else{audio.srcObject=ms;audio.volume=Number(tile.querySelector(".participant-volume input")?.value||100)/100;audio.muted=false;audio.play?.().catch(()=>setStatus("Check site audio permissions and use the volume icon to adjust participant volume."))}
   }
  };
  participant.on("stream-enabled",attach);
