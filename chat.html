@@ -2922,6 +2922,10 @@ async function sendMessage() {
     // After sending, always follow the newest message even if the user had
     // previously scrolled up. This only changes position after their own send.
     chatUserScrolledUp = false;
+    // Move to the bottom BEFORE re-rendering so loadMessages detects that the
+    // reader is at the bottom; otherwise its old scroll position can be restored
+    // first, creating a visible jump up before the later scroll correction.
+    messagesEl.scrollTop = messagesEl.scrollHeight;
     await loadMessages();
     const scrollToNewest = () => {
       messagesEl.scrollTop = messagesEl.scrollHeight;
