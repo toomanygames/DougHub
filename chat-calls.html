@@ -150,7 +150,6 @@ main{width:100%;height:calc(100dvh - 52px);min-height:0;margin:0;padding:clamp(5
 .call-toolbar .call-btn.danger:hover:not(:disabled){background:#ec4c5d}
 .call-toolbar .call-btn:disabled{opacity:.35}
 .call-toolbar #micButton::before{content:"🎙";font-size:19px;font-weight:500}
-.call-toolbar #enableSoundButton::before{content:"🔊";font-size:17px;font-weight:700}
 .call-toolbar #cameraButton::before{content:"▣";font-size:20px;font-weight:700}
 .call-toolbar #invitePeopleButton::before{content:"+";font-size:25px;font-weight:400}
  .call-toolbar #helpButton{font-size:17px;font-weight:900}
@@ -158,7 +157,6 @@ main{width:100%;height:calc(100dvh - 52px);min-height:0;margin:0;padding:clamp(5
  .call-toolbar .call-btn.is-on{background:#247a50!important;border-color:#36a66f!important;color:#fff}
  .call-toolbar #micButton.is-off::before{content:"🎙̸"}
  .call-toolbar #cameraButton.is-off::before{content:"▧"}
- .call-toolbar #enableSoundButton.is-off::before{content:"🔇"}
  .call-help-popup[hidden]{display:none!important}
  .call-help-popup{position:absolute;z-index:20;right:14px;bottom:76px;width:min(360px,calc(100% - 28px));max-height:min(65dvh,420px);overflow:auto;padding:14px;border:1px solid #ffffff20;border-radius:16px;background:#11131df7;box-shadow:0 20px 70px #000a;color:#f5f6ff}
  .call-help-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
@@ -168,7 +166,6 @@ main{width:100%;height:calc(100dvh - 52px);min-height:0;margin:0;padding:clamp(5
  .video-grid:has(.video-tile:only-child){grid-template-columns:minmax(0,min(100%,720px));justify-content:center;align-content:center;overflow:hidden}
  .video-grid:has(.video-tile:only-child) .video-tile{width:100%;max-height:calc(100dvh - 230px);min-height:0;aspect-ratio:16/9}
  .call-note,.call-footer{display:none!important}
-.call-toolbar #micButton[disabled]::before,.call-toolbar #enableSoundButton[disabled]::before,.call-toolbar #cameraButton[disabled]::before{opacity:.8}
 #startButton,#joinButton{width:auto;min-width:105px;padding:0 17px;border-radius:999px;font-size:12px}
 #fullscreenButton{width:auto;padding:0 14px;border-radius:999px;font-size:11px}
 #endButton{width:auto;min-width:82px;padding:0 16px;border-radius:999px;font-size:12px}
@@ -256,6 +253,16 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
  .invite-controls{grid-template-columns:minmax(0,1fr) auto}
  .call-note,.call-footer{padding:6px 9px}
 }
+
+.call-toolbar .call-icon-btn{position:relative;width:44px;min-width:44px;padding:0;border-radius:50%;font-size:0;background:#252732;border-color:#ffffff16}
+#volumeDrawerButton::before{content:"";display:block;width:17px;height:17px;margin:auto;background:currentColor;clip-path:polygon(0 35%,25% 35%,55% 10%,55% 90%,25% 65%,0 65%)}
+#volumeDrawerButton::after{content:")";position:absolute;right:8px;top:6px;font-size:19px;font-weight:800}#soundboardButton::before{content:"♫";font-size:21px}
+.call-slideout[hidden]{display:none!important}.call-slideout{position:absolute;z-index:30;right:12px;bottom:76px;width:min(350px,calc(100% - 24px));max-height:min(65dvh,460px);overflow:auto;padding:14px;border:1px solid #ffffff20;border-radius:18px;background:#101321f7;box-shadow:0 20px 70px #000a;backdrop-filter:blur(18px);color:#f6f6ff}
+.slideout-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.slideout-head strong{display:block;font-size:14px}.slideout-head span{display:block;margin-top:4px;color:#a5abc5;font-size:10px;line-height:1.5}.slideout-close{flex:0 0 30px;width:30px;height:30px;border:1px solid #ffffff16;border-radius:50%;background:#ffffff0a;color:#fff;font-size:20px;cursor:pointer}
+.master-volume-row{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;color:#dce0f4;font-size:11px}.master-volume-row input{grid-column:1/3;width:100%;accent-color:#818cf8}.master-volume-row output{color:#a5b4fc;font-variant-numeric:tabular-nums}
+.slideout-participants{display:grid;gap:10px;margin-top:14px}.slideout-participant{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,1.3fr) 34px;align-items:center;gap:9px;font-size:11px;color:#e4e7f8}.slideout-participant input{width:100%;min-width:0;accent-color:#818cf8}.slideout-participant output{text-align:right;color:#a5b4fc;font-variant-numeric:tabular-nums}
+.soundboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.soundboard-grid button{min-height:42px;border:1px solid #a5b4fc24;border-radius:11px;background:linear-gradient(135deg,#6366f11f,#a855f71a);color:#f4f4ff;font-size:12px;font-weight:800;cursor:pointer}.soundboard-grid button:hover{background:linear-gradient(135deg,#6366f13b,#a855f733)}.soundboard-grid button:disabled{opacity:.5;cursor:wait}.soundboard-note{margin:12px 0 0;color:#a5abc5;font-size:10px;line-height:1.5}
+@media(max-width:600px){.call-toolbar .call-icon-btn{width:42px;min-width:42px}.call-slideout{right:7px;bottom:68px;width:calc(100% - 14px);max-height:60dvh}}
 </style>
 </head>
 <body>
@@ -272,7 +279,8 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 <button class="call-btn primary" id="startButton" type="button">Start a call</button>
 <button class="call-btn primary" id="joinButton" type="button" hidden>Join call</button>
 <button class="call-btn" id="micButton" type="button" disabled>Mute mic</button>
-<button class="call-btn" id="enableSoundButton" type="button" disabled>Enable sound</button>
+<button class="call-btn call-icon-btn" id="volumeDrawerButton" type="button" aria-label="Call volume controls" aria-expanded="false" aria-controls="volumeDrawer" title="Call volume"></button>
+<button class="call-btn call-icon-btn" id="soundboardButton" type="button" aria-label="Open soundboard" aria-expanded="false" aria-controls="soundboardDrawer" title="Owner soundboard" hidden></button>
 <button class="call-btn" id="cameraButton" type="button" disabled>Turn camera off</button>
 <button class="call-btn" id="invitePeopleButton" type="button" hidden>Invite people</button>
 <button class="call-btn" id="fullscreenButton" type="button" aria-label="Enter full screen" title="Enter full screen">⛶ Full screen</button>
@@ -281,6 +289,8 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 <span id="roomCount" class="room-count">Up to 6 people</span>
 <span id="callStatus" class="call-status" role="status" aria-live="polite">Ready when you are.</span>
 </div>
+<aside id="volumeDrawer" class="call-slideout" aria-label="Call volume controls" hidden><div class="slideout-head"><div><strong>Call volume</strong><span>Only changes what you hear</span></div><button type="button" class="slideout-close" data-close-drawer="volumeDrawer" aria-label="Close volume controls">×</button></div><label class="master-volume-row"><span>Overall volume</span><output id="masterVolumeValue">100%</output><input id="masterVolume" type="range" min="0" max="100" value="100"></label><div id="volumeParticipantList" class="slideout-participants"><p>Participant volume controls appear when people join.</p></div></aside>
+<aside id="soundboardDrawer" class="call-slideout" aria-label="Owner soundboard" hidden><div class="slideout-head"><div><strong>Soundboard</strong><span>Plays to everyone’s speakers — never through your microphone</span></div><button type="button" class="slideout-close" data-close-drawer="soundboardDrawer" aria-label="Close soundboard">×</button></div><div class="soundboard-grid"><button type="button" data-sound="chime">✨ Chime</button><button type="button" data-sound="tada">🎉 Ta-da</button><button type="button" data-sound="boing">🌀 Boing</button><button type="button" data-sound="laser">⚡ Laser</button><button type="button" data-sound="drum">🥁 Drumroll</button><button type="button" data-sound="airhorn">📣 Air horn</button></div><p class="soundboard-note" id="soundboardStatus" role="status">Only the site owner can play sounds.</p></aside>
 <div id="invitePanel" class="invite-panel" aria-label="Invite people to this call">
   <div class="invite-panel-title">Invite people to this call</div>
   <div class="invite-panel-help">Enter a DougHub username to send the room link privately through DMail. They must be signed in to join.</div>
@@ -315,7 +325,7 @@ main{width:100%;height:calc(100dvh - 54px);min-height:0;margin:0;padding:10px 12
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search),MAX_PARTICIPANTS=6;
 console.info("DougHub call diagnostics loaded. Watch for captured tracks, sent/received RTP, remote track received/attached, and playback warnings.");
-let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",channel=null,localStream=null,meeting=null,subscribed=false,joining=false,ending=false;
+let room=params.get("room")||"",client=null,user=null,username="Guest",avatarUrl="",userIsOwner=false,soundboardChannel=null,channel=null,localStream=null,meeting=null,subscribed=false,joining=false,ending=false,masterVolume=1;
 const remoteCameraHidden=new Set(),remoteCameraOn=new Set();
 const peers=new Map(),participants=new Map(),pendingIce=new Map();
 const fallbackIceServers=[
@@ -374,7 +384,7 @@ function randomRoom(){const b=new Uint8Array(18);crypto.getRandomValues(b);retur
 function roomUrl(){const u=new URL(location.href);u.search="";u.searchParams.set("room",room);return u.href}
 function updateRoomUi(){const yes=!!room;$("startButton").hidden=yes;$("joinButton").hidden=!yes;$("invitePeopleButton").hidden=!yes||!subscribed;if(yes){$("inviteLink").value=roomUrl()}}
 async function getClient(){if(window.DougHubSupabaseClient)return window.DougHubSupabaseClient;await new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;clearTimeout(t);window.removeEventListener("douqhub:supabase-ready",finish);window.DougHubSupabaseClient?resolve():reject(new Error("DougHub sign-in service did not load. Refresh and try again."))};window.addEventListener("douqhub:supabase-ready",finish,{once:true});const t=setTimeout(finish,12000)});return window.DougHubSupabaseClient}
-async function ensureUser(){client=client||await getClient();const result=await client.auth.getSession();user=result.data?.session?.user||null;if(!user){location.href="/log-in.html?redirect="+encodeURIComponent("chat-calls.html"+location.search);throw new Error("Please sign in to use video calls.")}const {data}=await client.from("profiles").select("username,avatar_url").eq("id",user.id).maybeSingle();username=data?.username||user.user_metadata?.username||user.email?.split("@")[0]||"DougHub user";avatarUrl=data?.avatar_url||user.user_metadata?.avatar_url||"";if(avatarUrl){const avatar=$("localPlaceholder").querySelector(".avatar");avatar.replaceChildren();const img=document.createElement("img");img.src=avatarUrl;img.alt="Your profile picture";avatar.appendChild(img)}}
+async function ensureUser(){client=client||await getClient();const result=await client.auth.getSession();user=result.data?.session?.user||null;if(!user){location.href="/log-in.html?redirect="+encodeURIComponent("chat-calls.html"+location.search);throw new Error("Please sign in to use video calls.")}const {data}=await client.from("profiles").select("username,avatar_url,role").eq("id",user.id).maybeSingle();username=data?.username||user.user_metadata?.username||user.email?.split("@")[0]||"DougHub user";avatarUrl=data?.avatar_url||user.user_metadata?.avatar_url||"";userIsOwner=String(data?.role||user.user_metadata?.role||"").toLowerCase()==="owner";$("soundboardButton").hidden=!userIsOwner;if(avatarUrl){const avatar=$("localPlaceholder").querySelector(".avatar");avatar.replaceChildren();const img=document.createElement("img");img.src=avatarUrl;img.alt="Your profile picture";avatar.appendChild(img)}}
 async function ensureMedia(){
  if(localStream)return;
  if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera and microphone access requires a supported browser on HTTPS.");
@@ -409,7 +419,7 @@ async function ensureMedia(){
  $("localPlaceholder").hidden=false;
  $("localPlaceholder").querySelector("span:last-child").textContent=videoTrack?"Waiting for camera picture…":"Camera unavailable — you can still talk";
  const localVideo=$("localVideo");const showLocalFallback=()=>{const track=localStream?.getVideoTracks()[0];const visible=!!track&&track.enabled&&track.readyState==="live"&&localVideo.videoWidth>0&&localVideo.videoHeight>0;if(!visible){$("localPlaceholder").hidden=false;if(track?.enabled&&track.readyState==="live")$("localPlaceholder").querySelector("span:last-child").textContent="Waiting for camera picture…"}else $("localPlaceholder").hidden=true};localVideo.onplaying=showLocalFallback;localVideo.onloadeddata=showLocalFallback;localVideo.onerror=()=>{$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Camera picture unavailable"};localVideo.play?.().then(showLocalFallback).catch(showLocalFallback);
- $("micButton").disabled=false;$("cameraButton").disabled=false;$("enableSoundButton").disabled=false;$("endButton").disabled=false;
+ $("micButton").disabled=false;$("cameraButton").disabled=false;$("endButton").disabled=false;
  $("micButton").textContent=audioTrack?"Mute mic":"Enable mic";$("micButton").classList.toggle("is-on",!!audioTrack);$("micButton").classList.toggle("is-off",!audioTrack);$("micButton").setAttribute("aria-pressed",String(!!audioTrack));$("micButton").title=audioTrack?"Microphone on — click to mute":"Microphone unavailable — click to retry";
  $("cameraButton").textContent=videoTrack?"Turn camera off":"Enable camera";$("cameraButton").classList.toggle("is-on",!!videoTrack);$("cameraButton").classList.toggle("is-off",!videoTrack);$("cameraButton").setAttribute("aria-pressed",String(!!videoTrack));$("cameraButton").title=videoTrack?"Camera on — click to turn off":"Camera unavailable — click to retry";
  $("localVideoLabel").textContent=username+" (you)";
@@ -431,8 +441,8 @@ function renderParticipants(){
    const sm=document.createElement("span");sm.textContent="Connecting…";ph.append(av,st,sm);
    const label=document.createElement("span");label.className="video-label";label.dataset.label=id;label.textContent=info.username||"Participant";
    const volume=document.createElement("label");volume.className="participant-volume";volume.innerHTML='<span>Volume</span><input type="range" min="0" max="100" value="100" aria-label="Local volume for participant">';
-   volume.querySelector("input").addEventListener("input",e=>{const level=Number(e.target.value)/100;v.volume=level;remoteAudio.volume=level});
-   tile.append(v,remoteAudio,ph,label,volume);grid.appendChild(tile);
+   volume.querySelector("input").addEventListener("input",e=>{const level=Number(e.target.value)/100;v.volume=level;remoteAudio.volume=masterVolume*level;renderVolumeDrawer()});
+   tile.append(v,remoteAudio,ph,label,volume);grid.appendChild(tile);renderVolumeDrawer();
   }
   const label=tile.querySelector("[data-label]");if(label)label.textContent=info.username||"Participant";
   const st=tile.querySelector(".video-placeholder strong");if(st)st.textContent=info.username||"Participant";
@@ -463,20 +473,18 @@ function renderParticipants(){
  [...grid.querySelectorAll(".video-tile:not(.local-video-tile)")].forEach(t=>{if(!participants.has(t.id.slice(12)))t.remove()});
  $("roomCount").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent=participants.size+" / "+MAX_PARTICIPANTS+" people";
 }
-async function enableRemoteSound(){
- const audios=[...document.querySelectorAll("#videoGrid audio")];
- if(!audios.length){setStatus("Join a call first; participant audio will appear when someone connects.");return}
- let played=0;
- for(const audio of audios){
-  audio.muted=false;
-  const tile=audio.closest(".video-tile");
-  const slider=tile?.querySelector(".participant-volume input");
-  audio.volume=Number(slider?.value??100)/100;
-  try{await audio.play();played++}catch(e){console.warn("Audio unlock failed:",e);showError("Your browser blocked call audio. Tap Enable sound again and check the device output volume.");}
- }
- if(played){$("enableSoundButton").classList.add("is-on");$("enableSoundButton").classList.remove("is-off");$("enableSoundButton").setAttribute("aria-pressed","true");$("enableSoundButton").title="Call sound on — click to enable again";clearError();setStatus("Call sound enabled on this device.");}
-}
-$("enableSoundButton").addEventListener("click",enableRemoteSound);
+function setDrawerOpen(id,open){const d=$(id),b=$(id==="volumeDrawer"?"volumeDrawerButton":"soundboardButton");if(d&&b){d.hidden=!open;b.setAttribute("aria-expanded",String(open))}}
+$("volumeDrawerButton").addEventListener("click",()=>{renderVolumeDrawer();setDrawerOpen("volumeDrawer",$("volumeDrawer").hidden)});
+$("soundboardButton").addEventListener("click",()=>{if(userIsOwner)setDrawerOpen("soundboardDrawer",$("soundboardDrawer").hidden)});
+document.querySelectorAll("[data-close-drawer]").forEach(b=>b.addEventListener("click",()=>setDrawerOpen(b.dataset.closeDrawer,false)));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){setDrawerOpen("volumeDrawer",false);setDrawerOpen("soundboardDrawer",false)}});
+function applyMasterVolume(){$("masterVolumeValue").textContent=Math.round(masterVolume*100)+"%";document.querySelectorAll("#videoGrid audio").forEach(a=>{const r=a.closest(".video-tile")?.querySelector(".participant-volume input");a.volume=masterVolume*(Number(r?.value??100)/100)})}
+$("masterVolume").addEventListener("input",e=>{masterVolume=Number(e.target.value)/100;applyMasterVolume()});
+function renderVolumeDrawer(){const list=$("volumeParticipantList"),tiles=[...$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)")];list.replaceChildren();if(!tiles.length){list.innerHTML="<p>No other participants are connected yet.</p>";return}tiles.forEach(tile=>{const slider=tile.querySelector(".participant-volume input");if(!slider)return;const name=tile.querySelector(".video-label")?.textContent||"Participant",row=document.createElement("label");row.className="slideout-participant";const title=document.createElement("span");title.textContent=name;const input=document.createElement("input");input.type="range";input.min="0";input.max="100";input.value=slider.value;input.setAttribute("aria-label","Volume for "+name);const output=document.createElement("output");output.textContent=input.value+"%";input.addEventListener("input",()=>{slider.value=input.value;slider.dispatchEvent(new Event("input",{bubbles:true}));output.textContent=input.value+"%"});row.append(title,input,output);list.appendChild(row)})}
+function ensureSoundboardChannel(){if(soundboardChannel||!client||!room)return;soundboardChannel=client.channel("call-soundboard:"+room);soundboardChannel.on("broadcast",{event:"play-sound"},({payload})=>{if(payload?.sound&&typeof payload.sound==="string")playSoundOnSpeakers(payload.sound)});soundboardChannel.subscribe(status=>{if(status==="SUBSCRIBED")console.info("Call soundboard channel connected")})}
+function playSoundOnSpeakers(kind){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=new AC(),master=ctx.createGain();master.gain.value=masterVolume*.42;master.connect(ctx.destination);const now=ctx.currentTime;const tone=(f,st,d,w="sine",g=.3,endF=null)=>{const o=ctx.createOscillator(),v=ctx.createGain();o.type=w;o.frequency.setValueAtTime(f,now+st);if(endF)o.frequency.exponentialRampToValueAtTime(Math.max(1,endF),now+st+d);v.gain.setValueAtTime(.0001,now+st);v.gain.exponentialRampToValueAtTime(g,now+st+.015);v.gain.exponentialRampToValueAtTime(.0001,now+st+d);o.connect(v);v.connect(master);o.start(now+st);o.stop(now+st+d+.03)};if(kind==="chime"){tone(880,0,.45);tone(1320,.12,.6,"sine",.25);tone(1760,.23,.7,"sine",.18)}else if(kind==="tada"){tone(523,0,.25,"triangle");tone(659,.18,.25,"triangle");tone(784,.36,.55,"triangle",.35);tone(1047,.54,.85,"triangle")}else if(kind==="boing")tone(500,0,.65,"sine",.45,90);else if(kind==="laser")tone(1200,0,.42,"sawtooth",.24,100);else if(kind==="drum"){for(let i=0;i<8;i++)tone(95,i*.11,.08,"triangle",.22,42);tone(180,.9,.65,"triangle",.38,55)}else if(kind==="airhorn"){tone(440,0,.8,"sawtooth",.24);tone(554,0,.8,"sawtooth",.2)}setTimeout(()=>ctx.close().catch(()=>{}),1900)}
+async function broadcastSound(kind){if(!userIsOwner||!subscribed||!room)return;const b=$("soundboardDrawer").querySelector('[data-sound="'+kind+'"]');if(b)b.disabled=true;try{ensureSoundboardChannel();if(!soundboardChannel)throw Error("Soundboard connection is not ready.");const status=await soundboardChannel.send({type:"broadcast",event:"play-sound",payload:{sound:kind,from:user.id,at:Date.now()}});if(status!=="ok")throw Error("Sound could not be sent to the call.");playSoundOnSpeakers(kind);$("soundboardStatus").textContent="Played to call speakers. Your microphone was not used."}catch(e){console.error("Soundboard broadcast failed:",e);$("soundboardStatus").textContent="Couldn't send that sound. Check the call connection."}finally{if(b)b.disabled=false}}
+document.querySelectorAll("[data-sound]").forEach(b=>b.addEventListener("click",()=>broadcastSound(b.dataset.sound)));
 function sendSignal(kind,to,extra={}){if(!channel||!subscribed)return Promise.resolve();return channel.send({type:"broadcast",event:"signal",payload:{kind,from:user.id,to,room,...extra}})}
 function makePeer(id,info){
  if(peers.has(id))return peers.get(id);
@@ -509,7 +517,7 @@ function makePeer(id,info){
    if(audio.srcObject!==state.audioStream)audio.srcObject=state.audioStream;
    video.muted=true;
    audio.muted=false;
-   audio.volume=Number(t.querySelector(".participant-volume input")?.value??100)/100;
+   audio.volume=masterVolume*(Number(t.querySelector(".participant-volume input")?.value??100)/100);
    if(e.track.kind==="audio"){
     console.info("DougHub remote audio track received: "+JSON.stringify({participant:id,readyState:e.track.readyState,muted:e.track.muted,enabled:e.track.enabled,streamAudioTracks:state.stream.getAudioTracks().length}));
     e.track.onunmute=()=>{
@@ -676,7 +684,7 @@ async function connectRoom(){
   meeting=window.VideoSDK.initMeeting({meetingId:data.roomId,name:username,participantId:user.id,micEnabled:true,webcamEnabled:true,multistream:true,metaData:{avatarUrl:avatarUrl||""}});
   if(!meeting)throw new Error("VideoSDK could not initialize the call.");
   bindSdkParticipant(meeting.localParticipant,true);
-  meeting.on("meeting-joined",()=>{subscribed=true;joining=false;$("startButton").hidden=true;$("joinButton").hidden=true;$("endButton").disabled=false;$("micButton").disabled=false;$("cameraButton").disabled=false;$("enableSoundButton").disabled=false;$("invitePeopleButton").hidden=false;updateSdkRoomCount();setStatus("Connected to call.");});
+  meeting.on("meeting-joined",()=>{subscribed=true;joining=false;ensureSoundboardChannel();$("startButton").hidden=true;$("joinButton").hidden=true;$("endButton").disabled=false;$("micButton").disabled=false;$("cameraButton").disabled=false;$("invitePeopleButton").hidden=false;updateSdkRoomCount();setStatus("Connected to call.");});
   meeting.on("meeting-left",()=>{subscribed=false;$("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());});
   meeting.on("participant-joined",p=>{bindSdkParticipant(p,false);updateSdkRoomCount()});
   meeting.on("participant-left",p=>{document.getElementById("participant-"+p.id)?.remove();updateSdkRoomCount()});
@@ -731,7 +739,7 @@ async function cleanup(notify=true){
  if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}
  $("localVideo").srcObject=null;$("localPlaceholder").hidden=false;$("localPlaceholder").querySelector("span:last-child").textContent="Join to turn on your camera";
  $("videoGrid").querySelectorAll(".video-tile:not(.local-video-tile)").forEach(t=>t.remove());
- $("micButton").disabled=true;$("cameraButton").disabled=true;$("enableSoundButton").disabled=true;$("endButton").disabled=true;
+ $("micButton").disabled=true;$("cameraButton").disabled=true;$("endButton").disabled=true;
  $("micButton").textContent="Mute mic";$("cameraButton").textContent="Turn camera off";$("micButton").classList.remove("is-on");$("micButton").classList.add("is-off");$("cameraButton").classList.remove("is-on");$("cameraButton").classList.add("is-off");
  $("startButton").hidden=!!room;$("joinButton").hidden=!room;updateRoomUi();setStatus("Left the call.");$("roomCount").textContent="0 / "+MAX_PARTICIPANTS+" people";$("roomCountTop").textContent="0 / "+MAX_PARTICIPANTS+" people";ending=false;
 }
