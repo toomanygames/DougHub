@@ -2919,10 +2919,18 @@ async function sendMessage() {
     pendingAttachment = null;
     attachmentStatus.textContent = "";
     showAttachmentPreview(null);
-    // The changed message signature naturally triggers a render. Do not reset
-    // it to null here: that falsely marks this as a first load and yanks readers
-    // who are scrolled up straight to the bottom.
+    // After sending, always follow the newest message even if the user had
+    // previously scrolled up. This only changes position after their own send.
+    chatUserScrolledUp = false;
     await loadMessages();
+    const scrollToNewest = () => {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    };
+    scrollToNewest();
+    requestAnimationFrame(() => {
+      scrollToNewest();
+      requestAnimationFrame(scrollToNewest);
+    });
   } catch (error) {
     console.error("Unexpected Community Chat send error:", error);
     showError("Could not send your message: " + (error?.message || "Network connection failed. Please try again."));
