@@ -206,7 +206,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  scroll-behavior: smooth;
+  scroll-behavior: auto !important;
 }
 
 .messages::-webkit-scrollbar {
@@ -1263,7 +1263,7 @@ let initialChatScrollCancelled = false;
 let chatUserScrolledUp = false;
 // Explicitly force the next completed message refresh to the bottom after our own send.
 let forceChatScrollBottom = false;
-let chatLoadRetryScheduled = false;
+let chatLoadQueued = false;
 
 function cancelInitialChatScroll() {
   initialChatScrollCancelled = true;
@@ -2781,19 +2781,18 @@ document.getElementById("createPollButton").addEventListener("click", async () =
 async function loadMessages() {
 
   if (loadingMessages) {
-    // A realtime refresh may already be in progress when the user sends.
-    // Queue one follow-up refresh so the forced bottom-scroll is not lost.
-    if (forceChatScrollBottom && !chatLoadRetryScheduled) {
-      chatLoadRetryScheduled = true;
-      setTimeout(() => {
-        chatLoadRetryScheduled = false;
-        loadMessages();
-      }, 60);
-    }
+    // Do not drop refreshes that arrive while another fetch/render is running.
+    // In particular, a send must get a fresh fetch after the in-flight render.
+    chatLoadQueued = true;
     return;
   }
 
   loadingMessages = true;
+  // Consume the force-bottom request at the start of THIS fetch. If a send
+  // happens while this fetch is in flight, its new request stays queued for
+  // the follow-up fetch instead of being consumed by stale data.
+  const forceBottomThisLoad = forceChatScrollBottom;
+  forceChatScrollBottom = false;
 
   try {
     // Fetch the newest 100 messages first to keep rendering and scrolling responsive.
@@ -2825,9 +2824,8 @@ async function loadMessages() {
       .join("|");
 
     if (signature === lastRenderedMessageSignature) {
-      if (forceChatScrollBottom) {
+      if (forceBottomThisLoad) {
         messagesEl.scrollTop = messagesEl.scrollHeight;
-        forceChatScrollBottom = false;
       }
       return;
     }
@@ -2844,17 +2842,12 @@ async function loadMessages() {
       chatUserScrolledUp = false;
     }
     const shouldScrollBottom =
-      forceChatScrollBottom ||
+      forceBottomThisLoad ||
       isInitialRender ||
       (!chatUserScrolledUp && distanceFromBottom < 80);
 
     lastRenderedMessageSignature = signature;
     await renderMessages(orderedMessages, shouldScrollBottom);
-    if (forceChatScrollBottom) {
-      // Clear the override only after the new message DOM has been rendered.
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-      forceChatScrollBottom = false;
-    }
 
     // Retry only on entry, since the layout may settle after the first paint.
     // Upward user scrolling cancels these retries so normal scroll-up behavior
@@ -2872,6 +2865,12 @@ async function loadMessages() {
     console.error("Unexpected error loading chat messages:", error);
   } finally {
     loadingMessages = false;
+    if (chatLoadQueued) {
+      chatLoadQueued = false;
+      // Start the follow-up only after the current fetch AND render are done.
+      // A zero-delay task avoids overlapping renders or replacing stale rows.
+      setTimeout(() => loadMessages(), 0);
+    }
   }
 
 }
