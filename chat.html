@@ -1261,6 +1261,9 @@ try {
 // position briefly, but stop as soon as the user deliberately scrolls upward.
 let initialChatScrollCancelled = false;
 let chatUserScrolledUp = false;
+// Explicitly force the next completed message refresh to the bottom after our own send.
+let forceChatScrollBottom = false;
+let chatLoadRetryScheduled = false;
 
 function cancelInitialChatScroll() {
   initialChatScrollCancelled = true;
@@ -2778,6 +2781,15 @@ document.getElementById("createPollButton").addEventListener("click", async () =
 async function loadMessages() {
 
   if (loadingMessages) {
+    // A realtime refresh may already be in progress when the user sends.
+    // Queue one follow-up refresh so the forced bottom-scroll is not lost.
+    if (forceChatScrollBottom && !chatLoadRetryScheduled) {
+      chatLoadRetryScheduled = true;
+      setTimeout(() => {
+        chatLoadRetryScheduled = false;
+        loadMessages();
+      }, 60);
+    }
     return;
   }
 
@@ -2813,6 +2825,10 @@ async function loadMessages() {
       .join("|");
 
     if (signature === lastRenderedMessageSignature) {
+      if (forceChatScrollBottom) {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        forceChatScrollBottom = false;
+      }
       return;
     }
 
@@ -2828,11 +2844,17 @@ async function loadMessages() {
       chatUserScrolledUp = false;
     }
     const shouldScrollBottom =
+      forceChatScrollBottom ||
       isInitialRender ||
       (!chatUserScrolledUp && distanceFromBottom < 80);
 
     lastRenderedMessageSignature = signature;
     await renderMessages(orderedMessages, shouldScrollBottom);
+    if (forceChatScrollBottom) {
+      // Clear the override only after the new message DOM has been rendered.
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      forceChatScrollBottom = false;
+    }
 
     // Retry only on entry, since the layout may settle after the first paint.
     // Upward user scrolling cancels these retries so normal scroll-up behavior
@@ -2922,10 +2944,9 @@ async function sendMessage() {
     // After sending, always follow the newest message even if the user had
     // previously scrolled up. This only changes position after their own send.
     chatUserScrolledUp = false;
-    // Move to the bottom BEFORE re-rendering so loadMessages detects that the
-    // reader is at the bottom; otherwise its old scroll position can be restored
-    // first, creating a visible jump up before the later scroll correction.
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    // Force the refresh to render at the bottom. This also survives a refresh
+    // already in progress, which caused the previous scroll fix to be ignored.
+    forceChatScrollBottom = true;
     await loadMessages();
     const scrollToNewest = () => {
       messagesEl.scrollTop = messagesEl.scrollHeight;
