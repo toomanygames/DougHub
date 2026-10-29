@@ -3717,7 +3717,7 @@ startCommunityChat();
   window.setInterval(()=>{if(!drawer.hidden&&document.visibilityState==="visible")loadPolls(true);},15000);
   window.addEventListener("focus",()=>{if(!drawer.hidden)loadPolls(true);});
   // Keep the launcher available and poll scope fresh when users switch channels.
-  window.setInterval(()=>{const scope=String(activeChatGroupId??"public");if(scope!==lastScope){lastScope=scope;document.getElementById("pollsScopeLabel").textContent=(activeChatGroupId===null?"Public Chat":(activeChatGroup?.name||"Selected group"))+" · Vote and see results";loadPolls(true);}},1200);
+  window.setInterval(()=>{createToggle.hidden=!isStaffAdmin();const scope=String(activeChatGroupId??"public");if(scope!==lastScope){lastScope=scope;document.getElementById("pollsScopeLabel").textContent=(activeChatGroupId===null?"Public Chat":(activeChatGroup?.name||"Selected group"))+" · Vote and see results";loadPolls(true);}},1200);
 })();
 </script>
 
