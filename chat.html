@@ -946,6 +946,61 @@ main {
 .chat-feature-panel[hidden],.chat-feature-actions button[hidden]{display:none}
 .chat-pinned-item{border:1px solid rgba(165,180,252,.16);background:rgba(255,255,255,.035);border-radius:11px;padding:10px}
 </style>
+
+<style id="douqhub-polls-drawer-style">
+#pollsLauncher{position:fixed;right:14px;bottom:18px;z-index:12000;border:1px solid #8b8ff8aa;border-radius:15px;padding:11px 15px;background:linear-gradient(135deg,#6366f1,#9333ea);color:#fff;font-weight:850;box-shadow:0 12px 34px #0008;cursor:pointer}
+#pollsLauncher[hidden],#pollsBackdrop[hidden],#pollsDrawer[hidden]{display:none!important}
+#pollsBackdrop{position:fixed;inset:0;z-index:12001;background:rgba(2,4,12,.48);backdrop-filter:blur(3px)}
+#pollsDrawer{position:fixed;z-index:12002;top:0;right:0;height:100dvh;width:min(460px,96vw);display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at top right,#30216a 0,transparent 42%),linear-gradient(160deg,#10142d,#070914 78%);border-left:1px solid #a5b4fc44;box-shadow:-24px 0 80px #0009;color:#f6f5ff;animation:pollDrawerIn .22s ease-out}
+@keyframes pollDrawerIn{from{transform:translateX(32px);opacity:.5}to{transform:none;opacity:1}}
+.polls-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:19px 18px 15px;border-bottom:1px solid #ffffff16}
+.polls-eyebrow{font-size:10px;letter-spacing:.16em;font-weight:900;color:#a5b4fc;text-transform:uppercase}
+.polls-title{font-size:24px;font-weight:900;letter-spacing:-.04em;margin-top:4px}
+.polls-subtitle{font-size:12px;color:#a5abc8;margin-top:4px}
+.polls-close{width:36px;height:36px;flex:0 0 36px;border-radius:12px;border:1px solid #ffffff20;background:#ffffff0a;color:#e9eaff;font-size:22px;cursor:pointer}
+.polls-toolbar{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid #ffffff12}
+.polls-toolbar button,.poll-admin-actions button,.poll-create-form button{border:1px solid #a5b4fc38;border-radius:11px;background:#818cf81b;color:#e5e7ff;padding:9px 11px;font-size:12px;font-weight:800;cursor:pointer}
+.polls-toolbar button.primary,.poll-create-form button.primary{background:linear-gradient(135deg,#6366f1,#9333ea);border-color:#a5b4fc66;color:white}
+.polls-toolbar .polls-filter{margin-left:auto;max-width:145px;min-width:0;padding:8px 10px;background:#0b0d20;color:#f5f5ff;border:1px solid #ffffff20;border-radius:10px}
+#pollsList{flex:1;min-height:0;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.poll-empty{padding:28px 20px;text-align:center;border:1px dashed #a5b4fc35;border-radius:18px;background:#ffffff04;color:#b7bdd8}
+.poll-empty strong{display:block;color:#f4f3ff;font-size:16px;margin-bottom:6px}
+.poll-card{position:relative;overflow:hidden;border:1px solid #a5b4fc28;border-radius:18px;padding:15px;background:linear-gradient(145deg,#ffffff0b,#ffffff03);box-shadow:0 10px 28px #0002}
+.poll-card.featured{border-color:#a78bfa88;background:linear-gradient(145deg,#8b5cf626,#ffffff04)}
+.poll-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.poll-badges{display:flex;flex-wrap:wrap;gap:5px}
+.poll-badge{font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:#818cf81b;border:1px solid #818cf832;color:#c7d2fe}
+.poll-badge.closed{color:#c4c7d8;background:#ffffff0b;border-color:#ffffff1a}
+.poll-badge.featured{color:#f5d0fe;background:#a855f72b;border-color:#d8b4fe55}
+.poll-time{font-size:10px;color:#9298b6;white-space:nowrap}
+.poll-question{font-size:17px;line-height:1.3;font-weight:850;letter-spacing:-.025em;overflow-wrap:anywhere}
+.poll-description{font-size:12px;line-height:1.5;color:#aeb4d0;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+.poll-options{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.poll-option{position:relative;overflow:hidden;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:11px 12px;border:1px solid #a5b4fc2e;border-radius:12px;background:#090c1d;color:#e9eaff;cursor:pointer;min-height:43px}
+.poll-option:disabled{cursor:default}
+.poll-option:not(:disabled):hover{border-color:#a5b4fc88;background:#1a1c3c}
+.poll-option.selected{border-color:#a5b4fcaa;background:#6366f126}
+.poll-option-label{position:relative;z-index:1;font-size:12px;font-weight:750;overflow-wrap:anywhere}
+.poll-option-count{position:relative;z-index:1;font-size:11px;color:#b9c0df;white-space:nowrap}
+.poll-option-bar{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#6366f136,#a855f72c);pointer-events:none;transition:width .3s ease}
+.poll-results-summary{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font-size:10px;color:#959bb9}
+.poll-admin-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid #ffffff10}
+.poll-admin-actions button{padding:7px 9px;font-size:10px}
+.poll-admin-actions button.danger{color:#fecaca;border-color:#f871713d;background:#ef444414}
+.poll-create-wrap{border-bottom:1px solid #ffffff12;background:#ffffff04;padding:12px 15px}
+.poll-create-wrap[hidden]{display:none!important}
+.poll-create-form{display:flex;flex-direction:column;gap:9px}
+.poll-create-form label{font-size:11px;font-weight:800;color:#c8ccee}
+.poll-create-form input,.poll-create-form textarea,.poll-create-form select{display:block;width:100%;margin-top:5px;padding:10px 11px;border-radius:11px;background:#080b1b;color:#f5f5ff;border:1px solid #a5b4fc2c;font-size:12px}
+.poll-create-form textarea{resize:vertical;min-height:56px}
+.poll-option-editor{display:flex;flex-direction:column;gap:6px}
+.poll-option-editor input{margin-top:0}
+.poll-create-actions{display:flex;gap:8px;justify-content:flex-end}
+.poll-status{padding:7px 15px;color:#a5b4fc;font-size:11px;min-height:26px}
+.poll-status.error{color:#fca5a5}
+@media(max-width:520px){#pollsDrawer{width:100vw;border-left:0}.polls-head{padding:15px}.polls-title{font-size:22px}#pollsList{padding:10px}.poll-card{padding:13px}#pollsLauncher{right:9px;bottom:10px}}
+</style>
+
 </head>
 
 </head>
@@ -3506,6 +3561,165 @@ startCommunityChat();
   });
   searchCommons();
 })();</script>
+
+
+<div id="pollsBackdrop" aria-hidden="true"></div>
+<aside id="pollsDrawer" role="dialog" aria-modal="true" aria-labelledby="pollsDrawerTitle">
+  <div class="polls-head">
+    <div><div class="polls-eyebrow">DOUGHUB COMMUNITY</div><div class="polls-title" id="pollsDrawerTitle">Live Polls</div><div class="polls-subtitle" id="pollsScopeLabel">Public Chat · Vote and see results</div></div>
+    <button type="button" class="polls-close" id="pollsClose" aria-label="Close polls">×</button>
+  </div>
+  <div class="polls-toolbar">
+    <button type="button" id="pollsRefresh">↻ Refresh</button>
+    <button type="button" class="primary" id="pollsCreateToggle" hidden>＋ Create poll</button>
+    <select class="polls-filter" id="pollsFilter" aria-label="Filter polls"><option value="all">All polls</option><option value="open">Open only</option><option value="closed">Closed</option></select>
+  </div>
+  <div class="poll-create-wrap" id="pollCreateWrap" hidden>
+    <form class="poll-create-form" id="pollCreateForm">
+      <label>Question *<input id="pollQuestion" maxlength="240" required placeholder="What should the community decide?"></label>
+      <label>Extra details (optional)<textarea id="pollDescription" maxlength="500" placeholder="Add context or explain what the vote is for…"></textarea></label>
+      <label>Answer options <span style="color:#9298b6;font-weight:500">(2–6)</span><div class="poll-option-editor" id="pollOptionEditor"><input maxlength="120" required placeholder="Option 1"><input maxlength="120" required placeholder="Option 2"></div></label>
+      <div style="display:flex;gap:8px;align-items:end">
+        <label style="flex:1">Auto-close<select id="pollDuration"><option value="0">No time limit</option><option value="1">1 hour</option><option value="24">24 hours</option><option value="168">7 days</option></select></label>
+        <button type="button" id="pollAddOption">＋ Option</button>
+      </div>
+      <div class="poll-create-actions"><button type="button" id="pollCancelCreate">Cancel</button><button class="primary" type="submit" id="pollSubmitCreate">Launch poll</button></div>
+    </form>
+  </div>
+  <div id="pollsList" aria-live="polite"><div class="poll-empty"><strong>Loading polls…</strong>Connecting to the community vote board.</div></div>
+  <div class="poll-status" id="pollStatus" role="status"></div>
+</aside>
+<button type="button" id="pollsLauncher" hidden aria-controls="pollsDrawer">▤ Polls</button>
+
+
+<script id="douqhub-polls-drawer-script">
+(function initDougHubPollsDrawer(){
+  const drawer=document.getElementById("pollsDrawer");
+  const backdrop=document.getElementById("pollsBackdrop");
+  const launcher=document.getElementById("pollsLauncher");
+  const list=document.getElementById("pollsList");
+  const status=document.getElementById("pollStatus");
+  const createToggle=document.getElementById("pollsCreateToggle");
+  const createWrap=document.getElementById("pollCreateWrap");
+  const createForm=document.getElementById("pollCreateForm");
+  const optionEditor=document.getElementById("pollOptionEditor");
+  const filter=document.getElementById("pollsFilter");
+  if(!drawer||!list||window.__douqhubPollsDrawerReady)return;
+  window.__douqhubPollsDrawerReady=true;
+  let pollsCache=[];
+  let voteCache=[];
+  let busy=false;
+  let lastScope="__init__";
+  const isStaffAdmin=()=>Boolean(currentUser&&currentUserIsAdmin);
+  const escapeText=value=>String(value??"");
+  function setStatus(message,isError=false){status.textContent=message||"";status.classList.toggle("error",Boolean(isError));}
+  function openDrawer(){drawer.hidden=false;backdrop.hidden=false;launcher.hidden=true;document.body.classList.add("polls-drawer-open");loadPolls(true);}
+  function closeDrawer(){drawer.hidden=true;backdrop.hidden=true;launcher.hidden=false;document.body.classList.remove("polls-drawer-open");}
+  document.getElementById("pollsClose").addEventListener("click",closeDrawer);
+  launcher.addEventListener("click",openDrawer);
+  backdrop.addEventListener("click",closeDrawer);
+  document.getElementById("pollsRefresh").addEventListener("click",()=>loadPolls(true));
+  document.getElementById("pollsCreateToggle").addEventListener("click",()=>{createWrap.hidden=!createWrap.hidden;if(!createWrap.hidden)document.getElementById("pollQuestion").focus();});
+  document.getElementById("pollCancelCreate").addEventListener("click",()=>{createWrap.hidden=true;createForm.reset();resetOptions();setStatus("");});
+  filter.addEventListener("change",renderPolls);
+  document.getElementById("pollAddOption").addEventListener("click",()=>{
+    const inputs=optionEditor.querySelectorAll("input");
+    if(inputs.length>=6)return setStatus("Polls can have at most 6 options.",true);
+    const input=document.createElement("input");input.maxLength=120;input.required=true;input.placeholder="Option "+(inputs.length+1);optionEditor.appendChild(input);input.focus();
+  });
+  function resetOptions(){optionEditor.replaceChildren();for(let i=1;i<=2;i++){const input=document.createElement("input");input.maxLength=120;input.required=true;input.placeholder="Option "+i;optionEditor.appendChild(input);}}
+  function scopeQuery(query){return activeChatGroupId===null?query.is("group_id",null):query.eq("group_id",activeChatGroupId);}
+  function pollIsClosed(p){return p.is_closed===true||(p.ends_at&&new Date(p.ends_at).getTime()<=Date.now());}
+  function timeLabel(p){if(p.is_closed)return "Closed";if(p.ends_at){const left=new Date(p.ends_at).getTime()-Date.now();if(left<=0)return "Ended";const mins=Math.ceil(left/60000);if(mins<60)return mins+"m left";const hours=Math.ceil(mins/60);if(hours<24)return hours+"h left";return Math.ceil(hours/24)+"d left";}return "No deadline";}
+  async function loadPolls(force){
+    if(!supabaseClient||busy)return;
+    const scope=String(activeChatGroupId??"public");
+    if(!force&&scope===lastScope&&document.visibilityState!=="visible")return;
+    busy=true;lastScope=scope;
+    createToggle.hidden=!isStaffAdmin();
+    document.getElementById("pollsScopeLabel").textContent=(activeChatGroupId===null?"Public Chat":(activeChatGroup?.name||"Selected group"))+" · Vote and see results";
+    try{
+      let q=scopeQuery(supabaseClient.from("chat_polls").select("id,group_id,created_by,question,description,options,is_closed,is_featured,ends_at,created_at").order("is_featured",{ascending:false}).order("created_at",{ascending:false}).limit(60));
+      const pollResult=await q;
+      if(pollResult.error)throw pollResult.error;
+      pollsCache=pollResult.data||[];
+      if(pollsCache.length){
+        const ids=pollsCache.map(p=>p.id);
+        const votes=await supabaseClient.from("chat_poll_votes").select("poll_id,user_id,option_index").in("poll_id",ids);
+        if(votes.error)throw votes.error;
+        voteCache=votes.data||[];
+      }else voteCache=[];
+      renderPolls();setStatus("");
+    }catch(error){console.error("DougHub polls failed to load:",error);list.replaceChildren();const empty=document.createElement("div");empty.className="poll-empty";const title=document.createElement("strong");title.textContent="Polls couldn't load";const detail=document.createElement("div");detail.textContent=error?.message||"Check your connection and refresh.";empty.append(title,detail);list.appendChild(empty);setStatus("Couldn't refresh poll data.",true);}
+    finally{busy=false;}
+  }
+  function renderPolls(){
+    list.replaceChildren();
+    const view=pollsCache.filter(p=>filter.value==="all"||(filter.value==="open"?!pollIsClosed(p):pollIsClosed(p)));
+    if(!view.length){const empty=document.createElement("div");empty.className="poll-empty";const title=document.createElement("strong");title.textContent=filter.value==="closed"?"No closed polls yet":"No polls here yet";const detail=document.createElement("div");detail.textContent=isStaffAdmin()?"Create a poll to let the community vote.":"Staff-run polls will appear here when they launch.";empty.append(title,detail);list.appendChild(empty);return;}
+    view.forEach(p=>{
+      const options=Array.isArray(p.options)?p.options.map(x=>String(x)):[];const votes=voteCache.filter(v=>v.poll_id===p.id);const total=votes.length;const mine=votes.find(v=>v.user_id===currentUser?.id);const closed=pollIsClosed(p);
+      const card=document.createElement("article");card.className="poll-card"+(p.is_featured?" featured":"");
+      const top=document.createElement("div");top.className="poll-card-top";const badges=document.createElement("div");badges.className="poll-badges";
+      const state=document.createElement("span");state.className="poll-badge"+(closed?" closed":"");state.textContent=closed?"CLOSED":"LIVE";badges.appendChild(state);
+      if(p.is_featured){const b=document.createElement("span");b.className="poll-badge featured";b.textContent="FEATURED";badges.appendChild(b);}
+      const time=document.createElement("span");time.className="poll-time";time.textContent=timeLabel(p);top.append(badges,time);
+      const question=document.createElement("div");question.className="poll-question";question.textContent=p.question;
+      card.append(top,question);
+      if(p.description){const desc=document.createElement("div");desc.className="poll-description";desc.textContent=p.description;card.appendChild(desc);}
+      const optionsWrap=document.createElement("div");optionsWrap.className="poll-options";
+      options.forEach((label,index)=>{
+        const count=votes.filter(v=>Number(v.option_index)===index).length;const pct=total?Math.round(count*100/total):0;
+        const button=document.createElement("button");button.type="button";button.className="poll-option"+(Number(mine?.option_index)===index?" selected":"");button.disabled=closed||!currentUser;
+        const bar=document.createElement("span");bar.className="poll-option-bar";bar.style.width=pct+"%";
+        const name=document.createElement("span");name.className="poll-option-label";name.textContent=label;
+        const countEl=document.createElement("span");countEl.className="poll-option-count";countEl.textContent=total?pct+"% · "+count:"0 votes";
+        button.append(bar,name,countEl);
+        button.title=!currentUser?"Sign in to vote":closed?"This poll is closed":Number(mine?.option_index)===index?"Your current vote":"Vote for "+label;
+        button.addEventListener("click",async()=>{
+          if(!currentUser)return setStatus("Sign in to vote in polls.",true);
+          if(busy)return;
+          busy=true;setStatus("Saving your vote…");
+          try{const result=await supabaseClient.from("chat_poll_votes").upsert({poll_id:p.id,user_id:currentUser.id,option_index:index},{onConflict:"poll_id,user_id"});if(result.error)throw result.error;await loadPolls(true);setStatus("Vote saved.");}
+          catch(error){console.error("Poll vote failed:",error);setStatus(error?.message||"Vote failed. Try again.",true);}
+          finally{busy=false;}
+        });
+        optionsWrap.appendChild(button);
+      });
+      card.appendChild(optionsWrap);
+      const summary=document.createElement("div");summary.className="poll-results-summary";const countLabel=document.createElement("span");countLabel.textContent=total+" vote"+(total===1?"":"s");const voterLabel=document.createElement("span");voterLabel.textContent=mine?"Your vote is recorded":(currentUser?"Choose an option to vote":"Sign in to vote");summary.append(countLabel,voterLabel);card.appendChild(summary);
+      if(isStaffAdmin()){
+        const actions=document.createElement("div");actions.className="poll-admin-actions";
+        const close=document.createElement("button");close.type="button";close.textContent=closed?"Reopen":"Close poll";close.addEventListener("click",()=>adminUpdatePoll(p.id,{is_closed:!closed,ends_at:closed?null:p.ends_at},closed?"Reopen this poll?":"Close voting for this poll?"));
+        const feature=document.createElement("button");feature.type="button";feature.textContent=p.is_featured?"Unfeature":"Feature";feature.addEventListener("click",()=>adminUpdatePoll(p.id,{is_featured:!p.is_featured},p.is_featured?"Remove this poll from featured?":"Feature this poll at the top?"));
+        const remove=document.createElement("button");remove.type="button";remove.className="danger";remove.textContent="Delete";remove.addEventListener("click",async()=>{if(!confirm("Delete this poll and its votes? This cannot be undone."))return;try{const result=await supabaseClient.from("chat_polls").delete().eq("id",p.id);if(result.error)throw result.error;setStatus("Poll deleted.");await loadPolls(true);}catch(error){setStatus(error?.message||"Could not delete poll.",true);}});
+        actions.append(close,feature,remove);card.appendChild(actions);
+      }
+      list.appendChild(card);
+    });
+  }
+  async function adminUpdatePoll(id,patch,confirmText){if(!isStaffAdmin())return setStatus("Admin+ access is required.",true);if(!confirm(confirmText))return;try{const result=await supabaseClient.from("chat_polls").update(patch).eq("id",id);if(result.error)throw result.error;setStatus("Poll updated.");await loadPolls(true);}catch(error){setStatus(error?.message||"Could not update poll.",true);}}
+  createForm.addEventListener("submit",async event=>{
+    event.preventDefault();if(!isStaffAdmin())return setStatus("Only Admin+ can run polls.",true);if(!currentUser)return setStatus("Sign in with an Admin+ account first.",true);
+    const question=document.getElementById("pollQuestion").value.trim();const description=document.getElementById("pollDescription").value.trim();const options=[...optionEditor.querySelectorAll("input")].map(x=>x.value.trim()).filter(Boolean);
+    if(question.length<1||options.length<2||options.length>6||new Set(options.map(x=>x.toLowerCase())).size!==options.length)return setStatus("Enter a question and 2–6 unique answer options.",true);
+    const hours=Number(document.getElementById("pollDuration").value);const endsAt=hours?new Date(Date.now()+hours*3600000).toISOString():null;
+    const submit=document.getElementById("pollSubmitCreate");submit.disabled=true;submit.textContent="Launching…";setStatus("Launching poll…");
+    try{const result=await supabaseClient.from("chat_polls").insert({group_id:activeChatGroupId,created_by:currentUser.id,question,description,options,is_closed:false,is_featured:false,ends_at:endsAt}).select("id").single();if(result.error)throw result.error;createForm.reset();resetOptions();createWrap.hidden=true;filter.value="all";setStatus("Poll launched successfully.");await loadPolls(true);}
+    catch(error){console.error("Poll creation failed:",error);setStatus(error?.message||"Couldn't launch the poll.",true);}
+    finally{submit.disabled=false;submit.textContent="Launch poll";}
+  });
+  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!drawer.hidden)closeDrawer();});
+  // Start open on every visit. Closing it only affects the current page view.
+  drawer.hidden=false;backdrop.hidden=false;launcher.hidden=true;
+  const startup=()=>loadPolls(true);
+  const waitForClient=setInterval(()=>{if(supabaseClient){clearInterval(waitForClient);startup();}},250);
+  window.setInterval(()=>{if(!drawer.hidden&&document.visibilityState==="visible")loadPolls(true);},15000);
+  window.addEventListener("focus",()=>{if(!drawer.hidden)loadPolls(true);});
+  // Keep the launcher available and poll scope fresh when users switch channels.
+  window.setInterval(()=>{const scope=String(activeChatGroupId??"public");if(scope!==lastScope){lastScope=scope;document.getElementById("pollsScopeLabel").textContent=(activeChatGroupId===null?"Public Chat":(activeChatGroup?.name||"Selected group"))+" · Vote and see results";loadPolls(true);}},1200);
+})();
+</script>
 
 </body>
 </html>
