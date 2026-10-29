@@ -1155,6 +1155,80 @@
     }
 
 
+    /* DAILY CHAT + GAMES NAVIGATION BLACKOUT — Pacific Time */
+    function startChatGamesDailyButtonSchedule(client) {
+        if (window.__douqhubChatGamesDailyScheduleStarted) return;
+        window.__douqhubChatGamesDailyScheduleStarted = true;
+        const LOCK_PATH = "__daily_chat_games_button_lock__";
+        let enabled = false;
+        function withinBlackout() {
+            const parts = new Intl.DateTimeFormat("en-US", {
+                timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+            }).formatToParts(new Date());
+            const hour = Number(parts.find(p => p.type === "hour")?.value || 0);
+            const minute = Number(parts.find(p => p.type === "minute")?.value || 0);
+            const minutes = hour * 60 + minute;
+            return minutes >= 540 && minutes <= 890;
+        }
+        function isTarget(el) {
+            if (!(el instanceof Element) || !el.matches("a[href],button,[role='button']")) return false;
+            const href = (el.getAttribute("href") || "").trim().toLowerCase();
+            if (href) {
+                try {
+                    const url = new URL(href, location.href);
+                    const parts = url.pathname.split("/").filter(Boolean);
+                    const file = (parts[parts.length - 1] || "").replace(".html", "");
+                    if (file === "chat" || file === "games") return true;
+                } catch (_) {}
+            }
+            const label = (el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || "").trim().toLowerCase();
+            return ["chat","community chat","games","community games"].includes(label);
+        }
+        function apply() {
+            const locked = enabled && withinBlackout();
+            document.querySelectorAll("a[href],button,[role='button']").forEach(el => {
+                if (!isTarget(el) || el.closest("#chatGamesDailyScheduleCard")) return;
+                if (locked) {
+                    if (!el.dataset.dhDailyScheduleSaved) {
+                        el.dataset.dhDailyScheduleSaved = "1";
+                        el.dataset.dhDailyScheduleDisplay = el.style.display || "";
+                        el.dataset.dhDailyScheduleAria = el.getAttribute("aria-hidden") || "";
+                    }
+                    el.style.setProperty("display", "none", "important");
+                    el.setAttribute("aria-hidden", "true");
+                    el.setAttribute("tabindex", "-1");
+                } else if (el.dataset.dhDailyScheduleSaved) {
+                    el.style.display = el.dataset.dhDailyScheduleDisplay || "";
+                    if (el.dataset.dhDailyScheduleAria) el.setAttribute("aria-hidden", el.dataset.dhDailyScheduleAria);
+                    else el.removeAttribute("aria-hidden");
+                    el.removeAttribute("tabindex");
+                    delete el.dataset.dhDailyScheduleSaved;
+                    delete el.dataset.dhDailyScheduleDisplay;
+                    delete el.dataset.dhDailyScheduleAria;
+                }
+            });
+        }
+        async function refresh() {
+            try {
+                const {data,error} = await client.from("site_page_schedules").select("enabled")
+                    .eq("page_path", LOCK_PATH).maybeSingle();
+                if (error) throw error;
+                enabled = !!data?.enabled;
+            } catch (error) { console.debug("Could not load daily Chat/Games button schedule:", error); }
+            apply();
+        }
+        refresh();
+        setInterval(refresh, 60000);
+        setInterval(apply, 15000);
+        const observe = () => {
+            if (!document.body) return;
+            new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
+            apply();
+        };
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",observe,{once:true});
+        else observe();
+    }
+
     /* =========================================
        INITIALIZE
     ========================================= */
@@ -1178,6 +1252,7 @@
             window.dispatchEvent(new Event("douqhub:supabase-ready"));
             initializeOgBadges(supabaseClient);
             startDougHubChatDings(supabaseClient);
+            startChatGamesDailyButtonSchedule(supabaseClient);
 
             createStyles();
 
