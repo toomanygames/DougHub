@@ -5227,7 +5227,7 @@ async function loadChatGamesDailySchedule() {
     const status = document.getElementById("chatGamesDailyScheduleStatus");
     const toggle = document.getElementById("chatGamesDailyScheduleEnabled");
     if (!status || !toggle || !supabaseClient) return;
-    if (currentAdminRole !== "owner") {
+    if (currentAdminRole !== "owner" && currentAdminUser?.id !== DOUGHUB_OWNER_ID) {
         status.textContent = "Owner access required.";
         toggle.disabled = true;
         document.getElementById("saveChatGamesDailyScheduleButton").disabled = true;
@@ -5239,13 +5239,13 @@ async function loadChatGamesDailySchedule() {
         .eq("page_path", CHAT_GAMES_DAILY_LOCK_PATH).maybeSingle();
     if (error) { status.textContent = "Could not load schedule: " + error.message; return; }
     toggle.checked = !!data?.enabled;
-    status.textContent = toggle.checked ? "Enabled · Daily 9:00 AM–2:50 PM Pacific" : "Disabled · Chat and Games buttons stay visible";
+    status.textContent = toggle.checked ? "Enabled · Daily 9:00 AM–2:50 PM Pacific" : "Disabled · Chat and Games pages open normally";
 }
 async function saveChatGamesDailySchedule() {
     const status = document.getElementById("chatGamesDailyScheduleStatus");
     const toggle = document.getElementById("chatGamesDailyScheduleEnabled");
     const button = document.getElementById("saveChatGamesDailyScheduleButton");
-    if (currentAdminRole !== "owner") { status.textContent = "Only the Owner can change this site-wide schedule."; return; }
+    if (currentAdminRole !== "owner" && currentAdminUser?.id !== DOUGHUB_OWNER_ID) { status.textContent = "Only the Owner can change this site-wide schedule."; return; }
     button.disabled = true; status.textContent = "Saving site-wide schedule…";
     try {
         const enabled = !!toggle.checked;
@@ -5259,8 +5259,8 @@ async function saveChatGamesDailySchedule() {
         };
         const {error} = await supabaseClient.from("site_page_schedules").upsert(payload,{onConflict:"page_path"});
         if (error) throw error;
-        status.textContent = enabled ? "Saved. Buttons will be hidden daily from 9:00 AM to 2:50 PM Pacific." : "Saved. Chat and Games buttons will remain visible.";
-        await writeAuditLog("admin_action","navigation",enabled ? "Enabled daily Chat & Games navigation blackout (9:00 AM–2:50 PM Pacific)" : "Disabled daily Chat & Games navigation blackout");
+        status.textContent = enabled ? "Saved. Chat and Games pages will show the scheduled error screen daily from 9:00 AM to 2:50 PM Pacific. Press Q to dismiss until reload." : "Saved. Chat and Games pages will open normally.";
+        try { await writeAuditLog("admin_action","navigation",enabled ? "Enabled daily Chat & Games error screen (9:00 AM–2:50 PM Pacific)" : "Disabled daily Chat & Games error screen"); } catch (auditError) { console.warn("Schedule saved; audit log could not be written:", auditError); }
     } catch (error) {
         status.textContent = "Could not save: " + (error?.message || "Database error");
     } finally { button.disabled = false; }
