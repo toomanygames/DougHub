@@ -5361,7 +5361,7 @@ function applyStaffPermissions(){
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
+    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
     if(/custombadgemanagercard|feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
