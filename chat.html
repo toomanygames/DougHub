@@ -3680,9 +3680,9 @@ startCommunityChat();
           if(!currentUser)return setStatus("Sign in to vote in polls.",true);
           if(busy)return;
           busy=true;setStatus("Saving your vote…");
-          try{const result=await supabaseClient.from("chat_poll_votes").upsert({poll_id:p.id,user_id:currentUser.id,option_index:index},{onConflict:"poll_id,user_id"});if(result.error)throw result.error;await loadPolls(true);setStatus("Vote saved.");}
+          try{const result=await supabaseClient.from("chat_poll_votes").upsert({poll_id:p.id,user_id:currentUser.id,option_index:index},{onConflict:"poll_id,user_id"});if(result.error)throw result.error;setStatus("Vote saved.");}
           catch(error){console.error("Poll vote failed:",error);setStatus(error?.message||"Vote failed. Try again.",true);}
-          finally{busy=false;}
+          finally{busy=false;await loadPolls(true);}
         });
         optionsWrap.appendChild(button);
       });
@@ -3692,7 +3692,7 @@ startCommunityChat();
         const actions=document.createElement("div");actions.className="poll-admin-actions";
         const close=document.createElement("button");close.type="button";close.textContent=closed?"Reopen":"Close poll";close.addEventListener("click",()=>adminUpdatePoll(p.id,{is_closed:!closed,ends_at:closed?null:p.ends_at},closed?"Reopen this poll?":"Close voting for this poll?"));
         const feature=document.createElement("button");feature.type="button";feature.textContent=p.is_featured?"Unfeature":"Feature";feature.addEventListener("click",()=>adminUpdatePoll(p.id,{is_featured:!p.is_featured},p.is_featured?"Remove this poll from featured?":"Feature this poll at the top?"));
-        const remove=document.createElement("button");remove.type="button";remove.className="danger";remove.textContent="Delete";remove.addEventListener("click",async()=>{if(!confirm("Delete this poll and its votes? This cannot be undone."))return;try{const result=await supabaseClient.from("chat_polls").delete().eq("id",p.id);if(result.error)throw result.error;setStatus("Poll deleted.");await loadPolls(true);}catch(error){setStatus(error?.message||"Could not delete poll.",true);}});
+        const remove=document.createElement("button");remove.type="button";remove.className="danger";remove.textContent="Delete";remove.addEventListener("click",async()=>{if(!confirm("Delete this poll and its votes? This cannot be undone."))return;try{const voteDelete=await supabaseClient.from("chat_poll_votes").delete().eq("poll_id",p.id);if(voteDelete.error)throw voteDelete.error;const result=await supabaseClient.from("chat_polls").delete().eq("id",p.id);if(result.error)throw result.error;setStatus("Poll deleted.");await loadPolls(true);}catch(error){setStatus(error?.message||"Could not delete poll.",true);}});
         actions.append(close,feature,remove);card.appendChild(actions);
       }
       list.appendChild(card);
