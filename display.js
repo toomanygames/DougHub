@@ -1164,7 +1164,7 @@
         function withinBlackout() {
             const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
             const hour = Number(parts.find(p => p.type === "hour")?.value || 0), minute = Number(parts.find(p => p.type === "minute")?.value || 0);
-            return hour * 60 + minute >= 540 && hour * 60 + minute < 890;
+            return hour * 60 + minute >= 540 && hour * 60 + minute <= 890;
         }
         function isChatOrGamesPage() {
             const path = location.pathname.toLowerCase().replace(/\/+$/, "");
@@ -1174,7 +1174,7 @@
         function buildOverlay() {
             if (overlay || !document.body) return;
             overlay = document.createElement("div"); overlay.id = "dhScheduledErrorPage"; overlay.setAttribute("role", "alertdialog"); overlay.setAttribute("aria-modal", "true");
-            overlay.innerHTML = '<div class="dh-scheduled-error-box"><div class="dh-scheduled-error-code">ERROR 503</div><h1>This page is temporarily unavailable</h1><p>Chat and Games are unavailable during scheduled hours.</p><p class="dh-scheduled-error-time">Scheduled window: 9:00 AM–2:50 PM Pacific Time</p><div class="dh-scheduled-error-hint">Press <kbd>Q</kbd> to continue anyway</div></div>';
+            overlay.innerHTML = '<div class="dh-scheduled-error-box"><div class="dh-scheduled-error-code">ERROR 503</div><h1>This page is temporarily unavailable</h1><p>Chat and Games are temporarily unavailable during scheduled hours.</p><p class="dh-scheduled-error-time">Scheduled window: 9:00 AM–2:50 PM Pacific Time</p><div class="dh-scheduled-error-hint">Press <kbd>Q</kbd> to dismiss this screen until you reload</div></div>';
             const style = document.createElement("style"); style.id = "dhScheduledErrorStyles";
             style.textContent = "#dhScheduledErrorPage{position:fixed;inset:0;z-index:2147483647;background:#070912;color:#e8ebff;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif}#dhScheduledErrorPage .dh-scheduled-error-box{width:min(620px,100%);border:1px solid #343950;background:#101321;padding:clamp(24px,5vw,48px);box-shadow:0 24px 80px #0009}#dhScheduledErrorPage .dh-scheduled-error-code{color:#ff6978;font:800 12px ui-monospace,monospace;letter-spacing:.18em}#dhScheduledErrorPage h1{font-size:clamp(26px,4vw,40px);line-height:1.12;margin:18px 0 14px}#dhScheduledErrorPage p{color:#b8bfd8;line-height:1.6}#dhScheduledErrorPage .dh-scheduled-error-time{font-size:13px}#dhScheduledErrorPage .dh-scheduled-error-hint{margin-top:30px;border-top:1px solid #303449;padding-top:18px;color:#cbd0e6}#dhScheduledErrorPage kbd{padding:3px 9px;border:1px solid #69708b;border-radius:4px;background:#20253a;color:white;font-weight:800}";
             document.head.appendChild(style); document.body.appendChild(overlay);
