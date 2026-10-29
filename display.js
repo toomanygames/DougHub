@@ -1155,78 +1155,35 @@
     }
 
 
-    /* DAILY CHAT + GAMES NAVIGATION BLACKOUT — Pacific Time */
+    /* DAILY CHAT + GAMES ERROR PAGE — Pacific Time. Q dismisses until reload. */
     function startChatGamesDailyButtonSchedule(client) {
         if (window.__douqhubChatGamesDailyScheduleStarted) return;
         window.__douqhubChatGamesDailyScheduleStarted = true;
         const LOCK_PATH = "__daily_chat_games_button_lock__";
-        let enabled = false;
+        let enabled = false, dismissed = false, overlay = null;
         function withinBlackout() {
-            const parts = new Intl.DateTimeFormat("en-US", {
-                timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
-            }).formatToParts(new Date());
-            const hour = Number(parts.find(p => p.type === "hour")?.value || 0);
-            const minute = Number(parts.find(p => p.type === "minute")?.value || 0);
-            const minutes = hour * 60 + minute;
-            return minutes >= 540 && minutes <= 890;
+            const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+            const hour = Number(parts.find(p => p.type === "hour")?.value || 0), minute = Number(parts.find(p => p.type === "minute")?.value || 0);
+            return hour * 60 + minute >= 540 && hour * 60 + minute < 890;
         }
-        function isTarget(el) {
-            if (!(el instanceof Element) || !el.matches("a[href],button,[role='button']")) return false;
-            const href = (el.getAttribute("href") || "").trim().toLowerCase();
-            if (href) {
-                try {
-                    const url = new URL(href, location.href);
-                    const parts = url.pathname.split("/").filter(Boolean);
-                    const file = (parts[parts.length - 1] || "").replace(".html", "");
-                    if (file === "chat" || file === "games") return true;
-                } catch (_) {}
-            }
-            const label = (el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || "").trim().toLowerCase();
-            return ["chat","community chat","games","community games"].includes(label);
+        function isChatOrGamesPage() {
+            const path = location.pathname.toLowerCase().replace(/\/+$/, "");
+            const file = (path.split("/").pop() || "").replace(/\.html$/, "");
+            return file === "chat" || file === "games" || file === "douggames" || path === "/games" || path.startsWith("/games/");
         }
-        function apply() {
-            const locked = enabled && withinBlackout();
-            document.querySelectorAll("a[href],button,[role='button']").forEach(el => {
-                if (!isTarget(el) || el.closest("#chatGamesDailyScheduleCard")) return;
-                if (locked) {
-                    if (!el.dataset.dhDailyScheduleSaved) {
-                        el.dataset.dhDailyScheduleSaved = "1";
-                        el.dataset.dhDailyScheduleDisplay = el.style.display || "";
-                        el.dataset.dhDailyScheduleAria = el.getAttribute("aria-hidden") || "";
-                    }
-                    el.style.setProperty("display", "none", "important");
-                    el.setAttribute("aria-hidden", "true");
-                    el.setAttribute("tabindex", "-1");
-                } else if (el.dataset.dhDailyScheduleSaved) {
-                    el.style.display = el.dataset.dhDailyScheduleDisplay || "";
-                    if (el.dataset.dhDailyScheduleAria) el.setAttribute("aria-hidden", el.dataset.dhDailyScheduleAria);
-                    else el.removeAttribute("aria-hidden");
-                    el.removeAttribute("tabindex");
-                    delete el.dataset.dhDailyScheduleSaved;
-                    delete el.dataset.dhDailyScheduleDisplay;
-                    delete el.dataset.dhDailyScheduleAria;
-                }
-            });
+        function buildOverlay() {
+            if (overlay || !document.body) return;
+            overlay = document.createElement("div"); overlay.id = "dhScheduledErrorPage"; overlay.setAttribute("role", "alertdialog"); overlay.setAttribute("aria-modal", "true");
+            overlay.innerHTML = '<div class="dh-scheduled-error-box"><div class="dh-scheduled-error-code">ERROR 503</div><h1>This page is temporarily unavailable</h1><p>Chat and Games are unavailable during scheduled hours.</p><p class="dh-scheduled-error-time">Scheduled window: 9:00 AM–2:50 PM Pacific Time</p><div class="dh-scheduled-error-hint">Press <kbd>Q</kbd> to continue anyway</div></div>';
+            const style = document.createElement("style"); style.id = "dhScheduledErrorStyles";
+            style.textContent = "#dhScheduledErrorPage{position:fixed;inset:0;z-index:2147483647;background:#070912;color:#e8ebff;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif}#dhScheduledErrorPage .dh-scheduled-error-box{width:min(620px,100%);border:1px solid #343950;background:#101321;padding:clamp(24px,5vw,48px);box-shadow:0 24px 80px #0009}#dhScheduledErrorPage .dh-scheduled-error-code{color:#ff6978;font:800 12px ui-monospace,monospace;letter-spacing:.18em}#dhScheduledErrorPage h1{font-size:clamp(26px,4vw,40px);line-height:1.12;margin:18px 0 14px}#dhScheduledErrorPage p{color:#b8bfd8;line-height:1.6}#dhScheduledErrorPage .dh-scheduled-error-time{font-size:13px}#dhScheduledErrorPage .dh-scheduled-error-hint{margin-top:30px;border-top:1px solid #303449;padding-top:18px;color:#cbd0e6}#dhScheduledErrorPage kbd{padding:3px 9px;border:1px solid #69708b;border-radius:4px;background:#20253a;color:white;font-weight:800}";
+            document.head.appendChild(style); document.body.appendChild(overlay);
         }
-        async function refresh() {
-            try {
-                const {data,error} = await client.from("site_page_schedules").select("enabled")
-                    .eq("page_path", LOCK_PATH).maybeSingle();
-                if (error) throw error;
-                enabled = !!data?.enabled;
-            } catch (error) { console.debug("Could not load daily Chat/Games button schedule:", error); }
-            apply();
-        }
-        refresh();
-        setInterval(refresh, 60000);
-        setInterval(apply, 15000);
-        const observe = () => {
-            if (!document.body) return;
-            new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
-            apply();
-        };
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",observe,{once:true});
-        else observe();
+        function removeOverlay() { if (overlay) overlay.remove(); overlay = null; const style = document.getElementById("dhScheduledErrorStyles"); if (style) style.remove(); }
+        function apply() { if (!isChatOrGamesPage()) { removeOverlay(); return; } if (enabled && withinBlackout() && !dismissed) buildOverlay(); else removeOverlay(); }
+        document.addEventListener("keydown", event => { if (event.key.toLowerCase() === "q" && overlay) { dismissed = true; removeOverlay(); } });
+        async function refresh() { try { const result = await client.from("site_page_schedules").select("enabled").eq("page_path", LOCK_PATH).maybeSingle(); if (result.error) throw result.error; enabled = !!result.data?.enabled; } catch (error) { console.error("Could not load daily Chat/Games error-page schedule:", error); } apply(); }
+        refresh(); setInterval(refresh, 60000); setInterval(apply, 15000);
     }
 
     /* =========================================
