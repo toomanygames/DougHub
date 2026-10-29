@@ -209,7 +209,8 @@ function showStageBanner(){const names=['NEON DOCKS','CRIMSON GRID','FROST CIRCU
 
 function toggleAutoAim(){autoAim=!autoAim;$('autoAimBtn').textContent='AUTO AIM: '+(autoAim?'ON':'OFF')+' · Q';$('autoAimBtn').classList.toggle('active',autoAim);$('autoAimBtn').setAttribute('aria-pressed',String(autoAim));$('autoAimNote').classList.toggle('hidden',!autoAim);$('aimDot').style.display=autoAim?'none':(manualAim.active?'block':'none');if(!autoAim){mouse.x=manualAim.x;mouse.y=manualAim.y;mouse.active=manualAim.active}tone(autoAim?820:420,.09,'triangle',.05)}
 $('autoAimBtn').addEventListener('click',toggleAutoAim);
-\nconst prevUpdate4=update;
+
+const prevUpdate4=update;
 update=function(dt){const before=Math.floor(elapsed/75);if(autoAim&&player&&foes.length){let target=foes[0],best=Infinity;for(const e of foes){const d=(e.x-player.x)**2+(e.y-player.y)**2;if(d<best){best=d;target=e}}if(target){mouse.x=target.x;mouse.y=target.y;mouse.active=true}}else if(!autoAim){mouse.x=manualAim.x;mouse.y=manualAim.y;mouse.active=manualAim.active}prevUpdate4(dt);if(!running||paused||over)return;const next=Math.floor(elapsed/75);if(next>before){arenaStage=next;showStageBanner();for(let i=0;i<3;i++)turrets.push({x:rand(45,W-45),y:rand(70,H-70),cool:rand(.2,1)});rings.push({x:W/2,y:H/2,r:5,max:Math.max(W,H),life:.8,color:'#ffcf4a'})}
 magnetTime=Math.max(0,magnetTime-dt);shieldTime=Math.max(0,shieldTime-dt);if(stageToast>0)stageToast=Math.max(0,stageToast-dt);
 for(let i=powerups.length-1;i>=0;i--){const p=powerups[i];p.life-=dt;if(p.life<=0){powerups.splice(i,1);continue}if(Math.hypot(player.x-p.x,player.y-p.y)<player.r+p.r+5){if(p.type==='magnet')magnetTime=10;else if(p.type==='repair')player.hp=Math.min(stats.maxHealth,player.hp+35);else if(p.type==='overdrive')stats.rate=Math.max(.09,stats.rate*.72);else{for(const e of foes){if(Math.hypot(player.x-e.x,player.y-e.y)<250)e.hp=0}foes=foes.filter(e=>e.hp>0);burst(player.x,player.y,'#f0abfc',35);rings.push({x:player.x,y:player.y,r:4,max:250,life:.5,color:'#f0abfc'})}$('powerToast').textContent=({magnet:'MAGNET FIELD · SHARDS PULLED IN',repair:'NANITE REPAIR · +35 HULL',overdrive:'OVERCLOCK · RAPID FIRE',bomb:'PULSE BOMB · AREA CLEARED'})[p.type];$('powerToast').classList.remove('hidden');setTimeout(()=>$('powerToast').classList.add('hidden'),1450);tone(760,.12,'triangle',.05);powerups.splice(i,1)}}
@@ -236,7 +237,8 @@ upgrades.push(
 );
 const prevEnd4=end;
 end=function(){if(difficulty==='hard')runCoins=Math.floor(runCoins*1.5);else if(difficulty==='easy')runCoins=Math.floor(runCoins*.8);prevEnd4()};
-function dtDamage(){return .08}\ndraw();
+function dtDamage(){return .08}
+draw();
 })();
 </script>
 </body>
