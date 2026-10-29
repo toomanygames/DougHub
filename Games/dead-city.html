@@ -11,7 +11,7 @@
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const $=id=>document.getElementById(id),SUPABASE_URL='https://agsqdqcsmsppcdqxlppj.supabase.co',SUPABASE_KEY='sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52';
-let db=null,channel=null,room='',playerId=crypto.randomUUID(),online=false,hostId='',remote=new Map(),lastNet=0,networkReady=false;const SERVER_CAP=6,SERVER_COUNT=12;
+let db=null,channel=null,room='',playerId=crypto.randomUUID(),online=false,hostId='',remote=new Map(),last=0,lastNet=0,lastZombieSync=0,networkReady=false;const SERVER_CAP=6,SERVER_COUNT=12;
 try{db=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){console.warn(e)}
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x89958b);scene.fog=new THREE.FogExp2(0x89958b,.012);
 const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,500);camera.position.set(0,7,12);
