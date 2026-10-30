@@ -406,20 +406,6 @@ body{background:radial-gradient(circle at 12% 8%,#29205d 0,transparent 35%),radi
 
     </div>
 
-    <div id="accountTypeBox" style="display:none;margin:12px 0">
-      <label for="accountType">I am signing up as</label>
-      <select id="accountType" class="field" style="width:100%;padding:12px;border-radius:10px;background:#080a1b;color:#fff;border:1px solid #ffffff22">
-        <option value="student">Student</option>
-        <option value="teacher">Teacher (verification required)</option>
-        <option value="neither">Neither</option>
-      </select>
-      <div id="teacherSchoolBox" style="display:none;margin-top:9px">
-        <label for="teacherSchool">School / organization (optional)</label>
-        <input id="teacherSchool" type="text" maxlength="120" placeholder="School or organization">
-        <p style="font-size:11px;color:#a4abc7;margin:6px 0">Teacher accounts are reviewed by the DougHub Owner before classroom management is unlocked. Do not use a school email address to sign up.</p>
-      </div>
-    </div>
-
     <label for="email">
       Email
     </label>
@@ -667,25 +653,6 @@ function updateTeacherSignupFields(){
   document.getElementById("teacherSchoolBox").style.display=isTeacher?"block":"none";
 }
 
-async function syncSignupAccountType(account){
-  if(!account?.id)return;
-  const type=account.user_metadata?.account_type||"neither";
-  if(type==="teacher"){
-    const {error:profileError}=await supabaseClient.from("profiles").update({account_type:"teacher"}).eq("id",account.id);
-    if(profileError)console.warn("Could not save teacher account type:",profileError.message);
-    const {data:existing,error:readError}=await supabaseClient.from("teacher_verification_requests").select("id,status").eq("user_id",account.id).maybeSingle();
-    if(readError)throw readError;
-    if(!existing){
-      const {error}=await supabaseClient.from("teacher_verification_requests").insert({user_id:account.id,display_name:account.user_metadata?.username||"Teacher applicant",school_name:account.user_metadata?.teacher_school_name||null,details:"Teacher verification requested during signup."});
-      if(error)throw error;
-    }
-    return;
-  }
-  const {error}=await supabaseClient.from("profiles").update({account_type:type}).eq("id",account.id);
-  if(error)console.warn("Could not save account type:",error.message);
-}
-
-
 /* MESSAGE */
 
 function showMessage(text) {
@@ -766,9 +733,7 @@ async function submitForm() {
 
           options: {
             data: {
-              username: username,
-              account_type: document.getElementById("accountType").value,
-              teacher_school_name: document.getElementById("teacherSchool").value.trim()
+              username: username
             }
           }
 
@@ -779,7 +744,6 @@ async function submitForm() {
       }
 
       if (data.session) {
-        await syncSignupAccountType(data.user);
         await recordAuthAudit(data.user.id, "signup", "Account created and signed in", { method: "email_password" });
         window.location.href =
           safeRedirect;
@@ -787,7 +751,7 @@ async function submitForm() {
       } else {
 
         showMessage(
-          "Account created! Check your email to confirm your account. Your student / neither / teacher choice will be saved when you first log in; teacher access requires Owner verification."
+          "Account created! Check your email to confirm your account."
         );
 
       }
@@ -811,7 +775,6 @@ async function submitForm() {
       }
 
       if (signInData && signInData.user) {
-        await syncSignupAccountType(signInData.user);
         await recordAuthAudit(signInData.user.id, "login", "Successful sign-in", { method: "email_password" });
       }
 
