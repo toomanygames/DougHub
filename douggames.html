@@ -2093,6 +2093,18 @@ footer{font-size:12px}
 }
 
 </style>
+<style id="DOUGHUB_2048_CARD_ART">
+.game-card-puzzle{background:radial-gradient(ellipse at 92% 8%,#8b5cf626,transparent 48%),linear-gradient(145deg,rgba(18,22,53,.96),rgba(8,11,27,.96))!important;border-color:#8b83e844!important}
+.game-card-puzzle .game-card-art{position:absolute;right:17px;top:17px;width:108px;height:108px;padding:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border:1px solid #b6b8ff30;border-radius:15px;background:#090c20;box-shadow:0 14px 30px #0006;transform:rotate(4deg)}
+.game-card-puzzle .game-card-art span{display:grid;place-items:center;border-radius:6px;background:linear-gradient(145deg,#353a70,#25294f);color:#e8eaff;font-size:13px;font-weight:950;box-shadow:inset 0 1px #ffffff30}
+.game-card-puzzle .game-card-art span:nth-child(2),.game-card-puzzle .game-card-art span:nth-child(5){background:linear-gradient(145deg,#51418c,#35265e)}
+.game-card-puzzle .game-card-art span:nth-child(3),.game-card-puzzle .game-card-art span:nth-child(6){background:linear-gradient(145deg,#6366f1,#4338ca)}
+.game-card-puzzle .game-card-art span:nth-child(4),.game-card-puzzle .game-card-art span:nth-child(7){background:linear-gradient(145deg,#8b5cf6,#6d28d9)}
+.game-card-puzzle .game-card-art span:nth-child(8),.game-card-puzzle .game-card-art span:nth-child(9){background:linear-gradient(145deg,#c026d3,#86198f)}
+.game-card-puzzle h3{margin-top:12px!important;max-width:150px}
+.game-card-puzzle p{max-width:72%}
+@media(max-width:600px){.game-card-puzzle .game-card-art{width:88px;height:88px;right:12px;top:13px}.game-card-puzzle p{max-width:70%}}
+</style>
 </head>
 
 <body>
@@ -2382,21 +2394,15 @@ footer{font-size:12px}
 
             <a
                 href="Games/puzzle.html"
-                class="game-card"
+                class="game-card game-card-puzzle"
             >
-                <div class="game-icon">🧩</div>
-
-                <h3>
-                    Doug Puzzle
-                </h3>
-
-                <p>
-                    Solve puzzles and test your skills.
-                </p>
-
-                <div class="play-label">
-                    PLAY →
+                <div class="game-card-art" aria-hidden="true">
+                    <span>2</span><span>4</span><span>8</span><span>16</span>
+                    <span>32</span><span>64</span><span>128</span><span>256</span><span>512</span>
                 </div>
+                <h3>Doug Puzzle</h3>
+                <p>Slide, merge, and plan ahead in the classic 2048 number puzzle.</p>
+                <div class="play-label">PLAY 2048 →</div>
             </a>
 
             <div class="game-card drive-pig-switcher" id="drivePigSwitcher">
