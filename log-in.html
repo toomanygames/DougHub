@@ -671,6 +671,8 @@ async function syncSignupAccountType(account){
   if(!account?.id)return;
   const type=account.user_metadata?.account_type||"neither";
   if(type==="teacher"){
+    const {error:profileError}=await supabaseClient.from("profiles").update({account_type:"teacher"}).eq("id",account.id);
+    if(profileError)console.warn("Could not save teacher account type:",profileError.message);
     const {data:existing,error:readError}=await supabaseClient.from("teacher_verification_requests").select("id,status").eq("user_id",account.id).maybeSingle();
     if(readError)throw readError;
     if(!existing){
