@@ -8,17 +8,17 @@ This is the migration tracker for replacing the official DougHub games with real
 |---|---|---|---|
 | Bubble Grove | [mashukui/web-games — Bubble Shooter](https://github.com/mashukui/web-games/tree/main/bubble-shooter) | MIT | **Ported.** Upstream canvas visuals, bubble matching, controls, scoring and game loop are in the DougHub page. |
 | TITLEBOUND | [remarkablegames/button-clicker](https://github.com/remarkablegames/button-clicker) | MIT | Planned. Adapt its incremental generator, cost-scaling and persistent progression systems; pair with credited CC0 art. |
-| Neon Survivor | [LittleJS Arcade](https://github.com/KilledByAPixel/LittleJSArcade) / [LittleJS engine](https://github.com/KilledByAPixel/LittleJS) | MIT | Planned as a non-combat neon dodge-and-collect survival game, with open-source engine functions and licensed environment art. |
+| Neon Survivor | [LittleJS engine](https://github.com/KilledByAPixel/LittleJS) | MIT | Planned as a non-combat neon dodge-and-collect survival game, with open-source engine functions and licensed environment art. |
 | Dead City: Survival | [StarKnightt/ocean-drive](https://github.com/StarKnightt/ocean-drive) | MIT | Planned as a non-combat abandoned-city exploration/restoration game, reusing the open-source city rendering and movement foundation. |
 | Starfall Run | [mashukui/web-games — Dino Run](https://github.com/mashukui/web-games/tree/main/dino-run) | MIT | **Ported.** Upstream runner loop, obstacle logic, controls, scoring and canvas art are in the DougHub page. |
 | Crystal Breaker | [mashukui/web-games — Breakout](https://github.com/mashukui/web-games/tree/main/breakout) | MIT | **Ported.** Upstream paddle physics, brick logic, levels, scoring and canvas art are in the DougHub page. |
 | Pig Clicker | [remarkablegames/button-clicker](https://github.com/remarkablegames/button-clicker) | MIT | Planned. Adapt generator purchasing, exponential cost scaling, passive production and save logic. |
 | Rebirth Clicker | [remarkablegames/button-clicker](https://github.com/remarkablegames/button-clicker) | MIT | Planned. Reuse the open-source incremental foundation with a separate prestige/rebirth progression layer. |
 | Ocean Drive | [StarKnightt/ocean-drive](https://github.com/StarKnightt/ocean-drive) | MIT | Existing open-source base. Review and expand its asset credits as the art pass is rebuilt. |
-| Doug Racing | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt its browser kart-racing systems and generated visuals. |
+| Doug Racing | [jakesgordon/javascript-racer](https://github.com/jakesgordon/javascript-racer) | MIT | Planned. Adapt its arcade-racing systems; replace its demo sprites with separately licensed Kenney CC0 vehicle art. |
 | Doug Puzzle | [gabrielecirulli/2048](https://github.com/gabrielecirulli/2048) | MIT | Existing open-source base. Keep original creator/contributor credits and MIT notice. |
-| Drive Pig (Classic) | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt the kart-racing foundation with a separately licensed pig character asset. |
-| Pig Racing3D | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt the 3D kart-racing foundation and use separately licensed vehicle/character art. |
+| Drive Pig (Classic) | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt the arcade-racing foundation with a separately licensed CC0 pig character asset. |
+| Pig Racing3D | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt the arcade-racing foundation and use separately licensed CC0 vehicle/character art. |
 | Smack 'n Punch | [Matter.js](https://github.com/liabru/matter-js) | MIT | Planned as a non-weapon physics playground using open-source rigid-body physics and licensed props. |
 
 ## Artwork sources
@@ -41,7 +41,7 @@ This is the migration tracker for replacing the official DougHub games with real
 
 - [mashukui/web-games MIT license](https://github.com/mashukui/web-games/blob/main/LICENSE) — copied to `Games/licenses/mashukui-web-games-MIT.txt`.
 - [remarkablegames/button-clicker MIT license](https://github.com/remarkablegames/button-clicker/blob/master/LICENSE).
-- [ryancampbell/kart-royale MIT license](https://github.com/ryancampbell/kart-royale/blob/main/LICENSE).
+- [jakesgordon/javascript-racer MIT license](https://github.com/jakesgordon/javascript-racer/blob/master/LICENSE) — use code only; do not reuse its demo sprites.
 - [LittleJS Arcade MIT license](https://github.com/KilledByAPixel/LittleJSArcade/blob/main/LICENSE).
 - [StarKnightt/ocean-drive MIT license](https://github.com/StarKnightt/ocean-drive/blob/main/LICENSE).
 
