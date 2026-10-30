@@ -11,7 +11,7 @@
 <div class="panel" id="teacherPanel"><h3>Teacher controls</h3><p class="muted">Verified teachers can create and manage their classrooms.</p><input class="field" id="className" maxlength="70" placeholder="Class name"><input class="field" id="classDescription" maxlength="300" placeholder="Short description (optional)"><div class="actions"><button class="btn primary" id="createClass">Create classroom</button></div><div class="status" id="teacherStatus"></div></div>
 <div class="panel"><h3>Join a classroom</h3><p class="muted">Enter the code shared by your teacher.</p><input class="field" id="joinCode" maxlength="16" placeholder="CLASS CODE" autocomplete="off"><div class="actions"><button class="btn primary" id="joinClass">Join class</button></div><div class="status" id="joinStatus"></div></div>
 <div class="panel"><h3>Your classes</h3><div class="class-list" id="classList"><div class="empty">Loading classrooms…</div></div></div>
-<div class="panel"><h3>Class roster</h3><div class="muted" id="rosterInfo">Choose a classroom to view its members.</div><div class="roster" id="roster"></div></div>
+<div class="panel"><h3>Class roster</h3><div class="muted" id="rosterInfo">Choose a classroom to view its members.</div><div class="roster" id="roster"></div><div class="actions" id="rosterActions"></div><div class="status" id="rosterStatus"></div></div>
 <div class="panel"><h3>Post a reminder</h3><p class="muted">Reminders appear to everyone in the selected class.</p><input class="field" id="reminderTitle" maxlength="120" placeholder="Reminder title"><textarea class="field" id="reminderBody" maxlength="1500" rows="3" placeholder="Details, homework, or what to bring"></textarea><input class="field" id="reminderDue" type="datetime-local"><div class="actions"><button class="btn primary" id="postReminder">Post reminder</button></div><div class="status" id="reminderStatus"></div></div>
 <div class="panel"><h3>Class reminders</h3><div id="reminderList"><div class="empty">Select a class to view reminders.</div></div></div>
 </div></section>
@@ -78,10 +78,11 @@ async function loadRoster(){
  const ids=(data||[]).map(m=>m.user_id);
  const {data:people}=ids.length?await db.from("profiles").select("id,username,avatar_url").in("id",ids):{data:[]};
  const map=new Map((people||[]).map(p=>[p.id,p]));
- const roster=[{id:selectedClass.teacher_id,username:"Teacher",teacher:true},...(data||[]).map(m=>({id:m.user_id,username:map.get(m.user_id)?.username||"Student"}))];
+ const roster=[{id:selectedClass.teacher_id,username:"Teacher",teacher:true},...(data||[]).map(m=>({id:m.user_id,username:map.get(m.user_id)?.username||"Student",member:true}))];
  $("rosterInfo").textContent=roster.length+" people in "+selectedClass.name;
  $("roster").replaceChildren();
- roster.forEach(p=>{const tag=document.createElement("span");tag.className="person";tag.textContent=(p.teacher?"Teacher · ":"")+p.username;$("roster").append(tag);});
+ roster.forEach(p=>{const tag=document.createElement("span");tag.className="person";tag.textContent=(p.teacher?"Teacher · ":"")+p.username;$("roster").append(tag);if(profile.teacher_verified&&selectedClass.teacher_id===user.id&&p.member){const remove=document.createElement("button");remove.className="btn";remove.textContent="Remove";remove.style.marginLeft="6px";remove.addEventListener("click",async()=>{if(!confirm("Remove "+p.username+" from this classroom?"))return;const {error}=await db.from("classroom_members").delete().eq("classroom_id",selectedClass.id).eq("user_id",p.id);say("rosterStatus",error?error.message:"Member removed.");if(!error)loadRoster();});tag.append(remove);}});
+ $("rosterActions").replaceChildren();if(profile.teacher_verified&&selectedClass.teacher_id===user.id){const archive=document.createElement("button");archive.className="btn";archive.textContent=selectedClass.is_active?"Close class to new joins":"Reopen class";archive.addEventListener("click",async()=>{const {error}=await db.from("classrooms").update({is_active:!selectedClass.is_active}).eq("id",selectedClass.id);say("rosterStatus",error?error.message:(!selectedClass.is_active?"Class reopened.":"Class closed to new joins."));if(!error){selectedClass.is_active=!selectedClass.is_active;await loadClasses();}});$("rosterActions").append(archive);}
 }
 async function loadChat(){
  const {data,error}=await db.from("classroom_messages").select("id,user_id,message,created_at").eq("classroom_id",selectedClass.id).order("created_at",{ascending:true}).limit(150);
@@ -135,7 +136,7 @@ async function openGame(game){
   else {
    const q=data.questions[data.current_question];const h=document.createElement("h3");h.textContent="Question "+(data.current_question+1)+": "+q.question;body.append(h);
    const form=document.createElement("div");q.choices.forEach((choice,i)=>{const label=document.createElement("label");label.className="question-card";const radio=document.createElement("input");radio.type="radio";radio.name="quizAnswer";radio.value=i;label.append(radio,document.createTextNode(" "+choice));form.append(label);});body.append(form);
-   const submit=document.createElement("button");submit.className="btn primary";submit.textContent="Submit answer";submit.addEventListener("click",async()=>{const selected=form.querySelector("input:checked");if(!selected){say("activeGameStatus","Choose an answer first.");return;}const {error}=await db.from("classroom_game_answers").upsert({session_id:data.id,user_id:user.id,question_index:data.current_question,answer_index:Number(selected.value)},{onConflict:"session_id,user_id,question_index"});say("activeGameStatus",error?error.message:"Answer submitted!");submit.disabled=!error;});actions.append(submit);
+   const submit=document.createElement("button");submit.className="btn primary";submit.textContent="Submit answer";submit.addEventListener("click",async()=>{const selected=form.querySelector("input:checked");if(!selected){say("activeGameStatus","Choose an answer first.");return;}const {error}=await db.from("classroom_game_answers").insert({session_id:data.id,user_id:user.id,question_index:data.current_question,answer_index:Number(selected.value)});say("activeGameStatus",error?error.message:"Answer submitted!");submit.disabled=!error;});actions.append(submit);
   }
  }
 }
