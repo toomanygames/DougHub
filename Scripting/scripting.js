@@ -529,7 +529,7 @@ function ensureGameAssetManager(){
     const selected=Array.from(event.target.files||[]);event.target.value="";
     if(!selected.length)return;
     if(!codeCommunityDb||!codeCommunityUser){status.textContent="Sign in to DougHub before importing assets.";return;}
-    const allowed=/\\.(glb|gltf|bin|png|jpe?g|webp|ktx2|json)$/i;
+    const allowed=/\.(glb|gltf|bin|png|jpe?g|webp|ktx2|json)$/i;
     const packFiles=selected.filter(file=>allowed.test(file.name));
     if(!packFiles.length){status.textContent="No supported model or texture files found in that folder.";return;}
     if(packFiles.length>1000){status.textContent="That folder has more than 1,000 supported files. Choose a smaller folder.";return;}
@@ -544,12 +544,12 @@ function ensureGameAssetManager(){
         const relativePath=parts.map(part=>part.replace(/[^a-z0-9._-]/gi,"_").slice(-120)).join("/");
         if(!relativePath)continue;
         const path=codeCommunityUser.id+"/"+project+"/"+relativePath,lower=file.name.toLowerCase();
-        const type=file.type||(lower.endsWith(".glb")?"model/gltf-binary":lower.endsWith(".gltf")?"model/gltf+json":lower.endsWith(".png")?"image/png":/\\.jpe?g$/.test(lower)?"image/jpeg":lower.endsWith(".webp")?"image/webp":lower.endsWith(".ktx2")?"image/ktx2":"application/octet-stream");
+        const type=file.type||(lower.endsWith(".glb")?"model/gltf-binary":lower.endsWith(".gltf")?"model/gltf+json":lower.endsWith(".png")?"image/png":/\.jpe?g$/.test(lower)?"image/jpeg":lower.endsWith(".webp")?"image/webp":lower.endsWith(".ktx2")?"image/ktx2":"application/octet-stream");
         const {error}=await codeCommunityDb.storage.from("game-assets").upload(path,file,{upsert:true,contentType:type,cacheControl:"3600"});
         if(error)throw error;
         const {data}=codeCommunityDb.storage.from("game-assets").getPublicUrl(path);
         manifest=manifest.filter(item=>item.path!==path);
-        manifest.push({name:relativePath,path,url:data.publicUrl,kind:/\\.(glb|gltf)$/i.test(file.name)?"3D model":/\\.(png|jpe?g|webp|ktx2)$/i.test(file.name)?"Texture":"Model data",size:file.size,contentType:type});
+        manifest.push({name:relativePath,path,url:data.publicUrl,kind:/\.(glb|gltf)$/i.test(file.name)?"3D model":/\.(png|jpe?g|webp|ktx2)$/i.test(file.name)?"Texture":"Model data",size:file.size,contentType:type});
         uploaded++;
         if(uploaded%5===0||uploaded===packFiles.length)status.textContent="Uploaded "+uploaded+" of "+packFiles.length+" files…";
       }
