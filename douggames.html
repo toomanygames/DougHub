@@ -1957,6 +1957,40 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 @media(max-width:700px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.games-grid{grid-template-columns:1fr}}
 
+
+/* OPEN-SOURCE GAME ART — DougHub CC0 art pack */
+.games-grid .game-card{isolation:isolate;background:linear-gradient(105deg,rgba(13,17,39,.98) 0%,rgba(13,17,39,.88) 50%,rgba(13,17,39,.48) 100%)}
+.games-grid .game-card::before{content:"";position:absolute;z-index:-1;inset:0 0 0 auto;width:68%;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:.56;mask-image:linear-gradient(90deg,transparent 0%,#000 46%);transition:transform .35s,opacity .25s}
+.games-grid .game-card:hover::before{transform:scale(1.06);opacity:.78}
+.games-grid .game-card>*{position:relative;z-index:1}
+.games-grid .game-card .game-icon{width:58px;height:58px;background-size:cover;background-position:center;border:1px solid #ffffff35;box-shadow:0 8px 24px #0005;font-size:0}
+.game-card[href*="bubble-grove"]::before{background-image:url("Games/art/bubble-grove.svg")}
+.game-card[href*="titlebound"]::before{background-image:url("Games/art/titlebound.svg")}
+.game-card[href*="neon-survivor"]::before{background-image:url("Games/art/neon-survivor.svg")}
+.game-card[href*="dead-city"]::before{background-image:url("Games/art/dead-city.svg")}
+.game-card[href*="starfall-run"]::before{background-image:url("Games/art/starfall-run.svg")}
+.game-card[href*="crystal-breaker"]::before{background-image:url("Games/art/crystal-breaker.svg")}
+.game-card[href*="pig-clicker"]::before{background-image:url("Games/art/pig-clicker.svg")}
+.game-card[href*="rebirth-clicker"]::before{background-image:url("Games/art/rebirth-clicker.svg")}
+.game-card[href*="ocean-drive"]::before{background-image:url("Games/art/ocean-drive.svg")}
+.game-card[href*="racing.html"]::before{background-image:url("Games/art/racing.svg")}
+.game-card[href*="puzzle.html"]::before{background-image:url("Games/art/puzzle.svg")}
+.game-card[href*="smack-n-punch"]::before{background-image:url("Games/art/smack-n-punch.svg")}
+.game-card[href*="bubble-grove"] .game-icon{background-image:url("Games/art/bubble-grove.svg")}
+.game-card[href*="titlebound"] .game-icon{background-image:url("Games/art/titlebound.svg")}
+.game-card[href*="neon-survivor"] .game-icon{background-image:url("Games/art/neon-survivor.svg")}
+.game-card[href*="dead-city"] .game-icon{background-image:url("Games/art/dead-city.svg")}
+.game-card[href*="starfall-run"] .game-icon{background-image:url("Games/art/starfall-run.svg")}
+.game-card[href*="crystal-breaker"] .game-icon{background-image:url("Games/art/crystal-breaker.svg")}
+.game-card[href*="pig-clicker"] .game-icon{background-image:url("Games/art/pig-clicker.svg")}
+.game-card[href*="rebirth-clicker"] .game-icon{background-image:url("Games/art/rebirth-clicker.svg")}
+.game-card[href*="ocean-drive"] .game-icon{background-image:url("Games/art/ocean-drive.svg")}
+.game-card[href*="racing.html"] .game-icon{background-image:url("Games/art/racing.svg")}
+#drivePigSwitcher::before{content:"";position:absolute;z-index:-1;inset:0 0 0 auto;width:65%;background:url("Games/art/drive-pig.svg") center/cover no-repeat;opacity:.55;mask-image:linear-gradient(90deg,transparent,#000 55%)}
+#drivePigIcon{font-size:0!important;background:url("Games/art/drive-pig.svg") center/cover!important}
+.game-card-puzzle .game-card-art{opacity:.0}
+@media(max-width:600px){.games-grid .game-card::before{width:62%;opacity:.38}}
+
 </style>
   <script src="nav.js?v=20261030-no-class" defer></script>
 
