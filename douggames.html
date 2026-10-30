@@ -2139,6 +2139,16 @@ footer{font-size:12px}
 .game-card-puzzle p{max-width:72%}
 @media(max-width:600px){.game-card-puzzle .game-card-art{width:88px;height:88px;right:12px;top:13px}.game-card-puzzle p{max-width:70%}}
 </style>
+<style id="dh-game-logo-art">
+.game-icon{width:66px;height:66px;flex:0 0 66px;overflow:hidden;padding:0;background:rgba(255,255,255,.035);border:1px solid rgba(167,139,250,.24);box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.game-icon img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.game-card{isolation:isolate}
+.game-card::after{content:"";position:absolute;inset:auto -28px -52px auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,.13),transparent 70%);pointer-events:none;z-index:-1}
+.game-card h3{margin-top:15px}
+.trending-game-icon{width:68px;height:68px;border-radius:17px;overflow:hidden;border:1px solid rgba(167,139,250,.28);background:#ffffff08}
+.trending-game-icon img{width:100%;height:100%;display:block;object-fit:cover}
+.drive-pig-topline .game-icon{width:66px;height:66px}
+</style>
 </head>
 
 <body>
@@ -2313,7 +2323,7 @@ footer{font-size:12px}
         <div class="games-grid">
 
             <a href="Games/bubble-grove.html" class="game-card game-card-wide">
-                <div class="game-icon">🌈</div>
+                <div class="game-icon"><img src="Games/art/bubble-grove.svg" alt="Bubble Grove logo"></div>
                 <h3>Bubble Grove</h3>
                 <p>A cozy woodland bubble shooter. Aim, match 3 or more of the same color, pop clusters, and drop floating bubbles for bonus points.</p>
                 <div class="play-label">POP THE COLORS →</div>
@@ -2323,7 +2333,7 @@ footer{font-size:12px}
                 href="Games/titlebound.html"
                 class="game-card game-card-wide"
             >
-                <div class="game-icon">🎲</div>
+                <div class="game-icon"><img src="Games/art/titlebound.svg" alt="TITLEBOUND logo"></div>
                 <h3>TITLEBOUND: Realms of Fortune</h3>
                 <p>Roll from 650 cosmic titles, hunt nine rarity tiers, collect absurd discoveries, and grow a permanent luck upgrade tree.</p>
                 <div class="play-label">ROLL YOUR FATE →</div>
@@ -2333,28 +2343,28 @@ footer{font-size:12px}
                 href="Games/neon-survivor.html"
                 class="game-card game-card-wide"
             >
-                <div class="game-icon">⚡</div>
+                <div class="game-icon"><img src="Games/art/neon-survivor.svg" alt="Neon Survivor logo"></div>
                 <h3>NEON SURVIVOR</h3>
                 <p>Fight endless neon hunters, auto-fire your blaster, collect energy and build powerful upgrade combos.</p>
                 <div class="play-label">ENTER THE ARENA →</div>
             </a>
 
             <a href="Games/dead-city.html" class="game-card game-card-wide">
-                <div class="game-icon">🧟</div>
+                <div class="game-icon"><img src="Games/art/dead-city.svg" alt="Dead City logo"></div>
                 <h3>DEAD CITY: SURVIVAL</h3>
                 <p>Explore a 3D abandoned city, scavenge supply crates, and fight infected in solo or online co-op with friends.</p>
                 <div class="play-label">ENTER THE CITY →</div>
             </a>
 
             <a href="Games/starfall-run.html" class="game-card">
-                <div class="game-icon">☄️</div>
+                <div class="game-icon"><img src="Games/art/starfall-run.svg" alt="Starfall Run logo"></div>
                 <h3>Starfall Run</h3>
                 <p>Dodge the meteor storm, dash through danger, and collect glowing shards as the pace ramps up.</p>
                 <div class="play-label">SURVIVE THE STORM →</div>
             </a>
 
             <a href="Games/crystal-breaker.html" class="game-card">
-                <div class="game-icon">💎</div>
+                <div class="game-icon"><img src="Games/art/crystal-breaker.svg" alt="Crystal Breaker logo"></div>
                 <h3>Crystal Breaker</h3>
                 <p>A neon brick-breaker. Keep the energy core alive, clear crystal waves, and chase a high score.</p>
                 <div class="play-label">BREAK THE BOARD →</div>
@@ -2366,7 +2376,7 @@ footer{font-size:12px}
                 href="Games/pig-clicker.html"
                 class="game-card"
             >
-                <div class="game-icon">🐷</div>
+                <div class="game-icon"><img src="Games/art/pig-clicker.svg" alt="Pig Clicker logo"></div>
 
                 <h3>
                     Pig Clicker
@@ -2385,7 +2395,7 @@ footer{font-size:12px}
                 href="Games/rebirth-clicker.html"
                 class="game-card"
             >
-                <div class="game-icon">🔄</div>
+                <div class="game-icon"><img src="Games/art/rebirth-clicker.svg" alt="Rebirth Clicker logo"></div>
 
                 <h3>
                     Rebirth Clicker
@@ -2401,7 +2411,7 @@ footer{font-size:12px}
             </a>
 
             <a href="Games/ocean-drive.html" class="game-card game-card-wide">
-                <div class="game-icon">🌴</div>
+                <div class="game-icon"><img src="Games/art/ocean-drive.svg" alt="Ocean Drive logo"></div>
                 <h3>Ocean Drive</h3>
                 <p>Explore a detailed Miami-style beach district, walk the promenade, hop into cars, cruise with traffic, and visit the shore.</p>
                 <div class="play-label">EXPLORE THE COAST →</div>
@@ -2411,7 +2421,7 @@ footer{font-size:12px}
                 href="Games/racing.html"
                 class="game-card"
             >
-                <div class="game-icon">🏎️</div>
+                <div class="game-icon"><img src="Games/art/racing.svg" alt="Doug Racing logo"></div>
 
                 <h3>
                     Doug Racing
@@ -2430,17 +2440,14 @@ footer{font-size:12px}
                 href="Games/puzzle.html"
                 class="game-card game-card-puzzle"
             >
-                <div class="game-card-art" aria-hidden="true">
-                    <span>2</span><span>4</span><span>8</span><span>16</span>
-                    <span>32</span><span>64</span><span>128</span><span>256</span><span>512</span>
-                </div>
+                <div class="game-icon"><img src="Games/art/puzzle.svg" alt="Doug Puzzle logo"></div>
                 <h3>Doug Puzzle</h3>
                 <p>Slide, merge, and plan ahead in the classic 2048 number puzzle.</p>
                 <div class="play-label">PLAY 2048 →</div>
             </a>
 
             <div class="game-card drive-pig-switcher" id="drivePigSwitcher">
-                <div class="drive-pig-topline"><div class="game-icon" id="drivePigIcon">🐷</div><span class="drive-pig-twoinone">2 GAMES <b>IN 1</b></span></div>
+                <div class="drive-pig-topline"><div class="game-icon"><img id="drivePigIcon" src="Games/art/drive-pig.svg" alt="Drive Pig logo"></div><span class="drive-pig-twoinone">2 GAMES <b>IN 1</b></span></div>
                 <div class="drive-pig-version-label">ONE BUTTON · TWO RIDES</div>
                 <h3 id="drivePigTitle">Drive Pig <span class="drive-pig-title-tag">2-in-1</span></h3>
                 <p id="drivePigDescription">Pick the classic stunt course or jump into Pig Racing3D.</p>
@@ -2457,7 +2464,7 @@ footer{font-size:12px}
                 href="Games/smack-n-punch.html"
                 class="game-card game-card-wide"
             >
-                <div class="game-icon">💥</div>
+                <div class="game-icon"><img src="Games/art/smack-n-punch.svg" alt="Smack 'n Punch logo"></div>
                 <h3>Smack 'n Punch</h3>
                 <p>Test a physics playground with a ragdoll NPC and a huge collection of weapons.</p>
                 <div class="play-label">PLAY →</div>
@@ -3148,13 +3155,13 @@ async function updateGameCount() {
    CROSS-SITE TRENDING GAME ANALYTICS
 ========================================= */
 const BUILTIN_TRENDING_GAMES = {
-    "builtin:pig-clicker": { title: "Pig Clicker", icon: "🐷", href: "Games/pig-clicker.html" },
-    "builtin:rebirth-clicker": { title: "Rebirth Clicker", icon: "🔄", href: "Games/rebirth-clicker.html" },
-    "builtin:racing": { title: "Doug Racing", icon: "🏎️", href: "Games/racing.html" },
-    "builtin:puzzle": { title: "Doug Puzzle", icon: "🧩", href: "Games/puzzle.html" },
-    "builtin:drive-pig": { title: "Drive Pig", icon: "🐷", href: "Games/drive-pig.html" },
-    "builtin:smack-n-punch": { title: "Smack 'n Punch", icon: "💥", href: "Games/smack-n-punch.html" },
-    "builtin:titlebound": { title: "TITLEBOUND: Realms of Fortune", icon: "✧", href: "Games/titlebound.html" }
+    "builtin:pig-clicker": { title: "Pig Clicker", logo: "Games/art/pig-clicker.svg", href: "Games/pig-clicker.html" },
+    "builtin:rebirth-clicker": { title: "Rebirth Clicker", logo: "Games/art/rebirth-clicker.svg", href: "Games/rebirth-clicker.html" },
+    "builtin:racing": { title: "Doug Racing", logo: "Games/art/racing.svg", href: "Games/racing.html" },
+    "builtin:puzzle": { title: "Doug Puzzle", logo: "Games/art/puzzle.svg", href: "Games/puzzle.html" },
+    "builtin:drive-pig": { title: "Drive Pig", logo: "Games/art/drive-pig.svg", href: "Games/drive-pig.html" },
+    "builtin:smack-n-punch": { title: "Smack 'n Punch", logo: "Games/art/smack-n-punch.svg", href: "Games/smack-n-punch.html" },
+    "builtin:titlebound": { title: "TITLEBOUND: Realms of Fortune", logo: "Games/art/titlebound.svg", href: "Games/titlebound.html" }
 };
 let trendingRows = [];
 let trendingSortMode = "plays";
@@ -3189,7 +3196,7 @@ function renderTrendingGames() {
         const builtIn = BUILTIN_TRENDING_GAMES[row.game_key];
         const isCommunity = row.game_type === "community";
         const communityId = isCommunity ? row.game_key.replace(/^community:/, "") : "";
-        const icon = builtIn?.icon || (isCommunity ? "🎮" : "🕹️");
+        const icon = builtIn?.logo ? '<img src="' + builtIn.logo + '" alt="">' : (isCommunity ? "🎮" : "🕹️");
         const title = escapeHtml(row.game_title || builtIn?.title || "Untitled game");
         const type = isCommunity ? "Community game" : "DougHub game";
         const playCount = Number(row.play_count || 0).toLocaleString();
@@ -4056,7 +4063,7 @@ updateFeedbackCount();
  function selectVersion(key){
   const v=versions[key]||versions.classic;
   toggle.dataset.selected=key;
-  document.getElementById("drivePigIcon").textContent=v.icon;
+  document.getElementById("drivePigIcon").src=key==="racing"?"Games/art/drive-pig-racing3d.svg":"Games/art/drive-pig.svg";
   document.getElementById("drivePigTitle").textContent=v.title;
   document.getElementById("drivePigDescription").textContent=v.description;
   document.getElementById("drivePigPlay").href=v.href;
