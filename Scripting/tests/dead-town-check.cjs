@@ -19,7 +19,7 @@ for (const feature of [
   'await equipWeapon("pistol")',
   "function buildTownProps()",
   "if(!online){const zx=player.position.x-z.g.position.x",
-  "setTimeout(()=>{if(hostId===playerId){spawn("
+  "setTimeout(()=>{if(hostId===playerId){spawn(",
   "solidBuildings.some",
   "localDowned",
   'id="weaponName"'
