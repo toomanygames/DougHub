@@ -527,7 +527,17 @@ function ensureGameAssetManager(){
   input.addEventListener("change",async event=>{
     const selected=Array.from(event.target.files||[]);event.target.value="";
     if(!selected.length)return;
-    if(!codeCommunityDb||!codeCommunityUser){status.textContent="Sign in to DougHub before importing assets.";return;}
+    if(!codeCommunityDb){status.textContent="DougHub could not connect to Supabase. Refresh the page and try again.";return;}
+    status.textContent="Checking your DougHub sign-in…";
+    try{
+      const {data:{session},error:sessionError}=await codeCommunityDb.auth.getSession();
+      if(sessionError)throw sessionError;
+      codeCommunityUser=session?.user||null;
+    }catch(error){
+      status.textContent="Could not verify your sign-in: "+(error.message||"Please refresh and try again.");
+      return;
+    }
+    if(!codeCommunityUser){status.textContent="Sign in to DougHub, then refresh Game Creator before importing.";return;}
     const packFiles=selected;
     if(packFiles.length>1000){status.textContent="That folder has more than 1,000 files. Choose a smaller folder.";return;}
     const project=codeCommunitySafeName($("projectName").value);
