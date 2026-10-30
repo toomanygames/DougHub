@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a16">
+<title>Ocean Drive • DougHub</title>
+<link rel="icon" href="../DougHub.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080a16;color:#f7f7ff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{display:flex;flex-direction:column}
+.topbar{height:48px;min-height:48px;display:flex;align-items:center;gap:12px;padding:0 14px;background:rgba(8,10,22,.96);border-bottom:1px solid #ffffff13;z-index:2}
+.back{display:inline-flex;align-items:center;gap:7px;color:#c8c8df;text-decoration:none;font-size:12px;font-weight:800;padding:8px 10px;border:1px solid #ffffff16;border-radius:9px;background:#ffffff08}
+.back:hover{background:#ffffff12;color:white}
+.heading{min-width:0;display:flex;align-items:baseline;gap:9px}
+.heading strong{font-size:13px;white-space:nowrap}
+.heading span{font-size:10px;color:#8588a4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.action{border:1px solid #8b7bff55;border-radius:9px;background:linear-gradient(120deg,#6366f1,#8b5cf6);color:white;padding:8px 12px;font-size:11px;font-weight:900;cursor:pointer}
+.action:hover{filter:brightness(1.12)}
+.game{display:block;flex:1;width:100%;min-height:0;border:0;background:#c9b7a4}
+@media(max-width:560px){.topbar{gap:7px;padding:0 8px}.heading span{display:none}.back{padding:8px}.action{padding:8px 9px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="back" href="../douggames.html" aria-label="Back to DougHub Games">← <span>Games</span></a>
+  <div class="heading"><strong>Ocean Drive</strong><span>Open-world driving sandbox</span></div>
+  <div class="spacer"></div>
+  <button class="action" id="fullscreenButton" type="button">FULLSCREEN</button>
+</header>
+<iframe
+  class="game"
+  id="oceanDriveGame"
+  src="https://starknightt.github.io/ocean-drive/"
+  title="Ocean Drive open-world driving game"
+  allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; magnetometer; xr-spatial-tracking"
+  allowfullscreen
+  referrerpolicy="strict-origin-when-cross-origin">
+</iframe>
+<script>
+const gameFrame=document.getElementById("oceanDriveGame");
+document.getElementById("fullscreenButton").addEventListener("click",async()=>{
+  try{
+    if(document.fullscreenElement) await document.exitFullscreen();
+    else if(gameFrame.requestFullscreen) await gameFrame.requestFullscreen();
+  }catch(error){console.warn("Fullscreen request was blocked by the browser.",error);}
+});
+document.addEventListener("fullscreenchange",()=>{
+  document.getElementById("fullscreenButton").textContent=document.fullscreenElement?"EXIT FULLSCREEN":"FULLSCREEN";
+});
+</script>
+</body>
+</html>
