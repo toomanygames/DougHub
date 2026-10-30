@@ -1,0 +1,11 @@
+DougHub Open Game Art Pack
+==========================
+
+All SVG artwork in this directory was created for DougHub and is dedicated to the public domain under the Creative Commons CC0 1.0 Universal dedication.
+
+License: CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+You may copy, modify, distribute, perform, and use the artwork for any purpose, including commercial purposes, without asking permission. Attribution is appreciated but is not required.
+
+This dedication applies only to the original SVG artwork in this directory. It does not change the license, ownership, or terms of any game code, libraries, fonts, sound effects, or other third-party materials used by individual DougHub games. Check each game's own Credits section for those separate notices.
