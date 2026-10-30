@@ -53,3 +53,14 @@ This tracker is intentionally honest: planned entries are not represented as com
 - Added the complete MIT license text for `remarkablegames/button-clicker` at `Games/licenses/remarkablegames-button-clicker-MIT.txt` so the planned clicker ports can preserve the upstream notice when its code is adapted.
 - The shared `game-art.js` currently provides the DougHub-styled Back to Games control and Credits & License dialog. Games without a verified port intentionally show a pending-source notice rather than claiming unadapted code or artwork is third-party work.
 - Do not mark a planned game complete until its actual upstream gameplay implementation and correctly attributed assets are integrated and browser-tested.
+
+
+## Game-page artwork and repair pass — October 30, 2026
+
+- Wired the original CC0 SVG logo pack into all 13 official game cards on `douggames.html`, including the two-in-one Drive Pig selector and built-in Trending cards.
+- Added a distinct `drive-pig-racing3d.svg` logo for the 3D racing option.
+- Completed the shared credits map for Pig Clicker, Pig Clicker: Space, Rebirth Clicker, Doug Racing, Drive Pig, Pig Racing 3D and TITLEBOUND. Credits distinguish DougHub gameplay code from CC0 logo artwork rather than claiming the artwork license covers game code.
+- Fixed TITLEBOUND's duplicate quick-upgrade mount ID. The side dock now receives the same upgrade list as the main panel.
+- Added an “Open Game” direct-launch fallback to Ocean Drive in case its external embedded player does not load.
+- Static audit: all 16 HTML game pages were checked for missing local `src`/`href` references and duplicate element IDs; none remained after the fixes. All 13 game-card logo paths were verified to exist.
+- Browser playtesting has not yet been completed. External services and runtime gameplay still need hands-on verification; empty GitHub commit status output is not a browser test.
