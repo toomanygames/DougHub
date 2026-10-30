@@ -3,13 +3,11 @@ const vm = require("node:vm");
 const assert = require("node:assert/strict");
 const source = fs.readFileSync("Scripting/scripting.js", "utf8");
 new vm.Script(source, { filename: "Scripting/scripting.js" });
-const slash = String.fromCharCode(92);
-const tick = String.fromCharCode(96);
-const marker = source.indexOf("zombie:{");
-const start = source.indexOf("js:" + slash + tick, marker);
-const end = source.indexOf(slash + tick + "},\n quiz:{", start);
+const marker = source.indexOf(" zombie:{");
+const start = source.indexOf("js:`", marker);
+const end = source.indexOf("`},\n quiz:{", start);
 assert.ok(marker >= 0 && start >= 0 && end > start, "Dead Town starter template boundaries exist");
-const game = source.slice(start + 5, end);
+const game = source.slice(start + 4, end);
 new vm.Script(game, { filename: "Dead Town starter JavaScript" });
 for (const feature of [
   "function updateHostSimulation(dt)",
