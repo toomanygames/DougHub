@@ -5434,7 +5434,77 @@ function toggleAdminCard(card,title){
   card.classList.toggle("collapsed",!opening);
   title.setAttribute("aria-expanded",String(opening));
 }
+function ensureTeacherVerificationCard(){
+  const area=document.getElementById("adminArea");
+  if(!area||document.getElementById("teacherVerificationCard"))return;
+  const card=document.createElement("section");
+  card.id="teacherVerificationCard";
+  card.className="card";
+  card.innerHTML='<h2>Teacher verification</h2><p>Review teacher requests before an account can manage classroom chats.</p><div id="teacherVerificationStatus" class="muted">Loading requests…</div><div id="teacherVerificationList" class="teacher-verification-list"></div>';
+  area.appendChild(card);
+  loadTeacherVerificationRequests();
+}
+async function loadTeacherVerificationRequests(){
+  if(currentAdminRole!=="owner")return;
+  const status=document.getElementById("teacherVerificationStatus");
+  const list=document.getElementById("teacherVerificationList");
+  if(!status||!list)return;
+  status.textContent="Loading teacher requests…";
+  const {data,error}=await supabaseClient.from("teacher_verification_requests")
+    .select("id,user_id,display_name,school_name,details,status,created_at")
+    .order("created_at",{ascending:false});
+  if(error){status.textContent="Could not load requests: "+error.message;return;}
+  const requests=data||[];
+  status.textContent=requests.filter(item=>item.status==="pending").length+" pending · "+requests.length+" total";
+  if(!requests.length){list.innerHTML='<div class="empty">No teacher verification requests yet.</div>';return;}
+  list.replaceChildren();
+  for(const request of requests){
+    const item=document.createElement("article");
+    item.className="teacher-verification-item";
+    const title=document.createElement("strong");
+    title.textContent=request.display_name||"Teacher applicant";
+    const meta=document.createElement("small");
+    meta.textContent=(request.school_name||"School not provided")+" · "+new Date(request.created_at).toLocaleString();
+    const detail=document.createElement("p");
+    detail.textContent=request.details||"No additional details provided.";
+    const state=document.createElement("span");
+    state.className="teacher-verification-state";
+    state.textContent=request.status.toUpperCase();
+    item.append(title,meta,detail,state);
+    if(request.status==="pending"){
+      const actions=document.createElement("div");
+      actions.className="teacher-verification-actions";
+      for(const decision of ["approved","rejected"]){
+        const button=document.createElement("button");
+        button.type="button";
+        button.textContent=decision==="approved"?"Approve teacher":"Reject request";
+        button.className=decision==="approved"?"primary":"danger";
+        button.addEventListener("click",()=>reviewTeacherVerification(request.id,decision,button));
+        actions.appendChild(button);
+      }
+      item.appendChild(actions);
+    }
+    list.appendChild(item);
+  }
+}
+async function reviewTeacherVerification(requestId,decision,button){
+  if(currentAdminRole!=="owner")return;
+  button.disabled=true;
+  try{
+    const {error}=await supabaseClient.from("teacher_verification_requests")
+      .update({status:decision,reviewed_by:currentAdminUser.id,reviewed_at:new Date().toISOString()})
+      .eq("id",requestId).eq("status","pending");
+    if(error)throw error;
+    await loadTeacherVerificationRequests();
+  }catch(error){
+    button.disabled=false;
+    const status=document.getElementById("teacherVerificationStatus");
+    if(status)status.textContent="Review failed: "+error.message;
+  }
+}
+
 function applyStaffPermissions(){
+  if(currentAdminRole==="owner")ensureTeacherVerificationCard();
   const role=currentAdminRole||"none";
   const rank={none:0,helper:1,admin:2,developer:3,owner:4}[role]||0;
   const adminArea=document.getElementById("adminArea");
@@ -5443,7 +5513,7 @@ function applyStaffPermissions(){
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
+    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard|teacherverificationcard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
     if(/custombadgemanagercard|feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
@@ -6093,4 +6163,16 @@ startAdminPanel();
 #adminArea>.admin-function-group>.admin-function-heading:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,#818cf855,transparent)}
 #adminArea>.admin-function-group>.admin-rank-cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;width:100%;min-width:0}
 @media(max-width:760px){#adminArea>.admin-function-group>.admin-rank-cards{grid-template-columns:minmax(0,1fr)!important}}
+</style>
+
+<style>
+.teacher-verification-list{display:grid;gap:10px;margin-top:14px}
+.teacher-verification-item{padding:14px;border:1px solid #ffffff16;border-radius:13px;background:#ffffff06;display:grid;gap:7px}
+.teacher-verification-item small{color:#a5a8c7}
+.teacher-verification-item p{margin:2px 0;color:#d1d5e8;white-space:pre-wrap;overflow-wrap:anywhere}
+.teacher-verification-state{font-size:11px;font-weight:800;letter-spacing:.08em;color:#c4b5fd}
+.teacher-verification-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
+.teacher-verification-actions button{padding:9px 13px;border-radius:9px;border:1px solid #ffffff20;cursor:pointer}
+.teacher-verification-actions .primary{background:#4f46e5;color:white}
+.teacher-verification-actions .danger{background:#7f1d1d55;color:#fecaca}
 </style>
