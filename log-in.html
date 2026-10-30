@@ -600,7 +600,6 @@ function showLogin() {
 
   document.getElementById("usernameBox").style.display =
     "none";
-  document.getElementById("accountTypeBox").style.display = "none";
 
   document.getElementById("loginTab").classList.add("active");
 
@@ -628,7 +627,6 @@ function showSignup() {
 
   document.getElementById("usernameBox").style.display =
     "block";
-  document.getElementById("accountTypeBox").style.display = "block";
 
   document.getElementById("loginTab").classList.remove("active");
 
@@ -643,14 +641,7 @@ function showSignup() {
   document.getElementById("password").autocomplete =
     "new-password";
 
-  document.getElementById("accountType").onchange = updateTeacherSignupFields;
-  updateTeacherSignupFields();
   clearMessage();
-}
-
-function updateTeacherSignupFields(){
-  const isTeacher=document.getElementById("accountType").value==="teacher";
-  document.getElementById("teacherSchoolBox").style.display=isTeacher?"block":"none";
 }
 
 /* MESSAGE */
