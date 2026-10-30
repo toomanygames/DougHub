@@ -528,10 +528,8 @@ function ensureGameAssetManager(){
     const selected=Array.from(event.target.files||[]);event.target.value="";
     if(!selected.length)return;
     if(!codeCommunityDb||!codeCommunityUser){status.textContent="Sign in to DougHub before importing assets.";return;}
-    const allowed=/\.(glb|gltf|bin|png|jpe?g|webp|ktx2|json)$/i;
-    const packFiles=selected.filter(file=>allowed.test(file.name));
-    if(!packFiles.length){status.textContent="No supported model or texture files found in that folder.";return;}
-    if(packFiles.length>1000){status.textContent="That folder has more than 1,000 supported files. Choose a smaller folder.";return;}
+    const packFiles=selected;
+    if(packFiles.length>1000){status.textContent="That folder has more than 1,000 files. Choose a smaller folder.";return;}
     const project=codeCommunitySafeName($("projectName").value);
     trigger.disabled=true;input.disabled=true;status.textContent="Preparing "+packFiles.length+" files…";
     let manifest=gameAssetManifest(),uploaded=0;
