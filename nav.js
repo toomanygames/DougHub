@@ -71,12 +71,12 @@
     "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","nova.html":"nova",
     "chat.html":"chat","game-creator.html":"community_games","my-games.html":"community_games",
     "dougbase.html":"dougbase","dougbase/index.html":"dougbase","dougbase/login.html":"dougbase",
-    "dougcode.html":"dougcode","scripting/scripting.html":"scripting"
+    "dougcode.html":"dougcode","scripting/scripting.html":"scripting","school.html":"school_mode","school-games.html":"school_mode"
   };
   const labels = {
     games:"DougGames",dougtube:"DougTube",music:"DougHub Music",forum:"DougForum",dmail:"DMail",nova:"Nova AI",
     chat:"Community Chat",community_games:"Community Games",dougbase:"DougBase",
-    dougcode:"DougCode",scripting:"Scripting Editor"
+    dougcode:"DougCode",scripting:"Scripting Editor",school_mode:"School Mode"
   };
   function pathKey() {
     return location.pathname.replace(/^\/+/, "").toLowerCase() || "index.html";
@@ -178,7 +178,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html", "school.html", "school-games.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
