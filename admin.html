@@ -888,31 +888,33 @@ body{padding:0!important;background:radial-gradient(ellipse at 4% 0%,#312e8145,t
 .admin-ui-preference-copy{min-width:0}.admin-ui-preference-copy strong{display:block;font-size:15px;margin-bottom:5px}.admin-ui-preference-copy p{margin:0;color:#a7aec9;font-size:12px;line-height:1.5}.admin-ui-preference label{display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;font-size:13px;font-weight:700}.admin-ui-preference input{width:18px;height:18px;accent-color:#818cf8;cursor:pointer}
 @media(max-width:600px){.admin-ui-preference{align-items:flex-start;flex-direction:column}}
 
-/* Admin workspace redesign: full-width canvas, cleaner navigation and category filtering. */
-body{padding:10px!important;min-height:100vh}
-.container{width:calc(100vw - 20px)!important;max-width:none!important;margin:0 auto!important}
+/* Admin workspace: fill the available viewport and use the full horizontal space. */
+body{padding:8px!important;min-height:100vh;overflow-x:hidden}
+.container{width:100%!important;max-width:none!important;margin:0!important}
 .container>header{width:100%!important;min-height:64px!important;margin:0 0 10px!important;padding:12px 18px!important}
 #adminQuickNav{position:relative!important;top:auto!important;width:100%!important;margin:0 0 10px!important}
-#adminArea{display:block;min-width:0;width:100%;max-width:none}
-#adminArea>.admin-rank-group{width:100%;min-width:0;margin:0 0 14px!important;padding:0}
-#adminArea .admin-rank-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;width:100%;min-width:0}
-#adminArea .admin-rank-cards>.card{width:100%;max-width:none;min-width:0;margin:0!important;align-self:stretch}
+#adminCategoryBar{width:100%!important}
+#adminArea{display:block;min-width:0;width:100%!important;max-width:none!important}
+#adminArea>.admin-rank-group{width:100%!important;max-width:none!important;min-width:0;margin:0 0 14px!important;padding:0}
+#adminArea .admin-rank-section{width:100%!important;max-width:none!important;margin-bottom:10px!important}
+#adminArea .admin-rank-cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important;width:100%!important;max-width:none!important;min-width:0}
+#adminArea .admin-rank-cards>.card{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;align-self:stretch}
 #adminArea .admin-rank-cards>.card[hidden],#adminArea .admin-rank-group[hidden]{display:none!important}
-#adminArea .admin-rank-section{width:100%;margin-bottom:10px!important}
-#adminCategoryBar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;margin:0 0 14px;padding:12px 14px;border:1px solid rgba(148,163,255,.16);border-radius:14px;background:rgba(9,12,29,.88)}
+#adminCategoryBar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border:1px solid rgba(148,163,255,.16);border-radius:14px;background:rgba(9,12,29,.88)}
 .admin-category-title{font-size:11px;font-weight:900;letter-spacing:.13em;color:#a5b4fc;white-space:nowrap}
 .admin-category-buttons{display:flex;align-items:center;gap:7px;flex:1;flex-wrap:wrap}
 .admin-category-buttons button{border:1px solid #ffffff18;background:#ffffff08;color:#dce1ff;border-radius:9px;padding:8px 11px;font-weight:750;cursor:pointer}
 .admin-category-buttons button.active,.admin-category-buttons button:hover{background:#6366f133;border-color:#818cf866;color:#fff}
-#adminSectionSearch{width:min(260px,100%);padding:9px 11px;border:1px solid #ffffff20;border-radius:9px;background:#080b1b;color:#fff;outline:none}
+#adminSectionSearch{width:min(280px,100%);padding:9px 11px;border:1px solid #ffffff20;border-radius:9px;background:#080b1b;color:#fff;outline:none}
 #adminSectionSearch:focus{border-color:#818cf8}
 #adminArea .admin-rank-cards>.card h2{font-size:16px!important}
 #adminArea .admin-rank-cards>.card .admin-card-help{font-size:12px!important;line-height:1.55}
 #adminArea .admin-rank-cards>.card [id$="List"],#adminArea .admin-rank-cards>.card [id$="Rows"],#adminArea .admin-rank-cards>.card #chatMessages,#adminArea .admin-rank-cards>.card #communityGames,#adminArea .admin-rank-cards>.card #dougTubeVideos,#adminArea .admin-rank-cards>.card #activityList{max-height:440px!important}
 #adminArea .admin-rank-cards>.card#siteFeatureCard,#adminArea .admin-rank-cards>.card#auditLogCard,#adminArea .admin-rank-cards>.card#staffManagementCard,#adminArea .admin-rank-cards>.card#customBadgeManagerCard,#adminArea .admin-rank-cards>.card.community-games-tube-card{grid-column:1/-1!important}
 .admin-rank-group:empty{display:none}
-@media(max-width:850px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)}#adminCategoryBar{align-items:stretch}#adminSectionSearch{width:100%;max-width:none}.admin-category-buttons{flex-basis:100%}}
-@media(min-width:1500px){#adminArea .admin-rank-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)}#adminCategoryBar{align-items:stretch}#adminSectionSearch{width:100%;max-width:none}.admin-category-buttons{flex-basis:100%}}
+@media(min-width:1100px){#adminArea .admin-rank-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1750px){#adminArea .admin-rank-cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 </style>
 <!-- Admin access is checked once by checkAdmin() below using the shared Supabase client and all staff roles. -->
