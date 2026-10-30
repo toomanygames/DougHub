@@ -524,7 +524,6 @@ function ensureGameAssetManager(){
   const trigger=$("importGameAssetBtn"),input=$("gameAssetInput"),status=$("gameAssetStatus");
   if(!trigger||!input||trigger.dataset.bound==="1")return;
   trigger.dataset.bound="1";
-  trigger.addEventListener("click",()=>input.click());
   input.addEventListener("change",async event=>{
     const selected=Array.from(event.target.files||[]);event.target.value="";
     if(!selected.length)return;
@@ -534,7 +533,7 @@ function ensureGameAssetManager(){
     if(!packFiles.length){status.textContent="No supported model or texture files found in that folder.";return;}
     if(packFiles.length>1000){status.textContent="That folder has more than 1,000 supported files. Choose a smaller folder.";return;}
     const project=codeCommunitySafeName($("projectName").value);
-    trigger.disabled=true;status.textContent="Preparing "+packFiles.length+" files…";
+    trigger.disabled=true;input.disabled=true;status.textContent="Preparing "+packFiles.length+" files…";
     let manifest=gameAssetManifest(),uploaded=0;
     try{
       for(const file of packFiles){
@@ -559,7 +558,7 @@ function ensureGameAssetManager(){
     }catch(error){
       status.textContent="Import stopped after "+uploaded+" files: "+(error.message||"Unknown error");
       setStatus("Game asset import failed: "+(error.message||"Unknown error"),true);
-    }finally{trigger.disabled=false;}
+    }finally{trigger.disabled=false;input.disabled=false;}
   });
 }
 function codeCommunityInit(){
