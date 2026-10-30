@@ -259,14 +259,19 @@
     ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
     ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
 
-    const links = [["/class.html","Home"],["/class.html#games","Games"],["/class.html","Create"],["/class.html#chat","Chat"],];
+    const links = [
+      ["/dashboard.html","Home"],
+      ["/douggames.html","Games"],
+      ["/dougcode.html","Create"],
+      ["/chat.html","Chat"]
+    ];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
       const a = document.createElement("a");
       a.href = href;
       a.className = "nav-link";
       a.textContent = label;
-      if (href === "/chat.html") {
+      if (label === "Chat") {
         a.id = "communityChatLink";
         const dot = document.createElement("span");
         dot.id = "chatNotification";
@@ -275,19 +280,6 @@
         a.appendChild(dot);
       }
       nav.appendChild(a);
-      if (label === "Home" || label === "Create") {
-        a.href = "/class.html";
-      }
-      if (label === "Games" || label === "Chat") {
-        a.addEventListener("click", event => {
-          const target = label === "Games" ? "games" : "chat";
-          if (location.pathname.toLowerCase().endsWith("/class.html")) {
-            event.preventDefault();
-            document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            history.replaceState(null, "", "/class.html#" + target);
-          }
-        });
-      }
     });
     nav.appendChild(account);
 
