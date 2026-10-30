@@ -1380,6 +1380,45 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 .chat-group-write-toggle input{accent-color:#8b5cf6}
 @media(max-width:600px){.admin-feature-row{flex-direction:column}.admin-feature-actions{width:100%}.admin-feature-actions button{flex:1}}
 
+
+/* Rank workspaces — redesigned console */
+body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse at 4% 0%,#3730a344,transparent 38%),radial-gradient(ellipse at 96% 10%,#7e22ce26,transparent 34%),#050611!important}
+.container{width:100%!important;max-width:none!important;margin:0!important}
+.container>header{width:100%!important;margin:0 0 16px!important;padding:18px 22px!important;border:1px solid #ffffff16!important;border-radius:20px!important;background:linear-gradient(120deg,#151a35ee,#090b19ee)!important}
+#adminRankPages{display:grid;grid-template-columns: minmax(220px,.72fr) minmax(0,2fr);gap:16px;align-items:stretch;margin:0 0 16px}
+.admin-rank-pages-heading{display:flex;flex-direction:column;justify-content:center;gap:8px;padding:22px;border:1px solid #818cf833;border-radius:18px;background:linear-gradient(145deg,#171c3b,#0c1022)}
+.admin-eyebrow{font-size:10px;font-weight:900;letter-spacing:.16em;color:#a5b4fc}
+.admin-rank-pages-heading strong{font-size:22px;letter-spacing:-.04em}
+.admin-rank-pages-heading small,.admin-rank-page-link small{font-size:11px;line-height:1.45;color:#9ca3bd}
+.admin-rank-page-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.admin-rank-page-link{display:flex;align-items:center;gap:10px;min-width:0;padding:15px 12px;text-decoration:none;color:#f5f5ff;border:1px solid #ffffff14;border-radius:16px;background:linear-gradient(145deg,#131831,#090d1c);transition:.18s ease}
+.admin-rank-page-link:hover{transform:translateY(-2px);border-color:#818cf866;background:linear-gradient(145deg,#20264b,#10152b)}
+.admin-rank-page-link.active{border-color:#818cf8aa;background:linear-gradient(145deg,#282b62,#171a3b);box-shadow:0 8px 28px #6366f122}
+.admin-rank-page-link>span:nth-child(2){display:grid;gap:5px;min-width:0}
+.admin-rank-page-link strong{font-size:12px}
+.admin-rank-page-link small{display:block}
+.admin-rank-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:11px;background:#818cf825;color:#c7d2fe;font-size:14px;font-weight:950}
+.admin-rank-arrow{margin-left:auto;color:#a5b4fc;font-size:22px}
+.admin-current-rank{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 14px;padding:20px 22px;border:1px solid #ffffff15;border-radius:18px;background:linear-gradient(110deg,#171b38dd,#0c1021dd)}
+.admin-current-rank h1{margin:5px 0;font-size:clamp(23px,2.2vw,34px);letter-spacing:-.045em}
+.admin-current-rank p{margin:0;color:#a5abc2;font-size:13px}
+.admin-all-ranks-link{flex-shrink:0;color:#c7d2fe;text-decoration:none;font-size:12px;font-weight:800}
+#adminCategoryBar{width:100%;margin-bottom:14px}
+#adminArea{display:block!important;width:100%!important;max-width:none!important}
+#adminArea>.admin-rank-group{width:100%!important;margin:0 0 24px!important}
+#adminArea .admin-rank-section{display:flex!important;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:15px 18px!important;margin:0 0 12px!important;border:1px solid #818cf833!important;border-radius:15px!important;background:linear-gradient(100deg,#171b38,#0b1021)!important}
+.admin-rank-heading-copy{display:flex;align-items:center;gap:12px}
+.admin-rank-heading-copy>span:last-child{display:grid;gap:3px}
+.admin-rank-heading-copy strong{font-size:15px}
+.admin-rank-heading-copy small{font-size:11px;color:#9ca3bd;font-weight:500}
+.admin-rank-count{padding:6px 10px;border-radius:9px;background:#818cf81a;color:#c7d2fe;font-size:11px;font-weight:800}
+#adminArea .admin-rank-cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;width:100%!important}
+#adminArea .admin-rank-cards>.card{width:100%!important;max-width:none!important;min-width:0!important;padding:20px!important;border:1px solid #ffffff15!important;border-radius:17px!important;background:linear-gradient(145deg,#131831ed,#090d1ced)!important;box-shadow:0 14px 36px #0003!important}
+#adminArea .admin-rank-cards>.card h2{font-size:17px!important}
+#adminArea .admin-rank-cards>.card .admin-card-help{font-size:12px!important;line-height:1.6!important}
+#adminArea .admin-rank-cards>.card [id$="List"],#adminArea .admin-rank-cards>.card [id$="Rows"],#adminArea .admin-rank-cards>.card #chatMessages,#adminArea .admin-rank-cards>.card #communityGames,#adminArea .admin-rank-cards>.card #dougTubeVideos,#adminArea .admin-rank-cards>.card #activityList{max-height:520px!important}
+@media(max-width:1050px){#adminRankPages{grid-template-columns:1fr}.admin-rank-page-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){body{padding:10px!important}#adminRankPages{gap:10px}.admin-rank-page-links{grid-template-columns:1fr}.admin-current-rank{align-items:flex-start;flex-direction:column}.admin-rank-page-link{padding:12px}#adminArea .admin-rank-cards{grid-template-columns:1fr!important}#adminArea .admin-rank-cards>.card{padding:15px!important}}
 </style>
 </head>
 
@@ -1409,6 +1448,8 @@ button{padding:7px 10px!important;border-radius:8px!important;font-size:12px!imp
 </nav>
 
 
+<section id="adminRankPages" aria-label="Rank workspaces"></section>
+<section id="adminCurrentRank" class="admin-current-rank"><div><span class="admin-eyebrow">CURRENT WORKSPACE</span><h1 id="adminCurrentRankTitle">Staff workspace</h1><p id="adminCurrentRankDescription">Loading your available commands…</p></div><a href="admin.html" class="admin-all-ranks-link">My highest rank →</a></section>
 <div id="adminCategoryBar" aria-label="Filter admin sections"><div class="admin-category-title">ADMIN WORKSPACE</div><div class="admin-category-buttons"><button type="button" class="active" data-admin-category="all">All sections</button><button type="button" data-admin-category="users">Users &amp; staff</button><button type="button" data-admin-category="chat">Chat</button><button type="button" data-admin-category="content">Content</button><button type="button" data-admin-category="site">Site settings</button><button type="button" data-admin-category="logs">Logs &amp; feedback</button></div><input id="adminSectionSearch" type="search" placeholder="Search admin tools…" aria-label="Search admin tools"></div>
 <div id="loading">
     Checking admin permissions...
@@ -5399,10 +5440,9 @@ function applyStaffPermissions(){
   const adminArea=document.getElementById("adminArea");
   if(!adminArea)return;
 
-  // Collect cards before rebuilding the rank-group containers.
-  const preferenceCard=document.getElementById("adminUiPreferenceCard");
-  if(preferenceCard){preferenceCard.style.display=rank>=4?"flex":"none";adminArea.insertBefore(preferenceCard,adminArea.firstChild);}
-  const cards=[...adminArea.querySelectorAll(":scope > .card")].filter(card=>card!==preferenceCard);
+  // Keep the existing command cards and their event listeners; only move the original
+  // DOM nodes into the selected rank page.
+  const cards=[...adminArea.querySelectorAll(":scope > .card")];
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
@@ -5414,84 +5454,83 @@ function applyStaffPermissions(){
     if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
     return 2;
   };
-
   adminArea.querySelectorAll(":scope > .admin-rank-section,:scope > .admin-rank-group").forEach(node=>node.remove());
   const groups={1:[],2:[],3:[],4:[]};
   cards.forEach(card=>{
     const required=rankForCard(card);
     card.dataset.requiredRank=String(required);
-    card.style.display=(rank>=required&&rank>0)?"":"none";
     groups[required].push(card);
   });
 
-  const labels={1:"🟢 Helper+ · Community Support",2:"🔵 Admin+ · Moderation & Management",3:"🟣 Developer+ · Technical Tools",4:"🟡 Owner+ · Full Control"};
   const names={1:"Helper",2:"Admin",3:"Developer",4:"Owner"};
-  let order=Array.from({length:rank},(_,i)=>rank-i);
-  const collapsed={};
-  // Show every rank section available to the current role, fully expanded.
-  order.forEach(value=>collapsed[value]=false);
+  const descriptions={
+    1:"Community support, reports, and member safety tools.",
+    2:"All Helper tools plus account, chat, and content moderation.",
+    3:"All Admin and Helper tools plus developer, feedback, and site feature controls.",
+    4:"Every staff command, including full site and staff management."
+  };
+  const icons={1:"H",2:"A",3:"D",4:"O"};
+  const requested=new URLSearchParams(location.search).get("rank");
+  const requestedRank=({helper:1,admin:2,developer:3,owner:4})[String(requested||"").toLowerCase()];
+  const selectedRank=requestedRank&&requestedRank<=rank?requestedRank:rank;
+  const pageNav=document.getElementById("adminRankPages");
+  if(pageNav){
+    pageNav.replaceChildren();
+    const intro=document.createElement("div");
+    intro.className="admin-rank-pages-heading";
+    intro.innerHTML='<span class="admin-eyebrow">STAFF CONSOLE</span><strong>Rank workspaces</strong><small>Each workspace includes its own commands and every lower rank.</small>';
+    pageNav.appendChild(intro);
+    const links=document.createElement("div");
+    links.className="admin-rank-page-links";
+    for(let value=1;value<=rank;value++){
+      const link=document.createElement("a");
+      link.className="admin-rank-page-link"+(value===selectedRank?" active":"");
+      link.href="admin.html?rank="+names[value].toLowerCase();
+      link.innerHTML='<span class="admin-rank-icon">'+icons[value]+'</span><span><strong>'+names[value]+' workspace</strong><small>'+descriptions[value]+'</small></span><span class="admin-rank-arrow">›</span>';
+      links.appendChild(link);
+    }
+    pageNav.appendChild(links);
+  }
+  const pageTitle=document.getElementById("adminCurrentRankTitle");
+  const pageDescription=document.getElementById("adminCurrentRankDescription");
+  if(pageTitle)pageTitle.textContent=names[selectedRank]+" workspace";
+  if(pageDescription)pageDescription.textContent=descriptions[selectedRank]+" Includes "+names[selectedRank]+" commands and all lower-rank tools.";
+  const categoryBar=document.getElementById("adminCategoryBar");
+  if(categoryBar)categoryBar.hidden=false;
 
+  const order=Array.from({length:selectedRank},(_,i)=>i+1);
+  const collapsed={};
+  order.forEach(value=>collapsed[value]=false);
   function renderGroups(){
     adminArea.querySelectorAll(":scope > .admin-rank-group").forEach(node=>node.remove());
-    order.forEach((value,index)=>{
-      const visibleCards=groups[value].filter(card=>rank>0&&rank>=Number(card.dataset.requiredRank));
+    order.forEach(value=>{
+      const visibleCards=groups[value];
       if(!visibleCards.length)return;
-
-      // Keep each heading and its tools inside one grid item so moving a rank
-      // always moves the whole section, never just the heading.
       const group=document.createElement("section");
       group.className="admin-rank-group";
       group.dataset.rank=String(value);
-
       const heading=document.createElement("div");
       heading.className="admin-rank-section";
-      heading.style.cssText="display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:12px 14px;border:1px solid rgba(148,163,255,.15);border-radius:13px;background:rgba(13,17,39,.78);color:#c7d2fe;font-weight:850;font-size:13px;letter-spacing:.025em";
-
-      const label=document.createElement("button");
-      label.type="button";
-      label.className="rank-section-toggle";
-      label.style.cssText="display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-align:left;background:transparent;border:0;padding:0;color:inherit";
-      label.setAttribute("aria-expanded",String(!collapsed[value]));
-      const arrow=document.createElement("span");
-      arrow.textContent=collapsed[value]?"▸":"▾";
-      arrow.style.cssText="font-size:18px;color:#a5b4fc;flex:0 0 auto";
-      const title=document.createElement("span");
-      title.textContent=labels[value];
-      label.append(arrow,title);
-      label.addEventListener("click",()=>{collapsed[value]=!collapsed[value];renderGroups();});
+      const label=document.createElement("div");
+      label.className="admin-rank-heading-copy";
+      label.innerHTML='<span class="admin-rank-icon">'+icons[value]+'</span><span><strong>'+names[value]+' commands</strong><small>'+descriptions[value]+'</small></span>';
       heading.appendChild(label);
-
-      const move=document.createElement("button");
-      move.type="button";
-      move.textContent="↓";
-      move.title="Move "+names[value]+" section down";
-      move.setAttribute("aria-label",move.title);
-      move.disabled=index===order.length-1;
-      move.style.cssText="padding:5px 10px;min-width:34px;font-size:16px";
-      move.addEventListener("click",()=>{
-        if(index>=order.length-1)return;
-        [order[index],order[index+1]]=[order[index+1],order[index]];
-        renderGroups();
-      });
-      heading.appendChild(move);
+      const count=document.createElement("span");
+      count.className="admin-rank-count";
+      count.textContent=visibleCards.length+" tools";
+      heading.appendChild(count);
       group.appendChild(heading);
-
-      if(!collapsed[value]){
-        const cardsGrid=document.createElement("div");
-        cardsGrid.className="admin-rank-cards";
-        visibleCards.forEach(card=>{
-          card.style.display="";
-          card.style.gridColumn="";
-          cardsGrid.appendChild(card);
-        });
-        group.appendChild(cardsGrid);
-      }else{
-        visibleCards.forEach(card=>{card.style.display="none";});
-      }
+      const cardsGrid=document.createElement("div");
+      cardsGrid.className="admin-rank-cards";
+      visibleCards.forEach(card=>{
+        card.style.display="";
+        card.style.gridColumn="";
+        cardsGrid.appendChild(card);
+      });
+      group.appendChild(cardsGrid);
       adminArea.appendChild(group);
     });
   }
-
   renderGroups();
 }
 
