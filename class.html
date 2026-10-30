@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050611"><title>Classroom • DougHub</title><link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--line:#ffffff17;--muted:#a5abc5;--indigo:#6366f1;--purple:#a855f7}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:radial-gradient(ellipse at 12% 0%,#4f46e52b,transparent 35%),radial-gradient(ellipse at 90% 5%,#9333ea1c,transparent 32%),var(--bg);color:#f5f6ff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.top{height:66px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 clamp(14px,4vw,46px);border-bottom:1px solid var(--line);background:#050611e8;backdrop-filter:blur(18px)}.brand{font-weight:900;letter-spacing:-.04em}.brand span{color:#a5b4fc}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav a,.btn{border:1px solid var(--line);border-radius:10px;background:#ffffff08;color:#e6e8ff;padding:9px 13px;font-size:12px;font-weight:800;cursor:pointer}.nav a.active,.btn.primary{background:linear-gradient(120deg,#6366f1,#8b5cf6);border-color:transparent;color:white}main{width:min(1120px,calc(100% - 30px));margin:auto;padding:32px 0 70px}.hero{padding:clamp(22px,4vw,38px);border:1px solid #a5b4fc2b;border-radius:23px;background:linear-gradient(115deg,#111735e8,#0b0d20e8);box-shadow:0 24px 80px #0003}.eyebrow{color:#c4b5fd;font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}.hero h1{font-size:clamp(34px,6vw,55px);letter-spacing:-.06em;margin:12px 0}.hero p{color:#b4bad3;max-width:650px;line-height:1.7;font-size:14px;margin:0}.hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.section{margin-top:34px;scroll-margin-top:85px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}.section-head h2{font-size:22px;letter-spacing:-.04em;margin:0}.section-head p{font-size:12px;color:var(--muted);margin:5px 0 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.panel{background:linear-gradient(145deg,#11152bde,#090b19e8);border:1px solid var(--line);border-radius:17px;padding:18px;min-width:0}.panel h3{margin:0 0 10px;font-size:15px}.muted,.hint{color:var(--muted);font-size:12px;line-height:1.6}.field{width:100%;padding:11px 12px;margin:6px 0;border-radius:10px;border:1px solid #ffffff20;background:#070a19;color:#fff;outline:none}.field:focus{border-color:#818cf8}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.btn:disabled{opacity:.45;cursor:not-allowed}.class-list{display:grid;gap:8px;margin-top:12px}.class-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#ffffff05}.class-item small{display:block;color:var(--muted);margin-top:3px}.chat-feed{height:320px;overflow:auto;display:flex;flex-direction:column;gap:9px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#060817}.bubble{max-width:88%;padding:9px 11px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff08;overflow-wrap:anywhere}.bubble.mine{align-self:flex-end;background:#4f46e52b;border-color:#818cf833}.bubble strong{font-size:11px;color:#c4b5fd}.bubble p{font-size:13px;white-space:pre-wrap;margin:4px 0}.bubble small{font-size:9px;color:#828aa8}.chat-compose{display:flex;gap:8px;margin-top:9px}.chat-compose .field{margin:0}.reminder{padding:11px;border:1px solid var(--line);border-radius:11px;margin-top:8px;background:#ffffff05}.reminder strong{font-size:13px}.reminder p{font-size:12px;color:#b8bfd8;margin:5px 0}.reminder small{color:#969db9;font-size:10px}.question-card{padding:12px;border:1px solid var(--line);border-radius:12px;margin:9px 0;background:#ffffff05}.question-card label{display:block;font-size:12px;padding:7px 0;color:#dce0fa}.question-card input[type=radio]{accent-color:#818cf8}.status{font-size:12px;color:#c4b5fd;margin-top:10px;min-height:18px}.hidden{display:none!important}.roster{display:flex;flex-wrap:wrap;gap:7px}.person{font-size:11px;padding:7px 9px;border-radius:8px;background:#ffffff0a;border:1px solid var(--line)}.empty{padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed #ffffff24;border-radius:12px}.code-card{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.code-card p{margin:0;color:var(--muted);font-size:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}.top{height:auto;min-height:60px;align-items:flex-start;padding-top:12px;padding-bottom:12px;flex-direction:column}.nav{width:100%}.nav a{flex:1;text-align:center}.chat-compose{align-items:stretch}.chat-feed{height:280px}}
+</style></head><body>
+<header class="top"><a class="brand" href="class.html">DougHub <span>Classroom</span></a><nav class="nav"><a href="#chat" data-scroll="chat">Chat</a><a href="#games" data-scroll="games">Games</a><a href="Scripting/scripting.html">Coding</a><a href="#manage" data-scroll="manage">Class</a></nav></header>
+<main>
+<section class="hero"><div class="eyebrow">Your class space</div><h1>Learn together.<br><span style="background:linear-gradient(100deg,#a5b4fc,#d8b4fe 55%,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent">Build something great.</span></h1><p>A shared classroom with its own chat, reminders, live quiz games, and a direct link to DougCode. Teachers can manage their class; students and other members can join with a class code.</p><div class="hero-actions"><button class="btn primary" data-jump="chat">Open class chat</button><button class="btn" data-jump="games">Play a class game</button><a class="btn" href="Scripting/scripting.html">Open DougCode ↗</a></div><div class="status" id="globalStatus">Checking your account…</div></section>
+<section class="section" id="manage"><div class="section-head"><div><h2>My classroom</h2><p id="roleDescription">Create a class or join one with a code.</p></div></div><div class="grid">
+<div class="panel" id="teacherPanel"><h3>Teacher controls</h3><p class="muted">Verified teachers can create and manage their classrooms.</p><input class="field" id="className" maxlength="70" placeholder="Class name"><input class="field" id="classDescription" maxlength="300" placeholder="Short description (optional)"><div class="actions"><button class="btn primary" id="createClass">Create classroom</button></div><div class="status" id="teacherStatus"></div></div>
+<div class="panel"><h3>Join a classroom</h3><p class="muted">Enter the code shared by your teacher.</p><input class="field" id="joinCode" maxlength="16" placeholder="CLASS CODE" autocomplete="off"><div class="actions"><button class="btn primary" id="joinClass">Join class</button></div><div class="status" id="joinStatus"></div></div>
+<div class="panel"><h3>Your classes</h3><div class="class-list" id="classList"><div class="empty">Loading classrooms…</div></div></div>
+<div class="panel"><h3>Class roster</h3><div class="muted" id="rosterInfo">Choose a classroom to view its members.</div><div class="roster" id="roster"></div></div>
+<div class="panel"><h3>Post a reminder</h3><p class="muted">Reminders appear to everyone in the selected class.</p><input class="field" id="reminderTitle" maxlength="120" placeholder="Reminder title"><textarea class="field" id="reminderBody" maxlength="1500" rows="3" placeholder="Details, homework, or what to bring"></textarea><input class="field" id="reminderDue" type="datetime-local"><div class="actions"><button class="btn primary" id="postReminder">Post reminder</button></div><div class="status" id="reminderStatus"></div></div>
+<div class="panel"><h3>Class reminders</h3><div id="reminderList"><div class="empty">Select a class to view reminders.</div></div></div>
+</div></section>
+<section class="section" id="chat"><div class="section-head"><div><h2>Class chat</h2><p>Messages are visible only to members of the selected classroom and its teacher.</p></div></div><div class="panel"><div class="chat-feed" id="chatFeed"><div class="empty">Select a classroom to open its chat.</div></div><div class="chat-compose"><input class="field" id="chatInput" maxlength="2000" placeholder="Write a message…"><button class="btn primary" id="sendChat">Send</button></div><div class="status" id="chatStatus"></div></div></section>
+<section class="section" id="games"><div class="section-head"><div><h2>Class games</h2><p>Quick live quizzes inspired by classroom game platforms. Join on your own device and answer together.</p></div></div><div class="grid"><div class="panel" id="gameTeacherPanel"><h3>Launch a quiz</h3><input class="field" id="quizTitle" maxlength="120" placeholder="Quiz title"><p class="hint">Add one question per line. Separate each question's four choices and correct answer with a | character. Example: What is 2 + 2? | 3 | 4 | 5 | 6 | 1</p><textarea class="field" id="quizQuestions" rows="7" placeholder="Question? | Choice A | Choice B | Choice C | Choice D | correct choice number (1–4)"></textarea><div class="actions"><button class="btn primary" id="launchQuiz">Create quiz</button></div><div class="status" id="gameTeacherStatus"></div></div><div class="panel"><h3>Live games</h3><div id="gameList"><div class="empty">Select a classroom to see its games.</div></div></div></div><div class="panel hidden" id="activeGamePanel" style="margin-top:13px"><div class="section-head"><div><h3 id="activeGameTitle">Quiz</h3><p id="activeGameMeta"></p></div><button class="btn" id="refreshGame">Refresh</button></div><div id="activeGameBody"></div><div class="actions" id="activeGameActions"></div><div class="status" id="activeGameStatus"></div></div></section>
+<footer class="muted" style="text-align:center;margin-top:38px">DougHub Classroom · Keep class spaces respectful and focused.</footer>
+</main>
+<script>
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+let user=null,profile=null,classes=[],selectedClass=null,activeGame=null,refreshTimer=null;
+const say=(id,msg)=>{if($(id))$(id).textContent=msg};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function jump(id){document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"});}
+document.querySelectorAll("[data-jump]").forEach(b=>b.addEventListener("click",()=>jump(b.dataset.jump)));
+document.querySelectorAll("[data-scroll]").forEach(a=>a.addEventListener("click",()=>{document.querySelectorAll("[data-scroll]").forEach(x=>x.classList.toggle("active",x===a));}));
+async function init(){
+ const {data:{session}}=await db.auth.getSession();
+ if(!session){location.href="log-in.html?redirect=class.html";return;}
+ user=session.user;
+ const {data,error}=await db.from("profiles").select("id,username,account_type,teacher_verified").eq("id",user.id).maybeSingle();
+ if(error){say("globalStatus","Could not load your profile: "+error.message);return;}
+ profile=data||{};
+ const teacher=profile.teacher_verified===true;
+ $("teacherPanel").classList.toggle("hidden",!teacher);
+ $("gameTeacherPanel").classList.toggle("hidden",!teacher);
+ $("roleDescription").textContent=teacher?"Teacher workspace · Manage classes, students, chat, reminders, and live games.":"Join a classroom using the code from your teacher.";
+ if(profile.account_type==="teacher"&&!teacher)say("globalStatus","Your teacher verification is still pending. You can join classes while it is reviewed.");
+ else say("globalStatus",teacher?"Verified teacher account":"Welcome to your classroom space.");
+ await loadClasses();
+}
+async function loadClasses(){
+ const {data:owned,error:e1}=await db.from("classrooms").select("id,name,description,join_code,is_active,teacher_id,created_at").eq("teacher_id",user.id).order("created_at",{ascending:false});
+ const {data:members,error:e2}=await db.from("classroom_members").select("classroom_id,joined_at").eq("user_id",user.id);
+ if(e1||e2){$("classList").innerHTML='<div class="empty">'+esc((e1||e2).message)+'</div>';return;}
+ const memberIds=(members||[]).map(x=>x.classroom_id);
+ let joined=[];
+ if(memberIds.length){const q=await db.from("classrooms").select("id,name,description,join_code,is_active,teacher_id,created_at").in("id",memberIds);joined=q.data||[];}
+ const all=[...(owned||[]),...joined.filter(c=>!(owned||[]).some(o=>o.id===c.id))];
+ classes=all;
+ if(!all.length){$("classList").innerHTML='<div class="empty">No classrooms yet. Join one with a code or create one if you are a verified teacher.</div>';return;}
+ $("classList").replaceChildren();
+ all.forEach(c=>{
+  const row=document.createElement("div");row.className="class-item";
+  const info=document.createElement("div");const strong=document.createElement("strong");strong.textContent=c.name;
+  const small=document.createElement("small");small.textContent=c.teacher_id===user.id?"Your classroom · Code "+c.join_code:"Joined classroom";
+  info.append(strong,small);const button=document.createElement("button");button.className="btn";button.textContent=selectedClass?.id===c.id?"Selected":"Open";button.addEventListener("click",()=>selectClass(c));
+  row.append(info,button);$("classList").append(row);
+ });
+ if(!selectedClass||!all.some(c=>c.id===selectedClass.id))await selectClass(all[0]);
+}
+async function selectClass(c){
+ selectedClass=c;activeGame=null;$("activeGamePanel").classList.add("hidden");
+ $("classList").querySelectorAll(".class-item .btn").forEach(b=>{b.textContent=b.parentElement.querySelector("small")?.textContent?.startsWith("Your classroom")&&c.id===selectedClass.id?"Selected":b.textContent;});
+ if(c.teacher_id===user.id){$("teacherStatus").textContent="Invite code: "+c.join_code;}
+ else $("teacherStatus").textContent="You are a member of "+c.name+".";
+ await Promise.all([loadRoster(),loadChat(),loadReminders(),loadGames()]);
+}
+async function loadRoster(){
+ const {data,error}=await db.from("classroom_members").select("user_id,joined_at").eq("classroom_id",selectedClass.id).order("joined_at");
+ if(error){$("rosterInfo").textContent=error.message;return;}
+ const ids=(data||[]).map(m=>m.user_id);
+ const {data:people}=ids.length?await db.from("profiles").select("id,username,avatar_url").in("id",ids):{data:[]};
+ const map=new Map((people||[]).map(p=>[p.id,p]));
+ const roster=[{id:selectedClass.teacher_id,username:"Teacher",teacher:true},...(data||[]).map(m=>({id:m.user_id,username:map.get(m.user_id)?.username||"Student"}))];
+ $("rosterInfo").textContent=roster.length+" people in "+selectedClass.name;
+ $("roster").replaceChildren();
+ roster.forEach(p=>{const tag=document.createElement("span");tag.className="person";tag.textContent=(p.teacher?"Teacher · ":"")+p.username;$("roster").append(tag);});
+}
+async function loadChat(){
+ const {data,error}=await db.from("classroom_messages").select("id,user_id,message,created_at").eq("classroom_id",selectedClass.id).order("created_at",{ascending:true}).limit(150);
+ if(error){$("chatFeed").innerHTML='<div class="empty">'+esc(error.message)+'</div>';return;}
+ const ids=[...new Set((data||[]).map(m=>m.user_id))];const {data:people}=ids.length?await db.from("profiles").select("id,username").in("id",ids):{data:[]};const map=new Map((people||[]).map(p=>[p.id,p.username]));
+ $("chatFeed").replaceChildren();
+ if(!data?.length){$("chatFeed").innerHTML='<div class="empty">Start the conversation. Be kind and stay on topic.</div>';return;}
+ data.forEach(m=>{const bubble=document.createElement("div");bubble.className="bubble"+(m.user_id===user.id?" mine":"");const who=document.createElement("strong");who.textContent=map.get(m.user_id)||(m.user_id===selectedClass.teacher_id?"Teacher":"Class member");const msg=document.createElement("p");msg.textContent=m.message;const time=document.createElement("small");time.textContent=new Date(m.created_at).toLocaleString();bubble.append(who,msg,time);$("chatFeed").append(bubble);});
+ $("chatFeed").scrollTop=$("chatFeed").scrollHeight;
+}
+$("sendChat").addEventListener("click",async()=>{if(!selectedClass){say("chatStatus","Choose a classroom first.");return;}const message=$("chatInput").value.trim();if(!message)return;$("sendChat").disabled=true;const {error}=await db.from("classroom_messages").insert({classroom_id:selectedClass.id,user_id:user.id,message});$("sendChat").disabled=false;if(error){say("chatStatus",error.message);return;}$("chatInput").value="";say("chatStatus","Sent.");await loadChat();});
+$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("sendChat").click();}});
+async function loadReminders(){
+ const {data,error}=await db.from("classroom_reminders").select("id,title,body,due_at,created_at").eq("classroom_id",selectedClass.id).order("created_at",{ascending:false});
+ if(error){$("reminderList").textContent=error.message;return;}
+ $("reminderList").replaceChildren();if(!data?.length){$("reminderList").innerHTML='<div class="empty">No reminders posted yet.</div>';return;}
+ data.forEach(r=>{const el=document.createElement("div");el.className="reminder";const title=document.createElement("strong");title.textContent=r.title;const body=document.createElement("p");body.textContent=r.body;const due=document.createElement("small");due.textContent=r.due_at?"Due "+new Date(r.due_at).toLocaleString():"Posted "+new Date(r.created_at).toLocaleString();el.append(title,body,due);$("reminderList").append(el);});
+}
+$("postReminder").addEventListener("click",async()=>{if(!selectedClass||selectedClass.teacher_id!==user.id){say("reminderStatus","Only the teacher who owns this class can post reminders.");return;}const title=$("reminderTitle").value.trim();if(!title){say("reminderStatus","Add a reminder title.");return;}const due=$("reminderDue").value;const {error}=await db.from("classroom_reminders").insert({classroom_id:selectedClass.id,teacher_id:user.id,title,body:$("reminderBody").value.trim(),due_at:due?new Date(due).toISOString():null});if(error){say("reminderStatus",error.message);return;}$("reminderTitle").value="";$("reminderBody").value="";say("reminderStatus","Reminder posted to the class.");await loadReminders();});
+function parseQuiz(){
+ const lines=$("quizQuestions").value.split("\n").map(x=>x.trim()).filter(Boolean);
+ if(!lines.length)throw Error("Add at least one question.");
+ if(lines.length>30)throw Error("A quiz can have up to 30 questions.");
+ return lines.map((line,i)=>{const p=line.split("|").map(x=>x.trim());if(p.length!==6)throw Error("Question "+(i+1)+" needs a question, four choices, and a correct choice number.");const correct=Number(p[5])-1;if(!Number.isInteger(correct)||correct<0||correct>3)throw Error("Question "+(i+1)+" correct choice must be 1–4.");return {question:p[0],choices:p.slice(1,5),correct};});
+}
+$("createClass").addEventListener("click",async()=>{if(!profile.teacher_verified){say("teacherStatus","Teacher verification is required.");return;}const name=$("className").value.trim();if(name.length<2){say("teacherStatus","Class name must be at least 2 characters.");return;}const code=Array.from(crypto.getRandomValues(new Uint8Array(5))).map(n=>"ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[n%32]).join("");const {data,error}=await db.from("classrooms").insert({teacher_id:user.id,name,description:$("classDescription").value.trim(),join_code:code}).select().single();if(error){say("teacherStatus",error.message);return;}say("teacherStatus","Class created! Join code: "+code);$("className").value="";await loadClasses();if(data)await selectClass(data);});
+$("joinClass").addEventListener("click",async()=>{const code=$("joinCode").value.trim().toUpperCase();if(!code){say("joinStatus","Enter a class code.");return;}const {data,error}=await db.rpc("join_classroom_by_code",{p_join_code:code});if(error){say("joinStatus",error.message);return;}say("joinStatus","Joined classroom.");$("joinCode").value="";await loadClasses();const found=classes.find(c=>c.id===data);if(found)await selectClass(found);});
+$("launchQuiz").addEventListener("click",async()=>{if(!selectedClass||selectedClass.teacher_id!==user.id){say("gameTeacherStatus","Select a classroom you own.");return;}let questions;try{questions=parseQuiz();}catch(e){say("gameTeacherStatus",e.message);return;}const title=$("quizTitle").value.trim()||"Class quiz";const {data,error}=await db.from("classroom_game_sessions").insert({classroom_id:selectedClass.id,teacher_id:user.id,title,questions,status:"waiting"}).select().single();if(error){say("gameTeacherStatus",error.message);return;}say("gameTeacherStatus","Quiz created. Start it when everyone is ready.");$("quizTitle").value="";$("quizQuestions").value="";await loadGames();await openGame(data);});
+async function loadGames(){
+ const {data,error}=await db.from("classroom_game_sessions").select("id,title,status,current_question,created_at").eq("classroom_id",selectedClass.id).order("created_at",{ascending:false}).limit(20);
+ if(error){$("gameList").textContent=error.message;return;}
+ $("gameList").replaceChildren();if(!data?.length){$("gameList").innerHTML='<div class="empty">No class games yet. The teacher can launch the first quiz.</div>';return;}
+ data.forEach(g=>{const row=document.createElement("div");row.className="class-item";const label=document.createElement("div");const strong=document.createElement("strong");strong.textContent=g.title;const small=document.createElement("small");small.textContent=g.status.toUpperCase();label.append(strong,small);const b=document.createElement("button");b.className="btn";b.textContent="Open";b.addEventListener("click",()=>openGame(g));row.append(label,b);$("gameList").append(row);});
+}
+async function openGame(game){
+ const {data,error}=await db.from("classroom_game_sessions").select("*").eq("id",game.id).single();if(error){say("activeGameStatus",error.message);return;}
+ activeGame=data;$("activeGamePanel").classList.remove("hidden");$("activeGameTitle").textContent=data.title;$("activeGameMeta").textContent=data.status.toUpperCase()+" · "+data.questions.length+" questions";
+ const isTeacher=data.teacher_id===user.id;const body=$("activeGameBody");const actions=$("activeGameActions");body.replaceChildren();actions.replaceChildren();
+ if(isTeacher){
+  const start=document.createElement("button");start.className="btn primary";start.textContent=data.status==="waiting"?"Start game":data.status==="active"?"Next question":"Finished";
+  start.disabled=data.status==="finished";start.addEventListener("click",async()=>{const next=data.status==="waiting"?"active":data.current_question+1;const status=next>=data.questions.length?"finished":"active";const {error}=await db.from("classroom_game_sessions").update({status,current_question:Math.min(next,data.questions.length-1)}).eq("id",data.id);if(error){say("activeGameStatus",error.message);return;}await openGame({...data,status,current_question:Math.min(next,data.questions.length-1)});});actions.append(start);
+  const results=document.createElement("button");results.className="btn";results.textContent="Show answer & scores";results.addEventListener("click",()=>showGameResults(data));actions.append(results);
+  if(data.status==="waiting")body.innerHTML='<div class="empty">Waiting room · Students can open this game. Start when ready.</div>';
+  else {const q=data.questions[data.current_question];const h=document.createElement("h3");h.textContent="Question "+(data.current_question+1)+": "+q.question;body.append(h);q.choices.forEach((choice,i)=>{const d=document.createElement("div");d.className="question-card";d.textContent=(i+1)+". "+choice+(i===q.correct?" ✓":"");body.append(d);});}
+ }else{
+  if(data.status==="waiting"){body.innerHTML='<div class="empty">The teacher has not started this quiz yet.</div>';}
+  else if(data.status==="finished"){body.innerHTML='<div class="empty">This quiz has ended. Nice work participating!</div>';}
+  else {
+   const q=data.questions[data.current_question];const h=document.createElement("h3");h.textContent="Question "+(data.current_question+1)+": "+q.question;body.append(h);
+   const form=document.createElement("div");q.choices.forEach((choice,i)=>{const label=document.createElement("label");label.className="question-card";const radio=document.createElement("input");radio.type="radio";radio.name="quizAnswer";radio.value=i;label.append(radio,document.createTextNode(" "+choice));form.append(label);});body.append(form);
+   const submit=document.createElement("button");submit.className="btn primary";submit.textContent="Submit answer";submit.addEventListener("click",async()=>{const selected=form.querySelector("input:checked");if(!selected){say("activeGameStatus","Choose an answer first.");return;}const {error}=await db.from("classroom_game_answers").upsert({session_id:data.id,user_id:user.id,question_index:data.current_question,answer_index:Number(selected.value)},{onConflict:"session_id,user_id,question_index"});say("activeGameStatus",error?error.message:"Answer submitted!");submit.disabled=!error;});actions.append(submit);
+  }
+ }
+}
+async function showGameResults(game){
+ const {data,error}=await db.from("classroom_game_answers").select("user_id,question_index,answer_index").eq("session_id",game.id);if(error){say("activeGameStatus",error.message);return;}
+ const roster=[...new Set((data||[]).map(x=>x.user_id))];const {data:people}=roster.length?await db.from("profiles").select("id,username").in("id",roster):{data:[]};const names=new Map((people||[]).map(p=>[p.id,p.username]));const scores=new Map();
+ for(const a of data||[]){const correct=game.questions[a.question_index]?.correct===a.answer_index;scores.set(a.user_id,(scores.get(a.user_id)||0)+(correct?1:0));}
+ const body=$("activeGameBody");body.replaceChildren();[...scores.entries()].sort((a,b)=>b[1]-a[1]).forEach(([id,score],i)=>{const row=document.createElement("div");row.className="class-item";row.textContent=(i+1)+". "+(names.get(id)||"Student")+" — "+score+" points";body.append(row);});if(!scores.size)body.innerHTML='<div class="empty">No answers submitted yet.</div>';
+}
+$("refreshGame").addEventListener("click",()=>activeGame&&openGame(activeGame));
+init();
+refreshTimer=setInterval(()=>{if(!selectedClass)return;loadChat();loadReminders();loadGames();if(activeGame)openGame(activeGame);},7000);
+</script></body></html>
