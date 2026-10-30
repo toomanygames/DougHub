@@ -75,7 +75,7 @@ function renderFile(){renderFileTabs();$("activeFileLabel").textContent=fileLabe
 function updateLineCount(){const code=$("codeEditor").value;$("lineCount").textContent=(code.split("\n").length)+" line"+(code.split("\n").length===1?"":"s");}
 function switchFile(file){saveCurrentFile();activeFile=file;renderFile();persist();}
 function saveCurrentFile(){files[activeFile]=$("codeEditor").value;updateLineCount();persist();}
-function buildDocument(){const html=files.html||"";const css=files.css||"";const js=files.js||"";return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<style>\n'+css+'\n</style>\n</head>\n<body>\n'+html+'\n<script>\n'+js.replace(/<\/script/gi,"<\\/script")+'\n</script>\n</body>\n</html>';}
+function buildDocument(){const html=files.html||"";const css=files.css||"";const js=files.js||"";let assets=[];try{assets=JSON.parse(files["assets.json"]||"[]");if(!Array.isArray(assets))assets=[];}catch(_){}const bootstrap='<script>window.DougHubAssets='+JSON.stringify(assets).replace(/<\//g,"<\\/")+'</script>';return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>\n<style>\n'+css+'\n</style>\n</head>\n<body>\n'+html+'\n'+bootstrap+'\n<script>\n'+js.replace(/<\/script/gi,"<\\/script")+'\n</script>\n</body>\n</html>';}
 function runPreview(){saveCurrentFile();if(currentMode==="blocks")updateGenerated();const isBlocks=currentMode==="blocks",isFast=currentMode==="fast";const frame=$(isBlocks?"previewDialogFrame":isFast?"fastPreviewFrame":"previewFrame");if(frame)frame.srcdoc=buildDocument();const empty=$(isBlocks?"previewDialogEmpty":isFast?"fastPreviewEmpty":"previewEmpty");const status=$(isBlocks?"previewDialogStatus":isFast?"fastPreviewStatus":"previewStatus");if(empty)empty.hidden=true;if(status)status.textContent="Preview refreshed at "+new Date().toLocaleTimeString();setStatus("Preview updated");}
 function setMode(mode){currentMode=mode;document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$("codeMode").hidden=mode!=="code";$("blocksMode").hidden=mode!=="blocks";$("fastMode").hidden=mode!=="fast";if(mode==="blocks"){renderLibrary();renderBlocks();if(blocklyWorkspace){requestAnimationFrame(()=>{try{Blockly.svgResize(blocklyWorkspace);}catch(e){console.warn("Blockly resize failed",e);}});}}else if(mode==="code")renderFile();else renderFastStatus();persist();}
 
@@ -401,7 +401,10 @@ function codeCommunityDocument(project){
   const h=String(project.html_code||"");
   const c=String(project.css_code||"");
   const j=String(project.js_code||"").replace(/<\/script/gi,"<\\/script");
-  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+c+'</style></head><body>'+h+'<script>'+j+'</script></body></html>';
+  let assets=[];
+  try{const item=(project.files||[]).find(f=>String(f.name||"").toLowerCase()==="assets.json");assets=item?JSON.parse(item.content||"[]"):[];if(!Array.isArray(assets))assets=[];}catch(_){assets=[];}
+  const bootstrap='<script>window.DougHubAssets='+JSON.stringify(assets).replace(/<\//g,"<\\/")+'</script>';
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script><style>'+c+'</style></head><body>'+h+bootstrap+'<script>'+j+'</script></body></html>';
 }
 function codeCommunityAllCode(project){
   return "// "+String(project.title||"Community Project")+"\n\n/* index.html */\n"+String(project.html_code||"")+"\n\n/* style.css */\n"+String(project.css_code||"")+"\n\n/* main.js */\n"+String(project.js_code||"");
@@ -466,9 +469,12 @@ function codeCommunityLoadIntoEditor(p){
   if(!codeCommunityUser||p.owner_id!==codeCommunityUser.id)return;
   editingCodeCommunityId=p.id;
   files.html=String(p.html_code||STARTERS.html);files.css=String(p.css_code||STARTERS.css);files.js=String(p.js_code||"");
+  for(const item of (Array.isArray(p.files)?p.files:[])){
+    if(item&&item.name&&item.name!=="index.html"&&item.name!=="style.css"&&item.name!=="main.js"&&typeof item.content==="string")files[item.name]=item.content;
+  }
   $("projectName").value=p.title||"My Coding Project";$("codeCommunityTitle").value=p.title||"";$("codeCommunityDescription").value=p.description||"";
   $("codeCommunityAllowCopy").checked=!!p.allow_copy;$("codeCommunityAllowDownload").checked=!!p.allow_download;
-  activeFile="html";renderFile();persist();setMode("code");codeCommunitySetStatus("Editing your published project. Publish again to save changes.");
+  activeFile="html";renderFile();persist();setMode("code");renderGameAssetList();codeCommunitySetStatus("Editing your published project. Publish again to save changes.");
   $("codeCommunityProjects").scrollIntoView({behavior:"smooth",block:"start"});
 }
 async function codeCommunityPublish(){
@@ -478,7 +484,7 @@ async function codeCommunityPublish(){
   const description=$("codeCommunityDescription").value.trim();
   if(!title){codeCommunitySetStatus("Add a project title before publishing.",true);$("codeCommunityTitle").focus();return;}
   const button=$("publishCodeProjectBtn");button.disabled=true;button.textContent="Publishing…";
-  const payload={owner_id:codeCommunityUser.id,title:title.slice(0,80),description:description.slice(0,500),visibility:"public",allow_copy:$("codeCommunityAllowCopy").checked,allow_download:$("codeCommunityAllowDownload").checked,html_code:files.html||"",css_code:files.css||"",js_code:files.js||"",files:[{name:"index.html",type:"html",content:files.html||""},{name:"style.css",type:"css",content:files.css||""},{name:"main.js",type:"js",content:files.js||""}],entry_file:"index.html",runtime:"web"};
+  const payload={owner_id:codeCommunityUser.id,title:title.slice(0,80),description:description.slice(0,500),visibility:"public",allow_copy:$("codeCommunityAllowCopy").checked,allow_download:$("codeCommunityAllowDownload").checked,html_code:files.html||"",css_code:files.css||"",js_code:files.js||"",files:[{name:"index.html",type:"html",content:files.html||""},{name:"style.css",type:"css",content:files.css||""},{name:"main.js",type:"js",content:files.js||""},...Object.entries(files).filter(([name])=>name!=="html"&&name!=="css"&&name!=="js").map(([name,content])=>({name,type:name.split(".").pop(),content:String(content)}))],entry_file:"index.html",runtime:"web"};
   try{
     let q=codeCommunityDb.from("code_projects");
     if(editingCodeCommunityId)q=q.update(payload).eq("id",editingCodeCommunityId).eq("owner_id",codeCommunityUser.id);
@@ -490,6 +496,82 @@ async function codeCommunityPublish(){
   }catch(e){console.error("Project publish failed:",e);codeCommunitySetStatus("Couldn't publish: "+(e.message||"check your connection and try again"),true);}
   finally{button.disabled=false;button.textContent=editingCodeCommunityId?"Update published project":"Publish to Community Projects";}
 }
+function gameAssetManifest(){
+  try{const value=JSON.parse(files["assets.json"]||"[]");return Array.isArray(value)?value:[];}catch(_){return [];}
+}
+function saveGameAssetManifest(items){
+  files["assets.json"]=JSON.stringify(items,null,2);
+  persist();saveToMyProjects();renderGameAssetList();
+}
+function renderGameAssetList(){
+  const host=$("gameAssetList");if(!host)return;
+  host.replaceChildren();
+  const items=gameAssetManifest();
+  if(!items.length){const empty=document.createElement("div");empty.className="game-asset-empty";empty.textContent="No 3D assets added yet.";host.appendChild(empty);return;}
+  for(const item of items){
+    const row=document.createElement("div");row.className="game-asset-row";
+    const info=document.createElement("div");info.className="game-asset-info";
+    const name=document.createElement("strong");name.textContent=item.name||"Asset";
+    const meta=document.createElement("small");meta.textContent=(item.kind||"Asset")+" · "+(item.size?Math.round(item.size/1024)+" KB":"");
+    info.append(name,meta);
+    const actions=document.createElement("div");actions.className="game-asset-actions";
+    const link=document.createElement("a");link.href=item.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Open";
+    const copy=document.createElement("button");copy.type="button";copy.className="text-btn";copy.textContent="Copy URL";copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(item.url);setStatus("Asset URL copied");}catch(_){setStatus("Couldn't copy asset URL",true);}});
+    actions.append(link,copy);row.append(info,actions);host.appendChild(row);
+  }
+}
+function ensureGameAssetManager(){
+  if($("gameAssetManager"))return;
+  const anchor=$("fileTabs")?.parentElement;
+  if(!anchor)return;
+  const panel=document.createElement("section");panel.id="gameAssetManager";panel.className="game-asset-manager";
+  panel.innerHTML='<div class="game-asset-head"><div><strong>3D Game Assets</strong><small>Import an entire model pack folder, preserving textures and glTF dependencies.</small></div><label class="btn small primary game-asset-upload-label" for="gameAssetInput">＋ Import Pack Folder</label><input id="gameAssetInput" type="file" webkitdirectory directory multiple hidden></div><div id="gameAssetStatus" class="game-asset-status">Sign in, then choose the extracted Quaternius Pack folder. Files go directly to DougHub storage — nothing is attached to this chat.</div><div id="gameAssetList" class="game-asset-list"></div>';
+  const style=document.createElement("style");style.textContent=".game-asset-manager{margin:12px 0 16px;padding:14px;border:1px solid #ffffff18;border-radius:14px;background:#0b1024}.game-asset-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.game-asset-head strong,.game-asset-head small{display:block}.game-asset-head small,.game-asset-status,.game-asset-row small{color:#9aa4c0;font-size:11px;margin-top:4px}.game-asset-upload-label{cursor:pointer}.game-asset-status{margin:10px 0}.game-asset-list{display:grid;gap:7px}.game-asset-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;border:1px solid #ffffff12;border-radius:9px;background:#ffffff06}.game-asset-info{min-width:0}.game-asset-info strong,.game-asset-info small{display:block;overflow-wrap:anywhere}.game-asset-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}.game-asset-actions a{color:#a5b4fc;font-size:12px;text-decoration:none}.game-asset-empty{font-size:12px;color:#8792ae;padding:8px 0}";
+  anchor.insertBefore(style,anchor.querySelector(".editor-caption")||null);
+  anchor.insertBefore(panel,anchor.querySelector(".editor-caption")||null);
+  $("gameAssetInput").addEventListener("change",async event=>{
+    const selected=Array.from(event.target.files||[]);event.target.value="";
+    if(!selected.length)return;
+    if(!codeCommunityDb||!codeCommunityUser){$("gameAssetStatus").textContent="Sign in to DougHub before importing game assets.";return;}
+    const allowed=/\.(glb|gltf|bin|png|jpe?g|webp|ktx2|json)$/i;
+    const packFiles=selected.filter(file=>allowed.test(file.name));
+    if(!packFiles.length){$("gameAssetStatus").textContent="No supported model or texture files were found in that folder.";return;}
+    if(packFiles.length>1000){$("gameAssetStatus").textContent="That folder has more than 1,000 supported files. Please select a smaller asset folder.";return;}
+    const project=codeCommunitySafeName($("projectName").value);
+    const button=$("gameAssetInput");
+    button.disabled=true;$("gameAssetStatus").textContent="Preparing "+packFiles.length+" model-pack files…";
+    let manifest=gameAssetManifest(),uploaded=0;
+    try{
+      for(const file of packFiles){
+        if(file.size>50*1024*1024)throw new Error(file.name+" is over the 50 MB per-file limit.");
+        const relative=file.webkitRelativePath||file.name;
+        const parts=relative.split("/").filter(Boolean);
+        if(parts.length>1)parts.shift();
+        const safeParts=parts.map(part=>part.replace(/[^a-z0-9._-]/gi,"_").slice(-120));
+        const relativePath=safeParts.join("/");
+        if(!relativePath)continue;
+        const path=codeCommunityUser.id+"/"+project+"/"+relativePath;
+        const lower=file.name.toLowerCase();
+        const type=file.type||(lower.endsWith(".glb")?"model/gltf-binary":lower.endsWith(".gltf")?"model/gltf+json":lower.endsWith(".png")?"image/png":/\.jpe?g$/.test(lower)?"image/jpeg":lower.endsWith(".webp")?"image/webp":lower.endsWith(".ktx2")?"image/ktx2":"application/octet-stream");
+        const {error}=await codeCommunityDb.storage.from("game-assets").upload(path,file,{upsert:true,contentType:type,cacheControl:"3600"});
+        if(error)throw error;
+        const {data}=codeCommunityDb.storage.from("game-assets").getPublicUrl(path);
+        manifest=manifest.filter(x=>x.path!==path);
+        manifest.push({name:relativePath,path,url:data.publicUrl,kind:/\.(glb|gltf)$/i.test(file.name)?"3D model":/\.(png|jpe?g|webp|ktx2)$/i.test(file.name)?"Texture":"Model data",size:file.size,contentType:type});
+        uploaded++;
+        if(uploaded%5===0||uploaded===packFiles.length)$("gameAssetStatus").textContent="Uploaded "+uploaded+" of "+packFiles.length+" files…";
+      }
+      saveGameAssetManifest(manifest);
+      $("gameAssetStatus").textContent="Imported "+uploaded+" files with their folder paths preserved. Models can now resolve their relative textures and .bin files.";
+      setStatus("Imported "+uploaded+" game asset files");
+    }catch(error){
+      $("gameAssetStatus").textContent="Upload stopped after "+uploaded+" files: "+(error.message||"Unknown error");
+      setStatus("Game asset import failed: "+(error.message||"Unknown error"),true);
+    }finally{button.disabled=false;}
+  });
+  renderGameAssetList();
+}
+
 function codeCommunityInit(){
   const create=window.supabase?.createClient;
   if(!create){codeCommunitySetStatus("Community Projects could not connect to Supabase.",true);$("codeCommunityProjectSlider").textContent="Community Projects are unavailable right now.";return;}
@@ -506,6 +588,7 @@ function codeCommunityInit(){
   $("editCodeProjectBtn").addEventListener("click",()=>{if(selectedCodeCommunityProject){$("codeCommunityPreviewDialog").close();codeCommunityLoadIntoEditor(selectedCodeCommunityProject);}});
   $("codeCommunityTitle").addEventListener("input",()=>{if(!editingCodeCommunityId)$("publishCodeProjectBtn").textContent="Publish to Community Projects";});
   codeCommunityLoad();
+  ensureGameAssetManager();
 }
 
 codeCommunityInit();
