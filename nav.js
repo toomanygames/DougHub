@@ -65,7 +65,7 @@
   const API = "https://agsqdqcsmsppcdqxlppj.supabase.co/rest/v1/site_feature_flags?select=feature_key,enabled,display_name";
   const KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
   const pathMap = {
-    "douggames.html":"games","games/drive-pig.html":"games","games/dve-pig.html":"games",
+    "douggames.html":"games","games/ocean-drive.html":"games","games/drive-pig.html":"games","games/dve-pig.html":"games",
     "games/pig-clicker.html":"games","games/pig-clicker-space.html":"games","games/puzzle.html":"games",
     "games/racing.html":"games","games/rebirth-clicker.html":"games","games/smack-n-punch.html":"games",
     "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","nova.html":"nova",
