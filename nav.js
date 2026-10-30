@@ -918,11 +918,24 @@
     document.head.appendChild(script);
   }
 
+  async function addSchoolModeLink() {
+    try {
+      const response = await fetch(API + "&feature_key=eq.school_mode", {headers:{apikey:KEY,Authorization:"Bearer "+KEY,Accept:"application/json"},cache:"no-store"});
+      if (!response.ok) return;
+      const rows = await response.json();
+      if (!rows[0] || rows[0].enabled !== true) return;
+      const nav = document.querySelector("header nav[aria-label='Main navigation'], header > .nav");
+      if (!nav || nav.querySelector('[data-school-mode-link="true"]')) return;
+      const link = document.createElement("a");
+      link.href="/school.html";link.className="nav-link";link.dataset.schoolModeLink="true";link.textContent="School";nav.appendChild(link);
+    } catch (_) {}
+  }
   function start() {
     loadSideConversations();
     addNavStyle();
     document.getElementById("dh-global-help")?.remove();
     normalizePrimaryNav();
+    addSchoolModeLink();
     installQuickFind();
     startChatNotificationWatcher();
     removeRetiredNavLinks();
