@@ -114,7 +114,7 @@ function setStudioKind(kind){
   $("fastPreviewFrame").title=project?"Coding project preview":"Game preview";
   $("fastPreviewEmpty").querySelector("span").textContent=project?"Choose a project template to begin.":"Choose a template to make it playable.";
   document.querySelectorAll("[data-fast-template]").forEach(button=>{
-    const gameTemplate=["clicker","dodge"].includes(button.dataset.fastTemplate);
+    const gameTemplate=["clicker","dodge","zombie"].includes(button.dataset.fastTemplate);
     button.hidden=project&&gameTemplate;
     const cta=button.querySelector(".fast-template-cta");
     if(cta&&project)cta.textContent=button.dataset.fastTemplate==="landing"?"Create website ↗":button.dataset.fastTemplate==="quiz"?"Create project ↗":"Start building ↗";
