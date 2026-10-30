@@ -5441,7 +5441,7 @@ function applyStaffPermissions(){
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard|teacherverificationcard/.test(id))return 4;
+    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
     if(/custombadgemanagercard|feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
@@ -6090,13 +6090,4 @@ startAdminPanel();
 </style>
 
 <style>
-.teacher-verification-list{display:grid;gap:10px;margin-top:14px}
-.teacher-verification-item{padding:14px;border:1px solid #ffffff16;border-radius:13px;background:#ffffff06;display:grid;gap:7px}
-.teacher-verification-item small{color:#a5a8c7}
-.teacher-verification-item p{margin:2px 0;color:#d1d5e8;white-space:pre-wrap;overflow-wrap:anywhere}
-.teacher-verification-state{font-size:11px;font-weight:800;letter-spacing:.08em;color:#c4b5fd}
-.teacher-verification-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
-.teacher-verification-actions button{padding:9px 13px;border-radius:9px;border:1px solid #ffffff20;cursor:pointer}
-.teacher-verification-actions .primary{background:#4f46e5;color:white}
-.teacher-verification-actions .danger{background:#7f1d1d55;color:#fecaca}
 </style>
