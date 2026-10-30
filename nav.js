@@ -262,7 +262,7 @@
     const links = [
       ["/dashboard.html","Home"],
       ["/douggames.html","Games"],
-      ["/dougcode.html","Create"],
+      ["/Scripting/scripting.html","Create"],
       ["/chat.html","Chat"]
     ];
     nav.replaceChildren();
