@@ -911,6 +911,24 @@
     document.head.appendChild(script);
   }
 
+  // Add a dedicated Classroom destination to every existing site navigation.
+  // Pages without a navigation are untouched, and Classroom keeps its own local tabs.
+  function addClassroomNavLink() {
+    if (pathKey() === "class.html") return;
+    const navs = Array.from(document.querySelectorAll("header nav, nav[aria-label='Main navigation'], header .nav"));
+    navs.forEach(nav => {
+      if (nav.querySelector('[data-dh-classroom-link="true"]')) return;
+      const link = document.createElement("a");
+      link.href = "/class.html";
+      link.className = "nav-link dh-classroom-link";
+      link.dataset.dhClassroomLink = "true";
+      link.textContent = "Class";
+      link.setAttribute("aria-label", "Open DougHub Classroom");
+      const account = nav.querySelector(".account-area, .dh-shared-account");
+      if (account) nav.insertBefore(link, account); else nav.appendChild(link);
+    });
+  }
+
   async function addSchoolModeLink() {
     try {
       const response = await fetch(API + "&feature_key=eq.school_mode", {headers:{apikey:KEY,Authorization:"Bearer "+KEY,Accept:"application/json"},cache:"no-store"});
@@ -928,6 +946,7 @@
     addNavStyle();
     document.getElementById("dh-global-help")?.remove();
     normalizePrimaryNav();
+    addClassroomNavLink();
     addSchoolModeLink();
     installQuickFind();
     startChatNotificationWatcher();
