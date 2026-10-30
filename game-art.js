@@ -49,7 +49,7 @@
     ? '<p><b>Game code:</b> 2048 by Gabriele Cirulli and contributors, licensed under MIT. <a href="https://github.com/gabrielecirulli/2048" target="_blank" rel="noopener noreferrer">View source</a>.</p>'
     : key === "ocean-drive"
       ? '<p><b>Game code:</b> Ocean Drive by StarKnightt, licensed under MIT. <a href="https://github.com/StarKnightt/ocean-drive" target="_blank" rel="noopener noreferrer">View source</a>.</p>'
-      : '<p><b>Game code:</b> DougHub game implementation. This artwork credit does not change the game-code license or ownership.</p>';
+      : '<p><b>Game code:</b> The CC0 dedication covers artwork only. Game code, libraries, fonts, audio, and any third-party materials retain their own licenses and notices.</p>';
   modal.innerHTML = `<section class="dh-art-modal" role="dialog" aria-modal="true" aria-labelledby="dhArtTitle"><h2 id="dhArtTitle">Artwork & Credits</h2><p><b>${name}</b></p><p>${description}.</p><p><b>Artist:</b> DougHub Open Game Art Pack.</p><p><b>License:</b> <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener noreferrer">CC0 1.0 Universal</a>. You may copy, modify, distribute, and use this artwork without asking permission.</p>${codeCredit}<div class="dh-license">Artwork file: <code>${art.replace("Games/","")}</code><br>Dedicated to the public domain under CC0 1.0.</div><button class="dh-close" type="button" id="dhCloseArtCredits">Close</button></section>`;
   document.body.append(dock, modal);
   const open = () => modal.classList.add("open");
