@@ -272,7 +272,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="panel code-panel">
       <div class="panel-head"><div><span class="panel-kicker">SOURCE FILES</span><h2>Code</h2></div><span class="live-dot">Autosaves in this browser · no account needed</span></div>
       <div class="file-tabs" id="fileTabs" role="tablist" aria-label="Project files"><button class="file-tab active" data-file="html">index.html</button><button class="file-tab" data-file="css">style.css</button><button class="file-tab" data-file="js">main.js</button></div>
-      <div class="file-add-row"><button class="btn small" id="addFileBtn" type="button">＋ Add file</button><span class="file-add-hint">Add more source files to your project</span></div><div class="editor-caption"><span id="activeFileLabel">index.html</span><span id="lineCount">1 line</span></div>
+      <div class="file-add-row"><button class="btn small" id="addFileBtn" type="button">＋ Add file</button><button class="btn small primary" id="importGameAssetBtn" type="button">＋ Import Pack Folder</button><span class="file-add-hint">Add source files or import a 3D asset pack</span><input id="gameAssetInput" type="file" webkitdirectory directory multiple hidden></div><div id="gameAssetStatus" class="file-add-hint" aria-live="polite">Choose a folder to import its models and textures into this project.</div><div id="gameAssetList" hidden></div><div class="editor-caption"><span id="activeFileLabel">index.html</span><span id="lineCount">1 line</span></div>
       <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Source code" wrap="off"></textarea>
       <div class="editor-footer"><span>Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span><button class="text-btn" id="copyCodeBtn">Copy current file</button></div>
     </div>
@@ -390,6 +390,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="community-preview-bottom"><span id="codeCommunityPreviewAuthor"></span><button class="btn" id="editCodeProjectBtn" type="button" hidden>Edit my project</button></div>
   </dialo
 
-<script src="scripting.js?v=20"></script>
+<script src="scripting.js?v=21"></script>
 </body>
 </html>
