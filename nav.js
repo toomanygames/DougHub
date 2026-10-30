@@ -259,7 +259,7 @@
     ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
     ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
 
-    const links = [["/index.html","Home"],["/douggames.html","Games"],["/Scripting/scripting.html","Create"],["/chat.html","Chat"],];
+    const links = [["/class.html","Home"],["/class.html#games","Games"],["/class.html","Create"],["/class.html#chat","Chat"],];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
       const a = document.createElement("a");
@@ -275,23 +275,16 @@
         a.appendChild(dot);
       }
       nav.appendChild(a);
-      // When the homepage preference is enabled, send signed-in users straight
-      // to their Dashboard from the Home nav item instead of loading index first.
-      if (label === "Home") {
-        a.addEventListener("click", async event => {
-          let autoDashboard = true;
-          try { autoDashboard = localStorage.getItem("dh_dashboard_auto_open_v1") !== "false"; } catch (_) {}
-          if (!autoDashboard) return;
-          event.preventDefault();
-          if (a.dataset.dhHomeRouting === "true") return;
-          a.dataset.dhHomeRouting = "true";
-          try {
-            const client = await getNavSupabase();
-            const result = client ? await client.auth.getSession() : null;
-            const session = result && result.data && result.data.session;
-            location.href = session && session.user ? "/dashboard.html" : "/index.html";
-          } catch (_) {
-            location.href = "/index.html";
+      if (label === "Home" || label === "Create") {
+        a.href = "/class.html";
+      }
+      if (label === "Games" || label === "Chat") {
+        a.addEventListener("click", event => {
+          const target = label === "Games" ? "games" : "chat";
+          if (location.pathname.toLowerCase().endsWith("/class.html")) {
+            event.preventDefault();
+            document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            history.replaceState(null, "", "/class.html#" + target);
           }
         });
       }
