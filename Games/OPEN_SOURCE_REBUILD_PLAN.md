@@ -46,3 +46,10 @@ This is the migration tracker for replacing the official DougHub games with real
 - [StarKnightt/ocean-drive MIT license](https://github.com/StarKnightt/ocean-drive/blob/main/LICENSE).
 
 This tracker is intentionally honest: planned entries are not represented as completed ports.
+
+
+## Work resumed — October 30, 2026
+
+- Added the complete MIT license text for `remarkablegames/button-clicker` at `Games/licenses/remarkablegames-button-clicker-MIT.txt` so the planned clicker ports can preserve the upstream notice when its code is adapted.
+- The shared `game-art.js` currently provides the DougHub-styled Back to Games control and Credits & License dialog. Games without a verified port intentionally show a pending-source notice rather than claiming unadapted code or artwork is third-party work.
+- Do not mark a planned game complete until its actual upstream gameplay implementation and correctly attributed assets are integrated and browser-tested.
