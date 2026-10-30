@@ -5439,10 +5439,7 @@ function applyStaffPermissions(){
   const rank={none:0,helper:1,admin:2,developer:3,owner:4}[role]||0;
   const adminArea=document.getElementById("adminArea");
   if(!adminArea)return;
-
-  // Keep the existing command cards and their event listeners; only move the original
-  // DOM nodes into the selected rank page.
-  const cards=[...adminArea.querySelectorAll(":scope > .card")];
+  const cards=[...adminArea.querySelectorAll(":scope > .card, :scope > .admin-function-group .admin-rank-cards > .card, :scope > .admin-rank-group .admin-rank-cards > .card")];
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
@@ -5454,21 +5451,9 @@ function applyStaffPermissions(){
     if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
     return 2;
   };
-  adminArea.querySelectorAll(":scope > .admin-rank-section,:scope > .admin-rank-group").forEach(node=>node.remove());
-  const groups={1:[],2:[],3:[],4:[]};
-  cards.forEach(card=>{
-    const required=rankForCard(card);
-    card.dataset.requiredRank=String(required);
-    groups[required].push(card);
-  });
-
+  adminArea.querySelectorAll(":scope > .admin-rank-section,:scope > .admin-rank-group,:scope > .admin-function-group").forEach(node=>node.remove());
   const names={1:"Helper",2:"Admin",3:"Developer",4:"Owner"};
-  const descriptions={
-    1:"Community support, reports, and member safety tools.",
-    2:"All Helper tools plus account, chat, and content moderation.",
-    3:"All Admin and Helper tools plus developer, feedback, and site feature controls.",
-    4:"Every staff command, including full site and staff management."
-  };
+  const descriptions={1:"Community support, reports, and member safety tools.",2:"All Helper tools plus account, chat, and content moderation.",3:"All Admin and Helper tools plus developer, feedback, and site feature controls.",4:"Every staff command, including full site and staff management."};
   const icons={1:"H",2:"A",3:"D",4:"O"};
   const requested=new URLSearchParams(location.search).get("rank");
   const requestedRank=({helper:1,admin:2,developer:3,owner:4})[String(requested||"").toLowerCase()];
@@ -5494,44 +5479,40 @@ function applyStaffPermissions(){
   const pageTitle=document.getElementById("adminCurrentRankTitle");
   const pageDescription=document.getElementById("adminCurrentRankDescription");
   if(pageTitle)pageTitle.textContent=names[selectedRank]+" workspace";
-  if(pageDescription)pageDescription.textContent=descriptions[selectedRank]+" Includes "+names[selectedRank]+" commands and all lower-rank tools.";
+  if(pageDescription)pageDescription.textContent="Tools are organized by what they do, not by staff rank. This workspace includes all permissions available to "+names[selectedRank]+".";
   const categoryBar=document.getElementById("adminCategoryBar");
   if(categoryBar)categoryBar.hidden=false;
-
-  const order=Array.from({length:selectedRank},(_,i)=>i+1);
-  const collapsed={};
-  order.forEach(value=>collapsed[value]=false);
-  function renderGroups(){
-    adminArea.querySelectorAll(":scope > .admin-rank-group").forEach(node=>node.remove());
-    order.forEach(value=>{
-      const visibleCards=groups[value];
-      if(!visibleCards.length)return;
-      const group=document.createElement("section");
-      group.className="admin-rank-group";
-      group.dataset.rank=String(value);
-      const heading=document.createElement("div");
-      heading.className="admin-rank-section";
-      const label=document.createElement("div");
-      label.className="admin-rank-heading-copy";
-      label.innerHTML='<span class="admin-rank-icon">'+icons[value]+'</span><span><strong>'+names[value]+' commands</strong><small>'+descriptions[value]+'</small></span>';
-      heading.appendChild(label);
-      const count=document.createElement("span");
-      count.className="admin-rank-count";
-      count.textContent=visibleCards.length+" tools";
-      heading.appendChild(count);
-      group.appendChild(heading);
-      const cardsGrid=document.createElement("div");
-      cardsGrid.className="admin-rank-cards";
-      visibleCards.forEach(card=>{
-        card.style.display="";
-        card.style.gridColumn="";
-        cardsGrid.appendChild(card);
-      });
-      group.appendChild(cardsGrid);
-      adminArea.appendChild(group);
-    });
-  }
-  renderGroups();
+  const categories=[
+    {key:"people",title:"People & Accounts",test:/user|account|profile|ban|staff|permission|warning|access request|member/},
+    {key:"chat",title:"Chat & Community",test:/chat|group|message|community|retention|video call/},
+    {key:"content",title:"Content, Games & Media",test:/game|music|video|badge|moderation|report|announcement/},
+    {key:"developer",title:"Developer Tools & Feedback",test:/developer|code|project|feedback|feature|script|api/},
+    {key:"system",title:"Site & System Controls",test:/site|page|schedule|system|audit|activity|log|setting|preference|database|dougbase/},
+    {key:"other",title:"Other Tools",test:/.*/}
+  ];
+  const buckets=Object.fromEntries(categories.map(item=>[item.key,[]]));
+  cards.forEach(card=>{
+    const required=rankForCard(card);
+    card.dataset.requiredRank=String(required);
+    if(required>selectedRank){card.remove();return;}
+    const label=((card.id||"")+" "+(card.querySelector(":scope > h2, :scope > h3")?.textContent||"")).toLowerCase();
+    const category=categories.find(item=>item.test.test(label))||categories[categories.length-1];
+    buckets[category.key].push(card);
+  });
+  categories.filter(item=>buckets[item.key].length).forEach(category=>{
+    const section=document.createElement("section");
+    section.className="admin-function-group";
+    section.dataset.function=category.key;
+    const heading=document.createElement("div");
+    heading.className="admin-function-heading";
+    heading.textContent=category.title;
+    section.appendChild(heading);
+    const grid=document.createElement("div");
+    grid.className="admin-rank-cards";
+    buckets[category.key].forEach(card=>{card.style.display="";card.style.gridColumn="";grid.appendChild(card);});
+    section.appendChild(grid);
+    adminArea.appendChild(section);
+  });
 }
 
 const DOUGHUB_OWNER_ID = "f145067b-724c-40aa-9ab1-60ddaa351d27";
@@ -6105,3 +6086,11 @@ startAdminPanel();
 
 </body>
 </html>
+<style>
+/* Admin tools are grouped by functionality, not by the rank that grants access. */
+#adminArea>.admin-function-group{width:100%;margin:0 0 22px;box-sizing:border-box}
+#adminArea>.admin-function-group>.admin-function-heading{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:0 2px;color:#c7d2fe;font-size:15px;font-weight:750;letter-spacing:.025em}
+#adminArea>.admin-function-group>.admin-function-heading:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,#818cf855,transparent)}
+#adminArea>.admin-function-group>.admin-rank-cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;width:100%;min-width:0}
+@media(max-width:760px){#adminArea>.admin-function-group>.admin-rank-cards{grid-template-columns:minmax(0,1fr)!important}}
+</style>
