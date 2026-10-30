@@ -914,7 +914,22 @@ body{padding:8px!important;min-height:100vh;overflow-x:hidden}
 .admin-rank-group:empty{display:none}
 @media(max-width:760px){#adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)}#adminCategoryBar{align-items:stretch}#adminSectionSearch{width:100%;max-width:none}.admin-category-buttons{flex-basis:100%}}
 @media(min-width:1100px){#adminArea .admin-rank-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(min-width:1750px){#adminArea .admin-rank-cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* Larger two-column layout: use both sides of the screen without squeezing panels. */
+#adminArea .admin-rank-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important;align-items:stretch}
+#adminArea .admin-rank-cards>.card{padding:20px!important;min-height:190px;display:flex;flex-direction:column}
+#adminArea .admin-rank-cards>.card h2{font-size:18px!important;margin-bottom:10px!important}
+#adminArea .admin-rank-cards>.card .admin-card-help{font-size:13px!important;line-height:1.6!important}
+#adminArea .admin-rank-cards>.card .status{font-size:12px!important}
+#adminArea .admin-rank-cards>.card [id$="List"],#adminArea .admin-rank-cards>.card [id$="Rows"],#adminArea .admin-rank-cards>.card #chatMessages,#adminArea .admin-rank-cards>.card #communityGames,#adminArea .admin-rank-cards>.card #dougTubeVideos,#adminArea .admin-rank-cards>.card #activityList{max-height:520px!important}
+#adminArea .admin-rank-cards>.card button{font-size:12px!important;padding:9px 12px!important}
+@media(min-width:1500px){
+ #adminArea .admin-rank-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px!important}
+ #adminArea .admin-rank-cards>.card{padding:22px!important}
+}
+@media(max-width:760px){
+ #adminArea .admin-rank-cards{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ #adminArea .admin-rank-cards>.card{padding:16px!important;min-height:0}
+}
 
 </style>
 <!-- Admin access is checked once by checkAdmin() below using the shared Supabase client and all staff roles. -->
