@@ -521,58 +521,49 @@ function renderGameAssetList(){
   }
 }
 function ensureGameAssetManager(){
-  if($("gameAssetManager"))return;
-  const anchor=$("fileTabs")?.parentElement;
-  if(!anchor)return;
-  const panel=document.createElement("section");panel.id="gameAssetManager";panel.className="game-asset-manager";
-  panel.innerHTML='<div class="game-asset-head"><div><strong>3D Game Assets</strong><small>Import an entire model pack folder, preserving textures and glTF dependencies.</small></div><label class="btn small primary game-asset-upload-label" for="gameAssetInput">＋ Import Pack Folder</label><input id="gameAssetInput" type="file" webkitdirectory directory multiple hidden></div><div id="gameAssetStatus" class="game-asset-status">Sign in, then choose the extracted Quaternius Pack folder. Files go directly to DougHub storage — nothing is attached to this chat.</div><div id="gameAssetList" class="game-asset-list"></div>';
-  const style=document.createElement("style");style.textContent=".game-asset-manager{margin:12px 0 16px;padding:14px;border:1px solid #ffffff18;border-radius:14px;background:#0b1024}.game-asset-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.game-asset-head strong,.game-asset-head small{display:block}.game-asset-head small,.game-asset-status,.game-asset-row small{color:#9aa4c0;font-size:11px;margin-top:4px}.game-asset-upload-label{cursor:pointer}.game-asset-status{margin:10px 0}.game-asset-list{display:grid;gap:7px}.game-asset-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;border:1px solid #ffffff12;border-radius:9px;background:#ffffff06}.game-asset-info{min-width:0}.game-asset-info strong,.game-asset-info small{display:block;overflow-wrap:anywhere}.game-asset-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}.game-asset-actions a{color:#a5b4fc;font-size:12px;text-decoration:none}.game-asset-empty{font-size:12px;color:#8792ae;padding:8px 0}";
-  anchor.insertBefore(style,anchor.querySelector(".editor-caption")||null);
-  anchor.insertBefore(panel,anchor.querySelector(".editor-caption")||null);
-  $("gameAssetInput").addEventListener("change",async event=>{
+  const trigger=$("importGameAssetBtn"),input=$("gameAssetInput"),status=$("gameAssetStatus");
+  if(!trigger||!input||trigger.dataset.bound==="1")return;
+  trigger.dataset.bound="1";
+  trigger.addEventListener("click",()=>input.click());
+  input.addEventListener("change",async event=>{
     const selected=Array.from(event.target.files||[]);event.target.value="";
     if(!selected.length)return;
-    if(!codeCommunityDb||!codeCommunityUser){$("gameAssetStatus").textContent="Sign in to DougHub before importing game assets.";return;}
-    const allowed=/\.(glb|gltf|bin|png|jpe?g|webp|ktx2|json)$/i;
+    if(!codeCommunityDb||!codeCommunityUser){status.textContent="Sign in to DougHub before importing assets.";return;}
+    const allowed=/\\.(glb|gltf|bin|png|jpe?g|webp|ktx2|json)$/i;
     const packFiles=selected.filter(file=>allowed.test(file.name));
-    if(!packFiles.length){$("gameAssetStatus").textContent="No supported model or texture files were found in that folder.";return;}
-    if(packFiles.length>1000){$("gameAssetStatus").textContent="That folder has more than 1,000 supported files. Please select a smaller asset folder.";return;}
+    if(!packFiles.length){status.textContent="No supported model or texture files found in that folder.";return;}
+    if(packFiles.length>1000){status.textContent="That folder has more than 1,000 supported files. Choose a smaller folder.";return;}
     const project=codeCommunitySafeName($("projectName").value);
-    const button=$("gameAssetInput");
-    button.disabled=true;$("gameAssetStatus").textContent="Preparing "+packFiles.length+" model-pack files…";
+    trigger.disabled=true;status.textContent="Preparing "+packFiles.length+" files…";
     let manifest=gameAssetManifest(),uploaded=0;
     try{
       for(const file of packFiles){
         if(file.size>50*1024*1024)throw new Error(file.name+" is over the 50 MB per-file limit.");
-        const relative=file.webkitRelativePath||file.name;
-        const parts=relative.split("/").filter(Boolean);
+        const parts=(file.webkitRelativePath||file.name).split("/").filter(Boolean);
         if(parts.length>1)parts.shift();
-        const safeParts=parts.map(part=>part.replace(/[^a-z0-9._-]/gi,"_").slice(-120));
-        const relativePath=safeParts.join("/");
+        const relativePath=parts.map(part=>part.replace(/[^a-z0-9._-]/gi,"_").slice(-120)).join("/");
         if(!relativePath)continue;
-        const path=codeCommunityUser.id+"/"+project+"/"+relativePath;
-        const lower=file.name.toLowerCase();
-        const type=file.type||(lower.endsWith(".glb")?"model/gltf-binary":lower.endsWith(".gltf")?"model/gltf+json":lower.endsWith(".png")?"image/png":/\.jpe?g$/.test(lower)?"image/jpeg":lower.endsWith(".webp")?"image/webp":lower.endsWith(".ktx2")?"image/ktx2":"application/octet-stream");
+        const path=codeCommunityUser.id+"/"+project+"/"+relativePath,lower=file.name.toLowerCase();
+        const type=file.type||(lower.endsWith(".glb")?"model/gltf-binary":lower.endsWith(".gltf")?"model/gltf+json":lower.endsWith(".png")?"image/png":/\\.jpe?g$/.test(lower)?"image/jpeg":lower.endsWith(".webp")?"image/webp":lower.endsWith(".ktx2")?"image/ktx2":"application/octet-stream");
         const {error}=await codeCommunityDb.storage.from("game-assets").upload(path,file,{upsert:true,contentType:type,cacheControl:"3600"});
         if(error)throw error;
         const {data}=codeCommunityDb.storage.from("game-assets").getPublicUrl(path);
-        manifest=manifest.filter(x=>x.path!==path);
-        manifest.push({name:relativePath,path,url:data.publicUrl,kind:/\.(glb|gltf)$/i.test(file.name)?"3D model":/\.(png|jpe?g|webp|ktx2)$/i.test(file.name)?"Texture":"Model data",size:file.size,contentType:type});
+        manifest=manifest.filter(item=>item.path!==path);
+        manifest.push({name:relativePath,path,url:data.publicUrl,kind:/\\.(glb|gltf)$/i.test(file.name)?"3D model":/\\.(png|jpe?g|webp|ktx2)$/i.test(file.name)?"Texture":"Model data",size:file.size,contentType:type});
         uploaded++;
-        if(uploaded%5===0||uploaded===packFiles.length)$("gameAssetStatus").textContent="Uploaded "+uploaded+" of "+packFiles.length+" files…";
+        if(uploaded%5===0||uploaded===packFiles.length)status.textContent="Uploaded "+uploaded+" of "+packFiles.length+" files…";
       }
       saveGameAssetManifest(manifest);
-      $("gameAssetStatus").textContent="Imported "+uploaded+" files with their folder paths preserved. Models can now resolve their relative textures and .bin files.";
+      status.textContent="Imported "+uploaded+" files. Their folder paths are preserved.";
       setStatus("Imported "+uploaded+" game asset files");
     }catch(error){
-      $("gameAssetStatus").textContent="Upload stopped after "+uploaded+" files: "+(error.message||"Unknown error");
+      status.textContent="Import stopped after "+uploaded+" files: "+(error.message||"Unknown error");
       setStatus("Game asset import failed: "+(error.message||"Unknown error"),true);
-    }finally{button.disabled=false;}
+    }finally{trigger.disabled=false;}
   });
-  renderGameAssetList();
 }
-
 function codeCommunityInit(){
+  ensureGameAssetManager();
   const create=window.supabase?.createClient;
   if(!create){codeCommunitySetStatus("Community Projects could not connect to Supabase.",true);$("codeCommunityProjectSlider").textContent="Community Projects are unavailable right now.";return;}
   codeCommunityDb=dbClient||(dbClient=create("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"));
@@ -588,7 +579,6 @@ function codeCommunityInit(){
   $("editCodeProjectBtn").addEventListener("click",()=>{if(selectedCodeCommunityProject){$("codeCommunityPreviewDialog").close();codeCommunityLoadIntoEditor(selectedCodeCommunityProject);}});
   $("codeCommunityTitle").addEventListener("input",()=>{if(!editingCodeCommunityId)$("publishCodeProjectBtn").textContent="Publish to Community Projects";});
   codeCommunityLoad();
-  ensureGameAssetManager();
 }
 
 codeCommunityInit();
