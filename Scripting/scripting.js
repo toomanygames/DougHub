@@ -402,7 +402,10 @@ function codeCommunityDocument(project){
   const h=String(project.html_code||"");
   const c=String(project.css_code||"");
   const j=String(project.js_code||"").replace(/<\/script/gi,"<\\/script");
-  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+c+'</style></head><body>'+h+'<script>'+j+'</script></body></html>';
+  let assets=[];
+  try{const item=(project.files||[]).find(f=>String(f.name||"").toLowerCase()==="assets.json");assets=item?JSON.parse(item.content||"[]"):[];if(!Array.isArray(assets))assets=[];}catch(_){assets=[];}
+  const bootstrap='<script>window.DougHubAssets='+JSON.stringify(assets).replace(/<\//g,"<\\/")+'</script>';
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script><style>'+c+'</style></head><body>'+h+bootstrap+'<script>'+j+'</script></body></html>';
 }
 function codeCommunityAllCode(project){
   return "// "+String(project.title||"Community Project")+"\n\n/* index.html */\n"+String(project.html_code||"")+"\n\n/* style.css */\n"+String(project.css_code||"")+"\n\n/* main.js */\n"+String(project.js_code||"");
