@@ -713,8 +713,8 @@ body{background:radial-gradient(circle at 15% 0,#22215b,transparent 35%),radial-
         0 Asteroid Fragments
       </div>
 
-      <button class="btn" id="homeBtn">
-        Home
+      <button class="btn" id="homeBtn" type="button">
+        ← Games
       </button>
 
     </div>
@@ -2431,38 +2431,14 @@ body{background:radial-gradient(circle at 15% 0,#22215b,transparent 35%),radial-
       }
     );
 
-    homeBtn.addEventListener(
-      'click',
-      () => {
-
-        if (
-          window.parent !==
-          window
-        ) {
-
-          window.parent.postMessage(
-            {
-              type:
-                'DougHub-home'
-            },
-            '*'
-          );
-
-          window.parent.postMessage(
-            {
-              type:
-                'pig-clicker-home'
-            },
-            '*'
-          );
-
-        } else {
-
-          window.location.href =
-            '../index.html';
-        }
+    homeBtn.addEventListener('click', () => {
+      const gamesUrl = new URL('../douggames.html', window.location.href).href;
+      if (window.parent !== window) {
+        window.parent.location.href = gamesUrl;
+      } else {
+        window.location.href = gamesUrl;
       }
-    );
+    });
 
     farmBtn.addEventListener(
       'click',
