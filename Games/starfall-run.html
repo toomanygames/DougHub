@@ -215,7 +215,15 @@
   var STATE = { READY: 0, PLAYING: 1, PAUSED: 2, OVER: 3 };
   var state = STATE.READY;
   var BEST_KEY = 'dino_run_best_v1';
-  var best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0;
+  // Keep the runner playable when browser storage is blocked or unavailable.
+  function readBest() {
+    try { return parseInt(window.localStorage.getItem(BEST_KEY) || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function saveBest(value) {
+    try { window.localStorage.setItem(BEST_KEY, String(value)); } catch (e) {}
+  }
+  var best = readBest();
 
   var DW = 36, DH = 42, DUCK_W = 50, DUCK_H = 26;   // dino boxes
   var GRAV = 0.85, JUMP_V = -12.2;                   // 滞空≈29帧(0.48s) 峰值≈88px
@@ -250,7 +258,7 @@
     document.getElementById('over-best').textContent = t('common.bestLabel', { n: best });
   }
   refreshBest();
-  WG.onChange(refreshBest);
+  if (window.WG && typeof window.WG.onChange === 'function') window.WG.onChange(refreshBest);
 
   // ===== Input =====
   function jump() {
@@ -443,7 +451,7 @@
     shake = 1; flashT = 1;
     sfx.hit();
     var isRecord = score > best;
-    if (isRecord) { best = score; localStorage.setItem(BEST_KEY, String(best)); }
+    if (isRecord) { best = score; saveBest(best); }
     document.getElementById('final-score').textContent = score;
     document.getElementById('new-record').classList.toggle('hidden', !isRecord);
     document.getElementById('medal').textContent =
