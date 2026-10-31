@@ -1169,7 +1169,7 @@
         function isChatOrGamesPage() {
             const path = location.pathname.toLowerCase().replace(/\/+$/, "");
             const file = (path.split("/").pop() || "").replace(/\.html$/, "");
-            return file === "chat" || file === "games" || file === "douggames" || path === "/games" || path.startsWith("/games/");
+            return file === "chat" || file === "games" || file === "douggames" || path === "/games";
         }
         function buildOverlay() {
             if (overlay || !document.body) return;
