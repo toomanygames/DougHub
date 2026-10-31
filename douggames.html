@@ -1993,6 +1993,114 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 .game-card-puzzle .game-card-art{opacity:.0}
 @media(max-width:600px){.games-grid .game-card::before{width:62%;opacity:.38}}
 
+
+
+/* Game tiles: clearer, more polished play targets */
+.game-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  isolation: isolate;
+  text-decoration: none;
+  border: 1px solid rgba(150, 153, 255, .19);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(139, 92, 246, .13), transparent 42%),
+    linear-gradient(145deg, rgba(19, 24, 55, .98), rgba(8, 11, 28, .98));
+  box-shadow: 0 12px 28px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.045);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.game-card::before {
+  z-index: -1;
+  opacity: .7;
+  background: radial-gradient(circle at 100% 0%, rgba(129,140,248,.15), transparent 48%);
+}
+.game-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(167,139,250,.62);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(168,85,247,.2), transparent 45%),
+    linear-gradient(145deg, #1a2048, #0b0e25);
+  box-shadow: 0 20px 42px rgba(0,0,0,.32), 0 0 0 1px rgba(129,140,248,.1), 0 0 28px rgba(99,102,241,.1);
+}
+.game-card:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 4px;
+  border-color: #a78bfa;
+}
+.game-icon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  border: 1px solid rgba(167,139,250,.3);
+  background: linear-gradient(145deg, rgba(99,102,241,.25), rgba(168,85,247,.16));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 7px 18px rgba(0,0,0,.16);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.game-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  object-fit: contain;
+}
+.game-card:hover .game-icon {
+  transform: translateY(-2px) rotate(-2deg);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 9px 22px rgba(99,102,241,.2);
+}
+.game-card h3 {
+  color: #f7f7ff;
+  line-height: 1.25;
+}
+.game-card p {
+  margin-bottom: 42px;
+  color: #aeb4d0;
+}
+.play-label {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 32px;
+  padding: 0 13px;
+  border: 1px solid rgba(167,139,250,.3);
+  border-radius: 10px;
+  color: #e6e2ff;
+  background: linear-gradient(110deg, rgba(99,102,241,.25), rgba(168,85,247,.2));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .075em;
+  line-height: 1;
+  transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.play-label::after {
+  content: "↗";
+  font-size: 13px;
+  line-height: 1;
+  color: #c4b5fd;
+  transition: transform .18s ease;
+}
+.game-card:hover .play-label {
+  color: #fff;
+  border-color: rgba(196,181,253,.62);
+  background: linear-gradient(110deg, #5558dc, #8546c9);
+  box-shadow: 0 7px 18px rgba(99,102,241,.24), inset 0 1px 0 rgba(255,255,255,.16);
+  transform: translateY(-1px);
+}
+.game-card:hover .play-label::after {
+  color: #fff;
+  transform: translate(2px,-1px);
+}
+.drive-pig-switcher .play-label { position: static; margin-top: 12px; }
+@media (max-width: 600px) {
+  .game-card { min-height: 195px; padding: 18px; }
+  .play-label { left: 18px; bottom: 15px; min-height: 31px; }
+}
+
 </style>
   <script src="nav.js?v=20261030-no-class" defer></script>
 
