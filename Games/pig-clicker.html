@@ -352,65 +352,7 @@
 
 <script src="../search-autofill-fix.js" defer></script>
 
-<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
 
-/* Local DougHub glass redesign, styled in this page rather than a shared theme file */
-:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
-button{font:inherit;transition:filter .16s,border-color .16s,box-shadow .16s}
-button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
-
-
-body{background:radial-gradient(circle at 15% 0,#252052,transparent 35%),radial-gradient(circle at 90% 10%,#4a174d,transparent 30%),#050713}
-.topbar{background:rgba(5,7,20,.82);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
-.coins{background:linear-gradient(135deg,#6366f126,#a855f72b);border:1px solid #9b91ff44;border-radius:14px;padding:10px 14px}
-.panel{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(7,9,24,.91));border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 18px 48px #0004}
-.pig-wrap{background:radial-gradient(circle,#6366f129,transparent 68%);border:1px solid #8b83ff20;border-radius:28px}.pig{filter:drop-shadow(0 15px 30px #a855f72b)}
-/* Keep the tap counter as text; only actual buttons get button styling. */
-.tap{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;color:#f4f2ff!important;padding:0!important}
-.btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:1px solid #c4b5fd55;border-radius:14px;box-shadow:0 9px 25px #6366f133;cursor:pointer}
-.btn:disabled{cursor:not-allowed;filter:saturate(.5)}
-.stats .stat{background:#ffffff05;border:1px solid #ffffff0b;border-radius:13px}
-
-/* Repair the page sizing and keep the store/achievements reachable. */
-html,body{min-height:0;height:100%;overflow:hidden}
-body{padding:12px;align-items:center;justify-content:center}
-.screen{width:min(1100px,100%);height:min(860px,calc(100dvh - 24px));min-height:0;background:rgba(7,9,24,.82);border:1px solid var(--dh-line);border-radius:24px}
-.topbar{flex:0 0 auto;gap:12px;min-width:0}
-.coins{min-width:0;overflow-wrap:anywhere}
-.content{flex:1;min-height:0;overflow:hidden}
-.left{min-width:0;min-height:0;padding:clamp(12px,2vw,24px)}
-.pig-wrap{width:min(34vw,320px,42vh);flex:0 1 auto;min-width:140px;max-width:100%}
-.pig{font-size:clamp(100px,18vw,210px);cursor:pointer}
-.right{flex:0 0 min(38%,390px);width:min(38%,390px);min-width:270px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#55518b transparent}
-.panel{margin-bottom:10px}
-.fever-hud{z-index:5;pointer-events:none}
-
-@media (max-width:700px){
-  body{padding:7px}
-  .screen{height:calc(100dvh - 14px);border-radius:18px}
-  .topbar{padding:9px 11px}
-  .coins{font-size:clamp(17px,5vw,23px);padding:7px 9px}
-  .btn{padding:9px 12px;font-size:14px}
-  .content{flex-direction:column}
-  .left{flex:0 0 auto;gap:7px;padding:10px 8px 8px;justify-content:center}
-  .pig-wrap{width:min(30dvh,190px,52vw);min-width:120px}
-  .pig{font-size:clamp(100px,30vw,170px);border-radius:24px}
-  .tap{font-size:clamp(17px,4.5vw,23px)}
-  .right{flex:1 1 0;width:100%;min-width:0;min-height:0;border-left:0;border-top:1px solid var(--dh-line);padding:10px 10px 18px}
-  .panel{padding:10px;border-radius:16px}
-  .panel h3{font-size:14px;margin-bottom:8px}
-  .upg{padding:8px;min-height:54px}
-  .upg-icon{width:34px;height:34px;flex-basis:34px;font-size:21px}
-  .upg-name{font-size:13px}
-  .upg-btn{min-width:62px;padding:9px 7px}
-  .fever-hud{left:10px;bottom:10px;width:min(180px,45vw)}
-}
-@media (max-height:600px) and (min-width:701px){
-  .left{gap:8px;padding:10px}
-  .pig-wrap{width:min(28vw,230px,42vh)}
-  .fever-hud{bottom:8px}
-}
-</style>
 <script src="../game-art.js" defer></script>
 </head>
 
