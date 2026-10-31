@@ -1,627 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>DougHub Inbox</title>
-
-<link
-    rel="icon"
-    href="DougHub.svg"
-    type="image/x-icon"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DougHub Feedback Inbox</title>
+<link rel="icon" href="DougHub.ico">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="display.js"></script>
-
-
-<style>
-
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-
-    font-family:
-        Inter,
-        Arial,
-        sans-serif;
-
-    color: white;
-
-    background:
-        radial-gradient(
-            circle at 15% 10%,
-            rgba(99,102,241,.18),
-            transparent 32%
-        ),
-        radial-gradient(
-            circle at 85% 85%,
-            rgba(168,85,247,.14),
-            transparent 32%
-        ),
-        #02040a;
-}
-
-body {
-    padding: 28px;
-}
-
-.container {
-    width: min(1000px, 100%);
-    margin: auto;
-}
-
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-
-    margin-bottom: 30px;
-}
-
-.logo {
-    font-size: 30px;
-    font-weight: 900;
-}
-
-.logo span {
-    color: #6366f1;
-}
-
-.subtitle {
-    margin-top: 5px;
-
-    color: #858ca1;
-
-    font-size: 14px;
-}
-
-.back {
-    color: white;
-    text-decoration: none;
-
-    padding: 10px 15px;
-
-    border-radius: 11px;
-
-    border: 1px solid rgba(255,255,255,.1);
-
-    background: rgba(255,255,255,.05);
-
-    font-weight: 700;
-}
-
-.back:hover {
-    background: rgba(255,255,255,.1);
-}
-
-.card {
-    border: 1px solid rgba(255,255,255,.09);
-
-    background: rgba(13,17,39,.72);
-
-    border-radius: 20px;
-
-    padding: 20px;
-
-    margin-bottom: 20px;
-
-    backdrop-filter: blur(15px);
-
-    box-shadow:
-        0 18px 45px rgba(0,0,0,.25);
-}
-
-.card h2 {
-    margin: 0 0 5px;
-}
-
-.status {
-    color: #858ca1;
-    font-size: 13px;
-}
-
-.feedback {
-    padding: 18px;
-
-    margin-top: 12px;
-
-    border-radius: 15px;
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    background: rgba(255,255,255,.035);
-}
-
-.feedback-top {
-    display: flex;
-    justify-content: space-between;
-
-    gap: 15px;
-
-    margin-bottom: 10px;
-}
-
-.username {
-    color: #c4b5fd;
-
-    font-weight: 800;
-}
-
-.time {
-    color: #73798f;
-
-    font-size: 12px;
-}
-
-.feedback-message {
-    white-space: pre-wrap;
-    word-break: break-word;
-    color: #d7d9e5;
-    line-height: 1.55;
-}
-.actions {
-    display: flex;
-    gap: 8px;
-
-    margin-top: 14px;
-}
-
-button {
-    border: 1px solid rgba(255,255,255,.1);
-
-    border-radius: 9px;
-
-    padding: 9px 13px;
-
-    color: white;
-
-    background: rgba(255,255,255,.08);
-
-    cursor: pointer;
-
-    font-weight: 700;
-}
-
-button:hover {
-    background: rgba(99,102,241,.2);
-}
-
-.delete {
-    background: rgba(239,68,68,.12);
-
-    border-color:
-        rgba(239,68,68,.25);
-}
-
-.delete:hover {
-    background: rgba(239,68,68,.25);
-}
-
-.empty {
-    padding: 35px;
-
-    text-align: center;
-
-    color: #73798f;
-}
-
-#loading {
-    text-align: center;
-
-    padding: 60px;
-
-    color: #a78bfa;
-}
-
-#error {
-    display: none;
-
-    text-align: center;
-
-    padding: 60px;
-
-    color: #ef4444;
-}
-
-@media (max-width: 650px) {
-
-    body {
-        padding: 15px;
-    }
-
-    header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .feedback-top {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-}
-
-</style>
-
 <script src="auth-guard.js" data-require-auth="true"></script>
-  <script src="nav.js?v=20261030-no-class" defer></script>
-
-<script src="search-autofill-fix.js" defer></script>
-
-<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
-
-/* Inline, page-owned DougHub redesign */
-:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
-body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
-button,input,textarea,select{font:inherit}
-input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
-input::placeholder,textarea::placeholder{color:#858cab}
-input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
-button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
-
-
-body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
-.container{max-width:1100px}
-header{background:rgba(4,5,15,.78);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
-.logo{letter-spacing:-.05em}
-.card{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(8,10,25,.9));border:1px solid var(--dh-line);border-radius:21px;box-shadow:0 18px 48px #0003}
-.subtitle,.time{color:#a4a7c4}
-.feedback-top{border-bottom:1px solid var(--dh-line)}
-.feedback-message{background:#ffffff04;border:1px solid #ffffff0b;border-radius:14px}
-.delete{background:#ef444418;border:1px solid #ef444455;color:#fecaca;border-radius:11px}
-
+<script src="nav.js?v=20261030-no-class" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;color:#f5f6ff;background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+body{padding:26px}
+.container{width:min(1080px,100%);margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;padding:0 0 18px;border-bottom:1px solid var(--line)}
+.logo{font-size:26px;font-weight:950;letter-spacing:-.05em}.logo span{color:#8b83ff}
+.subtitle{margin-top:5px;color:var(--muted);font-size:12px}
+.back{padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:#ffffff08;color:#f5f6ff;text-decoration:none;font-size:11px;font-weight:850}
+.workspace{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{min-width:0;padding:18px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#111631ed,#080b1bed);box-shadow:0 18px 48px #0004}
+.card h2{margin:0 0 5px;font-size:17px}.help{margin:0 0 13px;color:var(--muted);font-size:11px;line-height:1.5}
+.status{margin-bottom:10px;color:#a5b4fc;font-size:11px}
+.item{padding:13px;margin-top:9px;border:1px solid #ffffff13;border-radius:12px;background:#ffffff05}
+.item-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.user{color:#c4b5fd;font-size:11px;font-weight:900}.date{color:#858eae;font-size:10px}
+.item-title{display:block;margin-bottom:5px;color:#f4f2ff;font-size:13px}
+.genre{margin-bottom:7px;color:#a5b4fc;font-size:10px;font-weight:800}
+.message{margin:0;color:#d6d9ec;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.actions{display:flex;justify-content:flex-end;margin-top:11px}
+button{padding:8px 11px;border:1px solid #f8717140;border-radius:9px;background:#ef444416;color:#fecaca;font-size:10px;font-weight:850;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+.empty{padding:28px 10px;text-align:center;color:#8f98b7;font-size:12px}
+#loading,#error{padding:48px 15px;text-align:center;color:#a5b4fc;font-size:13px}
+#error{display:none;color:#fca5a5}
+@media(max-width:720px){body{padding:15px}.workspace{grid-template-columns:1fr}header{align-items:flex-start}.logo{font-size:22px}}
 </style>
 </head>
-
-
 <body>
-
-
 <div class="container">
-
-
 <header>
-
-    <div>
-
-        <div class="logo">
-            Doug<span>Hub</span> Inbox
-        </div>
-
-        <div class="subtitle">
-            Feedback from the DougHub community
-        </div>
-
-    </div>
-
-
-    <a
-        class="back"
-        href="index.html"
-    >
-        ← DougHub
-    </a>
-
+  <div><div class="logo">Doug<span>Hub</span> Inbox</div><div class="subtitle">Community feedback and game ideas, kept in separate queues</div></div>
+  <a class="back" href="admin.html">← Admin panel</a>
 </header>
-
-
-<div id="loading">
-    Checking admin permissions...
+<div id="loading">Checking staff permissions…</div>
+<div id="error">Access denied. Developer+ staff access is required.</div>
+<main id="inboxContent" class="workspace" style="display:none">
+  <section class="card">
+    <h2>💬 Feedback</h2>
+    <p class="help">Messages and suggestions sent through DougHub's feedback form.</p>
+    <div class="status" id="feedbackStatus">Loading feedback…</div>
+    <div id="feedbackList" aria-live="polite"></div>
+  </section>
+  <section class="card">
+    <h2>🎮 Game Requests</h2>
+    <p class="help">Ideas submitted from the Request a game button on the Games page.</p>
+    <div class="status" id="gameRequestsStatus">Loading game requests…</div>
+    <div id="gameRequestsList" aria-live="polite"></div>
+  </section>
+</main>
 </div>
-
-
-<div id="error">
-    Access denied. Admins only.
-</div>
-
-
-<div
-    id="inboxContent"
-    style="display:none;"
->
-
-
-    <div class="card">
-
-        <h2>
-            💬 Feedback
-        </h2>
-
-        <div
-            class="status"
-            id="feedbackStatus"
-        >
-            Loading feedback...
-        </div>
-
-        <div id="feedbackList"></div>
-
-    </div>
-
-
-</div>
-
-
-</div>
-
-
 <script>
-
-const SUPABASE_URL =
-    "https://agsqdqcsmsppcdqxlppj.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-
-const loading =
-    document.getElementById("loading");
-
-const errorEl =
-    document.getElementById("error");
-
-const inboxContent =
-    document.getElementById("inboxContent");
-
-const feedbackList =
-    document.getElementById("feedbackList");
-
-const feedbackStatus =
-    document.getElementById("feedbackStatus");
-
-
-function escapeHtml(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
-    return div.innerHTML;
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let inboxUser=null;
+const loading=document.getElementById("loading"),errorEl=document.getElementById("error"),inboxContent=document.getElementById("inboxContent");
+function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;}
+async function checkAccess(){
+  const {data:{user},error:authError}=await supabaseClient.auth.getUser();
+  if(authError)throw authError;
+  if(!user){location.href="log-in.html?redirect=inbox.html";return false;}
+  const {data:profile,error}=await supabaseClient.from("profiles").select("staff_role,is_admin").eq("id",user.id).maybeSingle();
+  if(error)throw error;
+  const role=String(profile?.staff_role||"").toLowerCase();
+  if(!(profile?.is_admin===true||["developer","owner"].includes(role))){
+    loading.style.display="none";errorEl.style.display="block";return false;
+  }
+  inboxUser=user;loading.style.display="none";inboxContent.style.display="grid";return true;
 }
-
-
-function formatTime(value) {
-
-    return new Date(value)
-        .toLocaleString();
-
+async function logInboxAction(action,item){
+  try{await supabaseClient.from("admin_audit_logs").insert({actor_id:inboxUser.id,event_type:"admin_action",category:"feedback",action,details:{feedbackId:item.id,feedbackType:item.feedback_type}});}catch(e){console.warn("Inbox audit log failed",e);}
 }
-
-
-async function checkAdmin() {
-
-    const {
-        data: {
-            user
-        }
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-
-        window.location.href =
-            "log-in.html?redirect=inbox.html";
-
-        return false;
-    }
-
-
-    const {
-        data: profile,
-        error
-    } =
-        await supabaseClient
-            .from("profiles")
-            .select("is_admin")
-            .eq("id", user.id)
-            .maybeSingle();
-
-
-    if (
-        error ||
-        !profile ||
-        profile.is_admin !== true
-    ) {
-
-        loading.style.display =
-            "none";
-
-        errorEl.style.display =
-            "block";
-
-        return false;
-    }
-
-
-    loading.style.display =
-        "none";
-
-    inboxContent.style.display =
-        "block";
-
-
-    return true;
-}
-
-
-async function loadFeedback() {
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("feedback")
-            .select(
-                "id,user_id,username,message,created_at"
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            );
-
-
-    if (error) {
-
-        console.error(error);
-
-        feedbackStatus.textContent =
-            "Could not load feedback.";
-
-        return;
-    }
-
-
-    feedbackStatus.textContent =
-        `${data.length} feedback message${
-            data.length === 1
-                ? ""
-                : "s"
-        }`;
-
-
-    if (!data.length) {
-
-        feedbackList.innerHTML =
-            `
-            <div class="empty">
-                No feedback yet.
-            </div>
-            `;
-
-        return;
-    }
-
-
-    feedbackList.innerHTML = "";
-
-
-    data.forEach(item => {
-
-        const element =
-            document.createElement("div");
-
-        element.className =
-            "feedback";
-
-
-        element.innerHTML = `
-
-            <div class="feedback-top">
-
-                <span class="username">
-                    @${escapeHtml(
-                        item.username ||
-                        "Unknown User"
-                    )}
-                </span>
-
-                <span class="time">
-                    ${formatTime(
-                        item.created_at
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="feedback-message">
-                ${escapeHtml(
-                    item.message
-                )}
-            </div>
-
-
-            
-
-        `;
-
-
-        feedbackList.appendChild(element);
-
-        const deleteButton = element.querySelector(".delete");
-        deleteButton.addEventListener("click", () => deleteFeedback(item.id));
-
+async function loadQueue(type){
+  const game=type==="game_request";
+  const status=document.getElementById(game?"gameRequestsStatus":"feedbackStatus");
+  const list=document.getElementById(game?"gameRequestsList":"feedbackList");
+  status.textContent=game?"Loading game requests…":"Loading feedback…";list.replaceChildren();
+  const {data,error}=await supabaseClient.from("feedback")
+    .select("id,username,message,created_at,feedback_type,game_request_title,game_request_genre,game_request_details")
+    .eq("feedback_type",type).order("created_at",{ascending:false}).limit(300);
+  if(error){status.textContent="Could not load items: "+error.message;list.appendChild(node("div","empty","Could not load this inbox section."));return;}
+  const items=data||[];status.textContent=items.length+(game?" game request":" feedback item")+(items.length===1?"":"s");
+  if(!items.length){list.appendChild(node("div","empty",game?"No game ideas have been submitted yet.":"No feedback messages yet."));return;}
+  items.forEach(item=>{
+    const card=node("article","item"),head=node("div","item-head");
+    head.append(node("span","user","@"+(item.username||"Unknown user")),node("time","date",item.created_at?new Date(item.created_at).toLocaleString():"Date unknown"));
+    card.appendChild(head);
+    if(game){
+      card.appendChild(node("strong","item-title",item.game_request_title||"Untitled game idea"));
+      card.appendChild(node("div","genre","Genre: "+(item.game_request_genre||"Not specified")));
+      card.appendChild(node("p","message",item.game_request_details||item.message||"No extra details supplied."));
+    }else card.appendChild(node("p","message",item.message||"(Empty feedback)"));
+    const actions=node("div","actions"),del=node("button","",game?"Delete request":"Delete feedback");
+    del.type="button";
+    del.addEventListener("click",async()=>{
+      if(!confirm("Permanently delete this "+(game?"game request":"feedback message")+"? This cannot be undone."))return;
+      del.disabled=true;del.textContent="Deleting…";
+      const {error:deleteError}=await supabaseClient.from("feedback").delete().eq("id",item.id);
+      if(deleteError){status.textContent="Could not delete: "+deleteError.message;del.disabled=false;del.textContent=game?"Delete request":"Delete feedback";return;}
+      await logInboxAction("Deleted "+(game?"game request":"feedback message"),item);
+      await loadQueue(type);
     });
-
+    actions.appendChild(del);card.appendChild(actions);list.appendChild(card);
+  });
 }
-
-
-async function deleteFeedback(id) {
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("feedback")
-            .delete()
-            .eq("id", id);
-
-
-    if (error) {
-
-        console.error(error);
-
-        alert(
-            "Could not delete feedback."
-        );
-
-        return;
-    }
-
-
-    await loadFeedback();
-
+async function start(){
+  try{
+    const allowed=await checkAccess();if(!allowed)return;
+    await Promise.all([loadQueue("feedback"),loadQueue("game_request")]);
+  }catch(e){loading.style.display="none";errorEl.style.display="block";errorEl.textContent="Could not check staff access: "+(e.message||"Database error");}
 }
-
-
-async function start() {
-
-    const allowed =
-        await checkAdmin();
-
-
-    if (!allowed) {
-        return;
-    }
-
-
-    await loadFeedback();
-
-}
-
-
 start();
-
 </script>
-
-
 </body>
 </html>
