@@ -202,15 +202,12 @@ async function resumeClass(){
    if(!isActive)throw new Error("The database did not reopen the session. Check that you are the classroom teacher or Owner, then try again.");
   }
   activeClass.session_active=true;activeClass.session_resume_at=null;activeClass.session_ended_at=null;
-  $("teacherEndedOverlay").hidden=true;
-  if(sessionTimer){clearInterval(sessionTimer);sessionTimer=null;}
   updateSessionControls();renderClassList();
   say("sessionControlStatus","Classroom reopened. Students can enter again.");
  }catch(error){
-  say("teacherEndedStatus","Reopen failed: "+(error.message||"Unknown database error"));
   say("sessionControlStatus","Reopen failed: "+(error.message||"Unknown database error"));
  }finally{
-  resumeInFlight=false;continueButton.disabled=false;continueButton.textContent="Continue · reopen classroom";
+  resumeInFlight=false;
  }
 }
 $("resumeClassSession").addEventListener("click",resumeClass);
