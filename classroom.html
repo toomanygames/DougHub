@@ -51,7 +51,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id), C=window.DHClassroom;
-let db,user,profile,currentClass=null,classRows=[],chatTimer=null,sessionPoll=null,focusTimer=null,focusSeconds=900;
+let db,user,profile,currentClass=null,classRows=[],chatTimer=null,sessionPoll=null,focusTimer=null,focusSeconds=900,resumeInFlight=false,nextResumeAttempt=0,isOwner=false;
 const say=(id,msg)=>$(id).textContent=msg;
 function showLoading(msg){$("loadingState").innerHTML='<div class="empty">'+C.esc(msg)+'</div>';$("loadingState").hidden=false;$("classroomWorkspace").hidden=true;}
 function showWorkspace(){ $("loadingState").hidden=true;$("classroomWorkspace").hidden=false; }
@@ -59,24 +59,30 @@ async function boot(){
  try{
   db=await C.client();
   const {data:{user:u},error}=await db.auth.getUser();if(error||!u){location.replace("log-in.html?next="+encodeURIComponent(location.pathname));return;}user=u;
-  const {data:p}=await db.from("profiles").select("username,avatar_url").eq("id",user.id).maybeSingle();profile=p||{};
+  const {data:p}=await db.from("profiles").select("username,avatar_url,is_owner,staff_role").eq("id",user.id).maybeSingle();profile=p||{};isOwner=profile.is_owner===true||String(profile.staff_role||"").toLowerCase()==="owner";
   $("studentLabel").textContent=profile.username||"Student workspace";
   await loadMemberships();
  }catch(e){showLoading(e.message||"Could not load your classroom.");}
 }
 async function loadMemberships(){
- const {data:enrollments,error}=await db.from("classroom_enrollments").select("id,classroom_id,status,created_at").eq("student_id",user.id).order("created_at",{ascending:false});
- if(error)throw error;
- const approved=(enrollments||[]).filter(x=>x.status==="approved"),pending=(enrollments||[]).filter(x=>x.status==="pending");
- if(!approved.length){
-  showLoading(pending.length?"Your teacher has requested to add you. The DougHub Owner must verify the request before the classroom opens. Approval can take 1–7 business days.":"You don't have an approved classroom yet. Ask your teacher to request your enrollment using your DougHub username.");
-  return;
+ let classes=[];
+ if(isOwner){
+  const {data,error}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder,session_active,session_resume_at,session_ended_at").order("grade").order("class_name");
+  if(error)throw error;classes=data||[];
+ }else{
+  const {data:enrollments,error}=await db.from("classroom_enrollments").select("id,classroom_id,status,created_at").eq("student_id",user.id).order("created_at",{ascending:false});
+  if(error)throw error;
+  const approved=(enrollments||[]).filter(x=>x.status==="approved"),pending=(enrollments||[]).filter(x=>x.status==="pending");
+  if(!approved.length){
+   showLoading(pending.length?"Your teacher has requested to add you. The DougHub Owner must verify the request before the classroom opens. Approval can take 1–7 business days.":"You don't have an approved classroom yet. Ask your teacher to request your enrollment using your DougHub username.");
+   return;
+  }
+  const ids=approved.map(x=>x.classroom_id);
+  const {data:rows,error:classError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder,session_active,session_resume_at,session_ended_at").in("id",ids);
+  if(classError)throw classError;classes=rows||[];
  }
- const ids=approved.map(x=>x.classroom_id);
- const {data:classes,error:classError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder,session_active,session_resume_at,session_ended_at").in("id",ids);
- if(classError)throw classError;
- classRows=classes||[];
- if(!classRows.length){showLoading("Your classroom isn't available right now.");return;}
+ classRows=classes;
+ if(!classRows.length){showLoading(isOwner?"No classrooms have been created yet. Open the teacher classroom page to create the first one.":"Your classroom isn't available right now.");return;}
  $("classSelect").innerHTML=classRows.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
  showWorkspace();await selectClass(classRows[0].id);
  $("classSelect").addEventListener("change",()=>selectClass($("classSelect").value));
@@ -126,22 +132,42 @@ async function refreshClassSession(){
  if(!currentClass)return;
  const {data,error}=await db.from("classroom_spaces").select("session_active,session_resume_at").eq("id",currentClass.id).maybeSingle();
  if(error||!data)return;
- currentClass.session_active=data.session_active;currentClass.session_resume_at=data.session_resume_at;
+ currentClass.session_active=data.session_active;currentClass.session_resume_at=data.session_resume_at;currentClass.session_ended_at=data.session_ended_at;
  if(!data.session_active){checkSession();}else {$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);}
 }
 function checkSession(){
  if(!currentClass)return;
- if(currentClass.session_active){$("endedOverlay").hidden=true;return;}
- if(!$("endedOverlay").hidden)return;
- $("endedOverlay").hidden=false;$("endedDetail").textContent="This class will reopen automatically in about five minutes.";
+ if(currentClass.session_active){$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);return;}
+ $("endedOverlay").hidden=false;
+ $("endedDetail").textContent="This classroom will reopen automatically. You won't be trapped on this screen.";
  const tick=async()=>{
-  const target=new Date(currentClass.session_resume_at||Date.now()+300000).getTime(),remaining=Math.max(0,target-Date.now());
-  const sec=Math.ceil(remaining/1000);$("studentCountdown").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
-  if(remaining<=0){
-   const {data}=await db.rpc("resume_due_classroom",{p_classroom_id:currentClass.id});
-   if(data){currentClass.session_active=true;$("endedOverlay").hidden=true;location.reload();}
-   else {const {data:refresh}=await db.from("classroom_spaces").select("session_active,session_resume_at").eq("id",currentClass.id).maybeSingle();if(refresh?.session_active){location.reload();return;}currentClass.session_resume_at=refresh?.session_resume_at||new Date(Date.now()+30000).toISOString();}
+  const parsed=Date.parse(currentClass.session_resume_at||"");
+  const ended=Date.parse(currentClass.session_ended_at||"");
+  const target=Number.isFinite(parsed)?parsed:(Number.isFinite(ended)?ended+300000:NaN);
+  if(!Number.isFinite(target)){
+   $("studentCountdown").textContent="--:--";
+   $("endedDetail").textContent="Waiting for your teacher to set the reopening time.";
+   return;
   }
+  const remaining=Math.max(0,target-Date.now()),sec=Math.ceil(remaining/1000);
+  $("studentCountdown").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
+  if(remaining>0||resumeInFlight||Date.now()<nextResumeAttempt)return;
+  resumeInFlight=true;
+  try{
+   const {data,error}=await db.rpc("resume_due_classroom",{p_classroom_id:currentClass.id});
+   if(error)throw error;
+   if(data===true){currentClass.session_active=true;currentClass.session_resume_at=null;$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);return;}
+   const {data:refresh,error:refreshError}=await db.from("classroom_spaces").select("session_active,session_resume_at,session_ended_at").eq("id",currentClass.id).maybeSingle();
+   if(refreshError)throw refreshError;
+   if(refresh?.session_active){currentClass.session_active=true;$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);return;}
+   if(refresh){currentClass.session_resume_at=refresh.session_resume_at;currentClass.session_ended_at=refresh.session_ended_at;}
+   nextResumeAttempt=Date.now()+10000;
+   $("endedDetail").textContent="The room is ready to reopen. Retrying automatically…";
+  }catch(error){
+   nextResumeAttempt=Date.now()+10000;
+   $("endedDetail").textContent="Couldn't confirm the reopening yet. Retrying automatically…";
+   console.warn("Classroom auto-reopen check failed:",error);
+  }finally{resumeInFlight=false;}
  };
  tick();if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);window.__classSessionTimer=setInterval(tick,1000);
 }
