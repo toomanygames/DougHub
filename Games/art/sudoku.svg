@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 280" role="img" aria-labelledby="t d">
+<title id="t">Sudoku</title><desc id="d">A glowing nine by nine Sudoku grid.</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#171b46"/><stop offset="1" stop-color="#32184d"/></linearGradient><linearGradient id="line" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a5b4fc"/><stop offset="1" stop-color="#d8b4fe"/></linearGradient></defs>
+<rect width="420" height="280" rx="28" fill="url(#bg)"/>
+<rect x="105" y="30" width="210" height="210" rx="13" fill="#090d21" stroke="#a78bfa" stroke-opacity=".65" stroke-width="2"/>
+<g stroke="url(#line)" stroke-opacity=".72" fill="none">
+<path d="M128.3 30v210M151.7 30v210M175 30v210M198.3 30v210M221.7 30v210M245 30v210M268.3 30v210M291.7 30v210"/>
+<path d="M105 53.3h210M105 76.7h210M105 100h210M105 123.3h210M105 146.7h210M105 170h210M105 193.3h210M105 216.7h210"/>
+</g>
+<g fill="#e9e8ff" font-family="Arial,sans-serif" font-weight="700" font-size="17" text-anchor="middle">
+<text x="140" y="48">7</text><text x="210" y="72">3</text><text x="280" y="95">4</text><text x="163" y="142">5</text><text x="233" y="165">9</text><text x="280" y="188">6</text><text x="140" y="235">2</text>
+</g>
+<circle cx="338" cy="55" r="18" fill="#8b5cf6" opacity=".45"/><circle cx="70" cy="220" r="28" fill="#6366f1" opacity=".28"/>
+</svg>
