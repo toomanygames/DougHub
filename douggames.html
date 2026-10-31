@@ -2283,6 +2283,26 @@ footer{font-size:12px}
 #doug-games .games-grid>.game-card[hidden]{display:none!important}
 @media(max-width:700px){.dh-game-browser{grid-template-columns:1fr}.dh-game-genres{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.dh-game-genres button{white-space:nowrap}}
 </style>
+<style id="dh-game-request-style">
+.games-hero-actions #openGameRequest{cursor:pointer;font:inherit}
+.dh-request-backdrop{position:fixed;inset:0;z-index:300000;display:flex;align-items:center;justify-content:center;padding:18px;background:#02040add;backdrop-filter:blur(12px)}
+.dh-request-backdrop[hidden]{display:none}
+.dh-request-dialog{position:relative;width:min(520px,100%);max-height:90vh;overflow:auto;padding:25px;border:1px solid #a78bfa3d;border-radius:22px;background:linear-gradient(145deg,#171b3a,#090c1c);box-shadow:0 30px 100px #000b;color:#f5f5ff}
+.dh-request-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border:1px solid #ffffff20;border-radius:10px;background:#ffffff09;color:#fff;font-size:23px;cursor:pointer}
+.dh-request-kicker{color:#a99aff;font-size:9px;font-weight:950;letter-spacing:.16em}
+.dh-request-dialog h2{margin:9px 0 7px;font-size:26px;letter-spacing:-.04em}
+.dh-request-dialog>p{margin:0 0 19px;color:#aeb5d1;font-size:12px;line-height:1.6}
+.dh-request-dialog form{display:grid;gap:8px}
+.dh-request-dialog label{margin-top:7px;color:#e5e7f6;font-size:11px;font-weight:850}
+.dh-request-dialog label span{color:#858eae;font-weight:500}
+.dh-request-dialog input,.dh-request-dialog select,.dh-request-dialog textarea{width:100%;min-width:0;padding:11px 12px;border:1px solid #ffffff1c;border-radius:11px;background:#080b1c;color:#f6f5ff;font:inherit;font-size:12px}
+.dh-request-dialog textarea{resize:vertical}
+.dh-request-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.dh-request-footer span{max-width:245px;color:#929bbb;font-size:10px;line-height:1.45}
+.dh-request-footer button{padding:10px 15px;border:1px solid #ffffff22;border-radius:11px;background:linear-gradient(120deg,#6366f1,#a855f7);color:#fff;font-size:11px;font-weight:900;cursor:pointer}
+.dh-request-footer button:disabled{opacity:.55;cursor:wait}
+@media(max-width:540px){.dh-request-dialog{padding:20px}.dh-request-footer{align-items:stretch;flex-direction:column}.dh-request-footer button{width:100%}}
+</style>
 </head>
 
 <body>
@@ -2409,6 +2429,7 @@ footer{font-size:12px}
     <div class="games-hero-actions">
       <a href="#doug-games" class="games-hero-button primary">Browse games <span>↓</span></a>
       <a href="Scripting/scripting.html" class="games-hero-button">＋ Make a game</a>
+      <button type="button" class="games-hero-button" id="openGameRequest">✦ Request a game</button>
     </div>
     <div class="games-hero-meta"><span><strong id="userCount">—</strong> members</span><i></i><span><strong id="gameCount">11</strong> arcade games</span></div>
   </div>
@@ -2761,6 +2782,28 @@ footer{font-size:12px}
 
 </div>
 
+<!-- GAME REQUEST MODAL -->
+<div id="gameRequestModal" class="dh-request-backdrop" hidden>
+  <section class="dh-request-dialog" role="dialog" aria-modal="true" aria-labelledby="gameRequestTitle">
+    <button type="button" class="dh-request-close" id="closeGameRequest" aria-label="Close request form">×</button>
+    <div class="dh-request-kicker">DOUGHUB ARCADE · COMMUNITY IDEAS</div>
+    <h2 id="gameRequestTitle">Request a game</h2>
+    <p>Tell us what kind of game you would like to see on DougHub. Suggestions go to a separate Game Requests section in the staff feedback inbox.</p>
+    <form id="gameRequestForm">
+      <label for="gameRequestName">Game idea</label>
+      <input id="gameRequestName" name="game_request_title" maxlength="90" required placeholder="e.g. A cozy puzzle adventure">
+      <label for="gameRequestGenre">Genre</label>
+      <select id="gameRequestGenre" name="game_request_genre" required>
+        <option value="">Choose a genre…</option>
+        <option value="Puzzle">Puzzle</option><option value="Driving">Driving</option><option value="Clicker">Clicker</option><option value="Arcade">Arcade</option><option value="Platformer">Platformer</option><option value="Strategy">Strategy</option><option value="Other">Other</option>
+      </select>
+      <label for="gameRequestDetails">What should the game include? <span>Optional</span></label>
+      <textarea id="gameRequestDetails" name="game_request_details" maxlength="600" rows="4" placeholder="Describe the gameplay, features, or theme…"></textarea>
+      <div class="dh-request-footer"><span id="gameRequestStatus" role="status" aria-live="polite">Requests are suggestions, not guaranteed additions.</span><button type="submit" id="submitGameRequest">Send request</button></div>
+    </form>
+  </section>
+</div>
+
 <!-- PASSWORD MODAL -->
 
 <div
@@ -2931,7 +2974,7 @@ async function loadAccount() {
         await supabaseClient
             .from("profiles")
             .select(
-                "username, avatar_url, is_admin"
+                "username, avatar_url, is_admin, staff_role"
             )
             .eq(
                 "id",
@@ -2990,25 +3033,11 @@ async function loadAccount() {
             "feedbackInboxLink"
         );
 
-    if (
-        profile?.is_admin === true
-    ) {
-
-        adminLink.style.display =
-            "block";
-
-        feedbackInboxLink.style.display =
-            "block";
-
-    } else {
-
-        adminLink.style.display =
-            "none";
-
-        feedbackInboxLink.style.display =
-            "none";
-
-    }
+    const staffRole = String(profile?.staff_role || "").toLowerCase();
+    const isStaff = ["helper","admin","developer","owner"].includes(staffRole) || profile?.is_admin === true;
+    const canReviewFeedback = ["developer","owner"].includes(staffRole) || profile?.is_admin === true;
+    adminLink.style.display = isStaff ? "block" : "none";
+    feedbackInboxLink.style.display = canReviewFeedback ? "block" : "none";
 
     await loadDMailCount();
 
@@ -4284,6 +4313,55 @@ updateFeedbackCount();
  }));
  search.addEventListener("input",apply);
  apply();
+})();
+</script>
+<script id="dh-game-request-script">
+(function(){
+  const modal=document.getElementById("gameRequestModal");
+  const open=document.getElementById("openGameRequest");
+  const close=document.getElementById("closeGameRequest");
+  const form=document.getElementById("gameRequestForm");
+  const status=document.getElementById("gameRequestStatus");
+  const submit=document.getElementById("submitGameRequest");
+  if(!modal||!open||!close||!form||!status||!submit)return;
+  const hide=()=>{modal.hidden=true;};
+  open.addEventListener("click",()=>{
+    if(!currentUser){window.location.href="log-in.html?redirect=douggames.html";return;}
+    modal.hidden=false;
+    document.getElementById("gameRequestName").focus();
+  });
+  close.addEventListener("click",hide);
+  modal.addEventListener("click",event=>{if(event.target===modal)hide();});
+  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!modal.hidden)hide();});
+  form.addEventListener("submit",async event=>{
+    event.preventDefault();
+    if(!currentUser){status.textContent="Please sign in before sending a request.";return;}
+    const title=document.getElementById("gameRequestName").value.trim();
+    const genre=document.getElementById("gameRequestGenre").value;
+    const details=document.getElementById("gameRequestDetails").value.trim();
+    if(title.length<3||!genre){status.textContent="Add a game idea and choose a genre.";return;}
+    submit.disabled=true;submit.textContent="Sending…";status.textContent="Sending your idea to the Game Requests inbox…";
+    try{
+      const {data:profile,error:profileError}=await supabaseClient.from("profiles").select("username").eq("id",currentUser.id).maybeSingle();
+      if(profileError)throw profileError;
+      const {error}=await supabaseClient.from("feedback").insert({
+        user_id:currentUser.id,
+        username:profile?.username||currentUser.email?.split("@")[0]||"Player",
+        message:details||title,
+        feedback_type:"game_request",
+        game_request_title:title,
+        game_request_genre:genre,
+        game_request_details:details||null
+      });
+      if(error)throw error;
+      form.reset();status.textContent="Request sent! It is now in the staff Game Requests inbox.";
+      submit.textContent="Sent";
+      setTimeout(()=>{hide();submit.disabled=false;submit.textContent="Send request";status.textContent="Requests are suggestions, not guaranteed additions.";},1300);
+    }catch(error){
+      status.textContent="Could not send request: "+(error.message||"Please try again.");
+      submit.disabled=false;submit.textContent="Send request";
+    }
+  });
 })();
 </script>
 </body>
