@@ -75,3 +75,4 @@ This tracker is intentionally honest: planned entries are not represented as com
 - Fixed the upstream completion check so it validates any complete legal Sudoku grid (the upstream hard-coded solution list contained an invalid row), added a working restart button, and bounded the confetti animation.
 - Added a matching original SVG card logo and listed the game in the official Games catalog.
 - Static source checks passed; browser playtesting on desktop and touch devices remains to be done.
+- Follow-up audit of all 16 game pages found and fixed a malformed escaped-newline block in `Games/drive-pig.html` that prevented its inline JavaScript from parsing. Rechecked all 16 pages: no duplicate IDs or remaining inline-script parse errors (the Dead City module import was excluded from classic-script parsing).
