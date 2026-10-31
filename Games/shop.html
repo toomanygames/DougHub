@@ -45,9 +45,9 @@ function renderCharacters(){
  if(!host.children.length)host.append(node("div","empty","No characters in this section yet."));
 }
 function renderMarketInventory(){
- const select=$("marketInventory"),activeChars=new Set(marketListings.filter(x=>x.seller_id===window.__dhUserId).map(x=>x.character_id));
+ const select=$("marketInventory"),activeIds=new Set(marketListings.filter(x=>x.seller_id===window.__dhUserId).map(x=>x.inventory_id));
  select.replaceChildren();
- const available=inventory.filter(x=>!activeChars.has(x.character_id));
+ const available=inventory.filter(x=>!activeIds.has(x.id));
  if(!signedIn){select.append(new Option("Sign in to list characters",""));return;}
  if(!available.length){select.append(new Option("No unlisted characters available",""));return;}
  for(const item of available){const character=catalog.find(x=>x.character_id===item.character_id);if(character)select.append(new Option(character.character_name+" · "+item.finish.toUpperCase(),item.id));}
@@ -80,7 +80,7 @@ $("marketFinishTabs").addEventListener("click",e=>{const b=e.target.closest("[da
 $("marketRarity").addEventListener("change",e=>{marketRarityFilter=e.target.value;renderMarketplace();});
 $("marketGrid").addEventListener("click",e=>{const b=e.target.closest("[data-buy-listing]"),c=e.target.closest("[data-cancel-listing]");if(b)buyListing(b.dataset.buyListing);if(c)cancelListing(c.dataset.cancelListing);});
 $("createListing").addEventListener("click",createListing);
-async function sellCharacter(characterId){if(!signedIn){location.href="../login.html";return;}const listed=new Set(marketListings.filter(x=>x.seller_id===window.__dhUserId).map(x=>x.character_id));const item=inventory.find(x=>x.character_id===characterId&&!listed.has(x.character_id));if(!item){alert("No unlisted copy of this character is available.");return;}if(!confirm("Sell one copy of this character for credits? This cannot be undone."))return;try{const {data,error}=await db.rpc("dh_sell_character",{p_inventory_id:item.id});if(error)throw error;alert("Sold for "+data.credits_earned+" credits.");await load();}catch(e){alert(e.message||"Could not sell that character.");}}
+async function sellCharacter(characterId){if(!signedIn){location.href="../login.html";return;}const listed=new Set(marketListings.filter(x=>x.seller_id===window.__dhUserId).map(x=>x.inventory_id));const item=inventory.find(x=>x.character_id===characterId&&!listed.has(x.id));if(!item){alert("No unlisted copy of this character is available.");return;}if(!confirm("Sell one copy of this character for credits? This cannot be undone."))return;try{const {data,error}=await db.rpc("dh_sell_character",{p_inventory_id:item.id});if(error)throw error;alert("Sold for "+data.credits_earned+" credits.");await load();}catch(e){alert(e.message||"Could not sell that character.");}}
 async function createListing(){if(!signedIn){location.href="../login.html";return;}const inventoryId=$("marketInventory").value,price=Number($("marketPrice").value),finish=$("marketFinish").value;if(!inventoryId){alert("Choose a character from your collection first.");return;}const btn=$("createListing");btn.disabled=true;try{const {error}=await db.rpc("dh_create_market_listing",{p_inventory_id:inventoryId,p_price:price,p_finish:finish});if(error)throw error;await load();alert("Your character is now listed in the auction house.");}catch(e){alert(e.message||"Could not list that character.");}finally{btn.disabled=false;}}
 async function buyListing(id){if(!signedIn){location.href="../login.html";return;}if(!confirm("Buy this character at the listed price?"))return;try{const {data,error}=await db.rpc("dh_buy_market_listing",{p_listing_id:id});if(error)throw error;alert("You bought "+data.character_name+".");await load();}catch(e){alert(e.message||"Could not buy that listing.");}}
 async function cancelListing(id){try{const {error}=await db.rpc("dh_cancel_market_listing",{p_listing_id:id});if(error)throw error;await load();}catch(e){alert(e.message||"Could not cancel that listing.");}}
