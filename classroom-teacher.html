@@ -59,7 +59,7 @@ async function boot(){
 }
 $("requestTeacherAccess").addEventListener("click",async()=>{
  const b=$("requestTeacherAccess");b.disabled=true;
- const {error}=await db.from("classroom_teacher_applications").upsert({user_id:user.id,message:$("teacherApplicationNote").value.trim(),status:"pending"},{onConflict:"user_id"});
+ const {error}=await db.from("classroom_teacher_applications").upsert({user_id:user.id,message:$("teacherApplicationNote").value.trim(),status:"pending",reviewed_by:null,reviewed_at:null},{onConflict:"user_id"});
  if(error){say("teacherApplyStatus","Could not send request: "+error.message);b.disabled=false;return;}
  say("teacherApplyStatus","Request sent. The DougHub Owner will review it. Please allow time for verification.");b.hidden=true;
 });
