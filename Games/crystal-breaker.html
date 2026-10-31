@@ -197,7 +197,15 @@
   var STATE = { READY: 0, SERVE: 1, PLAYING: 2, LEVELUP: 3, OVER: 4 };
   var state = STATE.READY;
   var BEST_KEY = 'breakout_best_v1';
-  var best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0;
+  // Keep the game playable when browser storage is blocked or unavailable.
+  function readBest() {
+    try { return parseInt(window.localStorage.getItem(BEST_KEY) || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function saveBest(value) {
+    try { window.localStorage.setItem(BEST_KEY, String(value)); } catch (e) {}
+  }
+  var best = readBest();
 
   var PADDLE_W = 84, PADDLE_H = 14, PADDLE_Y = PLAY_B - 26;
   var BALL_R = 7;
@@ -247,7 +255,7 @@
     document.getElementById('over-best').textContent = t('common.bestLabel', { n: best });
   }
   refreshBest();
-  WG.onChange(refreshBest);
+  if (window.WG && typeof window.WG.onChange === 'function') window.WG.onChange(refreshBest);
 
   // ===== Input =====
   var wrap = document.getElementById('wrap');
@@ -348,7 +356,7 @@
   function gameOver() {
     state = STATE.OVER;
     var isRecord = score > best;
-    if (isRecord) { best = score; localStorage.setItem(BEST_KEY, String(best)); }
+    if (isRecord) { best = score; saveBest(best); }
     document.getElementById('final-score').textContent = score;
     document.getElementById('new-record').classList.toggle('hidden', !isRecord);
     refreshBest();
