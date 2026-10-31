@@ -188,30 +188,47 @@ $("endClassSession").addEventListener("click",async()=>{
  activeClass.session_active=false;activeClass.session_ended_at=now;activeClass.session_resume_at=resume;updateSessionControls();showTeacherEnded();
 });
 function showTeacherEnded(){
- $("teacherEndedOverlay").hidden=false;const tick=async()=>{
-  const target=Date.parse(activeClass?.session_resume_at||"");
-  if(!Number.isFinite(target)){$("teacherCountdown").textContent="--:--";return;}
-  const remain=Math.max(0,target-Date.now()),s=Math.ceil(remain/1000);
-  $("teacherCountdown").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
-  if(remain<=0)await resumeClass();
+ if(sessionTimer){clearInterval(sessionTimer);sessionTimer=null;}
+ $("teacherEndedOverlay").hidden=false;
+ const deadline=Date.parse(activeClass?.session_resume_at||"");
+ const tick=()=>{
+  const remain=Number.isFinite(deadline)?Math.max(0,deadline-Date.now()):0;
+  const seconds=Math.ceil(remain/1000);
+  $("teacherCountdown").textContent=Number.isFinite(deadline)
+   ?String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0")
+   :"--:--";
+  if(remain<=0&&Number.isFinite(deadline)){clearInterval(sessionTimer);sessionTimer=null;resumeClass();}
  };
- tick();if(sessionTimer)clearInterval(sessionTimer);sessionTimer=setInterval(tick,1000);
+ tick();
+ sessionTimer=window.setInterval(tick,250);
 }
 async function resumeClass(){
  if(!activeClass||resumeInFlight)return;
- resumeInFlight=true;$("continueClassSession").disabled=true;
+ resumeInFlight=true;
+ const continueButton=$("continueClassSession");
+ continueButton.disabled=true;continueButton.textContent="Reopening…";
+ say("teacherEndedStatus","Contacting DougHub to reopen this classroom…");
  try{
   const {data,error}=await db.rpc("resume_due_classroom",{p_classroom_id:activeClass.id});
   if(error)throw error;
-  if(data!==true){
+  let isActive=data===true;
+  if(!isActive){
    const {data:latest,error:readError}=await db.from("classroom_spaces").select("session_active,session_resume_at,session_ended_at").eq("id",activeClass.id).maybeSingle();
    if(readError)throw readError;
-   if(!latest?.session_active){say("teacherEndedStatus","The classroom could not be reopened. Check your access and try again.");return;}
+   isActive=latest?.session_active===true;
+   if(!isActive)throw new Error("The database did not reopen the session. Check that you are the classroom teacher or Owner, then try again.");
   }
   activeClass.session_active=true;activeClass.session_resume_at=null;activeClass.session_ended_at=null;
-  $("teacherEndedOverlay").hidden=true;if(sessionTimer)clearInterval(sessionTimer);updateSessionControls();renderClassList();
- }catch(error){say("teacherEndedStatus","Could not reopen the classroom: "+(error.message||"Please try again."));}
- finally{resumeInFlight=false;$("continueClassSession").disabled=false;}
+  $("teacherEndedOverlay").hidden=true;
+  if(sessionTimer){clearInterval(sessionTimer);sessionTimer=null;}
+  updateSessionControls();renderClassList();
+  say("sessionControlStatus","Classroom reopened. Students can enter again.");
+ }catch(error){
+  say("teacherEndedStatus","Reopen failed: "+(error.message||"Unknown database error"));
+  say("sessionControlStatus","Reopen failed: "+(error.message||"Unknown database error"));
+ }finally{
+  resumeInFlight=false;continueButton.disabled=false;continueButton.textContent="Continue · reopen classroom";
+ }
 }
 $("continueClassSession").addEventListener("click",resumeClass);
 $("resumeClassSession").addEventListener("click",resumeClass);
