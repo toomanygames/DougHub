@@ -1251,29 +1251,14 @@ pigEl.addEventListener(
   }
 );
 
-homeBtn.addEventListener(
-  'click',
-  () => {
-    if (window.parent !== window) {
-      window.parent.postMessage(
-        {
-          type: 'DougHub-home'
-        },
-        '*'
-      );
-
-      window.parent.postMessage(
-        {
-          type: 'pig-clicker-home'
-        },
-        '*'
-      );
-    } else {
-      window.location.href =
-        '../index.html';
-    }
+homeBtn.addEventListener('click', () => {
+  const gamesUrl = new URL('../douggames.html', window.location.href).href;
+  if (window.parent !== window) {
+    window.parent.location.href = gamesUrl;
+  } else {
+    window.location.href = gamesUrl;
   }
-);
+});
 
 window.addEventListener(
   'message',
