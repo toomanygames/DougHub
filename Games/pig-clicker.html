@@ -332,6 +332,43 @@
       font-size: 18px;
     }
 
+    /* Keep every label readable on the warm original palette. */
+    .topbar, .coins, .tap, .panel, .panel h3, .stat, .stat strong,
+    .upg-name, .upg-cost, .achievement .title, .achievement .reward {
+      color: #3b2319;
+      text-shadow: none;
+    }
+
+    .right {
+      scrollbar-width: thin;
+      scrollbar-color: #c65d83 rgba(255,255,255,0.24);
+      overscroll-behavior: contain;
+    }
+    .right::-webkit-scrollbar { width: 10px; }
+    .right::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.24);
+      border-radius: 999px;
+      margin: 8px 2px;
+    }
+    .right::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #ec8db2, #d97706);
+      border: 2px solid rgba(255,247,237,0.8);
+      border-radius: 999px;
+    }
+    .right::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #db6797, #b45309);
+    }
+    #rebirthButton {
+      background: linear-gradient(180deg, #7c2d12, #431407) !important;
+      color: #fff !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+      border: 1px solid rgba(67,20,7,0.3);
+    }
+    #rebirthButton:disabled {
+      opacity: 1;
+      filter: saturate(0.8);
+    }
+
     @media (max-width: 700px) {
       .content {
         flex-direction: column;
