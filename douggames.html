@@ -2151,45 +2151,6 @@ footer{font-size:12px}
 .trending-game-icon img{width:100%;height:100%;display:block;object-fit:cover}
 .drive-pig-topline .game-icon{width:66px;height:66px}
 </style>
-
-
-<style id="DOUGHUB_ARCADE_V2">
-/* DougHub Arcade: scalable storefront layout */
-#doug-games{padding-top:18px}
-#doug-games>.section-header{display:flex;align-items:flex-end;gap:14px;border:0;padding:0;margin-bottom:17px}
-#doug-games>.section-header .section-title{font-size:clamp(23px,2.6vw,30px)}
-.arcade-library-count{flex:0 0 auto;padding:7px 10px;border:1px solid #a78bfa2b;border-radius:9px;background:#8b5cf614;color:#c8bdff;font-size:10px;font-weight:900;letter-spacing:.08em}
-.arcade-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:12px;align-items:center;margin:0 0 11px;padding:12px;border:1px solid #ffffff12;border-radius:15px;background:linear-gradient(110deg,#101329e8,#090b19e8);box-shadow:0 12px 28px #0002}
-.arcade-search-wrap{display:flex;align-items:center;gap:10px;min-width:0;height:42px;padding:0 12px;border:1px solid #ffffff15;border-radius:11px;background:#050715b8;color:#9da2c0}
-.arcade-search-wrap>span{font-size:23px;line-height:1;color:#aaa0ff}
-.arcade-search-wrap input{width:100%;min-width:0;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:#fff!important;font-size:12px}
-.arcade-search-wrap input::placeholder{color:#777e9e}
-.arcade-search-wrap kbd{padding:3px 6px;border:1px solid #ffffff18;border-radius:5px;background:#ffffff08;color:#858ba9;font:10px ui-monospace,monospace}
-.arcade-category-filters{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
-.arcade-filter{min-height:34px;padding:0 11px;border:1px solid #ffffff12;border-radius:9px;background:#ffffff05;color:#aeb3ce;font-size:10px;font-weight:800;cursor:pointer;transition:.18s}
-.arcade-filter:hover{color:#fff;border-color:#a78bfa55;background:#8b5cf617}
-.arcade-filter.active{color:#fff;border-color:#a78bfa66;background:linear-gradient(120deg,#6366f13b,#a855f72b);box-shadow:inset 0 1px #ffffff12}
-.arcade-results-line{display:flex;justify-content:space-between;gap:12px;margin:0 2px 12px;color:#858ba8;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.arcade-results-line span:last-child{color:#666d8b}
-.arcade-games-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-flow:row;gap:13px}
-.arcade-games-grid>.game-card{min-width:0;min-height:208px!important;padding:17px!important;border-radius:16px!important}
-.arcade-games-grid>.game-card[hidden]{display:none!important}
-.arcade-games-grid>.game-card .game-icon{width:50px!important;height:50px!important;flex-basis:50px!important;border-radius:13px!important}
-.arcade-games-grid>.game-card .game-icon img{width:100%;height:100%;object-fit:cover}
-.arcade-games-grid>.game-card h3{font-size:15px!important;line-height:1.3;overflow-wrap:anywhere}
-.arcade-games-grid>.game-card p{font-size:11px!important;line-height:1.55}
-.arcade-games-grid>.game-card .play-label{font-size:9px!important}
-.arcade-games-grid>.drive-pig-switcher{grid-column:auto!important;grid-row:auto!important}
-.arcade-empty{display:none;grid-column:1/-1;padding:34px 18px;border:1px dashed #ffffff20;border-radius:15px;color:#999fbd;text-align:center;font-size:13px}
-.arcade-empty.show{display:block}
-#trendingSection{margin-top:10px}
-#community-games{padding-top:25px}
-@media(max-width:1100px){.arcade-toolbar{grid-template-columns:1fr}.arcade-category-filters{justify-content:flex-start}.arcade-games-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
-@media(max-width:760px){.arcade-games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px}.arcade-games-grid>.game-card{min-height:190px!important;padding:13px!important}.arcade-games-grid>.game-card h3{font-size:13px!important}.arcade-games-grid>.game-card p{font-size:10px!important}.arcade-filter{min-height:32px;padding:0 9px}.arcade-toolbar{padding:9px}.arcade-results-line{font-size:8px}}
-@media(max-width:430px){.arcade-category-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.arcade-filter{width:100%}.arcade-games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.arcade-games-grid>.game-card{min-height:198px!important}.arcade-results-line span:last-child{display:none}}
-@media(prefers-reduced-motion:reduce){.arcade-filter,.arcade-games-grid>.game-card{transition:none}}
-</style>
-
 </head>
 
 <body>
@@ -2350,38 +2311,18 @@ footer{font-size:12px}
             <div>
 
                 <h2 class="section-title">
-                    DougHub Arcade
+                    Doug's Games
                 </h2>
 
                 <p class="section-subtitle">
-                    Browse the full collection. More games can slot into this grid without changing the layout.
+                    Games made by Doug.
                 </p>
 
             </div>
 
-            <span class="arcade-library-count" id="arcadeLibraryCount">12 GAMES</span>
-
         </div>
 
-        <div class="arcade-toolbar">
-            <label class="arcade-search-wrap">
-                <span aria-hidden="true">⌕</span>
-                <input id="officialGameSearch" type="search" placeholder="Search all arcade games..." autocomplete="off" aria-label="Search DougHub arcade games">
-                <kbd>/</kbd>
-            </label>
-            <div class="arcade-category-filters" role="group" aria-label="Filter arcade games">
-                <button type="button" class="arcade-filter active" data-arcade-filter="all" aria-pressed="true">All games</button>
-                <button type="button" class="arcade-filter" data-arcade-filter="arcade" aria-pressed="false">Arcade</button>
-                <button type="button" class="arcade-filter" data-arcade-filter="puzzle" aria-pressed="false">Puzzle</button>
-                <button type="button" class="arcade-filter" data-arcade-filter="racing" aria-pressed="false">Racing</button>
-                <button type="button" class="arcade-filter" data-arcade-filter="clicker" aria-pressed="false">Clicker</button>
-                <button type="button" class="arcade-filter" data-arcade-filter="explore" aria-pressed="false">Explore</button>
-            </div>
-        </div>
-
-        <div class="arcade-results-line"><span id="arcadeResultsLabel">Showing all games</span><span>NEW GAMES ADDED REGULARLY</span></div>
-
-        <div class="games-grid arcade-games-grid">
+        <div class="games-grid">
 
             <a href="Games/bubble-grove.html" class="game-card game-card-wide">
                 <div class="game-icon"><img src="Games/art/bubble-grove.svg" alt="Bubble Grove logo"></div>
@@ -4124,69 +4065,6 @@ updateFeedbackCount();
 </script>
 
 
-
-
-<script id="DOUGHUB_ARCADE_FILTERS">
-(function(){
- const grid=document.querySelector(".arcade-games-grid");
- if(!grid)return;
- const cards=[...grid.querySelectorAll(":scope > .game-card")];
- const search=document.getElementById("officialGameSearch");
- const count=document.getElementById("arcadeLibraryCount");
- const label=document.getElementById("arcadeResultsLabel");
- const empty=document.createElement("div");
- empty.className="arcade-empty";
- empty.textContent="No games match that search. Try another title or category.";
- grid.appendChild(empty);
- const categoryFor=card=>{
-  const href=(card.getAttribute("href")||"").toLowerCase();
-  const title=(card.querySelector("h3")?.textContent||"").toLowerCase();
-  if(href.includes("ocean-drive")||href.includes("dead-city"))return "explore";
-  if(card.id==="drivePigSwitcher"||href.includes("racing")||href.includes("drive-pig"))return "racing";
-  if(href.includes("pig-clicker")||href.includes("rebirth-clicker")||title.includes("clicker")||title.includes("titlebound"))return "clicker";
-  if(href.includes("sudoku")||href.includes("puzzle"))return "puzzle";
-  return "arcade";
- };
- cards.forEach(card=>{
-  card.dataset.arcadeCategory=categoryFor(card);
-  card.dataset.arcadeSearch=((card.querySelector("h3")?.textContent||"")+" "+(card.querySelector("p")?.textContent||"")+" "+card.dataset.arcadeCategory).toLowerCase();
- });
- let active="all";
- function apply(){
-  const query=(search?.value||"").trim().toLowerCase();
-  let shown=0;
-  cards.forEach(card=>{
-   const matchCategory=active==="all"||card.dataset.arcadeCategory===active;
-   const matchSearch=!query||card.dataset.arcadeSearch.includes(query);
-   const visible=matchCategory&&matchSearch;
-   card.hidden=!visible;
-   if(visible)shown++;
-  });
-  empty.classList.toggle("show",shown===0);
-  if(count)count.textContent=shown+" "+(shown===1?"GAME":"GAMES");
-  if(label)label.textContent=query||active!=="all"?"Showing "+shown+" matching games":"Showing all "+shown+" games";
- }
- document.querySelectorAll("[data-arcade-filter]").forEach(button=>{
-  button.addEventListener("click",()=>{
-   active=button.dataset.arcadeFilter;
-   document.querySelectorAll("[data-arcade-filter]").forEach(item=>{
-    const selected=item===button;
-    item.classList.toggle("active",selected);
-    item.setAttribute("aria-pressed",String(selected));
-   });
-   apply();
-  });
- });
- search?.addEventListener("input",apply);
- document.addEventListener("keydown",event=>{
-  if(event.key==="/"&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!(event.target instanceof HTMLInputElement)&&!(event.target instanceof HTMLTextAreaElement)){
-   event.preventDefault();search?.focus();
-  }
-  if(event.key==="Escape"&&document.activeElement===search){search.value="";apply();search.blur();}
- });
- apply();
-})();
-</script>
 
 </body>
 </html>
