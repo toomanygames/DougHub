@@ -1,0 +1,2 @@
+-- Monthly event, public leaderboard snapshot, and per-player skill analytics.
+-- Daily Wordle completion is recorded once per UTC day by a server-side RPC.
