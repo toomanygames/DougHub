@@ -23,7 +23,7 @@
 <section class="panel"><div class="panel-head"><div><h2>👩‍🎓 Student roster</h2><p>Add a DougHub username. Every request waits for Owner verification before the student can enter.</p></div><span class="pill orange">1–7 BUSINESS DAYS</span></div><form id="addStudentForm" style="display:flex;gap:9px;flex-wrap:wrap"><input id="studentUsername" class="search-field" style="flex:1;min-width:190px" maxlength="30" placeholder="Student's DougHub username" required><button class="btn" id="addStudentButton" type="submit">Request student</button></form><div class="notice warm" style="margin-top:12px">Student access is not immediate. The DougHub Owner must verify that the selected account is actually your student. Requests can take 1–7 business days.</div><div id="rosterList" style="margin-top:12px"><div class="empty">Choose a class to view its roster.</div></div></section>
 <section class="panel"><div class="panel-head"><div><h2>🛡️ Word filter & classroom safety</h2><p>Manage blocked words and review frequently used possible variations detected in class chat.</p></div><span class="pill pink">TEACHER ONLY</span></div><form id="bannedWordForm" style="display:flex;gap:9px;flex-wrap:wrap"><input id="bannedWordInput" class="search-field" style="flex:1;min-width:180px" maxlength="60" placeholder="Add a word to the class filter" required><button class="btn pink" type="submit">Add banned word</button></form><div id="bannedWordsList" style="margin-top:8px"><div class="empty">Choose a class to manage its word filter.</div></div><div style="height:1px;background:#eeeef7;margin:18px 0"></div><div class="panel-head"><div><h2>Possible filter workarounds</h2><p>Pattern review from recent class messages. Suggestions are automated hints, not proof of intent.</p></div><span class="pill orange" id="wordRadarCount">SCANNING</span></div><div id="wordRadar" class="notice">Choose a class to scan recent chat messages.</div></section>
 <section class="panel"><div class="panel-head"><div><h2>💬 Classroom chat</h2><p>View the class conversation and send announcements.</p></div><span class="pill">CLASS ONLY</span></div><div id="teacherChatMessages" class="chat-box"><div class="empty">Choose a class to load messages.</div></div><form id="teacherChatForm" class="chat-compose"><input id="teacherChatInput" maxlength="1000" placeholder="Message your class…" required><button class="btn" id="teacherSendChat" type="submit">Send</button></form><div id="teacherChatStatus" class="chat-status"></div></section>
-<section class="panel"><div class="panel-head"><div><h2>⏸️ Session controls</h2><p>End the student session temporarily. Students will see a clear message and the room will reopen automatically after five minutes.</p></div><span class="pill orange" id="sessionStatusBadge">SESSION LIVE</span></div><button class="btn danger" id="endClassSession" type="button">End student session</button><div id="sessionControlStatus" class="chat-status">Students can currently use this classroom.</div></section>
+<section class="panel"><div class="panel-head"><div><h2>⏸️ Session controls</h2><p>End the student session temporarily. Students will see a clear message and the room will reopen automatically after five minutes.</p></div><span class="pill orange" id="sessionStatusBadge">SESSION LIVE</span></div><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn danger" id="endClassSession" type="button">End student session</button><button class="btn" id="resumeClassSession" type="button" hidden>Reopen classroom</button></div><div id="sessionControlStatus" class="chat-status">Students can currently use this classroom.</div></section>
 </div>
 </main>
 </div>
@@ -152,9 +152,8 @@ async function scanWordRadar(){
   const tokens=String(m.body||"").match(/[a-z0-9@$!._-]{2,24}/gi)||[];
   tokens.forEach(token=>{
    const clean=token.replace(/^[._-]+|[._-]+$/g,""),n=normalize(clean);if(n.length<3||!/[a-z]/i.test(clean))return;
-   const matched=banned.some(b=>n===b.norm||((Math.min(n.length,b.norm.length)>=4)&&distance(n,b.norm)<=Math.max(1,Math.floor(b.norm.length*.22))));
-   const altered=banned.some(b=>n===b.norm&&clean.toLowerCase()!==b.word.toLowerCase());
-   if(matched&&altered){const key=clean.toLowerCase();const row=counts.get(key)||{word:clean,count:0};row.count++;counts.set(key,row);}
+   const matchedVariant=banned.some(b=>(n===b.norm||((Math.min(n.length,b.norm.length)>=4)&&distance(n,b.norm)<=Math.max(1,Math.floor(b.norm.length*.22))))&&clean.toLowerCase()!==b.word.toLowerCase());
+   if(matchedVariant){const key=clean.toLowerCase();const row=counts.get(key)||{word:clean,count:0};row.count++;counts.set(key,row);}
   });
  });
  const candidates=[...counts.values()].sort((a,b)=>b.count-a.count).slice(0,12);
@@ -177,7 +176,7 @@ $("teacherChatForm").addEventListener("submit",async e=>{
  if(error){say("teacherChatStatus",error.message);return;}$("teacherChatInput").value="";say("teacherChatStatus","Message sent.");await loadTeacherChat();
 });
 function updateSessionControls(){
- const active=activeClass?.session_active!==false;$("sessionStatusBadge").textContent=active?"SESSION LIVE":"SESSION PAUSED";$("sessionStatusBadge").className="pill "+(active?"mint":"orange");$("sessionControlStatus").textContent=active?"Students can currently use this classroom.":"Students are seeing the session-ended screen.";
+ const active=activeClass?.session_active!==false;$("resumeClassSession").hidden=active;$("sessionStatusBadge").textContent=active?"SESSION LIVE":"SESSION PAUSED";$("sessionStatusBadge").className="pill "+(active?"mint":"orange");$("sessionControlStatus").textContent=active?"Students can currently use this classroom.":"Students are seeing the session-ended screen.";
  $("endClassSession").disabled=!active;
 }
 $("endClassSession").addEventListener("click",async()=>{
@@ -215,6 +214,7 @@ async function resumeClass(){
  finally{resumeInFlight=false;$("continueClassSession").disabled=false;}
 }
 $("continueClassSession").addEventListener("click",resumeClass);
+$("resumeClassSession").addEventListener("click",resumeClass);
 boot();
 })();
 </script>
