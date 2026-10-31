@@ -30,12 +30,12 @@
 </div>
 <div class="footer">DougHub Teacher Studio · Grade 4 through Grade 8</div>
 </div>
-<div id="teacherEndedOverlay" class="ended-screen" hidden><section class="ended-card"><div class="ended-icon">⏸</div><div class="eyebrow" style="color:#8878df">SESSION PAUSED</div><h1>Students are seeing the session-ended screen.</h1><p>The classroom will automatically reopen in five minutes. You can reopen it now with Continue, or leave this page and students will still be able to return when the timer expires.</p><div class="countdown" id="teacherCountdown">05:00</div><button class="btn" id="continueClassSession" type="button">Continue · reopen classroom</button><p id="teacherEndedStatus">Automatic reopening is scheduled.</p></section></div>
+
 <script>
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),C=window.DHClassroom;
-let db,user,profile,classes=[],activeClass=null,chatTimer=null,scanTimer=null,sessionTimer=null,resumeInFlight=false,isOwner=false,classTeacherNames={};
+let db,user,profile,classes=[],activeClass=null,chatTimer=null,scanTimer=null,resumeInFlight=false,isOwner=false,classTeacherNames={};
 const say=(id,msg)=>$(id).textContent=msg;
 function normalize(s){return String(s||"").toLowerCase().replace(/[@]/g,"a").replace(/[4]/g,"a").replace(/[3]/g,"e").replace(/[0]/g,"o").replace(/[1!]/g,"i").replace(/[$5]/g,"s").replace(/[7]/g,"t").replace(/[8]/g,"b").replace(/[^a-z0-9]/g,"").replace(/(.)\1+/g,"$1");}
 function distance(a,b){const row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return row[b.length];}
@@ -97,7 +97,7 @@ $("createClassForm").addEventListener("submit",async e=>{
 async function selectClass(id){
  activeClass=classes.find(c=>c.id===id);if(!activeClass)return;
  $("classManagementTools").hidden=false;
- if(sessionTimer)clearInterval(sessionTimer);$("teacherEndedOverlay").hidden=true;
+ 
  $("selectedClassTitle").textContent=activeClass.class_name;$("selectedClassMeta").textContent="Grade "+activeClass.grade+" · Created "+new Date(activeClass.created_at).toLocaleDateString()+(isOwner?" · Teacher: "+(classTeacherNames[activeClass.teacher_id]||"Unknown"):"");
  $("teacherReminder").value=activeClass.reminder||"";$("teacherReminderDisplay").textContent=activeClass.reminder||"No reminder set. Add one to share it with your students.";
  renderClassList();await Promise.all([loadRoster(),loadBannedWords(),loadTeacherChat(),scanWordRadar()]);
@@ -185,29 +185,12 @@ $("endClassSession").addEventListener("click",async()=>{
  if(error){say("sessionControlStatus","Could not end the session: "+error.message);return;}
  if(data!==true){say("sessionControlStatus","The session is already paused or this account cannot manage it.");return;}
  const now=new Date().toISOString(),resume=new Date(Date.now()+5*60*1000).toISOString();
- activeClass.session_active=false;activeClass.session_ended_at=now;activeClass.session_resume_at=resume;updateSessionControls();showTeacherEnded();
+ activeClass.session_active=false;activeClass.session_ended_at=now;activeClass.session_resume_at=resume;updateSessionControls();say("sessionControlStatus","Session paused for students. Teacher Studio stays open so you can keep managing your classroom.");
 });
-function showTeacherEnded(){
- if(sessionTimer){clearInterval(sessionTimer);sessionTimer=null;}
- $("teacherEndedOverlay").hidden=false;
- const deadline=Date.parse(activeClass?.session_resume_at||"");
- const tick=()=>{
-  const remain=Number.isFinite(deadline)?Math.max(0,deadline-Date.now()):0;
-  const seconds=Math.ceil(remain/1000);
-  $("teacherCountdown").textContent=Number.isFinite(deadline)
-   ?String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0")
-   :"--:--";
-  if(remain<=0&&Number.isFinite(deadline)){clearInterval(sessionTimer);sessionTimer=null;resumeClass();}
- };
- tick();
- sessionTimer=window.setInterval(tick,250);
-}
 async function resumeClass(){
  if(!activeClass||resumeInFlight)return;
  resumeInFlight=true;
- const continueButton=$("continueClassSession");
- continueButton.disabled=true;continueButton.textContent="Reopening…";
- say("teacherEndedStatus","Contacting DougHub to reopen this classroom…");
+ say("sessionControlStatus","Reopening classroom…");
  try{
   const {data,error}=await db.rpc("resume_due_classroom",{p_classroom_id:activeClass.id});
   if(error)throw error;
@@ -230,7 +213,6 @@ async function resumeClass(){
   resumeInFlight=false;continueButton.disabled=false;continueButton.textContent="Continue · reopen classroom";
  }
 }
-$("continueClassSession").addEventListener("click",resumeClass);
 $("resumeClassSession").addEventListener("click",resumeClass);
 boot();
 })();
