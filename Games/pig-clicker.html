@@ -391,6 +391,41 @@
 
 
 <script src="../game-art.js" defer></script>
+<style id="DOUGHUB_PIG_RESTYLE">
+:root{color-scheme:light}
+html,body{background:radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.78),transparent 34%),radial-gradient(ellipse at 86% 82%,rgba(251,146,60,.32),transparent 35%),linear-gradient(135deg,#fff1e6 0%,#ffd5e5 48%,#ffc88d 100%)!important;color:#542b35!important}
+body{padding:12px!important}
+.screen{width:min(1120px,100%)!important;height:calc(100dvh - 24px)!important;max-height:940px!important;border:1px solid rgba(154,67,85,.22)!important;border-radius:26px!important;background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(255,239,225,.76))!important;box-shadow:0 24px 70px rgba(112,49,64,.2),inset 0 1px rgba(255,255,255,.9)!important;backdrop-filter:blur(18px)}
+.topbar{min-height:68px;padding:12px 20px!important;background:linear-gradient(90deg,#fff8ed,#ffe1e9)!important;border-bottom:1px solid rgba(154,67,85,.16)!important;color:#542b35!important}
+.coins{color:#7c2d48!important;font-weight:950}
+.btn{background:linear-gradient(180deg,#fffdf8,#ffe7d2)!important;color:#713348!important;border:1px solid rgba(153,67,91,.2)!important;box-shadow:0 5px 0 rgba(156,75,91,.14),0 9px 18px rgba(112,49,64,.1)!important;cursor:pointer;transition:transform .15s ease,filter .15s ease}
+.btn:hover{filter:brightness(1.03);transform:translateY(-1px)}
+.content{min-height:0}
+.left{position:relative;background:radial-gradient(ellipse at 50% 44%,rgba(255,255,255,.58),transparent 56%);padding:24px!important}
+.pig-wrap{width:min(62vw,350px)!important}
+.pig{border:5px solid rgba(255,255,255,.78)!important;border-radius:38px!important;background:radial-gradient(circle at 32% 25%,#fff 0%,#ffe9b9 25%,#ffb5c8 72%,#ed8eaa 100%)!important;box-shadow:inset 0 8px 24px rgba(255,255,255,.72),0 20px 42px rgba(151,69,86,.24)!important;cursor:pointer}
+.tap{color:#7c2d48!important;font-weight:950;text-shadow:0 2px rgba(255,255,255,.7)}
+.right{width:min(39vw,410px)!important;padding:16px!important;background:rgba(255,246,239,.56)!important;border-left:1px solid rgba(154,67,85,.14)!important;scrollbar-width:thin;scrollbar-color:#d76b91 #f9e2dc;overscroll-behavior:contain}
+.panel{background:rgba(255,255,255,.78)!important;border:1px solid rgba(161,78,98,.15)!important;border-radius:19px!important;box-shadow:0 7px 20px rgba(112,49,64,.07)!important;color:#542b35!important}
+.panel h3{color:#8c3655!important;letter-spacing:.08em}
+.stat,.upg,.achievement{background:linear-gradient(145deg,#fffaf5,#ffedf0)!important;border:1px solid rgba(161,78,98,.13)!important;color:#542b35!important}
+.stat{box-shadow:inset 0 1px rgba(255,255,255,.9)}
+.stat strong,.upg-name,.achievement .title{color:#713348!important}
+.upg-cost,.achievement .reward{color:#855b64!important}
+.upg-icon{background:linear-gradient(145deg,#fff,#ffe0e8)!important;border-color:rgba(161,78,98,.15)!important}
+.upg-btn{background:linear-gradient(180deg,#ffd66e,#f4a936)!important;color:#603819!important;border:1px solid rgba(155,94,29,.18)!important;box-shadow:0 3px 0 rgba(156,91,25,.18);cursor:pointer}
+.upg-btn:disabled{filter:grayscale(.35);opacity:.55}
+.fever-hud{left:24px!important;bottom:22px!important;width:min(230px,30vw)!important;padding:10px 12px;border:1px solid rgba(161,78,98,.15);border-radius:14px;background:rgba(255,250,245,.86);box-shadow:0 8px 24px rgba(112,49,64,.1)}
+.fever-hud .fever-label{color:#8c3655!important}
+.fever-bar{background:#f4d9dd!important}
+.fever-fill{background:linear-gradient(90deg,#fb7185,#f59e0b)!important}
+#rebirthButton{background:linear-gradient(180deg,#a85575,#713348)!important;color:#fff!important;border:1px solid rgba(113,51,72,.25)!important;box-shadow:0 4px 0 rgba(83,35,53,.2)!important}
+.right::-webkit-scrollbar{width:10px}
+.right::-webkit-scrollbar-track{background:#f9e2dc;border-radius:99px}
+.right::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#e88cac,#c56b7d);border:2px solid #f9e2dc;border-radius:99px}
+@media(max-width:700px){body{padding:6px!important}.screen{height:calc(100dvh - 12px)!important;border-radius:19px!important}.topbar{min-height:58px;padding:9px 12px!important}.content{flex-direction:column}.left{flex:0 0 43%;min-height:230px;padding:12px 12px 44px!important;gap:8px}.pig-wrap{width:min(34vh,220px)!important;max-width:55vw}.right{flex:1 1 57%;width:100%!important;min-height:0;border-left:0!important;border-top:1px solid rgba(154,67,85,.14)!important;padding:10px 12px 18px!important}.fever-hud{position:absolute;left:14px!important;bottom:calc(57% + 8px)!important;width:min(190px,48vw)!important;padding:6px 9px}.fever-hud .fever-label{font-size:11px}.fever-bar{height:9px}}
+@media(max-height:620px) and (min-width:701px){.left{padding:10px!important;gap:8px}.pig-wrap{width:min(45vh,260px)!important}.fever-hud{bottom:12px!important}}
+</style>
 </head>
 
 <body>
