@@ -1468,6 +1468,7 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
   <div class="admin-card-actions">
     <span id="feedbackManagementStatus" class="status">Feedback not loaded yet.</span>
     <button type="button" id="refreshFeedbackButton">↻ Refresh</button>
+    <a href="inbox.html" class="admin-inline-link">Open full inbox ↗</a>
   </div>
   <div id="feedbackManagementList" class="admin-scroll-area" aria-live="polite"><div class="empty">Loading feedback…</div></div>
 </div>
@@ -5462,9 +5463,9 @@ function applyStaffPermissions(){
   const rankForCard=card=>{
     const id=(card.id||"").toLowerCase();
     const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard/.test(id))return 4;
+    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard|adminactivityflagscard/.test(id))return 4;
     if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
-    if(/custombadgemanagercard|feedbackmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
+    if(/custombadgemanagercard|feedbackmanagementcard|gamerequestsmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
     if(/code projects|developer tools|site features/.test(title))return 3;
     if(/userwarningscard|recentwarningscard|user warnings|recent warnings|group moderation/.test(id+" "+title))return 1;
     if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
