@@ -2193,9 +2193,6 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
 .games-discovery-link.active{background:#ff987625;color:#ffd1b9}
 .games-discovery-create{background:#ff9876!important;color:#25171d!important}
 .game-card[hidden]{display:none!important}
-/* Keep only the requested games; daily games live outside this grid. */
-#doug-games .games-grid>.game-card:not([href="Games/pig-clicker.html"]):not([href="Games/racing.html"]):not([href="Games/puzzle.html"]):not([href="Games/sudoku.html"]):not([href="Games/gem-garden.html"]):not([href="Games/pipe-parade.html"]):not([href="Games/brick-bounce.html"]):not(#drivePigSwitcher){display:none!important}
-#trendingSection,#community-games,.games-discovery-link[href="#trendingSection"],.games-discovery-link[href="#community-games"]{display:none!important}
 @media(max-width:700px){.games-grid .game-card{border-radius:15px}.dh-daily-section{border-radius:18px}}
 
 </style>
@@ -2211,6 +2208,37 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
 .dh-game-results{grid-column:1/-1;margin:0;color:#b8afb3;font-size:10px}
 #doug-games .games-grid>.game-card[hidden]{display:none!important}
 @media(max-width:700px){.dh-game-browser{grid-template-columns:1fr}.dh-game-genres{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.dh-game-genres button{white-space:nowrap}}
+</style>
+<style id="dh-games-vibrant-refresh">
+:root{--dh-games-coral:#ffad87;--dh-games-mint:#91edc7;--dh-games-blue:#96d9ff;--dh-games-lilac:#c9b1ff}
+body{background:radial-gradient(ellipse at 8% 0,#d36b4a36,transparent 34%),radial-gradient(ellipse at 90% 12%,#57b99730,transparent 30%),#100f18}
+.games-hero{background:linear-gradient(118deg,#4a2b32 0%,#342941 54%,#20443e 100%)!important;border-color:#ffffff35!important}
+.games-hero-eyebrow{color:#ffd2a8}.games-hero-eyebrow>span{background:#ffad87;box-shadow:0 0 0 5px #ffad8728}
+.games-hero h1 span{color:#ffb18c}
+.games-hero-button.primary{background:linear-gradient(110deg,#ffad87,#f18aa1)!important;color:#28171d!important}
+.games-discovery-link.active{background:#ffad8730!important;color:#ffe0cb!important}
+.games-grid .game-card{border-color:#ffffff2a!important;box-shadow:0 13px 30px #0003}
+.games-grid .game-card:nth-child(4n+1){border-top-color:#ffad87!important}
+.games-grid .game-card:nth-child(4n+2){border-top-color:#91edc7!important}
+.games-grid .game-card:nth-child(4n+3){border-top-color:#96d9ff!important}
+.games-grid .game-card:nth-child(4n){border-top-color:#c9b1ff!important}
+.games-grid .game-card:hover{border-color:#ffd0ad!important;box-shadow:0 18px 38px #0005}
+.dh-game-browser{background:linear-gradient(120deg,#382a35,#263b39)!important;border-color:#ffffff2a!important}
+.dh-game-search-wrap{background:#1c1822!important;border-color:#ffffff2c!important}
+.dh-game-search-wrap:focus-within{border-color:#ffad87!important;box-shadow:0 0 0 3px #ffad8722}
+.dh-game-genres button{border-color:#ffffff25!important;color:#f0e5e6!important}
+.dh-game-genres button:hover,.dh-game-genres button.active{background:#ffad8730!important;border-color:#ffad87!important;color:#ffe0cb!important}
+.dh-daily-section{background:linear-gradient(120deg,#3d2a35,#2a443d)!important;border-color:#ffffff30!important}
+.dh-daily-quick{border-color:#ffffff2b!important}
+.dh-daily-quick.rune{background:linear-gradient(140deg,#382c48,#252d3a)!important}
+.dh-daily-quick b{color:#a6f0ce}
+.dh-daily-quickgrid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.community-card{background:linear-gradient(145deg,#2d2938,#202a30)!important;border-color:#ffffff27!important}
+.community-card:hover{border-color:#d1b4ff!important}
+.community-category{background:#b79aff25!important;border-color:#c9b1ff55!important;color:#e0d2ff!important}
+.community-popularity{color:#a6dfff!important}
+@media(max-width:900px){.dh-daily-quickgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:600px){.dh-daily-quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
 </head>
 
@@ -2356,12 +2384,10 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
     <nav class="games-discovery-nav" aria-label="Browse game sections">
       <a class="games-discovery-link active" href="#trendingSection"><span>⌁</span> Discover</a>
       <a class="games-discovery-link" href="#trendingSection"><span>↗</span> Popular</a>
-      <a class="games-discovery-link" href="#doug-games"><span>▣</span> DougHub Originals</a>
       <a class="games-discovery-link" href="#community-games"><span>◈</span> Community Games</a>
-      <a class="games-discovery-create" href="Scripting/scripting.html">＋ Create a game</a>
     </nav>
 
-<section class="dh-daily-section" id="daily-games"><div class="dh-daily-head"><div><div class="dh-daily-kicker"><span></span> DAILY ARCADE</div><h2>Quick daily games</h2><p>Four short challenges. Earn credits and come back after the UTC reset.</p></div><div class="dh-daily-date"><small>DATABASE RESET</small><strong id="dhDailyCountdown">--:--:--</strong><span id="dhDailyDate">SYNCING UTC</span></div></div><div class="dh-daily-quickgrid"><a class="dh-daily-quick wordle" href="Games/wordle.html"><img src="Games/art/wordle.svg" alt=""><span><strong>Wordle</strong><small>Five-letter puzzle</small></span><b>+25</b></a><a class="dh-daily-quick match" href="Games/daily-arcade.html?game=match"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt=""><span><strong>Daily Match</strong><small>Find the pairs</small></span><b>+15</b></a><a class="dh-daily-quick sequence" href="Games/daily-arcade.html?game=sequence"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt=""><span><strong>Sequence</strong><small>Remember the pattern</small></span><b>+15</b></a><a class="dh-daily-quick trivia" href="Games/daily-arcade.html?game=trivia"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt=""><span><strong>Daily Trivia</strong><small>Five quick questions</small></span><b>+15</b></a></div><div class="dh-daily-progress"><div><span id="dhChallengeCount">0 / 4 CLAIMED</span><div class="dh-daily-progress-track" id="dhChallengeProgress" role="progressbar" aria-label="Daily rewards claimed" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><i id="dhChallengeFill"></i></div></div><a href="Games/journey.html">VIEW GAME JOURNEY ↗</a></div></section>
+<section class="dh-daily-section" id="daily-games"><div class="dh-daily-head"><div><div class="dh-daily-kicker"><span></span> DAILY ARCADE</div><h2>Quick daily games</h2><p>Five short challenges. Earn credits and return after the daily reset.</p></div><div class="dh-daily-date"><small>DAILY RESET</small><strong id="dhDailyCountdown">--:--:--</strong><span id="dhDailyDate">SYNCING UTC</span></div></div><div class="dh-daily-quickgrid"><a class="dh-daily-quick wordle" href="Games/wordle.html"><img src="Games/art/wordle.svg" alt=""><span><strong>Wordle</strong><small>Five-letter puzzle</small></span><b>+25</b></a><a class="dh-daily-quick match" href="Games/daily-arcade.html?game=match"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt=""><span><strong>Daily Match</strong><small>Find the pairs</small></span><b>+15</b></a><a class="dh-daily-quick sequence" href="Games/daily-arcade.html?game=sequence"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt=""><span><strong>Sequence</strong><small>Remember the pattern</small></span><b>+15</b></a><a class="dh-daily-quick trivia" href="Games/daily-arcade.html?game=trivia"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt=""><span><strong>Daily Trivia</strong><small>Five quick questions</small></span><b>+15</b></a><a class="dh-daily-quick rune" href="Games/rune-decode.html"><img src="Games/art/rune-decode.svg" alt=""><span><strong>Rune Decoder</strong><small>Crack the daily code</small></span><b>+20</b></a></div><div class="dh-daily-progress><div><span id="dhChallengeCount">0 / 4 CLAIMED</span><div class="dh-daily-progress-track" id="dhChallengeProgress" role="progressbar" aria-label="Daily rewards claimed" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><i id="dhChallengeFill"></i></div></div><a href="Games/journey.html">VIEW GAME JOURNEY ↗</a></div></section>
 <section class="dh-collectibles-link" style="margin:24px 0 42px;padding:22px;border:1px solid #ffffff18;border-radius:20px;background:linear-gradient(120deg,#24285a,#151a36);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"><div><small style="color:#aaa1ff;font-weight:900;letter-spacing:.15em">THE CHARACTER COLLECTION</small><h2 style="margin:8px 0 5px">Collect. Customize. Show off.</h2><p style="margin:0;color:#aeb4d4;font-size:12px">Browse animal collections in the separate shop, then build your own character.</p></div><div style="display:flex;gap:9px;flex-wrap:wrap"><a href="Games/shop.html" style="padding:11px 15px;border-radius:10px;background:linear-gradient(120deg,#7774ff,#a65ce9);font-size:11px;font-weight:900">OPEN SHOP ↗</a><a href="Games/character-editor.html" style="padding:11px 15px;border-radius:10px;background:#ffffff13;border:1px solid #ffffff20;font-size:11px;font-weight:900">CHARACTER EDITOR</a></div></section>
 
 
@@ -2397,6 +2423,7 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
             <button type="button" data-genre="driving">Driving</button>
             <button type="button" data-genre="clicker">Clicker</button>
             <button type="button" data-genre="arcade">Arcade</button>
+            <button type="button" data-genre="credits">Credits</button>
           </div>
           <p class="dh-game-results" id="dhGameResults" aria-live="polite">Browse by genre or search by name.</p>
         </div>
@@ -2553,6 +2580,27 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
                 <p>Keep the ball moving, steer your paddle, and clear every block.</p>
                 <div class="play-label">BREAK THE BLOCKS →</div>
             </a>
+
+            <a href="Games/wordle.html" class="game-card" data-genre="credits" data-credit-game="true">
+                <div class="game-icon"><img src="Games/art/wordle.svg" alt="Wordle icon"></div>
+                <h3>Wordle</h3><p>Solve the daily five-letter word to earn 25 credits once per day.</p><div class="play-label">DAILY REWARD · +25 →</div>
+            </a>
+            <a href="Games/daily-arcade.html?game=match" class="game-card" data-genre="credits" data-credit-game="true">
+                <div class="game-icon"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt="Daily Match icon"></div>
+                <h3>Daily Match</h3><p>Find the matching pairs and collect 15 credits once per day.</p><div class="play-label">DAILY REWARD · +15 →</div>
+            </a>
+            <a href="Games/daily-arcade.html?game=sequence" class="game-card" data-genre="credits" data-credit-game="true">
+                <div class="game-icon"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt="Sequence icon"></div>
+                <h3>Sequence</h3><p>Remember the pattern and earn 15 credits once per day.</p><div class="play-label">DAILY REWARD · +15 →</div>
+            </a>
+            <a href="Games/daily-arcade.html?game=trivia" class="game-card" data-genre="credits" data-credit-game="true">
+                <div class="game-icon"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt="Daily Trivia icon"></div>
+                <h3>Daily Trivia</h3><p>Answer five quick questions and earn 15 credits once per day.</p><div class="play-label">DAILY REWARD · +15 →</div>
+            </a>
+            <a href="Games/rune-decode.html" class="game-card" data-genre="credits" data-credit-game="true">
+                <div class="game-icon"><img src="Games/art/rune-decode.svg" alt="Rune Decoder icon"></div>
+                <h3>Rune Decoder</h3><p>Decode the daily rune word and earn 20 credits once per day.</p><div class="play-label">DAILY REWARD · +20 →</div>
+            </a>
             
 
         </div>
@@ -2606,9 +2654,10 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
                 type="search"
                 id="gameSearch"
                 class="search-box"
-                name="q"
-                placeholder="Search DougHub..."
-                autocomplete="off"
+                name="site-search"
+                 placeholder="Search community games..."
+                 autocomplete="new-password"
+                 data-search-input
                 autocorrect="off"
                 autocapitalize="off"
                 spellcheck="false"
@@ -2617,7 +2666,6 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
                 data-form-type="other"
                 data-lpignore="true"
                 data-1p-ignore="true"
-                readonly
               >
               <select id="gameFilter" aria-label="Filter community games">
                 <option value="all">All games</option>
@@ -3198,7 +3246,7 @@ async function updateGameCount() {
     }
 
     /* Keep this number in one place: these are the built-in games. */
-    const BUILT_IN_GAME_COUNT = 7;
+    const BUILT_IN_GAME_COUNT = document.querySelectorAll("#doug-games .games-grid > .game-card").length || 7;
 
     const {
         count,
@@ -4168,7 +4216,7 @@ updateFeedbackCount();
 
 
 
-<script id="DOUGHUB_DAILY_CHALLENGE_BAR">(function(){if(!window.supabase)return;const db=window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"),$=id=>document.getElementById(id);let date="",serverNow=0,nextReset=0,perfAt=0,timer=null;function tick(){const now=serverNow+(performance.now()-perfAt),s=Math.max(0,Math.floor((nextReset-now)/1000));$("dhDailyCountdown").textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,"0")).join(":");if(s===0)location.reload();}async function sync(){const {data,error}=await db.rpc("dh_get_daily_status");if(error)throw error;if(date&&date!==data.server_date){location.reload();return;}date=data.server_date;serverNow=Date.parse(data.server_now);nextReset=Date.parse(data.next_reset);perfAt=performance.now();$("dhDailyDate").textContent="UTC · "+date;const claimed=data.claimed_games||[],n=["wordle","match","sequence","trivia"].filter(id=>claimed.includes(id)).length;$("dhChallengeCount").textContent=n+" / 4 CLAIMED";$("dhChallengeFill").style.width=(n/4*100)+"%";$("dhChallengeProgress").setAttribute("aria-valuenow",String(n));const note=document.getElementById("dhWordleStatus");if(note){note.textContent=claimed.includes("wordle")?"REWARD CLAIMED":"AVAILABLE NOW";note.classList.toggle("live",true);}tick();if(timer)clearInterval(timer);timer=setInterval(tick,1000);}sync().catch(e=>{console.warn("Daily UTC status:",e);$("dhDailyDate").textContent="UTC CLOCK UNAVAILABLE";$("dhDailyCountdown").textContent="--:--:--";});window.addEventListener("focus",()=>sync().catch(()=>{}));})();</script>
+<script id="DOUGHUB_DAILY_CHALLENGE_BAR">(function(){if(!window.supabase)return;const db=window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"),$=id=>document.getElementById(id);let date="",serverNow=0,nextReset=0,perfAt=0,timer=null;function tick(){const now=serverNow+(performance.now()-perfAt),s=Math.max(0,Math.floor((nextReset-now)/1000));$("dhDailyCountdown").textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,"0")).join(":");if(s===0)location.reload();}async function sync(){const {data,error}=await db.rpc("dh_get_daily_status");if(error)throw error;if(date&&date!==data.server_date){location.reload();return;}date=data.server_date;serverNow=Date.parse(data.server_now);nextReset=Date.parse(data.next_reset);perfAt=performance.now();$("dhDailyDate").textContent="UTC · "+date;const claimed=data.claimed_games||[],n=["wordle","match","sequence","trivia","rune_decode"].filter(id=>claimed.includes(id)).length;$("dhChallengeCount").textContent=n+" / 4 CLAIMED";$("dhChallengeFill").style.width=(n/5*100)+"%";$("dhChallengeProgress").setAttribute("aria-valuenow",String(n));const note=document.getElementById("dhWordleStatus");if(note){note.textContent=claimed.includes("wordle")?"REWARD CLAIMED":"AVAILABLE NOW";note.classList.toggle("live",true);}tick();if(timer)clearInterval(timer);timer=setInterval(tick,1000);}sync().catch(e=>{console.warn("Daily UTC status:",e);$("dhDailyDate").textContent="UTC CLOCK UNAVAILABLE";$("dhDailyCountdown").textContent="--:--:--";});window.addEventListener("focus",()=>sync().catch(()=>{}));})();</script>
 <script id="dh-game-genre-script">
 (()=>{
  const root=document.getElementById("dhGameBrowser");
