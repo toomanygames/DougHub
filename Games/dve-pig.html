@@ -79,14 +79,15 @@ button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3p
 <canvas id="c"></canvas>
 <div id="dmg">Total damage: 0</div>
 <button id="reset">Reset</button>
-<button id="homeBtn">🏠 Kaicade</button>
+<button id="homeBtn">← Games</button>
 
 <script>
 document.getElementById("homeBtn").addEventListener("click", () => {
+  const gamesUrl = new URL("../douggames.html", window.location.href).href;
   if (window.parent !== window) {
-    window.parent.postMessage({ type: "kaicade-home" }, "*");
+    window.parent.location.href = gamesUrl;
   } else {
-    window.location.href = "kaicade.html";
+    window.location.href = gamesUrl;
   }
 });
 </script>
