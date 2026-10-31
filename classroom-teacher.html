@@ -18,11 +18,13 @@
 <section class="panel"><h2>＋ Create a class</h2><form id="createClassForm"><div class="field"><label for="newClassName">CLASS NAME</label><input id="newClassName" maxlength="80" placeholder="e.g. Room 204 · Explorers" required></div><div class="field"><label for="newClassGrade">GRADE</label><select id="newClassGrade" required><option value="4">4th Grade</option><option value="5">5th Grade</option><option value="6">6th Grade</option><option value="7">7th Grade</option><option value="8">8th Grade</option></select></div><button class="btn" id="createClassButton" type="submit">Create classroom</button><div id="createClassStatus" class="chat-status"></div></form></section>
 </aside>
 <main class="stack">
+<div id="classManagementTools" hidden>
 <section class="panel"><div class="panel-head"><div><h2 id="selectedClassTitle">Select a class</h2><p id="selectedClassMeta">Your classroom management tools will appear here.</p></div><span class="pill mint" id="selectedClassBadge">TEACHER VIEW</span></div><div id="teacherReminderDisplay" class="notice">No reminder set.</div><form id="reminderForm"><div class="field"><label for="teacherReminder">CLASS REMINDER</label><textarea id="teacherReminder" maxlength="500" placeholder="e.g. Bring your reading journal tomorrow."></textarea></div><button class="btn soft" type="submit" id="saveReminderButton">Save reminder</button><span class="chat-status" id="reminderStatus"></span></form></section>
 <section class="panel"><div class="panel-head"><div><h2>👩‍🎓 Student roster</h2><p>Add a DougHub username. Every request waits for Owner verification before the student can enter.</p></div><span class="pill orange">1–7 BUSINESS DAYS</span></div><form id="addStudentForm" style="display:flex;gap:9px;flex-wrap:wrap"><input id="studentUsername" class="search-field" style="flex:1;min-width:190px" maxlength="30" placeholder="Student's DougHub username" required><button class="btn" id="addStudentButton" type="submit">Request student</button></form><div class="notice warm" style="margin-top:12px">Student access is not immediate. The DougHub Owner must verify that the selected account is actually your student. Requests can take 1–7 business days.</div><div id="rosterList" style="margin-top:12px"><div class="empty">Choose a class to view its roster.</div></div></section>
 <section class="panel"><div class="panel-head"><div><h2>🛡️ Word filter & classroom safety</h2><p>Manage blocked words and review frequently used possible variations detected in class chat.</p></div><span class="pill pink">TEACHER ONLY</span></div><form id="bannedWordForm" style="display:flex;gap:9px;flex-wrap:wrap"><input id="bannedWordInput" class="search-field" style="flex:1;min-width:180px" maxlength="60" placeholder="Add a word to the class filter" required><button class="btn pink" type="submit">Add banned word</button></form><div id="bannedWordsList" style="margin-top:8px"><div class="empty">Choose a class to manage its word filter.</div></div><div style="height:1px;background:#eeeef7;margin:18px 0"></div><div class="panel-head"><div><h2>Possible filter workarounds</h2><p>Pattern review from recent class messages. Suggestions are automated hints, not proof of intent.</p></div><span class="pill orange" id="wordRadarCount">SCANNING</span></div><div id="wordRadar" class="notice">Choose a class to scan recent chat messages.</div></section>
 <section class="panel"><div class="panel-head"><div><h2>💬 Classroom chat</h2><p>View the class conversation and send announcements.</p></div><span class="pill">CLASS ONLY</span></div><div id="teacherChatMessages" class="chat-box"><div class="empty">Choose a class to load messages.</div></div><form id="teacherChatForm" class="chat-compose"><input id="teacherChatInput" maxlength="1000" placeholder="Message your class…" required><button class="btn" id="teacherSendChat" type="submit">Send</button></form><div id="teacherChatStatus" class="chat-status"></div></section>
 <section class="panel"><div class="panel-head"><div><h2>⏸️ Session controls</h2><p>End the student session temporarily. Students will see a clear message and the room will reopen automatically after five minutes.</p></div><span class="pill orange" id="sessionStatusBadge">SESSION LIVE</span></div><button class="btn danger" id="endClassSession" type="button">End student session</button><div id="sessionControlStatus" class="chat-status">Students can currently use this classroom.</div></section>
+</div>
 </main>
 </div>
 </div>
@@ -33,7 +35,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),C=window.DHClassroom;
-let db,user,profile,classes=[],activeClass=null,chatTimer=null,scanTimer=null,sessionTimer=null;
+let db,user,profile,classes=[],activeClass=null,chatTimer=null,scanTimer=null,sessionTimer=null,resumeInFlight=false,isOwner=false,classTeacherNames={};
 const say=(id,msg)=>$(id).textContent=msg;
 function normalize(s){return String(s||"").toLowerCase().replace(/[@]/g,"a").replace(/[4]/g,"a").replace(/[3]/g,"e").replace(/[0]/g,"o").replace(/[1!]/g,"i").replace(/[$5]/g,"s").replace(/[7]/g,"t").replace(/[8]/g,"b").replace(/[^a-z0-9]/g,"").replace(/(.)\1+/g,"$1");}
 function distance(a,b){const row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return row[b.length];}
@@ -46,8 +48,8 @@ async function boot(){
   const {data:p,error:pe}=await db.from("profiles").select("username,account_type,teacher_verified,is_owner,staff_role").eq("id",user.id).maybeSingle();if(pe)throw pe;profile=p||{};
   $("teacherLabel").textContent=profile.username||"Teacher workspace";
   const {data:application}=await db.from("classroom_teacher_applications").select("id,status").eq("user_id",user.id).maybeSingle();
-  const owner=profile.is_owner===true||String(profile.staff_role||"").toLowerCase()==="owner";
-  if(!(profile.account_type==="teacher"&&profile.teacher_verified===true)&&!owner){
+  isOwner=profile.is_owner===true||String(profile.staff_role||"").toLowerCase()==="owner";
+  if(!(profile.account_type==="teacher"&&profile.teacher_verified===true)&&!isOwner){
    if(application?.status==="pending")showApplication("Your teacher verification request is waiting for the DougHub Owner. You can check back here later.",false);
    else if(application?.status==="rejected")showApplication("Your previous teacher verification request was not approved. Contact the Owner if you think this was a mistake.",true);
    else showApplication("Teacher tools are locked until the DougHub Owner verifies your account. Request verification below to get started.",true);
@@ -64,12 +66,25 @@ $("requestTeacherAccess").addEventListener("click",async()=>{
  say("teacherApplyStatus","Request sent. The DougHub Owner will review it. Please allow time for verification.");b.hidden=true;
 });
 async function loadClasses(){
- const {data,error}=await db.from("classroom_spaces").select("*").eq("teacher_id",user.id).order("created_at",{ascending:true});if(error)throw error;
- classes=data||[];renderClassList();if(classes.length)await selectClass(classes[0].id);
+ let query=db.from("classroom_spaces").select("*").order("created_at",{ascending:true});
+ if(!isOwner)query=query.eq("teacher_id",user.id);
+ const {data,error}=await query;if(error)throw error;
+ classes=data||[];
+ classTeacherNames={};
+ if(isOwner&&classes.length){
+  const ids=[...new Set(classes.map(c=>c.teacher_id))];
+  const {data:teachers,error:teacherError}=await db.from("profiles").select("id,username").in("id",ids);
+  if(teacherError)throw teacherError;
+  (teachers||[]).forEach(x=>classTeacherNames[x.id]=x.username||"Teacher");
+ }
+ $("classManagementTools").hidden=!classes.length;
+ renderClassList();
+ if(classes.length)await selectClass(classes[0].id);
+ else {activeClass=null;say("createClassStatus","Create a classroom to unlock its roster, reminders, chat, word filters, and session controls.");}
 }
 function renderClassList(){
  const box=$("teacherClassList");if(!classes.length){box.innerHTML='<div class="empty">No classes yet. Create your first class below.</div>';return;}
- box.innerHTML=classes.map(c=>'<button class="class-choice '+(activeClass?.id===c.id?'active':'')+'" data-class-id="'+C.esc(c.id)+'"><strong>'+C.esc(c.class_name)+'</strong><small>Grade '+c.grade+' · '+(c.session_active?'Session live':'Session paused')+'</small></button>').join("");
+ box.innerHTML=classes.map(c=>'<button class="class-choice '+(activeClass?.id===c.id?'active':'')+'" data-class-id="'+C.esc(c.id)+'"><strong>'+C.esc(c.class_name)+'</strong><small>Grade '+c.grade+' · '+(c.session_active?'Session live':'Session paused')+(isOwner?' · '+C.esc(classTeacherNames[c.teacher_id]||"Teacher"):'')+'</small></button>').join("");
  box.querySelectorAll("[data-class-id]").forEach(b=>b.addEventListener("click",()=>selectClass(b.dataset.classId)));
 }
 $("createClassForm").addEventListener("submit",async e=>{
@@ -77,11 +92,13 @@ $("createClassForm").addEventListener("submit",async e=>{
  const b=$("createClassButton");b.disabled=true;say("createClassStatus","Creating classroom…");
  const {data,error}=await db.from("classroom_spaces").insert({teacher_id:user.id,class_name:name,grade}).select("*").single();
  b.disabled=false;if(error){say("createClassStatus",error.message);return;}
- $("newClassName").value="";say("createClassStatus","Class created.");classes.push(data);renderClassList();await selectClass(data.id);
+ $("newClassName").value="";say("createClassStatus","Class created.");classes.push(data);$("classManagementTools").hidden=false;renderClassList();await selectClass(data.id);
 });
 async function selectClass(id){
  activeClass=classes.find(c=>c.id===id);if(!activeClass)return;
- $("selectedClassTitle").textContent=activeClass.class_name;$("selectedClassMeta").textContent="Grade "+activeClass.grade+" · Created "+new Date(activeClass.created_at).toLocaleDateString();
+ $("classManagementTools").hidden=false;
+ if(sessionTimer)clearInterval(sessionTimer);$("teacherEndedOverlay").hidden=true;
+ $("selectedClassTitle").textContent=activeClass.class_name;$("selectedClassMeta").textContent="Grade "+activeClass.grade+" · Created "+new Date(activeClass.created_at).toLocaleDateString()+(isOwner?" · Teacher: "+(classTeacherNames[activeClass.teacher_id]||"Unknown"):"");
  $("teacherReminder").value=activeClass.reminder||"";$("teacherReminderDisplay").textContent=activeClass.reminder||"No reminder set. Add one to share it with your students.";
  renderClassList();await Promise.all([loadRoster(),loadBannedWords(),loadTeacherChat(),scanWordRadar()]);
  if(chatTimer)clearInterval(chatTimer);chatTimer=setInterval(loadTeacherChat,5000);
@@ -165,23 +182,37 @@ function updateSessionControls(){
 }
 $("endClassSession").addEventListener("click",async()=>{
  if(!activeClass||!confirm("End the student session? Students will see a message and the classroom will reopen automatically in five minutes."))return;
- const now=Date.now(),resume=new Date(now+5*60*1000).toISOString();
- const {error}=await db.from("classroom_spaces").update({session_active:false,session_ended_at:new Date(now).toISOString(),session_resume_at:resume,updated_at:new Date().toISOString()}).eq("id",activeClass.id);
- if(error){say("sessionControlStatus",error.message);return;}
- activeClass.session_active=false;activeClass.session_resume_at=resume;updateSessionControls();showTeacherEnded();
+ const {data,error}=await db.rpc("end_classroom_session",{p_classroom_id:activeClass.id});
+ if(error){say("sessionControlStatus","Could not end the session: "+error.message);return;}
+ if(data!==true){say("sessionControlStatus","The session is already paused or this account cannot manage it.");return;}
+ const now=new Date().toISOString(),resume=new Date(Date.now()+5*60*1000).toISOString();
+ activeClass.session_active=false;activeClass.session_ended_at=now;activeClass.session_resume_at=resume;updateSessionControls();showTeacherEnded();
 });
 function showTeacherEnded(){
  $("teacherEndedOverlay").hidden=false;const tick=async()=>{
-  const remain=Math.max(0,new Date(activeClass.session_resume_at).getTime()-Date.now()),s=Math.ceil(remain/1000);
+  const target=Date.parse(activeClass?.session_resume_at||"");
+  if(!Number.isFinite(target)){$("teacherCountdown").textContent="--:--";return;}
+  const remain=Math.max(0,target-Date.now()),s=Math.ceil(remain/1000);
   $("teacherCountdown").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
   if(remain<=0)await resumeClass();
  };
  tick();if(sessionTimer)clearInterval(sessionTimer);sessionTimer=setInterval(tick,1000);
 }
 async function resumeClass(){
- if(!activeClass)return;const {error}=await db.from("classroom_spaces").update({session_active:true,session_resume_at:null,updated_at:new Date().toISOString()}).eq("id",activeClass.id);
- if(error){say("teacherEndedStatus","Could not reopen automatically: "+error.message);return;}
- activeClass.session_active=true;activeClass.session_resume_at=null;$("teacherEndedOverlay").hidden=true;if(sessionTimer)clearInterval(sessionTimer);updateSessionControls();renderClassList();
+ if(!activeClass||resumeInFlight)return;
+ resumeInFlight=true;$("continueClassSession").disabled=true;
+ try{
+  const {data,error}=await db.rpc("resume_due_classroom",{p_classroom_id:activeClass.id});
+  if(error)throw error;
+  if(data!==true){
+   const {data:latest,error:readError}=await db.from("classroom_spaces").select("session_active,session_resume_at,session_ended_at").eq("id",activeClass.id).maybeSingle();
+   if(readError)throw readError;
+   if(!latest?.session_active){say("teacherEndedStatus","The classroom could not be reopened. Check your access and try again.");return;}
+  }
+  activeClass.session_active=true;activeClass.session_resume_at=null;activeClass.session_ended_at=null;
+  $("teacherEndedOverlay").hidden=true;if(sessionTimer)clearInterval(sessionTimer);updateSessionControls();renderClassList();
+ }catch(error){say("teacherEndedStatus","Could not reopen the classroom: "+(error.message||"Please try again."));}
+ finally{resumeInFlight=false;$("continueClassSession").disabled=false;}
 }
 $("continueClassSession").addEventListener("click",resumeClass);
 boot();
