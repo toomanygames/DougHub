@@ -392,47 +392,55 @@
 
 <script src="../game-art.js" defer></script>
 <style id="DOUGHUB_PIG_RESTYLE">
-:root{color-scheme:light}
-html,body{background:radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.78),transparent 34%),radial-gradient(ellipse at 86% 82%,rgba(251,146,60,.32),transparent 35%),linear-gradient(135deg,#fff1e6 0%,#ffd5e5 48%,#ffc88d 100%)!important;color:#542b35!important}
+:root{color-scheme:dark}
+html,body{background:radial-gradient(ellipse at 18% 5%,#34306b 0,transparent 38%),radial-gradient(ellipse at 90% 90%,#54234f 0,transparent 34%),#080b19!important;color:#f4f2ff!important}
 body{padding:12px!important}
-.screen{width:min(1120px,100%)!important;height:calc(100dvh - 24px)!important;max-height:940px!important;border:1px solid rgba(154,67,85,.22)!important;border-radius:26px!important;background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(255,239,225,.76))!important;box-shadow:0 24px 70px rgba(112,49,64,.2),inset 0 1px rgba(255,255,255,.9)!important;backdrop-filter:blur(18px)}
-.topbar{min-height:68px;padding:12px 20px!important;background:linear-gradient(90deg,#fff8ed,#ffe1e9)!important;border-bottom:1px solid rgba(154,67,85,.16)!important;color:#542b35!important}
-.coins{color:#7c2d48!important;font-weight:950}
-.btn{background:linear-gradient(180deg,#fffdf8,#ffe7d2)!important;color:#713348!important;border:1px solid rgba(153,67,91,.2)!important;box-shadow:0 5px 0 rgba(156,75,91,.14),0 9px 18px rgba(112,49,64,.1)!important;cursor:pointer;transition:transform .15s ease,filter .15s ease}
-.btn:hover{filter:brightness(1.03);transform:translateY(-1px)}
-.content{min-height:0}
-.left{position:relative;background:radial-gradient(ellipse at 50% 44%,rgba(255,255,255,.58),transparent 56%);padding:24px!important}
-.pig-wrap{width:min(62vw,350px)!important}
-.pig{border:5px solid rgba(255,255,255,.78)!important;border-radius:38px!important;background:radial-gradient(circle at 32% 25%,#fff 0%,#ffe9b9 25%,#ffb5c8 72%,#ed8eaa 100%)!important;box-shadow:inset 0 8px 24px rgba(255,255,255,.72),0 20px 42px rgba(151,69,86,.24)!important;cursor:pointer}
-.tap{color:#7c2d48!important;font-weight:950;text-shadow:0 2px rgba(255,255,255,.7)}
-.right{width:min(39vw,410px)!important;padding:16px!important;background:rgba(255,246,239,.56)!important;border-left:1px solid rgba(154,67,85,.14)!important;scrollbar-width:thin;scrollbar-color:#d76b91 #f9e2dc;overscroll-behavior:contain}
-.panel{background:rgba(255,255,255,.78)!important;border:1px solid rgba(161,78,98,.15)!important;border-radius:19px!important;box-shadow:0 7px 20px rgba(112,49,64,.07)!important;color:#542b35!important}
-.panel h3{color:#8c3655!important;letter-spacing:.08em}
-.stat,.upg,.achievement{background:linear-gradient(145deg,#fffaf5,#ffedf0)!important;border:1px solid rgba(161,78,98,.13)!important;color:#542b35!important}
-.stat{box-shadow:inset 0 1px rgba(255,255,255,.9)}
-.stat strong,.upg-name,.achievement .title{color:#713348!important}
-.upg-cost,.achievement .reward{color:#855b64!important}
-.upg-icon{background:linear-gradient(145deg,#fff,#ffe0e8)!important;border-color:rgba(161,78,98,.15)!important}
-.upg-btn{background:linear-gradient(180deg,#ffd66e,#f4a936)!important;color:#603819!important;border:1px solid rgba(155,94,29,.18)!important;box-shadow:0 3px 0 rgba(156,91,25,.18);cursor:pointer}
-.upg-btn:disabled{filter:grayscale(.35);opacity:.55}
-.fever-hud{left:24px!important;bottom:22px!important;width:min(230px,30vw)!important;padding:10px 12px;border:1px solid rgba(161,78,98,.15);border-radius:14px;background:rgba(255,250,245,.86);box-shadow:0 8px 24px rgba(112,49,64,.1)}
-.fever-hud .fever-label{color:#8c3655!important}
-.fever-bar{background:#f4d9dd!important}
-.fever-fill{background:linear-gradient(90deg,#fb7185,#f59e0b)!important}
-#rebirthButton{background:linear-gradient(180deg,#a85575,#713348)!important;color:#fff!important;border:1px solid rgba(113,51,72,.25)!important;box-shadow:0 4px 0 rgba(83,35,53,.2)!important}
-.right::-webkit-scrollbar{width:10px}
-.right::-webkit-scrollbar-track{background:#f9e2dc;border-radius:99px}
-.right::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#e88cac,#c56b7d);border:2px solid #f9e2dc;border-radius:99px}
-@media(max-width:700px){body{padding:6px!important}.screen{height:calc(100dvh - 12px)!important;border-radius:19px!important}.topbar{min-height:58px;padding:9px 12px!important}.content{flex-direction:column}.left{flex:0 0 43%;min-height:230px;padding:12px 12px 44px!important;gap:8px}.pig-wrap{width:min(34vh,220px)!important;max-width:55vw}.right{flex:1 1 57%;width:100%!important;min-height:0;border-left:0!important;border-top:1px solid rgba(154,67,85,.14)!important;padding:10px 12px 18px!important}.fever-hud{position:absolute;left:14px!important;bottom:calc(57% + 8px)!important;width:min(190px,48vw)!important;padding:6px 9px}.fever-hud .fever-label{font-size:11px}.fever-bar{height:9px}}
-@media(max-height:620px) and (min-width:701px){.left{padding:10px!important;gap:8px}.pig-wrap{width:min(45vh,260px)!important}.fever-hud{bottom:12px!important}}
+.screen{width:min(1180px,100%)!important;height:calc(100dvh - 24px)!important;max-height:960px!important;border:1px solid #ffffff20!important;border-radius:24px!important;background:linear-gradient(145deg,#171b36f2,#0c1025f5)!important;box-shadow:0 28px 80px #0008,inset 0 1px #ffffff12!important;backdrop-filter:blur(18px)}
+.topbar{min-height:72px;padding:12px 20px!important;gap:16px;background:#0b1025d9!important;border-bottom:1px solid #ffffff16!important;color:#f4f2ff!important}
+.dh-game-brand{display:flex;align-items:center;gap:10px;min-width:0;color:#fff;font-size:15px;font-weight:950;letter-spacing:-.03em}
+.dh-game-brand img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 4px 9px #0006)}
+.dh-game-brand small{display:block;margin-top:2px;color:#969fc4;font-size:8px;font-weight:900;letter-spacing:.16em}
+.coins{margin-left:auto;color:#ffe39a!important;font-size:clamp(19px,3vw,27px);font-weight:950;font-variant-numeric:tabular-nums}
+.btn{border:1px solid #ffffff25!important;border-radius:11px!important;padding:10px 15px!important;background:linear-gradient(135deg,#252b54,#30234f)!important;color:#f4f2ff!important;box-shadow:0 5px 18px #0003!important;cursor:pointer}
+.btn:hover{border-color:#a99aff88!important;background:linear-gradient(135deg,#343c70,#50316c)!important}
+.content{min-height:0;gap:0}
+.left{position:relative;flex:1.15;padding:clamp(16px,3vw,34px)!important;gap:15px;background:radial-gradient(ellipse at 50% 42%,#6b5dd01c,transparent 58%)}
+.pig-wrap{width:min(58vw,360px)!important}
+.pig{border:5px solid #ffffff20!important;border-radius:34px!important;background:radial-gradient(circle at 32% 24%,#fff4f8 0%,#ffc1d5 28%,#df78ad 72%,#844caa 100%)!important;box-shadow:inset 0 9px 24px #fff8,0 24px 55px #0006,0 0 45px #e879f933!important;cursor:pointer}
+.pig:active{transform:scale(.965)}
+.tap{color:#f5eaff!important;font-weight:950;text-shadow:0 3px 18px #a78bfa55}
+.fever-hud{left:24px!important;bottom:22px!important;width:min(240px,32vw)!important;padding:11px 13px;border:1px solid #ffffff20;border-radius:14px;background:#101630e8;box-shadow:0 10px 28px #0005}
+.fever-hud .fever-label{color:#c7bcff!important}
+.fever-bar{height:12px;background:#ffffff17!important;border:1px solid #ffffff1c!important}
+.fever-fill{background:linear-gradient(90deg,#8b5cf6,#ec4899,#f59e0b)!important}
+.right{width:min(40vw,430px)!important;padding:16px!important;background:#0a0f22b8!important;border-left:1px solid #ffffff16!important;scrollbar-width:thin;scrollbar-color:#6257ad #11162d;overscroll-behavior:contain}
+.panel{padding:14px!important;margin-bottom:12px!important;border:1px solid #ffffff17!important;border-radius:17px!important;background:linear-gradient(145deg,#1a2040,#11162d)!important;box-shadow:0 10px 25px #0002!important;color:#eef0ff!important}
+.panel h3{color:#b9adff!important;font-size:11px!important;letter-spacing:.14em!important}
+.stat,.upg,.achievement{border:1px solid #ffffff12!important;border-radius:12px!important;background:#ffffff08!important;color:#f0efff!important}
+.stat{padding:11px!important;color:#aab2d0!important}
+.stat strong{color:#fff!important;font-size:20px!important}
+.upg{min-height:64px!important;padding:9px!important}
+.upg.locked,.achievement.locked{opacity:.42}
+.upg-icon{background:linear-gradient(145deg,#343a68,#252047)!important;border:1px solid #ffffff18!important}
+.upg-name,.achievement .title{color:#f5f2ff!important}
+.upg-cost,.achievement .reward{color:#aab2d0!important}
+.upg-btn{min-width:76px;background:linear-gradient(120deg,#7c6cff,#b15bd2)!important;color:#fff!important;border:1px solid #ffffff25!important;box-shadow:0 4px 12px #0003;cursor:pointer}
+.upg-btn:disabled{filter:grayscale(.55);opacity:.48}
+#rebirthButton{background:linear-gradient(120deg,#d39b42,#9b642d)!important;color:#fff!important;border:1px solid #f5d18b55!important;box-shadow:0 4px 15px #0004!important}
+.right::-webkit-scrollbar{width:9px}
+.right::-webkit-scrollbar-track{background:#11162d;border-radius:99px}
+.right::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#8b7cf6,#bd5bba);border:2px solid #11162d;border-radius:99px}
+@media(max-width:700px){body{padding:5px!important}.screen{height:calc(100dvh - 10px)!important;border-radius:17px!important}.topbar{min-height:56px;padding:8px 10px!important;gap:8px}.dh-game-brand{font-size:12px;gap:7px}.dh-game-brand img{width:28px;height:28px}.dh-game-brand small{font-size:7px}.coins{font-size:18px}.btn{padding:8px 10px!important;font-size:12px}.content{flex-direction:column}.left{flex:0 0 42%;min-height:220px;padding:10px 10px 46px!important;gap:7px}.pig-wrap{width:min(31vh,210px)!important;max-width:54vw}.pig{border-radius:26px!important}.tap{font-size:18px}.right{flex:1 1 58%;width:100%!important;min-height:0;border-left:0!important;border-top:1px solid #ffffff16!important;padding:9px 10px 15px!important}.panel{padding:10px!important;margin-bottom:9px!important}.panel h3{margin-bottom:8px;font-size:10px!important}.stats{gap:6px}.stat{padding:7px!important;font-size:10px}.stat strong{font-size:16px!important}.upg{min-height:55px!important;padding:7px!important}.upg-icon{width:34px;height:34px;flex-basis:34px;font-size:21px}.upg-name{font-size:13px}.upg-cost{font-size:10px}.upg-btn{min-width:65px;padding:8px 7px;font-size:10px}.fever-hud{position:absolute;left:12px!important;bottom:calc(58% + 5px)!important;width:min(185px,48vw)!important;padding:6px 8px}.fever-hud .fever-label{font-size:10px}.fever-bar{height:8px}}
+@media(max-height:620px) and (min-width:701px){.left{padding:10px!important;gap:8px}.pig-wrap{width:min(42vh,250px)!important}.fever-hud{bottom:10px!important}}
 </style>
 </head>
 
 <body>
   <div class="screen">
     <div class="topbar">
+      <div class="dh-game-brand"><img src="../DougHub.svg" alt="DougHub"><span>DougHub<small>ARCADE · PIG CLICKER</small></span></div>
       <div class="coins" id="coins">0 coins</div>
-      <button class="btn" id="homeBtn">Home</button>
+      <button class="btn" id="homeBtn" type="button">← Games</button>
     </div>
 
     <div class="fever-hud">
