@@ -1092,7 +1092,8 @@
             ".author-name", "[data-username]"
         ].join(",");
         const style = document.createElement("style");
-        style.textContent = ".dh-og-badge{display:inline-flex;align-items:center;vertical-align:middle;margin-left:6px;padding:2px 6px;border:1px solid rgba(250,204,21,.35);border-radius:6px;background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(249,115,22,.1));color:#fde68a;font:900 10px/1.3 Inter,Arial,sans-serif;letter-spacing:.04em;white-space:nowrap}";
+        style.textContent = ".dh-og-badge{display:inline-flex;align-items:center;vertical-align:middle;margin-left:6px;padding:2px 6px;border:1px solid rgba(250,204,21,.35);border-radius:6px;background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(249,115,22,.1));color:#fde68a;font:900 10px/1.3 Inter,Arial,sans-serif;letter-spacing:.04em;white-space:nowrap}.dh-character-badge-chip{display:inline-flex;align-items:center;vertical-align:middle;margin-left:4px;padding:2px 5px;border:1px solid rgba(167,139,250,.32);border-radius:6px;background:rgba(139,92,246,.13);color:#d9c7ff;font:800 9px/1.3 Inter,Arial,sans-serif;white-space:nowrap}";
+
         document.head.appendChild(style);
 
         async function decorate(element) {
@@ -1109,23 +1110,43 @@
             element.dataset.dhOgChecked = "true";
             const key = username.toLowerCase();
             try {
-                let hasBadge = cache.get(key);
-                if (hasBadge === undefined) {
+                let badgeData = cache.get(key);
+                if (badgeData === undefined) {
                     const { data, error } = await client.from("profiles")
                         .select("username,reward_badges")
                         .ilike("username", username)
                         .limit(5);
                     if (error) throw error;
                     const profile = (data || []).find(item => String(item.username || "").toLowerCase() === key);
-                    hasBadge = !!(profile && Array.isArray(profile.reward_badges) && profile.reward_badges.includes("og"));
-                    cache.set(key, hasBadge);
+                    const rewards = profile && Array.isArray(profile.reward_badges) ? profile.reward_badges : [];
+                    badgeData = { og: rewards.includes("og"), characters: rewards.filter(value => /^badge_[a-z0-9_]+$/.test(value)) };
+                    cache.set(key, badgeData);
                 }
-                if (hasBadge && element.isConnected && !element.querySelector(".dh-og-badge")) {
-                    const badge = document.createElement("span");
-                    badge.className = "dh-og-badge";
-                    badge.textContent = "★ OG";
-                    badge.title = "Original Member badge";
-                    element.appendChild(badge);
+                if (element.isConnected) {
+                    if (badgeData.og && !element.querySelector(".dh-og-badge")) {
+                        const badge = document.createElement("span");
+                        badge.className = "dh-og-badge";
+                        badge.textContent = "★ OG";
+                        badge.title = "Original Member badge";
+                        element.appendChild(badge);
+                    }
+                    if (badgeData.characters.length && !element.querySelector(".dh-character-badge-chip")) {
+                        const names = badgeData.characters.map(value => value.replace(/^badge_/, "").split("_").map(part => part.charAt(0).toUpperCase()+part.slice(1)).join(" "));
+                        names.slice(0, 2).forEach(name => {
+                            const badge = document.createElement("span");
+                            badge.className = "dh-character-badge-chip";
+                            badge.textContent = "✦ " + name;
+                            badge.title = name + " character badge";
+                            element.appendChild(badge);
+                        });
+                        if (names.length > 2) {
+                            const more = document.createElement("span");
+                            more.className = "dh-character-badge-chip";
+                            more.textContent = "+" + (names.length - 2);
+                            more.title = names.slice(2).join(", ");
+                            element.appendChild(more);
+                        }
+                    }
                 }
             } catch (error) {
                 element.dataset.dhOgChecked = "false";
