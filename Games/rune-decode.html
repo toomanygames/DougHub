@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11101a">
+<title>Rune Decoder • DougHub</title>
+<link rel="icon" href="../DougHub.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--ink:#fff8f1;--muted:#c1b7bc;--line:#ffffff20;--panel:#211e2a;--coral:#ff9a70;--mint:#79d9b7;--blue:#83c9ef;--lilac:#b79aff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 10% 0,#a94f4633,transparent 32%),radial-gradient(ellipse at 90% 15%,#3d8b7930,transparent 30%),#100f18}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1080px)/2));border-bottom:1px solid var(--line);background:#17131de8;backdrop-filter:blur(16px)}
+.brand{font-size:17px;font-weight:950;letter-spacing:-.03em}.brand span{color:var(--coral)}
+.toplinks{display:flex;gap:8px}.toplinks a{padding:9px 12px;border:1px solid transparent;border-radius:10px;color:#d8cbd0;font-size:11px;font-weight:850}.toplinks a:hover{background:#ffffff0d;border-color:var(--line)}
+main{width:min(1080px,calc(100% - 28px));margin:auto;padding:34px 0 28px}
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px}.eyebrow{color:#ffc19a;font-size:9px;font-weight:950;letter-spacing:.19em}.intro h1{margin:8px 0 6px;font-size:clamp(32px,6vw,48px);letter-spacing:-.06em}.intro p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}.wallet{flex:0 0 auto;padding:12px 15px;border:1px solid #79d9b755;border-radius:13px;background:#79d9b71a;text-align:right}.wallet small{display:block;color:#a6ebce;font-size:8px;font-weight:950;letter-spacing:.13em}.wallet strong{display:block;margin-top:3px;font-size:21px}
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:14px;align-items:start}
+.panel{min-width:0;padding:20px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#2a2430,#1e242b);box-shadow:0 16px 42px #0003}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.panel-head h2{margin:0;font-size:17px}.pill{padding:6px 9px;border:1px solid #ff9a7055;border-radius:999px;background:#ff9a701b;color:#ffd1b8;font-size:9px;font-weight:950;letter-spacing:.08em}
+.clue{padding:13px 14px;border:1px solid #83c9ef40;border-radius:13px;background:#83c9ef13;color:#d9f1ff;font-size:12px;line-height:1.6}
+.rune-code{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;min-height:126px;margin:18px 0;padding:14px;border:1px solid #ffffff17;border-radius:16px;background:linear-gradient(120deg,#17151e,#24212d)}
+.rune-code img{width:52px;height:88px;object-fit:contain;filter:drop-shadow(0 5px 8px #0005)}
+.answer-row{display:flex;gap:9px;margin-top:14px}.answer-row input{flex:1;min-width:0;height:46px;padding:0 13px;border:1px solid #ffffff28;border-radius:11px;outline:0;background:#17151e;color:white;text-transform:uppercase;letter-spacing:.2em;font-weight:900}.answer-row input:focus{border-color:var(--coral);box-shadow:0 0 0 3px #ff9a7020}.answer-row button{padding:0 17px;border:0;border-radius:11px;background:linear-gradient(110deg,#ff9a70,#ee8096);color:#29171d;font-size:11px;font-weight:950;cursor:pointer}.answer-row button:disabled{opacity:.55;cursor:not-allowed}
+.feedback{min-height:23px;margin:12px 0 0;color:#c4b8c0;font-size:11px;line-height:1.6}.feedback.success{color:#a4f0cb}.feedback.error{color:#ffb2a4}
+.key-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.key-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;padding:7px 3px;border:1px solid #ffffff16;border-radius:10px;background:#171720}.key-tile img{width:27px;height:46px;object-fit:contain}.key-tile b{font-size:10px;color:#f5e8de}
+.key-note{margin:12px 0 0;color:#a9a0a7;font-size:10px;line-height:1.6}
+.statusbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border:1px solid #ffffff18;border-radius:13px;background:#ffffff08}.statusbar small{display:block;color:#bdb2b8;font-size:8px;font-weight:900;letter-spacing:.12em}.statusbar strong{display:block;margin-top:4px;font-size:13px}.statusbar .timer{text-align:right;color:#a6ebce;font-variant-numeric:tabular-nums}
+.login-note{margin-top:12px;padding:11px 13px;border:1px solid #ffcb8b3b;border-radius:11px;background:#ffcb8b12;color:#ffe0ba;font-size:10px;line-height:1.6}.login-note a{font-weight:950;text-decoration:underline}
+footer{padding:18px 12px 34px;color:#a69ca2;text-align:center;font-size:10px}footer a{color:#ffc09b;text-decoration:underline}
+@media(max-width:760px){main{padding-top:22px}.layout{grid-template-columns:1fr}.intro{align-items:flex-start;flex-direction:column}.wallet{align-self:flex-start;text-align:left}.panel{padding:16px}.key-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:420px){.topbar{padding:0 12px}.toplinks a{padding:8px 7px;font-size:9px}.key-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.rune-code img{width:43px;height:74px}.answer-row{flex-direction:column}.answer-row button{height:43px}}
+</style>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="../douggames.html">Doug<span>Hub</span> Games</a><nav class="toplinks"><a href="../douggames.html">All games</a><a href="journey.html">Game journey</a><a href="shop.html">Shop</a></nav></header>
+<main>
+  <section class="intro">
+    <div><div class="eyebrow">DAILY CODE CHALLENGE</div><h1>Rune Decoder</h1><p>Read the stone symbols, crack today's five-letter word, and collect a small daily credit reward.</p></div>
+    <div class="wallet"><small>YOUR CREDITS</small><strong id="walletBalance">—</strong></div>
+  </section>
+  <div class="layout">
+    <section class="panel">
+      <div class="panel-head"><h2>Today's encoded word</h2><span class="pill">+20 CREDITS</span></div>
+      <div class="clue" id="dailyClue">Loading today's clue…</div>
+      <div class="rune-code" id="runeCode" aria-label="Encoded rune word"></div>
+      <label for="answerInput" style="display:block;color:#d8cbd0;font-size:10px;font-weight:900;letter-spacing:.1em">YOUR DECODED WORD</label>
+      <div class="answer-row"><input id="answerInput" type="text" maxlength="5" minlength="5" placeholder="ENTER 5 LETTERS" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Decoded five-letter word"><button id="submitAnswer" type="button">DECODE</button></div>
+      <p class="feedback" id="gameFeedback" role="status" aria-live="polite">Use the rune key to translate each symbol, then enter the word.</p>
+      <div class="statusbar"><div><small>DAILY REWARD</small><strong id="rewardStatus">Checking today's reward…</strong></div><div class="timer"><small>NEW CODE IN</small><strong id="resetCountdown">--:--:--</strong></div></div>
+      <div class="login-note" id="loginNote" hidden>Sign in to save your score and collect credits. <a href="../log-in.html">Log in</a></div>
+    </section>
+    <aside class="panel">
+      <div class="panel-head"><h2>Rune translation key</h2><span class="pill">A — Z</span></div>
+      <div class="key-grid" id="runeKey" aria-label="Rune alphabet"></div>
+      <p class="key-note">Each blue stone represents one letter. Match the symbols in the code above with this key to reveal the word.</p>
+    </aside>
+  </div>
+</main>
+<footer>Rune Pack art by <a href="https://kenney.nl/assets/rune-pack" target="_blank" rel="noopener">Kenney.nl</a> · CC0 1.0 · New puzzle at midnight UTC.</footer>
+<script>
+(function(){
+  const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+  const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+  const WORDS=["EMBER","LIGHT","STONE","RIVER","CLOUD","FLAME","NORTH","BRAVE","CROWN","MAGIC","SPARK","QUEST","SHINE","DREAM","PIXEL","CHARM","FROST","GLOBE","PRISM","STARS"];
+  const CLUES=["A warm glow from a campfire.","Something that helps you see.","A small piece of rock.","Water that flows across land.","A soft shape floating in the sky.","A bright, dancing fire.","The direction opposite south.","Showing courage when things are tough.","A royal circle worn on the head.","A mysterious kind of power.","A tiny flash of energy.","An adventure with a goal.","A bright light or reflection.","A story your mind makes while sleeping.","A tiny square of a digital picture.","A small object with a special meaning.","A cold layer that forms in winter.","A round model of the world.","A clear object that splits light into colors.","Bright points seen in the night sky."];
+  const ASSET_BASE="https://raw.githubusercontent.com/ETdoFresh/kenney.nl/master/kenney_runepack/PNG/Blue/Rectangle/runeBlue_rectangle_";
+  const $=id=>document.getElementById(id);
+  const db=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY);
+  let target="",user=null,claimed=false,serverNow=0,nextReset=0,perfAt=0,timer=null;
+  const imageFor=n=>ASSET_BASE+String(n).padStart(3,"0")+".png";
+  function dayIndex(date){const day=Date.parse(date+"T00:00:00Z"),base=Date.UTC(2026,0,1);return Math.floor((day-base)/86400000);}
+  function renderPuzzle(date){
+    const index=((dayIndex(date)%WORDS.length)+WORDS.length)%WORDS.length;
+    target=WORDS[index];
+    $("dailyClue").textContent=CLUES[index];
+    $("runeCode").innerHTML=[...target].map(letter=>'<img src="'+imageFor(letter.charCodeAt(0)-64)+'" alt="Rune symbol" draggable="false">').join("");
+    $("runeKey").innerHTML=Array.from({length:26},(_,i)=>'<div class="key-tile"><img src="'+imageFor(i+1)+'" alt=""><b>'+String.fromCharCode(65+i)+'</b></div>').join("");
+  }
+  function tick(){
+    const seconds=Math.max(0,Math.floor((nextReset-(serverNow+(performance.now()-perfAt)))/1000));
+    $("resetCountdown").textContent=[Math.floor(seconds/3600),Math.floor(seconds%3600/60),seconds%60].map(n=>String(n).padStart(2,"0")).join(":");
+    if(seconds===0)location.reload();
+  }
+  async function sync(){
+    if(!db){$("gameFeedback").textContent="The game service could not start. Please refresh.";return;}
+    const [{data:{session}},{data:status,error:statusError}]=await Promise.all([db.auth.getSession(),db.rpc("dh_get_daily_status")]);
+    if(statusError)throw statusError;
+    user=session?.user||null;
+    claimed=(status.claimed_games||[]).includes("rune_decode");
+    renderPuzzle(status.server_date);
+    serverNow=Date.parse(status.server_now);
+    nextReset=Date.parse(status.next_reset);
+    perfAt=performance.now();
+    $("rewardStatus").textContent=claimed?"Collected for today":"Available · +20 credits";
+    $("loginNote").hidden=!!user;
+    $("submitAnswer").disabled=claimed;
+    if(claimed){$("gameFeedback").textContent="You have already collected today's Rune Decoder reward. A new code arrives at midnight UTC.";}
+    if(user){
+      const {data:wallet}=await db.from("dh_wallets").select("credits").eq("user_id",user.id).maybeSingle();
+      $("walletBalance").textContent=Number(wallet?.credits||0).toLocaleString();
+    }else{$("walletBalance").textContent="Sign in";}
+    tick();
+    if(timer)clearInterval(timer);
+    timer=setInterval(tick,1000);
+  }
+  async function submit(){
+    const input=$("answerInput"),button=$("submitAnswer"),feedback=$("gameFeedback");
+    const guess=input.value.trim().toUpperCase();
+    if(guess.length!==5){feedback.className="feedback error";feedback.textContent="Enter a five-letter word.";return;}
+    if(guess!==target){feedback.className="feedback error";feedback.textContent="Not quite. Check the rune key and try again.";input.select();return;}
+    if(!user){feedback.className="feedback error";feedback.textContent="Correct! Sign in to collect the daily credits.";return;}
+    button.disabled=true;feedback.className="feedback";feedback.textContent="Checking your daily reward…";
+    try{
+      const {data,error}=await db.rpc("dh_claim_rune_decode",{p_answer:guess});
+      if(error)throw error;
+      if(data?.claimed){
+        claimed=true;$("rewardStatus").textContent="Collected · +20 credits";$("walletBalance").textContent=Number(data.credits_balance||0).toLocaleString();
+        feedback.className="feedback success";feedback.textContent="Decoded correctly! 20 credits have been added to your wallet.";
+      }else if(data?.already_claimed){
+        claimed=true;$("rewardStatus").textContent="Collected for today";feedback.className="feedback success";feedback.textContent="Correct code! You already collected today's credits.";
+      }else{
+        feedback.className="feedback error";feedback.textContent=data?.message||"The server could not verify that code. Try again.";
+      }
+    }catch(error){
+      console.error("Rune Decoder reward:",error);feedback.className="feedback error";feedback.textContent=error.message||"Could not collect the reward. Please try again.";
+    }finally{
+      button.disabled=claimed;
+    }
+  }
+  $("submitAnswer").addEventListener("click",submit);
+  $("answerInput").addEventListener("keydown",event=>{if(event.key==="Enter")submit();});
+  $("answerInput").addEventListener("input",event=>{event.target.value=event.target.value.replace(/[^a-z]/gi,"").slice(0,5).toUpperCase();});
+  sync().catch(error=>{console.error("Rune Decoder daily status:",error);$("dailyClue").textContent="Today's puzzle timer is temporarily unavailable."; $("gameFeedback").textContent="Please refresh in a moment. Rewards are verified by the DougHub database.";});
+  db?.auth.onAuthStateChange(()=>sync().catch(console.warn));
+})();
+</script>
+</body>
+</html>
