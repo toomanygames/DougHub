@@ -2194,10 +2194,23 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
 .games-discovery-create{background:#ff9876!important;color:#25171d!important}
 .game-card[hidden]{display:none!important}
 /* Keep only the requested games; daily games live outside this grid. */
-#doug-games .games-grid>.game-card:not([href="Games/pig-clicker.html"]):not([href="Games/racing.html"]):not([href="Games/puzzle.html"]):not([href="Games/sudoku.html"]):not(#drivePigSwitcher){display:none!important}
+#doug-games .games-grid>.game-card:not([href="Games/pig-clicker.html"]):not([href="Games/racing.html"]):not([href="Games/puzzle.html"]):not([href="Games/sudoku.html"]):not([href="Games/gem-garden.html"]):not([href="Games/pipe-parade.html"]):not([href="Games/brick-bounce.html"]):not(#drivePigSwitcher){display:none!important}
 #trendingSection,#community-games,.games-discovery-link[href="#trendingSection"],.games-discovery-link[href="#community-games"]{display:none!important}
 @media(max-width:700px){.games-grid .game-card{border-radius:15px}.dh-daily-section{border-radius:18px}}
 
+</style>
+
+<style id="dh-game-genre-style">
+.dh-game-browser{display:grid;grid-template-columns:minmax(190px,.8fr) 2fr;gap:10px 14px;align-items:center;margin:0 0 15px;padding:13px;border:1px solid #ffffff1b;border-radius:16px;background:linear-gradient(120deg,#28232c,#202a2b)}
+.dh-game-search-wrap{display:flex;align-items:center;gap:9px;min-width:0;padding:0 12px;border:1px solid #ffffff20;border-radius:11px;background:#171720;color:#ffb28e}
+.dh-game-search-wrap input{width:100%;min-width:0;height:39px;border:0;outline:0;background:transparent;color:#fff7ed;font:inherit;font-size:12px}
+.dh-game-search-wrap input::placeholder{color:#a9a0a2}
+.dh-game-genres{display:flex;flex-wrap:wrap;gap:7px}
+.dh-game-genres button{padding:9px 12px;border:1px solid #ffffff1b;border-radius:999px;background:#ffffff08;color:#e6dadd;font-size:11px;font-weight:850;cursor:pointer}
+.dh-game-genres button:hover,.dh-game-genres button.active{background:#ff987626;border-color:#ff9876;color:#ffd0b8}
+.dh-game-results{grid-column:1/-1;margin:0;color:#b8afb3;font-size:10px}
+#doug-games .games-grid>.game-card[hidden]{display:none!important}
+@media(max-width:700px){.dh-game-browser{grid-template-columns:1fr}.dh-game-genres{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.dh-game-genres button{white-space:nowrap}}
 </style>
 </head>
 
@@ -2375,6 +2388,18 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
 
         </div>
 
+
+        <div class="dh-game-browser" id="dhGameBrowser">
+          <div class="dh-game-search-wrap"><span aria-hidden="true">⌕</span><input id="dhGameSearch" type="search" placeholder="Search games..." autocomplete="off" aria-label="Search games"></div>
+          <div class="dh-game-genres" role="group" aria-label="Filter games by genre">
+            <button type="button" class="active" data-genre="all">All games</button>
+            <button type="button" data-genre="puzzle">Puzzle</button>
+            <button type="button" data-genre="driving">Driving</button>
+            <button type="button" data-genre="clicker">Clicker</button>
+            <button type="button" data-genre="arcade">Arcade</button>
+          </div>
+          <p class="dh-game-results" id="dhGameResults" aria-live="polite">Browse by genre or search by name.</p>
+        </div>
         <div class="games-grid">
 
             <a href="Games/bubble-grove.html" class="game-card game-card-wide">
@@ -2509,6 +2534,25 @@ header{background:#17131dde;border-bottom-color:#ffffff1b}
                 <div class="drive-pig-status"><span class="drive-pig-live-dot"></span><span id="drivePigStatus">Classic stunt-course adventure</span></div>
             </div>
 
+
+            <a href="Games/gem-garden.html" class="game-card" data-genre="puzzle">
+                <div class="game-icon"><img src="https://raw.githubusercontent.com/eturner58/game-assets/main/kenney/2D%20assets/Puzzle%20Pack%201/PNG/Default/element_blue_diamond_glossy.png" alt="Kenney gem artwork"></div>
+                <h3>Gem Garden</h3>
+                <p>Swap colorful gems, build matches, and clear the board before your moves run out.</p>
+                <div class="play-label">MATCH THE GEMS →</div>
+            </a>
+            <a href="Games/pipe-parade.html" class="game-card" data-genre="puzzle">
+                <div class="game-icon"><img src="https://raw.githubusercontent.com/eturner58/game-assets/main/kenney/2D%20assets/Puzzle%20Pack%202/PNG/Pipes/Green/pipeGreen_01.png" alt="Kenney pipe artwork"></div>
+                <h3>Pipe Parade</h3>
+                <p>Rotate the pipe pieces and connect the route from start to finish.</p>
+                <div class="play-label">CONNECT THE PIPES →</div>
+            </a>
+            <a href="Games/brick-bounce.html" class="game-card" data-genre="arcade">
+                <div class="game-icon"><img src="https://raw.githubusercontent.com/eturner58/game-assets/main/kenney/2D%20assets/Puzzle%20Pack%201/PNG/Default/ballBlue.png" alt="Kenney ball artwork"></div>
+                <h3>Brick Bounce</h3>
+                <p>Keep the ball moving, steer your paddle, and clear every block.</p>
+                <div class="play-label">BREAK THE BLOCKS →</div>
+            </a>
             
 
         </div>
@@ -4124,5 +4168,49 @@ updateFeedbackCount();
 
 
 
-<script id="DOUGHUB_DAILY_CHALLENGE_BAR">(function(){if(!window.supabase)return;const db=window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"),$=id=>document.getElementById(id);let date="",serverNow=0,nextReset=0,perfAt=0,timer=null;function tick(){const now=serverNow+(performance.now()-perfAt),s=Math.max(0,Math.floor((nextReset-now)/1000));$("dhDailyCountdown").textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,"0")).join(":");if(s===0)location.reload();}async function sync(){const {data,error}=await db.rpc("dh_get_daily_status");if(error)throw error;if(date&&date!==data.server_date){location.reload();return;}date=data.server_date;serverNow=Date.parse(data.server_now);nextReset=Date.parse(data.next_reset);perfAt=performance.now();$("dhDailyDate").textContent="UTC · "+date;const claimed=data.claimed_games||[],n=["wordle","match","sequence","trivia"].filter(id=>claimed.includes(id)).length;$("dhChallengeCount").textContent=n+" / 4 CLAIMED";$("dhChallengeFill").style.width=(n/4*100)+"%";$("dhChallengeProgress").setAttribute("aria-valuenow",String(n));const note=document.getElementById("dhWordleStatus");if(note){note.textContent=claimed.includes("wordle")?"REWARD CLAIMED":"AVAILABLE NOW";note.classList.toggle("live",true);}tick();if(timer)clearInterval(timer);timer=setInterval(tick,1000);}sync().catch(e=>{console.warn("Daily UTC status:",e);$("dhDailyDate").textContent="UTC CLOCK UNAVAILABLE";$("dhDailyCountdown").textContent="--:--:--";});window.addEventListener("focus",()=>sync().catch(()=>{}));})();</script></body>
+<script id="DOUGHUB_DAILY_CHALLENGE_BAR">(function(){if(!window.supabase)return;const db=window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52"),$=id=>document.getElementById(id);let date="",serverNow=0,nextReset=0,perfAt=0,timer=null;function tick(){const now=serverNow+(performance.now()-perfAt),s=Math.max(0,Math.floor((nextReset-now)/1000));$("dhDailyCountdown").textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,"0")).join(":");if(s===0)location.reload();}async function sync(){const {data,error}=await db.rpc("dh_get_daily_status");if(error)throw error;if(date&&date!==data.server_date){location.reload();return;}date=data.server_date;serverNow=Date.parse(data.server_now);nextReset=Date.parse(data.next_reset);perfAt=performance.now();$("dhDailyDate").textContent="UTC · "+date;const claimed=data.claimed_games||[],n=["wordle","match","sequence","trivia"].filter(id=>claimed.includes(id)).length;$("dhChallengeCount").textContent=n+" / 4 CLAIMED";$("dhChallengeFill").style.width=(n/4*100)+"%";$("dhChallengeProgress").setAttribute("aria-valuenow",String(n));const note=document.getElementById("dhWordleStatus");if(note){note.textContent=claimed.includes("wordle")?"REWARD CLAIMED":"AVAILABLE NOW";note.classList.toggle("live",true);}tick();if(timer)clearInterval(timer);timer=setInterval(tick,1000);}sync().catch(e=>{console.warn("Daily UTC status:",e);$("dhDailyDate").textContent="UTC CLOCK UNAVAILABLE";$("dhDailyCountdown").textContent="--:--:--";});window.addEventListener("focus",()=>sync().catch(()=>{}));})();</script>
+<script id="dh-game-genre-script">
+(()=>{
+ const root=document.getElementById("dhGameBrowser");
+ const grid=document.querySelector("#doug-games .games-grid");
+ if(!root||!grid)return;
+ const search=document.getElementById("dhGameSearch"),result=document.getElementById("dhGameResults");
+ const cards=[...grid.querySelectorAll(".game-card")];
+ const genreMap={
+  "Games/pig-clicker.html":"clicker",
+  "Games/racing.html":"driving",
+  "Games/puzzle.html":"puzzle",
+  "Games/sudoku.html":"puzzle",
+  "Games/gem-garden.html":"puzzle",
+  "Games/pipe-parade.html":"puzzle",
+  "Games/brick-bounce.html":"arcade"
+ };
+ let active="all";
+ cards.forEach(card=>{
+  const href=card.getAttribute("href")||card.querySelector("a")?.getAttribute("href");
+  if(genreMap[href])card.dataset.genre=genreMap[href];
+  else if(card.id==="drivePigSwitcher")card.dataset.genre="driving";
+  else if(!card.dataset.genre)card.dataset.genre="other";
+ });
+ function apply(){
+  const q=search.value.trim().toLowerCase();let shown=0;
+  cards.forEach(card=>{
+   const matchGenre=active==="all"||card.dataset.genre===active;
+   const matchText=!q||card.textContent.toLowerCase().includes(q);
+   const visible=matchGenre&&matchText;
+   card.hidden=!visible;
+   if(visible)shown++;
+  });
+  result.textContent=shown+" game"+(shown===1?"":"s")+" shown"+(active==="all"?"":" · "+active)+"."; 
+ }
+ root.querySelectorAll("[data-genre]").forEach(button=>button.addEventListener("click",()=>{
+  active=button.dataset.genre;
+  root.querySelectorAll("[data-genre]").forEach(b=>b.classList.toggle("active",b===button));
+  apply();
+ }));
+ search.addEventListener("input",apply);
+ apply();
+})();
+</script>
+</body>
 </html>
