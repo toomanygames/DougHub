@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classroom • DougHub</title><link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<link rel="stylesheet" href="classroom.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="display.js"></script><script src="classroom-shared.js"></script>
+</head>
+<body>
+<div class="shell">
+<header class="topbar"><div class="brand"><span class="brand-mark">D</span><span>DougHub <small>CLASSROOM</small></span></div><span class="top-chip" id="studentLabel">Student workspace</span></header>
+<section class="hero"><div class="hero-inner"><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1 id="welcomeTitle">A bright place to learn.</h1><p id="welcomeCopy">Games, class chat, quick learning tools, and everything your teacher shares — all together.</p><div class="hero-meta"><span id="gradeBadge">Grade —</span><span id="classBadge">Choose your class</span><span id="teacherBadge">Teacher —</span></div></div></section>
+<div class="grid" id="classroomWorkspace" hidden>
+<main class="stack">
+<section class="panel"><div class="panel-head"><div><h2>Today in your classroom</h2><p>Your teacher's latest reminder and class information.</p></div><span class="pill mint" id="classLiveBadge">● CLASS LIVE</span></div><div id="classReminder" class="notice">Your teacher hasn't posted a reminder yet.</div></section>
+<section class="panel"><div class="panel-head"><div><h2>🎮 Classroom arcade</h2><p>All DougHub games, ready for a quick brain break.</p></div><span class="pill">PLAY & EXPLORE</span></div><div class="game-grid" id="classGameGrid">
+<a class="game-tile" href="Games/bubble-grove.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/bubble-grove.svg" alt=""></div><strong>Bubble Grove</strong><small>Match colors and clear the bubbles.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/titlebound.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/titlebound.svg" alt=""></div><strong>Titlebound: Realms of Fortune</strong><small>Collect titles and discover new rarities.</small><span class="game-tag">COLLECTION · PLAY ↗</span></a>
+<a class="game-tile" href="Games/starfall-run.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/starfall-run.svg" alt=""></div><strong>Starfall Run</strong><small>Dodge obstacles and collect shards.</small><span class="game-tag">ARCADE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/crystal-breaker.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/crystal-breaker.svg" alt=""></div><strong>Crystal Breaker</strong><small>Keep the core safe and clear waves.</small><span class="game-tag">ARCADE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/pig-clicker.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/pig-clicker.svg" alt=""></div><strong>Pig Clicker</strong><small>Earn points and unlock upgrades.</small><span class="game-tag">CLICKER · PLAY ↗</span></a>
+<a class="game-tile" href="Games/rebirth-clicker.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/rebirth-clicker.svg" alt=""></div><strong>Rebirth Clicker</strong><small>Build up, upgrade, and rebirth.</small><span class="game-tag">CLICKER · PLAY ↗</span></a>
+<a class="game-tile" href="Games/ocean-drive.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/ocean-drive.svg" alt=""></div><strong>Ocean Drive</strong><small>Explore a colorful coastal district.</small><span class="game-tag">EXPLORATION · PLAY ↗</span></a>
+<a class="game-tile" href="Games/racing.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/racing.svg" alt=""></div><strong>Doug Racing</strong><small>Race the track and beat your best.</small><span class="game-tag">RACING · PLAY ↗</span></a>
+<a class="game-tile" href="Games/puzzle.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/puzzle.svg" alt=""></div><strong>Doug Puzzle</strong><small>Slide, merge, and plan ahead.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/sudoku.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/sudoku.svg" alt=""></div><strong>DougHub Sudoku</strong><small>Use logic to complete the grid.</small><span class="game-tag">LOGIC · PLAY ↗</span></a>
+<a class="game-tile" href="Games/drive-pig.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/drive-pig.svg" alt=""></div><strong>Drive Pig</strong><small>Take on the classic stunt course.</small><span class="game-tag">DRIVING · PLAY ↗</span></a>
+<a class="game-tile" href="Games/pig-racing-3d.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/drive-pig.svg" alt=""></div><strong>Pig Racing 3D</strong><small>Race through a 3D course.</small><span class="game-tag">RACING · PLAY ↗</span></a>
+<a class="game-tile" href="Games/gem-garden.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/gem-garden.svg" alt=""></div><strong>Gem Garden</strong><small>Swap gems and make colorful matches.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/pipe-parade.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/pipe-parade.svg" alt=""></div><strong>Pipe Parade</strong><small>Connect the pipes from start to finish.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/brick-bounce.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/brick-bounce.svg" alt=""></div><strong>Brick Bounce</strong><small>Keep the ball moving and clear blocks.</small><span class="game-tag">ARCADE · PLAY ↗</span></a>
+<a class="game-tile" href="Games/rune-decode.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/rune-decode.svg" alt=""></div><strong>Rune Decoder</strong><small>Crack the hidden word with logic.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
+<a class="game-tile" href="douggames.html#community-games" target="_blank" rel="noopener"><div class="game-art"><div class="brand-mark">✦</div></div><strong>Community Games</strong><small>Explore games made by DougHub creators.</small><span class="game-tag">COMMUNITY · EXPLORE ↗</span></a>
+</div></section>
+<section class="panel"><div class="panel-head"><div><h2>💬 Class chat</h2><p>Talk with your classmates and teacher. Keep it kind and on-topic.</p></div><span class="pill pink">CLASS ONLY</span></div><div id="chatMessages" class="chat-box" aria-live="polite"><div class="empty">Loading class chat…</div></div><form id="chatForm" class="chat-compose"><input id="chatInput" maxlength="1000" autocomplete="off" placeholder="Write a message to your class…" required><button class="btn" id="sendChat" type="submit">Send message</button></form><div id="chatStatus" class="chat-status" role="status"></div></section>
+</main>
+<aside class="stack">
+<section class="panel"><div class="panel-head"><div><h2>📚 Word studio</h2><p>Look up definitions and discover better words.</p></div><span class="pill mint">LEARN</span></div>
+<div class="field"><label for="dictionaryWord">DICTIONARY</label><input id="dictionaryWord" maxlength="50" placeholder="Enter a word"></div><button class="btn" id="lookupDefinition" type="button">Find definition</button><div id="dictionaryResult" class="tool-result" hidden></div>
+<div class="field" style="margin-top:18px"><label for="thesaurusWord">THESAURUS</label><input id="thesaurusWord" maxlength="50" placeholder="Find similar words"></div><button class="btn soft" id="lookupSynonyms" type="button">Find synonyms</button><div id="thesaurusResult" class="tool-result" hidden></div>
+<p class="subtle">Dictionary definitions: Free Dictionary API. Similar words: Datamuse.</p></section>
+<section class="panel"><div class="panel-head"><div><h2>⏱️ Focus timer</h2><p>A little quiet time for your next task.</p></div><span class="pill orange">15 MIN</span></div><div id="focusClock" style="font:900 36px Nunito;color:#705cdb;text-align:center;padding:14px">15:00</div><div style="display:flex;gap:8px;justify-content:center"><button class="btn mint" id="focusStart" type="button">Start focus</button><button class="btn soft" id="focusReset" type="button">Reset</button></div><div class="subtle" id="focusStatus" style="text-align:center;margin-top:9px">Ready when you are.</div></section>
+<section class="panel"><div class="panel-head"><div><h2>🧩 Class details</h2><p>Your class at a glance.</p></div></div><div class="word-row"><span>Grade</span><strong id="detailGrade">—</strong></div><div class="word-row"><span>Teacher</span><strong id="detailTeacher">—</strong></div><div class="word-row"><span>Class</span><strong id="detailClass">—</strong></div><div class="word-row"><span>Word filter</span><strong id="filterCount">0 words</strong></div></section>
+</aside>
+</div>
+<section id="loadingState" class="panel" style="margin:20px 0"><div class="empty">Checking your class membership…</div></section>
+<div class="footer">DougHub Classroom · A focused space for learning together</div>
+</div>
+<div id="endedOverlay" class="ended-screen" hidden><section class="ended-card"><div class="ended-icon">☁</div><div class="eyebrow" style="color:#8878df">CLASSROOM SESSION</div><h1>Your teacher has ended the session.</h1><p>This classroom is temporarily paused. Your teacher set it to reopen automatically, so you won't be stuck here.</p><div class="countdown" id="studentCountdown">05:00</div><p id="endedDetail">You can return when the session is available again.</p></section></div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id), C=window.DHClassroom;
+let db,user,profile,currentClass=null,classRows=[],chatTimer=null,focusTimer=null,focusSeconds=900;
+const say=(id,msg)=>$(id).textContent=msg;
+function showLoading(msg){$("loadingState").innerHTML='<div class="empty">'+C.esc(msg)+'</div>';$("loadingState").hidden=false;$("classroomWorkspace").hidden=true;}
+function showWorkspace(){ $("loadingState").hidden=true;$("classroomWorkspace").hidden=false; }
+async function boot(){
+ try{
+  db=await C.client();
+  const {data:{user:u},error}=await db.auth.getUser();if(error||!u){location.replace("log-in.html?next="+encodeURIComponent(location.pathname));return;}user=u;
+  const {data:p}=await db.from("profiles").select("username,avatar_url").eq("id",user.id).maybeSingle();profile=p||{};
+  $("studentLabel").textContent=profile.username||"Student workspace";
+  await loadMemberships();
+ }catch(e){showLoading(e.message||"Could not load your classroom.");}
+}
+async function loadMemberships(){
+ const {data:enrollments,error}=await db.from("classroom_enrollments").select("id,classroom_id,status,created_at").eq("student_id",user.id).order("created_at",{ascending:false});
+ if(error)throw error;
+ const approved=(enrollments||[]).filter(x=>x.status==="approved"),pending=(enrollments||[]).filter(x=>x.status==="pending");
+ if(!approved.length){
+  showLoading(pending.length?"Your teacher has requested to add you. The DougHub Owner must verify the request before the classroom opens. Approval can take 1–7 business days.":"You don't have an approved classroom yet. Ask your teacher to request your enrollment using your DougHub username.");
+  return;
+ }
+ const ids=approved.map(x=>x.classroom_id);
+ const {data:classes,error:classError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder,session_active,session_resume_at,session_ended_at").in("id",ids);
+ if(classError)throw classError;
+ classRows=classes||[];
+ if(!classRows.length){showLoading("Your classroom isn't available right now.");return;}
+ showWorkspace();await selectClass(classRows[0].id);
+}
+async function selectClass(id){
+ currentClass=classRows.find(c=>c.id===id);if(!currentClass)return;
+ const {data:teacher}=await db.from("profiles").select("username").eq("id",currentClass.teacher_id).maybeSingle();
+ $("welcomeTitle").textContent="Welcome to "+currentClass.class_name+"!";
+ $("welcomeCopy").textContent="Your classroom is ready. Find your class games, chat, and learning tools below.";
+ $("gradeBadge").textContent="Grade "+currentClass.grade;
+ $("classBadge").textContent=currentClass.class_name;
+ $("teacherBadge").textContent="Teacher "+(teacher?.username||"your teacher");
+ $("detailGrade").textContent="Grade "+currentClass.grade;
+ $("detailTeacher").textContent=teacher?.username||"—";
+ $("detailClass").textContent=currentClass.class_name;
+ $("classReminder").textContent=currentClass.reminder||"Your teacher hasn't posted a reminder yet.";
+ await loadFilters();await loadChat();
+ if(chatTimer)clearInterval(chatTimer);chatTimer=setInterval(loadChat,5000);
+ checkSession();
+}
+async function loadFilters(){
+ const {data,error}=await db.from("classroom_word_filters").select("word").eq("classroom_id",currentClass.id);
+ if(error)throw error;$("filterCount").textContent=(data||[]).length+" words";
+}
+async function loadChat(){
+ if(!currentClass)return;
+ const {data,error}=await db.from("classroom_chat_messages").select("id,user_id,body,created_at").eq("classroom_id",currentClass.id).order("created_at",{ascending:true}).limit(120);
+ if(error){say("chatStatus","Chat is unavailable: "+error.message);return;}
+ const ids=[...new Set((data||[]).map(m=>m.user_id))];
+ let names={};if(ids.length){const {data:users}=await db.from("profiles").select("id,username").in("id",ids);(users||[]).forEach(u=>names[u.id]=u.username||"Classmate");}
+ const box=$("chatMessages"),old=box.scrollTop,nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<70;
+ if(!data?.length){box.innerHTML='<div class="empty">No messages yet. Start with a friendly hello!</div>';return;}
+ box.innerHTML=data.map(m=>'<div class="chat-msg"><div class="chat-avatar">'+C.esc(C.initials(names[m.user_id]))+'</div><div class="chat-bubble"><strong>'+C.esc(names[m.user_id]||"Classmate")+'</strong><p>'+C.esc(m.body)+'</p><time>'+C.esc(C.niceTime(m.created_at))+'</time></div></div>').join("");
+ box.scrollTop=nearBottom?box.scrollHeight:old;
+}
+$("chatForm").addEventListener("submit",async e=>{
+ e.preventDefault();const body=$("chatInput").value.trim();if(!body||!currentClass)return;
+ $("sendChat").disabled=true;say("chatStatus","Sending…");
+ const {error}=await db.from("classroom_chat_messages").insert({classroom_id:currentClass.id,user_id:user.id,body});
+ $("sendChat").disabled=false;
+ if(error){say("chatStatus",error.message.includes("blocked by this classroom")?"That message contains a word blocked by your teacher.":error.message);return;}
+ $("chatInput").value="";say("chatStatus","Message sent.");await loadChat();
+});
+function checkSession(){
+ if(!currentClass)return;
+ if(currentClass.session_active){$("endedOverlay").hidden=true;return;}
+ $("endedOverlay").hidden=false;$("endedDetail").textContent="This class will reopen automatically in about five minutes.";
+ const tick=async()=>{
+  const target=new Date(currentClass.session_resume_at||Date.now()+300000).getTime(),remaining=Math.max(0,target-Date.now());
+  const sec=Math.ceil(remaining/1000);$("studentCountdown").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
+  if(remaining<=0){
+   const {data}=await db.rpc("resume_due_classroom",{p_classroom_id:currentClass.id});
+   if(data){currentClass.session_active=true;$("endedOverlay").hidden=true;location.reload();}
+   else {const {data:refresh}=await db.from("classroom_spaces").select("session_active,session_resume_at").eq("id",currentClass.id).maybeSingle();if(refresh?.session_active){location.reload();return;}currentClass.session_resume_at=refresh?.session_resume_at||new Date(Date.now()+30000).toISOString();}
+  }
+ };
+ tick();if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);window.__classSessionTimer=setInterval(tick,1000);
+}
+$("lookupDefinition").addEventListener("click",async()=>{
+ const word=$("dictionaryWord").value.trim(),out=$("dictionaryResult");if(!word)return;
+ out.hidden=false;out.textContent="Looking up "+word+"…";
+ try{const res=await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(word));if(!res.ok)throw new Error("No definition found.");const json=await res.json();const meanings=(json[0]?.meanings||[]).slice(0,3);out.innerHTML="<strong>"+C.esc(json[0]?.word||word)+"</strong>"+meanings.map(m=>"<p><b>"+C.esc(m.partOfSpeech||"")+"</b> · "+C.esc(m.definitions?.[0]?.definition||"")+"</p>").join("");}catch(e){out.textContent=e.message||"Could not reach the dictionary.";}
+});
+$("lookupSynonyms").addEventListener("click",async()=>{
+ const word=$("thesaurusWord").value.trim(),out=$("thesaurusResult");if(!word)return;
+ out.hidden=false;out.textContent="Finding similar words…";
+ try{const res=await fetch("https://api.datamuse.com/words?rel_syn="+encodeURIComponent(word)+"&max=14");if(!res.ok)throw new Error("Thesaurus is unavailable.");const json=await res.json();out.innerHTML=json.length?json.map(x=>'<span class="pill" style="margin:3px">'+C.esc(x.word)+'</span>').join(""):"No synonyms found for that word.";}catch(e){out.textContent=e.message;}
+});
+function drawFocus(){const m=Math.floor(focusSeconds/60),s=focusSeconds%60;$("focusClock").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
+$("focusStart").addEventListener("click",()=>{
+ if(focusTimer){clearInterval(focusTimer);focusTimer=null;$("focusStart").textContent="Resume focus";say("focusStatus","Paused.");return;}
+ $("focusStart").textContent="Pause";say("focusStatus","Focus time is running.");
+ focusTimer=setInterval(()=>{focusSeconds=Math.max(0,focusSeconds-1);drawFocus();if(!focusSeconds){clearInterval(focusTimer);focusTimer=null;$("focusStart").textContent="Start again";say("focusStatus","Focus session complete. Nice work!");}},1000);
+});
+$("focusReset").addEventListener("click",()=>{if(focusTimer)clearInterval(focusTimer);focusTimer=null;focusSeconds=900;drawFocus();$("focusStart").textContent="Start focus";say("focusStatus","Ready when you are.");});
+boot();
+})();
+</script>
+</body></html>
