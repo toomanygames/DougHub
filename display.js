@@ -1163,7 +1163,7 @@
         // and refresh existing names once, avoiding duplicate/racing refresh handlers.
         window.addEventListener("douqhub:og-badges-updated", () => {
             cache.clear();
-            document.querySelectorAll(".dh-og-badge").forEach(badge => badge.remove());
+            document.querySelectorAll(".dh-og-badge,.dh-character-badge-chip").forEach(badge => badge.remove());
             document.querySelectorAll(selectors).forEach(element => {
                 delete element.dataset.dhOgChecked;
             });
