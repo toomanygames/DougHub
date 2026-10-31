@@ -171,7 +171,15 @@
   var STATE = { READY: 0, PLAYING: 1, OVER: 2 };
   var state = STATE.READY;
   var BEST_KEY = 'bubble_shooter_best_v1';
-  var best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0;
+  // Storage can be unavailable in private/restricted browser contexts; the game must still start.
+  function readBest() {
+    try { return parseInt(window.localStorage.getItem(BEST_KEY) || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function saveBest(value) {
+    try { window.localStorage.setItem(BEST_KEY, String(value)); } catch (e) {}
+  }
+  var best = readBest();
 
   var COLS = 11, R = 20, M_R = 40, ROWH = 34.6, GRID_TOP = 8;
   var SHOOTER_Y = H - 56, DEATH_Y = H - 96;
@@ -252,7 +260,8 @@
     if (deadKey) document.getElementById('over-reason').textContent = t(deadKey);
   }
   refreshBest();
-  WG.onChange(refreshBest);
+  // Language hooks are optional on standalone game pages.
+  if (window.WG && typeof window.WG.onChange === 'function') window.WG.onChange(refreshBest);
 
   // ===== Shooting =====
   function aimAt(x, y) {
@@ -406,7 +415,7 @@
     shake = 14;
     sfx.over();
     var isRecord = score > best;
-    if (isRecord) { best = score; localStorage.setItem(BEST_KEY, String(best)); }
+    if (isRecord) { best = score; saveBest(best); }
     document.getElementById('medal').textContent = isRecord ? '👑' : (score >= 600 ? '🥇' : '🥉');
     document.getElementById('new-record').classList.toggle('hidden', !isRecord);
     document.getElementById('final-score').textContent = score;
