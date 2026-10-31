@@ -128,11 +128,12 @@ async function refreshClassSession(){
  const {data,error}=await db.from("classroom_spaces").select("session_active,session_resume_at").eq("id",currentClass.id).maybeSingle();
  if(error||!data)return;
  currentClass.session_active=data.session_active;currentClass.session_resume_at=data.session_resume_at;
- if(!data.session_active){checkSession();}else $("endedOverlay").hidden=true;
+ if(!data.session_active){checkSession();}else {$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);}
 }
 function checkSession(){
  if(!currentClass)return;
  if(currentClass.session_active){$("endedOverlay").hidden=true;return;}
+ if(!$("endedOverlay").hidden)return;
  $("endedOverlay").hidden=false;$("endedDetail").textContent="This class will reopen automatically in about five minutes.";
  const tick=async()=>{
   const target=new Date(currentClass.session_resume_at||Date.now()+300000).getTime(),remaining=Math.max(0,target-Date.now());
