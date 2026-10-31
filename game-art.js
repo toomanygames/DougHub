@@ -3,6 +3,7 @@
 "use strict";
 const id=(location.pathname.split("/").pop()||"").replace(/\.html$/i,"");
 const sources={
+"wordle":{name:"DougHub Wordle",author:"DougHub",project:"Original DougHub implementation and artwork",url:"https://github.com/toomanygames/DougHub",license:"Original DougHub work",licenseUrl:"https://github.com/toomanygames/DougHub",detail:"The game logic and tile artwork were created for DougHub. The daily five-letter guessing format is inspired by Wordle, created by Josh Wardle; no third-party game code or artwork is used."},
 "bubble-grove":{name:"Bubble Grove",author:"mashukui (马哥python说)",project:"Web Games — Bubble Shooter",url:"https://github.com/mashukui/web-games",license:"MIT",licenseUrl:"https://github.com/mashukui/web-games/blob/main/LICENSE",detail:"Gameplay logic, canvas-drawn bubble visuals and interface adapted from the upstream Bubble Shooter game."},
 "crystal-breaker":{name:"Crystal Breaker",author:"mashukui (马哥python说)",project:"Web Games — Breakout",url:"https://github.com/mashukui/web-games/tree/main/breakout",license:"MIT",licenseUrl:"https://github.com/mashukui/web-games/blob/main/LICENSE",detail:"Gameplay, canvas visuals and interface adapted from the upstream Breakout game."},
 "starfall-run":{name:"Starfall Run",author:"mashukui (马哥python说)",project:"Web Games — Dino Run",url:"https://github.com/mashukui/web-games/tree/main/dino-run",license:"MIT",licenseUrl:"https://github.com/mashukui/web-games/blob/main/LICENSE",detail:"Endless-runner gameplay, canvas-drawn art and interface adapted from the upstream Dino Run game."},
