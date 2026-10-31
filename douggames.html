@@ -4141,10 +4141,10 @@ updateFeedbackCount();
  const categoryFor=card=>{
   const href=(card.getAttribute("href")||"").toLowerCase();
   const title=(card.querySelector("h3")?.textContent||"").toLowerCase();
-  if(card.id==="drivePigSwitcher"||href.includes("racing")||href.includes("drive-pig")||href.includes("ocean-drive"))return "racing";
+  if(href.includes("ocean-drive")||href.includes("dead-city"))return "explore";
+  if(card.id==="drivePigSwitcher"||href.includes("racing")||href.includes("drive-pig"))return "racing";
   if(href.includes("pig-clicker")||href.includes("rebirth-clicker")||title.includes("clicker")||title.includes("titlebound"))return "clicker";
   if(href.includes("sudoku")||href.includes("puzzle"))return "puzzle";
-  if(href.includes("ocean-drive")||href.includes("dead-city"))return "explore";
   return "arcade";
  };
  cards.forEach(card=>{
