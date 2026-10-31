@@ -1,0 +1,4193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Doug Games • DougHub</title>
+
+<link rel="icon" href="DougHub.svg" type="image/x-icon">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top left, #17133b 0%, transparent 35%),
+        radial-gradient(circle at top right, #25104b 0%, transparent 30%),
+        #02040a;
+    color: #fff;
+    min-height: 100vh;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+/* HEADER */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 72px;
+    padding: 0 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(4, 5, 15, 0.82);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(18px);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.logo-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+
+    box-shadow:
+        0 0 25px rgba(99,102,241,0.35);
+
+    font-weight: 900;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 22px;
+    margin-left: auto;
+}
+
+.nav-link {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+
+    color: #aaa9bb;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        color 0.2s,
+        transform 0.2s;
+}
+
+.nav-link:hover {
+    color: white;
+    transform: translateY(-1px);
+}
+
+.dmail-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.dmail-badge {
+    display: none;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: #ef4444;
+    color: white;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    line-height: 18px;
+
+    box-shadow:
+        0 0 12px rgba(239,68,68,0.45);
+}
+
+.dmail-badge.show {
+    display: inline-flex;
+}
+
+/* ACCOUNT */
+
+.account-area {
+    position: relative;
+}
+
+.account-btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 7px 11px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    cursor: pointer;
+}
+
+.account-btn:hover {
+    background:
+        rgba(255,255,255,0.09);
+}
+
+.account-avatar {
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(135deg, #6366f1, #a855f7);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 800;
+}
+
+.account-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.account-menu {
+    position: absolute;
+
+    right: 0;
+    top: calc(100% + 10px);
+
+    width: 190px;
+
+    padding: 8px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(12, 13, 28, 0.97);
+
+    border:
+        1px solid rgba(255,255,255,0.1);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.4);
+
+    backdrop-filter:
+        blur(20px);
+
+    display: none;
+}
+
+.account-menu.show {
+    display: block;
+}
+
+.account-menu a,
+.account-menu button {
+    display: block;
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    text-align: left;
+
+    color: #d8d7e5;
+
+    background: transparent;
+
+    border: none;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+}
+
+.account-menu a:hover,
+.account-menu button:hover {
+    background:
+        rgba(255,255,255,0.07);
+
+    color: white;
+}
+
+.logout {
+    color: #ff7777 !important;
+}
+
+/* MAIN */
+
+main {
+    width: min(1200px, calc(100% - 32px));
+    margin: auto;
+}
+
+/* BIG TOP SECTION */
+
+.hero {
+    padding: 55px 0 30px;
+}
+
+.hero-card {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 60px 50px;
+
+    border-radius: 28px;
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(168,85,247,0.2),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 15% 80%,
+            rgba(99,102,241,0.18),
+            transparent 35%
+        ),
+        rgba(13,17,39,0.78);
+
+    border:
+        1px solid rgba(255,255,255,0.09);
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,0.3),
+        inset 0 1px rgba(255,255,255,0.05);
+}
+
+.hero-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    right: -100px;
+    top: -120px;
+
+    background:
+        rgba(139,92,246,0.2);
+
+    filter:
+        blur(70px);
+
+    border-radius:
+        50%;
+}
+
+.hero-badge {
+    position: relative;
+
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(99,102,241,0.13);
+
+    border:
+        1px solid rgba(99,102,241,0.25);
+
+    color:
+        #aaa9ff;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+}
+
+.hero h1 {
+    position: relative;
+
+    margin:
+        20px 0 15px;
+
+    font-size:
+        clamp(42px, 7vw, 76px);
+
+    line-height:
+        0.98;
+
+    letter-spacing:
+        -3px;
+}
+
+.hero h1 span {
+    background:
+        linear-gradient(
+            90deg,
+            #818cf8,
+            #c084fc
+        );
+
+    -webkit-background-clip:
+        text;
+
+    background-clip:
+        text;
+
+    color:
+        transparent;
+}
+
+.hero p {
+    position: relative;
+
+    max-width:
+        700px;
+
+    margin:
+        0 auto;
+
+    color:
+        #aaa9bb;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.65;
+}
+
+/* HERO STATS */
+
+.hero-stats {
+    position: relative;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 20px;
+
+    margin-top:
+        35px;
+
+    flex-wrap:
+        wrap;
+}
+
+.hero-stat {
+    min-width:
+        175px;
+
+    padding:
+        20px 25px;
+
+    border-radius:
+        17px;
+
+    background:
+        rgba(255,255,255,0.045);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+}
+
+.hero-stat-number {
+    font-size:
+        32px;
+
+    font-weight:
+        900;
+
+    line-height:
+        1;
+
+    background:
+        linear-gradient(
+            90deg,
+            #a5b4fc,
+            #d8b4fe
+        );
+
+    -webkit-background-clip:
+        text;
+
+    background-clip:
+        text;
+
+    color:
+        transparent;
+}
+
+.hero-stat-label {
+    margin-top:
+        8px;
+
+    color:
+        #a7a6b7;
+
+    font-size:
+        13px;
+}
+
+/* CREATE GAME */
+
+.hero-create-button {
+    position: relative;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-top: 28px;
+
+    padding: 13px 22px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #8b5cf6
+        );
+
+    border: none;
+
+    font-size:
+        14px;
+
+    font-weight:
+        800;
+
+    box-shadow:
+        0 10px 30px rgba(99,102,241,0.25);
+
+    transition:
+        0.2s;
+}
+
+.hero-create-button:hover {
+    transform:
+        translateY(-2px);
+
+    background:
+        linear-gradient(
+            135deg,
+            #7477ff,
+            #9b6bff
+        );
+
+    box-shadow:
+        0 14px 35px rgba(99,102,241,0.35);
+}
+
+/* SECTIONS */
+
+.section {
+    padding:
+        25px 0 55px;
+}
+
+.section-header {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    margin-bottom:
+        20px;
+}
+
+.section-title {
+    margin:
+        0;
+
+    font-size:
+        25px;
+}
+
+.section-subtitle {
+    margin:
+        5px 0 0;
+
+    color:
+        #858494;
+
+    font-size:
+        14px;
+}
+
+/* SEARCH */
+
+.search-box {
+    width:
+        260px;
+
+    max-width:
+        100%;
+
+    padding:
+        11px 14px;
+
+    border-radius:
+        11px;
+
+    outline:
+        none;
+
+    color:
+        white;
+
+    background:
+        rgba(255,255,255,0.045);
+
+    border:
+        1px solid rgba(255,255,255,0.09);
+}
+
+.search-box:focus {
+    border-color:
+        rgba(129,140,248,0.6);
+}
+
+/* GAMES */
+
+.games-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap:
+        18px;
+}
+
+.game-card-wide {
+    grid-column: span 2;
+}
+
+.game-card {
+    position:
+        relative;
+
+    min-height:
+        210px;
+
+    padding:
+        23px;
+
+    border-radius:
+        20px;
+
+    overflow:
+        hidden;
+
+    background:
+        rgba(13,17,39,0.72);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    transition:
+        0.25s;
+
+    cursor:
+        pointer;
+}
+
+.game-card:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(129,140,248,0.35);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.25);
+}
+
+.game-icon {
+    width:
+        52px;
+
+    height:
+        52px;
+
+    border-radius:
+        15px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        27px;
+
+    background:
+        rgba(99,102,241,0.12);
+
+    border:
+        1px solid rgba(99,102,241,0.18);
+}
+
+.game-card h3 {
+    margin:
+        18px 0 7px;
+
+    font-size:
+        19px;
+}
+
+.game-card p {
+    margin:
+        0;
+
+    color:
+        #888798;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.5;
+}
+
+.play-label {
+    position:
+        absolute;
+
+    left:
+        23px;
+
+    bottom:
+        19px;
+
+    color:
+        #9fa3ff;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+}
+
+
+/* COMMUNITY */
+
+.community-games {
+    display:
+        flex;
+
+    gap:
+        16px;
+
+    overflow-x:
+        auto;
+
+    padding:
+        4px 2px 16px;
+
+    scrollbar-width:
+        thin;
+    scrollbar-color: rgba(129,140,248,.6) rgba(255,255,255,.04);
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+}
+
+.community-card {
+    flex:
+        0 0 270px;
+    scroll-snap-align: start;
+    scroll-snap-align: start;
+
+    min-height:
+        190px;
+
+    padding:
+        21px;
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(13,17,39,0.72);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    cursor:
+        pointer;
+
+    transition:
+        transform 0.2s, border-color 0.2s, background 0.2s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+}
+
+.community-card:hover {
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(168,85,247,0.35);
+}
+
+.community-card-badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}.community-official-badge{display:inline-flex;align-items:center;padding:4px 7px;border-radius:6px;background:linear-gradient(110deg,#6366f12b,#a855f72b);border:1px solid #a78bfa66;color:#ddd6fe;font-size:9px;font-weight:900;letter-spacing:.07em}.community-card-badges .community-category{margin:0}.community-category {
+    display:
+        inline-block;
+
+    padding:
+        5px 9px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        11px;
+
+    color:
+        #c4b5fd;
+
+    background:
+        rgba(139,92,246,0.12);
+}
+
+.community-card h3 {
+    margin:
+        15px 0 7px;
+}
+
+.community-card p {
+    color:
+        #8c8b9c;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+
+    margin:
+        0;
+}
+
+.community-author {
+    margin-top:
+        15px;
+
+    color:
+        #777687;
+
+    font-size:
+        12px;
+}
+
+.empty {
+    padding:
+        35px;
+
+    text-align:
+        center;
+
+    color:
+        #777687;
+
+    border:
+        1px dashed rgba(255,255,255,0.1);
+
+    border-radius:
+        18px;
+}
+
+/* FEEDBACK */
+
+.feedback-section {
+    padding:
+        20px 0 45px;
+}
+
+.feedback-card {
+    padding:
+        28px;
+
+    border-radius:
+        22px;
+
+    border:
+        1px solid rgba(255,255,255,0.09);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.065),
+            rgba(255,255,255,0.025)
+        );
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.22);
+
+    backdrop-filter:
+        blur(15px);
+}
+
+.feedback-card h2 {
+    margin:
+        0 0 7px;
+
+    font-size:
+        24px;
+}
+
+.feedback-card p {
+    margin:
+        0 0 18px;
+
+    color:
+        #858ca1;
+}
+
+#feedbackMessage {
+    width:
+        100%;
+
+    min-height:
+        130px;
+
+    resize:
+        vertical;
+
+    padding:
+        14px;
+
+    border-radius:
+        13px;
+
+    border:
+        1px solid rgba(255,255,255,0.1);
+
+    outline:
+        none;
+
+    color:
+        white;
+
+    background:
+        rgba(2,4,10,0.65);
+}
+
+#feedbackMessage:focus {
+    border-color:
+        rgba(99,102,241,0.6);
+}
+
+.feedback-bottom {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    margin-top:
+        10px;
+}
+
+#feedbackCount {
+    color:
+        #666d82;
+
+    font-size:
+        12px;
+}
+
+#feedbackButton {
+    border:
+        none;
+
+    border-radius:
+        11px;
+
+    padding:
+        11px 17px;
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #a855f7
+        );
+
+    cursor:
+        pointer;
+
+    font-weight:
+        800;
+}
+
+#feedbackButton:hover {
+    filter:
+        brightness(1.12);
+}
+
+#feedbackButton:disabled {
+    opacity:
+        0.55;
+
+    cursor:
+        not-allowed;
+}
+
+#feedbackStatus {
+    min-height:
+        18px;
+
+    margin-top:
+        10px;
+
+    color:
+        #858ca1;
+
+    font-size:
+        13px;
+}
+
+/* PLAYER */
+
+.player-overlay {
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    z-index:
+        2000;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        20px;
+
+    background:
+        rgba(0,0,0,0.75);
+
+    backdrop-filter:
+        blur(10px);
+}
+
+.player-overlay.show {
+    display:
+        flex;
+}
+
+.player-window {
+    width:
+        min(1100px, 100%);
+
+    height:
+        min(800px, 90vh);
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    overflow:
+        hidden;
+
+    border-radius:
+        20px;
+
+    background:
+        #080a16;
+
+    border:
+        1px solid rgba(255,255,255,0.1);
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,0.6);
+}
+
+.player-header {
+    height:
+        58px;
+
+    padding:
+        0 16px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.08);
+}
+
+.player-title {
+    font-weight:
+        800;
+}
+
+.close-player {
+    width:
+        35px;
+
+    height:
+        35px;
+
+    border:
+        none;
+
+    border-radius:
+        9px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    color:
+        white;
+
+    cursor:
+        pointer;
+
+    font-size:
+        18px;
+}
+
+#gameFrame {
+    flex:
+        1;
+
+    width:
+        100%;
+
+    border:
+        none;
+
+    background:
+        white;
+}
+
+/* MODAL */
+
+.modal {
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    z-index:
+        3000;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        20px;
+
+    background:
+        rgba(0,0,0,0.75);
+}
+
+.modal.show {
+    display:
+        flex;
+}
+
+.modal-box {
+    width:
+        min(420px, 100%);
+
+    padding:
+        25px;
+
+    border-radius:
+        18px;
+
+    background:
+        #0d1020;
+
+    border:
+        1px solid rgba(255,255,255,0.1);
+}
+
+.modal-box h2 {
+    margin-top:
+        0;
+}
+
+.modal-box input {
+    width:
+        100%;
+
+    padding:
+        12px;
+
+    margin:
+        12px 0;
+
+    border-radius:
+        10px;
+
+    color:
+        white;
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border:
+        1px solid rgba(255,255,255,0.1);
+
+    outline:
+        none;
+}
+
+.modal-buttons {
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    justify-content:
+        flex-end;
+}
+
+.modal-buttons button {
+    padding:
+        10px 15px;
+
+    border-radius:
+        9px;
+
+    border:
+        none;
+
+    cursor:
+        pointer;
+}
+
+.cancel-btn {
+    background:
+        rgba(255,255,255,0.08);
+
+    color:
+        white;
+}
+
+.confirm-btn {
+    background:
+        #6366f1;
+
+    color:
+        white;
+}
+
+/* FOOTER */
+
+footer {
+    padding:
+        30px 0 50px;
+
+    color:
+        #666576;
+
+    text-align:
+        center;
+
+    font-size:
+        13px;
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+
+    .game-card-wide { grid-column: span 1; }
+
+    .games-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    header {
+        padding:
+            0 15px;
+    }
+
+    .nav {
+        gap:
+            12px;
+    }
+
+    .nav-link {
+        font-size:
+            13px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    header {
+        height:
+            auto;
+
+        min-height:
+            72px;
+
+        padding:
+            10px 15px;
+
+        gap:
+            10px;
+    }
+
+    .logo {
+        font-size:
+            18px;
+    }
+
+    .logo-icon {
+        width:
+            34px;
+
+        height:
+            34px;
+    }
+
+    .nav {
+        gap:
+            9px;
+
+        flex-wrap:
+            wrap;
+
+        justify-content:
+            flex-end;
+    }
+
+    .nav-link {
+        font-size:
+            12px;
+    }
+
+    .account-btn {
+        padding:
+            5px 7px;
+    }
+
+    .account-btn span {
+        display:
+            none;
+    }
+
+    .hero-card {
+        padding:
+            40px 25px;
+    }
+
+    .hero h1 {
+        font-size:
+            45px;
+
+        letter-spacing:
+            -2px;
+    }
+
+    .games-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .section-header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .search-box {
+        width:
+            100%;
+    }
+
+    .hero-stat {
+        flex:
+            1;
+
+        min-width:
+            140px;
+    }
+
+    .feedback-card {
+        padding:
+            20px;
+    }
+
+    .feedback-bottom {
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+    }
+
+    #feedbackButton {
+        width:
+            100%;
+    }
+}
+/* MODERN COMMUNITY GAMES SLIDER */
+.community-slider-shell{position:relative;display:flex;align-items:center;gap:10px}.community-slider-arrow{flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(129,140,248,.28);border-radius:14px;color:#fff;background:linear-gradient(145deg,rgba(99,102,241,.22),rgba(168,85,247,.16));box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.06);cursor:pointer;font-size:27px;line-height:1;transition:.2s}.community-slider-arrow:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(168,85,247,.55);background:linear-gradient(145deg,rgba(99,102,241,.34),rgba(168,85,247,.27))}.community-slider-arrow:disabled{opacity:.28;cursor:default}.community-games{flex:1 1 auto;min-width:0;scroll-padding-inline:8px;padding:6px 4px 17px}.community-games::-webkit-scrollbar{height:10px}.community-games::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.04);border-radius:999px}.community-games::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#6366f1,#a855f7);border:2px solid rgba(2,4,10,.35);border-radius:999px}.community-games::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#818cf8,#c084fc)}.community-card{flex-basis:min(330px,42vw)}@media(max-width:700px){.community-slider-arrow{flex-basis:36px;width:36px;height:36px;font-size:23px}.community-card{flex-basis:78vw}}
+.community-popularity{margin-top:12px;color:#a5b4fc;font-size:12px;font-weight:800}
+
+/* DougGames visual refresh — component styling only; preserve page background and layout */
+:root {
+  --games-line: rgba(175, 180, 255, .17);
+  --games-muted: #a9b0ce;
+  --games-surface: rgba(13, 17, 39, .76);
+}
+header {
+  border-bottom-color: rgba(174, 166, 255, .15);
+  box-shadow: 0 8px 35px rgba(0,0,0,.16);
+}
+.nav-link {
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.nav-link:hover {
+  background: rgba(129, 140, 248, .10);
+  border-color: rgba(165, 180, 252, .15);
+}
+.account-btn {
+  border-color: var(--games-line);
+  background: rgba(255,255,255,.045);
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.account-btn:hover {
+  background: rgba(129,140,248,.12);
+  border-color: rgba(165,180,252,.35);
+  box-shadow: 0 7px 22px rgba(0,0,0,.16);
+}
+.account-menu {
+  border-color: var(--games-line);
+  box-shadow: 0 22px 65px rgba(0,0,0,.45);
+}
+.account-menu a, .account-menu button {
+  border-radius: 9px;
+  transition: background .16s ease, color .16s ease;
+}
+.account-menu a:hover, .account-menu button:hover {
+  background: rgba(129,140,248,.13);
+}
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(167,139,250,.24);
+  background: linear-gradient(135deg, rgba(26,25,66,.84), rgba(13,17,39,.88) 58%, rgba(54,26,84,.58));
+  box-shadow: 0 24px 70px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.045);
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  color: #d7d5ff;
+  background: rgba(129,140,248,.12);
+  border: 1px solid rgba(165,180,252,.23);
+  border-radius: 999px;
+  font-weight: 750;
+  letter-spacing: .025em;
+}
+.hero h1 span {
+  color: #c4b5fd;
+  text-shadow: 0 0 30px rgba(139,92,246,.22);
+}
+.hero-card > p { color: #c0c5df; }
+.hero-stat {
+  border: 1px solid rgba(180,187,255,.13);
+  border-radius: 14px;
+  background: rgba(4,6,20,.28);
+  padding: 13px 17px;
+}
+.hero-stat-number {
+  color: #fff;
+  text-shadow: 0 0 24px rgba(129,140,248,.22);
+}
+.hero-create-button {
+  border: 1px solid rgba(196,181,253,.3);
+  background: linear-gradient(135deg,#6366f1,#8b5cf6);
+  box-shadow: 0 10px 28px rgba(99,102,241,.22);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.hero-create-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 34px rgba(99,102,241,.31);
+  filter: brightness(1.06);
+}
+.section-header {
+  border-bottom: 1px solid rgba(177,184,255,.10);
+  padding-bottom: 12px;
+}
+.section-title { color: #f5f6ff; }
+.section-subtitle { color: var(--games-muted); }
+.games-grid { align-items: stretch; }
+.game-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--games-line);
+  background: linear-gradient(145deg, rgba(22,27,58,.88), rgba(11,14,31,.91));
+  box-shadow: 0 12px 32px rgba(0,0,0,.17), inset 0 1px rgba(255,255,255,.025);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(167,139,250,.55);
+  background: linear-gradient(145deg, rgba(31,35,76,.94), rgba(14,17,39,.96));
+  box-shadow: 0 20px 42px rgba(0,0,0,.27), 0 0 0 1px rgba(129,140,248,.07);
+}
+.game-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(177,184,255,.12);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(99,102,241,.20), rgba(168,85,247,.12));
+}
+.game-card h3 { color: #f7f7ff; }
+.game-card p { color: #aeb5d1; }
+.play-label {
+  color: #c4b5fd;
+  font-weight: 850;
+  letter-spacing: .06em;
+}
+.game-card:hover .play-label { color: #e9d5ff; }
+.search-box, input[type="search"], #gameSearch {
+  background-color: rgba(8,10,26,.78);
+  border: 1px solid var(--games-line);
+  border-radius: 12px;
+}
+.search-box:focus, input[type="search"]:focus, #gameSearch:focus {
+  outline: none;
+  border-color: rgba(167,139,250,.68);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.13);
+}
+.community-slider-shell {
+  border-color: rgba(177,184,255,.12);
+}
+.community-card {
+  border: 1px solid var(--games-line);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(20,25,53,.94), rgba(10,13,29,.94));
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.community-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(167,139,250,.5);
+  box-shadow: 0 18px 35px rgba(0,0,0,.24);
+}
+.community-slider-arrow {
+  border: 1px solid rgba(177,184,255,.2);
+  background: rgba(17,20,46,.88);
+  color: #e5e7ff;
+  box-shadow: 0 8px 20px rgba(0,0,0,.16);
+}
+.community-slider-arrow:hover {
+  background: rgba(99,102,241,.24);
+  border-color: rgba(167,139,250,.5);
+}
+.feedback-section {
+  border: 1px solid var(--games-line);
+  border-radius: 18px;
+  background: rgba(13,17,39,.62);
+}
+@media (max-width: 700px) {
+  .hero-card { border-radius: 18px; }
+  .game-card:hover, .community-card:hover { transform: none; }
+  .nav-link { padding: 7px 8px; }
+}
+
+
+/* INDEX-INSPIRED DOUG GAMES VISUAL REFRESH */
+.hero{position:relative;isolation:isolate;padding:30px 0 34px;overflow:hidden}
+.hero-card{
+ position:relative;isolation:isolate;overflow:hidden;text-align:left;
+ display:flex;flex-direction:column;align-items:flex-start;
+ padding:clamp(30px,5vw,54px);border:1px solid #b3a7ff20;border-radius:30px;
+ background:linear-gradient(115deg,#13152a 0%,#111326 48%,#101b2d 100%);
+ box-shadow:0 30px 90px #0004;
+}
+.hero-card:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background-image:linear-gradient(#ffffff04 1px,transparent 1px),linear-gradient(90deg,#ffffff04 1px,transparent 1px);
+ background-size:38px 38px;mask-image:linear-gradient(90deg,#000,transparent 95%);
+}
+.hero-card:after{
+ content:"";position:absolute;z-index:-1;width:350px;height:350px;right:-90px;top:-190px;
+ border-radius:50%;background:#7c3aed24;filter:blur(8px);pointer-events:none;
+}
+.hero-badge{
+ display:inline-flex;align-items:center;gap:9px;margin:0 0 20px;padding:0;
+ border:0;border-radius:0;background:none;color:#b6b7d3;
+ font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;
+}
+.hero-badge:before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#70e3b0;box-shadow:0 0 12px #70e3b080}
+.hero h1{margin:0;color:#fbfaff;font-size:clamp(44px,6vw,70px);line-height:1.02;letter-spacing:-.065em;font-weight:850}
+.hero h1 span{color:transparent;background:linear-gradient(95deg,#b9a8ff 0%,#8ba8ff 48%,#70dfd0 100%);background-clip:text;-webkit-background-clip:text}
+.hero p{max-width:650px;margin:20px 0 0;color:#b2b4cc;font-size:15px;line-height:1.8}
+.hero-stats{justify-content:flex-start;gap:12px;margin-top:28px}
+.hero-stat{min-width:145px;padding:16px 19px;border:1px solid #b1b3ff20;border-radius:15px;background:linear-gradient(145deg,#ffffff0b,#ffffff04)}
+.hero-stat-number{background:linear-gradient(95deg,#b9a8ff,#70dfd0);background-clip:text;-webkit-background-clip:text}
+.hero-stat-label{color:#9698b1}
+.hero-create-button{margin-top:25px;padding:13px 19px;border:1px solid #ffffff1c;border-radius:12px;background:linear-gradient(110deg,#7068ee,#9362ee 70%,#667eea);box-shadow:0 12px 32px #7466ee2b}
+.hero-create-button:hover{background:linear-gradient(110deg,#8179ff,#a879ff 70%,#7c91ff);box-shadow:0 16px 38px #7466ee40}
+.section{padding:24px 0 46px}
+.section-header{margin-bottom:18px}
+.section-title{font-size:25px;font-weight:850;letter-spacing:-.035em;color:#f3f2ff}
+.section-subtitle{color:#8588a7;line-height:1.6}
+.game-card,.community-card{
+ border:1px solid #b3a7ff18;
+ background:linear-gradient(145deg,rgba(23,25,49,.94),rgba(12,15,32,.92));
+ box-shadow:0 14px 36px #0000001c;
+}
+.game-card:before,.community-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,rgba(139,92,246,.10),transparent 52%);opacity:.9}
+.game-card h3,.community-card h3{color:#f3f2ff;letter-spacing:-.025em}
+.game-card p,.community-card p{color:#a0a2bd}
+.game-icon{border-color:#b1a3ff2c;background:linear-gradient(145deg,#7770f026,#9b70f01c)}
+.play-label{color:#b8b1ff}
+.community-category{border:1px solid #a78bfa28;background:#8b5cf616;color:#c7bbff}
+.search-box{width:280px;border:1px solid #b1b3ff26;border-radius:12px;background:#080a17b8;color:#f8f7ff}
+.search-box:focus{border-color:#a7a0ffb0;box-shadow:0 0 0 4px #8b7bff14}
+.feedback-card{border:1px solid #b3a7ff20;background:linear-gradient(115deg,#15172c,#101426);box-shadow:0 24px 60px #0003}
+.feedback-card h2{color:#f3f2ff;letter-spacing:-.035em}
+.feedback-card p{color:#9698b1}
+#feedbackMessage{border-color:#b1b3ff24;background:#080a17b8}
+#feedbackMessage:focus{border-color:#a7a0ffb0;box-shadow:0 0 0 4px #8b7bff14}
+@media(max-width:760px){
+ .hero{padding-top:18px}
+ .hero-card{padding:28px 22px;border-radius:22px}
+ .hero h1{font-size:clamp(40px,11vw,58px);letter-spacing:-.055em}
+ .hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+ .hero-stat{min-width:0;padding:15px}
+ .hero-create-button{align-self:flex-start}
+ .section-title{font-size:22px}
+ .section-header{align-items:flex-start;flex-wrap:wrap}
+ .search-box{width:100%}
+}
+
+
+/* TRENDING GAMES */
+.trending-panel{position:relative;overflow:hidden;padding:22px;border:1px solid rgba(167,139,250,.2);border-radius:22px;background:linear-gradient(135deg,rgba(25,27,62,.82),rgba(11,14,31,.94));box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.trending-panel:before{content:"";position:absolute;right:-80px;top:-130px;width:280px;height:280px;border-radius:50%;background:rgba(124,58,237,.12);filter:blur(35px);pointer-events:none}
+.trending-controls{display:flex;gap:8px;flex-wrap:wrap}
+.trending-tab{border:1px solid rgba(177,184,255,.17);background:rgba(255,255,255,.035);color:#b9bdd6;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer}
+.trending-tab.active{color:#fff;background:linear-gradient(120deg,rgba(99,102,241,.28),rgba(168,85,247,.2));border-color:rgba(167,139,250,.45)}
+.trending-grid{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.trending-card{position:relative;min-width:0;text-align:left;color:#fff;padding:17px;border:1px solid rgba(177,184,255,.14);border-radius:16px;background:linear-gradient(145deg,rgba(26,30,64,.82),rgba(9,12,28,.94));cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.trending-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.52);box-shadow:0 14px 32px rgba(0,0,0,.24)}
+.trending-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:13px}
+.trending-rank{display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:27px;padding:0 7px;border-radius:9px;background:rgba(129,140,248,.15);color:#d6d2ff;font-size:12px;font-weight:900}
+.trending-type{color:#969ab8;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.trending-game-icon{font-size:25px;margin-bottom:10px}
+.trending-card h3{margin:0 0 7px;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.trending-card p{margin:0;color:#969bb8;font-size:12px;line-height:1.5}
+.trending-metrics{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid rgba(177,184,255,.1)}
+.trending-metric{color:#bfc4e3;font-size:11px;font-weight:800}
+.trending-metric strong{display:block;color:#f5f3ff;font-size:16px;margin-bottom:3px}
+.trending-note{position:relative;margin:0 0 16px;color:#9297b5;font-size:13px;line-height:1.6}
+.trending-empty{grid-column:1/-1;padding:26px;border:1px dashed rgba(177,184,255,.18);border-radius:15px;text-align:center;color:#9ba0bd;font-size:13px}
+@media(max-width:900px){.trending-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.trending-panel{padding:16px}.trending-grid{grid-template-columns:1fr}.trending-card{padding:15px}}
+
+
+.game-search-controls{display:flex;align-items:center;gap:10px;width:min(100%,520px)}
+.game-search-controls #gameSearch{flex:1;min-width:140px;width:100%}
+.game-search-controls #gameFilter{flex:0 0 150px;min-width:0;padding:13px 12px;color:#f5f6ff;background:rgba(8,10,26,.9);border:1px solid var(--games-line);border-radius:12px}
+.community-card{position:relative;padding-top:44px}
+.community-favorite{position:absolute;top:12px;right:12px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(177,184,255,.2);border-radius:10px;background:rgba(5,7,20,.72);color:#aeb5d1;font-size:18px;cursor:pointer}
+.community-favorite.is-favorite{color:#fbbf24;border-color:#fbbf2466;background:#fbbf2414}
+.community-favorite:hover{transform:scale(1.06)}
+.trending-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.trending-card{padding:clamp(22px,3vw,32px);min-height:220px}
+.trending-card h3{font-size:clamp(18px,2vw,23px)}
+.trending-card p{font-size:14px}
+.trending-game-icon{font-size:32px}
+.trending-metric strong{font-size:19px}
+@media(max-width:520px){.trending-grid{grid-template-columns:1fr}.game-search-controls{flex-direction:column;align-items:stretch}.game-search-controls #gameFilter{flex-basis:auto;width:100%}}
+
+/* ===== DougHub modern glass redesign ===== */
+:root{--games-line:rgba(177,184,255,.16);--games-muted:#a3a8c2;--games-indigo:#6366f1;--games-purple:#a855f7}
+body{background:radial-gradient(ellipse at 12% 0%,rgba(99,102,241,.17),transparent 34%),radial-gradient(ellipse at 88% 6%,rgba(168,85,247,.14),transparent 30%),#050611;color:#f5f6ff;-webkit-font-smoothing:antialiased}
+header{position:sticky!important;top:0!important;z-index:10000!important;min-height:72px;height:auto;padding:12px clamp(14px,3.5vw,48px);gap:14px;background:rgba(5,6,17,.82);border-bottom:1px solid var(--games-line);box-shadow:0 10px 35px rgba(0,0,0,.15);backdrop-filter:blur(22px)}
+main{width:min(1240px,calc(100% - 36px));}
+.hero{padding:38px 0 24px}
+.hero-card{padding:clamp(32px,5.8vw,68px) 24px;border:1px solid var(--games-line);border-radius:30px;background:radial-gradient(circle at 82% 18%,rgba(168,85,247,.18),transparent 34%),radial-gradient(circle at 15% 90%,rgba(99,102,241,.19),transparent 38%),linear-gradient(145deg,rgba(16,20,46,.94),rgba(9,11,27,.88));box-shadow:0 30px 90px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06)}
+.hero-card:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.025) 48%,transparent 72%)}
+.hero-badge{border-color:rgba(167,139,250,.27);background:rgba(99,102,241,.13);color:#c4b5fd;letter-spacing:.04em}
+.hero h1{font-size:clamp(42px,7.5vw,78px);letter-spacing:-.055em;line-height:1.02;margin:22px 0 16px}
+.hero p{max-width:660px;color:#b0b5ce;font-size:clamp(15px,1.8vw,18px)}
+.hero-stats{gap:12px;margin-top:30px}
+.hero-stat{min-width:150px;padding:18px 25px;border-radius:17px;background:rgba(255,255,255,.045);border-color:rgba(177,184,255,.12);box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.hero-stat-number{font-size:30px}
+.hero-create-button,#feedbackButton{border:1px solid rgba(255,255,255,.13);border-radius:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6 60%,#a855f7);box-shadow:0 12px 34px rgba(99,102,241,.23);transition:transform .18s,filter .18s,box-shadow .18s}
+.hero-create-button:hover,#feedbackButton:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 16px 38px rgba(99,102,241,.32)}
+.section{padding:24px 0 34px}
+.section-header{margin-bottom:18px;align-items:flex-end}
+.section-title{font-size:clamp(21px,2.5vw,27px);letter-spacing:-.035em}
+.section-subtitle{color:#969bb5;line-height:1.6}
+.games-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.game-card,.community-card,.trending-card{border:1px solid var(--games-line);background:linear-gradient(145deg,rgba(17,21,48,.88),rgba(10,12,29,.88));box-shadow:0 14px 36px rgba(0,0,0,.13),inset 0 1px rgba(255,255,255,.025);transition:transform .2s,border-color .2s,box-shadow .2s}
+.game-card{min-height:220px;padding:23px;border-radius:21px}
+.game-card:hover,.community-card:hover,.trending-card:hover{transform:translateY(-4px);border-color:rgba(165,180,252,.38);box-shadow:0 22px 48px rgba(0,0,0,.24)}
+.game-card-wide{grid-column:span 1}
+.game-icon{border-radius:16px;background:linear-gradient(145deg,rgba(99,102,241,.18),rgba(168,85,247,.12));border-color:rgba(167,139,250,.22)}
+.game-card h3,.community-card h3{letter-spacing:-.02em}
+.game-card p,.community-card p{color:#a0a5bf}
+.play-label{color:#b5b9ff;font-weight:800;letter-spacing:.04em}
+.game-search-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.search-box,#gameFilter{border:1px solid var(--games-line);border-radius:12px;background:rgba(10,12,29,.88);color:#f5f6ff;outline:none;padding:11px 13px}
+.search-box:focus,#gameFilter:focus{border-color:rgba(129,140,248,.65);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+#gameFilter option{background:#0d1127;color:#fff}
+.community-games{gap:14px;padding:5px 3px 18px}
+.community-card{position:relative;flex-basis:275px;min-height:205px;border-radius:20px;padding:22px}
+.community-category{border:1px solid rgba(167,139,250,.18);background:rgba(139,92,246,.12);color:#d0c4ff}
+.community-author{color:#969bb5}
+.community-popularity{color:#c4b5fd}
+.community-slider-arrow{flex-basis:40px;width:40px;height:40px;border-radius:13px}
+.trending-panel{border:1px solid var(--games-line);border-radius:22px;padding:16px;background:rgba(12,15,35,.62);box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.trending-note{color:#969bb5;line-height:1.55}
+.trending-tab{border:1px solid var(--games-line);border-radius:11px;background:rgba(255,255,255,.035);color:#bfc3da;padding:10px 14px;font-weight:750;transition:all .18s}
+.trending-tab:hover,.trending-tab.active{color:#fff;border-color:rgba(165,180,252,.3);background:rgba(99,102,241,.17)}
+.trending-empty,.empty{border-color:rgba(177,184,255,.18);background:rgba(255,255,255,.02);color:#969bb5;border-radius:16px}
+.feedback-section{padding:20px 0 48px}
+.feedback-card{border-color:var(--games-line);border-radius:24px;background:radial-gradient(circle at 100% 0%,rgba(168,85,247,.09),transparent 35%),linear-gradient(145deg,rgba(17,21,48,.88),rgba(9,11,27,.88));box-shadow:0 20px 55px rgba(0,0,0,.2)}
+.feedback-card p{color:#a0a5bf}
+#feedbackMessage,.modal-box input{background:rgba(3,5,16,.7);border-color:var(--games-line);border-radius:13px}
+#feedbackMessage:focus,.modal-box input:focus{border-color:rgba(129,140,248,.7);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+footer{color:#777e9d}
+.player-window,.modal-box{border:1px solid var(--games-line);background:linear-gradient(145deg,#10132b,#070914);box-shadow:0 35px 100px rgba(0,0,0,.62)}
+.player-header{background:rgba(255,255,255,.025)}
+.close-player{border:1px solid var(--games-line);border-radius:11px}
+@media(max-width:900px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.game-card-wide{grid-column:span 1}.section-header{align-items:flex-start}.trending-controls{display:flex;flex-wrap:wrap;gap:8px}}
+@media(max-width:600px){main{width:calc(100% - 24px)}.hero{padding-top:22px}.hero-card{border-radius:23px;padding:36px 17px}.hero h1{letter-spacing:-.045em;font-size:clamp(39px,12vw,54px)}.hero-stats{gap:9px}.hero-stat{min-width:125px;padding:15px 12px}.hero-stat-number{font-size:26px}.games-grid{grid-template-columns:1fr}.game-card{min-height:195px}.community-slider-shell{gap:6px}.community-slider-arrow{flex-basis:34px;width:34px;height:38px}.community-card{flex-basis:min(275px,82vw)}.section{padding:18px 0 28px}.trending-panel{padding:11px}.trending-controls{width:100%}.trending-tab{flex:1;padding:9px 10px;font-size:12px}}
+
+
+/* Compact, index-matched sizing: keep the existing layout, just tighten it up. */
+:root{--games-line:#ffffff14;--games-muted:#a0a1bb}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 4% 0%,#312e8145,transparent 35%),radial-gradient(ellipse at 92% 9%,#701a7530,transparent 32%),#050611}
+header{height:76px;min-height:0;padding:0 clamp(16px,4vw,56px);gap:0;background:#050611dc;border-bottom:1px solid #ffffff14;box-shadow:none;backdrop-filter:blur(20px)}
+main{width:min(1240px,calc(100% - 40px))}
+.hero{padding:30px 0 18px}
+.hero-card{padding:34px 28px;border-radius:22px;background:radial-gradient(circle at 85% 10%,#a855f715,transparent 38%),linear-gradient(145deg,#10142bef,#090b19ed);border:1px solid #ffffff14;box-shadow:0 16px 45px #0002,inset 0 1px #ffffff08}
+.hero-card:after{display:none}
+.hero-badge{padding:5px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#6366f118;border-color:#a78bfa30;color:#c4b5fd}
+.hero h1{font-size:clamp(36px,5vw,56px);letter-spacing:-.06em;line-height:1.02;margin:15px 0 12px}
+.hero p{font-size:14px;line-height:1.75;max-width:600px;color:#b4b5cc}
+.hero-stats{gap:10px;margin-top:22px}
+.hero-stat{min-width:125px;padding:13px 18px;border-radius:13px;background:#ffffff05;border-color:#ffffff12;box-shadow:none}
+.hero-stat-number{font-size:24px}
+.hero-stat-label{font-size:11px;margin-top:6px;color:#a0a1bb}
+.hero-create-button{margin-top:20px;min-height:42px;padding:0 17px;border-radius:12px;font-size:12px;box-shadow:0 8px 24px #6366f122}
+.section{padding:24px 0}
+.section-header{margin-bottom:15px}
+.section-title{font-size:23px;letter-spacing:-.04em}
+.section-subtitle{font-size:12px;line-height:1.6;color:#a0a1bb}
+.games-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.game-card{min-height:175px;padding:18px;border-radius:16px;background:linear-gradient(145deg,#10142bef,#090b19ed);border-color:#ffffff12;box-shadow:none}
+.game-card:hover,.community-card:hover,.trending-card:hover{transform:translateY(-3px);border-color:#a78bfa50;box-shadow:0 12px 28px #0003}
+.game-icon{width:42px;height:42px;border-radius:12px;font-size:22px}
+.game-card h3{font-size:16px;margin:13px 0 6px}
+.game-card p{font-size:12px;line-height:1.6;color:#a0a1bb}
+.play-label{left:18px;bottom:14px;font-size:11px}
+.game-search-controls{gap:8px}
+.search-box,#gameFilter{padding:9px 11px;border-radius:10px;font-size:12px;background:#0b0e1d;border-color:#ffffff14}
+.community-games{gap:12px;padding:4px 2px 14px}
+.community-card{flex-basis:245px;min-height:170px;padding:17px;border-radius:16px;background:linear-gradient(145deg,#10142bef,#090b19ed);border-color:#ffffff12;box-shadow:none}
+.community-category{font-size:10px;padding:4px 8px}
+.community-card h3{font-size:15px;margin:11px 0 6px}
+.community-card p{font-size:12px;line-height:1.55;color:#a0a1bb}
+.community-author{font-size:10px;margin-top:11px;color:#8588a7}
+.community-popularity{font-size:11px}
+.community-slider-arrow{flex-basis:34px;width:34px;height:34px;border-radius:11px;font-size:22px}
+.trending-panel{padding:12px;border-radius:17px;background:#ffffff03;border-color:#ffffff12;box-shadow:none}
+.trending-note{font-size:11px;line-height:1.6;color:#a0a1bb}
+.trending-tab{padding:8px 11px;border-radius:10px;font-size:11px;background:#ffffff06;border-color:#ffffff14}
+.feedback-section{padding:12px 0 36px}
+.feedback-card{padding:20px;border-radius:18px;border-color:#ffffff14;background:linear-gradient(145deg,#10142bef,#090b19ed);box-shadow:none;backdrop-filter:none}
+.feedback-card h2{font-size:18px;margin-bottom:5px}
+.feedback-card p{font-size:12px;line-height:1.65;color:#a0a1bb;margin-bottom:13px}
+#feedbackMessage{min-height:95px;padding:12px;border-radius:11px;font-size:12px}
+#feedbackButton{padding:9px 14px;border-radius:10px;font-size:12px;box-shadow:none}
+#feedbackCount,#feedbackStatus{font-size:11px}
+footer{padding:22px 0 32px;color:#747792;font-size:11px}
+.player-window{width:min(1050px,100%);height:min(740px,90vh);border-radius:17px;box-shadow:0 25px 70px #0008}
+.player-header{height:50px;flex-shrink:0}
+.modal-box{padding:21px;border-radius:16px}
+@media(max-width:900px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-header{align-items:flex-start}.trending-controls{display:flex;flex-wrap:wrap;gap:7px}}
+@media(max-width:600px){main{width:calc(100% - 24px)}.hero{padding:18px 0 12px}.hero-card{padding:28px 17px;border-radius:18px}.hero h1{font-size:clamp(34px,10vw,44px);letter-spacing:-.055em}.hero-stats{gap:8px;margin-top:18px}.hero-stat{min-width:112px;padding:11px 12px}.hero-stat-number{font-size:22px}.hero-create-button{margin-top:16px}.games-grid{grid-template-columns:1fr}.game-card{min-height:158px;padding:16px}.game-card-wide{grid-column:span 1}.section{padding:19px 0}.section-title{font-size:21px}.section-header{gap:12px}.community-slider-shell{gap:5px}.community-slider-arrow{flex-basis:29px;width:29px;height:32px;font-size:20px}.community-card{flex-basis:min(245px,80vw);min-height:165px}.trending-panel{padding:9px}.trending-controls{width:100%}.trending-tab{flex:1;padding:8px;font-size:10px}.feedback-card{padding:16px}.feedback-bottom{align-items:center;flex-direction:row}#feedbackButton{width:auto}}
+
+
+/* Small, airy index-inspired games intro */
+.games-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(270px,.9fr);align-items:center;gap:clamp(20px,4vw,48px);padding:32px 0 24px;overflow:visible}
+.games-hero-copy{min-width:0}
+.games-hero-eyebrow{display:flex;align-items:center;gap:8px;color:#b6b7d3;font-size:10px;font-weight:900;letter-spacing:.15em}
+.games-hero-eyebrow>span,.games-live-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#70e3b0;box-shadow:0 0 12px #70e3b080}
+.games-hero h1{margin:14px 0 11px;font-size:clamp(34px,4.3vw,53px);font-weight:850;line-height:1.02;letter-spacing:-.065em}
+.games-hero h1 span{color:transparent;background:linear-gradient(95deg,#b9a8ff,#8ba8ff 55%,#70dfd0);background-clip:text;-webkit-background-clip:text}
+.games-hero-copy>p{max-width:460px;margin:0;color:#b2b4cc;font-size:13px;line-height:1.75}
+.games-hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:19px}
+.games-hero-button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:38px;padding:0 13px;border:1px solid #ffffff17;border-radius:10px;background:#ffffff06;color:#f7f5ff;font-size:11px;font-weight:800;transition:transform .18s,border-color .18s,background .18s}
+.games-hero-button:hover{transform:translateY(-2px);border-color:#a78bfa70;background:#ffffff0d}
+.games-hero-button.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 8px 22px #6366f122}
+.games-hero-meta{display:flex;align-items:center;gap:11px;margin-top:17px;color:#8588a7;font-size:10px}
+.games-hero-meta strong{color:#c9c9e2;font-size:11px}
+.games-hero-meta i{width:3px;height:3px;border-radius:50%;background:#666985}
+.games-hero-preview{min-width:0;padding:15px;border:1px solid #ffffff12;border-radius:17px;background:linear-gradient(145deg,#10142bef,#090b19ed);box-shadow:0 15px 35px #0002}
+.games-preview-top{display:flex;align-items:center;gap:7px;color:#a0a1bb;font-size:9px;font-weight:850;letter-spacing:.09em}
+.games-preview-count{margin-left:auto;color:#6f7391;font-size:9px}
+.games-preview-feature{display:flex;align-items:center;gap:12px;margin-top:13px;padding:12px;border:1px solid #ffffff10;border-radius:12px;background:#ffffff04}
+.games-preview-art{display:grid;place-items:center;width:56px;height:56px;flex:0 0 56px;border:1px solid #a78bfa24;border-radius:12px;background:linear-gradient(145deg,#6366f126,#a855f724);font-size:30px}
+.games-preview-feature>div:nth-child(2){display:grid;gap:4px;min-width:0}
+.games-preview-feature small{color:#a5b4fc;font-size:8px;font-weight:900;letter-spacing:.1em}
+.games-preview-feature strong{font-size:14px;letter-spacing:-.3px}
+.games-preview-feature span{color:#8588a7;font-size:10px}
+.games-preview-feature>b{margin-left:auto;color:#a5b4fc;font-size:16px}
+.games-preview-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+.games-preview-mini>div{display:grid;justify-items:center;gap:6px;padding:10px 4px;border:1px solid #ffffff0c;border-radius:10px;background:#ffffff03}
+.games-preview-mini>div span{font-size:18px}
+.games-preview-mini small{color:#a0a1bb;font-size:9px}
+@media(max-width:700px){.games-hero{grid-template-columns:1fr;gap:19px;padding:23px 0 15px}.games-hero h1{font-size:clamp(34px,9vw,44px)}.games-hero-preview{max-width:460px;width:100%}}
+@media(max-width:600px){.games-hero-actions{gap:8px}.games-hero-button{min-height:36px}.games-hero-meta{margin-top:13px}}
+
+
+/* Compact standout 2-in-1 Drive Pig tile */
+.drive-pig-switcher{grid-column:auto!important;min-height:0!important;padding:17px!important;display:flex;flex-direction:column;align-items:stretch;gap:10px;position:relative;overflow:hidden;border-color:#8b7bff66!important;background:radial-gradient(ellipse at 95% 0%,#a855f72b,transparent 45%),linear-gradient(145deg,rgba(25,24,62,.98),rgba(10,12,29,.98))!important;box-shadow:0 0 0 1px #8b5cf61c,0 12px 35px #0004}
+.drive-pig-switcher:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#6366f1,#d946ef,#f0abfc);pointer-events:none}
+.drive-pig-topline{display:flex;align-items:center;justify-content:space-between;gap:8px}.drive-pig-topline .game-icon{width:43px;height:43px;display:grid;place-items:center;font-size:23px;margin:0;background:#8b5cf624;border-color:#a78bfa44}
+.drive-pig-twoinone{padding:6px 8px;border-radius:8px;background:linear-gradient(110deg,#6366f13b,#c026d33b);border:1px solid #c4b5fd55;color:#e5ddff;font-size:9px;font-weight:1000;letter-spacing:.08em;white-space:nowrap}.drive-pig-twoinone b{color:#f5d0fe}
+.drive-pig-version-label{font-size:8px;font-weight:900;letter-spacing:.14em;color:#c4b5fd}.drive-pig-switcher h3{margin:0!important;font-size:19px!important;line-height:1.25;color:#fff}.drive-pig-title-tag{font-size:9px;vertical-align:middle;color:#ddd6fe;border:1px solid #a78bfa44;border-radius:5px;padding:3px 5px;letter-spacing:0}.drive-pig-switcher p{margin:0!important;min-height:37px;color:#a0a5bf;font-size:11px!important;line-height:1.55}
+.drive-pig-toggle{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid #ffffff19;border-radius:12px;background:#070916a8;isolation:isolate}.drive-pig-slider{position:absolute;z-index:-1;left:4px;top:4px;bottom:4px;width:calc((100% - 12px)/2);border:1px solid #a5b4fc55;border-radius:8px;background:linear-gradient(110deg,#6366f14a,#a855f745);transition:transform .22s cubic-bezier(.2,.8,.2,1)}.drive-pig-toggle[data-selected="racing"] .drive-pig-slider{transform:translateX(calc(100% + 4px))}
+.drive-pig-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:66px;padding:7px 3px;text-align:center;border:1px solid transparent;border-radius:8px;background:transparent;color:#a5a8c4;cursor:pointer;transition:color .18s}.drive-pig-option.active{color:#fff}.drive-pig-option:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px}.drive-pig-option-icon{display:grid;place-items:center;width:27px;height:27px;border:1px solid #ffffff12;border-radius:8px;background:#ffffff08;font-size:16px}.drive-pig-option>span:last-child{display:grid;gap:3px;min-width:0}.drive-pig-option b{font-size:10px;white-space:nowrap}.drive-pig-option small{font-size:8px;color:#8588a7;white-space:nowrap}.drive-pig-option.active small{color:#c4b5fd}
+.drive-pig-play{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;background:linear-gradient(110deg,#6366f1,#a855f7);color:white;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.06em;box-shadow:0 8px 20px #6366f12b;transition:transform .18s,filter .18s}.drive-pig-play:hover{transform:translateY(-2px);filter:brightness(1.12)}.drive-pig-play span{font-size:15px;line-height:10px}.drive-pig-status{display:flex;align-items:center;gap:6px;color:#8588a7;font-size:9px;line-height:1.4}.drive-pig-live-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 9px #6ee7b766}
+@media(max-width:600px){.drive-pig-switcher{gap:10px;padding:17px!important}.drive-pig-switcher p{min-height:0}.drive-pig-option{min-height:63px}}
+
+
+/* Game storefront polish: familiar DougHub glass style, with a more playable arcade layout. */
+.games-discovery-nav{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px;margin:0 0 5px;border:1px solid #ffffff12;border-radius:15px;background:linear-gradient(110deg,#0d1022d9,#080a17d9);box-shadow:0 10px 28px #0002}
+.games-discovery-link,.games-discovery-create{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:0 12px;border:1px solid transparent;border-radius:10px;color:#aeb2ce;font-size:11px;font-weight:800;white-space:nowrap;transition:background .18s,border-color .18s,color .18s,transform .18s}
+.games-discovery-link span{font-size:14px;color:#a5a8ff}
+.games-discovery-link:hover,.games-discovery-link.active{color:#fff;border-color:#a78bfa28;background:#7770e51c}
+.games-discovery-create{margin-left:auto;color:#fff;border-color:#a78bfa30;background:linear-gradient(110deg,#6366f126,#a855f71c)}
+.games-discovery-create:hover{transform:translateY(-1px);background:linear-gradient(110deg,#6366f13b,#a855f735)}
+#trendingSection{padding-top:22px}
+#trendingSection .section-header{align-items:center}
+.trending-card{position:relative;overflow:hidden}
+.trending-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#6366f1,#a855f7,#67e8f9);opacity:.8}
+.trending-card-top,.trending-game-icon,.trending-card h3,.trending-card p,.trending-metrics{position:relative}
+.trending-game-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:12px;border:1px solid #a78bfa2b;border-radius:15px;background:radial-gradient(circle at 30% 20%,#a78bfa2b,transparent 70%),#6366f112}
+.games-grid{align-items:stretch}
+.game-card{display:flex;flex-direction:column;align-items:flex-start;isolation:isolate;min-height:205px!important;padding:19px!important;background:linear-gradient(180deg,#171a35e8 0%,#0b0d1eeF 75%)!important}
+.game-card:before{content:"";position:absolute;z-index:-1;inset:0 0 auto;height:88px;background:radial-gradient(ellipse at 18% 0%,#8b5cf630,transparent 68%),linear-gradient(120deg,#6366f112,#a855f70a);pointer-events:none}
+.game-card:after{content:"";position:absolute;z-index:-1;right:-28px;top:-38px;width:120px;height:120px;border-radius:50%;border:1px solid #a78bfa12;box-shadow:0 0 0 18px #a78bfa05,0 0 0 38px #a78bfa03;pointer-events:none}
+.game-card .game-icon{width:48px!important;height:48px!important;flex:0 0 48px;border-radius:14px!important;background:linear-gradient(145deg,#6366f12c,#a855f71e)!important;box-shadow:0 8px 20px #0002}
+.game-card h3{margin:14px 0 6px!important;font-size:16px!important;line-height:1.35}
+.game-card p{margin:0 0 29px!important;font-size:12px!important;line-height:1.6}
+.game-card .play-label{left:19px;bottom:15px;padding:6px 9px;border:1px solid #a5b4fc22;border-radius:8px;background:#6366f113;color:#c4c7ff;font-size:9px;letter-spacing:.06em}
+.game-card:hover:before{background:radial-gradient(ellipse at 18% 0%,#8b5cf64a,transparent 68%),linear-gradient(120deg,#6366f11a,#a855f712)}
+.drive-pig-switcher{display:flex!important}
+.community-slider-shell{align-items:stretch}
+.community-card{overflow:hidden;background:linear-gradient(180deg,#171a35e8,#0b0d1eef)!important}
+.community-card:after{content:"";position:absolute;z-index:0;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8b5cf6,#6366f1);opacity:.7}
+.community-card>*{position:relative}
+.community-favorite{z-index:2}
+.community-card:hover{background:linear-gradient(180deg,#1c1d40,#0d1024)!important}
+.section-title{display:flex;align-items:center;gap:9px}
+.section-title:before{content:"";width:3px;height:22px;flex:0 0 3px;border-radius:99px;background:linear-gradient(#818cf8,#c084fc)}
+@media(max-width:700px){.games-discovery-nav{gap:5px;padding:7px}.games-discovery-link,.games-discovery-create{min-height:33px;padding:0 9px;font-size:10px}.games-discovery-create{margin-left:0}.game-card{min-height:190px!important}.game-card h3{font-size:15px!important}}
+@media(max-width:480px){.games-discovery-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.games-discovery-link,.games-discovery-create{width:100%}.games-discovery-create{grid-column:1/-1}.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.game-card{min-height:205px!important;padding:13px!important}.game-card .game-icon{width:40px!important;height:40px!important;flex-basis:40px}.game-card h3{font-size:14px!important}.game-card p{font-size:11px!important}.game-card .play-label{left:13px;bottom:12px}.drive-pig-switcher{grid-column:span 2!important}}
+@media(prefers-reduced-motion:reduce){.games-discovery-link,.games-discovery-create,.game-card,.community-card,.trending-card{transition:none}}
+
+
+/* COMPACT TRENDING LEADERBOARD */
+#trendingSection{padding-top:8px;padding-bottom:24px}
+#trendingSection .section-header{margin-bottom:12px}
+#trendingSection .section-title{font-size:21px}
+#trendingSection .section-subtitle{font-size:12px}
+#trendingSection .trending-panel{padding:12px;border-radius:16px}
+#trendingSection .trending-note{font-size:11px;line-height:1.4;margin-bottom:9px}
+#trendingSection .trending-grid{gap:8px}
+#trendingSection .trending-card{padding:11px;border-radius:12px}
+#trendingSection .trending-card-top{margin-bottom:7px}
+#trendingSection .trending-rank{min-width:23px;height:23px;font-size:10px}
+#trendingSection .trending-game-icon{font-size:19px;margin-bottom:5px}
+#trendingSection .trending-card h3{font-size:13px;margin-bottom:4px}
+#trendingSection .trending-card p{font-size:11px;line-height:1.35}
+#trendingSection .trending-metrics{gap:8px;margin-top:8px;padding-top:7px}
+#trendingSection .trending-metric{font-size:10px}
+#trendingSection .trending-metric strong{font-size:13px}
+#trendingSection .trending-tab{padding:7px 9px;font-size:11px}
+@media(max-width:520px){#trendingSection .trending-panel{padding:10px}#trendingSection .trending-card{padding:10px}}
+
+
+/* Give the Drive Pig 2-in-1 selector its own wider mini-column. */
+@media(min-width:1000px){
+  .games-grid{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(250px,1.35fr);grid-auto-flow:dense}
+  .games-grid>.drive-pig-switcher{grid-column:4;grid-row:1 / span 2;align-self:stretch}
+  .games-grid>.drive-pig-switcher .drive-pig-toggle{grid-template-columns:1fr}
+  .games-grid>.drive-pig-switcher .drive-pig-slider{left:4px;right:4px;top:4px;bottom:auto;width:auto;height:calc((100% - 12px)/2);transition:transform .25s ease}
+  .games-grid>.drive-pig-switcher .drive-pig-option{min-height:54px;justify-content:flex-start}
+  .games-grid>.drive-pig-switcher .drive-pig-toggle[data-selected="racing"] .drive-pig-slider{transform:translateY(calc(100% + 4px))}
+}
+@media(max-width:999px){
+  .games-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .games-grid>.drive-pig-switcher{grid-column:auto;grid-row:auto}
+  .games-grid>.drive-pig-switcher .drive-pig-toggle{grid-template-columns:1fr 1fr}
+  .games-grid>.drive-pig-switcher .drive-pig-slider{left:4px;right:auto;top:4px;bottom:4px;width:calc((100% - 8px)/2);height:auto}
+  .games-grid>.drive-pig-switcher .drive-pig-toggle[data-selected="racing"] .drive-pig-slider{transform:translateX(calc(100% + 4px))}
+}
+@media(max-width:700px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.games-grid{grid-template-columns:1fr}}
+
+
+/* OPEN-SOURCE GAME ART — DougHub CC0 art pack */
+.games-grid .game-card{isolation:isolate;background:linear-gradient(105deg,rgba(13,17,39,.98) 0%,rgba(13,17,39,.88) 50%,rgba(13,17,39,.48) 100%)}
+.games-grid .game-card::before{content:"";position:absolute;z-index:-1;inset:0 0 0 auto;width:68%;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:.56;mask-image:linear-gradient(90deg,transparent 0%,#000 46%);transition:transform .35s,opacity .25s}
+.games-grid .game-card:hover::before{transform:scale(1.06);opacity:.78}
+.games-grid .game-card>*{position:relative;z-index:1}
+.games-grid .game-card .game-icon{width:58px;height:58px;background-size:cover;background-position:center;border:1px solid #ffffff35;box-shadow:0 8px 24px #0005;font-size:0}
+.game-card[href*="bubble-grove"]::before{background-image:url("Games/art/bubble-grove.svg")}
+.game-card[href*="titlebound"]::before{background-image:url("Games/art/titlebound.svg")}
+.game-card[href*="neon-survivor"]::before{background-image:url("Games/art/neon-survivor.svg")}
+.game-card[href*="dead-city"]::before{background-image:url("Games/art/dead-city.svg")}
+.game-card[href*="starfall-run"]::before{background-image:url("Games/art/starfall-run.svg")}
+.game-card[href*="crystal-breaker"]::before{background-image:url("Games/art/crystal-breaker.svg")}
+.game-card[href*="pig-clicker"]::before{background-image:url("Games/art/pig-clicker.svg")}
+.game-card[href*="rebirth-clicker"]::before{background-image:url("Games/art/rebirth-clicker.svg")}
+.game-card[href*="ocean-drive"]::before{background-image:url("Games/art/ocean-drive.svg")}
+.game-card[href*="racing.html"]::before{background-image:url("Games/art/racing.svg")}
+.game-card[href*="puzzle.html"]::before{background-image:url("Games/art/puzzle.svg")}
+.game-card[href*="sudoku.html"]::before{background-image:url("Games/art/sudoku.svg")}
+.game-card[href*="sudoku.html"] .game-icon{background-image:url("Games/art/sudoku.svg")}
+
+.game-card[href*="bubble-grove"] .game-icon{background-image:url("Games/art/bubble-grove.svg")}
+.game-card[href*="titlebound"] .game-icon{background-image:url("Games/art/titlebound.svg")}
+.game-card[href*="neon-survivor"] .game-icon{background-image:url("Games/art/neon-survivor.svg")}
+.game-card[href*="dead-city"] .game-icon{background-image:url("Games/art/dead-city.svg")}
+.game-card[href*="starfall-run"] .game-icon{background-image:url("Games/art/starfall-run.svg")}
+.game-card[href*="crystal-breaker"] .game-icon{background-image:url("Games/art/crystal-breaker.svg")}
+.game-card[href*="pig-clicker"] .game-icon{background-image:url("Games/art/pig-clicker.svg")}
+.game-card[href*="rebirth-clicker"] .game-icon{background-image:url("Games/art/rebirth-clicker.svg")}
+.game-card[href*="ocean-drive"] .game-icon{background-image:url("Games/art/ocean-drive.svg")}
+.game-card[href*="racing.html"] .game-icon{background-image:url("Games/art/racing.svg")}
+#drivePigSwitcher::before{content:"";position:absolute;z-index:-1;inset:0 0 0 auto;width:65%;background:url("Games/art/drive-pig.svg") center/cover no-repeat;opacity:.55;mask-image:linear-gradient(90deg,transparent,#000 55%)}
+#drivePigIcon{font-size:0!important;background:url("Games/art/drive-pig.svg") center/cover!important}
+.game-card-puzzle .game-card-art{opacity:.0}
+@media(max-width:600px){.games-grid .game-card::before{width:62%;opacity:.38}}
+
+</style>
+  <script src="nav.js?v=20261030-no-class" defer></script>
+
+<script src="search-autofill-fix.js" defer></script>
+
+<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
+
+/* DougHub page-specific redesign — homepage glass language, embedded locally */
+:root{color-scheme:dark;--dh-ink:#f6f5ff;--dh-muted:#a4a7c4;--dh-line:rgba(177,184,255,.15);--dh-glass:rgba(13,17,39,.82);--dh-glass-deep:rgba(5,7,20,.86);--dh-indigo:#6366f1;--dh-purple:#a855f7}
+*{box-sizing:border-box}
+body{color:var(--dh-ink);-webkit-font-smoothing:antialiased}
+a{transition:color .18s ease,text-decoration-color .18s ease}
+h1,h2,h3,h4{letter-spacing:-.035em}
+::selection{background:#7776ed66;color:#fff}
+button,input,textarea,select{font:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background-color:rgba(5,7,19,.82);border:1px solid var(--dh-line);border-radius:12px}
+input::placeholder,textarea::placeholder{color:#898eaf}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
+button,.button,.btn,a.button,input[type=button],input[type=submit]{border-radius:12px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease}
+button:not(:disabled):hover,.button:hover,.btn:hover,a.button:hover{filter:brightness(1.08)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+.card,.panel,.settings-card,.settings-section,.tool-card,.game-card,.feature-card,.content-card,.auth-card,.feedback-section,.section-card,.video-card,.post-card,.profile-card,.workspace-card,.modal,.modal-box,.modal-content{border-color:var(--dh-line)}
+@media(max-width:700px){button,.button,.btn,a.button{max-width:100%}}
+
+
+body{background:radial-gradient(circle at 8% 0,#17133b,transparent 35%),radial-gradient(circle at 92% 8%,#25104b,transparent 30%),#02040a}
+header{background:rgba(4,5,15,.82);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
+.logo-icon,.account-avatar{background:linear-gradient(135deg,#6366f1,#a855f7)}
+.hero-card{background:radial-gradient(circle at 80% 15%,#a855f733,transparent 35%),radial-gradient(circle at 15% 85%,#6366f129,transparent 35%),rgba(13,17,39,.82);border:1px solid var(--dh-line);border-radius:28px;box-shadow:0 25px 80px #0004,inset 0 1px #ffffff08}
+.hero-badge{background:#6366f11b;border:1px solid #818cf13b;border-radius:999px;color:#c4b5fd}
+.hero-create-button{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #b6a4ff55;color:#fff;box-shadow:0 10px 30px #6366f133}
+.game-card{background:linear-gradient(145deg,rgba(18,22,50,.92),rgba(8,10,25,.9));border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 16px 42px #0003;transition:transform .2s,border-color .2s,box-shadow .2s}
+.game-card:hover{transform:translateY(-4px);border-color:#8b83ff77;box-shadow:0 22px 55px #0004,0 0 25px #6366f111}
+.section-header{border-color:var(--dh-line)}
+.search-box{background:#070918;border:1px solid var(--dh-line);border-radius:13px}
+.feedback-section,.feedback-card{background:rgba(13,17,39,.8);border:1px solid var(--dh-line);border-radius:22px}
+.player-window,.modal-box{background:#0d1127;border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 25px 80px #0008}
+
+
+/* Follow-up sizing: roomier Games intro, more compact Trending cards */
+.games-hero{padding:48px 0 34px;gap:clamp(28px,5vw,62px);grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr)}
+.games-hero h1{font-size:clamp(40px,5vw,62px);margin:18px 0 14px}
+.games-hero-copy>p{font-size:14px;line-height:1.8;max-width:510px}
+.games-hero-actions{margin-top:23px}
+.games-hero-button{min-height:41px;padding:0 15px;font-size:12px}
+.games-hero-meta{margin-top:20px;font-size:11px}
+.games-hero-preview{padding:18px;border-radius:19px}
+.games-preview-feature{padding:14px;margin-top:15px}
+.games-preview-art{width:62px;height:62px;flex-basis:62px;font-size:32px}
+.games-preview-feature strong{font-size:15px}
+.games-preview-mini{gap:9px;margin-top:11px}
+.games-preview-mini>div{padding:12px 5px}
+.trending-panel{padding:10px;border-radius:16px}
+.trending-note{margin-bottom:11px;font-size:10px}
+.trending-grid{gap:12px}
+.trending-card{padding:15px;min-height:160px;border-radius:14px}
+.trending-card-top{margin-bottom:9px}
+.trending-rank{min-width:24px;height:24px;font-size:11px}
+.trending-type{font-size:9px}
+.trending-game-icon{font-size:25px;margin-bottom:7px}
+.trending-card h3{font-size:16px;margin:0 0 5px}
+.trending-card p{font-size:12px;line-height:1.45}
+.trending-metrics{gap:8px;margin-top:10px;padding-top:9px}
+.trending-metric{font-size:10px}
+.trending-metric strong{font-size:15px}
+@media(max-width:700px){.games-hero{padding:30px 0 23px;gap:20px;grid-template-columns:1fr}.games-hero h1{font-size:clamp(38px,10vw,50px)}.games-hero-preview{max-width:none}}
+@media(max-width:520px){.games-hero{padding:25px 0 18px}.games-hero-preview{padding:14px}.trending-card{min-height:145px;padding:13px}.trending-card h3{font-size:15px}}
+
+
+/* Slightly larger overall scale for easier reading and a fuller layout */
+main{width:min(1280px,calc(100% - 44px))}
+.games-hero{padding:54px 0 38px;gap:clamp(32px,5.2vw,68px)}
+.games-hero h1{font-size:clamp(43px,5.3vw,66px)}
+.games-hero-copy>p{font-size:15px;line-height:1.85}
+.games-hero-eyebrow{font-size:11px}
+.games-hero-actions{gap:11px;margin-top:25px}
+.games-hero-button{min-height:44px;padding:0 17px;font-size:12px}
+.games-hero-meta{font-size:12px;margin-top:22px}
+.games-hero-meta strong{font-size:12px}
+.games-hero-preview{padding:20px}
+.games-preview-top{font-size:10px}
+.games-preview-feature{padding:16px;gap:14px}
+.games-preview-art{width:68px;height:68px;flex-basis:68px;font-size:35px}
+.games-preview-feature strong{font-size:16px}
+.games-preview-feature span{font-size:11px}
+.games-preview-mini>div{padding:14px 5px}
+.games-preview-mini>div span{font-size:20px}
+.games-preview-mini small{font-size:10px}
+.section{padding:28px 0 32px}
+.section-title{font-size:clamp(23px,2.6vw,29px)}
+.section-subtitle{font-size:13px}
+.section-header{margin-bottom:18px}
+.games-grid{gap:15px}
+.game-card{min-height:190px;padding:20px}
+.game-icon{width:46px;height:46px;font-size:24px}
+.game-card h3{font-size:17px;margin:15px 0 7px}
+.game-card p{font-size:13px;line-height:1.65}
+.play-label{font-size:12px}
+.search-box,#gameFilter{font-size:13px;padding:11px 13px}
+.community-games{gap:14px}
+.community-card{flex-basis:260px;min-height:185px;padding:19px}
+.community-category{font-size:11px}
+.community-card h3{font-size:16px}
+.community-card p{font-size:13px}
+.community-author{font-size:11px}
+.community-slider-arrow{flex-basis:37px;width:37px;height:37px}
+.trending-panel{padding:13px}
+.trending-note{font-size:12px;margin-bottom:13px}
+.trending-grid{gap:14px}
+.trending-card{padding:17px;min-height:175px}
+.trending-rank{min-width:26px;height:26px;font-size:12px}
+.trending-type{font-size:10px}
+.trending-game-icon{font-size:28px}
+.trending-card h3{font-size:17px}
+.trending-card p{font-size:13px}
+.trending-metric{font-size:11px}
+.trending-metric strong{font-size:17px}
+.feedback-card{padding:23px}
+.feedback-card h2{font-size:20px}
+.feedback-card p{font-size:13px}
+#feedbackMessage{font-size:13px;min-height:110px}
+#feedbackButton{font-size:13px;padding:11px 16px}
+footer{font-size:12px}
+@media(max-width:700px){
+ main{width:calc(100% - 28px)}
+ .games-hero{padding:32px 0 25px;gap:22px}
+ .games-hero h1{font-size:clamp(39px,10.5vw,51px)}
+ .games-hero-copy>p{font-size:14px}
+ .games-hero-preview{padding:16px}
+ .section{padding:22px 0 26px}
+ .game-card{min-height:175px;padding:17px}
+ .community-card{flex-basis:min(260px,83vw)}
+ .trending-card{padding:15px;min-height:160px}
+}
+
+</style>
+<style id="DOUGHUB_2048_CARD_ART">
+.game-card-puzzle{background:radial-gradient(ellipse at 92% 8%,#8b5cf626,transparent 48%),linear-gradient(145deg,rgba(18,22,53,.96),rgba(8,11,27,.96))!important;border-color:#8b83e844!important}
+.game-card-puzzle .game-card-art{position:absolute;right:17px;top:17px;width:108px;height:108px;padding:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border:1px solid #b6b8ff30;border-radius:15px;background:#090c20;box-shadow:0 14px 30px #0006;transform:rotate(4deg)}
+.game-card-puzzle .game-card-art span{display:grid;place-items:center;border-radius:6px;background:linear-gradient(145deg,#353a70,#25294f);color:#e8eaff;font-size:13px;font-weight:950;box-shadow:inset 0 1px #ffffff30}
+.game-card-puzzle .game-card-art span:nth-child(2),.game-card-puzzle .game-card-art span:nth-child(5){background:linear-gradient(145deg,#51418c,#35265e)}
+.game-card-puzzle .game-card-art span:nth-child(3),.game-card-puzzle .game-card-art span:nth-child(6){background:linear-gradient(145deg,#6366f1,#4338ca)}
+.game-card-puzzle .game-card-art span:nth-child(4),.game-card-puzzle .game-card-art span:nth-child(7){background:linear-gradient(145deg,#8b5cf6,#6d28d9)}
+.game-card-puzzle .game-card-art span:nth-child(8),.game-card-puzzle .game-card-art span:nth-child(9){background:linear-gradient(145deg,#c026d3,#86198f)}
+.game-card-puzzle h3{margin-top:12px!important;max-width:150px}
+.game-card-puzzle p{max-width:72%}
+@media(max-width:600px){.game-card-puzzle .game-card-art{width:88px;height:88px;right:12px;top:13px}.game-card-puzzle p{max-width:70%}}
+</style>
+<style id="dh-game-logo-art">
+.game-icon{width:66px;height:66px;flex:0 0 66px;overflow:hidden;padding:0;background:rgba(255,255,255,.035);border:1px solid rgba(167,139,250,.24);box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.game-icon img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.game-card{isolation:isolate}
+.game-card::after{content:"";position:absolute;inset:auto -28px -52px auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,.13),transparent 70%);pointer-events:none;z-index:-1}
+.game-card h3{margin-top:15px}
+.trending-game-icon{width:68px;height:68px;border-radius:17px;overflow:hidden;border:1px solid rgba(167,139,250,.28);background:#ffffff08}
+.trending-game-icon img{width:100%;height:100%;display:block;object-fit:cover}
+.drive-pig-topline .game-icon{width:66px;height:66px}
+</style>
+
+
+<style id="DOUGHUB_ARCADE_V2">
+/* DougHub Arcade: scalable storefront layout */
+#doug-games{padding-top:18px}
+#doug-games>.section-header{display:flex;align-items:flex-end;gap:14px;border:0;padding:0;margin-bottom:17px}
+#doug-games>.section-header .section-title{font-size:clamp(23px,2.6vw,30px)}
+.arcade-library-count{flex:0 0 auto;padding:7px 10px;border:1px solid #a78bfa2b;border-radius:9px;background:#8b5cf614;color:#c8bdff;font-size:10px;font-weight:900;letter-spacing:.08em}
+.arcade-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:12px;align-items:center;margin:0 0 11px;padding:12px;border:1px solid #ffffff12;border-radius:15px;background:linear-gradient(110deg,#101329e8,#090b19e8);box-shadow:0 12px 28px #0002}
+.arcade-search-wrap{display:flex;align-items:center;gap:10px;min-width:0;height:42px;padding:0 12px;border:1px solid #ffffff15;border-radius:11px;background:#050715b8;color:#9da2c0}
+.arcade-search-wrap>span{font-size:23px;line-height:1;color:#aaa0ff}
+.arcade-search-wrap input{width:100%;min-width:0;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:#fff!important;font-size:12px}
+.arcade-search-wrap input::placeholder{color:#777e9e}
+.arcade-search-wrap kbd{padding:3px 6px;border:1px solid #ffffff18;border-radius:5px;background:#ffffff08;color:#858ba9;font:10px ui-monospace,monospace}
+.arcade-category-filters{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.arcade-filter{min-height:34px;padding:0 11px;border:1px solid #ffffff12;border-radius:9px;background:#ffffff05;color:#aeb3ce;font-size:10px;font-weight:800;cursor:pointer;transition:.18s}
+.arcade-filter:hover{color:#fff;border-color:#a78bfa55;background:#8b5cf617}
+.arcade-filter.active{color:#fff;border-color:#a78bfa66;background:linear-gradient(120deg,#6366f13b,#a855f72b);box-shadow:inset 0 1px #ffffff12}
+.arcade-results-line{display:flex;justify-content:space-between;gap:12px;margin:0 2px 12px;color:#858ba8;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.arcade-results-line span:last-child{color:#666d8b}
+.arcade-games-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-flow:row;gap:13px}
+.arcade-games-grid>.game-card{min-width:0;min-height:208px!important;padding:17px!important;border-radius:16px!important}
+.arcade-games-grid>.game-card[hidden]{display:none!important}
+.arcade-games-grid>.game-card .game-icon{width:50px!important;height:50px!important;flex-basis:50px!important;border-radius:13px!important}
+.arcade-games-grid>.game-card .game-icon img{width:100%;height:100%;object-fit:cover}
+.arcade-games-grid>.game-card h3{font-size:15px!important;line-height:1.3;overflow-wrap:anywhere}
+.arcade-games-grid>.game-card p{font-size:11px!important;line-height:1.55}
+.arcade-games-grid>.game-card .play-label{font-size:9px!important}
+.arcade-games-grid>.drive-pig-switcher{grid-column:auto!important;grid-row:auto!important}
+.arcade-empty{display:none;grid-column:1/-1;padding:34px 18px;border:1px dashed #ffffff20;border-radius:15px;color:#999fbd;text-align:center;font-size:13px}
+.arcade-empty.show{display:block}
+#trendingSection{margin-top:10px}
+#community-games{padding-top:25px}
+@media(max-width:1100px){.arcade-toolbar{grid-template-columns:1fr}.arcade-category-filters{justify-content:flex-start}.arcade-games-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.arcade-games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px}.arcade-games-grid>.game-card{min-height:190px!important;padding:13px!important}.arcade-games-grid>.game-card h3{font-size:13px!important}.arcade-games-grid>.game-card p{font-size:10px!important}.arcade-filter{min-height:32px;padding:0 9px}.arcade-toolbar{padding:9px}.arcade-results-line{font-size:8px}}
+@media(max-width:430px){.arcade-category-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.arcade-filter{width:100%}.arcade-games-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.arcade-games-grid>.game-card{min-height:198px!important}.arcade-results-line span:last-child{display:none}}
+@media(prefers-reduced-motion:reduce){.arcade-filter,.arcade-games-grid>.game-card{transition:none}}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+    <a href="index.html" class="logo">
+        <div class="logo-icon">D</div>
+        <span>DougHub</span>
+    </a>
+
+    <div class="nav">
+
+        <a
+            href="index.html"
+            class="nav-link"
+        >
+            Home
+        </a>
+
+        <a
+            href="douggames.html"
+            class="nav-link"
+        >
+            Games
+        </a>
+        <a href="arcade.html" class="nav-link">Arcade</a>
+
+        <a
+            href="DougTube.html"
+            class="nav-link"
+        >
+            DougTube
+        </a>
+
+        <a
+            href="DMail.html"
+            class="nav-link dmail-nav"
+        >
+            <span>DMail</span>
+            
+        </a>
+<a href="nova.html" class="nav-link">✳ Nova AI</a>
+        <a
+            href="chat.html"
+            class="nav-link"
+        >
+            Chat
+        </a>
+
+        <div class="account-area">
+
+            <button
+                id="accountButton"
+                class="account-btn"
+                type="button"
+            >
+
+                <div
+                    id="accountAvatar"
+                    class="account-avatar"
+                >
+                    ?
+                </div>
+
+                <span id="accountName">
+                    Log In
+                </span>
+
+            </button>
+
+            <div
+                id="accountMenu"
+                class="account-menu"
+            >
+
+                <a href="my-games.html">
+                    My Games &amp; Videos
+                </a>
+
+                <a
+                    href="admin.html"
+                    id="adminLink"
+                >
+                    Admin Panel
+                </a>
+
+                <a
+                    href="inbox.html"
+                    id="feedbackInboxLink"
+                    style="display:none;"
+                >
+                    Feedback
+                </a>
+
+                <a href="settings.html">
+                    Settings
+                </a>
+
+                <button
+                    id="logoutButton"
+                    class="logout"
+                    type="button"
+                >
+                    Log Out
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<main>
+
+    <!-- BIG TOP SECTION -->
+
+    <section class="hero games-hero" aria-labelledby="gamesHeroTitle">
+  <div class="games-hero-copy">
+    <div class="games-hero-eyebrow"><span></span> DOUGHUB ARCADE</div>
+    <h1 id="gamesHeroTitle">Ready to <span>play?</span></h1>
+    <p>Discover DougHub games, try community creations, or build a game of your own.</p>
+    <div class="games-hero-actions">
+      <a href="#doug-games" class="games-hero-button primary">Browse games <span>↓</span></a>
+      <a href="Scripting/scripting.html" class="games-hero-button">＋ Make a game</a>
+    </div>
+    <div class="games-hero-meta"><span><strong id="userCount">—</strong> members</span><i></i><span><strong id="gameCount">11</strong> arcade games</span></div>
+  </div>
+  <div class="games-hero-preview" aria-hidden="true">
+    <div class="games-preview-top"><span class="games-live-dot"></span> PICK YOUR NEXT GAME <span class="games-preview-count">01 / 04</span></div>
+    <div class="games-preview-feature"><div class="games-preview-art">🐷</div><div><small>FEATURED GAME</small><strong>Pig Clicker</strong><span>Click · Upgrade · Repeat</span></div><b>↗</b></div>
+    <div class="games-preview-mini">
+      <div><span>🏎️</span><small>Racing</small></div>
+      <div><span>🧩</span><small>Puzzles</small></div>
+      <div><span>✨</span><small>Community</small></div>
+    </div>
+  </div>
+</section>
+
+
+    <nav class="games-discovery-nav" aria-label="Browse game sections">
+      <a class="games-discovery-link active" href="#trendingSection"><span>⌁</span> Discover</a>
+      <a class="games-discovery-link" href="#trendingSection"><span>↗</span> Popular</a>
+      <a class="games-discovery-link" href="#doug-games"><span>▣</span> DougHub Originals</a>
+      <a class="games-discovery-link" href="#community-games"><span>◈</span> Community Games</a>
+      <a class="games-discovery-create" href="Scripting/scripting.html">＋ Create a game</a>
+    </nav>
+
+    
+
+    <!-- DOUG'S GAMES -->
+
+    <section class="section" id="doug-games">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    DougHub Arcade
+                </h2>
+
+                <p class="section-subtitle">
+                    Browse the full collection. More games can slot into this grid without changing the layout.
+                </p>
+
+            </div>
+
+            <span class="arcade-library-count" id="arcadeLibraryCount">12 GAMES</span>
+
+        </div>
+
+        <div class="arcade-toolbar">
+            <label class="arcade-search-wrap">
+                <span aria-hidden="true">⌕</span>
+                <input id="officialGameSearch" type="search" placeholder="Search all arcade games..." autocomplete="off" aria-label="Search DougHub arcade games">
+                <kbd>/</kbd>
+            </label>
+            <div class="arcade-category-filters" role="group" aria-label="Filter arcade games">
+                <button type="button" class="arcade-filter active" data-arcade-filter="all" aria-pressed="true">All games</button>
+                <button type="button" class="arcade-filter" data-arcade-filter="arcade" aria-pressed="false">Arcade</button>
+                <button type="button" class="arcade-filter" data-arcade-filter="puzzle" aria-pressed="false">Puzzle</button>
+                <button type="button" class="arcade-filter" data-arcade-filter="racing" aria-pressed="false">Racing</button>
+                <button type="button" class="arcade-filter" data-arcade-filter="clicker" aria-pressed="false">Clicker</button>
+                <button type="button" class="arcade-filter" data-arcade-filter="explore" aria-pressed="false">Explore</button>
+            </div>
+        </div>
+
+        <div class="arcade-results-line"><span id="arcadeResultsLabel">Showing all games</span><span>NEW GAMES ADDED REGULARLY</span></div>
+
+        <div class="games-grid arcade-games-grid">
+
+            <a href="Games/bubble-grove.html" class="game-card game-card-wide">
+                <div class="game-icon"><img src="Games/art/bubble-grove.svg" alt="Bubble Grove logo"></div>
+                <h3>Bubble Grove</h3>
+                <p>A cozy woodland bubble shooter. Aim, match 3 or more of the same color, pop clusters, and drop floating bubbles for bonus points.</p>
+                <div class="play-label">POP THE COLORS →</div>
+            </a>
+
+            <a
+                href="Games/titlebound.html"
+                class="game-card game-card-wide"
+            >
+                <div class="game-icon"><img src="Games/art/titlebound.svg" alt="TITLEBOUND logo"></div>
+                <h3>TITLEBOUND: Realms of Fortune</h3>
+                <p>Roll from 650 cosmic titles, hunt nine rarity tiers, collect absurd discoveries, and grow a permanent luck upgrade tree.</p>
+                <div class="play-label">ROLL YOUR FATE →</div>
+            </a>
+
+            
+
+            
+
+            <a href="Games/starfall-run.html" class="game-card">
+                <div class="game-icon"><img src="Games/art/starfall-run.svg" alt="Starfall Run logo"></div>
+                <h3>Starfall Run</h3>
+                <p>Dodge the meteor storm, dash through danger, and collect glowing shards as the pace ramps up.</p>
+                <div class="play-label">SURVIVE THE STORM →</div>
+            </a>
+
+            <a href="Games/crystal-breaker.html" class="game-card">
+                <div class="game-icon"><img src="Games/art/crystal-breaker.svg" alt="Crystal Breaker logo"></div>
+                <h3>Crystal Breaker</h3>
+                <p>A neon brick-breaker. Keep the energy core alive, clear crystal waves, and chase a high score.</p>
+                <div class="play-label">BREAK THE BOARD →</div>
+            </a>
+
+            
+
+            <a
+                href="Games/pig-clicker.html"
+                class="game-card"
+            >
+                <div class="game-icon"><img src="Games/art/pig-clicker.svg" alt="Pig Clicker logo"></div>
+
+                <h3>
+                    Pig Clicker
+                </h3>
+
+                <p>
+                    Click the pig, earn points, and keep upgrading.
+                </p>
+
+                <div class="play-label">
+                    PLAY →
+                </div>
+            </a>
+
+            <a
+                href="Games/rebirth-clicker.html"
+                class="game-card"
+            >
+                <div class="game-icon"><img src="Games/art/rebirth-clicker.svg" alt="Rebirth Clicker logo"></div>
+
+                <h3>
+                    Rebirth Clicker
+                </h3>
+
+                <p>
+                    Click, upgrade, rebirth, and build your progress.
+                </p>
+
+                <div class="play-label">
+                    PLAY →
+                </div>
+            </a>
+
+            <a href="Games/ocean-drive.html" class="game-card game-card-wide">
+                <div class="game-icon"><img src="Games/art/ocean-drive.svg" alt="Ocean Drive logo"></div>
+                <h3>Ocean Drive</h3>
+                <p>Explore a detailed Miami-style beach district, walk the promenade, hop into cars, cruise with traffic, and visit the shore.</p>
+                <div class="play-label">EXPLORE THE COAST →</div>
+            </a>
+
+            <a
+                href="Games/racing.html"
+                class="game-card"
+            >
+                <div class="game-icon"><img src="Games/art/racing.svg" alt="Doug Racing logo"></div>
+
+                <h3>
+                    Doug Racing
+                </h3>
+
+                <p>
+                    Race around the track and try to beat your best time.
+                </p>
+
+                <div class="play-label">
+                    PLAY →
+                </div>
+            </a>
+
+            <a
+                href="Games/puzzle.html"
+                class="game-card game-card-puzzle"
+            >
+                <div class="game-icon"><img src="Games/art/puzzle.svg" alt="Doug Puzzle logo"></div>
+                <h3>Doug Puzzle</h3>
+                <p>Slide, merge, and plan ahead in the classic 2048 number puzzle.</p>
+                <div class="play-label">PLAY 2048 →</div>
+            </a>
+
+            <a href="Games/sudoku.html" class="game-card">
+                <div class="game-icon"><img src="Games/art/sudoku.svg" alt="Sudoku logo"></div>
+                <h3>DougHub Sudoku</h3>
+                <p>A timed 9×9 logic puzzle with touch-friendly number controls and restart.</p>
+                <div class="play-label">SOLVE THE GRID →</div>
+            </a>
+
+            <div class="game-card drive-pig-switcher" id="drivePigSwitcher">
+                <div class="drive-pig-topline"><div class="game-icon"><img id="drivePigIcon" src="Games/art/drive-pig.svg" alt="Drive Pig logo"></div><span class="drive-pig-twoinone">2 GAMES <b>IN 1</b></span></div>
+                <div class="drive-pig-version-label">ONE BUTTON · TWO RIDES</div>
+                <h3 id="drivePigTitle">Drive Pig <span class="drive-pig-title-tag">2-in-1</span></h3>
+                <p id="drivePigDescription">Pick the classic stunt course or jump into Pig Racing3D.</p>
+                <div class="drive-pig-toggle" role="group" aria-label="Choose a Drive Pig game version">
+                    <span class="drive-pig-slider" id="drivePigSlider"></span>
+                    <button type="button" class="drive-pig-option active" data-drive-version="classic" aria-pressed="true"><span class="drive-pig-option-icon">🐷</span><span><b>Drive Pig</b><small>Classic</small></span></button>
+                    <button type="button" class="drive-pig-option" data-drive-version="racing" aria-pressed="false"><span class="drive-pig-option-icon">🏎️</span><span><b>Pig Racing3D</b><small>3D racer</small></span></button>
+                </div>
+                <a class="drive-pig-play" id="drivePigPlay" href="Games/drive-pig.html">PLAY DRIVE PIG <span>→</span></a>
+                <div class="drive-pig-status"><span class="drive-pig-live-dot"></span><span id="drivePigStatus">Classic stunt-course adventure</span></div>
+            </div>
+
+            
+
+        </div>
+
+    </section>
+
+
+    <!-- TRENDING GAMES -->
+
+    <section class="section" id="trendingSection">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">🔥 Trending Games</h2>
+                <p class="section-subtitle">A live leaderboard for DougHub games and community creations.</p>
+            </div>
+            <div class="trending-controls" role="group" aria-label="Sort trending games">
+                <button type="button" class="trending-tab active" data-trending-sort="plays">Most played</button>
+                <button type="button" class="trending-tab" data-trending-sort="time">Avg. playtime</button>
+            </div>
+        </div>
+        <div class="trending-panel">
+            <p class="trending-note">Showing only the top two games. Use the tabs to switch between most played and average playtime. Rankings update as people play.</p>
+            <div id="trendingGames" class="trending-grid" aria-live="polite">
+                <div class="trending-empty">Loading live game stats…</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMUNITY GAMES -->
+
+    <section class="section" id="community-games" style="scroll-margin-top:90px">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Community Games
+                </h2>
+
+                <p class="section-subtitle">
+                    Games created with the DougHub Creator.
+                </p>
+
+            </div>
+
+            <div class="game-search-controls">
+              <input
+                type="search"
+                id="gameSearch"
+                class="search-box"
+                name="q"
+                placeholder="Search DougHub..."
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                inputmode="search"
+                aria-label="Search DougHub"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                readonly
+              >
+              <select id="gameFilter" aria-label="Filter community games">
+                <option value="all">All games</option>
+                <option value="favorites">★ Favorites</option>
+                <option value="new">New games</option>
+              </select>
+            </div>
+
+        </div>
+
+        <div class="community-slider-shell">
+            <button class="community-slider-arrow left" type="button" aria-label="Previous community games">‹</button>
+            <div
+                id="communityGames"
+                class="community-games"
+            >
+
+            <div class="empty">
+                Loading community games...
+            </div>
+
+            </div>
+            <button class="community-slider-arrow right" type="button" aria-label="Next community games">›</button>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    DougHub © 2026
+</footer>
+
+<!-- GAME PLAYER -->
+
+<div
+    id="playerOverlay"
+    class="player-overlay"
+>
+
+    <div class="player-window">
+
+        <div class="player-header">
+
+            <div
+                id="playerTitle"
+                class="player-title"
+            >
+                Game
+            </div>
+
+            <button
+                id="closePlayer"
+                class="close-player"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <iframe
+            id="gameFrame"
+        ></iframe>
+
+    </div>
+
+</div>
+
+<!-- PASSWORD MODAL -->
+
+<div
+    id="passwordModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <h2>
+            Enter Password
+        </h2>
+
+        <input
+            id="passwordInput"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+        >
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancelPassword"
+                class="cancel-btn"
+                type="button"
+            >
+                Cancel
+            </button>
+
+            <button
+                id="confirmPassword"
+                class="confirm-btn"
+                type="button"
+            >
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+    "https://agsqdqcsmsppcdqxlppj.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+let currentUser = null;
+let communityGames = [];
+
+
+let currentGameId = null;
+let currentPlaySessionId = null;
+let playStartedAt = null;
+/* =========================================
+   ACCOUNT
+========================================= */
+
+const accountButton =
+    document.getElementById("accountButton");
+
+const accountMenu =
+    document.getElementById("accountMenu");
+
+if (accountButton) {
+
+    accountButton.addEventListener(
+        "click",
+        async function(event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!currentUser) {
+
+                window.location.href =
+                    "log-in.html";
+
+                return;
+            }
+
+            accountMenu.classList.toggle("show");
+        }
+    );
+
+}
+
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            !event.target.closest(".account-area") &&
+            accountMenu
+        ) {
+
+            accountMenu.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   LOAD ACCOUNT
+========================================= */
+
+async function loadAccount() {
+
+    const {
+        data: {
+            session
+        }
+    } =
+        await supabaseClient.auth.getSession();
+
+    if (!session) {
+
+        currentUser = null;
+
+        document
+            .getElementById("accountName")
+            .textContent =
+                "Log In";
+
+        document
+            .getElementById("accountAvatar")
+            .textContent =
+                "?";
+
+        document
+            .getElementById("adminLink")
+            .style.display =
+                "none";
+
+        document
+            .getElementById("feedbackInboxLink")
+            .style.display =
+                "none";
+
+        await loadDMailCount();
+
+        return;
+    }
+
+    currentUser =
+        session.user;
+
+    const {
+        data: profile,
+        error
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select(
+                "username, avatar_url, is_admin"
+            )
+            .eq(
+                "id",
+                currentUser.id
+            )
+            .maybeSingle();
+
+    if (error) {
+
+        console.error(
+            "Could not load profile:",
+            error
+        );
+
+    }
+
+    const username =
+        profile?.username ||
+        currentUser.email?.split("@")[0] ||
+        "User";
+
+    document
+        .getElementById("accountName")
+        .textContent =
+            username;
+
+    const avatar =
+        document.getElementById(
+            "accountAvatar"
+        );
+
+    if (profile?.avatar_url) {
+
+        avatar.innerHTML =
+            `<img
+                src="${escapeHtml(profile.avatar_url)}"
+                alt="Profile"
+            >`;
+
+    } else {
+
+        avatar.textContent =
+            username
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+    const adminLink =
+        document.getElementById(
+            "adminLink"
+        );
+
+    const feedbackInboxLink =
+        document.getElementById(
+            "feedbackInboxLink"
+        );
+
+    if (
+        profile?.is_admin === true
+    ) {
+
+        adminLink.style.display =
+            "block";
+
+        feedbackInboxLink.style.display =
+            "block";
+
+    } else {
+
+        adminLink.style.display =
+            "none";
+
+        feedbackInboxLink.style.display =
+            "none";
+
+    }
+
+    await loadDMailCount();
+
+}
+
+
+/* =========================================
+   DMAIL COUNT
+========================================= */
+
+const DMAIL_SEEN_KEY =
+    "doughub_dmail_last_seen";
+
+async function loadDMailCount() {
+
+    const badge =
+        document.getElementById(
+            "dmailBadge"
+        );
+
+    if (!badge) {
+        return;
+    }
+
+    badge.textContent = "0";
+    badge.classList.remove("show");
+
+    if (!currentUser) {
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("direct_messages")
+            .select("created_at")
+            .eq("receiver_id", currentUser.id)
+            .order("created_at", {
+                ascending: false
+            })
+            .limit(1);
+
+    if (error) {
+        console.error(
+            "Could not check DMail count:",
+            error
+        );
+        return;
+    }
+
+    const latestMessage =
+        data?.[0]?.created_at;
+
+    if (!latestMessage) {
+        return;
+    }
+
+    let lastSeen =
+        localStorage.getItem(
+            DMAIL_SEEN_KEY
+        );
+
+    /*
+       On the first visit, use the newest existing
+       message as the starting point. This prevents
+       old DMail messages from appearing as new.
+    */
+    if (!lastSeen) {
+        localStorage.setItem(
+            DMAIL_SEEN_KEY,
+            latestMessage
+        );
+        return;
+    }
+
+    const {
+        count,
+        error: countError
+    } =
+        await supabaseClient
+            .from("direct_messages")
+            .select(
+                "id",
+                {
+                    count: "exact",
+                    head: true
+                }
+            )
+            .eq(
+                "receiver_id",
+                currentUser.id
+            )
+            .gt(
+                "created_at",
+                lastSeen
+            );
+
+    if (countError) {
+        console.error(
+            "Could not load new DMail count:",
+            countError
+        );
+        return;
+    }
+
+    const messageCount =
+        Number(count || 0);
+
+    if (messageCount > 0) {
+        badge.textContent =
+            messageCount > 99
+                ? "99+"
+                : messageCount;
+
+        badge.classList.add("show");
+    }
+}
+
+/*
+   Opening DMail marks the current messages as seen.
+*/
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const dmailLink =
+            event.target.closest(
+                'a[href="DMail.html"]'
+            );
+
+        if (!dmailLink) {
+            return;
+        }
+
+        if (currentUser) {
+            supabaseClient
+                .from("direct_messages")
+                .select("created_at")
+                .eq("receiver_id", currentUser.id)
+                .order("created_at", {
+                    ascending: false
+                })
+                .limit(1)
+                .then(function(result) {
+
+                    const latest =
+                        result.data?.[0]?.created_at;
+
+                    if (latest) {
+                        localStorage.setItem(
+                            DMAIL_SEEN_KEY,
+                            latest
+                        );
+                    }
+
+                });
+        }
+
+        const badge =
+            document.getElementById("dmailBadge");
+
+        if (badge) {
+            badge.textContent = "0";
+            badge.classList.remove("show");
+        }
+    }
+);
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
+
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        async function(event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            await supabaseClient.auth.signOut();
+
+            currentUser = null;
+
+            window.location.reload();
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   USER COUNT
+========================================= */
+
+async function loadUserCount() {
+
+    const userCount =
+        document.getElementById(
+            "userCount"
+        );
+
+    const {
+        count,
+        error
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select(
+                "id",
+                {
+                    count: "exact",
+                    head: true
+                }
+            );
+
+    if (error) {
+
+        console.error(
+            "Could not load user count:",
+            error
+        );
+
+        userCount.textContent =
+            "—";
+
+        return;
+    }
+
+    userCount.textContent =
+        Number(
+            count || 0
+        ).toLocaleString();
+
+}
+
+
+/* =========================================
+   GAME COUNT
+========================================= */
+
+async function updateGameCount() {
+
+    const gameCount =
+        document.getElementById(
+            "gameCount"
+        );
+
+    if (!gameCount) {
+        return;
+    }
+
+    /* Keep this number in one place: these are the built-in games. */
+    const BUILT_IN_GAME_COUNT = 7;
+
+    const {
+        count,
+        error
+    } =
+        await supabaseClient
+            .from("community_games")
+            .select(
+                "id",
+                {
+                    count: "exact",
+                    head: true
+                }
+            );
+
+    if (error) {
+
+        console.error(
+            "Could not load community game count:",
+            error
+        );
+
+        /* Still show the built-in games if Supabase is unavailable. */
+        gameCount.textContent =
+            BUILT_IN_GAME_COUNT.toLocaleString();
+
+        return;
+    }
+
+    gameCount.textContent =
+        (
+            BUILT_IN_GAME_COUNT +
+            Number(count || 0)
+        ).toLocaleString();
+
+}
+
+
+
+/* =========================================
+   CROSS-SITE TRENDING GAME ANALYTICS
+========================================= */
+const BUILTIN_TRENDING_GAMES = {
+    "builtin:pig-clicker": { title: "Pig Clicker", logo: "Games/art/pig-clicker.svg", href: "Games/pig-clicker.html" },
+    "builtin:rebirth-clicker": { title: "Rebirth Clicker", logo: "Games/art/rebirth-clicker.svg", href: "Games/rebirth-clicker.html" },
+    "builtin:racing": { title: "Doug Racing", logo: "Games/art/racing.svg", href: "Games/racing.html" },
+    "builtin:puzzle": { title: "Doug Puzzle", logo: "Games/art/puzzle.svg", href: "Games/puzzle.html" },
+    "builtin:drive-pig": { title: "Drive Pig", logo: "Games/art/drive-pig.svg", href: "Games/drive-pig.html" },
+    "builtin:titlebound": { title: "TITLEBOUND: Realms of Fortune", logo: "Games/art/titlebound.svg", href: "Games/titlebound.html" }
+};
+let trendingRows = [];
+let trendingSortMode = "plays";
+
+function formatPlaytime(seconds) {
+    const total = Math.max(0, Number(seconds) || 0);
+    if (total < 60) return Math.round(total) + " sec";
+    const mins = Math.floor(total / 60);
+    const secs = Math.round(total % 60);
+    if (mins < 60) return mins + "m " + secs + "s";
+    return Math.floor(mins / 60) + "h " + (mins % 60) + "m";
+}
+
+function renderTrendingGames() {
+    const container = document.getElementById("trendingGames");
+    if (!container) return;
+    const rows = [...trendingRows].sort((a, b) => {
+        if (trendingSortMode === "time") {
+            return (Number(b.avg_playtime_seconds || 0) - Number(a.avg_playtime_seconds || 0)) ||
+                   (Number(b.play_count || 0) - Number(a.play_count || 0));
+        }
+        return (Number(b.play_count || 0) - Number(a.play_count || 0)) ||
+               (Number(b.avg_playtime_seconds || 0) - Number(a.avg_playtime_seconds || 0));
+    });
+    if (!rows.length) {
+        container.innerHTML = '<div class="trending-empty">No game stats yet. Launch a DougHub or community game and it will start appearing here.</div>';
+        return;
+    }
+    // Keep the Popular/Trending Games section focused on the top two games only.
+    const topGames = rows.slice(0, 2);
+    container.innerHTML = topGames.map((row, index) => {
+        const builtIn = BUILTIN_TRENDING_GAMES[row.game_key];
+        const isCommunity = row.game_type === "community";
+        const communityId = isCommunity ? row.game_key.replace(/^community:/, "") : "";
+        const icon = builtIn?.logo ? '<img src="' + builtIn.logo + '" alt="">' : (isCommunity ? "🎮" : "🕹️");
+        const title = escapeHtml(row.game_title || builtIn?.title || "Untitled game");
+        const type = isCommunity ? "Community game" : "DougHub game";
+        const playCount = Number(row.play_count || 0).toLocaleString();
+        const avg = formatPlaytime(row.avg_playtime_seconds);
+        const action = isCommunity
+            ? 'type="button" data-trending-community-id="' + escapeHtml(communityId) + '"'
+            : 'type="button" data-trending-href="' + escapeHtml(builtIn?.href || "douggames.html") + '"';
+        return '<button class="trending-card" ' + action + '>' +
+            '<div class="trending-card-top"><span class="trending-rank">#' + (index + 1) + '</span><span class="trending-type">' + type + '</span></div>' +
+            '<div class="trending-game-icon">' + icon + '</div><h3>' + title + '</h3>' +
+            '<p>' + (trendingSortMode === "time" ? "Sorted by average playtime" : "Sorted by launches") + '</p>' +
+            '<div class="trending-metrics"><div class="trending-metric"><strong>' + playCount + '</strong>plays</div><div class="trending-metric"><strong>' + escapeHtml(avg) + '</strong>avg. playtime</div></div></button>';
+    }).join("");
+    container.querySelectorAll("[data-trending-community-id]").forEach(button => {
+        button.addEventListener("click", () => openCommunityGame(button.dataset.trendingCommunityId));
+    });
+    container.querySelectorAll("[data-trending-href]").forEach(button => {
+        button.addEventListener("click", () => { window.location.href = button.dataset.trendingHref; });
+    });
+}
+
+async function loadTrendingGames() {
+    const container = document.getElementById("trendingGames");
+    try {
+        const { data, error } = await supabaseClient
+            .from("game_trending_stats")
+            .select("game_key, game_type, game_title, play_count, avg_playtime_seconds")
+            .gt("play_count", 0)
+            .order("play_count", { ascending: false })
+            .limit(1000);
+        if (error) throw error;
+        trendingRows = data || [];
+        renderTrendingGames();
+        console.info("DougHub trending games loaded:", trendingRows.length);
+    } catch (error) {
+        console.error("Could not load trending game stats:", error);
+        if (container) container.innerHTML = '<div class="trending-empty">Trending stats could not load. Check the game analytics table permissions in Supabase.</div>';
+    }
+}
+
+document.querySelectorAll("[data-trending-sort]").forEach(button => {
+    button.addEventListener("click", () => {
+        trendingSortMode = button.dataset.trendingSort;
+        document.querySelectorAll("[data-trending-sort]").forEach(tab => tab.classList.toggle("active", tab === button));
+        renderTrendingGames();
+    });
+});
+
+async function recordTrendingEvent(gameKey, gameType, gameTitle, eventType, durationSeconds = 0) {
+    try {
+        const { error } = await supabaseClient.from("game_trending_events").insert({
+            game_key: gameKey,
+            game_type: gameType,
+            game_title: String(gameTitle || "Untitled game").slice(0, 120),
+            event_type: eventType,
+            duration_seconds: Math.max(0, Math.min(86400, Math.floor(durationSeconds || 0))),
+            user_id: currentUser?.id || null
+        });
+        if (error) console.warn("Trending event was not saved:", error.message);
+    } catch (error) {
+        console.warn("Trending event was not saved:", error);
+    }
+}
+let communityTrendingStartedAt = null;
+let communityTrendingRecordedSeconds = 0;
+let communityTrendingTimer = null;
+
+async function startCommunityTrending(game) {
+    clearInterval(communityTrendingTimer);
+    communityTrendingStartedAt = Date.now();
+    communityTrendingRecordedSeconds = 0;
+    await recordTrendingEvent("community:" + game.id, "community", game.title || "Community Game", "play", 0);
+    communityTrendingTimer = setInterval(async () => {
+        if (!communityTrendingStartedAt || document.hidden) return;
+        const elapsed = Math.floor((Date.now() - communityTrendingStartedAt) / 1000);
+        const delta = Math.min(60, elapsed - communityTrendingRecordedSeconds);
+        if (delta > 0) {
+            communityTrendingRecordedSeconds += delta;
+            await recordTrendingEvent("community:" + game.id, "community", game.title || "Community Game", "duration", delta);
+        }
+    }, 15000);
+}
+async function endCommunityTrending(game) {
+    clearInterval(communityTrendingTimer);
+    communityTrendingTimer = null;
+    if (!communityTrendingStartedAt || !game) return;
+    const elapsed = Math.min(86400, Math.floor((Date.now() - communityTrendingStartedAt) / 1000));
+    let remaining = Math.max(0, elapsed - communityTrendingRecordedSeconds);
+    while (remaining > 0) {
+        const chunk = Math.min(60, remaining);
+        await recordTrendingEvent("community:" + game.id, "community", game.title || "Community Game", "duration", chunk);
+        remaining -= chunk;
+    }
+    communityTrendingStartedAt = null;
+    communityTrendingRecordedSeconds = 0;
+    loadTrendingGames();
+}
+
+
+/* =========================================
+   COMMUNITY GAMES
+========================================= */
+
+async function loadCommunityGames() {
+
+    const container =
+        document.getElementById(
+            "communityGames"
+        );
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("community_games")
+            .select(
+                "id, title, description, author, category, code, created_at, creator_id, is_official"
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+    if (error) {
+
+        console.error(
+            "Could not load community games:",
+            error
+        );
+
+        container.innerHTML =
+            `<div class="empty">
+                Could not load community games.
+            </div>`;
+
+        updateGameCount();
+
+        return;
+    }
+
+    communityGames = data || [];
+
+    /* COMMUNITY GAMES SORTED BY POPULARITY */
+    if (communityGames.length) {
+        const ids = communityGames.map(game => game.id);
+        const { data: sessions } = await supabaseClient.from("game_play_sessions").select("game_id").in("game_id", ids);
+        const playCounts = {};
+        (sessions || []).forEach(session => { playCounts[session.game_id] = (playCounts[session.game_id] || 0) + 1; });
+        communityGames.forEach(game => { game.playCount = playCounts[game.id] || 0; });
+        communityGames.sort((a,b) => (b.playCount-a.playCount) || (new Date(b.created_at||0)-new Date(a.created_at||0)));
+    }
+
+    renderCommunityGames();
+
+    updateGameCount();
+
+}
+
+
+/* =========================================
+   RENDER COMMUNITY GAMES
+========================================= */
+
+function setupCommunitySlider(){const container=document.getElementById("communityGames");const shell=container?.parentElement;if(!container||!shell)return;const left=shell.querySelector(".community-slider-arrow.left");const right=shell.querySelector(".community-slider-arrow.right");const update=()=>{const max=container.scrollWidth-container.clientWidth;if(left)left.disabled=container.scrollLeft<=2;if(right)right.disabled=container.scrollLeft>=max-2};if(left)left.onclick=()=>container.scrollBy({left:-Math.max(container.clientWidth*.82,280),behavior:"smooth"});if(right)right.onclick=()=>container.scrollBy({left:Math.max(container.clientWidth*.82,280),behavior:"smooth"});container.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);requestAnimationFrame(update)}
+
+function getFavoriteGameIds() {
+    try {
+        const ids = JSON.parse(localStorage.getItem("dougHubFavoriteGames") || "[]");
+        return Array.isArray(ids) ? ids.map(String) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function toggleFavoriteGame(gameId) {
+    const id = String(gameId);
+    const ids = getFavoriteGameIds();
+    const next = ids.includes(id) ? ids.filter(item => item !== id) : [...ids, id];
+    localStorage.setItem("dougHubFavoriteGames", JSON.stringify(next));
+    renderCommunityGames();
+}
+
+function renderCommunityGames() {
+
+    const container =
+        document.getElementById(
+            "communityGames"
+        );
+
+    const searchInput =
+        document.getElementById(
+            "gameSearch"
+        );
+
+    const search =
+        searchInput
+            ? searchInput.value.toLowerCase().trim()
+            : "";
+    const filterMode = document.getElementById("gameFilter")?.value || "all";
+    const favoriteIds = getFavoriteGameIds();
+    const newGameCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    const filtered = communityGames.filter(function(game) {
+        const matchesSearch =
+            (game.title || "").toLowerCase().includes(search) ||
+            (game.description || "").toLowerCase().includes(search) ||
+            (game.author || "").toLowerCase().includes(search) ||
+            (game.category || "").toLowerCase().includes(search);
+        const isFavorite = favoriteIds.includes(String(game.id));
+        const createdAt = new Date(game.created_at || 0).getTime();
+        const isNew = Number.isFinite(createdAt) && createdAt >= newGameCutoff;
+        return matchesSearch &&
+            (filterMode !== "favorites" || isFavorite) &&
+            (filterMode !== "new" || isNew);
+    });
+
+    if (!filtered.length) {
+
+        container.innerHTML =
+            `<div class="empty">
+                ${filterMode === "favorites" ? "No favorite games yet. Tap the star on a game to save it." : filterMode === "new" ? "No new games from the last 7 days found." : "No community games found."} 
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML =
+        filtered
+            .map(
+                function(game) {
+
+                    return `
+
+                        <div
+                            class="community-card"
+                            data-game-id="${escapeHtml(game.id)}"
+                        >
+
+                            <button type="button" class="community-favorite ${getFavoriteGameIds().includes(String(game.id)) ? "is-favorite" : ""}" aria-label="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}" aria-pressed="${getFavoriteGameIds().includes(String(game.id))}" title="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}">${getFavoriteGameIds().includes(String(game.id)) ? "★" : "☆"}</button>
+
+                            <div class="community-card-badges">
+                                ${game.is_official ? '<span class="community-official-badge">OFFICIAL DOUGHUB</span>' : ""}
+                                <span class="community-category">${escapeHtml(game.category || "Game")}</span>
+                            </div>
+
+                            <h3>
+                                ${escapeHtml(
+                                    game.title ||
+                                    "Untitled Game"
+                                )}
+                            </h3>
+
+                            <p>
+                                ${escapeHtml(
+                                    game.description ||
+                                    "A community-created game."
+                                )}
+                            </p>
+
+                            <div class="community-popularity">
+                                🔥 ${Number(game.playCount || 0).toLocaleString()} plays
+                            </div>
+
+                            <div
+                                class="community-author"
+                            >
+                                Made by
+                                ${escapeHtml(
+                                    game.author ||
+                                    "Unknown"
+                                )}
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+    container
+        .querySelectorAll(
+            ".community-card"
+        )
+        .forEach(
+            function(card) {
+
+                const favoriteButton = card.querySelector(".community-favorite");
+                if (favoriteButton) {
+                    favoriteButton.addEventListener("click", function(event) {
+                        event.stopPropagation();
+                        toggleFavoriteGame(card.dataset.gameId);
+                    });
+                }
+
+                card.addEventListener(
+                    "click",
+                    function() {
+
+                        openCommunityGame(
+                            card.dataset.gameId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   SEARCH AUTOFILL PROTECTION + SEARCH
+========================================= */
+
+const gameSearch =
+    document.getElementById(
+        "gameSearch"
+    );
+
+const gameFilter = document.getElementById("gameFilter");
+if (gameFilter) {
+    gameFilter.addEventListener("change", renderCommunityGames);
+}
+
+if (gameSearch) {
+
+    gameSearch.addEventListener(
+        "focus",
+        function() {
+
+            gameSearch.readOnly =
+                false;
+
+        }
+    );
+
+    gameSearch.addEventListener(
+        "click",
+        function() {
+
+            gameSearch.readOnly =
+                false;
+
+        }
+    );
+
+    gameSearch.addEventListener(
+        "input",
+        function() {
+
+            renderCommunityGames();
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   OPEN COMMUNITY GAME
+========================================= */
+
+async function openCommunityGame(
+    gameId
+) {
+
+    const game =
+        communityGames.find(
+            function(item) {
+
+                return item.id === gameId;
+
+            }
+        );
+
+    if (!game) {
+        return;
+    }
+
+    currentGameId =
+        game.id;
+
+    document
+        .getElementById(
+            "playerTitle"
+        )
+        .textContent =
+            game.title ||
+            "Game";
+
+    document
+        .getElementById(
+            "gameFrame"
+        )
+        .srcdoc =
+            game.code ||
+            "<h1>No game code</h1>";
+
+    document
+        .getElementById(
+            "playerOverlay"
+        )
+        .classList.add(
+            "show"
+        );
+
+    await startPlaySession(
+        game.id
+    );
+    await startCommunityTrending(game);
+
+}
+
+
+/* =========================================
+   CLOSE GAME
+========================================= */
+
+const closePlayer =
+    document.getElementById(
+        "closePlayer"
+    );
+
+if (closePlayer) {
+
+    closePlayer.addEventListener(
+        "click",
+        closeGame
+    );
+
+}
+
+
+const playerOverlay =
+    document.getElementById(
+        "playerOverlay"
+    );
+
+if (playerOverlay) {
+
+    playerOverlay.addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target.id ===
+                "playerOverlay"
+            ) {
+
+                closeGame();
+
+            }
+
+        }
+    );
+
+}
+
+
+async function closeGame() {
+
+    const playedCommunityGame = communityGames.find(item => item.id === currentGameId);
+    await endCommunityTrending(playedCommunityGame);
+    await endPlaySession();
+
+    document
+        .getElementById(
+            "gameFrame"
+        )
+        .srcdoc =
+            "";
+
+    document
+        .getElementById(
+            "playerOverlay"
+        )
+        .classList.remove(
+            "show"
+        );
+
+    currentGameId =
+        null;
+
+}
+
+
+/* =========================================
+   PLAY TRACKING
+========================================= */
+
+async function startPlaySession(
+    gameId
+) {
+
+    playStartedAt =
+        Date.now();
+
+    if (!currentUser) {
+
+        currentPlaySessionId =
+            null;
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from(
+                "game_play_sessions"
+            )
+            .insert({
+                game_id:
+                    gameId,
+
+                user_id:
+                    currentUser.id
+            })
+            .select(
+                "id"
+            )
+            .single();
+
+    if (error) {
+
+        console.error(
+            "Could not start play session:",
+            error
+        );
+
+        currentPlaySessionId =
+            null;
+
+        return;
+    }
+
+    currentPlaySessionId =
+        data.id;
+
+}
+
+
+async function endPlaySession() {
+
+    if (!playStartedAt) {
+        return;
+    }
+
+    const duration =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    Date.now() -
+                    playStartedAt
+                ) / 1000
+            )
+        );
+
+    if (
+        currentUser &&
+        currentPlaySessionId
+    ) {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "game_play_sessions"
+                )
+                .update({
+
+                    ended_at:
+                        new Date()
+                            .toISOString(),
+
+                    duration_seconds:
+                        duration
+
+                })
+                .eq(
+                    "id",
+                    currentPlaySessionId
+                );
+
+        if (error) {
+
+            console.error(
+                "Could not end play session:",
+                error
+            );
+
+        }
+
+    }
+
+    currentPlaySessionId =
+        null;
+
+    playStartedAt =
+        null;
+
+}
+
+
+/* =========================================
+   FEEDBACK
+========================================= */
+
+const feedbackMessage =
+    document.getElementById(
+        "feedbackMessage"
+    );
+
+const feedbackButton =
+    document.getElementById(
+        "feedbackButton"
+    );
+
+const feedbackStatus =
+    document.getElementById(
+        "feedbackStatus"
+    );
+
+const feedbackCount =
+    document.getElementById(
+        "feedbackCount"
+    );
+
+
+function updateFeedbackCount() {
+    // The feedback form may be omitted on some page layouts.
+    if (!feedbackCount || !feedbackMessage) return;
+
+    feedbackCount.textContent =
+        `${feedbackMessage.value.length.toLocaleString()} / 2000`;
+}
+
+
+if (feedbackMessage) {
+
+    feedbackMessage.addEventListener(
+        "input",
+        updateFeedbackCount
+    );
+
+}
+
+
+if (feedbackButton) {
+
+    feedbackButton.addEventListener(
+        "click",
+        async function() {
+
+            // Safely handle layouts where the feedback form is not present.
+            if (!feedbackMessage || !feedbackStatus) return;
+
+            const message =
+                feedbackMessage.value.trim();
+
+            feedbackStatus.textContent =
+                "";
+
+            feedbackStatus.style.color =
+                "#858ca1";
+
+            if (!message) {
+
+                feedbackStatus.textContent =
+                    "Please write some feedback first.";
+
+                return;
+            }
+
+            if (message.length > 2000) {
+
+                feedbackStatus.textContent =
+                    "Your feedback is too long.";
+
+                return;
+            }
+
+            feedbackButton.disabled =
+                true;
+
+            feedbackButton.textContent =
+                "Sending...";
+
+            try {
+
+                const {
+                    data: {
+                        user
+                    }
+                } =
+                    await supabaseClient
+                        .auth
+                        .getUser();
+
+                if (!user) {
+
+                    feedbackStatus.textContent =
+                        "Please log in before sending feedback.";
+
+                    return;
+                }
+
+                const {
+                    data: profile
+                } =
+                    await supabaseClient
+                        .from("profiles")
+                        .select(
+                            "username"
+                        )
+                        .eq(
+                            "id",
+                            user.id
+                        )
+                        .maybeSingle();
+
+                const {
+                    error
+                } =
+                    await supabaseClient
+                        .from("feedback")
+                        .insert({
+
+                            user_id:
+                                user.id,
+
+                            username:
+                                profile?.username ||
+                                "Unknown User",
+
+                            message:
+                                message
+
+                        });
+
+                if (error) {
+                    throw error;
+                }
+
+                feedbackMessage.value =
+                    "";
+
+                updateFeedbackCount();
+
+                feedbackStatus.textContent =
+                    "Thanks! Your feedback was sent.";
+
+                feedbackStatus.style.color =
+                    "#22c55e";
+
+            } catch (error) {
+
+                console.error(
+                    "Feedback error:",
+                    error
+                );
+
+                feedbackStatus.textContent =
+                    error.message ||
+                    "Could not send your feedback.";
+
+                feedbackStatus.style.color =
+                    "#ef4444";
+
+            } finally {
+
+                feedbackButton.disabled =
+                    false;
+
+                feedbackButton.textContent =
+                    "Send Feedback";
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================
+   CENTER BIG HEADER ON OPEN
+========================================= */
+function centerDougHubHero(){
+ const hero=document.querySelector(".hero-card");
+ if(!hero)return;
+ const header=document.querySelector("header");
+ const headerHeight=header?header.offsetHeight:0;
+ const rect=hero.getBoundingClientRect();
+ const visibleHeight=Math.max(0,window.innerHeight-headerHeight);
+ const target=window.scrollY+rect.top-((visibleHeight-rect.height)/2)-headerHeight;
+ window.scrollTo({top:Math.max(0,target),behavior:"instant"});
+}
+window.addEventListener("load",function(){requestAnimationFrame(centerDougHubHero);});
+window.addEventListener("pageshow",function(){requestAnimationFrame(centerDougHubHero);});
+
+/* =========================================
+   START
+========================================= */
+
+loadAccount();
+loadCommunityGames().finally(loadTrendingGames);
+setupCommunitySlider();
+loadUserCount();
+updateFeedbackCount();
+
+
+/* Drive Pig classic / Pig Racing3D side slider */
+(function setupDrivePigVersionSlider(){
+ const root=document.getElementById("drivePigSwitcher");
+ if(!root)return;
+ const versions={
+  classic:{icon:"🐷",title:"Drive Pig",description:"Drive the pig, jump ramps, flip through the air, and try to survive the course.",href:"Games/drive-pig.html",button:"PLAY DRIVE PIG",status:"Classic stunt-course adventure"},
+  racing:{icon:"🏎️",title:"Pig Racing3D",description:"Race a pig-powered sports car down a neon 3D highway. Dodge traffic, collect golden coins, and unleash turbo.",href:"Games/drivepig3d.html",button:"PLAY PIG RACING3D",status:"3D highway racing · Turbo · Coin collecting"}
+ };
+ const toggle=root.querySelector(".drive-pig-toggle");
+ const buttons=[...root.querySelectorAll("[data-drive-version]")];
+ function selectVersion(key){
+  const v=versions[key]||versions.classic;
+  toggle.dataset.selected=key;
+  document.getElementById("drivePigIcon").src=key==="racing"?"Games/art/drive-pig-racing3d.svg":"Games/art/drive-pig.svg";
+  document.getElementById("drivePigTitle").textContent=v.title;
+  document.getElementById("drivePigDescription").textContent=v.description;
+  document.getElementById("drivePigPlay").href=v.href;
+  document.getElementById("drivePigPlay").innerHTML=v.button+' <span>→</span>';
+  document.getElementById("drivePigStatus").textContent=v.status;
+  buttons.forEach(b=>{const active=b.dataset.driveVersion===key;b.classList.toggle("active",active);b.setAttribute("aria-pressed",String(active));});
+ }
+ buttons.forEach(b=>b.addEventListener("click",()=>selectVersion(b.dataset.driveVersion)));
+ selectVersion("classic");
+})();
+
+</script>
+
+
+
+
+<script id="DOUGHUB_ARCADE_FILTERS">
+(function(){
+ const grid=document.querySelector(".arcade-games-grid");
+ if(!grid)return;
+ const cards=[...grid.querySelectorAll(":scope > .game-card")];
+ const search=document.getElementById("officialGameSearch");
+ const count=document.getElementById("arcadeLibraryCount");
+ const label=document.getElementById("arcadeResultsLabel");
+ const empty=document.createElement("div");
+ empty.className="arcade-empty";
+ empty.textContent="No games match that search. Try another title or category.";
+ grid.appendChild(empty);
+ const categoryFor=card=>{
+  const href=(card.getAttribute("href")||"").toLowerCase();
+  const title=(card.querySelector("h3")?.textContent||"").toLowerCase();
+  if(href.includes("ocean-drive")||href.includes("dead-city"))return "explore";
+  if(card.id==="drivePigSwitcher"||href.includes("racing")||href.includes("drive-pig"))return "racing";
+  if(href.includes("pig-clicker")||href.includes("rebirth-clicker")||title.includes("clicker")||title.includes("titlebound"))return "clicker";
+  if(href.includes("sudoku")||href.includes("puzzle"))return "puzzle";
+  return "arcade";
+ };
+ cards.forEach(card=>{
+  card.dataset.arcadeCategory=categoryFor(card);
+  card.dataset.arcadeSearch=((card.querySelector("h3")?.textContent||"")+" "+(card.querySelector("p")?.textContent||"")+" "+card.dataset.arcadeCategory).toLowerCase();
+ });
+ let active="all";
+ function apply(){
+  const query=(search?.value||"").trim().toLowerCase();
+  let shown=0;
+  cards.forEach(card=>{
+   const matchCategory=active==="all"||card.dataset.arcadeCategory===active;
+   const matchSearch=!query||card.dataset.arcadeSearch.includes(query);
+   const visible=matchCategory&&matchSearch;
+   card.hidden=!visible;
+   if(visible)shown++;
+  });
+  empty.classList.toggle("show",shown===0);
+  if(count)count.textContent=shown+" "+(shown===1?"GAME":"GAMES");
+  if(label)label.textContent=query||active!=="all"?"Showing "+shown+" matching games":"Showing all "+shown+" games";
+ }
+ document.querySelectorAll("[data-arcade-filter]").forEach(button=>{
+  button.addEventListener("click",()=>{
+   active=button.dataset.arcadeFilter;
+   document.querySelectorAll("[data-arcade-filter]").forEach(item=>{
+    const selected=item===button;
+    item.classList.toggle("active",selected);
+    item.setAttribute("aria-pressed",String(selected));
+   });
+   apply();
+  });
+ });
+ search?.addEventListener("input",apply);
+ document.addEventListener("keydown",event=>{
+  if(event.key==="/"&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!(event.target instanceof HTMLInputElement)&&!(event.target instanceof HTMLTextAreaElement)){
+   event.preventDefault();search?.focus();
+  }
+  if(event.key==="Escape"&&document.activeElement===search){search.value="";apply();search.blur();}
+ });
+ apply();
+})();
+</script>
+
+</body>
+</html>
