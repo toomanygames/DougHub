@@ -17,6 +17,7 @@ This is the migration tracker for replacing the official DougHub games with real
 | Ocean Drive | [StarKnightt/ocean-drive](https://github.com/StarKnightt/ocean-drive) | MIT | Existing open-source base. Review and expand its asset credits as the art pass is rebuilt. |
 | Doug Racing | [jakesgordon/javascript-racer](https://github.com/jakesgordon/javascript-racer) | MIT | Planned. Adapt its arcade-racing systems; replace its demo sprites with separately licensed Kenney CC0 vehicle art. |
 | Doug Puzzle | [gabrielecirulli/2048](https://github.com/gabrielecirulli/2048) | MIT | Existing open-source base. Keep original creator/contributor credits and MIT notice. |
+| DougHub Sudoku | [sausi-7/games — Sudoku](https://github.com/sausi-7/games/tree/main/games/puzzle/sudoku) | MIT | **Ported.** Upstream Sudoku board and entry logic adapted; added validated completion, restart, responsive DougHub styling and shared credits. |
 | Drive Pig (Classic) | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt the arcade-racing foundation with a separately licensed CC0 pig character asset. |
 | Pig Racing3D | [ryancampbell/kart-royale](https://github.com/ryancampbell/kart-royale) | MIT | Planned. Adapt the arcade-racing foundation and use separately licensed CC0 vehicle/character art. |
 | Smack 'n Punch | [Matter.js](https://github.com/liabru/matter-js) | MIT | Planned as a non-weapon physics playground using open-source rigid-body physics and licensed props. |
@@ -44,6 +45,7 @@ This is the migration tracker for replacing the official DougHub games with real
 - [jakesgordon/javascript-racer MIT license](https://github.com/jakesgordon/javascript-racer/blob/master/LICENSE) — use code only; do not reuse its demo sprites.
 - [LittleJS Arcade MIT license](https://github.com/KilledByAPixel/LittleJSArcade/blob/main/LICENSE).
 - [StarKnightt/ocean-drive MIT license](https://github.com/StarKnightt/ocean-drive/blob/main/LICENSE).
+- [sausi-7/games MIT license](https://github.com/sausi-7/games/blob/main/LICENSE) — copied to `Games/licenses/sausi-7-games-MIT.txt`.
 
 This tracker is intentionally honest: planned entries are not represented as completed ports.
 
@@ -64,3 +66,12 @@ This tracker is intentionally honest: planned entries are not represented as com
 - Added an “Open Game” direct-launch fallback to Ocean Drive in case its external embedded player does not load.
 - Static audit: all 16 HTML game pages were checked for missing local `src`/`href` references and duplicate element IDs; none remained after the fixes. All 13 game-card logo paths were verified to exist.
 - Browser playtesting has not yet been completed. External services and runtime gameplay still need hands-on verification; empty GitHub commit status output is not a browser test.
+
+
+## Additional open-source game — October 31, 2026
+
+- Added DougHub Sudoku from [sausi-7/games](https://github.com/sausi-7/games/tree/main/games/puzzle/sudoku), licensed MIT; the full upstream MIT notice is stored in `Games/licenses/sausi-7-games-MIT.txt`.
+- Adapted the original single-file Sudoku implementation to DougHub's responsive dark theme and shared Back/Credits controls. Removed its external background/config fetch and unused mobile-wrapper messaging.
+- Fixed the upstream completion check so it validates any complete legal Sudoku grid (the upstream hard-coded solution list contained an invalid row), added a working restart button, and bounded the confetti animation.
+- Added a matching original SVG card logo and listed the game in the official Games catalog.
+- Static source checks passed; browser playtesting on desktop and touch devices remains to be done.
