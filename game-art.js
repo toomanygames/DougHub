@@ -19,9 +19,8 @@ const sources={
 const s=sources[id]||null;
 const style=document.createElement("style");
 style.textContent=`
-.dh-shared-back{position:relative!important;inset:auto!important;z-index:2147483000!important;display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;gap:8px!important;margin:0!important;padding:9px 13px!important;border:1px solid rgba(167,139,250,.34)!important;border-radius:12px!important;background:rgba(8,10,25,.92)!important;color:#e9e5ff!important;text-decoration:none!important;white-space:nowrap!important;font:800 11px Inter,system-ui,sans-serif!important;box-shadow:0 8px 28px #0006!important;backdrop-filter:blur(14px)!important}
+.dh-shared-back{position:fixed!important;top:12px!important;left:12px!important;z-index:2147483000!important;display:inline-flex!important;align-items:center!important;gap:8px!important;padding:9px 13px!important;border:1px solid rgba(167,139,250,.34)!important;border-radius:12px!important;background:rgba(8,10,25,.88)!important;color:#e9e5ff!important;text-decoration:none!important;font:800 11px Inter,system-ui,sans-serif!important;box-shadow:0 8px 28px #0006!important;backdrop-filter:blur(14px)!important}
 .dh-shared-back:hover{background:rgba(99,102,241,.25)!important;border-color:#a78bfa!important;color:white!important}
-.dh-game-nav{position:relative;z-index:2147483000;display:flex;align-items:center;min-height:48px;width:100%;padding:6px 12px;background:rgba(5,7,20,.96);border-bottom:1px solid rgba(167,139,250,.2);}
 #dhGameCreditsButton{position:fixed;right:12px;bottom:12px;z-index:2147483000;padding:10px 14px;border:1px solid #a78bfa66;border-radius:12px;background:linear-gradient(135deg,#6366f1,#9333ea);color:white;font:800 11px Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 26px #0007}
 #dhGameCredits{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;padding:18px;background:#03040bdc;backdrop-filter:blur(12px);font:14px/1.55 Inter,system-ui,sans-serif;color:#f8f7ff}
 #dhGameCredits.open{display:flex}
@@ -35,27 +34,8 @@ style.textContent=`
 `;
 document.head.appendChild(style);
 let back=document.querySelector("a.back, a[href*='douggames.html'], a[href*='douggames']");
-if(back){
-  back.classList.add("dh-shared-back");
-  back.href="../douggames.html";
-  back.textContent="← Back to Games";
-}else{
-  back=document.createElement("a");
-  back.href="../douggames.html";
-  back.className="dh-shared-back";
-  back.textContent="← Back to Games";
-  const host=document.querySelector(".topbar,.header,.dh-topbar");
-  if(host){
-    host.insertBefore(back,host.firstChild);
-    host.style.setProperty("gap","12px","important");
-    host.style.setProperty("flex-wrap","wrap","important");
-  }else{
-    const nav=document.createElement("div");
-    nav.className="dh-game-nav";
-    nav.appendChild(back);
-    document.body.insertBefore(nav,document.body.firstChild);
-  }
-}
+if(back)back.classList.add("dh-shared-back");
+else{back=document.createElement("a");back.href="../douggames.html";back.className="dh-shared-back";back.textContent="← Back to Games";document.body.appendChild(back);}
 const button=document.createElement("button");button.id="dhGameCreditsButton";button.type="button";button.textContent="Credits & License";
 const modal=document.createElement("div");modal.id="dhGameCredits";
 const content=s
