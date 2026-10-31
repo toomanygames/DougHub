@@ -46,23 +46,62 @@ body{display:flex;align-items:center;justify-content:center;padding:12px}
 
 <script src="../search-autofill-fix.js" defer></script>
 
-<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
-
-/* Local DougHub glass redesign, styled in this page rather than a shared theme file */
-:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
-button{font:inherit;transition:filter .16s,border-color .16s,box-shadow .16s}
-button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
-
-
-body{background:radial-gradient(circle at 12% 0,#25184f,transparent 35%),radial-gradient(circle at 90% 15%,#4b185a,transparent 31%),#050713}
-.topbar{background:rgba(5,7,20,.82);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(18px)}
-.coins{background:linear-gradient(135deg,#6366f126,#a855f72b);border:1px solid #9b91ff44;border-radius:14px}
-.panel{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(7,9,24,.91));border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 18px 48px #0004}
-.core-wrap{background:radial-gradient(circle,#a855f72a,transparent 68%);border-radius:28px}.core{filter:drop-shadow(0 15px 30px #a855f72b)}
-.tap,.action,.btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:1px solid #c4b5fd55;border-radius:13px;box-shadow:0 9px 25px #6366f133}
-.stats .stat,.petrow{background:#ffffff05;border:1px solid #ffffff0b;border-radius:13px}
-.questbar{background:#070918;border:1px solid var(--dh-line);border-radius:999px;overflow:hidden}.questfill{background:linear-gradient(90deg,#6366f1,#a855f7)}
-
+<style id="DOUGHUB_REBIRTH_THEME">
+/* Rebirth Clicker: independent cosmic/energy theme. */
+:root{color-scheme:dark;--rb-bg:#050b16;--rb-panel:#0d1b2b;--rb-line:rgba(103,232,249,.18);--rb-cyan:#67e8f9;--rb-violet:#a78bfa;--rb-text:#e7f8ff;--rb-muted:#9bb4c5}
+html,body{background:radial-gradient(ellipse at 50% -15%,#173a59 0,transparent 48%),radial-gradient(circle at 85% 82%,#27205a 0,transparent 34%),var(--rb-bg);color:var(--rb-text)}
+body{padding:12px}
+.screen{background:linear-gradient(155deg,rgba(12,27,45,.97),rgba(5,11,24,.98));border:1px solid var(--rb-line);border-radius:24px;box-shadow:0 24px 90px #0009,0 0 50px #22d3ee0c}
+.topbar{background:linear-gradient(90deg,rgba(15,35,57,.98),rgba(17,20,48,.95));border-bottom:1px solid var(--rb-line);gap:12px}
+.coins{color:#baf7ff;font-size:clamp(20px,3vw,29px);font-weight:900;letter-spacing:.02em;text-shadow:0 0 20px #22d3ee55}
+.btn,.buy{font:800 13px/1.2 inherit;border:1px solid #67e8f944;border-radius:11px;background:linear-gradient(135deg,#164e63,#312e81);color:#e8fdff;box-shadow:0 7px 22px #02061799;cursor:pointer;transition:transform .16s,border-color .16s,filter .16s}
+.btn{padding:10px 16px}
+.btn:hover,.buy:hover:not(:disabled),.action:hover:not(:disabled){transform:translateY(-1px);border-color:#a5f3fc;filter:brightness(1.12)}
+.content{background:linear-gradient(90deg,#07132155,transparent 55%)}
+.left{position:relative;gap:17px}
+.core-wrap{position:relative;width:min(62vw,300px,42vh);isolation:isolate}
+.core-wrap::before,.core-wrap::after{content:"";position:absolute;inset:-12%;border:1px solid #67e8f966;border-radius:50%;transform:rotate(-24deg) scaleY(.38);box-shadow:0 0 20px #22d3ee22;pointer-events:none;z-index:-1}
+.core-wrap::after{inset:-19%;border-color:#a78bfa66;transform:rotate(34deg) scaleY(.3);animation:rb-orbit 16s linear infinite}
+.core{position:relative;border-radius:50%;background:radial-gradient(circle at 34% 28%,#ecfeff 0,#67e8f9 9%,#2563eb 34%,#312e81 67%,#111827 100%);border:2px solid #a5f3fc99;box-shadow:inset 0 0 34px #e0f2fe55,0 0 35px #22d3ee55,0 0 90px #6366f133;color:white;cursor:pointer}
+.core::after{content:"";position:absolute;inset:8%;border:1px solid #dbeafe66;border-radius:50%;box-shadow:inset 0 0 22px #67e8f955;pointer-events:none}
+.core:active{transform:scale(.94);filter:brightness(1.2)}
+.tap{color:#d9faff;font-size:clamp(20px,3vw,28px);letter-spacing:.02em;text-shadow:0 0 20px #22d3ee44}
+.status{color:#9feaf5;min-height:18px}
+.right{background:rgba(3,10,22,.52);border-left:1px solid var(--rb-line);scrollbar-width:thin;scrollbar-color:#256477 transparent}
+.panel{background:linear-gradient(145deg,rgba(15,35,55,.96),rgba(10,17,38,.97));border:1px solid var(--rb-line);border-radius:16px;box-shadow:0 12px 32px #0004}
+.panel h3{color:#a5f3fc;font-size:14px;letter-spacing:.12em}
+.stats .stat{background:linear-gradient(145deg,#102a40,#10182d);border:1px solid #67e8f91c;border-radius:11px;color:var(--rb-muted)}
+.stat strong{color:#f0fdff}
+.action{width:100%;border:1px solid #67e8f966;border-radius:11px;padding:12px;font-weight:900;font-size:14px;background:linear-gradient(110deg,#0e7490,#4f46e5);color:#f0fdff;box-shadow:0 8px 25px #0891b233;cursor:pointer}
+.action:disabled,.buy:disabled,.btn:disabled{opacity:.38;filter:saturate(.45);cursor:not-allowed}
+.row{background:linear-gradient(100deg,#10263a,#111a31);border:1px solid #67e8f91a;border-radius:11px}
+.name{color:#e6fbff}.desc,.small{color:#9bb4c5}
+.buy{background:linear-gradient(110deg,#155e75,#4338ca);min-width:72px;padding:9px 11px;color:#ecfeff}
+.pet{filter:drop-shadow(0 0 8px #67e8f944)}
+.questbar{background:#030a15;border:1px solid #67e8f933;border-radius:99px;overflow:hidden}
+.questfill{background:linear-gradient(90deg,#22d3ee,#818cf8,#c084fc);box-shadow:0 0 14px #22d3ee88}
+.drop{color:#a5f3fc;text-shadow:0 0 14px #22d3ee99}
+button:focus-visible{outline:2px solid #a5f3fc;outline-offset:3px}
+@keyframes rb-orbit{to{transform:rotate(394deg) scaleY(.3)}}
+@media(max-width:700px){
+ body{padding:7px}
+ .screen{height:calc(100dvh - 14px);border-radius:18px}
+ .topbar{padding:10px 12px}
+ .content{flex-direction:column}
+ .left{flex:0 0 auto;padding:10px 18px;gap:8px}
+ .core-wrap{width:min(24dvh,170px,48vw)}
+ .right{width:100%;min-width:0;min-height:0;flex:1 1 0;border-left:0;border-top:1px solid var(--rb-line);padding:10px;overscroll-behavior:contain}
+ .panel{padding:10px;border-radius:13px}
+ .panel h3{margin-bottom:8px;font-size:13px}
+ .stats{gap:6px}
+ .stat{padding:8px}
+}
+@media(max-height:600px) and (min-width:701px){
+ .left{gap:7px;padding:10px}
+ .core-wrap{width:min(24vw,190px,38vh)}
+ .right{padding:9px}
+ .panel{padding:9px;margin-bottom:8px}
+}
 </style>
 <script src="../game-art.js" defer></script>
 </head>
