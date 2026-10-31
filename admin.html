@@ -1472,6 +1472,16 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
   <div id="feedbackManagementList" class="admin-scroll-area" aria-live="polite"><div class="empty">Loading feedback…</div></div>
 </div>
 
+<div class="card" id="gameRequestsManagementCard">
+  <h2>🎮 Game Requests</h2>
+  <p class="admin-card-help">Suggestions submitted from the Games page. This list is separate from general feedback.</p>
+  <div class="admin-card-actions">
+    <span id="gameRequestsManagementStatus" class="status">Game requests not loaded yet.</span>
+    <button type="button" id="refreshGameRequestsButton">↻ Refresh</button>
+  </div>
+  <div id="gameRequestsManagementList" class="admin-scroll-area" aria-live="polite"><div class="empty">Loading game requests…</div></div>
+</div>
+
 <div class="card staff-management-card" id="staffManagementCard" style="display:none">
   <h2>🛡️ Staff & Permissions</h2>
   <p class="admin-card-help">Manage the staff ladder. Only the Owner account should be able to change roles. Promotions use the protected staff-role endpoint.</p>
@@ -1600,6 +1610,16 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
       <div class="audit-table-wrap"><table class="audit-table"><thead><tr><th>TIME · WA</th><th>LEVEL</th><th>ACTOR</th><th>EVENT</th><th>LOCATION</th></tr></thead><tbody id="auditRows"><tr><td colspan="5">Awaiting log records…</td></tr></tbody></table></div>
       <div class="audit-footer"><span>TIMEZONE: America/Los_Angeles</span><span>Newest first · up to 1,000 recent events</span></div>
     </div>
+</div>
+
+<div class="card" id="adminActivityFlagsCard" style="display:none">
+  <h2>🚩 Suspicious Admin Activity</h2>
+  <p class="admin-card-help">Automated review flags for unusually high-impact changes or abnormal bursts of admin actions. A flag is a reason to review an event, not proof of misconduct.</p>
+  <div class="admin-card-actions">
+    <span id="adminActivityFlagsStatus" class="status">Checking flagged activity…</span>
+    <button type="button" id="refreshAdminActivityFlagsButton">↻ Refresh</button>
+  </div>
+  <div id="adminActivityFlagsList" class="admin-scroll-area" aria-live="polite"><div class="empty">Loading review flags…</div></div>
 </div>
 
 <div class="card">
@@ -5234,6 +5254,7 @@ async function clearAuditLogs() {
     if(button)button.disabled=true;
     if(status)status.textContent="CLEARING STORED AUDIT LOGS…";
     try {
+        await writeAuditLog("admin_action","authentication","Cleared audit logs",{previousCount:auditState.rows.length});
         const {error}=await supabaseClient.from("admin_audit_logs").delete().not("id","is",null);
         if(error)throw error;
         auditState.rows=[];
@@ -5830,25 +5851,14 @@ async function loadChatGroupModeration() {
 }
 document.getElementById("refreshChatGroupsButton")?.addEventListener("click", loadChatGroupModeration);
 
-async function loadFeedback() {
-    const status = document.getElementById("feedbackManagementStatus");
-    const list = document.getElementById("feedbackManagementList");
-    if (!status || !list) return;
-    status.textContent = "Loading feedback…";
+function renderFeedbackItems(items, list, status, kind) {
     list.replaceChildren();
-    const { data, error } = await supabaseClient
-        .from("feedback")
-        .select("id,username,message,created_at")
-        .order("created_at", { ascending: false });
-    if (error) {
-        status.textContent = "Could not load feedback: " + (error.message || "Database error");
-        list.innerHTML = '<div class="empty">Feedback could not be loaded. Check staff permissions and refresh.</div>';
-        return;
-    }
-    const items = data || [];
-    status.textContent = items.length + " open item" + (items.length === 1 ? "" : "s");
+    status.textContent = items.length + (kind === "game_request" ? " game request" : " open feedback item") + (items.length === 1 ? "" : "s");
     if (!items.length) {
-        list.innerHTML = '<div class="empty">🎉 No open feedback. You are all caught up.</div>';
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = kind === "game_request" ? "No game requests yet." : "No open feedback. You are all caught up.";
+        list.appendChild(empty);
         return;
     }
     items.forEach(item => {
@@ -5865,32 +5875,151 @@ async function loadFeedback() {
         date.textContent = item.created_at ? new Date(item.created_at).toLocaleString() : "Date unknown";
         date.style.cssText = "font-size:10px;color:#8d93b3";
         head.append(who, date);
-        const message = document.createElement("p");
-        message.textContent = item.message || "(Empty feedback)";
-        message.style.cssText = "margin:0 0 12px;color:#d7d9ec;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere";
+        const body = document.createElement("div");
+        body.style.cssText = "margin:0 0 12px;color:#d7d9ec;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere";
+        if (kind === "game_request") {
+            const title = document.createElement("strong");
+            title.textContent = item.game_request_title || "Untitled game idea";
+            title.style.cssText = "display:block;color:#c4b5fd;font-size:14px;margin-bottom:5px";
+            const genre = document.createElement("div");
+            genre.textContent = "Genre: " + (item.game_request_genre || "Not specified");
+            genre.style.cssText = "color:#9da8ca;font-size:11px;margin-bottom:7px";
+            const details = document.createElement("div");
+            details.textContent = item.game_request_details || item.message || "No extra details supplied.";
+            body.append(title, genre, details);
+        } else {
+            body.textContent = item.message || "(Empty feedback)";
+        }
         const close = document.createElement("button");
         close.type = "button";
-        close.textContent = "✓ Close feedback";
+        close.textContent = "✓ Close " + (kind === "game_request" ? "request" : "feedback");
         close.style.cssText = "padding:7px 10px;font-size:11px;background:rgba(34,197,94,.13);border:1px solid rgba(74,222,128,.25);color:#bbf7d0";
         close.addEventListener("click", async () => {
-            if (!confirm("Close this feedback item? It will be permanently removed from the inbox.")) return;
+            const label = kind === "game_request" ? "game request" : "feedback item";
+            if (!confirm("Permanently delete this " + label + " from the inbox?")) return;
             close.disabled = true;
-            close.textContent = "Closing…";
-            const { error: closeError } = await supabaseClient.from("feedback").delete().eq("id", item.id);
-            if (closeError) {
-                status.textContent = "Could not close feedback: " + (closeError.message || "Database error");
+            close.textContent = "Deleting…";
+            const { error: deleteError } = await supabaseClient.from("feedback").delete().eq("id", item.id);
+            if (deleteError) {
+                status.textContent = "Could not delete: " + (deleteError.message || "Database error");
                 close.disabled = false;
-                close.textContent = "✓ Close feedback";
+                close.textContent = "✓ Close " + (kind === "game_request" ? "request" : "feedback");
                 return;
             }
-            await writeAuditLog("admin_action", "feedback", "Closed feedback from @" + (item.username || "Unknown user"), { feedbackId: item.id });
-            await loadFeedback();
+            await writeAuditLog("admin_action", "feedback", "Deleted " + label + " from @" + (item.username || "Unknown user"), { feedbackId: item.id, feedbackType: kind });
+            if (kind === "game_request") await loadGameRequests();
+            else await loadFeedback();
         });
-        card.append(head, message, close);
+        card.append(head, body, close);
         list.appendChild(card);
     });
 }
+
+async function loadFeedback() {
+    const status = document.getElementById("feedbackManagementStatus");
+    const list = document.getElementById("feedbackManagementList");
+    if (!status || !list) return;
+    status.textContent = "Loading feedback…";
+    const { data, error } = await supabaseClient.from("feedback")
+        .select("id,username,message,created_at,feedback_type")
+        .eq("feedback_type", "feedback")
+        .order("created_at", { ascending: false }).limit(300);
+    if (error) {
+        status.textContent = "Could not load feedback: " + (error.message || "Database error");
+        list.innerHTML = '<div class="empty">Feedback could not be loaded. Check staff permissions and refresh.</div>';
+        return;
+    }
+    renderFeedbackItems(data || [], list, status, "feedback");
+}
 document.getElementById("refreshFeedbackButton")?.addEventListener("click", loadFeedback);
+
+async function loadGameRequests() {
+    const status = document.getElementById("gameRequestsManagementStatus");
+    const list = document.getElementById("gameRequestsManagementList");
+    if (!status || !list) return;
+    status.textContent = "Loading game requests…";
+    const { data, error } = await supabaseClient.from("feedback")
+        .select("id,username,message,created_at,game_request_title,game_request_genre,game_request_details")
+        .eq("feedback_type", "game_request")
+        .order("created_at", { ascending: false }).limit(300);
+    if (error) {
+        status.textContent = "Could not load game requests: " + (error.message || "Database error");
+        list.innerHTML = '<div class="empty">Game requests could not be loaded. Check staff permissions and refresh.</div>';
+        return;
+    }
+    renderFeedbackItems(data || [], list, status, "game_request");
+}
+document.getElementById("refreshGameRequestsButton")?.addEventListener("click", loadGameRequests);
+
+async function loadAdminActivityFlags() {
+    const status = document.getElementById("adminActivityFlagsStatus");
+    const list = document.getElementById("adminActivityFlagsList");
+    const card = document.getElementById("adminActivityFlagsCard");
+    if (!status || !list || !card) return;
+    if (currentAdminRole !== "owner") {
+        card.style.display = "none";
+        return;
+    }
+    card.style.display = "";
+    status.textContent = "Loading review flags…";
+    list.replaceChildren();
+    const { data, error } = await supabaseClient.from("admin_activity_flags")
+        .select("id,actor_id,created_at,severity,score,reason,action,category,page")
+        .is("resolved_at", null).order("created_at", { ascending: false }).limit(100);
+    if (error) {
+        status.textContent = "Could not load activity flags: " + (error.message || "Database error");
+        return;
+    }
+    const flags = data || [];
+    const actorIds = [...new Set(flags.map(flag => flag.actor_id).filter(Boolean))];
+    const names = new Map();
+    if (actorIds.length) {
+        const { data: profiles } = await supabaseClient.from("profiles").select("id,username").in("id", actorIds);
+        (profiles || []).forEach(profile => names.set(profile.id, profile.username || profile.id.slice(0, 8)));
+    }
+    status.textContent = flags.length + " open review flag" + (flags.length === 1 ? "" : "s");
+    if (!flags.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No suspicious admin activity has been flagged.";
+        list.appendChild(empty);
+        return;
+    }
+    flags.forEach(flag => {
+        const row = document.createElement("article");
+        row.style.cssText = "padding:13px;margin:8px 0;border:1px solid " + (flag.severity === "high" ? "rgba(248,113,113,.32)" : "rgba(251,191,36,.25)") + ";border-radius:12px;background:rgba(255,255,255,.025)";
+        const title = document.createElement("strong");
+        title.textContent = (flag.severity === "high" ? "HIGH PRIORITY · " : "REVIEW · ") + (names.get(flag.actor_id) || "Unknown staff");
+        title.style.cssText = "display:block;color:" + (flag.severity === "high" ? "#fca5a5" : "#fcd34d") + ";font-size:12px";
+        const meta = document.createElement("div");
+        meta.textContent = "Score " + flag.score + "/100 · " + new Date(flag.created_at).toLocaleString() + " · " + (flag.category || "general");
+        meta.style.cssText = "margin:5px 0;color:#929bb9;font-size:10px";
+        const reason = document.createElement("p");
+        reason.textContent = flag.reason;
+        reason.style.cssText = "margin:8px 0;color:#e2e5f5;font-size:12px;line-height:1.5";
+        const action = document.createElement("p");
+        action.textContent = "Action: " + flag.action + (flag.page ? " · " + flag.page : "");
+        action.style.cssText = "margin:0 0 10px;color:#aeb6d2;font-size:11px;overflow-wrap:anywhere";
+        const reviewed = document.createElement("button");
+        reviewed.type = "button";
+        reviewed.textContent = "Mark reviewed";
+        reviewed.addEventListener("click", async () => {
+            reviewed.disabled = true;
+            const { error: updateError } = await supabaseClient.from("admin_activity_flags")
+                .update({ resolved_at: new Date().toISOString(), resolved_by: currentAdminUser.id })
+                .eq("id", flag.id).is("resolved_at", null);
+            if (updateError) {
+                status.textContent = "Could not mark reviewed: " + updateError.message;
+                reviewed.disabled = false;
+                return;
+            }
+            await loadAdminActivityFlags();
+        });
+        row.append(title, meta, reason, action, reviewed);
+        list.appendChild(row);
+    });
+}
+document.getElementById("refreshAdminActivityFlagsButton")?.addEventListener("click", loadAdminActivityFlags);
 
 /* =========================================
    START ADMIN PANEL
@@ -5933,6 +6062,8 @@ async function startAdminPanel() {
         loadDougHubMusicModeration(),
         loadDougBaseAccessRequests(),
         loadFeedback(),
+        loadGameRequests(),
+        loadAdminActivityFlags(),
         loadCodeProjects(),
         loadSiteFeatures(),
         loadSiteEvents(),
@@ -5967,21 +6098,6 @@ startAdminPanel();
       a.setAttribute("href","work.html");
     }
   });
-})();
-</script><script id="owner-deleted-items-manager">
-(function(){
- "use strict";let installed=false;
- function install(){if(installed||typeof currentAdminRole==="undefined"||currentAdminRole!=="owner")return;installed=true;
- const style=document.createElement("style");style.textContent=`#dhDeletedItemsLauncher{position:fixed;right:18px;bottom:18px;z-index:8000;border:1px solid #f8717166;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#991b1b,#7f1d1d);color:#fff;font-weight:850;box-shadow:0 12px 35px #0007;cursor:pointer}#dhDeletedItemsBackdrop{position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;padding:18px;background:#02040acc;backdrop-filter:blur(9px)}#dhDeletedItemsBackdrop[hidden]{display:none}#dhDeletedItemsPanel{width:min(900px,100%);max-height:min(86vh,850px);display:flex;flex-direction:column;overflow:hidden;border:1px solid #f8717144;border-radius:22px;background:linear-gradient(145deg,#15162d,#080a16);color:#f8fafc;box-shadow:0 28px 100px #000b}.dh-trash-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:21px;border-bottom:1px solid #ffffff14}.dh-trash-head h2{margin:0 0 6px;font-size:22px}.dh-trash-head p{margin:0;color:#a5acc8;font-size:12px;line-height:1.5}.dh-trash-close{width:36px;height:36px;border:1px solid #ffffff20;border-radius:10px;background:#ffffff09;color:#fff;font-size:22px;cursor:pointer}#dhDeletedItemsStatus{padding:12px 20px;color:#a5b4fc;font-size:12px}#dhDeletedItemsList{overflow:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:9px}.dh-trash-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border:1px solid #ffffff13;border-radius:13px;background:#ffffff05}.dh-trash-item strong{display:block;font-size:13px;overflow-wrap:anywhere}.dh-trash-meta{margin-top:5px;color:#969db9;font-size:11px}.dh-trash-preview{margin-top:7px;color:#c7cbe0;font-size:11px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;max-height:90px;overflow:auto}.dh-trash-delete{border:1px solid #f8717155;border-radius:10px;padding:9px 11px;background:#ef444418;color:#fecaca;font-size:11px;font-weight:850;cursor:pointer}.dh-trash-delete:disabled{opacity:.5;cursor:wait}@media(max-width:600px){#dhDeletedItemsLauncher{right:10px;bottom:10px}.dh-trash-item{grid-template-columns:minmax(0,1fr)}.dh-trash-delete{justify-self:start}.dh-trash-head{padding:16px}}`;document.head.appendChild(style);
- const launch=document.createElement("button");launch.id="dhDeletedItemsLauncher";launch.type="button";launch.textContent="▣ Deleted items";launch.title="Owner-only deleted items archive";
- const back=document.createElement("div");back.id="dhDeletedItemsBackdrop";back.hidden=true;back.setAttribute("role","dialog");back.setAttribute("aria-modal","true");back.setAttribute("aria-labelledby","dhDeletedItemsTitle");back.innerHTML='<section id="dhDeletedItemsPanel"><header class="dh-trash-head"><div><h2 id="dhDeletedItemsTitle">Deleted items</h2><p>Only the Owner can permanently erase archived content. Deletions made after the archive was enabled are listed here.</p></div><button type="button" class="dh-trash-close" id="dhDeletedItemsClose" aria-label="Close deleted items">×</button></header><div id="dhDeletedItemsStatus">Loading deleted items…</div><div id="dhDeletedItemsList"></div></section>';document.body.append(launch,back);
- const status=back.querySelector("#dhDeletedItemsStatus"),list=back.querySelector("#dhDeletedItemsList"),close=()=>back.hidden=true;back.querySelector("#dhDeletedItemsClose").addEventListener("click",close);back.addEventListener("click",e=>{if(e.target===back)close();});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!back.hidden)close();});
- async function load(){status.textContent="Loading archived deletions…";list.replaceChildren();const {data,error}=await supabaseClient.from("deleted_items").select("id,source_table,source_row,item_label,deleted_at,deleted_by").order("deleted_at",{ascending:false});if(error){status.textContent="Could not load deleted items: "+error.message;return;}status.textContent=(data?.length||0)+" archived item"+((data?.length||0)===1?"":"s");if(!data?.length){list.innerHTML='<div style="padding:28px;text-align:center;color:#9299b5">Nothing in the deleted-items archive yet.</div>';return;}
- for(const item of data){const row=document.createElement("article");row.className="dh-trash-item";const content=document.createElement("div"),label=document.createElement("strong"),meta=document.createElement("div"),preview=document.createElement("div");label.textContent=item.item_label||"Deleted item";meta.className="dh-trash-meta";meta.textContent=item.source_table+" · "+new Date(item.deleted_at).toLocaleString();preview.className="dh-trash-preview";const raw=item.source_row||{};preview.textContent=String(raw.message||raw.body||raw.comment||raw.description||raw.title||raw.name||raw.path||"").slice(0,400);content.append(label,meta,preview);const del=document.createElement("button");del.className="dh-trash-delete";del.type="button";del.textContent="Permanently delete";del.addEventListener("click",async()=>{if(currentAdminRole!=="owner"){status.textContent="Owner access is required.";return;}if(!confirm('Permanently erase "'+(item.item_label||"this item")+'" from the deleted-items archive? This cannot be undone.'))return;del.disabled=true;del.textContent="Deleting…";const {error:de}=await supabaseClient.from("deleted_items").delete().eq("id",item.id);if(de){status.textContent="Could not permanently delete: "+de.message;del.disabled=false;del.textContent="Permanently delete";return;}row.remove();status.textContent="Item permanently deleted.";});row.append(content,del);list.appendChild(row);}
- }
- launch.addEventListener("click",async()=>{back.hidden=false;await load();});
- }
- const timer=setInterval(()=>{if(typeof currentAdminRole!=="undefined"&&currentAdminRole==="owner"){clearInterval(timer);install();}},400);setTimeout(()=>clearInterval(timer),60000);
 })();
 </script>
 
@@ -6044,7 +6160,7 @@ startAdminPanel();
   chatGamesDailyScheduleCard:"chat",
   communityGames:"content",dougHubMusicModerationCard:"content",dougTubeModerationCard:"content",dougHubCodeProjectsCard:"content",
   siteFeatureCard:"site",siteAnnouncementCard:"site",pageScheduleCard:"site",adminUiPreferenceCard:"site",
-  customBadgeManagerCard:"users",deletedItemsCard:"logs",dhDeletedItemsPanel:"logs",dougBaseAccessRequestsCard:"users"
+  customBadgeManagerCard:"users",dougBaseAccessRequestsCard:"users"
  };
  function getCategory(card){
   if(categories[card.id])return categories[card.id];
