@@ -67,7 +67,18 @@ body{padding:12px}
 .core:active{transform:scale(.94);filter:brightness(1.2)}
 .tap{color:#d9faff;font-size:clamp(20px,3vw,28px);letter-spacing:.02em;text-shadow:0 0 20px #22d3ee44}
 .status{color:#9feaf5;min-height:18px}
-.right{background:rgba(3,10,22,.52);border-left:1px solid var(--rb-line);scrollbar-width:thin;scrollbar-color:#256477 transparent}
+.right{background:rgba(3,10,22,.52);border-left:1px solid var(--rb-line);scrollbar-width:thin;scrollbar-color:#38bdf8 rgba(3,10,22,.75);overscroll-behavior:contain}
+.right::-webkit-scrollbar{width:10px}
+.right::-webkit-scrollbar-track{background:rgba(3,10,22,.75);border-radius:99px;margin:8px 2px}
+.right::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#67e8f9,#818cf8,#a78bfa);border:2px solid #081323;border-radius:99px}
+.right::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#a5f3fc,#a78bfa)}
+/* High-contrast text stays clear throughout the scrollable panels. */
+.right,.panel,.stat,.name,.desc,.small,.tap,.status{ text-shadow:none }
+.panel h3,.name{color:#e6fbff}
+.desc,.small{color:#b8ccda}
+.stat{color:#c4d8e5}
+.stat strong{color:#fff}
+.action,.buy,.btn{color:#f8fdff}
 .panel{background:linear-gradient(145deg,rgba(15,35,55,.96),rgba(10,17,38,.97));border:1px solid var(--rb-line);border-radius:16px;box-shadow:0 12px 32px #0004}
 .panel h3{color:#a5f3fc;font-size:14px;letter-spacing:.12em}
 .stats .stat{background:linear-gradient(145deg,#102a40,#10182d);border:1px solid #67e8f91c;border-radius:11px;color:var(--rb-muted)}
