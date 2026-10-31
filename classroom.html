@@ -12,7 +12,7 @@
 <section class="hero"><div class="hero-inner"><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1 id="welcomeTitle">A bright place to learn.</h1><p id="welcomeCopy">Games, class chat, quick learning tools, and everything your teacher shares — all together.</p><div class="hero-meta"><span id="gradeBadge">Grade —</span><span id="classBadge">Choose your class</span><span id="teacherBadge">Teacher —</span></div></div></section>
 <div class="grid" id="classroomWorkspace" hidden>
 <main class="stack">
-<section class="panel"><div class="panel-head"><div><h2>Today in your classroom</h2><p>Your teacher's latest reminder and class information.</p></div><span class="pill mint" id="classLiveBadge">● CLASS LIVE</span></div><div id="classReminder" class="notice">Your teacher hasn't posted a reminder yet.</div></section>
+<section class="panel"><div class="panel-head"><div><h2>Today in your classroom</h2><p>Your teacher's latest reminder and class information.</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="classSelect" aria-label="Choose classroom" style="padding:8px 10px;border:1px solid #e8e7f6;border-radius:999px;background:#faf9ff;color:#5f5b8e;font-size:11px;font-weight:800"></select><span class="pill mint" id="classLiveBadge">● CLASS LIVE</span></div></div><div id="classReminder" class="notice">Your teacher hasn't posted a reminder yet.</div></section>
 <section class="panel"><div class="panel-head"><div><h2>🎮 Classroom arcade</h2><p>All DougHub games, ready for a quick brain break.</p></div><span class="pill">PLAY & EXPLORE</span></div><div class="game-grid" id="classGameGrid">
 <a class="game-tile" href="Games/bubble-grove.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/bubble-grove.svg" alt=""></div><strong>Bubble Grove</strong><small>Match colors and clear the bubbles.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
 <a class="game-tile" href="Games/titlebound.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/titlebound.svg" alt=""></div><strong>Titlebound: Realms of Fortune</strong><small>Collect titles and discover new rarities.</small><span class="game-tag">COLLECTION · PLAY ↗</span></a>
@@ -25,7 +25,7 @@
 <a class="game-tile" href="Games/puzzle.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/puzzle.svg" alt=""></div><strong>Doug Puzzle</strong><small>Slide, merge, and plan ahead.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
 <a class="game-tile" href="Games/sudoku.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/sudoku.svg" alt=""></div><strong>DougHub Sudoku</strong><small>Use logic to complete the grid.</small><span class="game-tag">LOGIC · PLAY ↗</span></a>
 <a class="game-tile" href="Games/drive-pig.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/drive-pig.svg" alt=""></div><strong>Drive Pig</strong><small>Take on the classic stunt course.</small><span class="game-tag">DRIVING · PLAY ↗</span></a>
-<a class="game-tile" href="Games/pig-racing-3d.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/drive-pig.svg" alt=""></div><strong>Pig Racing 3D</strong><small>Race through a 3D course.</small><span class="game-tag">RACING · PLAY ↗</span></a>
+<a class="game-tile" href="Games/drivepig3d.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/drive-pig.svg" alt=""></div><strong>Pig Racing 3D</strong><small>Race through a 3D course.</small><span class="game-tag">RACING · PLAY ↗</span></a>
 <a class="game-tile" href="Games/gem-garden.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/gem-garden.svg" alt=""></div><strong>Gem Garden</strong><small>Swap gems and make colorful matches.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
 <a class="game-tile" href="Games/pipe-parade.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/pipe-parade.svg" alt=""></div><strong>Pipe Parade</strong><small>Connect the pipes from start to finish.</small><span class="game-tag">PUZZLE · PLAY ↗</span></a>
 <a class="game-tile" href="Games/brick-bounce.html" target="_blank" rel="noopener"><div class="game-art"><img src="Games/art/brick-bounce.svg" alt=""></div><strong>Brick Bounce</strong><small>Keep the ball moving and clear blocks.</small><span class="game-tag">ARCADE · PLAY ↗</span></a>
@@ -51,7 +51,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id), C=window.DHClassroom;
-let db,user,profile,currentClass=null,classRows=[],chatTimer=null,focusTimer=null,focusSeconds=900;
+let db,user,profile,currentClass=null,classRows=[],chatTimer=null,sessionPoll=null,focusTimer=null,focusSeconds=900;
 const say=(id,msg)=>$(id).textContent=msg;
 function showLoading(msg){$("loadingState").innerHTML='<div class="empty">'+C.esc(msg)+'</div>';$("loadingState").hidden=false;$("classroomWorkspace").hidden=true;}
 function showWorkspace(){ $("loadingState").hidden=true;$("classroomWorkspace").hidden=false; }
@@ -77,10 +77,14 @@ async function loadMemberships(){
  if(classError)throw classError;
  classRows=classes||[];
  if(!classRows.length){showLoading("Your classroom isn't available right now.");return;}
+ $("classSelect").innerHTML=classRows.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
  showWorkspace();await selectClass(classRows[0].id);
+ $("classSelect").addEventListener("change",()=>selectClass($("classSelect").value));
 }
 async function selectClass(id){
  currentClass=classRows.find(c=>c.id===id);if(!currentClass)return;
+ $("classSelect").value=currentClass.id;
+ if(chatTimer)clearInterval(chatTimer);if(sessionPoll)clearInterval(sessionPoll);
  const {data:teacher}=await db.from("profiles").select("username").eq("id",currentClass.teacher_id).maybeSingle();
  $("welcomeTitle").textContent="Welcome to "+currentClass.class_name+"!";
  $("welcomeCopy").textContent="Your classroom is ready. Find your class games, chat, and learning tools below.";
@@ -92,7 +96,8 @@ async function selectClass(id){
  $("detailClass").textContent=currentClass.class_name;
  $("classReminder").textContent=currentClass.reminder||"Your teacher hasn't posted a reminder yet.";
  await loadFilters();await loadChat();
- if(chatTimer)clearInterval(chatTimer);chatTimer=setInterval(loadChat,5000);
+ chatTimer=setInterval(loadChat,5000);
+ sessionPoll=setInterval(refreshClassSession,4000);
  checkSession();
 }
 async function loadFilters(){
@@ -118,6 +123,13 @@ $("chatForm").addEventListener("submit",async e=>{
  if(error){say("chatStatus",error.message.includes("blocked by this classroom")?"That message contains a word blocked by your teacher.":error.message);return;}
  $("chatInput").value="";say("chatStatus","Message sent.");await loadChat();
 });
+async function refreshClassSession(){
+ if(!currentClass)return;
+ const {data,error}=await db.from("classroom_spaces").select("session_active,session_resume_at").eq("id",currentClass.id).maybeSingle();
+ if(error||!data)return;
+ currentClass.session_active=data.session_active;currentClass.session_resume_at=data.session_resume_at;
+ if(!data.session_active){checkSession();}else $("endedOverlay").hidden=true;
+}
 function checkSession(){
  if(!currentClass)return;
  if(currentClass.session_active){$("endedOverlay").hidden=true;return;}
