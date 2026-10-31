@@ -130,7 +130,7 @@ $("chatForm").addEventListener("submit",async e=>{
 });
 async function refreshClassSession(){
  if(!currentClass)return;
- const {data,error}=await db.from("classroom_spaces").select("session_active,session_resume_at").eq("id",currentClass.id).maybeSingle();
+ const {data,error}=await db.from("classroom_spaces").select("session_active,session_resume_at,session_ended_at").eq("id",currentClass.id).maybeSingle();
  if(error||!data)return;
  currentClass.session_active=data.session_active;currentClass.session_resume_at=data.session_resume_at;currentClass.session_ended_at=data.session_ended_at;
  if(!data.session_active){checkSession();}else {$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);}
