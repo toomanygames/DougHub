@@ -31,7 +31,7 @@
 
     .screen {
       width: min(980px, 100%);
-      height: min(100vh - 24px, 860px);
+      height: min(calc(100dvh - 24px), 860px);
       background: rgba(255,255,255,0.2);
       border: 1px solid rgba(88,38,20,0.12);
       border-radius: 28px;
@@ -161,11 +161,10 @@
     }
 
     .fever-hud {
-      position: fixed;
-      left: 14px;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      width: min(220px, 42vw);
-      z-index: 20;
+      position: static;
+      width: min(220px, 80%);
+      z-index: 2;
+      margin-top: 2px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -403,12 +402,12 @@ body{padding:12px;align-items:center;justify-content:center}
   .upg-icon{width:34px;height:34px;flex-basis:34px;font-size:21px}
   .upg-name{font-size:13px}
   .upg-btn{min-width:62px;padding:9px 7px}
-  .fever-hud{left:10px;bottom:10px;width:min(180px,45vw)}
+  .fever-hud{width:min(220px,85%);margin-top:2px}
 }
 @media (max-height:600px) and (min-width:701px){
   .left{gap:8px;padding:10px}
   .pig-wrap{width:min(28vw,230px,42vh)}
-  .fever-hud{bottom:8px}
+  .fever-hud{margin-top:0}
 }
 </style>
 <script src="../game-art.js" defer></script>
@@ -421,18 +420,18 @@ body{padding:12px;align-items:center;justify-content:center}
       <button class="btn" id="homeBtn">Home</button>
     </div>
 
+    <div class="content">
+      <div class="left">
+        <div class="pig-wrap">
+          <div class="pig" id="pig">🐷</div>
+        </div>
+
     <div class="fever-hud">
       <div class="fever-label" id="feverLabel">Fever ready</div>
       <div class="fever-bar">
         <div class="fever-fill" id="feverFill"></div>
       </div>
     </div>
-
-    <div class="content">
-      <div class="left">
-        <div class="pig-wrap">
-          <div class="pig" id="pig">🐷</div>
-        </div>
 
         <div class="tap" id="tapText">+1 per tap</div>
       </div>
