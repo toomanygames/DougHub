@@ -38,7 +38,7 @@ footer{text-align:center;color:#9aa5b8;font-size:9px;padding:20px}
 /* Original anchored navy classroom sidebar */
 .sidebar{position:sticky;top:0;height:100dvh;align-self:start;overflow:hidden;}
 </style>
-<script src="classroom-unified.js?v=4" defer></script>
+<script src="classroom-unified.js?v=5" defer></script>
 </head>
 <body>
 <div class="app">
@@ -46,7 +46,7 @@ footer{text-align:center;color:#9aa5b8;font-size:9px;padding:20px}
  <a class="brand" href="community-classroom.html"><span class="brand-icon">D</span><span class="brand-name">DougHub</span></a>
  <nav class="nav" aria-label="DougHub sections">
   <a class="current" href="community-classroom.html"><span class="nav-icon">⌂</span><span class="nav-label">Home</span></a>
-  <a href="classroom.html"><span class="nav-icon">▣</span><span class="nav-label">My Class</span></a>
+  <a href="community-classroom.html"><span class="nav-icon">▣</span><span class="nav-label">My Class</span></a>
   <a href="class-chat.html"><span class="nav-icon">◉</span><span class="nav-label">Class Chat</span></a>
   <a href="classroom-dms.html"><span class="nav-icon">◎</span><span class="nav-label">Chat & DMs</span></a>
   <a href="classroom-community.html"><span class="nav-icon">▤</span><span class="nav-label">Community</span></a>
@@ -60,13 +60,13 @@ footer{text-align:center;color:#9aa5b8;font-size:9px;padding:20px}
  <div class="profile"><div class="avatar" id="userAvatar">DH</div><div class="profile-info"><strong id="userName">DougHub Student</strong><small>Student space</small></div></div>
 </aside>
 <main>
- <header class="topbar"><div class="crumb">DougHub / <strong>Community & Class</strong></div><div class="top-actions"><a href="classroom.html">Open classroom</a><a href="classroom-settings.html">Settings</a></div></header>
+ <header class="topbar"><div class="crumb">DougHub / <strong>Community & Class</strong></div><div class="top-actions"><a href="community-classroom.html">Open classroom</a><a href="classroom-settings.html">Settings</a></div></header>
  <div class="content">
   <section class="welcome"><div><div class="eyebrow">YOUR SCHOOL DAY, YOUR COMMUNITY</div><h1>Welcome back<span id="welcomeName"></span>.</h1><p>A place to keep up with class, catch up with friends and explore DougHub.</p></div><div class="grade-chip" id="gradeChip">Your classroom</div></section>
   <div class="grid">
    <div class="stack">
-    <section class="panel"><div class="panel-head"><div><h2>Classroom reminder</h2><p class="sub">The latest update from your teacher.</p></div><a class="link" href="classroom.html">Open class ↗</a></div><div class="reminder"><div class="reminder-top"><strong>Check your classroom</strong><span class="tag">CLASS UPDATE</span></div><p>Open your classroom to see your teacher's latest reminders, assignments and class information. Updates stay in the classroom so you always see the current version.</p><div class="reminder-foot">Your selected class · Teacher announcements</div></div></section>
-    <section class="panel"><div class="panel-head"><div><h2>Coming up in class</h2><p class="sub">Check the classroom for current due dates and reminders.</p></div><a class="link" href="classroom.html">Assignments ↗</a></div><div class="task-list"><div class="task"><span class="task-dot"></span><div><strong>Teacher reminders</strong><small>Announcements and class updates</small></div><time>Classroom</time></div><div class="task"><span class="task-dot" style="background:var(--blue)"></span><div><strong>Class assignments</strong><small>What to work on next</small></div><time>Classroom</time></div><div class="task"><span class="task-dot" style="background:var(--mint)"></span><div><strong>Class resources</strong><small>Materials shared by your teacher</small></div><time>Classroom</time></div></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Classroom reminder</h2><p class="sub">The latest update from your teacher.</p></div><a class="link" href="community-classroom.html">Open class ↗</a></div><div class="reminder"><div class="reminder-top"><strong>Check your classroom</strong><span class="tag">CLASS UPDATE</span></div><p>Open your classroom to see your teacher's latest reminders, assignments and class information. Updates stay in the classroom so you always see the current version.</p><div class="reminder-foot">Your selected class · Teacher announcements</div></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Coming up in class</h2><p class="sub">Check the classroom for current due dates and reminders.</p></div><a class="link" href="community-classroom.html">Assignments ↗</a></div><div class="task-list"><div class="task"><span class="task-dot"></span><div><strong>Teacher reminders</strong><small>Announcements and class updates</small></div><time>Classroom</time></div><div class="task"><span class="task-dot" style="background:var(--blue)"></span><div><strong>Class assignments</strong><small>What to work on next</small></div><time>Classroom</time></div><div class="task"><span class="task-dot" style="background:var(--mint)"></span><div><strong>Class resources</strong><small>Materials shared by your teacher</small></div><time>Classroom</time></div></div></section>
     <section class="panel"><div class="panel-head"><div><h2>Student tools</h2><p class="sub">Quick tools for learning, planning and creating.</p></div><a class="link" href="#student-tools">All tools</a></div><div class="action-grid" id="student-tools">
      <button class="action" data-tool="calculator"><span class="action-icon">▦</span><span><strong>Calculator</strong><small>Basic maths</small></span></button>
      <button class="action" data-tool="notes"><span class="action-icon">▤</span><span><strong>Quick notes</strong><small>Write and save notes</small></span></button>
