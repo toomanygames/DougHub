@@ -46,7 +46,7 @@ function mount(){
  if(existing){
   if(path==="community-classroom.html"||path==="class-chat.html"){
    addStudentSection(existing);
-   const oldLink=existing.querySelector('a[href="classroom.html"]');if(oldLink)oldLink.remove();
+   const oldLink=[...existing.querySelectorAll("a")].find(a=>(a.querySelector(".nav-label")?.textContent||"").trim()==="My Class"||(a.textContent||"").trim()==="My Class");if(oldLink)oldLink.remove();
    installToggle(existing);
    return;
   }
