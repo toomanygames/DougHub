@@ -60,7 +60,7 @@ async function boot(){
   db=await C.client();
   const {data:{user:u},error}=await db.auth.getUser();if(error||!u){location.replace("log-in.html?next="+encodeURIComponent(location.pathname));return;}user=u;
   const {data:p}=await db.from("profiles").select("username,avatar_url,is_owner,is_developer,is_admin,staff_role").eq("id",user.id).maybeSingle();profile=p||{};const role=String(profile.staff_role||"").toLowerCase();isOwner=profile.is_owner===true||role==="owner";isDevPlus=profile.is_developer===true||profile.is_admin===true||["developer","admin","owner"].includes(role);
-  $("studentLabel").textContent=profile.username||"Student workspace";
+  $("studentLabel").textContent=(profile.username||"Student workspace")+(isDevPlus?" · DEV+ STUDENT PREVIEW":"");
   await loadMemberships();
  }catch(e){showLoading(e.message||"Could not load your classroom.");}
 }
