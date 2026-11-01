@@ -84,3 +84,13 @@ header .brand-icon,
  .dh-classroom-student-label{justify-content:center!important;padding:8px 4px!important;font-size:0!important}
  .dh-classroom-student-label:before{margin:0!important}
 }
+
+/* Classroom appearance choices are shared across all classroom pages. */
+body[data-classroom-theme="default"]{--classroom-bg:#f5f7fc}
+body[data-classroom-theme="blue"]{--classroom-bg:#eff6ff;--classroom-blue:#4e8df5}
+body[data-classroom-theme="mint"]{--classroom-bg:#effbf7;--classroom-blue:#35a98d}
+body[data-classroom-theme="rose"]{--classroom-bg:#fff3f8;--classroom-blue:#d66a9f}
+body[data-classroom-theme="default"] .hero{background:linear-gradient(115deg,#6155d9,#8063e9 50%,#c16ac7)}
+body[data-classroom-theme="blue"] .hero{background:linear-gradient(115deg,#3679d8,#4e9cf5 55%,#71c7ef)}
+body[data-classroom-theme="mint"] .hero{background:linear-gradient(115deg,#258f79,#35b99a 55%,#75d6b8)}
+body[data-classroom-theme="rose"] .hero{background:linear-gradient(115deg,#bd5689,#d66a9f 55%,#ef9ab9)}
