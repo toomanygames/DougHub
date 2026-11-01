@@ -88,7 +88,8 @@ async function loadMemberships(){
   if(error)throw error;
   const {data:available,error:availableError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder,session_active,session_resume_at,session_ended_at").order("grade").order("class_name");
   if(availableError)throw availableError;
-  const {data:teacherProfiles}=await db.from("profiles").select("id,username").in("id",[...new Set((available||[]).map(c=>c.teacher_id))]);
+  const teacherIds=[...new Set((available||[]).map(c=>c.teacher_id))];
+  const {data:teacherProfiles}=teacherIds.length?await db.from("profiles").select("id,username").in("id",teacherIds):{data:[],error:null};
   const teacherNames={};(teacherProfiles||[]).forEach(p=>teacherNames[p.id]=p.username||"Teacher");
   renderJoinClasses(available||[],enrollments||[],teacherNames);
   classes=(available||[]).filter(c=>(enrollments||[]).some(e=>e.classroom_id===c.id&&e.status==="approved"));
@@ -142,7 +143,8 @@ async function checkEnrollmentUpdates(){
   if((data||[]).some(e=>e.status==="approved")){await loadMemberships();return;}
   const {data:available,error:ae}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").order("grade");
   if(ae)throw ae;
-  const {data:teachers}=await db.from("profiles").select("id,username").in("id",[...new Set((available||[]).map(c=>c.teacher_id))]);
+  const teacherIds=[...new Set((available||[]).map(c=>c.teacher_id))];
+  const {data:teachers}=teacherIds.length?await db.from("profiles").select("id,username").in("id",teacherIds):{data:[],error:null};
   const names={};(teachers||[]).forEach(p=>names[p.id]=p.username||"Teacher");
   renderJoinClasses(available||[],data||[],names);
  }catch(error){say("joinClassStatus",error.message||"Could not refresh requests.");}
