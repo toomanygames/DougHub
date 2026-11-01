@@ -20,3 +20,10 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}a{color:inherit;
 .footer{padding:12px 0 28px;text-align:center;color:#9a9db3;font-size:10px}
 @media(max-width:980px){.grid{grid-template-columns:1fr}.teacher-layout{grid-template-columns:1fr}.side-panel{position:static}.game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.shell{width:min(100% - 22px,1440px)}.topbar{height:64px}.brand{font-size:20px}.brand-mark{width:37px;height:37px}.hero{border-radius:22px;padding:24px}.panel{padding:16px;border-radius:18px}.game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.game-tile{min-height:136px;padding:10px}.game-art img{width:49px;height:49px}.chat-box{height:290px}.chat-compose{flex-wrap:wrap}.chat-compose input{flex-basis:100%}.panel-head{flex-wrap:wrap}}
+
+/* Shared classroom navigation and page identity */
+.classroom-top-links{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.classroom-top-links a{display:inline-flex;align-items:center;padding:8px 10px;border-radius:10px;background:#f0efff;color:#6555d2;font-size:11px;font-weight:900;text-decoration:none;white-space:nowrap}
+.classroom-top-links a:hover{background:#e6e3ff;color:#493bb2}
+@media(max-width:1050px){.classroom-top-links{overflow-x:auto;flex-wrap:nowrap;max-width:58vw;padding:3px}.classroom-top-links a{flex:0 0 auto}}
+@media(max-width:650px){.classroom-top-links{max-width:62vw}.classroom-top-links a{font-size:10px;padding:7px 8px}}
