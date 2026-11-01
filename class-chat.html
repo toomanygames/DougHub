@@ -24,7 +24,7 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 @media(max-width:900px){.layout{grid-template-columns:68px minmax(0,1fr)}.sidebar{padding:18px 7px;gap:22px}.brand{justify-content:center;padding:0}.brand-name,.nav-label,.sidebar-note,.profile-info{display:none}.nav a{justify-content:center;padding:12px 4px;font-size:0}.nav-icon{font-size:16px}.profile{justify-content:center}}
 @media(max-width:560px){.topbar{height:58px;padding:0 10px}.chat-page{padding:12px 8px 8px}.heading{align-items:flex-start}.heading h1{font-size:21px}.heading p{max-width:210px}.class-picker{max-width:145px;min-width:110px;padding:8px 6px}.chat-head{padding:10px}.messages{padding:12px 8px}.message{max-width:96%}.compose-wrap{padding:9px}.compose{gap:6px}.compose input{padding:11px 9px}.send{padding:11px 12px}}
 
-/* Original anchored navy classroom sidebar */
+/* Compact nav pills: do not stretch across the sidebar */\n.nav{align-items:start}\n.nav a{width:max-content;max-width:100%;padding:9px 11px}\n@media(max-width:900px){.nav{align-items:stretch}.nav a{width:100%;max-width:100%;justify-content:center;padding:12px 4px}}\n/* Original anchored navy classroom sidebar */
 .sidebar{position:sticky;top:0;align-self:start;}
 </style></head>
 <body><div class="layout">
