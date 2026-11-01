@@ -30,7 +30,7 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 <div class="sidebar-note"><strong>Your class, together.</strong>Messages here are only for the students and teacher in your selected class.</div>
 <div class="profile"><div class="avatar" id="userAvatar">DH</div><div class="profile-info"><strong id="userName">DougHub Student</strong><small id="userRole">Class member</small></div></div></aside>
 <main><header class="topbar"><div class="crumb">DougHub / My Class / <strong>Class Chat</strong></div><div class="top-actions"><a href="community-classroom.html">Community & Class</a><a href="classroom.html">Classroom</a></div></header>
-<section class="chat-page"><div class="heading"><div><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1>Class chat</h1><p id="classSubtitle">Talk with your classmates and teacher.</p></div><select class="class-picker" id="classSelect" aria-label="Choose a class" hidden></select></div>
+<section class="chat-page"><div class="heading"><div><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1 id="classChatHeading">Grade Chat</h1><p id="classSubtitle">Talk with your classmates and teacher.</p></div><select class="class-picker" id="classSelect" aria-label="Choose a class" hidden></select></div>
 <div id="state" class="state"><h2>Connecting to your classroom…</h2><p>Checking your class membership.</p></div>
 <section class="chat-card" id="chatCard" hidden><header class="chat-head"><div><strong id="roomTitle">Class chat</strong><small id="roomSub">Only members of this class can see these messages.</small></div><span class="live">CLASS ONLY</span></header><div class="messages" id="messages" aria-live="polite"><div class="empty">Loading messages…</div></div><div class="compose-wrap"><form class="compose" id="compose"><input id="messageInput" maxlength="1000" autocomplete="off" placeholder="Write a message to your class…" required><button class="send" id="sendButton" type="submit">Send</button></form><div class="status" id="status" role="status"></div></div></section>
 </section></main></div>
@@ -43,6 +43,7 @@ function showState(title,detail,linkText="Open classroom",href="classroom.html")
  $("chatCard").hidden=true;$("state").hidden=false;$("state").innerHTML="<h2>"+C.esc(title)+"</h2><p>"+C.esc(detail)+"</p><a href=\""+href+"\">"+C.esc(linkText)+"</a>";
 }
 function initials(name){return String(name||"?").trim().slice(0,1).toUpperCase();}
+function gradeLabel(grade){const n=Number(grade),lastTwo=n%100;const suffix=lastTwo>=11&&lastTwo<=13?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th");return n+suffix+" Grade Chat";}
 async function boot(){
  try{
   db=await C.client();const {data:{user:u},error}=await db.auth.getUser();
@@ -64,8 +65,8 @@ async function boot(){
 async function openClass(id){
  currentClass=classes.find(c=>c.id===id);if(!currentClass)return;
  if(poll){clearInterval(poll);poll=null;}
- $("classSelect").value=currentClass.id;$("roomTitle").textContent=currentClass.class_name;$("roomSub").textContent="Grade "+currentClass.grade+" · Only members of this class can see these messages.";
- $("classSubtitle").textContent="Grade "+currentClass.grade+" · "+currentClass.class_name;
+ $("classSelect").value=currentClass.id;const gradeTitle=gradeLabel(currentClass.grade);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=currentClass.class_name+" · Only members of this class can see these messages.";
+ $("classSubtitle").textContent=currentClass.class_name+" · Talk with your classmates and teacher.";
  $("state").hidden=true;$("chatCard").hidden=false;say("");await loadMessages();poll=setInterval(loadMessages,5000);
 }
 async function loadMessages(){
