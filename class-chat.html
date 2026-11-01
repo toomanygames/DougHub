@@ -24,17 +24,8 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 @media(max-width:900px){.layout{grid-template-columns:68px minmax(0,1fr)}.sidebar{padding:18px 7px;gap:22px}.brand{justify-content:center;padding:0}.brand-name,.nav-label,.sidebar-note,.profile-info{display:none}.nav a{justify-content:center;padding:12px 4px;font-size:0}.nav-icon{font-size:16px}.profile{justify-content:center}}
 @media(max-width:560px){.topbar{height:58px;padding:0 10px}.chat-page{padding:12px 8px 8px}.heading{align-items:flex-start}.heading h1{font-size:21px}.heading p{max-width:210px}.class-picker{max-width:145px;min-width:110px;padding:8px 6px}.chat-head{padding:10px}.messages{padding:12px 8px}.message{max-width:96%}.compose-wrap{padding:9px}.compose{gap:6px}.compose input{padding:11px 9px}.send{padding:11px 12px}}
 
-/* Shared light classroom shell */
-.sidebar{background:linear-gradient(180deg,#fff,#f8f8ff)!important;color:#172642!important;border-right:1px solid #e4eaf3!important}
-.sidebar .brand{color:#172642!important}
-.sidebar .brand-icon{background:linear-gradient(135deg,#4e8df5 0%,#7257e8 62%,#d66dbb)!important;box-shadow:0 8px 20px #7257e82b}
-.sidebar .nav a{color:#66738d!important;border-radius:12px!important}
-.sidebar .nav a:hover{background:#f0efff!important;color:#6555d2!important}
-.sidebar .nav a.current{background:linear-gradient(100deg,#eeedff,#f9eff9)!important;color:#6555d2!important;box-shadow:inset 3px 0 #806de8!important}
-.sidebar .nav-icon{color:#7969d9!important}
-.sidebar .sidebar-note{border:1px solid #e4e5f2!important;background:#f7f7ff!important;color:#78849c!important}
-.sidebar .sidebar-note strong{color:#172642!important}
-.sidebar .profile-info strong{color:#172642!important}.sidebar .profile-info small{color:#8994a9!important}
+/* Original anchored navy classroom sidebar */
+.sidebar{position:sticky;top:0;align-self:start;}
 </style></head>
 <body><div class="layout">
 <aside class="sidebar"><a class="brand" href="community-classroom.html"><span class="brand-icon">D</span><span class="brand-name">DougHub</span></a>
