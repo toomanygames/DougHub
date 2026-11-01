@@ -574,6 +574,7 @@ main {
   }
 }
 
+ .message-bubble a.chat-message-link{color:#aebeff;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere;font-weight:650}.message-bubble a.chat-message-link:hover{color:#fff}
 </style>
   <script src="nav.js?v=20261030-no-class" defer></script>
 
@@ -1877,11 +1878,19 @@ async function renderMessageText(container, text) {
   const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
   const matches = [];
   function appendTextWithInviteLinks(value){
-    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+/gi;
-    let cursor=0,m;
-    while((m=urlPattern.exec(value))!==null){
-      if(m.index>cursor)container.appendChild(document.createTextNode(value.slice(cursor,m.index)));
-      const link=document.createElement("a");link.href=m[0];link.target="_blank";link.rel="noopener noreferrer";link.className="chat-call-invite-link";link.textContent="Join video call ↗";container.appendChild(link);cursor=m.index+m[0].length;
+    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+|(?:https?:\/\/|www\.)[^\\s<>"']+/gi;
+    let cursor=0,match;
+    while((match=urlPattern.exec(value))!==null){
+      let raw=match[0],clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
+      if(match.index>cursor)container.appendChild(document.createTextNode(value.slice(cursor,match.index)));
+      const link=document.createElement("a");
+      link.href=/^www\./i.test(clean)?"https://"+clean:clean;
+      link.target="_blank";link.rel="noopener noreferrer";
+      link.className=clean.toLowerCase().includes("/chat-calls.html?room=")?"chat-call-invite-link":"chat-message-link";
+      link.textContent=link.className==="chat-call-invite-link"?"Join video call ↗":clean;
+      container.appendChild(link);
+      if(tail)container.appendChild(document.createTextNode(tail));
+      cursor=match.index+raw.length;
     }
     if(cursor<value.length)container.appendChild(document.createTextNode(value.slice(cursor)));
   }
