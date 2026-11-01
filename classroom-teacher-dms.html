@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#172642">
+<title>Teacher Inbox • DougHub Classroom</title>
+<link rel="icon" href="DougHub-classroom.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script><script src="classroom-shared.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#172642;--navy2:#213657;--ink:#202b46;--muted:#78849c;--line:#e4eaf3;--blue:#4e8df5;--purple:#7257e8;--pink:#f36fae;--mint:#55cdb2;--bg:#f5f7fc}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer}
+.shell{height:100dvh;display:grid;grid-template-rows:66px minmax(0,1fr);overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 3px 18px #23385a0b;z-index:2}
+.brand{display:flex;align-items:center;gap:10px;font:900 20px Nunito,sans-serif;color:var(--navy)}.brand-mark{width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;color:white}
+.top-actions{display:flex;align-items:center;gap:10px}.class-picker{max-width:220px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--navy);background:#f8faff;font-weight:700}.back{padding:9px 13px;border-radius:10px;background:#f0f4fb;color:#40516f;font-size:13px;font-weight:800;text-decoration:none}
+.workspace{min-height:0;display:grid;grid-template-columns:310px minmax(0,1fr);padding:18px;gap:16px;overflow:hidden}
+.people-panel,.thread-panel{min-height:0;background:#fff;border:1px solid var(--line);border-radius:19px;box-shadow:0 10px 34px #253b5b0a;overflow:hidden}
+.people-panel{display:flex;flex-direction:column}.people-head{padding:21px 19px 15px;border-bottom:1px solid #edf0f7}.eyebrow{font-size:10px;letter-spacing:.13em;font-weight:900;color:var(--purple)}h1,h2,p{margin:0}.people-head h1{font:900 25px Nunito,sans-serif;color:var(--navy);margin:5px 0}.people-head p{font-size:12px;color:var(--muted);line-height:1.5}
+.search-wrap{padding:12px 14px 8px}.search{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#f8faff;outline:none;color:var(--ink)}.search:focus{border-color:#9db9fb;box-shadow:0 0 0 3px #4e8df51a}
+.people-label{padding:9px 18px 7px;font-size:10px;letter-spacing:.12em;font-weight:900;color:#98a3b7}.people-list{overflow:auto;min-height:0;padding:0 9px 12px}
+.person{width:100%;display:flex;align-items:center;gap:11px;text-align:left;padding:11px 10px;border:0;border-radius:12px;background:transparent;color:var(--ink)}.person:hover,.person.active{background:#f0f4ff}.avatar{width:39px;height:39px;flex:0 0 39px;border-radius:13px;background:linear-gradient(135deg,#dce8ff,#e9ddff);display:grid;place-items:center;color:#4e62ad;font-weight:900;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.person-meta{min-width:0;flex:1}.person-name{font-size:13px;font-weight:850;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.person-sub{margin-top:3px;color:#8b96aa;font-size:11px}.person-arrow{color:#a3adc0;font-size:18px}
+.thread-panel{display:flex;flex-direction:column}.thread-head{height:76px;flex:0 0 76px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid #edf0f7}.thread-head .avatar{width:43px;height:43px;flex-basis:43px}.thread-title{font:900 17px Nunito,sans-serif;color:var(--navy)}.thread-sub{font-size:11px;color:var(--muted);margin-top:3px}.thread-tools{margin-left:auto;color:#94a0b4;font-size:11px;font-weight:700}
+.message-list{flex:1;min-height:0;overflow:auto;padding:22px;display:flex;flex-direction:column;gap:13px;background:linear-gradient(180deg,#fbfcff,#fff)}
+.welcome{margin:auto;text-align:center;max-width:360px;padding:30px}.welcome-icon{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#e4edff,#eee6ff);display:grid;place-items:center;margin:0 auto 16px;font-size:28px}.welcome h2{font:900 22px Nunito;color:var(--navy);margin-bottom:7px}.welcome p{font-size:13px;color:var(--muted);line-height:1.6}
+.message{display:flex;align-items:flex-end;gap:9px;max-width:min(78%,650px)}.message.mine{align-self:flex-end;flex-direction:row-reverse}.message .avatar{width:30px;height:30px;flex-basis:30px;border-radius:10px;font-size:11px}.bubble-wrap{min-width:0}.bubble-meta{display:flex;gap:8px;align-items:center;font-size:10px;color:#98a2b5;margin:0 4px 5px}.message.mine .bubble-meta{justify-content:flex-end}.bubble{padding:10px 13px;border-radius:15px 15px 15px 5px;background:#f0f3fa;color:#33415c;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.message.mine .bubble{background:linear-gradient(135deg,#5c8ff0,#7a69e8);color:#fff;border-radius:15px 15px 5px 15px}
+.composer{padding:14px 18px 17px;border-top:1px solid #edf0f7;background:#fff}.compose-row{display:flex;gap:10px}.compose-input{flex:1;min-width:0;border:1px solid #e2e8f2;border-radius:13px;padding:13px 15px;outline:none;background:#f9fbff;color:var(--ink)}.compose-input:focus{border-color:#9db9fb;box-shadow:0 0 0 3px #4e8df51a}.send{border:0;border-radius:12px;padding:0 22px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;font-weight:900}.send:disabled{opacity:.5;cursor:not-allowed}.compose-note{margin-top:8px;font-size:10px;color:#a0a9b9}.status{min-height:18px;padding:0 20px 8px;color:#71809a;font-size:11px}
+.state{margin:18px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:32px;text-align:center;color:var(--muted)}.state h2{font:900 22px Nunito;color:var(--navy);margin-bottom:8px}.state p{font-size:13px;line-height:1.6}.state a{display:inline-block;margin-top:15px;padding:10px 15px;background:#edf2ff;color:#4e61b3;border-radius:10px;font-weight:800;text-decoration:none}
+@media(max-width:760px){.workspace{grid-template-columns:1fr;grid-template-rows:minmax(150px,34%) minmax(0,1fr);padding:9px;gap:9px}.people-panel{min-height:0}.people-head{padding:12px 14px 8px}.people-head h1{font-size:20px}.people-head p{display:none}.search-wrap{padding:8px 10px 4px}.people-label{padding:5px 13px}.people-list{display:flex;overflow-x:auto;overflow-y:hidden;padding:0 8px 8px;gap:5px}.person{width:auto;min-width:145px;padding:8px}.thread-head{height:62px;flex-basis:62px;padding:0 13px}.message-list{padding:14px}.composer{padding:10px}.topbar{padding:0 12px}.brand{font-size:17px}.class-picker{max-width:135px}.back{font-size:11px;padding:8px}.message{max-width:92%}}
+@media(max-width:420px){.top-actions{gap:5px}.brand-mark{width:30px;height:30px}.brand{gap:7px}.class-picker{max-width:115px;padding:7px;font-size:11px}}
+
+/* The shared sidebar hides the old topbar, so the workspace must occupy the full shell. */
+.shell{grid-template-rows:minmax(0,1fr)!important}
+.workspace{height:100%;min-height:0}
+</style>
+
+<link rel="stylesheet" href="classroom-unified.css?v=9">
+<script src="classroom-unified.js?v=10" defer></script>
+</head>
+<body>
+<div class="shell">
+<header class="topbar"><div class="brand"><span class="brand-mark">D</span><span>DougHub <small style="font:800 9px 'DM Sans';letter-spacing:.12em;color:#8a96ae">CLASSROOM</small></span></div><div class="top-actions"><nav class="classroom-top-links" aria-label="Classroom navigation"><a href="community-classroom.html">Home</a><a href="community-classroom.html">My Class</a><a href="class-chat.html">Class Chat</a><a href="classroom-dms.html">Chat &amp; DMs</a><a href="classroom-community.html">Community</a><a href="classroom-games.html">Games</a><a href="classroom-create.html">Create</a><a href="classroom-dictionary.html">Dictionary</a><a href="classroom-tools.html">Student Tools</a><a href="classroom-settings.html">Settings</a></nav><select id="classSelect" class="class-picker" hidden aria-label="Choose class"></select><a class="back" href="community-classroom.html">← Classroom home</a></div></header>
+<section class="workspace" id="workspace" hidden>
+<aside class="people-panel"><div class="people-head"><div class="eyebrow">TEACHER WORKSPACE</div><h1>Teacher Inbox</h1><p>Private conversations with approved students in your classroom.</p></div><div class="search-wrap"><input id="peopleSearch" class="search" type="search" placeholder="Find someone in your class…" autocomplete="off"></div><div class="people-label">CLASSMATES & TEACHER</div><div class="people-list" id="peopleList"></div></aside>
+<section class="thread-panel"><header class="thread-head"><div class="avatar" id="threadAvatar">✦</div><div><div class="thread-title" id="threadTitle">Choose a student</div><div class="thread-sub" id="threadSub">Private student conversations</div></div><div class="thread-tools" id="threadClass"></div></header><div class="message-list" id="messages"><div class="welcome"><div class="welcome-icon">✉</div><h2>Your student inbox</h2><p>Select a student to open your private conversation. Only the two people in a conversation can read it.</p></div></div><form class="composer" id="compose"><div class="compose-row"><input class="compose-input" id="messageInput" maxlength="1000" autocomplete="off" placeholder="Message this student…" disabled><button class="send" id="sendButton" disabled>Send</button></div><div class="compose-note">Messages are private to you and the person you selected.</div></form><div class="status" id="status" role="status"></div></section>
+</section>
+<section class="state" id="state"><h2>Loading your classroom…</h2><p>Checking your class membership.</p></section>
+</div>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id),C=window.DHClassroom;
+let db,user,profile={},classes=[],currentClass=null,people=[],activePerson=null,activeConversation=null,poll=null,busy=false;
+const say=s=>$("status").textContent=s||"";
+const initials=n=>String(n||"?").trim().slice(0,1).toUpperCase();
+function showState(title,detail,link="Open classroom",href="community-classroom.html"){$("workspace").hidden=true;$("state").hidden=false;$("state").innerHTML="<h2>"+C.esc(title)+"</h2><p>"+C.esc(detail)+"</p><a href=\""+href+"\">"+C.esc(link)+"</a>";}
+function avatarHtml(person){return person.avatar_url?'<img alt="" src="'+C.esc(person.avatar_url)+'">':C.esc(initials(person.username));}
+async function boot(){
+ try{
+  db=await C.client();const {data:{user:u},error}=await db.auth.getUser();if(error||!u){location.replace("log-in.html?next="+encodeURIComponent(location.pathname));return;}user=u;
+  const {data:p,error:pe}=await db.from("profiles").select("username,avatar_url,account_type,is_owner,is_developer,is_admin,staff_role").eq("id",user.id).maybeSingle();if(pe)throw pe;profile=p||{};
+  const role=String(profile.staff_role||"").toLowerCase(),staff=profile.is_owner||profile.is_developer||profile.is_admin||["owner","developer","admin"].includes(role);
+  if(!staff&&profile.account_type!=="teacher"){showState("Teacher access only","This separate inbox is for classroom teachers. Open the regular Chat & DMs page to use the student inbox.","Open student messages","classroom-dms.html");return;}
+  if(staff){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").order("grade");if(r.error)throw r.error;classes=r.data||[];}
+  else if(profile.account_type==="teacher"){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("teacher_id",user.id).order("grade");if(r.error)throw r.error;classes=r.data||[];}
+  else if(profile.account_type==="student"){const e=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",user.id).eq("status","approved");if(e.error)throw e.error;const ids=[...new Set((e.data||[]).map(x=>x.classroom_id))];if(ids.length){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").in("id",ids).order("grade");if(r.error)throw r.error;classes=r.data||[];}}
+  else{showState("Classroom account required","Choose Student or Teacher in Settings, then join a classroom.");return;}
+  if(!classes.length){showState("No classroom assigned","Your teacher account does not have a classroom assigned yet.","Open student messages","classroom-dms.html");return;}
+  $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
+  $("classSelect").addEventListener("change",()=>openClass($("classSelect").value));
+  $("workspace").hidden=false;$("state").hidden=true;await openClass(classes[0].id);
+ }catch(e){console.error(e);showState("Couldn't open classroom messages",e.message||"Refresh and try again.");}
+}
+async function openClass(id){
+ currentClass=classes.find(c=>c.id===id);if(!currentClass)return;if(poll){clearInterval(poll);poll=null;}activePerson=null;activeConversation=null;
+ $("classSelect").value=id;$("threadClass").textContent="Grade "+currentClass.grade;
+ $("threadTitle").textContent="Choose someone";$("threadSub").textContent=currentClass.class_name+" · Private classroom inbox";$("threadAvatar").textContent="✉";
+ $("messageInput").disabled=true;$("sendButton").disabled=true;
+ const enrollment=await db.from("classroom_enrollments").select("student_id").eq("classroom_id",id).eq("status","approved");if(enrollment.error)throw enrollment.error;
+ const ids=[...new Set((enrollment.data||[]).map(x=>x.student_id))].filter(x=>x!==user.id);
+ if(ids.length){const r=await db.from("profiles").select("id,username,avatar_url,account_type").in("id",ids);if(r.error)throw r.error;people=r.data||[];}else people=[];
+ renderPeople();$("messages").innerHTML='<div class="welcome"><div class="welcome-icon">✉</div><h2>Your classroom inbox</h2><p>Select a classmate or your teacher to start a private conversation. Only the two people in a conversation can read it.</p></div>';
+}
+function renderPeople(){
+ const term=$("peopleSearch").value.trim().toLowerCase(),list=people.filter(p=>(p.username||"Student").toLowerCase().includes(term));
+ $("peopleList").innerHTML=list.length?list.map(p=>'<button class="person '+(activePerson?.id===p.id?"active":"")+'" data-person="'+C.esc(p.id)+'"><span class="avatar">'+avatarHtml(p)+'</span><span class="person-meta"><span class="person-name">'+C.esc(p.username||"Classmate")+'</span><span class="person-sub">'+(p.id===currentClass.teacher_id?"Teacher":"Classmate")+'</span></span><span class="person-arrow">›</span></button>').join(""):'<div style="padding:18px;color:#929db0;font-size:12px">No one found in this class.</div>';
+ $("peopleList").querySelectorAll("[data-person]").forEach(b=>b.addEventListener("click",()=>openPerson(b.dataset.person)));
+}
+async function openPerson(id){
+ activePerson=people.find(p=>p.id===id);if(!activePerson)return;renderPeople();if(poll)clearInterval(poll);
+ $("threadTitle").textContent=activePerson.username||"Classmate";$("threadSub").textContent=(activePerson.id===currentClass.teacher_id?"Your teacher":"Classmate")+" · "+currentClass.class_name;
+ $("threadAvatar").innerHTML=avatarHtml(activePerson);$("messageInput").disabled=false;$("sendButton").disabled=false;say("Opening conversation…");
+ const a=[user.id,id].sort();let q=await db.from("classroom_dm_conversations").select("id").eq("classroom_id",currentClass.id).eq("participant_one",a[0]).eq("participant_two",a[1]).maybeSingle();
+ if(q.error)throw q.error;
+ if(!q.data){q=await db.from("classroom_dm_conversations").insert({classroom_id:currentClass.id,participant_one:a[0],participant_two:a[1]}).select("id").single();if(q.error)throw q.error;}
+ activeConversation=q.data.id;say("");await loadMessages();poll=setInterval(loadMessages,3500);
+}
+async function loadMessages(){
+ if(!activeConversation||busy)return;busy=true;
+ try{const box=$("messages"),near=box.scrollHeight-box.scrollTop-box.clientHeight<80,old=box.scrollTop;
+  const r=await db.from("classroom_dm_messages").select("id,sender_id,body,created_at").eq("conversation_id",activeConversation).order("created_at",{ascending:true}).limit(150);if(r.error)throw r.error;
+  const all=[...(r.data||[])],map={[user.id]:profile,...Object.fromEntries(people.map(p=>[p.id,p]))};
+  if(!all.length)box.innerHTML='<div class="welcome"><div class="welcome-icon">💬</div><h2>Say hello!</h2><p>This is the start of your conversation with this student.</p></div>';
+  else box.innerHTML=all.map(m=>{const mine=m.sender_id===user.id,p=map[m.sender_id]||{};return '<article class="message '+(mine?"mine":"")+'"><span class="avatar">'+avatarHtml(p)+'</span><div class="bubble-wrap"><div class="bubble-meta"><strong>'+C.esc(mine?"You":p.username||"Classmate")+'</strong><time>'+C.esc(C.niceTime(m.created_at))+'</time></div><div class="bubble">'+C.esc(m.body)+'</div></div></article>';}).join("");
+  box.scrollTop=near?box.scrollHeight:old;
+ }catch(e){say("Couldn't load messages: "+(e.message||"Please try again."));}
+ finally{busy=false;}
+}
+$("peopleSearch").addEventListener("input",renderPeople);
+$("compose").addEventListener("submit",async e=>{e.preventDefault();const body=$("messageInput").value.trim();if(!body||!activeConversation)return;$("sendButton").disabled=true;say("Sending…");
+ try{const r=await db.from("classroom_dm_messages").insert({conversation_id:activeConversation,sender_id:user.id,body});if(r.error)throw r.error;$("messageInput").value="";say("");await loadMessages();}
+ catch(err){say(err.message||"Message could not be sent.");}
+ finally{$("sendButton").disabled=false;$("messageInput").focus();}
+});
+window.addEventListener("beforeunload",()=>{if(poll)clearInterval(poll);});boot();
+})();</script>
+</body></html>
