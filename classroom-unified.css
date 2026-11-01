@@ -96,6 +96,12 @@ body[data-classroom-theme="mint"] .hero{background:linear-gradient(115deg,#258f7
 body[data-classroom-theme="rose"] .hero{background:linear-gradient(115deg,#bd5689,#d66a9f 55%,#ef9ab9)}
 
 /* Expandable classroom navigation — pushes the page content instead of covering it. */
+.dh-classroom-sidebar{width:var(--dh-side-collapsed)!important;padding:18px 10px!important}
+body>.app>.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:var(--dh-side-width)!important;height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;z-index:5000!important;transition:width .32s cubic-bezier(.22,.75,.25,1)!important}
+body>.app>.sidebar .sidebar-note{display:none!important}
+body>.app>.sidebar .nav a{white-space:nowrap!important}
+body>.app>.sidebar .nav-icon{flex:0 0 18px!important}
+body>.app>.sidebar .brand-icon{flex:0 0 36px!important}
 :root{--dh-side-collapsed:76px;--dh-side-expanded:236px;--dh-side-width:var(--dh-side-collapsed)}
 body.dh-sidebar-expanded{--dh-side-width:var(--dh-side-expanded)}
 .dh-classroom-sidebar,.sidebar{transition:width .32s cubic-bezier(.22,.75,.25,1),padding .32s cubic-bezier(.22,.75,.25,1)!important}
