@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="shell">
-<header class="topbar"><div class="brand"><span class="brand-mark">D</span><span>DougHub <small>CLASSROOM</small></span></div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><a class="btn soft" href="classroom-guide.html" style="text-decoration:none">How it works</a><span class="top-chip" id="studentLabel">Student workspace</span></div></header>
+<header class="topbar"><div class="brand"><span class="brand-mark">D</span><span>DougHub <small>CLASSROOM</small></span></div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><a class="btn soft" href="classroom-guide.html" style="text-decoration:none">How it works</a><a class="btn soft" href="classroom-teacher.html" style="text-decoration:none">Teacher Studio</a><span class="top-chip" id="studentLabel">Student workspace</span></div></header>
 <section class="hero"><div class="hero-inner"><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1 id="welcomeTitle">A bright place to learn.</h1><p id="welcomeCopy">Games, class chat, quick learning tools, and everything your teacher shares — all together.</p><div class="hero-meta"><span id="gradeBadge">Grade —</span><span id="classBadge">Choose your class</span><span id="teacherBadge">Teacher —</span></div></div></section>
 <div class="grid" id="classroomWorkspace" hidden>
 <main class="stack">
@@ -115,6 +115,8 @@ async function selectClass(id){
    if(!online){
     if(chatTimer)clearInterval(chatTimer);if(sessionPoll)clearInterval(sessionPoll);
     showLoading("CLASSROOM CLOSED · Your teacher is offline. This room opens when your teacher is back online.");
+   }else if(!$("loadingState").hidden){
+    clearInterval(roomPresenceTimer);roomPresenceTimer=null;await selectClass(roomId);
    }
   }finally{roomCheckInFlight=false;}
  },10000);
