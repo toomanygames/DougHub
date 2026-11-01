@@ -149,3 +149,40 @@ body.dh-sidebar-expanded>.app>.sidebar .nav a,body.dh-sidebar-expanded>.layout>.
 /* The shared sidebar replaces the old per-page top navigation. */
 body>.shell>.topbar{display:none!important}
 body>.app>header{display:none!important}
+
+/* Sidebar is permanently full-sized; no collapse/expand control or Student label. */
+:root{--dh-side-collapsed:236px!important;--dh-side-expanded:236px!important;--dh-side-width:236px!important}
+body{--dh-side-width:236px!important}
+.dh-classroom-sidebar{width:236px!important;padding:22px 14px!important}
+.dh-classroom-sidebar .dh-classroom-brand-name,
+.dh-classroom-sidebar .dh-nav-label,
+.dh-classroom-sidebar .dh-classroom-profile-copy{display:initial!important}
+.dh-classroom-sidebar .dh-classroom-brand,
+.dh-classroom-sidebar .dh-classroom-nav a,
+.dh-classroom-sidebar .dh-classroom-profile{justify-content:flex-start!important}
+.dh-classroom-sidebar .dh-classroom-nav a{width:100%!important;padding:11px 12px!important;font-size:12px!important}
+.dh-classroom-student-label{display:none!important}
+.dh-sidebar-toggle{display:none!important}
+body>.app{margin-left:236px!important}
+body>.app>.sidebar{width:236px!important}
+body>.layout{grid-template-columns:236px minmax(0,1fr)!important}
+body>.layout>.sidebar{width:236px!important}
+body>.shell{margin-left:236px!important;width:calc(100% - 236px)!important}
+body>main{margin-left:236px!important;width:calc(100% - 236px)!important}
+body>.app>.sidebar .brand-name,body>.app>.sidebar .nav-label,body>.app>.sidebar .profile-info,
+body>.layout>.sidebar .brand-name,body>.layout>.sidebar .nav-label,body>.layout>.sidebar .profile-info{display:initial!important}
+body>.app>.sidebar .brand,body>.layout>.sidebar .brand,
+body>.app>.sidebar .nav a,body>.layout>.sidebar .nav a{justify-content:flex-start!important}
+@media(max-width:900px){
+ :root{--dh-side-collapsed:220px!important;--dh-side-expanded:220px!important;--dh-side-width:220px!important}
+ body{--dh-side-width:220px!important}
+ .dh-classroom-sidebar{width:220px!important;padding:18px 12px!important}
+ body>.app{margin-left:220px!important}
+ body>.app>.sidebar{width:220px!important}
+ body>.layout{grid-template-columns:220px minmax(0,1fr)!important}
+ body>.layout>.sidebar{width:220px!important}
+ body>.shell{margin-left:220px!important;width:calc(100% - 220px)!important}
+ body>main{margin-left:220px!important;width:calc(100% - 220px)!important}
+ .dh-classroom-sidebar .dh-classroom-brand-name,.dh-classroom-sidebar .dh-nav-label,.dh-classroom-sidebar .dh-classroom-profile-copy{display:initial!important}
+ .dh-classroom-sidebar .dh-classroom-nav a{justify-content:flex-start!important}
+}
