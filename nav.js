@@ -262,6 +262,7 @@
     const links = [
       ["/dashboard.html","Home"],
       ["/douggames.html","Games"],
+      ["/classroom.html","Classroom"],
       ["/Scripting/scripting.html","Create"],
       ["/chat.html","Chat"]
     ];
