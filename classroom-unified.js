@@ -15,6 +15,28 @@ const path=(location.pathname.split("/").pop()||"community-classroom.html").toLo
 const style=document.createElement("style");
 style.textContent=".dh-classroom-student-label{display:flex;align-items:center;gap:10px;margin-top:auto;padding:11px 10px;border:1px solid #405474;border-radius:10px;background:#ffffff08;color:#fff;font-size:11px;font-weight:850}.dh-classroom-student-label:before{content:'S';display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border-radius:8px;background:#4e8df5;color:#fff;font-size:13px;font-weight:900}.sidebar-note{display:none!important}@media(max-width:900px){.dh-classroom-student-label{justify-content:center;padding:8px 4px;font-size:0}.dh-classroom-student-label:before{margin:0}}";
 document.head.append(style);
+
+style.textContent += `
+:root{--dh-side-collapsed:76px;--dh-side-expanded:236px;--dh-side-width:var(--dh-side-collapsed)}
+body.dh-sidebar-expanded{--dh-side-width:var(--dh-side-expanded)}
+.sidebar,.dh-classroom-sidebar{transition:width .32s cubic-bezier(.22,.75,.25,1),padding .32s cubic-bezier(.22,.75,.25,1)!important}
+.dh-sidebar-toggle{width:30px;height:30px;flex:0 0 30px;align-self:flex-end;display:grid;place-items:center;border:1px solid #ffffff2a;border-radius:9px;background:#ffffff12;color:#fff;font-size:22px;line-height:1;cursor:pointer;transition:background .2s,transform .32s}
+.dh-sidebar-toggle:hover{background:#ffffff25}
+body>.app{display:block!important;margin-left:var(--dh-side-width)!important;transition:margin-left .32s cubic-bezier(.22,.75,.25,1)!important}
+body>.app>.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:var(--dh-side-width)!important;height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;z-index:5000!important;transition:width .32s cubic-bezier(.22,.75,.25,1)!important}
+body>.layout{grid-template-columns:var(--dh-side-width) minmax(0,1fr)!important;transition:grid-template-columns .32s cubic-bezier(.22,.75,.25,1)!important}
+body>.layout>.sidebar{width:var(--dh-side-width)!important}
+body>.app>.sidebar .brand-name,body>.app>.sidebar .nav-label,body>.app>.sidebar .profile-info,body>.layout>.sidebar .brand-name,body>.layout>.sidebar .nav-label,body>.layout>.sidebar .profile-info{display:none!important}
+body.dh-sidebar-expanded>.app>.sidebar .brand-name,body.dh-sidebar-expanded>.app>.sidebar .nav-label,body.dh-sidebar-expanded>.app>.sidebar .profile-info,body.dh-sidebar-expanded>.layout>.sidebar .brand-name,body.dh-sidebar-expanded>.layout>.sidebar .nav-label,body.dh-sidebar-expanded>.layout>.sidebar .profile-info{display:initial!important}
+body>.app>.sidebar .brand,body>.layout>.sidebar .brand{justify-content:center!important}
+body.dh-sidebar-expanded>.app>.sidebar .brand,body.dh-sidebar-expanded>.layout>.sidebar .brand{justify-content:flex-start!important}
+body>.app>.sidebar .nav a,body>.layout>.sidebar .nav a{justify-content:center!important}
+body.dh-sidebar-expanded>.app>.sidebar .nav a,body.dh-sidebar-expanded>.layout>.sidebar .nav a{justify-content:flex-start!important}
+body.dh-sidebar-expanded>.app>.sidebar,body.dh-sidebar-expanded>.layout>.sidebar{width:var(--dh-side-expanded)!important;padding:22px 14px!important}
+@media(max-width:900px){:root{--dh-side-collapsed:68px;--dh-side-expanded:220px}}
+@media(prefers-reduced-motion:reduce){.sidebar,.dh-classroom-sidebar,body>.app,body>.layout{transition:none!important}}
+`;
+
 try{document.body.dataset.classroomTheme=localStorage.getItem("classroomTheme")||"default";}catch(e){}
 function addStudentSection(aside){
  const label=document.createElement("div");
