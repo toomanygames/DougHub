@@ -30,6 +30,7 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 @media(max-width:900px){.nav{align-items:stretch}.nav a{width:100%;max-width:100%;justify-content:center;padding:12px 4px}}
 /* Original anchored navy classroom sidebar */
 .sidebar{position:sticky;top:0;align-self:start;}
+ .bubble p .chat-message-link{color:#2867c4;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere;font-weight:700}.bubble p .chat-message-link:hover{color:#174a96}
 </style>
 <script src="classroom-unified.js?v=10" defer></script>
 </head>
@@ -50,6 +51,14 @@ let db,user,profile={},classes=[],currentClass=null,poll=null,busy=false;
 const say=(s)=>$("status").textContent=s||"";
 function showState(title,detail,linkText="Open classroom",href="community-classroom.html"){
  $("chatCard").hidden=true;$("state").hidden=false;$("state").innerHTML="<h2>"+C.esc(title)+"</h2><p>"+C.esc(detail)+"</p><a href=\""+href+"\">"+C.esc(linkText)+"</a>";
+}
+function linkifyMessage(value){
+ const escaped=C.esc(value);
+ return escaped.replace(/(https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+)/gi,raw=>{
+  const clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
+  const href=/^www\\./i.test(clean)?"https://"+clean:clean;
+  return '<a class="chat-message-link" href="'+C.esc(href)+'" target="_blank" rel="noopener noreferrer">'+clean+'</a>'+tail;
+ });
 }
 function initials(name){return String(name||"?").trim().slice(0,1).toUpperCase();}
 function gradeLabel(grade){const n=Number(grade),lastTwo=n%100;const suffix=lastTwo>=11&&lastTwo<=13?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th");return n+suffix+" Grade Chat";}
@@ -88,7 +97,7 @@ async function loadMessages(){
   if(!data?.length){box.innerHTML='<div class="empty">No messages yet. Start with a friendly hello!</div>';return;}
   const ids=[...new Set(data.map(m=>m.user_id))],names={};
   if(ids.length){const {data:users,error:userError}=await db.from("profiles").select("id,username").in("id",ids);if(userError)throw userError;(users||[]).forEach(u=>names[u.id]=u.username||"Classmate");}
-  box.innerHTML=data.map(m=>'<article class="message '+(m.user_id===user.id?"mine":"")+'"><div class="message-avatar">'+C.esc(initials(names[m.user_id]))+'</div><div class="bubble"><div class="bubble-top"><strong>'+C.esc(names[m.user_id]||"Classmate")+'</strong><time>'+C.esc(C.niceTime(m.created_at))+'</time></div><p>'+C.esc(m.body)+'</p></div></article>').join("");
+  box.innerHTML=data.map(m=>'<article class="message '+(m.user_id===user.id?"mine":"")+'"><div class="message-avatar">'+C.esc(initials(names[m.user_id]))+'</div><div class="bubble"><div class="bubble-top"><strong>'+C.esc(names[m.user_id]||"Classmate")+'</strong><time>'+C.esc(C.niceTime(m.created_at))+'</time></div><p>'+linkifyMessage(m.body)+'</p></div></article>').join("");
   box.scrollTop=near?box.scrollHeight:old;
  }catch(e){say("Couldn't refresh messages: "+(e.message||"try again."));}
  finally{busy=false;}
