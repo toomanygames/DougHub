@@ -35,7 +35,7 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),C=window.DHClassroom;
-let db,user,profile,classes=[],activeClass=null,chatTimer=null,scanTimer=null,resumeInFlight=false,isOwner=false,classTeacherNames={};
+let db,user,profile,classes=[],activeClass=null,chatTimer=null,scanTimer=null,rosterTimer=null,resumeInFlight=false,isOwner=false,classTeacherNames={};
 const say=(id,msg)=>$(id).textContent=msg;
 function normalize(s){return String(s||"").toLowerCase().replace(/[@]/g,"a").replace(/[4]/g,"a").replace(/[3]/g,"e").replace(/[0]/g,"o").replace(/[1!]/g,"i").replace(/[$5]/g,"s").replace(/[7]/g,"t").replace(/[8]/g,"b").replace(/[^a-z0-9]/g,"").replace(/(.)\1+/g,"$1");}
 function distance(a,b){const row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return row[b.length];}
@@ -103,6 +103,7 @@ async function selectClass(id){
  renderClassList();await Promise.all([loadRoster(),loadBannedWords(),loadTeacherChat(),scanWordRadar()]);
  if(chatTimer)clearInterval(chatTimer);chatTimer=setInterval(loadTeacherChat,5000);
  if(scanTimer)clearInterval(scanTimer);scanTimer=setInterval(scanWordRadar,30000);
+ if(rosterTimer)clearInterval(rosterTimer);rosterTimer=setInterval(loadRoster,8000);
  updateSessionControls();
 }
 $("reminderForm").addEventListener("submit",async e=>{
