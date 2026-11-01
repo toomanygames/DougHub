@@ -66,7 +66,7 @@ async function boot(){
   const {data:{user:u},error}=await db.auth.getUser();if(error||!u){location.replace("log-in.html?next="+encodeURIComponent(location.pathname));return;}user=u;
   const {data:p}=await db.from("profiles").select("username,avatar_url,is_owner,is_developer,is_admin,staff_role,account_type").eq("id",user.id).maybeSingle();profile=p||{};const role=String(profile.staff_role||"").toLowerCase();isOwner=profile.is_owner===true||role==="owner";isDevPlus=profile.is_developer===true||profile.is_admin===true||["developer","admin","owner"].includes(role);
   $("studentLabel").textContent=(profile.username||"Student workspace")+(isDevPlus?" · DEV+ STUDENT PREVIEW":"");
-  $("teacherStudioLink").hidden=!(profile.account_type==="teacher"||isDevPlus);
+  $("teacherStudioLink").style.display=(profile.account_type==="teacher"||isDevPlus)?"inline-flex":"none";
   if(!isDevPlus && profile.account_type!=="student"){
    showLoading(profile.account_type==="teacher"?"This is a teacher account. Open Teacher Studio to manage your classes. Change your account type in Settings if this is incorrect.":"Set your account type to Student in Settings to browse and join classrooms.");
    $("studentJoinPanel").hidden=true;return;
