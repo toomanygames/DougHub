@@ -1,5 +1,5 @@
 /* Shared classroom shell — matched to community-classroom.html */
-:root{--classroom-bg:#f5f7fc;--classroom-ink:#202b46;--classroom-muted:#78849c;--classroom-line:#e4eaf3;--classroom-blue:#4e8df5;--classroom-purple:#7257e8}
+:root{color-scheme:light;--classroom-bg:#f5f7fc;--classroom-ink:#202b46;--classroom-muted:#78849c;--classroom-line:#e4eaf3;--classroom-blue:#4e8df5;--classroom-purple:#7257e8}
 html,body{min-height:100%;background:var(--classroom-bg)}
 body{color:var(--classroom-ink);font-family:"DM Sans",system-ui,sans-serif}
 .dh-classroom-sidebar{position:fixed!important;z-index:5000!important;inset:0 auto 0 0!important;width:226px!important;height:100dvh!important;min-height:100vh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;gap:25px!important;padding:22px 14px!important;background:linear-gradient(165deg,#1b2d4d,#12213b)!important;color:#fff!important}
@@ -18,7 +18,7 @@ body{color:var(--classroom-ink);font-family:"DM Sans",system-ui,sans-serif}
 .dh-classroom-profile strong{display:block!important;font-size:10px!important;color:#fff!important}
 .dh-classroom-profile small{font-size:9px!important;color:#b9c9df!important}
 body>.shell{max-width:none!important;margin:0 0 0 226px!important;width:calc(100% - 226px)!important}
-body>.app{display:block!important;margin-left:226px!important;min-height:100vh!important}
+body>.app{display:block!important;margin-left:226px!important;min-height:100vh!important}\nbody>main{margin-left:226px!important;width:calc(100% - 226px)!important}\nbody>header{display:none!important}\nbody>.app>.sidebar,body>.layout>.sidebar{display:none!important}\nbody>.layout .side,body>.layout .feed{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}\nbody>.layout .forum-stat{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}
 body>.app>.sidebar,body>.layout>.sidebar{display:none!important}
 body>.app>main{min-width:0!important}
 body>.shell>.topbar,body>.app>main>.topbar{background:#fff!important;color:#202b46!important;border-bottom:1px solid #e4eaf3!important}
@@ -37,7 +37,7 @@ body .classroom-top-links{display:none!important}
  .dh-classroom-nav .dh-nav-icon{font-size:16px!important}
  .dh-classroom-profile{justify-content:center!important}
  body>.shell{margin-left:68px!important;width:calc(100% - 68px)!important}
- body>.app{margin-left:68px!important}
+ body>.app{margin-left:68px!important}\n body>main{margin-left:68px!important;width:calc(100% - 68px)!important}
 }
 @media(max-width:560px){
  body>.shell{width:calc(100% - 68px)!important}
