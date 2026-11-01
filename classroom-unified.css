@@ -1,82 +1,44 @@
-/* DougHub Classroom unified shell */
-:root{--classroom-bg:#050611;--classroom-panel:#0d1127;--classroom-line:#ffffff18;--classroom-text:#f6f5ff;--classroom-muted:#a2a4c0;--classroom-indigo:#6366f1;--classroom-purple:#a855f7}
-html{min-height:100%;background:#050611}
-body{color:var(--classroom-text);background:radial-gradient(ellipse 75% 48% at 8% -8%,rgba(79,70,229,.22),transparent 70%),radial-gradient(ellipse 58% 42% at 100% 8%,rgba(147,51,234,.16),transparent 68%),radial-gradient(ellipse 65% 55% at 50% 110%,rgba(49,46,129,.17),transparent 72%),linear-gradient(rgba(165,180,252,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(165,180,252,.025) 1px,transparent 1px),linear-gradient(180deg,#070817 0%,#050611 48%,#080715 100%);background-size:auto,auto,auto,44px 44px,44px 44px,auto;background-attachment:fixed;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-.dh-classroom-sidebar{position:fixed!important;inset:0 auto 0 0!important;z-index:5000!important;width:238px!important;height:100dvh!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;gap:16px!important;padding:20px 15px 15px!important;background:linear-gradient(165deg,rgba(20,25,54,.98),rgba(8,10,25,.99))!important;border-right:1px solid #ffffff18!important;box-shadow:18px 0 55px #0003!important;color:#f7f6ff!important;backdrop-filter:blur(20px)}
-.dh-classroom-brand{display:flex;align-items:center;gap:11px;flex:none;padding:3px 7px 16px;border-bottom:1px solid #ffffff13;color:#fff!important;text-decoration:none!important;font-size:20px;font-weight:900;letter-spacing:-.5px}
-.dh-classroom-brand-mark{width:39px;height:39px;display:grid;place-items:center;flex:none;border-radius:13px;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 28px #6366f144;font-weight:950}
-.dh-classroom-brand small{display:block;margin-top:2px;color:#a7a9c7;font-size:9px;letter-spacing:.17em;font-weight:850}
-.dh-classroom-nav{display:flex!important;flex:1 1 auto!important;min-height:0!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;overflow:hidden!important}
-.dh-classroom-nav a{display:inline-flex!important;align-items:center!important;gap:10px!important;width:max-content!important;max-width:100%!important;min-height:39px!important;padding:7px 10px!important;border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#c0c2dc!important;text-decoration:none!important;font-size:12px!important;font-weight:750!important;white-space:nowrap!important;transition:background .16s,border-color .16s,color .16s!important}
-.dh-classroom-nav a:hover{background:#ffffff0b!important;color:#fff!important;border-color:#ffffff10!important}
-.dh-classroom-nav a.active{background:linear-gradient(100deg,#6366f12b,#a855f723)!important;border-color:#a78bfa40!important;color:#fff!important;box-shadow:inset 3px 0 #a78bfa!important}
-.dh-classroom-nav svg{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.dh-classroom-divider{height:1px;flex:none;background:#ffffff13;margin:1px 4px}
-.dh-classroom-extra{display:flex;flex-direction:column;align-items:flex-start;gap:4px;flex:none}
-.dh-classroom-extra a{display:inline-flex;align-items:center;gap:9px;width:max-content;max-width:100%;padding:7px 10px;border-radius:9px;color:#9fa2c0;text-decoration:none;font-size:11px;font-weight:750}
-.dh-classroom-extra a:hover{background:#ffffff0b;color:#fff}
-.dh-classroom-note{flex:none;padding:12px;border:1px solid #ffffff14;border-radius:13px;background:linear-gradient(135deg,#6366f11a,#a855f711)}
-.dh-classroom-note strong{display:block;color:#e9e6ff;font-size:11px}
-.dh-classroom-note span{display:block;margin-top:5px;color:#a3a5c0;font-size:10px;line-height:1.55}
-.dh-classroom-sidebar .dh-sidebar-profile{display:flex;align-items:center;gap:9px;flex:none;padding:10px 6px 2px;border-top:1px solid #ffffff13;color:#c5c6dc;font-size:10px}
-.dh-classroom-sidebar .dh-profile-dot{width:27px;height:27px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-weight:900}
-.dh-classroom-sidebar .dh-profile-copy{min-width:0}
-.dh-classroom-sidebar .dh-profile-copy strong{display:block;color:#fff;font-size:10px}
-.dh-classroom-sidebar .dh-profile-copy span{display:block;margin-top:2px;color:#9295b3;font-size:9px}
-body> .shell,body> .layout,body>header,body>main{margin-left:238px!important;width:calc(100% - 238px)!important;max-width:none!important}
-body>.shell{padding-left:clamp(18px,3vw,42px)!important;padding-right:clamp(18px,3vw,42px)!important}
-body>.layout{grid-template-columns:minmax(0,1fr)!important}
-body>.layout>.sidebar{display:none!important}
-body>header.topbar,body>.shell>.topbar{position:relative!important;top:auto!important;min-height:68px!important;height:auto!important;padding:10px 0!important;border-bottom:1px solid #ffffff14!important;background:transparent!important;box-shadow:none!important;color:#f6f5ff!important}
-.classroom-top-links{display:none!important}
-.dh-classroom-sidebar~.shell .topbar,.dh-classroom-sidebar~.layout .topbar{color:#f6f5ff!important}
-.dh-classroom-sidebar~.shell .brand,.dh-classroom-sidebar~.shell .brand small{color:#f6f5ff!important}
-.dh-classroom-sidebar~.shell .top-chip{background:#ffffff0a!important;border-color:#ffffff18!important;color:#c8c7e1!important;box-shadow:none!important}
-h1,h2,h3{color:#f6f5ff}
-p,.subtle,.sub,.muted,.footer{color:#a4a6c1}
-.panel,.people-panel,.thread-panel,.side-panel,.post,.compose,.side-note,.forum-stat,.workspace{background:linear-gradient(145deg,rgba(13,17,39,.94),rgba(7,9,22,.94))!important;border:1px solid #ffffff16!important;color:#f4f3ff!important;box-shadow:0 18px 50px #0002!important}
-.panel h2,.people-head h1,.thread-title,.post h3{color:#f5f3ff!important}
-.panel-head p,.people-head p,.thread-sub,.person-sub,.comment-body,.post-body{color:#b7b8d0!important}
-.field,.search,.search-field,.field input,.field textarea,.field select,.class-picker,.chat-compose input{background:#080a19!important;border-color:#ffffff1b!important;color:#f5f4ff!important}
-.field::placeholder,.search::placeholder,.chat-compose input::placeholder{color:#8588a8!important}
-.output,.tool-result,.chat-box,.message-list,.flashcard,.task,.comment,.forum-stat{background:rgba(255,255,255,.045)!important;border-color:#ffffff16!important;color:#d8d7ed!important}
-.btn.soft,.back,.presets button,.card-controls button{background:#ffffff0c!important;border:1px solid #ffffff19!important;color:#d7d3ff!important}
-.btn:not(.soft){color:#fff!important}
-.topbar a,.top-actions a{color:#c9c8e4}
-.topbar .btn.soft{background:#ffffff0b!important;border-color:#ffffff19!important;color:#d7d3ff!important}
-.hero{box-shadow:0 22px 55px #0004!important}
-.hero p{color:#f0edff!important}
-.ended-screen{background:linear-gradient(135deg,#0b0d20ef,#18102bef)!important}
-.ended-card{background:#11152b!important;color:#fff!important}
-.ended-card h1,.ended-card p{color:#f5f3ff!important}
-body>.layout>main,body>.shell>main{min-width:0}
-@media(max-width:760px){
- .dh-classroom-sidebar{inset:0 0 auto 0!important;width:100%!important;height:68px!important;padding:8px 10px!important;flex-direction:row!important;align-items:center!important;gap:10px!important;border-right:0!important;border-bottom:1px solid #ffffff18!important}
- .dh-classroom-brand{padding:0 7px 0 0;border:0;flex:0 0 auto;font-size:15px}
- .dh-classroom-brand-mark{width:34px;height:34px;border-radius:11px}
- .dh-classroom-brand small{font-size:7px}
- .dh-classroom-nav{flex-direction:row!important;align-items:center!important;gap:4px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none}
- .dh-classroom-nav::-webkit-scrollbar{display:none}
- .dh-classroom-nav a{width:auto!important;min-height:39px!important;padding:7px 9px!important;font-size:0!important;gap:0!important}
- .dh-classroom-nav a svg{width:19px;height:19px}
- .dh-classroom-extra,.dh-classroom-divider,.dh-classroom-note,.dh-sidebar-profile{display:none!important}
- body>.shell,body>.layout,body>header,body>main{margin-left:0!important;width:100%!important}
- body>.shell{padding:68px 12px 24px!important}
- body>.layout{margin-top:68px!important;width:100%!important;height:calc(100dvh - 68px)!important}
- body>header{margin-top:68px!important;padding-left:14px!important;padding-right:14px!important}
- body>main{padding:20px 12px 35px!important}
- body>.shell>.topbar{min-height:56px!important}
+/* Shared classroom shell — matched to community-classroom.html */
+:root{--classroom-bg:#f5f7fc;--classroom-ink:#202b46;--classroom-muted:#78849c;--classroom-line:#e4eaf3;--classroom-blue:#4e8df5;--classroom-purple:#7257e8}
+html,body{min-height:100%;background:var(--classroom-bg)}
+body{color:var(--classroom-ink);font-family:"DM Sans",system-ui,sans-serif}
+.dh-classroom-sidebar{position:fixed!important;z-index:5000!important;inset:0 auto 0 0!important;width:226px!important;height:100dvh!important;min-height:100vh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;gap:25px!important;padding:22px 14px!important;background:linear-gradient(165deg,#1b2d4d,#12213b)!important;color:#fff!important}
+.dh-classroom-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:0 7px!important;flex:none!important;color:#fff!important;text-decoration:none!important;font:900 21px Nunito,sans-serif!important;letter-spacing:-.5px!important}
+.dh-classroom-brand-mark{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:11px!important;background:#4e8df5!important;display:grid!important;place-items:center!important;color:#fff!important;font-size:19px!important;font-weight:900!important;box-shadow:none!important}
+.dh-classroom-nav{display:grid!important;grid-auto-rows:min-content!important;gap:5px!important;flex:none!important;min-height:0!important;overflow:hidden!important}
+.dh-classroom-nav a{display:flex!important;align-items:center!important;gap:12px!important;width:max-content!important;max-width:100%!important;min-height:0!important;padding:11px 12px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#d7e1f1!important;text-decoration:none!important;font-size:12px!important;font-weight:650!important;white-space:nowrap!important;box-shadow:none!important}
+.dh-classroom-nav a:hover{background:#ffffff12!important;color:#fff!important}
+.dh-classroom-nav a.active{background:#ffffff19!important;color:#fff!important;box-shadow:inset 3px 0 #76a9ff!important}
+.dh-classroom-nav svg{display:none!important}
+.dh-classroom-nav .dh-nav-icon{width:18px!important;flex:0 0 18px!important;text-align:center!important;color:#b8c9e2!important;font-size:15px!important}
+.dh-classroom-note{margin-top:auto!important;border:1px solid #405474!important;background:#ffffff08!important;border-radius:10px!important;padding:12px!important;color:#d8e2f1!important;font-size:10px!important;line-height:1.6!important}
+.dh-classroom-note strong{display:block!important;color:#fff!important;font-size:11px!important;margin-bottom:3px!important}
+.dh-classroom-profile{display:flex!important;gap:9px!important;align-items:center!important;padding:4px 7px!important;flex:none!important;color:#fff!important}
+.dh-classroom-avatar{width:33px!important;height:33px!important;flex:0 0 33px!important;border-radius:50%!important;display:grid!important;place-items:center!important;background:#e7efff!important;color:#3977cf!important;font-size:10px!important;font-weight:900!important}
+.dh-classroom-profile strong{display:block!important;font-size:10px!important;color:#fff!important}
+.dh-classroom-profile small{font-size:9px!important;color:#b9c9df!important}
+body>.shell{max-width:none!important;margin:0 0 0 226px!important;width:calc(100% - 226px)!important}
+body>.app{display:block!important;margin-left:226px!important;min-height:100vh!important}
+body>.app>.sidebar,body>.layout>.sidebar{display:none!important}
+body>.app>main{min-width:0!important}
+body>.shell>.topbar,body>.app>main>.topbar{background:#fff!important;color:#202b46!important;border-bottom:1px solid #e4eaf3!important}
+body>.shell>.topbar{margin-left:0!important;margin-right:0!important}
+body>.shell>.hero,body>.app>main>.content{max-width:1480px}
+body>.shell .panel,body>.app .panel,body>.shell .people-panel,body>.shell .thread-panel{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}
+body h1,body h2,body h3{color:#202b46}
+body p,body .sub,body .muted{color:#78849c}
+body .classroom-top-links{display:none!important}
+@media(max-width:900px){
+ .dh-classroom-sidebar{width:68px!important;padding:18px 7px!important;gap:22px!important}
+ .dh-classroom-brand{justify-content:center!important;padding:0!important}
+ .dh-classroom-brand-name,.dh-classroom-nav .dh-nav-label,.dh-classroom-note,.dh-classroom-profile-copy{display:none!important}
+ .dh-classroom-nav{align-items:stretch!important}
+ .dh-classroom-nav a{justify-content:center!important;width:100%!important;padding:12px 4px!important;font-size:0!important}
+ .dh-classroom-nav .dh-nav-icon{font-size:16px!important}
+ .dh-classroom-profile{justify-content:center!important}
+ body>.shell{margin-left:68px!important;width:calc(100% - 68px)!important}
+ body>.app{margin-left:68px!important}
 }
-@media(max-height:680px) and (min-width:761px){.dh-classroom-sidebar{padding-top:12px!important;padding-bottom:10px!important;gap:9px!important}.dh-classroom-brand{padding-bottom:9px}.dh-classroom-nav{gap:2px!important}.dh-classroom-nav a{min-height:34px!important;padding:5px 9px!important}.dh-classroom-note{padding:8px}.dh-classroom-extra a{padding:5px 9px}}
-
-/* Optional appearance presets stay within the shared dark classroom shell. */
-body[data-classroom-theme="default"]{background-image:radial-gradient(ellipse 75% 48% at 8% -8%,rgba(99,102,241,.24),transparent 70%),radial-gradient(ellipse 58% 42% at 100% 8%,rgba(168,85,247,.17),transparent 68%),linear-gradient(rgba(165,180,252,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(165,180,252,.025) 1px,transparent 1px),linear-gradient(180deg,#070817 0%,#050611 48%,#080715 100%)}
-body[data-classroom-theme="blue"]{background-image:radial-gradient(ellipse 75% 48% at 8% -8%,rgba(59,130,246,.25),transparent 70%),radial-gradient(ellipse 58% 42% at 100% 8%,rgba(99,102,241,.18),transparent 68%),linear-gradient(rgba(147,197,253,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(147,197,253,.025) 1px,transparent 1px),linear-gradient(180deg,#07101f 0%,#050611 48%,#080b18 100%)}
-body[data-classroom-theme="mint"]{background-image:radial-gradient(ellipse 75% 48% at 8% -8%,rgba(16,185,129,.2),transparent 70%),radial-gradient(ellipse 58% 42% at 100% 8%,rgba(99,102,241,.16),transparent 68%),linear-gradient(rgba(110,231,183,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(110,231,183,.025) 1px,transparent 1px),linear-gradient(180deg,#061713 0%,#050611 48%,#080715 100%)}
-body[data-classroom-theme="rose"]{background-image:radial-gradient(ellipse 75% 48% at 8% -8%,rgba(236,72,153,.2),transparent 70%),radial-gradient(ellipse 58% 42% at 100% 8%,rgba(168,85,247,.17),transparent 68%),linear-gradient(rgba(249,168,212,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(249,168,212,.025) 1px,transparent 1px),linear-gradient(180deg,#190915 0%,#050611 48%,#080715 100%)}
-
-/* Match the exact blue DougHub mark used on the Classroom home page. */
-.dh-classroom-brand{font:900 21px Nunito,sans-serif!important;letter-spacing:-.5px!important;gap:10px!important}
-.dh-classroom-brand-mark{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:11px!important;background:#4e8df5!important;box-shadow:none!important;color:#fff!important;font-size:19px!important}
-header .brand-mark{width:36px!important;height:36px!important;border-radius:11px!important;background:#4e8df5!important;box-shadow:none!important;color:#fff!important;font-size:19px!important}
-header .brand-icon{width:36px!important;height:36px!important;border-radius:11px!important;background:#4e8df5!important;box-shadow:none!important;color:#fff!important;font-size:19px!important}
+@media(max-width:560px){
+ body>.shell{width:calc(100% - 68px)!important}
+}
