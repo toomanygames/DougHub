@@ -2,7 +2,6 @@
 "use strict";
 const items=[
  ["community-classroom.html","Home","⌂"],
- ["classroom.html","My Class","▣"],
  ["class-chat.html","Class Chat","◉"],
  ["classroom-dms.html","Chat & DMs","◎"],
  ["classroom-community.html","Community","▤"],
@@ -27,11 +26,30 @@ function addStudentSection(aside){
  if(profile){profile.insertAdjacentElement("beforebegin",label);}
  else aside.append(label);
 }
+function installToggle(aside){
+ if(aside.querySelector(".dh-sidebar-toggle"))return;
+ const toggle=document.createElement("button");
+ toggle.type="button";toggle.className="dh-sidebar-toggle";
+ toggle.setAttribute("aria-label","Expand classroom sidebar");
+ toggle.setAttribute("aria-expanded","false");
+ toggle.innerHTML='<span aria-hidden="true">›</span>';
+ toggle.addEventListener("click",()=>{
+  const expanded=document.body.classList.toggle("dh-sidebar-expanded");
+  toggle.setAttribute("aria-expanded",String(expanded));
+  toggle.setAttribute("aria-label",expanded?"Collapse classroom sidebar":"Expand classroom sidebar");
+  toggle.querySelector("span").textContent=expanded?"‹":"›";
+ });
+ aside.insertBefore(toggle,aside.firstChild);
+}
 function mount(){
- if(path==="community-classroom.html"||path==="class-chat.html"){
-  const existing=document.querySelector(".sidebar");
-  if(existing)addStudentSection(existing);
-  return;
+ const existing=document.querySelector(".sidebar");
+ if(existing){
+  if(path==="community-classroom.html"||path==="class-chat.html"){
+   addStudentSection(existing);
+   const oldLink=existing.querySelector('a[href="classroom.html"]');if(oldLink)oldLink.remove();
+   installToggle(existing);
+   return;
+  }
  }
  if(document.querySelector(".dh-classroom-sidebar"))return;
  const aside=document.createElement("aside");aside.className="dh-classroom-sidebar";aside.setAttribute("aria-label","Classroom navigation");
@@ -39,8 +57,8 @@ function mount(){
  const nav=document.createElement("nav");nav.className="dh-classroom-nav";nav.setAttribute("aria-label","Classroom pages");
  items.forEach(([href,label,glyph])=>{const a=document.createElement("a");a.href=href;a.innerHTML='<span class="dh-nav-icon" aria-hidden="true">'+glyph+'</span><span class="dh-nav-label">'+label+'</span>';if(path===href)a.classList.add("active");nav.append(a);});
  const profile=document.createElement("div");profile.className="dh-classroom-profile";profile.innerHTML='<span class="dh-classroom-avatar">DH</span><span class="dh-classroom-profile-copy"><strong>DougHub Student</strong><small>Student space</small></span>';
- aside.append(brand,nav,profile);addStudentSection(aside);document.body.prepend(aside);
- document.querySelectorAll(".classroom-top-links").forEach(el=>el.setAttribute("aria-hidden","true"));
+ aside.append(brand,nav,profile);addStudentSection(aside);document.body.prepend(aside);installToggle(aside);
+ document.querySelectorAll(".classroom-top-links").forEach(el=>el.remove());
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount,{once:true});else mount();
 })();
