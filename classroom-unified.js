@@ -16,6 +16,7 @@ const path=(location.pathname.split("/").pop()||"community-classroom.html").toLo
 const style=document.createElement("style");
 style.textContent=".dh-classroom-student-label{display:flex;align-items:center;gap:10px;margin-top:auto;padding:11px 10px;border:1px solid #405474;border-radius:10px;background:#ffffff08;color:#fff;font-size:11px;font-weight:850}.dh-classroom-student-label:before{content:'S';display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border-radius:8px;background:#4e8df5;color:#fff;font-size:13px;font-weight:900}.sidebar-note{display:none!important}@media(max-width:900px){.dh-classroom-student-label{justify-content:center;padding:8px 4px;font-size:0}.dh-classroom-student-label:before{margin:0}}";
 document.head.append(style);
+try{document.body.dataset.classroomTheme=localStorage.getItem("classroomTheme")||"default";}catch(e){}
 function addStudentSection(aside){
  const label=document.createElement("div");
  label.className="dh-classroom-student-label";
