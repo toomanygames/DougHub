@@ -53,7 +53,7 @@
 const $=id=>document.getElementById(id), C=window.DHClassroom;
 let db,user,profile,currentClass=null,classRows=[],chatTimer=null,sessionPoll=null,focusTimer=null,focusSeconds=900,resumeInFlight=false,nextResumeAttempt=0,isOwner=false,isDevPlus=false,roomPresenceTimer=null,roomCheckInFlight=false;
 const say=(id,msg)=>$(id).textContent=msg;
-function showLoading(msg){$("loadingState").innerHTML='<div class="empty">'+C.esc(msg)+'</div>';$("loadingState").hidden=false;$("classroomWorkspace").hidden=true;}
+function showLoading(msg){$("loadingState").innerHTML='<div class="empty">'+C.esc(msg)+'</div>';$("loadingState").hidden=false;$("classroomWorkspace").hidden=true;if($("endedOverlay"))$("endedOverlay").hidden=true;if(window.__classSessionTimer)clearInterval(window.__classSessionTimer);}
 function showWorkspace(){ $("loadingState").hidden=true;$("classroomWorkspace").hidden=false; }
 async function boot(){
  try{
