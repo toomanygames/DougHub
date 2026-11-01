@@ -522,7 +522,7 @@ $("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavi
    if(ids.length){const {data,error:spaceError}=await db.from("classroom_spaces").select("id,class_name,grade,reminder,session_active").in("id",ids).order("class_name");if(spaceError)throw spaceError;spaces=data||[];}
   }
   if(!spaces.length){box.innerHTML='<div class="class-room-empty">No approved class spaces yet. Ask your teacher to approve your class enrollment. In the meantime, you can still share ideas and join the community discussions below.</div>';return;}
-  box.innerHTML=spaces.map(room=>'<article class="class-room-card"><strong>'+esc(room.class_name)+'</strong><small>Grade '+esc(room.grade)+' · '+(room.session_active?'Class available':'Class currently closed')+'</small><p>'+esc(room.reminder||"No class reminder right now.")+'</p><a href="class-chat.html">Open class chat ↗</a></article>').join("");
+  box.innerHTML=spaces.map(room=>'<article class="class-room-card"><strong>'+esc(room.class_name)+'</strong><small>Grade '+esc(room.grade)+' · '+(room.session_active?'Class available':'Class currently closed')+'</small><p>'+esc(room.reminder||"No class reminder right now.")+'</p><a href="class-chat.html?class='+encodeURIComponent(room.id)+'">Open class chat ↗</a></article>').join("");
  }catch(error){console.warn("Could not load classroom spaces",error);box.innerHTML='<div class="class-room-empty">Your class spaces could not load right now. You can still use the shared ideas and discussion feed below.</div>';}
 }
 async function init(){
