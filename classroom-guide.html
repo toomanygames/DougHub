@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classroom Guide • DougHub</title><link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<link rel="stylesheet" href="classroom.css">
+<style>
+.guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:20px 0}
+.guide-step{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid #ecebfa}
+.guide-step:last-child{border-bottom:0}
+.step-num{flex:0 0 30px;height:30px;border-radius:10px;background:#eeeaff;color:#6554c8;display:grid;place-items:center;font-weight:900}
+.guide-step p{margin:4px 0 0;color:#777b97;font-size:13px;line-height:1.55}
+.guide-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.guide-actions a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+@media(max-width:760px){.guide-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar"><div class="brand"><span class="brand-mark">D</span><span>DougHub <small>CLASSROOM GUIDE</small></span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn soft" href="classroom.html" style="text-decoration:none">Student view</a><a class="btn" href="classroom-teacher.html" style="text-decoration:none">Teacher Studio</a></div></header>
+<section class="hero"><div class="hero-inner"><div class="eyebrow">GETTING STARTED</div><h1>Welcome to DougHub Classroom.</h1><p>A shared space for class chat, learning tools, reminders, and games. Choose the guide that matches your role.</p><div class="hero-meta"><span>GRADES 4–8</span><span>PRIVATE CLASS SPACES</span><span>TEACHER-MANAGED</span></div></div></section>
+<div class="guide-grid">
+<section class="panel">
+<div class="panel-head"><div><h2>For teachers</h2><p>Set up a class and invite your students.</p></div><span class="pill mint">TEACHER</span></div>
+<div class="guide-step"><span class="step-num">1</span><div><strong>Get teacher access</strong><p>Open Teacher Studio and request verification. Classroom creation unlocks after the DougHub Owner approves your teacher account. Owners can create classes immediately.</p></div></div>
+<div class="guide-step"><span class="step-num">2</span><div><strong>Create your classroom</strong><p>Choose a class name and grade from 4 through 8, then select Create classroom. Your class appears in the list on the left.</p></div></div>
+<div class="guide-step"><span class="step-num">3</span><div><strong>Request student enrollment</strong><p>Enter each student's DougHub username in the roster. Requests need Owner verification before the student can enter.</p></div></div>
+<div class="guide-step"><span class="step-num">4</span><div><strong>Manage the class</strong><p>Post reminders, review class chat, manage the word filter, and use the session controls when needed.</p></div></div>
+<div class="guide-step"><span class="step-num">5</span><div><strong>Keep the room available</strong><p>The classroom is open while your DougHub account is online. If you go offline, students see Classroom Closed. Return online to reopen access.</p></div></div>
+<div class="guide-actions"><a class="btn" href="classroom-teacher.html">Open Teacher Studio</a></div>
+</section>
+<section class="panel">
+<div class="panel-head"><div><h2>For students</h2><p>Join your class and use its learning tools.</p></div><span class="pill">STUDENT</span></div>
+<div class="guide-step"><span class="step-num">1</span><div><strong>Ask your teacher to add you</strong><p>Give your teacher your DougHub username so they can send an enrollment request.</p></div></div>
+<div class="guide-step"><span class="step-num">2</span><div><strong>Wait for approval</strong><p>The Owner verifies student requests. The class appears after your enrollment is approved.</p></div></div>
+<div class="guide-step"><span class="step-num">3</span><div><strong>Open your classroom</strong><p>Use the classroom selector if you belong to more than one class. Your teacher must be online for the room to open.</p></div></div>
+<div class="guide-step"><span class="step-num">4</span><div><strong>Use the class tools</strong><p>Chat with your class, check reminders, look up words, use the focus timer, and play the classroom games.</p></div></div>
+<div class="guide-step"><span class="step-num">5</span><div><strong>When the room is closed</strong><p>If your teacher is offline or has paused the session, wait until the room becomes available again. The page checks for the teacher automatically.</p></div></div>
+<div class="guide-actions"><a class="btn" href="classroom.html">Open Student Classroom</a></div>
+</section>
+</div>
+<section class="panel"><div class="panel-head"><div><h2>Classroom basics</h2><p>Important rules for everyone.</p></div></div>
+<ul style="color:#777b97;font-size:13px;line-height:1.8;padding-left:20px;margin:8px 0"><li>Classrooms are private to approved students, their teacher, and authorized DougHub staff.</li><li>Keep class chat kind, relevant, and respectful.</li><li>Teachers manage reminders and classroom word filters.</li><li>Developers and higher staff ranks can preview the student experience without joining a roster; this does not grant teacher controls.</li><li>Never share passwords or private information in class chat.</li></ul>
+</section>
+<div class="footer">DougHub Classroom · Help for teachers and students</div>
+</div>
+</body></html>
