@@ -208,3 +208,15 @@ body .classroom-top-links{display:none!important}
  body>.shell{width:calc(100% - 220px)!important;margin-left:220px!important}
  body>main:not(.app main):not(.layout main){width:calc(100% - 220px)!important;margin-left:220px!important}
 }
+/* Consistent pinned classroom sidebar + matching content offset on every page. */
+.dh-classroom-sidebar,.dh-classroom-native-sidebar{position:fixed!important;top:0!important;left:0!important;right:auto!important;bottom:0!important;width:236px!important;height:100vh!important;height:100dvh!important;z-index:5000!important;transform:none!important}
+.dh-classroom-student-label,.dh-sidebar-toggle{display:none!important}
+body>.app,body>.layout{display:block!important;position:relative!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important}
+body>.app>.sidebar,body>.layout>.sidebar{position:fixed!important;top:0!important;left:0!important;bottom:0!important;width:236px!important;height:100vh!important;height:100dvh!important;z-index:5000!important}
+body>.app>main,body>.layout>main{display:block!important;width:calc(100% - 236px)!important;max-width:none!important;margin:0 0 0 236px!important;box-sizing:border-box!important}
+body>.shell,body>main:not(.app main):not(.layout main){width:calc(100% - 236px)!important;max-width:none!important;margin-left:236px!important;box-sizing:border-box!important}
+body .classroom-top-links{display:none!important}
+@media(max-width:900px){
+ .dh-classroom-sidebar,.dh-classroom-native-sidebar,body>.app>.sidebar,body>.layout>.sidebar{width:220px!important}
+ body>.app>main,body>.layout>main,body>.shell,body>main:not(.app main):not(.layout main){width:calc(100% - 220px)!important;margin-left:220px!important}
+}
