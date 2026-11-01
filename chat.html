@@ -1878,7 +1878,7 @@ async function renderMessageText(container, text) {
   const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
   const matches = [];
   function appendTextWithInviteLinks(value){
-    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+|(?:https?:\/\/|www\.)[^\\s<>"']+/gi;
+    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+|(?:https?:\/\/|www\.)[^\s<>"']+/gi;
     let cursor=0,match;
     while((match=urlPattern.exec(value))!==null){
       let raw=match[0],clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
