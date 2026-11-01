@@ -68,7 +68,8 @@ async function boot(){
   if(!classes.length){showState("No class chat available yet",profile.account_type==="teacher"?"Create a classroom in Teacher Studio to start its class chat.":"Join a classroom and wait for its teacher to approve your request.");return;}
   $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
   $("classSelect").addEventListener("change",()=>openClass($("classSelect").value));
-  await openClass(classes[0].id);
+  const requestedClass=new URLSearchParams(location.search).get('class');
+  await openClass(classes.some(c=>c.id===requestedClass)?requestedClass:classes[0].id);
  }catch(e){console.error("Class chat failed to initialize",e);showState("Couldn't open class chat",e.message||"Refresh and try again.");}
 }
 async function openClass(id){
