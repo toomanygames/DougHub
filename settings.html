@@ -953,6 +953,22 @@ document.addEventListener("DOMContentLoaded",function(){
 
     </section>
 
+    <section class="settings-section" id="accountTypeSettingsSection">
+      <h2 class="section-title">Account type</h2>
+      <p class="section-description">Choose how you use DougHub. Student and Neither accounts do not need classroom verification. Teacher accounts must be verified by the DougHub team before teacher tools unlock.</p>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-label">I am a...</div><div class="setting-help">You can change this anytime.</div></div>
+        <div class="setting-control" style="display:block">
+          <select id="accountTypeSetting" class="setting-input" aria-label="Account type">
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+            <option value="neither">Neither</option>
+          </select>
+          <div class="setting-help" id="accountTypeHelp">Loading your account type…</div>
+        </div>
+      </div>
+    </section>
+
     <section class="settings-section" id="rewardsSettingsSection">
 
       <h2 class="section-title">Rewards & Badges</h2>
@@ -1696,7 +1712,7 @@ async function loadSettings() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge, equipped_badge_style, seasonal_theme"
+        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge, equipped_badge_style, seasonal_theme, account_type"
       )
       .eq(
         "id",
@@ -1723,6 +1739,10 @@ async function loadSettings() {
 
   currentProfile =
     profile || {};
+  const accountTypeSetting = document.getElementById("accountTypeSetting");
+  const accountTypeHelp = document.getElementById("accountTypeHelp");
+  if (accountTypeSetting) accountTypeSetting.value = ["student","teacher","neither"].includes(currentProfile.account_type) ? currentProfile.account_type : "neither";
+  if (accountTypeHelp) accountTypeHelp.textContent = currentProfile.account_type === "teacher" ? (currentProfile.teacher_verified ? "Teacher access is verified." : "Teacher tools remain locked until your account is verified in Admin.") : "No classroom verification is needed for this account type.";
   const savedSeasonalTheme = ["normal","spring","summer","autumn","winter","custom"].includes(currentProfile.seasonal_theme) ? currentProfile.seasonal_theme : (window.DougHubSeasonalTheme?.getTheme() || "normal");
   const seasonalRadio = document.querySelector('input[name="seasonalThemeSelect"][value="' + savedSeasonalTheme + '"]');
   if (seasonalRadio) seasonalRadio.checked = true;
@@ -2511,6 +2531,26 @@ document.getElementById("badgeSelect").addEventListener("change",async()=>{
 });
 
 
+
+
+document.getElementById("accountTypeSetting")?.addEventListener("change", async function () {
+  if (!currentUser || !currentProfile) return;
+  const control = this;
+  const nextType = control.value;
+  const previousType = currentProfile.account_type || "neither";
+  control.disabled = true;
+  const { error } = await supabaseClient.from("profiles").update({ account_type: nextType }).eq("id", currentUser.id);
+  control.disabled = false;
+  if (error) {
+    control.value = previousType;
+    showStatus("Could not update your account type: " + error.message, "error");
+    return;
+  }
+  currentProfile.account_type = nextType;
+  const help = document.getElementById("accountTypeHelp");
+  if (help) help.textContent = nextType === "teacher" ? (currentProfile.teacher_verified ? "Teacher access is verified." : "Teacher tools remain locked until your account is verified in Admin.") : "No classroom verification is needed for this account type.";
+  showStatus(nextType === "teacher" && !currentProfile.teacher_verified ? "Account type updated. Request teacher verification from Teacher Studio." : "Account type updated.", "success");
+});
 
 function renderStaffBadgeSetting(){
   const row=document.getElementById("staffBadgeSetting");
