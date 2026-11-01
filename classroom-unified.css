@@ -42,3 +42,16 @@ body .classroom-top-links{display:none!important}
 @media(max-width:560px){
  body>.shell{width:calc(100% - 68px)!important}
 }
+
+
+/* Every actual DougHub logo mark inside classroom headers uses the blue D tile. */
+header .logo-icon,
+header .brand-mark,
+header .brand-icon,
+.dh-classroom-brand-mark{
+ background:#4e8df5!important;
+ background-image:none!important;
+ color:#fff!important;
+ box-shadow:none!important;
+ text-shadow:none!important;
+}
