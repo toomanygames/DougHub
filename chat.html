@@ -1878,21 +1878,32 @@ async function renderMessageText(container, text) {
   const pattern = /(^|[^A-Za-z0-9_])@([A-Za-z0-9_]{1,32})(?![A-Za-z0-9_])/g;
   const matches = [];
   function appendTextWithInviteLinks(value){
-    const urlPattern=/https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+|(?:https?:\/\/|www\.)[^\s<>"']+/gi;
-    let cursor=0,match;
-    while((match=urlPattern.exec(value))!==null){
-      let raw=match[0],clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
-      if(match.index>cursor)container.appendChild(document.createTextNode(value.slice(cursor,match.index)));
-      const link=document.createElement("a");
-      link.href=/^www\./i.test(clean)?"https://"+clean:clean;
-      link.target="_blank";link.rel="noopener noreferrer";
-      link.className=clean.toLowerCase().includes("/chat-calls.html?room=")?"chat-call-invite-link":"chat-message-link";
-      link.textContent=link.className==="chat-call-invite-link"?"Join video call ↗":clean;
-      container.appendChild(link);
-      if(tail)container.appendChild(document.createTextNode(tail));
-      cursor=match.index+raw.length;
+    const markdown=/\[([^\]]+)\]\((https?:\/\/[^)\s]+|www\.[^)\s]+)\)([A-Za-z0-9._~/%-]+)?/gi;
+    const appendPlain=part=>{
+      const urls=/(https:\/\/doughub\.online\/chat-calls\.html\?room=[a-z0-9_-]+|(?:https?:\/\/|www\.)[^\s<>"']+)/gi;
+      let pos=0,hit;
+      while((hit=urls.exec(part))!==null){
+        const raw=hit[0],clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
+        if(hit.index>pos)container.appendChild(document.createTextNode(part.slice(pos,hit.index)));
+        const link=document.createElement("a");
+        link.href=/^www\./i.test(clean)?"https://"+clean:clean;link.target="_blank";link.rel="noopener noreferrer";
+        link.className=clean.toLowerCase().includes("/chat-calls.html?room=")?"chat-call-invite-link":"chat-message-link";
+        link.textContent=link.className==="chat-call-invite-link"?"Join video call ↗":clean;
+        container.appendChild(link);if(tail)container.appendChild(document.createTextNode(tail));pos=hit.index+raw.length;
+      }
+      if(pos<part.length)container.appendChild(document.createTextNode(part.slice(pos)));
+    };
+    let pos=0,hit;
+    while((hit=markdown.exec(value))!==null){
+      if(hit.index>pos)appendPlain(value.slice(pos,hit.index));
+      let label=hit[1],href=hit[2],suffix=hit[3]||"";
+      if(suffix&&label.replace(/\*\*|__|\*|_/g,"")===href){label+=suffix;href+=suffix;}
+      const link=document.createElement("a");link.href=/^www\./i.test(href)?"https://"+href:href;
+      link.target="_blank";link.rel="noopener noreferrer";link.className="chat-message-link";
+      link.textContent=label.replace(/\*\*(.*?)\*\*/g,"$1").replace(/__(.*?)__/g,"$1").replace(/\*(.*?)\*/g,"$1").replace(/_(.*?)_/g,"$1");
+      container.appendChild(link);pos=hit.index+hit[0].length;
     }
-    if(cursor<value.length)container.appendChild(document.createTextNode(value.slice(cursor)));
+    if(pos<value.length)appendPlain(value.slice(pos));
   }
   let match;
   while ((match = pattern.exec(text)) !== null) {
