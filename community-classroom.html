@@ -30,6 +30,18 @@ main{min-width:0}.topbar{height:72px;background:#fff;border-bottom:1px solid var
 footer{text-align:center;color:#9aa5b8;font-size:9px;padding:20px}
 @media(max-width:900px){.app{grid-template-columns:68px minmax(0,1fr)}.sidebar{padding:18px 7px}.brand{justify-content:center;padding:0}.brand-name,.nav-label,.sidebar-note,.profile-info{display:none}.nav a{justify-content:center;padding:12px 4px;font-size:0}.nav-icon{font-size:16px}.profile{justify-content:center}.grid{grid-template-columns:1fr}.content{padding-top:17px}}
 @media(max-width:560px){.topbar{height:60px}.top-actions a:nth-child(2){display:none}.welcome{align-items:flex-start;flex-direction:column}.action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:12px}.content{padding-left:10px;padding-right:10px}}
+
+/* Shared light classroom shell */
+.sidebar{background:linear-gradient(180deg,#fff,#f8f8ff)!important;color:#172642!important;border-right:1px solid #e4eaf3!important}
+.sidebar .brand{color:#172642!important}
+.sidebar .brand-icon{background:linear-gradient(135deg,#4e8df5 0%,#7257e8 62%,#d66dbb)!important;box-shadow:0 8px 20px #7257e82b}
+.sidebar .nav a{color:#66738d!important;border-radius:12px!important}
+.sidebar .nav a:hover{background:#f0efff!important;color:#6555d2!important}
+.sidebar .nav a.current{background:linear-gradient(100deg,#eeedff,#f9eff9)!important;color:#6555d2!important;box-shadow:inset 3px 0 #806de8!important}
+.sidebar .nav-icon{color:#7969d9!important}
+.sidebar .sidebar-note{border:1px solid #e4e5f2!important;background:#f7f7ff!important;color:#78849c!important}
+.sidebar .sidebar-note strong{color:#172642!important}
+.sidebar .profile-info strong{color:#172642!important}.sidebar .profile-info small{color:#8994a9!important}
 </style>
 </head>
 <body>
@@ -38,7 +50,8 @@ footer{text-align:center;color:#9aa5b8;font-size:9px;padding:20px}
  <a class="brand" href="community-classroom.html"><span class="brand-icon">D</span><span class="brand-name">DougHub</span></a>
  <nav class="nav" aria-label="DougHub sections">
   <a href="community-classroom.html"><span class="nav-icon">⌂</span><span class="nav-label">Home</span></a>
-  <a class="current" href="classroom.html"><span class="nav-icon">▣</span><span class="nav-label">My Class</span></a>
+  <a class="current" href="community-classroom.html"><span class="nav-icon">⌂</span><span class="nav-label">Home</span></a>
+  <a href="classroom.html"><span class="nav-icon">▣</span><span class="nav-label">My Class</span></a>
   <a href="class-chat.html"><span class="nav-icon">◉</span><span class="nav-label">Class Chat</span></a>
   <a href="classroom-dms.html"><span class="nav-icon">◎</span><span class="nav-label">Chat & DMs</span></a>
   <a href="classroom-community.html"><span class="nav-icon">▤</span><span class="nav-label">Community</span></a>
