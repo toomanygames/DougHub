@@ -503,7 +503,7 @@ $("postForm").addEventListener("submit",async e=>{
 });
 $("searchPosts").addEventListener("input",renderPosts);$("sortPosts").addEventListener("change",renderPosts);
 $("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavior:"smooth",block:"center"});$("postTitle").focus({preventScroll:true});});
-(async function loadClassRooms(){
+async function loadClassRooms(){
  const box=$("classRoomGrid");if(!box)return;
  if(!currentUser){box.innerHTML='<div class="class-room-empty">Log in to see your approved class spaces here. Your class chats and shared spaces will appear once you are enrolled.</div>';return;}
  try{
@@ -525,7 +525,7 @@ $("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavi
   box.innerHTML=spaces.map(room=>'<article class="class-room-card"><strong>'+esc(room.class_name)+'</strong><small>Grade '+esc(room.grade)+' · '+(room.session_active?'Class available':'Class currently closed')+'</small><p>'+esc(room.reminder||"No class reminder right now.")+'</p><a href="class-chat.html?class='+encodeURIComponent(room.id)+'">Open class chat ↗</a></article>').join("");
  }catch(error){console.warn("Could not load classroom spaces",error);box.innerHTML='<div class="class-room-empty">Your class spaces could not load right now. You can still use the shared ideas and discussion feed below.</div>';}
 }
-async function init(){
+(async function init(){
  try{db=await loadClient();if(!db)throw new Error("Supabase client is unavailable");
   const {data,error}=await db.auth.getSession();if(error)throw error;currentUser=data?.session?.user||null;
   if(currentUser){const {data:profile}=await db.from("profiles").select("username,staff_role,is_admin").eq("id",currentUser.id).maybeSingle();currentProfile=profile;$("composeAccount").textContent="Posting as "+(profile?.username||currentUser.email?.split("@")[0]||"member");$("postHelp").textContent="Posts are public. Keep personal details private.";$("publishPost").textContent="Publish post";}
