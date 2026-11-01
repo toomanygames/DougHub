@@ -58,9 +58,20 @@ body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .profile{justify-co
 .daily-copy{min-width:0}
 .daily-copy strong{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .daily-copy small{display:block;margin-top:4px;color:#6f7ca0;font-size:8px;font-weight:850}
-.character-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.character-links a{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid #ffffff55;border-radius:9px;background:#ffffff1c;color:#fff;font-size:9px;font-weight:950}
-.character-links a:hover{background:#ffffff2b}
+.character-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px;max-width:690px}
+.character-links a{position:relative;isolation:isolate;overflow:hidden;min-height:112px;display:flex;align-items:center;gap:14px;padding:19px 20px;border:1px solid #ffffff70;border-radius:17px;background:linear-gradient(125deg,#fff,#f4f1ff);color:#342d77;font-size:14px;font-weight:950;box-shadow:0 12px 28px #211c6a35;transition:transform .18s,box-shadow .18s}
+.character-links a:before{content:"";position:absolute;z-index:-1;width:125px;height:125px;right:-25px;top:-55px;border-radius:50%;background:#b9aaff88;filter:blur(10px)}
+.character-links a:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 18px 35px #211c6a45}
+.character-links a:focus-visible{outline:4px solid #ffe18a;outline-offset:3px}
+.character-links .character-link-icon{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:16px;background:linear-gradient(145deg,#8067f5,#b56be1);color:white;font-size:27px;box-shadow:0 7px 16px #5141b54a}
+.character-links a:nth-child(2){background:linear-gradient(125deg,#e7fff5,#d9f7ff);color:#155a65}
+.character-links a:nth-child(2):before{background:#91e8dc88}
+.character-links a:nth-child(2) .character-link-icon{background:linear-gradient(145deg,#23a98d,#3b9fd0)}
+.character-link-copy{display:grid;gap:5px;min-width:0}
+.character-link-copy small{font-size:9px;font-weight:750;line-height:1.45;color:#7770a5}
+.character-links a:nth-child(2) .character-link-copy small{color:#54818a}
+.character-link-arrow{margin-left:auto;font-size:20px}
+@media(max-width:620px){.character-links{grid-template-columns:1fr;gap:9px}.character-links a{min-height:88px;padding:13px 15px}}
 @media(max-width:1050px){.daily-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.daily-games{padding:12px}.daily-head{align-items:flex-start;flex-direction:column}.daily-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.daily-card{padding:9px;gap:7px}}
 
@@ -89,7 +100,10 @@ body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .profile{justify-co
 </aside>
 <main><header class="topbar"><div class="crumb">DougHub / Classroom / <strong>Games</strong></div><div class="top-actions"><a href="community-classroom.html">Class home</a><a href="classroom-settings.html">Settings</a></div></header>
 <div class="content">
-<section class="hero"><div class="hero-inner"><div class="hero-copy"><div class="eyebrow">DOUGHUB CLASSROOM ARCADE</div><h1>Take a quick game break.</h1><p>Choose a puzzle, racing game, arcade challenge or brain teaser. Search the collection or filter by the kind of game you want to play.</p><div class="hero-actions"><a class="hero-btn primary" href="#gameLibrary">Browse games ↓</a><a class="hero-btn" href="classroom-create.html">Create a game ↗</a></div><div class="character-links"><a href="Games/shop.html">Character Shop ↗</a><a href="Games/character-editor.html">Edit Character ↗</a></div></div><div class="hero-art" aria-hidden="true"><div class="art-tile">✦</div><div class="art-tile">▦</div><div class="art-tile">◈</div><div class="art-tile">◎</div></div></div></section>
+<section class="hero"><div class="hero-inner"><div class="hero-copy"><div class="eyebrow">DOUGHUB CLASSROOM ARCADE</div><h1>Take a quick game break.</h1><p>Choose a puzzle, racing game, arcade challenge or brain teaser. Search the collection or filter by the kind of game you want to play.</p><div class="hero-actions"><a class="hero-btn primary" href="#gameLibrary">Browse games ↓</a><a class="hero-btn" href="classroom-create.html">Create a game ↗</a></div><div class="character-links" aria-label="Your classroom character">
+<a href="classroom-character-shop.html"><span class="character-link-icon" aria-hidden="true">✦</span><span class="character-link-copy">Character Shop<small>Open packs, discover rare characters and collect accessories</small></span><span class="character-link-arrow" aria-hidden="true">↗</span></a>
+<a href="classroom-character-editor.html"><span class="character-link-icon" aria-hidden="true">✎</span><span class="character-link-copy">Edit Character<small>Choose your avatar, equip items and save your look</small></span><span class="character-link-arrow" aria-hidden="true">↗</span></a>
+</div></div><div class="hero-art" aria-hidden="true"><div class="art-tile">✦</div><div class="art-tile">▦</div><div class="art-tile">◈</div><div class="art-tile">◎</div></div></div></section>
 
 <section class="daily-games" aria-labelledby="dailyGamesTitle">
  <div class="daily-head"><div><div class="kicker">FRESH EVERY DAY</div><h2 id="dailyGamesTitle">Daily Games</h2><p>Complete today's challenges to earn credits for character packs and accessories.</p></div><span class="daily-reset">Resets at midnight UTC</span></div>
