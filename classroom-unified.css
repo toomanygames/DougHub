@@ -145,3 +145,7 @@ body.dh-sidebar-expanded>.app>.sidebar .nav a,body.dh-sidebar-expanded>.layout>.
 @media(prefers-reduced-motion:reduce){
  .dh-classroom-sidebar,.sidebar,body>.shell,body>.app,body>main,body>.layout{transition:none!important}
 }
+
+/* The shared sidebar replaces the old per-page top navigation. */
+body>.shell>.topbar{display:none!important}
+body>.app>header{display:none!important}
