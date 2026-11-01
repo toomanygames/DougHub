@@ -107,6 +107,17 @@ async function selectClass(id){
   return;
  }
  showWorkspace();
+ roomPresenceTimer=setInterval(async()=>{
+  if(roomCheckInFlight||currentClass?.id!==roomId)return;roomCheckInFlight=true;
+  try{
+   const {data:p,error:e}=await db.from("user_presence").select("last_seen_at").eq("user_id",teacherId).maybeSingle();
+   const online=!e&&p?.last_seen_at&&Date.now()-Date.parse(p.last_seen_at)<90000;
+   if(!online){
+    if(chatTimer)clearInterval(chatTimer);if(sessionPoll)clearInterval(sessionPoll);
+    showLoading("CLASSROOM CLOSED · Your teacher is offline. This room opens when your teacher is back online.");
+   }
+  }finally{roomCheckInFlight=false;}
+ },10000);
  const {data:teacher}=await db.from("profiles").select("username").eq("id",teacherId).maybeSingle();
  $("welcomeTitle").textContent="Welcome to "+currentClass.class_name+"!";
  $("welcomeCopy").textContent="Your classroom is ready. Find your class games, chat, and learning tools below.";
