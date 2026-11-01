@@ -1915,10 +1915,9 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 </div>
 <div class="card" id="classroomApprovalCard" style="display:none;margin:18px 0">
  <h2>🏫 Classroom verification</h2>
- <p class="admin-card-help">Owner-only review queue. Verify that each student belongs to the teacher's class before granting classroom access. Student requests can take 1–7 business days.</p>
+ <p class="admin-card-help">Owner-only teacher verification. Verify teacher accounts here. Student enrollment requests are handled directly by each classroom's teacher.</p>
  <div class="admin-card-actions"><span id="classroomApprovalStatus" class="status">Loading classroom requests…</span><button type="button" id="refreshClassroomApprovals">↻ Refresh</button></div>
  <h3 style="margin:18px 0 8px">Teacher verification requests</h3><div id="classroomTeacherApplications" class="admin-scroll-area"></div>
- <h3 style="margin:22px 0 8px">Student enrollment requests</h3><div id="classroomStudentApplications" class="admin-scroll-area"></div>
 </div>
 </div>
 
@@ -6210,32 +6209,19 @@ startAdminPanel();
  if(!card)return;
  const status=document.getElementById("classroomApprovalStatus");
  const teacherList=document.getElementById("classroomTeacherApplications");
- const studentList=document.getElementById("classroomStudentApplications");
  const esc=value=>typeof escapeHtml==="function"?escapeHtml(String(value??"")):String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  let started=false;
  async function load(){
   if(typeof supabaseClient==="undefined"||!supabaseClient?.from||!currentAdminUser?.id)return;
-  status.textContent="Loading requests…";
-  const [appsResult,enrollResult]=await Promise.all([
-   supabaseClient.from("classroom_teacher_applications").select("id,user_id,message,created_at").eq("status","pending").order("created_at",{ascending:true}),
-   supabaseClient.from("classroom_enrollments").select("id,classroom_id,student_id,created_at").eq("status","pending").order("created_at",{ascending:true})
-  ]);
-  if(appsResult.error||enrollResult.error){status.textContent="Could not load requests: "+(appsResult.error?.message||enrollResult.error?.message);return;}
-  const appRows=appsResult.data||[],enrollRows=enrollResult.data||[];
-  const classIds=[...new Set(enrollRows.map(x=>x.classroom_id))],userIds=[...new Set([...appRows.map(x=>x.user_id),...enrollRows.map(x=>x.student_id)])];
-  const [classesResult,usersResult]=await Promise.all([
-   classIds.length?supabaseClient.from("classroom_spaces").select("id,class_name,grade,teacher_id").in("id",classIds):Promise.resolve({data:[],error:null}),
-   userIds.length?supabaseClient.from("profiles").select("id,username").in("id",userIds):Promise.resolve({data:[],error:null})
-  ]);
-  if(classesResult.error||usersResult.error){status.textContent="Could not load names: "+(classesResult.error?.message||usersResult.error?.message);return;}
-  const classes=Object.fromEntries((classesResult.data||[]).map(x=>[x.id,x]));
-  const users=Object.fromEntries((usersResult.data||[]).map(x=>[x.id,x.username||"Unknown user"]));
-  const teacherIds=[...new Set((classesResult.data||[]).map(x=>x.teacher_id))];
-  const teacherResult=teacherIds.length?await supabaseClient.from("profiles").select("id,username").in("id",teacherIds):{data:[],error:null};
-  const teacherNames=Object.fromEntries((teacherResult.data||[]).map(x=>[x.id,x.username||"Teacher"]));
-  teacherList.innerHTML=appRows.length?appRows.map(x=>'<div class="admin-list-item" style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin:8px 0;background:rgba(255,255,255,.025)"><strong>'+esc(users[x.user_id]||"Unknown user")+'</strong><div class="admin-card-help">'+esc(x.message||"No note provided")+' · Requested '+esc(new Date(x.created_at).toLocaleDateString())+'</div><div style="display:flex;gap:8px;margin-top:9px"><button type="button" data-teacher-approve="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Verify teacher</button><button type="button" class="delete-button" data-teacher-reject="'+esc(x.id)+'">Reject</button></div></div>').join(""):'<div class="empty">No teacher requests are waiting.</div>';
-  studentList.innerHTML=enrollRows.length?enrollRows.map(x=>{const cl=classes[x.classroom_id]||{};return '<div class="admin-list-item" style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin:8px 0;background:rgba(255,255,255,.025)"><strong>'+esc(users[x.student_id]||"Unknown student")+'</strong><div class="admin-card-help">Teacher: '+esc(teacherNames[cl.teacher_id]||"Unknown teacher")+' · Grade '+esc(cl.grade||"—")+' · Class: '+esc(cl.class_name||"Unknown class")+'</div><div class="admin-card-help">Requested '+esc(new Date(x.created_at).toLocaleDateString())+'</div><div style="display:flex;gap:8px;margin-top:9px"><button type="button" data-enrollment-approve="'+esc(x.id)+'">Approve student</button><button type="button" class="delete-button" data-enrollment-reject="'+esc(x.id)+'">Reject</button></div></div>';}).join(""):'<div class="empty">No student enrollment requests are waiting.</div>';
-  status.textContent=appRows.length+" teacher request(s) · "+enrollRows.length+" student request(s) awaiting review.";
+  status.textContent="Loading teacher requests…";
+  const {data:apps,error:appsError}=await supabaseClient.from("classroom_teacher_applications").select("id,user_id,message,created_at").eq("status","pending").order("created_at",{ascending:true});
+  if(appsError){status.textContent="Could not load teacher requests: "+appsError.message;return;}
+  const rows=apps||[],ids=[...new Set(rows.map(x=>x.user_id))];
+  const {data:users,error:userError}=ids.length?await supabaseClient.from("profiles").select("id,username,account_type,teacher_verified").in("id",ids):{data:[],error:null};
+  if(userError){status.textContent="Could not load teacher names: "+userError.message;return;}
+  const names=Object.fromEntries((users||[]).map(x=>[x.id,x.username||"Unknown user"]));
+  teacherList.innerHTML=rows.length?rows.map(x=>'<div class="admin-list-item" style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin:8px 0;background:rgba(255,255,255,.025)"><strong>'+esc(names[x.user_id]||"Unknown user")+'</strong><div class="admin-card-help">'+esc(x.message||"No note provided")+' · Requested '+esc(new Date(x.created_at).toLocaleDateString())+'</div><div style="display:flex;gap:8px;margin-top:9px"><button type="button" data-teacher-approve="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Verify teacher</button><button type="button" class="delete-button" data-teacher-reject="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Reject</button></div></div>').join(""):'<div class="empty">No teacher requests are waiting.</div>';
+  status.textContent=rows.length+" teacher verification request(s) awaiting review.";
   card.querySelectorAll("[data-teacher-approve]").forEach(button=>button.addEventListener("click",async()=>{
    button.disabled=true;const id=button.dataset.teacherApprove,uid=button.dataset.user;
    const {error:profileError}=await supabaseClient.from("profiles").update({account_type:"teacher",teacher_verified:true}).eq("id",uid);
@@ -6244,16 +6230,11 @@ startAdminPanel();
    if(error){status.textContent="Profile verified, but request status did not update: "+error.message;button.disabled=false;return;}await load();
   }));
   card.querySelectorAll("[data-teacher-reject]").forEach(button=>button.addEventListener("click",async()=>{
-   button.disabled=true;const {error}=await supabaseClient.from("classroom_teacher_applications").update({status:"rejected",reviewed_by:currentAdminUser.id,reviewed_at:new Date().toISOString()}).eq("id",button.dataset.teacherReject);
+   button.disabled=true;const uid=button.dataset.user;
+   const {error:profileError}=await supabaseClient.from("profiles").update({teacher_verified:false}).eq("id",uid);
+   if(profileError){status.textContent="Could not update teacher verification: "+profileError.message;button.disabled=false;return;}
+   const {error}=await supabaseClient.from("classroom_teacher_applications").update({status:"rejected",reviewed_by:currentAdminUser.id,reviewed_at:new Date().toISOString()}).eq("id",button.dataset.teacherReject);
    if(error){status.textContent=error.message;button.disabled=false;return;}await load();
-  }));
-  card.querySelectorAll("[data-enrollment-approve]").forEach(button=>button.addEventListener("click",async()=>{
-   button.disabled=true;const {error}=await supabaseClient.from("classroom_enrollments").update({status:"approved",verified_by:currentAdminUser.id,verified_at:new Date().toISOString()}).eq("id",button.dataset.enrollmentApprove);
-   if(error){status.textContent="Could not approve student: "+error.message;button.disabled=false;return;}await load();
-  }));
-  card.querySelectorAll("[data-enrollment-reject]").forEach(button=>button.addEventListener("click",async()=>{
-   button.disabled=true;const {error}=await supabaseClient.from("classroom_enrollments").update({status:"rejected",verified_by:currentAdminUser.id,verified_at:new Date().toISOString()}).eq("id",button.dataset.enrollmentReject);
-   if(error){status.textContent="Could not reject request: "+error.message;button.disabled=false;return;}await load();
   }));
  }
  function start(){
