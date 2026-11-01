@@ -54,9 +54,9 @@ function showState(title,detail,linkText="Open classroom",href="community-classr
 }
 function linkifyMessage(value){
  const escaped=C.esc(value);
- return escaped.replace(/(https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+)/gi,raw=>{
+ return escaped.replace(/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi,raw=>{
   const clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
-  const href=/^www\\./i.test(clean)?"https://"+clean:clean;
+  const href=/^www\./i.test(clean)?"https://"+clean:clean;
   return '<a class="chat-message-link" href="'+C.esc(href)+'" target="_blank" rel="noopener noreferrer">'+clean+'</a>'+tail;
  });
 }
