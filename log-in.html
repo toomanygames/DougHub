@@ -406,6 +406,13 @@ body{background:radial-gradient(circle at 12% 8%,#29205d 0,transparent 35%),radi
 
     </div>
 
+    <label for="accountType">I am a...</label>
+    <select id="accountType" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.3);color:white;font-size:15px">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="neither" selected>Neither</option>
+    </select>
+
     <label for="email">
       Email
     </label>
@@ -724,7 +731,8 @@ async function submitForm() {
 
           options: {
             data: {
-              username: username
+              username: username,
+              account_type: document.getElementById("accountType").value
             }
           }
 
@@ -767,6 +775,9 @@ async function submitForm() {
 
       if (signInData && signInData.user) {
         await recordAuthAudit(signInData.user.id, "login", "Successful sign-in", { method: "email_password" });
+        const selectedType = document.getElementById("accountType").value;
+        const { error: typeError } = await supabaseClient.from("profiles").update({ account_type: selectedType }).eq("id", signInData.user.id);
+        if (typeError) console.warn("Account type could not be updated:", typeError.message);
       }
 
       window.location.href =
