@@ -16,12 +16,11 @@ const css=`
 :root{--dh-classroom-sidebar-width:236px}
 html,body{min-height:100%;width:100%;max-width:100%;overflow-x:hidden}
 .dh-classroom-sidebar,.dh-classroom-native-sidebar{
- position:fixed!important;z-index:5000!important;inset:0 auto 0 0!important;
- width:236px!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;
+ position:fixed!important;z-index:5000!important;top:0!important;left:0!important;right:auto!important;bottom:0!important;
+ width:236px!important;height:100vh!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;
  overflow-y:auto!important;overflow-x:hidden!important;display:flex!important;flex-direction:column!important;
- padding:22px 14px!important;gap:22px!important;
- background:linear-gradient(165deg,#1b2d4d,#12213b)!important;color:#fff!important;
- box-sizing:border-box!important;transition:none!important
+ padding:22px 14px!important;gap:22px!important;background:linear-gradient(165deg,#1b2d4d,#12213b)!important;
+ color:#fff!important;box-sizing:border-box!important;transform:none!important;transition:none!important;
 }
 .dh-classroom-sidebar{border:0!important}
 .dh-classroom-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:0 7px!important;flex:none!important;color:#fff!important;text-decoration:none!important;font:900 21px Nunito,sans-serif!important}
@@ -35,35 +34,35 @@ html,body{min-height:100%;width:100%;max-width:100%;overflow-x:hidden}
 .dh-classroom-profile strong{display:block!important;font-size:10px!important;color:#fff!important}
 .dh-classroom-profile small{font-size:9px!important;color:#b9c9df!important}
 .dh-classroom-student-label,.dh-sidebar-toggle{display:none!important}
+/* Native home/chat sidebars use the exact same fixed geometry as generated sidebars. */
 .dh-classroom-native-sidebar .brand,.dh-classroom-native-sidebar .brand-name{display:flex!important;align-items:center!important}
 .dh-classroom-native-sidebar .brand-name,.dh-classroom-native-sidebar .nav-label,.dh-classroom-native-sidebar .profile-info{display:initial!important}
-.dh-classroom-native-sidebar .nav{display:grid!important;gap:5px!important;overflow:visible!important}
+.dh-classroom-native-sidebar .nav{display:grid!important;grid-auto-rows:min-content!important;gap:5px!important;overflow:visible!important;flex:none!important}
 .dh-classroom-native-sidebar .nav a{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;min-height:38px!important;padding:10px 12px!important;white-space:nowrap!important}
-body>.app,body>.layout{display:grid!important;grid-template-columns:236px minmax(0,1fr)!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;min-width:0!important}
-body>.app>.sidebar,body>.layout>.sidebar{display:flex!important;position:fixed!important;inset:0 auto 0 0!important;width:236px!important;height:100vh!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important}
-body>.app>main,body>.layout>main{grid-column:2!important;min-width:0!important;width:100%!important;margin:0!important}
+.dh-classroom-native-sidebar .profile{margin-top:auto!important;flex:none!important}
+body>.app,body>.layout{display:block!important;position:relative!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important;overflow:visible!important}
+body>.app>.sidebar,body>.layout>.sidebar{position:fixed!important;top:0!important;left:0!important;right:auto!important;bottom:0!important;width:236px!important;height:100vh!important;height:100dvh!important;min-height:0!important;z-index:5000!important}
+body>.app>main,body>.layout>main{display:block!important;position:relative!important;width:calc(100% - 236px)!important;max-width:none!important;min-width:0!important;margin:0 0 0 236px!important;padding-left:clamp(12px,2vw,28px)!important;padding-right:clamp(12px,2vw,28px)!important;box-sizing:border-box!important}
+body>.app>main{min-height:100vh}
+body>.layout>main{height:100dvh;min-height:0;overflow:hidden}
 body>.shell{max-width:none!important;width:calc(100% - 236px)!important;margin:0 0 0 236px!important;padding-left:clamp(12px,2vw,28px)!important;padding-right:clamp(12px,2vw,28px)!important;box-sizing:border-box!important}
-body>main:not(.app main):not(.layout main){width:calc(100% - 236px)!important;max-width:none!important;margin-left:236px!important;margin-right:0!important;box-sizing:border-box!important}
+body>main:not(.app main):not(.layout main){width:calc(100% - 236px)!important;max-width:none!important;margin:0 0 0 236px!important;padding-left:clamp(12px,2vw,28px)!important;padding-right:clamp(12px,2vw,28px)!important;box-sizing:border-box!important}
 body>header{display:none!important}
-body>.shell>.topbar,body>.shell>header.topbar,body>.app>main>.topbar,body>.layout>main>.topbar{display:flex!important}
 body .classroom-top-links{display:none!important}
-body .dh-classroom-sidebar~.app,body .dh-classroom-sidebar~.layout{margin-left:0!important}
-body>.app>.sidebar .sidebar-note,body>.layout>.sidebar .sidebar-note{display:none!important}
 @media(max-width:900px){
  :root{--dh-classroom-sidebar-width:220px}
  .dh-classroom-sidebar,.dh-classroom-native-sidebar,body>.app>.sidebar,body>.layout>.sidebar{width:220px!important;padding:18px 12px!important}
- body>.app,body>.layout{grid-template-columns:220px minmax(0,1fr)!important}
- body>.shell{width:calc(100% - 220px)!important;margin-left:220px!important;padding-left:12px!important;padding-right:12px!important}
- body>main:not(.app main):not(.layout main){width:calc(100% - 220px)!important;margin-left:220px!important}
+ body>.app>main,body>.layout>main,body>.shell,body>main:not(.app main):not(.layout main){width:calc(100% - 220px)!important;margin-left:220px!important;padding-left:12px!important;padding-right:12px!important}
 }
 @media(max-width:560px){
  .dh-classroom-sidebar,.dh-classroom-native-sidebar,body>.app>.sidebar,body>.layout>.sidebar{padding:14px 9px!important}
- body>.shell{padding-left:9px!important;padding-right:9px!important}
+ body>.app>main,body>.layout>main,body>.shell,body>main:not(.app main):not(.layout main){padding-left:9px!important;padding-right:9px!important}
 }
 `;
 function mount(){
- if(document.getElementById("dh-classroom-layout-fix"))return;
- const style=document.createElement("style");style.id="dh-classroom-layout-fix";style.textContent=css;document.head.append(style);
+ let style=document.getElementById("dh-classroom-layout-fix");
+ if(!style){style=document.createElement("style");style.id="dh-classroom-layout-fix";document.head.append(style);}
+ style.textContent=css;
  const native=document.querySelector("body>.app>.sidebar,body>.layout>.sidebar");
  if(native){
   native.classList.add("dh-classroom-native-sidebar");
