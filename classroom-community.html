@@ -304,18 +304,41 @@ main{padding-top:16px!important}
 
 </style><link rel="stylesheet" href="classroom.css"><style>body{background:radial-gradient(ellipse at 4% 0%,#c6c5ff88,transparent 32%),radial-gradient(ellipse at 92% 4%,#ffd2e388,transparent 28%),#f7f7ff;color:#172642}header{background:#ffffffdf;border-bottom:1px solid #e4eaf3}.logo{color:#172642}.logo-icon{background:linear-gradient(135deg,#4e8df5,#7257e8 62%,#d66dbb);box-shadow:0 8px 20px #7257e82b}.classroom-top-links a{background:#f0efff;color:#6555d2;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:900}</style>
 <link rel="stylesheet" href="classroom-unified.css?v=4"><script src="classroom-unified.js?v=4" defer></script>
+<style>
+.class-connection{margin:16px 0 26px;padding:22px;border:1px solid #ffffff16;border-radius:20px;background:linear-gradient(145deg,rgba(13,17,39,.9),rgba(8,10,25,.94));box-shadow:0 20px 55px #0002}
+.class-connection-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}
+.class-connection-kicker{color:#a5b4fc;font-size:10px;font-weight:900;letter-spacing:.16em}
+.class-connection-head h2{margin:7px 0 5px;color:#f8f7ff;font-size:23px;letter-spacing:-.04em}
+.class-connection-head p{margin:0;color:#a0a1bb;font-size:12px;line-height:1.6}
+.class-room-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
+.class-room-card{min-width:0;padding:15px;border:1px solid #ffffff14;border-radius:14px;background:#ffffff06}
+.class-room-card strong{display:block;color:#f4f5ff;font-size:13px}
+.class-room-card small{display:block;margin-top:5px;color:#9ea2c1;font-size:10px}
+.class-room-card p{min-height:30px;margin:9px 0;color:#b9bad0;font-size:11px;line-height:1.5}
+.class-room-card a{display:inline-flex;align-items:center;min-height:34px;padding:0 11px;border-radius:9px;background:#4e8df5;color:#fff;font-size:10px;font-weight:850}
+.class-room-empty{padding:18px;border:1px dashed #ffffff20;border-radius:13px;color:#a0a1bb;font-size:11px;line-height:1.7}
+.class-community-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.class-community-actions a{padding:8px 11px;border:1px solid #ffffff17;border-radius:9px;color:#c9d2ff;font-size:10px;font-weight:800}
+.class-community-actions a:hover{background:#ffffff0b}
+@media(max-width:700px){.class-connection{padding:16px}.class-connection-head{align-items:flex-start;flex-direction:column}.class-connection-head h2{font-size:20px}.class-room-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <header><a href="community-classroom.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="classroom-top-links" aria-label="Classroom navigation"><a href="community-classroom.html">Home</a><a href="classroom.html">My Class</a><a href="class-chat.html">Class Chat</a><a href="classroom-dms.html">Chat &amp; DMs</a><a href="classroom-community.html">Community</a><a href="classroom-games.html">Games</a><a href="classroom-create.html">Create</a><a href="classroom-dictionary.html">Dictionary</a><a href="classroom-tools.html">Student Tools</a><a href="classroom-settings.html">Settings</a></nav></header>
 <main>
 <section class="hero">
- <div class="hero-copy"><div class="eyebrow">THE DOUGHUB COMMUNITY</div><h1>Welcome to <span class="gradient">DougForum.</span></h1><p>A place to share what you're making, ask questions, talk about games, and help shape DougHub. Find your community and join the conversation.</p><div class="forum-stats" aria-label="Live forum activity"><div class="forum-stat"><strong id="statPosts">—</strong><span>Discussions</span></div><div class="forum-stat"><strong id="statCommunities">—</strong><span>Communities</span></div><div class="forum-stat"><strong id="statReplies">—</strong><span>Replies</span></div></div><div class="hero-actions"><button class="button primary" id="startPost"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Create a post</button><a class="button" href="community-classroom.html"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6M9 12h12M3 5v14"/></svg>Back to Dashboard</a></div></div>
+ <div class="hero-copy"><div class="eyebrow">YOUR CLASSROOM COMMUNITY</div><h1>Welcome to <span class="gradient">Class Community.</span></h1><p>Connect with the other classes, open your class chat, share ideas, and talk about what everyone is creating. Find your community and join the conversation.</p><div class="forum-stats" aria-label="Live forum activity"><div class="forum-stat"><strong id="statPosts">—</strong><span>Discussions</span></div><div class="forum-stat"><strong id="statCommunities">—</strong><span>Communities</span></div><div class="forum-stat"><strong id="statReplies">—</strong><span>Replies</span></div></div><div class="hero-actions"><button class="button primary" id="startPost"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Create a post</button><a class="button" href="community-classroom.html"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6M9 12h12M3 5v14"/></svg>Back to Dashboard</a></div></div>
  <div class="hero-mark" aria-hidden="true"><span>DF</span></div>
+</section>
+<section class="class-connection" id="classConnections">
+ <div class="class-connection-head"><div><span class="class-connection-kicker">YOUR CLASS SPACES</span><h2>All your classes, connected.</h2><p>Jump into a class conversation or see what your classmates are working on.</p></div><a class="button primary" href="class-chat.html">Open Class Chat ↗</a></div>
+ <div class="class-room-grid" id="classRoomGrid"><div class="class-room-empty">Loading your class spaces…</div></div>
+ <div class="class-community-actions"><a href="class-chat.html">Class chat</a><a href="classroom-dms.html">Private messages</a><a href="classroom-create.html">Create something</a><a href="classroom-games.html">Class games</a></div>
 </section>
 <div class="layout">
  <aside class="side" aria-label="Forum communities"><div class="side-title">Communities</div><div class="community-nav" id="communityNav"><button class="community-choice active" data-community="all"><span class="community-letter">ALL</span><span>All posts</span></button></div><div class="side-note"><strong>Keep it constructive</strong><p>Be kind, protect private information, and keep posts relevant to the selected community.</p></div></aside>
  <section class="feed" id="feed">
-  <div class="feed-head"><div><h2 id="feedTitle">All posts</h2><p id="feedDescription">Recent conversations from across DougHub.</p></div><div class="feed-controls"><input class="search" id="searchPosts" type="search" placeholder="Search posts..." autocomplete="off" spellcheck="false" aria-label="Search posts"><select class="select" id="sortPosts" aria-label="Sort posts"><option value="new">Newest</option><option value="top">Top voted</option></select></div></div>
+  <div class="feed-head"><div><h2 id="feedTitle">All posts</h2><p id="feedDescription">Ideas, questions, projects, and conversations from across the classroom.</p></div><div class="feed-controls"><input class="search" id="searchPosts" type="search" placeholder="Search posts..." autocomplete="off" spellcheck="false" aria-label="Search posts"><select class="select" id="sortPosts" aria-label="Sort posts"><option value="new">Newest</option><option value="top">Top voted</option></select></div></div>
   <div class="message" id="statusMessage" role="status" aria-live="polite"></div>
   <section class="compose" id="compose">
    <div class="compose-top"><strong>Start a discussion</strong><span id="composeAccount">Sign in to post</span></div>
@@ -480,12 +503,34 @@ $("postForm").addEventListener("submit",async e=>{
 });
 $("searchPosts").addEventListener("input",renderPosts);$("sortPosts").addEventListener("change",renderPosts);
 $("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavior:"smooth",block:"center"});$("postTitle").focus({preventScroll:true});});
-(async function init(){
+(async function loadClassRooms(){
+ const box=$("classRoomGrid");if(!box)return;
+ if(!currentUser){box.innerHTML='<div class="class-room-empty">Log in to see your approved class spaces here. Your class chats and shared spaces will appear once you are enrolled.</div>';return;}
+ try{
+  const {data:profile}=await db.from("profiles").select("account_type,teacher_verified,is_owner,staff_role").eq("id",currentUser.id).maybeSingle();
+  const isTeacher=profile?.account_type==="teacher"&&profile?.teacher_verified===true;
+  const isOwner=profile?.is_owner===true||String(profile?.staff_role||"").toLowerCase()==="owner";
+  let spaces=[];
+  if(isTeacher||isOwner){
+   let q=db.from("classroom_spaces").select("id,class_name,grade,reminder,session_active,teacher_id").order("class_name");
+   if(!isOwner)q=q.eq("teacher_id",currentUser.id);
+   const {data,error}=await q;if(error)throw error;spaces=data||[];
+  }else{
+   const {data:enrollments,error}=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",currentUser.id).eq("status","approved");
+   if(error)throw error;
+   const ids=[...new Set((enrollments||[]).map(x=>x.classroom_id))];
+   if(ids.length){const {data,error:spaceError}=await db.from("classroom_spaces").select("id,class_name,grade,reminder,session_active").in("id",ids).order("class_name");if(spaceError)throw spaceError;spaces=data||[];}
+  }
+  if(!spaces.length){box.innerHTML='<div class="class-room-empty">No approved class spaces yet. Ask your teacher to approve your class enrollment. In the meantime, you can still share ideas and join the community discussions below.</div>';return;}
+  box.innerHTML=spaces.map(room=>'<article class="class-room-card"><strong>'+esc(room.class_name)+'</strong><small>Grade '+esc(room.grade)+' · '+(room.session_active?'Class available':'Class currently closed')+'</small><p>'+esc(room.reminder||"No class reminder right now.")+'</p><a href="class-chat.html">Open class chat ↗</a></article>').join("");
+ }catch(error){console.warn("Could not load classroom spaces",error);box.innerHTML='<div class="class-room-empty">Your class spaces could not load right now. You can still use the shared ideas and discussion feed below.</div>';}
+}
+async function init(){
  try{db=await loadClient();if(!db)throw new Error("Supabase client is unavailable");
   const {data,error}=await db.auth.getSession();if(error)throw error;currentUser=data?.session?.user||null;
   if(currentUser){const {data:profile}=await db.from("profiles").select("username,staff_role,is_admin").eq("id",currentUser.id).maybeSingle();currentProfile=profile;$("composeAccount").textContent="Posting as "+(profile?.username||currentUser.email?.split("@")[0]||"member");$("postHelp").textContent="Posts are public. Keep personal details private.";$("publishPost").textContent="Publish post";}
   else{$("composeAccount").innerHTML='<a href="log-in.html?redirect=classroom-community.html" style="color:#c4b5fd;font-weight:800">Log in to post</a>';$("postHelp").textContent="You can browse freely. Log in to post, vote, or comment.";$("publishPost").textContent="Log in to post";}
-  await loadCommunities();await loadPosts();
+  await loadCommunities();await loadPosts();await loadClassRooms();
  }catch(e){console.error("DougForum initialization failed:",e);$("postList").innerHTML='<div class="empty"><strong>DougForum could not connect</strong>Try refreshing the page. If this continues, the database permissions may need checking.</div>';tell("The forum could not load its data.");}
 })();
 </script>
