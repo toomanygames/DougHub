@@ -24,7 +24,11 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 @media(max-width:900px){.layout{grid-template-columns:68px minmax(0,1fr)}.sidebar{padding:18px 7px;gap:22px}.brand{justify-content:center;padding:0}.brand-name,.nav-label,.sidebar-note,.profile-info{display:none}.nav a{justify-content:center;padding:12px 4px;font-size:0}.nav-icon{font-size:16px}.profile{justify-content:center}}
 @media(max-width:560px){.topbar{height:58px;padding:0 10px}.chat-page{padding:12px 8px 8px}.heading{align-items:flex-start}.heading h1{font-size:21px}.heading p{max-width:210px}.class-picker{max-width:145px;min-width:110px;padding:8px 6px}.chat-head{padding:10px}.messages{padding:12px 8px}.message{max-width:96%}.compose-wrap{padding:9px}.compose{gap:6px}.compose input{padding:11px 9px}.send{padding:11px 12px}}
 
-/* Compact nav pills: do not stretch across the sidebar */\n.nav{align-items:start}\n.nav a{width:max-content;max-width:100%;padding:9px 11px}\n@media(max-width:900px){.nav{align-items:stretch}.nav a{width:100%;max-width:100%;justify-content:center;padding:12px 4px}}\n/* Original anchored navy classroom sidebar */
+/* Compact nav pills: do not stretch across the sidebar */
+.nav{align-items:start}
+.nav a{width:max-content;max-width:100%;padding:9px 11px}
+@media(max-width:900px){.nav{align-items:stretch}.nav a{width:100%;max-width:100%;justify-content:center;padding:12px 4px}}
+/* Original anchored navy classroom sidebar */
 .sidebar{position:sticky;top:0;align-self:start;}
 </style>
 <script src="classroom-unified.js?v=4" defer></script>
@@ -32,7 +36,7 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 <body><div class="layout">
 <aside class="sidebar"><a class="brand" href="community-classroom.html"><span class="brand-icon">D</span><span class="brand-name">DougHub</span></a>
 <nav class="nav" aria-label="DougHub sections"><a href="community-classroom.html"><span class="nav-icon">⌂</span><span class="nav-label">Home</span></a><a href="classroom.html"><span class="nav-icon">▣</span><span class="nav-label">My Class</span></a><a class="current" href="class-chat.html"><span class="nav-icon">◉</span><span class="nav-label">Class Chat</span></a><a href="classroom-dms.html"><span class="nav-icon">◎</span><span class="nav-label">Chat & DMs</span></a><a href="classroom-community.html"><span class="nav-icon">▤</span><span class="nav-label">Community</span></a><a href="classroom-games.html"><span class="nav-icon">▦</span><span class="nav-label">Games</span></a><a href="classroom-create.html"><span class="nav-icon">＋</span><span class="nav-label">Create</span></a><a href="classroom-dictionary.html"><span class="nav-icon">▤</span><span class="nav-label">Dictionary</span></a><a href="classroom-tools.html"><span class="nav-icon">⚒</span><span class="nav-label">Student Tools</span></a><a href="classroom-settings.html"><span class="nav-icon">⚙</span><span class="nav-label">Settings</span></a></nav>
-<div class="sidebar-note"><strong>Your class, together.</strong>Messages here are only for the students and teacher in your selected class.</div>
+
 <div class="profile"><div class="avatar" id="userAvatar">DH</div><div class="profile-info"><strong id="userName">DougHub Student</strong><small id="userRole">Class member</small></div></div></aside>
 <main><header class="topbar"><div class="crumb">DougHub / My Class / <strong>Class Chat</strong></div><div class="top-actions"><a href="community-classroom.html">Community & Class</a><a href="classroom.html">Classroom</a></div></header>
 <section class="chat-page"><div class="heading"><div><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1 id="classChatHeading">Grade Chat</h1><p id="classSubtitle">Talk with your classmates and teacher.</p></div><select class="class-picker" id="classSelect" aria-label="Choose a class" hidden></select></div>
