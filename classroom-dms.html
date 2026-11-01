@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
+/* The shared classroom sidebar hides the old topbar; remove its reserved 66px grid row. */
+.shell{grid-template-rows:minmax(0,1fr)}
 :root{--navy:#172642;--navy2:#213657;--ink:#202b46;--muted:#78849c;--line:#e4eaf3;--blue:#4e8df5;--purple:#7257e8;--pink:#f36fae;--mint:#55cdb2;--bg:#f5f7fc}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer}
 .shell{height:100dvh;display:grid;grid-template-rows:66px minmax(0,1fr);overflow:hidden}
