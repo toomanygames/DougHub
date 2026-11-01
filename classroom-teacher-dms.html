@@ -43,8 +43,8 @@
 <div class="shell">
 <header class="topbar"><div class="brand"><span class="brand-mark">D</span><span>DougHub <small style="font:800 9px 'DM Sans';letter-spacing:.12em;color:#8a96ae">CLASSROOM</small></span></div><div class="top-actions"><nav class="classroom-top-links" aria-label="Classroom navigation"><a href="community-classroom.html">Home</a><a href="community-classroom.html">My Class</a><a href="class-chat.html">Class Chat</a><a href="classroom-dms.html">Chat &amp; DMs</a><a href="classroom-community.html">Community</a><a href="classroom-games.html">Games</a><a href="classroom-create.html">Create</a><a href="classroom-dictionary.html">Dictionary</a><a href="classroom-tools.html">Student Tools</a><a href="classroom-settings.html">Settings</a></nav><select id="classSelect" class="class-picker" hidden aria-label="Choose class"></select><a class="back" href="community-classroom.html">← Classroom home</a></div></header>
 <section class="workspace" id="workspace" hidden>
-<aside class="people-panel"><div class="people-head"><div class="eyebrow">TEACHER WORKSPACE</div><h1>Teacher Inbox</h1><p>Private conversations with approved students in your classroom.</p></div><div class="search-wrap"><input id="peopleSearch" class="search" type="search" placeholder="Find someone in your class…" autocomplete="off"></div><div class="people-label">CLASSMATES & TEACHER</div><div class="people-list" id="peopleList"></div></aside>
-<section class="thread-panel"><header class="thread-head"><div class="avatar" id="threadAvatar">✦</div><div><div class="thread-title" id="threadTitle">Choose a student</div><div class="thread-sub" id="threadSub">Private student conversations</div></div><div class="thread-tools" id="threadClass"></div></header><div class="message-list" id="messages"><div class="welcome"><div class="welcome-icon">✉</div><h2>Your student inbox</h2><p>Select a student to open your private conversation. Only the two people in a conversation can read it.</p></div></div><form class="composer" id="compose"><div class="compose-row"><input class="compose-input" id="messageInput" maxlength="1000" autocomplete="off" placeholder="Message this student…" disabled><button class="send" id="sendButton" disabled>Send</button></div><div class="compose-note">Messages are private to you and the person you selected.</div></form><div class="status" id="status" role="status"></div></section>
+<aside class="people-panel"><div class="people-head"><div class="eyebrow">TEACHER WORKSPACE</div><h1>Teacher Inbox</h1><p>Private conversations with approved students in your classroom.</p></div><div class="search-wrap"><input id="peopleSearch" class="search" type="search" placeholder="Find a student…" autocomplete="off"></div><div class="people-label">CLASSMATES & TEACHER</div><div class="people-list" id="peopleList"></div></aside>
+<section class="thread-panel"><header class="thread-head"><div class="avatar" id="threadAvatar">✦</div><div><div class="thread-title" id="threadTitle">Choose a student</div><div class="thread-sub" id="threadSub">Private student conversations</div></div><div class="thread-tools" id="threadClass"></div></header><div class="message-list" id="messages"><div class="welcome"><div class="welcome-icon">✉</div><h2>Your student inbox</h2><p>Select a student to open your private conversation. Only the two people in a conversation can read it.</p></div></div><form class="composer" id="compose"><div class="compose-row"><input class="compose-input" id="messageInput" maxlength="1000" autocomplete="off" placeholder="Message this student…" disabled><button class="send" id="sendButton" disabled>Send</button></div><div class="compose-note">Messages are private to you and the student you selected.</div></form><div class="status" id="status" role="status"></div></section>
 </section>
 <section class="state" id="state"><h2>Loading your classroom…</h2><p>Checking your class membership.</p></section>
 </div>
@@ -66,7 +66,7 @@ async function boot(){
   else if(profile.account_type==="teacher"){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("teacher_id",user.id).order("grade");if(r.error)throw r.error;classes=r.data||[];}
   else if(profile.account_type==="student"){const e=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",user.id).eq("status","approved");if(e.error)throw e.error;const ids=[...new Set((e.data||[]).map(x=>x.classroom_id))];if(ids.length){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").in("id",ids).order("grade");if(r.error)throw r.error;classes=r.data||[];}}
   else{showState("Classroom account required","Choose Student or Teacher in Settings, then join a classroom.");return;}
-  if(!classes.length){showState("No classroom assigned","Your teacher account does not have a classroom assigned yet.","Open student messages","classroom-dms.html");return;}
+  if(!classes.length){showState("No classroom assigned","Teacher account does not have a classroom assigned yet.","Open student messages","classroom-dms.html");return;}
   $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
   $("classSelect").addEventListener("change",()=>openClass($("classSelect").value));
   $("workspace").hidden=false;$("state").hidden=true;await openClass(classes[0].id);
@@ -75,21 +75,21 @@ async function boot(){
 async function openClass(id){
  currentClass=classes.find(c=>c.id===id);if(!currentClass)return;if(poll){clearInterval(poll);poll=null;}activePerson=null;activeConversation=null;
  $("classSelect").value=id;$("threadClass").textContent="Grade "+currentClass.grade;
- $("threadTitle").textContent="Choose someone";$("threadSub").textContent=currentClass.class_name+" · Private classroom inbox";$("threadAvatar").textContent="✉";
+ $("threadTitle").textContent="Choose a student";$("threadSub").textContent=currentClass.class_name+" · Private teacher inbox";$("threadAvatar").textContent="✉";
  $("messageInput").disabled=true;$("sendButton").disabled=true;
  const enrollment=await db.from("classroom_enrollments").select("student_id").eq("classroom_id",id).eq("status","approved");if(enrollment.error)throw enrollment.error;
  const ids=[...new Set((enrollment.data||[]).map(x=>x.student_id))].filter(x=>x!==user.id);
  if(ids.length){const r=await db.from("profiles").select("id,username,avatar_url,account_type").in("id",ids);if(r.error)throw r.error;people=r.data||[];}else people=[];
- renderPeople();$("messages").innerHTML='<div class="welcome"><div class="welcome-icon">✉</div><h2>Your classroom inbox</h2><p>Select a classmate or your teacher to start a private conversation. Only the two people in a conversation can read it.</p></div>';
+ renderPeople();$("messages").innerHTML='<div class="welcome"><div class="welcome-icon">✉</div><h2>Your student inbox</h2><p>Select a student to start a private conversation. Only the two people in a conversation can read it.</p></div>';
 }
 function renderPeople(){
  const term=$("peopleSearch").value.trim().toLowerCase(),list=people.filter(p=>(p.username||"Student").toLowerCase().includes(term));
- $("peopleList").innerHTML=list.length?list.map(p=>'<button class="person '+(activePerson?.id===p.id?"active":"")+'" data-person="'+C.esc(p.id)+'"><span class="avatar">'+avatarHtml(p)+'</span><span class="person-meta"><span class="person-name">'+C.esc(p.username||"Classmate")+'</span><span class="person-sub">'+(p.id===currentClass.teacher_id?"Teacher":"Classmate")+'</span></span><span class="person-arrow">›</span></button>').join(""):'<div style="padding:18px;color:#929db0;font-size:12px">No one found in this class.</div>';
+ $("peopleList").innerHTML=list.length?list.map(p=>'<button class="person '+(activePerson?.id===p.id?"active":"")+'" data-person="'+C.esc(p.id)+'"><span class="avatar">'+avatarHtml(p)+'</span><span class="person-meta"><span class="person-name">'+C.esc(p.username||"Student")+'</span><span class="person-sub">'+(p.id===currentClass.teacher_id?"Teacher":"Student")+'</span></span><span class="person-arrow">›</span></button>').join(""):'<div style="padding:18px;color:#929db0;font-size:12px">No one found in this class.</div>';
  $("peopleList").querySelectorAll("[data-person]").forEach(b=>b.addEventListener("click",()=>openPerson(b.dataset.person)));
 }
 async function openPerson(id){
  activePerson=people.find(p=>p.id===id);if(!activePerson)return;renderPeople();if(poll)clearInterval(poll);
- $("threadTitle").textContent=activePerson.username||"Classmate";$("threadSub").textContent=(activePerson.id===currentClass.teacher_id?"Your teacher":"Classmate")+" · "+currentClass.class_name;
+ $("threadTitle").textContent=activePerson.username||"Student";$("threadSub").textContent=(activePerson.id===currentClass.teacher_id?"Teacher":"Student")+" · "+currentClass.class_name;
  $("threadAvatar").innerHTML=avatarHtml(activePerson);$("messageInput").disabled=false;$("sendButton").disabled=false;say("Opening conversation…");
  const a=[user.id,id].sort();let q=await db.from("classroom_dm_conversations").select("id").eq("classroom_id",currentClass.id).eq("participant_one",a[0]).eq("participant_two",a[1]).maybeSingle();
  if(q.error)throw q.error;
@@ -102,7 +102,7 @@ async function loadMessages(){
   const r=await db.from("classroom_dm_messages").select("id,sender_id,body,created_at").eq("conversation_id",activeConversation).order("created_at",{ascending:true}).limit(150);if(r.error)throw r.error;
   const all=[...(r.data||[])],map={[user.id]:profile,...Object.fromEntries(people.map(p=>[p.id,p]))};
   if(!all.length)box.innerHTML='<div class="welcome"><div class="welcome-icon">💬</div><h2>Say hello!</h2><p>This is the start of your conversation with this student.</p></div>';
-  else box.innerHTML=all.map(m=>{const mine=m.sender_id===user.id,p=map[m.sender_id]||{};return '<article class="message '+(mine?"mine":"")+'"><span class="avatar">'+avatarHtml(p)+'</span><div class="bubble-wrap"><div class="bubble-meta"><strong>'+C.esc(mine?"You":p.username||"Classmate")+'</strong><time>'+C.esc(C.niceTime(m.created_at))+'</time></div><div class="bubble">'+C.esc(m.body)+'</div></div></article>';}).join("");
+  else box.innerHTML=all.map(m=>{const mine=m.sender_id===user.id,p=map[m.sender_id]||{};return '<article class="message '+(mine?"mine":"")+'"><span class="avatar">'+avatarHtml(p)+'</span><div class="bubble-wrap"><div class="bubble-meta"><strong>'+C.esc(mine?"You":p.username||"Student")+'</strong><time>'+C.esc(C.niceTime(m.created_at))+'</time></div><div class="bubble">'+C.esc(m.body)+'</div></div></article>';}).join("");
   box.scrollTop=near?box.scrollHeight:old;
  }catch(e){say("Couldn't load messages: "+(e.message||"Please try again."));}
  finally{busy=false;}
