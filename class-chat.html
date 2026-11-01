@@ -53,12 +53,23 @@ function showState(title,detail,linkText="Open classroom",href="community-classr
  $("chatCard").hidden=true;$("state").hidden=false;$("state").innerHTML="<h2>"+C.esc(title)+"</h2><p>"+C.esc(detail)+"</p><a href=\""+href+"\">"+C.esc(linkText)+"</a>";
 }
 function linkifyMessage(value){
- const escaped=C.esc(value);
- return escaped.replace(/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi,raw=>{
-  const clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length);
-  const href=/^www\./i.test(clean)?"https://"+clean:clean;
-  return '<a class="chat-message-link" href="'+C.esc(href)+'" target="_blank" rel="noopener noreferrer">'+clean+'</a>'+tail;
+ const esc=C.esc,pattern=/\[([^\]]+)\]\((https?:\/\/[^)\s]+|www\.[^)\s]+)\)([A-Za-z0-9._~/%-]+)?/gi;
+ let out="",cursor=0,match;
+ const plain=part=>esc(part).replace(/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi,raw=>{
+  const clean=raw.replace(/[),.!?;:]+$/,""),tail=raw.slice(clean.length),href=/^www\./i.test(clean)?"https://"+clean:clean;
+  return '<a class="chat-message-link" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+clean+'</a>'+tail;
  });
+ while((match=pattern.exec(value))!==null){
+  if(match.index>cursor)out+=plain(value.slice(cursor,match.index));
+  let label=match[1],href=match[2],suffix=match[3]||"";
+  if(suffix&&label.replace(/\*\*|__|\*|_/g,"")===href){label+=suffix;href+=suffix;}
+  const safeHref=/^www\./i.test(href)?"https://"+href:href;
+  const safeLabel=label.replace(/\*\*(.*?)\*\*/g,"$1").replace(/__(.*?)__/g,"$1").replace(/\*(.*?)\*/g,"$1").replace(/_(.*?)_/g,"$1");
+  out+='<a class="chat-message-link" href="'+esc(safeHref)+'" target="_blank" rel="noopener noreferrer">'+esc(safeLabel)+'</a>';
+  cursor=match.index+match[0].length;
+ }
+ if(cursor<value.length)out+=plain(value.slice(cursor));
+ return out;
 }
 function initials(name){return String(name||"?").trim().slice(0,1).toUpperCase();}
 function gradeLabel(grade){const n=Number(grade),lastTwo=n%100;const suffix=lastTwo>=11&&lastTwo<=13?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th");return n+suffix+" Grade Chat";}
