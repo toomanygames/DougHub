@@ -18,7 +18,12 @@ body{color:var(--classroom-ink);font-family:"DM Sans",system-ui,sans-serif}
 .dh-classroom-profile strong{display:block!important;font-size:10px!important;color:#fff!important}
 .dh-classroom-profile small{font-size:9px!important;color:#b9c9df!important}
 body>.shell{max-width:none!important;margin:0 0 0 226px!important;width:calc(100% - 226px)!important}
-body>.app{display:block!important;margin-left:226px!important;min-height:100vh!important}\nbody>main{margin-left:226px!important;width:calc(100% - 226px)!important}\nbody>header{display:none!important}\nbody>.app>.sidebar,body>.layout>.sidebar{display:none!important}\nbody>.layout .side,body>.layout .feed{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}\nbody>.layout .forum-stat{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}
+body>.app{display:block!important;margin-left:226px!important;min-height:100vh!important}
+body>main{margin-left:226px!important;width:calc(100% - 226px)!important}
+body>header{display:none!important}
+body>.app>.sidebar,body>.layout>.sidebar{display:none!important}
+body>.layout .side,body>.layout .feed{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}
+body>.layout .forum-stat{background:#fff!important;color:#202b46!important;border-color:#e4eaf3!important}
 body>.app>.sidebar,body>.layout>.sidebar{display:none!important}
 body>.app>main{min-width:0!important}
 body>.shell>.topbar,body>.app>main>.topbar{background:#fff!important;color:#202b46!important;border-bottom:1px solid #e4eaf3!important}
@@ -37,7 +42,8 @@ body .classroom-top-links{display:none!important}
  .dh-classroom-nav .dh-nav-icon{font-size:16px!important}
  .dh-classroom-profile{justify-content:center!important}
  body>.shell{margin-left:68px!important;width:calc(100% - 68px)!important}
- body>.app{margin-left:68px!important}\n body>main{margin-left:68px!important;width:calc(100% - 68px)!important}
+ body>.app{margin-left:68px!important}
+ body>main{margin-left:68px!important;width:calc(100% - 68px)!important}
 }
 @media(max-width:560px){
  body>.shell{width:calc(100% - 68px)!important}
@@ -54,4 +60,27 @@ header .brand-icon,
  color:#fff!important;
  box-shadow:none!important;
  text-shadow:none!important;
+}
+
+
+/* Student identity block replaces the old promotional sidebar note. */
+.dh-classroom-student-label{
+ display:flex!important;align-items:center!important;gap:10px!important;
+ margin-top:auto!important;padding:11px 10px!important;
+ border:1px solid #405474!important;border-radius:10px!important;
+ background:#ffffff08!important;color:#fff!important;
+ font-size:11px!important;font-weight:850!important;letter-spacing:.02em!important;
+}
+.dh-classroom-student-label:before{
+ content:"S"!important;display:grid!important;place-items:center!important;
+ width:27px!important;height:27px!important;flex:0 0 27px!important;
+ border-radius:8px!important;background:#4e8df5!important;color:#fff!important;
+ font-size:13px!important;font-weight:900!important;
+}
+.dh-classroom-sidebar .dh-classroom-student-label{margin-top:auto!important}
+.dh-classroom-sidebar .dh-classroom-profile{margin-top:0!important}
+.sidebar-note{display:none!important}
+@media(max-width:900px){
+ .dh-classroom-student-label{justify-content:center!important;padding:8px 4px!important;font-size:0!important}
+ .dh-classroom-student-label:before{margin:0!important}
 }
