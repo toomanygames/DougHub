@@ -13,7 +13,7 @@ const items=[
 ];
 const path=(location.pathname.split("/").pop()||"community-classroom.html").toLowerCase();
 if(!document.querySelector('script[data-dh-classroom-theme]')){
- const themeScript=document.createElement("script");themeScript.src="/classroom-theme.js?v=3";themeScript.defer=true;themeScript.dataset.dhClassroomTheme="1";document.head.appendChild(themeScript);
+ const themeScript=document.createElement("script");themeScript.src="/classroom-theme.js?v=4";themeScript.defer=true;themeScript.dataset.dhClassroomTheme="1";document.head.appendChild(themeScript);
 }
 async function addTeacherPanel(nav){
  if(!nav||document.querySelector('a[href="class-chat-teacher.html"]'))return;
