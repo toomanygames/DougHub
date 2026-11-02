@@ -23,8 +23,7 @@ function apply(){
  .btn.soft,.button.soft,.btn.ghost,.button.ghost{background:var(--classroom-accent-soft)!important;border-color:color-mix(in srgb,var(--classroom-accent) 24%,transparent)!important;color:var(--classroom-accent)!important}
  button:not(.action):not(.switch):not(.soft):not(.ghost):not(.primary):not(.send):not([data-theme]):not(.tab-buttons button){accent-color:var(--classroom-accent)}
  .action:hover,.panel a.link:hover,.top-actions a:hover{border-color:var(--classroom-accent)!important}
- .action-icon,.grade-chip,.task-dot,.tag,.lookup-result,.tool-output{--classroom-accent:var(--classroom-accent)}
- .action-icon{background:var(--classroom-accent-soft)!important;color:var(--classroom-accent)!important}
+  .action-icon{background:var(--classroom-accent-soft)!important;color:var(--classroom-accent)!important}
  .grade-chip{background:var(--classroom-accent-soft)!important;color:var(--classroom-accent)!important}
  .link,.eyebrow,.nav a.current .nav-icon{color:var(--classroom-accent)!important}
  .nav a.current{box-shadow:inset 3px 0 var(--classroom-accent)!important}
