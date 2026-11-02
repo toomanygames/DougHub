@@ -417,7 +417,7 @@
       }
       const user = session.user;
       let profile = null;
-      const result = await client.from("profiles").select("username,avatar_url,is_admin,is_developer,is_owner,staff_role,account_type,teacher_verified")
+      const result = await client.from("profiles").select("username,avatar_url,is_admin,is_developer,is_owner,staff_role")
         .eq("id", user.id).maybeSingle();
       if (!result.error) profile = result.data;
       const username = profile?.username || user.user_metadata?.username ||
