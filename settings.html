@@ -970,6 +970,19 @@ document.addEventListener("DOMContentLoaded",function(){
       </div>
     </section>
 
+    <section class="settings-section" id="teacherApplicationSection">
+      <h2 class="section-title">Request teacher access</h2>
+      <p class="section-description">Ask the DougHub Owner to verify your teacher account. If approved, the Owner will assign your class number and your classroom will be created automatically.</p>
+      <div class="setting-row" style="align-items:flex-start">
+        <div class="setting-info"><div class="setting-label">Message to the Owner</div><div class="setting-help">Optional. Add a short note about your class.</div></div>
+        <div class="setting-control" style="display:block">
+          <textarea id="teacherApplicationMessage" class="setting-input" maxlength="500" rows="3" placeholder="Add a note for the Owner…"></textarea>
+          <button type="button" class="setting-button" id="requestTeacherAccess" style="margin-top:10px">Request teacher access</button>
+          <div class="setting-help" id="teacherApplicationStatus" aria-live="polite">Checking your request…</div>
+        </div>
+      </div>
+    </section>
+
     <section class="settings-section" id="rewardsSettingsSection">
 
       <h2 class="section-title">Rewards & Badges</h2>
@@ -1740,10 +1753,11 @@ async function loadSettings() {
 
   currentProfile =
     profile || {};
+  refreshTeacherApplication();
   const accountTypeSetting = document.getElementById("accountTypeSetting");
   const accountTypeHelp = document.getElementById("accountTypeHelp");
   if (accountTypeSetting) accountTypeSetting.value = ["student","teacher","neither"].includes(currentProfile.account_type) ? currentProfile.account_type : "neither";
-  if (accountTypeHelp) accountTypeHelp.textContent = currentProfile.account_type === "teacher" ? (currentProfile.teacher_verified ? "Teacher access is verified." : "Teacher tools remain locked until your account is verified in Admin.") : "No classroom verification is needed for this account type.";
+  if (accountTypeHelp) accountTypeHelp.textContent = currentProfile.account_type === "teacher" ? (currentProfile.teacher_verified ? "Teacher access is verified." : "Teacher tools remain locked until the Owner approves your teacher request.") : "No classroom verification is needed for this account type.";
   const savedSeasonalTheme = ["normal","spring","summer","autumn","winter","custom"].includes(currentProfile.seasonal_theme) ? currentProfile.seasonal_theme : (window.DougHubSeasonalTheme?.getTheme() || "normal");
   const seasonalRadio = document.querySelector('input[name="seasonalThemeSelect"][value="' + savedSeasonalTheme + '"]');
   if (seasonalRadio) seasonalRadio.checked = true;
@@ -2534,6 +2548,37 @@ document.getElementById("badgeSelect").addEventListener("change",async()=>{
 
 
 
+async function refreshTeacherApplication(){
+ const status=document.getElementById("teacherApplicationStatus"),button=document.getElementById("requestTeacherAccess");
+ if(!status||!button||!currentUser?.id||!supabaseClient)return;
+ status.textContent="Checking your request…";
+ const {data,error}=await supabaseClient.from("classroom_teacher_applications").select("id,status,assigned_grade").eq("user_id",currentUser.id).maybeSingle();
+ if(error){status.textContent="Could not load your teacher request: "+error.message;return;}
+ if(data?.status==="pending"){status.textContent="Your request is waiting for the Owner to review it.";button.disabled=true;button.textContent="Request pending";}
+ else if(data?.status==="approved"){status.textContent="Approved · Your assigned class is Class "+(data.assigned_grade||"—")+". Your Teacher Panel is ready.";button.disabled=true;button.textContent="Teacher access approved";}
+ else if(data?.status==="rejected"){status.textContent="Your previous request was declined. You can send a new request.";button.disabled=false;button.textContent="Request again";}
+ else{status.textContent="No teacher request submitted yet.";button.disabled=false;button.textContent="Request teacher access";}
+}
+document.getElementById("requestTeacherAccess")?.addEventListener("click",async()=>{
+ if(!currentUser?.id||!supabaseClient){showStatus("Sign in again before requesting teacher access.","error");return;}
+ const button=document.getElementById("requestTeacherAccess"),status=document.getElementById("teacherApplicationStatus");
+ button.disabled=true;status.textContent="Sending your request…";
+ const message=(document.getElementById("teacherApplicationMessage")?.value||"").trim();
+ const {data:existing,error:readError}=await supabaseClient.from("classroom_teacher_applications").select("id,status").eq("user_id",currentUser.id).maybeSingle();
+ if(readError){status.textContent="Could not check your previous request: "+readError.message;button.disabled=false;return;}
+ let result;
+ if(existing?.status==="rejected"){
+  result=await supabaseClient.from("classroom_teacher_applications").update({status:"pending",message,assigned_grade:null,reviewed_by:null,reviewed_at:null}).eq("id",existing.id);
+ }else if(!existing){
+  result=await supabaseClient.from("classroom_teacher_applications").insert({user_id:currentUser.id,message,status:"pending"});
+ }else{
+  status.textContent="A teacher request is already being reviewed.";return;
+ }
+ if(result.error){status.textContent="Could not send your request: "+result.error.message;button.disabled=false;return;}
+ status.textContent="Request sent. The Owner can now assign your class number when approving it.";
+ button.textContent="Request pending";
+});
+
 document.getElementById("accountTypeSetting")?.addEventListener("change", async function () {
   if (!currentUser || !currentProfile) return;
   const control = this;
@@ -2550,7 +2595,7 @@ document.getElementById("accountTypeSetting")?.addEventListener("change", async 
   currentProfile.account_type = nextType;
   const help = document.getElementById("accountTypeHelp");
   if (help) help.textContent = nextType === "teacher" ? (currentProfile.teacher_verified ? "Teacher access is verified." : "Teacher tools remain locked until your account is verified in Admin.") : "No classroom verification is needed for this account type.";
-  showStatus(nextType === "teacher" && !currentProfile.teacher_verified ? "Account type updated. Request teacher verification from Teacher Studio." : "Account type updated.", "success");
+  showStatus(nextType === "teacher" && !currentProfile.teacher_verified ? "Account type updated. Use the Request teacher access section below to ask the Owner for approval." : "Account type updated.", "success");
 });
 
 function renderStaffBadgeSetting(){
