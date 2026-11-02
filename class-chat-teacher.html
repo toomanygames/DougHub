@@ -61,7 +61,7 @@ async function boot(){
   let q=db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder,session_active,session_ended_at,session_resume_at").order("grade").order("class_name");
   if(!staff)q=q.eq("teacher_id",user.id);
   const {data,error:ce}=await q;if(error)throw error;classes=data||[];if(!classes.length){showError("No classrooms found","There are no classrooms assigned to this teacher account yet.");return;}
-  $("loading").hidden=true;$("app").hidden=false;$("classSelect").innerHTML=classes.map(c=>'<option value="'+esc(c.id)+'">'+esc("Class "+c.grade+" · "+c.class_name)+'</option>').join("");
+  $("loading").hidden=true;$("app").hidden=false;$("classSelect").innerHTML=classes.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.class_name==="Whole School"?"Whole School":"Class "+c.grade+" · "+c.class_name)+'</option>').join("");
   $("classSelect").addEventListener("change",()=>selectClass($("classSelect").value));$("sessionToggle").addEventListener("click",toggleSession);$("saveSettings").addEventListener("click",saveSettings);
   await selectClass(classes[0].id);
  }catch(e){console.error("Teacher panel error",e);showError("Couldn't load teacher panel",e.message||"Refresh and try again.");}
