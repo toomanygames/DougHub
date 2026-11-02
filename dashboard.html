@@ -236,7 +236,7 @@ async function loadDashboard(){
  if(sessionError)console.warn("Dashboard session check:",sessionError.message);
  currentUser=sessionData?.session?.user||null;
  if(!currentUser){location.replace("log-in.html?redirect=dashboard.html");return;}
- document.body.style.visibility="visible";
+ document.body.style.visibility="hidden";
  const now=new Date();
  $("todayLabel").textContent=now.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}).toUpperCase()+" / WORKSPACE";
  const [profileResult,ownResult,gamesResult,membersResult,recentResult,forumResult]=await Promise.all([
@@ -251,6 +251,7 @@ async function loadDashboard(){
  const profile=profileResult.data||{},name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
  const {data:schoolSettings,error:schoolSettingsError}=await supabaseClient.from("classroom_school_settings").select("whole_school_enabled").eq("singleton",true).maybeSingle();
  if(!schoolSettingsError&&schoolSettings?.whole_school_enabled){location.replace("community-classroom.html?wholeSchool=1");return;}
+ document.body.style.visibility="visible";
  $("welcomeTitle").textContent="Welcome back, "+name; document.title="Home · DougHub";
  $("profileName").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed in";
  $("profileAvatar").innerHTML=profile.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
