@@ -1207,6 +1207,92 @@
         refresh(); setInterval(refresh, 60000); setInterval(apply, 15000);
     }
 
+    /* PRIVACY AWARENESS DEMO — answers are never read or transmitted */
+    function startPrivacyAwarenessPrank(client) {
+        if (window.__dhPrivacyDemoStarted) return;
+        window.__dhPrivacyDemoStarted = true;
+        let overlay = null, dismissedForVersion = null;
+        const storageKey = "dh-privacy-demo-dismissed-v1";
+        function isAdminPage() { return /\/admin(?:\.html)?$/i.test(location.pathname); }
+        function wasDismissed(version) {
+            try { return sessionStorage.getItem(storageKey) === String(version); }
+            catch (_) { return dismissedForVersion === version; }
+        }
+        function rememberDismissal(version) {
+            dismissedForVersion = version;
+            try { sessionStorage.setItem(storageKey, String(version)); } catch (_) {}
+        }
+        function close() {
+            if (overlay) overlay.remove();
+            overlay = null;
+        }
+        function show(version) {
+            if (overlay || isAdminPage() || wasDismissed(version) || !document.body) return;
+            const root = document.createElement("div");
+            root.id = "dhPrivacyDemoOverlay";
+            root.innerHTML = '<section class="dh-privacy-demo-card" role="dialog" aria-modal="true" aria-labelledby="dhPrivacyDemoTitle">' +
+              '<button type="button" class="dh-privacy-demo-close" aria-label="Close privacy demonstration" title="Close">×</button>' +
+              '<div class="dh-privacy-demo-kicker">DOUGHUB PRIVACY AWARENESS LAB · EXTREMELY SUSPICIOUS SURVEY</div>' +
+              '<h2 id="dhPrivacyDemoTitle">WE NEED TO KNOW… BASICALLY EVERYTHING.</h2>' +
+              '<p class="dh-privacy-demo-intro">This is a deliberately ridiculous security-awareness demonstration. Use made-up answers only. Nothing you type is read, saved, or sent anywhere.</p>' +
+              '<form class="dh-privacy-demo-form" autocomplete="off">' +
+              '<label>1. What is your completely fictional superhero name?<input required placeholder="Captain Toast"></label>' +
+              '<label>2. Name of your imaginary pet dragon?<input required placeholder="Sir Flames-a-Lot"></label>' +
+              '<label>3. Which planet did you allegedly grow up on?<input required placeholder="Mars, probably"></label>' +
+              '<label>4. What is your cereal’s legal name?<input required placeholder="Crunchy McBowlface"></label>' +
+              '<label>5. What would your royal castle be called?<input required placeholder="The Fort of Snacks"></label>' +
+              '<label>6. Choose your highly classified favorite dinosaur<select required><option value="">Choose one…</option><option>Stegosaurus</option><option>Tiny T-Rex</option><option>Extremely polite triceratops</option><option>Kevin</option></select></label>' +
+              '<label>7. What is the password to your imaginary submarine? <small>(Not a real password!)</small><input required placeholder="DefinitelyNotARealPassword"></label>' +
+              '<label>8. What is your secret agent codename?<input required placeholder="Agent Waffle"></label>' +
+              '<label>9. How many penguins are in your imaginary band?<input required type="number" min="1" max="999" placeholder="7"></label>' +
+              '<label>10. What is the name of your fictional hometown?<input required placeholder="Pancake City"></label>' +
+              '<label>11. Pick a suspiciously specific snack<select required><option value="">Select snack…</option><option>Cheese-shaped cheese</option><option>Emergency biscuits</option><option>One singular grape</option><option>Invisible pizza</option></select></label>' +
+              '<label>12. What is your imaginary spaceship’s registration number?<input required placeholder="UFO-000-NOPE"></label>' +
+              '<label>13. What is the middle name of your left shoe?<input required placeholder="Gerald"></label>' +
+              '<label>14. Which color would you assign to Tuesday?<input required placeholder="Microwave blue"></label>' +
+              '<label>15. What is your fictional villain’s evil plan?<input required placeholder="Replace all water with soup"></label>' +
+              '<label>16. How many ducks would it take to run a small airport?<input required type="number" min="0" max="999999" placeholder="A concerning number"></label>' +
+              '<label>17. What is the name of your imaginary island?<input required placeholder="Probably Not A Tax Haven"></label>' +
+              '<label>18. Final verification: type “I AM A FICTIONAL POTATO”<input required pattern="I AM A FICTIONAL POTATO" title="Type I AM A FICTIONAL POTATO exactly" placeholder="I AM A FICTIONAL POTATO"></label>' +
+              '<button class="dh-privacy-demo-submit" type="submit">SUBMIT MY ENTIRELY FAKE EXISTENCE</button></form>' +
+              '<p class="dh-privacy-demo-foot">Reminder: never enter real passwords, addresses, phone numbers, or private information into random forms.</p></section>';
+            const style = document.createElement("style");
+            style.id = "dhPrivacyDemoStyles";
+            style.textContent = "#dhPrivacyDemoOverlay{position:fixed;inset:0;z-index:2147483646;background:rgba(3,5,16,.88);backdrop-filter:blur(10px);display:grid;place-items:center;padding:14px;font-family:Inter,system-ui,sans-serif}.dh-privacy-demo-card{position:relative;width:min(680px,100%);max-height:min(92dvh,900px);overflow:auto;background:linear-gradient(145deg,#171d3d,#090d20);border:1px solid #8874ff66;border-radius:22px;padding:clamp(20px,4vw,34px);color:#f7f7ff;box-shadow:0 30px 100px #000b}.dh-privacy-demo-close{position:sticky;float:right;top:0;width:38px;height:38px;padding:0;border:1px solid #ffffff35;border-radius:12px;background:#ffffff12;color:white;font-size:28px;line-height:1;cursor:pointer}.dh-privacy-demo-kicker{color:#a5aaff;font-size:10px;font-weight:900;letter-spacing:.12em;margin:4px 46px 12px 0}#dhPrivacyDemoTitle{font-size:clamp(23px,4vw,34px);line-height:1.08;margin:0 0 12px;letter-spacing:-.04em}.dh-privacy-demo-intro,.dh-privacy-demo-foot{color:#c5c9e3;font-size:13px;line-height:1.6}.dh-privacy-demo-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}.dh-privacy-demo-form label{display:grid;gap:6px;color:#e1e4ff;font-size:11px;font-weight:800;min-width:0}.dh-privacy-demo-form small{color:#a8afd0;font-weight:500}.dh-privacy-demo-form input,.dh-privacy-demo-form select{width:100%;min-width:0;padding:11px;border-radius:10px;border:1px solid #ffffff22;background:#080c1b;color:white;font:inherit;font-size:12px;outline:none}.dh-privacy-demo-form input:focus,.dh-privacy-demo-form select:focus{border-color:#a5aaff;box-shadow:0 0 0 3px #8b5cf633}.dh-privacy-demo-submit{grid-column:1/-1;padding:14px;border:0;border-radius:12px;background:linear-gradient(120deg,#6659e8,#a34ed1);color:white;font-weight:950;letter-spacing:.03em;cursor:pointer}.dh-privacy-demo-foot{border-top:1px solid #ffffff18;padding-top:14px;margin:16px 0 0}.dh-privacy-demo-result{text-align:center;padding:30px 8px}.dh-privacy-demo-result h2{font-size:clamp(28px,5vw,48px);line-height:1.04;color:#ff6b8a;margin:18px 0}.dh-privacy-demo-result p{color:#e2e5ff;line-height:1.7;font-size:14px}.dh-privacy-demo-result strong{color:#9ff3c5}.dh-privacy-demo-done{margin-top:18px;padding:12px 22px;border:0;border-radius:11px;background:#7667ed;color:white;font-weight:900;cursor:pointer}@media(max-width:560px){.dh-privacy-demo-form{grid-template-columns:1fr}.dh-privacy-demo-card{padding:18px}.dh-privacy-demo-submit{grid-column:auto}}";
+            document.head.appendChild(style);
+            document.body.appendChild(root);
+            overlay = root;
+            const closeButton = root.querySelector(".dh-privacy-demo-close");
+            closeButton.addEventListener("click", () => { rememberDismissal(version); close(); });
+            root.querySelector("form").addEventListener("submit", event => {
+                event.preventDefault();
+                rememberDismissal(version);
+                const card = root.querySelector(".dh-privacy-demo-card");
+                card.innerHTML = '<div class="dh-privacy-demo-result"><div class="dh-privacy-demo-kicker">SURVEY COMPLETE · DEFINITELY NOT A REAL DATA BREACH</div>' +
+                  '<h2>Thnak you your infomation has been sold overseas to russian hackers for a quick buck.</h2>' +
+                  '<p><strong>JUST KIDDING.</strong> This was a privacy-awareness demonstration. Your answers were never read by the script, saved, or sent anywhere. Nothing was sold.</p>' +
+                  '<p>The lesson: a real website should explain why it needs information, collect only what is necessary, and never ask for passwords or sensitive details in a random pop-up.</p>' +
+                  '<button type="button" class="dh-privacy-demo-done">I GET IT — CLOSE</button></div>';
+                card.querySelector(".dh-privacy-demo-done").addEventListener("click", close);
+            });
+            closeButton.focus();
+        }
+        async function refresh() {
+            if (isAdminPage()) { close(); return; }
+            try {
+                const { data, error } = await client.from("site_announcements")
+                    .select("privacy_prank_enabled,privacy_prank_version").eq("id", 1).maybeSingle();
+                if (error) throw error;
+                if (!data?.privacy_prank_enabled) { close(); return; }
+                show(Number(data.privacy_prank_version || 1));
+            } catch (error) {
+                console.debug("Privacy awareness demo setting unavailable:", error);
+            }
+        }
+        refresh();
+        setInterval(refresh, 12000);
+    }
+
     /* =========================================
        INITIALIZE
     ========================================= */
@@ -1231,6 +1317,7 @@
             initializeOgBadges(supabaseClient);
             startDougHubChatDings(supabaseClient);
             startChatGamesDailyButtonSchedule(supabaseClient);
+            startPrivacyAwarenessPrank(supabaseClient);
 
             createStyles();
 
