@@ -42,7 +42,7 @@ main{height:100dvh;min-width:0;min-height:0;display:flex;flex-direction:column;o
 <main><header class="topbar"><div class="crumb">DougHub / Classroom / <strong>Class Chat</strong></div><div class="top-actions"><a href="classrooms.html">Find Classes</a><a href="community-classroom.html">Classroom Home</a></div></header>
 <section class="chat-page"><div class="heading"><div><div class="eyebrow">YOUR CLASS · YOUR SPACE</div><h1 id="classChatHeading">Grade Chat</h1><p id="classSubtitle">Talk with your classmates and teacher.</p></div><select class="class-picker" id="classSelect" aria-label="Choose a class" hidden></select></div>
 <div id="state" class="state"><h2>Connecting to your classroom…</h2><p>Checking your class membership.</p></div>
-<section class="chat-card" id="chatCard" hidden><header class="chat-head"><div><strong id="roomTitle">Class chat</strong><small id="roomSub">Only members of this class can see these messages.</small></div><span class="live">CLASS ONLY</span></header><div class="messages" id="messages" aria-live="polite"><div class="empty">Loading messages…</div></div><div class="compose-wrap"><form class="compose" id="compose"><input id="messageInput" maxlength="1000" autocomplete="off" placeholder="Write a message to your class…" required><button class="send" id="sendButton" type="submit">Send</button></form><div class="status" id="status" role="status"></div></div></section>
+<section class="chat-card" id="chatCard" hidden><header class="chat-head"><div><strong id="roomTitle">Class chat</strong><small id="roomSub">Only members of this class can see these messages.</small></div><span class="live" id="chatScopeBadge">CLASS ONLY</span></header><div class="messages" id="messages" aria-live="polite"><div class="empty">Loading messages…</div></div><div class="compose-wrap"><form class="compose" id="compose"><input id="messageInput" maxlength="1000" autocomplete="off" placeholder="Write a message to your class…" required><button class="send" id="sendButton" type="submit">Send</button></form><div class="status" id="status" role="status"></div></div></section>
 </section></main></div>
 <script>
 (()=>{"use strict";
@@ -104,7 +104,7 @@ async function boot(){
 async function openClass(id){
  currentClass=classes.find(c=>c.id===id);if(!currentClass)return;
  if(poll){clearInterval(poll);poll=null;}
- $("classSelect").value=currentClass.id;const isWholeSchool=currentClass.class_name==="Whole School";const gradeTitle=gradeLabel(currentClass.grade,currentClass);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=isWholeSchool?"Shared school chat for students who are not assigned to a class.":"Only members of this class can see these messages.";
+ $("classSelect").value=currentClass.id;const isWholeSchool=currentClass.class_name==="Whole School";const scopeBadge=$("chatScopeBadge");if(scopeBadge)scopeBadge.textContent=isWholeSchool?"WHOLE SCHOOL":"CLASS ONLY";const gradeTitle=gradeLabel(currentClass.grade,currentClass);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=isWholeSchool?"Shared school chat for students who are not assigned to a class.":"Only members of this class can see these messages.";
  $("classSubtitle").textContent=isWholeSchool?"Everyone currently without an approved class is together here.":currentClass.class_name+" · Talk with your classmates and teacher.";
  $("state").hidden=true;$("chatCard").hidden=false;say("");await loadMessages();poll=setInterval(loadMessages,5000);
 }
