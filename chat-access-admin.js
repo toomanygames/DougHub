@@ -55,7 +55,7 @@
         status.textContent = "Searching…";
         results.replaceChildren();
         const { data, error } = await db.from("profiles")
-          .select("id,username,chat_verified,staff_role,is_admin,is_developer,is_owner")
+          .select("id,username,staff_role,is_admin,is_developer,is_owner")
           .ilike("username", "%" + term.replace(/[%_]/g, "") + "%")
           .order("username").limit(20);
         if (error) {
@@ -66,8 +66,16 @@
           status.textContent = "No matching accounts found.";
           return;
         }
+        const { data: approvalRows, error: approvalError } = await db.from("chat_access_approvals")
+          .select("user_id").in("user_id", data.map(person => person.id));
+        if (approvalError) {
+          status.textContent = "Could not load chat approvals: " + approvalError.message;
+          return;
+        }
+        const approvedIds = new Set((approvalRows || []).map(row => row.user_id));
         status.textContent = data.length + " account(s) found.";
         data.forEach(person => {
+          person.chat_verified = approvedIds.has(person.id);
           const personRole = String(person.staff_role || "").toLowerCase();
           const isStaff = ["admin","developer","owner"].includes(personRole) ||
             person.is_admin === true || person.is_developer === true || person.is_owner === true;
