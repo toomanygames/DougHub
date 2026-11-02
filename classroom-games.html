@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#172642">
-<title>Classroom Games • DougHub</title><link rel="icon" href="DougHub-classroom.svg" type="image/svg+xml">
+<title>Classroom Games • DougHub</title><link rel="icon" href="/DougHub-classroom.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="display.js"></script><script src="classroom-shared.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -153,11 +153,34 @@ body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .profile{justify-co
 function apply(){const q=search.value.trim().toLowerCase();let shown=0;cards.forEach(c=>{const ok=(active==="all"||c.dataset.genre===active)&&(!q||(c.dataset.title+" "+c.textContent).toLowerCase().includes(q));c.hidden=!ok;if(ok)shown++;});result.textContent="Showing "+shown+" of "+cards.length+" games"+(active==="all"?"":" · "+active)+(q?" matching “"+q+"”":"") +"."; $("gameCount").textContent=shown+" GAMES";}
 filters.forEach(b=>b.addEventListener("click",()=>{active=b.dataset.filter;filters.forEach(x=>{x.classList.toggle("active",x===b);x.setAttribute("aria-pressed",String(x===b));});apply();}));search.addEventListener("input",apply);
 sort.addEventListener("change",()=>{const ordered=[...cards].sort((a,b)=>sort.value==="az"?a.dataset.title.localeCompare(b.dataset.title):(Number(b.dataset.featured||0)-Number(a.dataset.featured||0))||cards.indexOf(a)-cards.indexOf(b));ordered.forEach(c=>grid.append(c));apply();});
-const player=$("gamePlayer"),frame=$("gameFrame");function exit(){player.classList.remove("open");frame.src="about:blank";document.body.style.overflow="";if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});}
-cards.forEach(c=>c.addEventListener("click",()=>{$("playerTitle").textContent=c.dataset.title;frame.src=c.dataset.href;player.classList.add("open");document.body.style.overflow="hidden";$("exitGame").focus();}));$("exitGame").addEventListener("click",exit);$("fullscreenGame").addEventListener("click",async()=>{try{if(!document.fullscreenElement)await $(".frame-wrap").requestFullscreen();else await document.exitFullscreen();}catch(e){$("fullscreenGame").textContent="Unavailable";}});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&player.classList.contains("open"))exit();});window.addEventListener("beforeunload",()=>{frame.src="about:blank";});
+const player=$("gamePlayer"),frame=$("gameFrame");
+function applyClassroomFavicon(doc){try{if(!doc?.head)return;let icon=doc.querySelector('link[rel~="icon"]');if(!icon){icon=doc.createElement("link");icon.rel="icon";doc.head.appendChild(icon);}icon.href="/DougHub-classroom.svg";icon.type="image/svg+xml";}catch(e){console.debug("Could not set classroom game icon:",e);}}
+applyClassroomFavicon(document);
+frame.addEventListener("load",()=>applyClassroomFavicon(frame.contentDocument));
+function exit(){player.classList.remove("open");document.body.classList.remove("dh-game-player-open");frame.src="about:blank";document.body.style.overflow="";if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});}
+cards.forEach(c=>c.addEventListener("click",()=>{$("playerTitle").textContent=c.dataset.title;const href=new URL(c.dataset.href,location.href);href.searchParams.set("fromClass","1");frame.src=href.href;player.classList.add("open");document.body.classList.add("dh-game-player-open");document.body.style.overflow="hidden";$("exitGame").focus();}));$("exitGame").addEventListener("click",exit);$("fullscreenGame").addEventListener("click",async()=>{try{if(!document.fullscreenElement)await $(".frame-wrap").requestFullscreen();else await document.exitFullscreen();}catch(e){$("fullscreenGame").textContent="Unavailable";}});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&player.classList.contains("open"))exit();});window.addEventListener("beforeunload",()=>{frame.src="about:blank";});
 async function profile(){try{const db=await window.DHClassroom?.client?.();if(!db)return;const {data:{user}}=await db.auth.getUser();if(!user)return;const {data}=await db.from("profiles").select("username").eq("id",user.id).maybeSingle();const name=data?.username||user.user_metadata?.username||"DougHub Student";$("userName").textContent=name;$("userAvatar").textContent=name.trim().slice(0,1).toUpperCase();}catch(e){console.warn("Classroom profile:",e);}}
 profile();apply();})();
 </script>
 <script>
-(()=>{const init=()=>{const btn=document.getElementById("gamesSidebarToggle");if(!btn)return;const sidebar=document.querySelector("body>.app>.sidebar");if(sidebar)sidebar.classList.add("dh-classroom-native-sidebar");const label=btn.querySelector(".toggle-label"),glyph=btn.querySelector(".toggle-glyph");function sync(){const collapsed=document.body.classList.contains("dh-games-sidebar-collapsed");btn.setAttribute("aria-expanded",String(!collapsed));btn.setAttribute("aria-label",collapsed?"Expand classroom sidebar":"Collapse classroom sidebar");if(label)label.textContent=collapsed?"Expand sidebar":"Collapse sidebar";if(glyph)glyph.textContent=collapsed?"›":"‹";}btn.addEventListener("click",()=>{document.body.classList.toggle("dh-games-sidebar-collapsed");sync();});sync();};if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();})();
+(()=>{const init=()=>{const btn=document.getElementById("gamesSidebarToggle");if(!btn)return;const sidebar=document.querySelector("body>.app>.sidebar");if(sidebar)sidebar.classList.add("dh-classroom-native-sidebar");
+const style=document.createElement("style");style.id="dh-classroom-games-sidebar-fix";style.textContent=`
+body>.app>.dh-classroom-native-sidebar{transition:width .32s cubic-bezier(.22,.75,.25,1),padding .32s cubic-bezier(.22,.75,.25,1),transform .32s cubic-bezier(.22,.75,.25,1)!important}
+body.dh-games-sidebar-collapsed>.app>.dh-classroom-native-sidebar{width:72px!important;padding:18px 8px!important;gap:18px!important}
+body.dh-games-sidebar-collapsed>.app>main{width:calc(100% - 72px)!important;margin-left:72px!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .brand{justify-content:center!important;padding:0!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .brand-name,body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .nav-label,body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .profile-info,body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .toggle-label{display:none!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .nav a{justify-content:center!important;width:100%!important;padding:12px 4px!important;font-size:0!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .nav-icon{font-size:16px!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .games-sidebar-toggle{padding:10px 4px!important;font-size:0!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .games-sidebar-toggle .toggle-glyph{font-size:18px!important}
+body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .profile{justify-content:center!important}
+body.dh-game-player-open>.app>.dh-classroom-native-sidebar{transform:translateX(-110%)!important;pointer-events:none!important}
+body>.app>.dh-classroom-native-sidebar{z-index:5000!important}
+.player{z-index:6000!important}
+`;document.head.appendChild(style);
+const label=btn.querySelector(".toggle-label"),glyph=btn.querySelector(".toggle-glyph");
+function sync(){const collapsed=document.body.classList.contains("dh-games-sidebar-collapsed");btn.setAttribute("aria-expanded",String(!collapsed));btn.setAttribute("aria-label",collapsed?"Expand classroom sidebar":"Collapse classroom sidebar");if(label)label.textContent=collapsed?"Expand sidebar":"Collapse sidebar";if(glyph)glyph.textContent=collapsed?"›":"‹";}
+btn.addEventListener("click",()=>{document.body.classList.toggle("dh-games-sidebar-collapsed");sync();});sync();};
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();})();
 </script></body></html>
