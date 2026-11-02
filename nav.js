@@ -262,7 +262,7 @@
     const links = [
       ["/dashboard.html","Home"],
       ["/douggames.html","Games"],
-      ["/classroom.html","Class"],
+      ["/classrooms.html","Class"],
       ["/Scripting/scripting.html","Create"],
       ["/chat.html","Chat"]
     ];
@@ -272,6 +272,7 @@
       a.href = href;
       a.className = "nav-link";
       a.textContent = label;
+      if (label === "Class") { a.id = "classNavLink"; a.addEventListener("click", async event => { event.preventDefault(); const client = await getNavSupabase(); if (!client) { location.href = "/classrooms.html"; return; } try { const {data:{user}} = await client.auth.getUser(); if (!user) { location.href = "/log-in.html?redirect=classrooms.html"; return; } const {data:p} = await client.from("profiles").select("account_type,is_owner,staff_role").eq("id",user.id).maybeSingle(); const role=String(p?.staff_role||"").toLowerCase(); const owner=p?.is_owner===true||role==="owner"; if (p?.account_type==="student"&&!owner) { const {data:en,error} = await client.from("classroom_enrollments").select("classroom_id,verified_at").eq("student_id",user.id).eq("status","approved").order("verified_at",{ascending:false}).limit(1); if (!error&&en?.[0]?.classroom_id) { location.href="/class-chat.html?class="+encodeURIComponent(en[0].classroom_id); return; } } location.href="/classrooms.html"; } catch (_) { location.href="/classrooms.html"; } }); }
       if (label === "Chat") {
         a.id = "communityChatLink";
         const dot = document.createElement("span");
@@ -418,9 +419,15 @@
       }
       const user = session.user;
       let profile = null;
-      const result = await client.from("profiles").select("username,avatar_url,is_admin,staff_role")
+      const result = await client.from("profiles").select("username,avatar_url,is_admin,staff_role,account_type,is_owner,teacher_verified")
         .eq("id", user.id).maybeSingle();
       if (!result.error) profile = result.data;
+      if (pathKey() === "index.html" && profile?.account_type === "student" && profile?.is_owner !== true && String(profile?.staff_role||"").toLowerCase() !== "owner") {
+        try {
+          const {data:en,error:enError}=await client.from("classroom_enrollments").select("classroom_id,verified_at").eq("student_id",user.id).eq("status","approved").order("verified_at",{ascending:false}).limit(1);
+          if(!enError&&en?.[0]?.classroom_id){location.replace("/class-chat.html?class="+encodeURIComponent(en[0].classroom_id));return;}
+        } catch (_) {}
+      }
       const username = profile?.username || user.user_metadata?.username ||
         user.user_metadata?.full_name || user.email?.split("@")[0] || "Account";
       name.textContent = username;
