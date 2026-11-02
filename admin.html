@@ -1457,7 +1457,7 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 
 <div class="card" id="wholeSchoolModeCard" style="margin-bottom:16px">
   <h2>Whole School Mode</h2>
-  <p class="admin-card-help">When enabled, students without an approved class are sent to the Whole School classroom home and use its shared class chat. Students already assigned to a class stay in their own classroom. Only the Owner can change this setting.</p>
+  <p class="admin-card-help">When enabled, the Whole School classroom home becomes the default home for everyone. People with an assigned class still use their own class chat; unassigned people share the Whole School chat. Only the Owner can change this setting.</p>
   <label class="admin-toggle-line" for="wholeSchoolModeToggle"><input id="wholeSchoolModeToggle" type="checkbox" disabled> Enable Whole School Mode</label>
   <div id="wholeSchoolModeStatus" class="status" aria-live="polite">Loading school setting…</div>
 </div>
@@ -6074,7 +6074,7 @@ async function setupWholeSchoolModeControl() {
         toggle.checked = data?.whole_school_enabled === true;
         toggle.disabled = false;
         status.textContent = toggle.checked
-            ? "Enabled · Unassigned students use the Whole School classroom home and chat."
+            ? "Enabled · Whole School is the default home for everyone."
             : "Off · Students use their approved class as usual.";
     } catch (error) {
         status.textContent = "Could not load the school setting: " + (error?.message || "Please refresh.");
@@ -6089,7 +6089,7 @@ async function setupWholeSchoolModeControl() {
             if (error) throw error;
             toggle.checked = data === true;
             status.textContent = toggle.checked
-                ? "Enabled · Unassigned students are now routed to the Whole School classroom home and chat."
+                ? "Enabled · Whole School is now the default home for everyone."
                 : "Disabled · Students will need an approved class to use Class Chat.";
         } catch (error) {
             toggle.checked = !requested;
