@@ -6288,20 +6288,24 @@ startAdminPanel();
  async function load(){
   if(typeof supabaseClient==="undefined"||!supabaseClient?.from||!currentAdminUser?.id)return;
   status.textContent="Loading teacher requests…";
-  const {data:apps,error:appsError}=await supabaseClient.from("classroom_teacher_applications").select("id,user_id,message,created_at").eq("status","pending").order("created_at",{ascending:true});
+  const {data:apps,error:appsError}=await supabaseClient.from("classroom_teacher_applications").select("id,user_id,message,created_at,assigned_grade").eq("status","pending").order("created_at",{ascending:true});
   if(appsError){status.textContent="Could not load teacher requests: "+appsError.message;return;}
   const rows=apps||[],ids=[...new Set(rows.map(x=>x.user_id))];
   const {data:users,error:userError}=ids.length?await supabaseClient.from("profiles").select("id,username,account_type,teacher_verified").in("id",ids):{data:[],error:null};
   if(userError){status.textContent="Could not load teacher names: "+userError.message;return;}
   const names=Object.fromEntries((users||[]).map(x=>[x.id,x.username||"Unknown user"]));
-  teacherList.innerHTML=rows.length?rows.map(x=>'<div class="admin-list-item" style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin:8px 0;background:rgba(255,255,255,.025)"><strong>'+esc(names[x.user_id]||"Unknown user")+'</strong><div class="admin-card-help">'+esc(x.message||"No note provided")+' · Requested '+esc(new Date(x.created_at).toLocaleDateString())+'</div><div style="display:flex;gap:8px;margin-top:9px"><button type="button" data-teacher-approve="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Verify teacher</button><button type="button" class="delete-button" data-teacher-reject="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Reject</button></div></div>').join(""):'<div class="empty">No teacher requests are waiting.</div>';
+  teacherList.innerHTML=rows.length?rows.map(x=>'<div class="admin-list-item" style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin:8px 0;background:rgba(255,255,255,.025)"><strong>'+esc(names[x.user_id]||"Unknown user")+'</strong><div class="admin-card-help">'+esc(x.message||"No note provided")+' · Requested '+esc(new Date(x.created_at).toLocaleDateString())+'</div><label style="display:block;margin:10px 0 6px;font-size:11px;font-weight:800">Assign class number</label><input type="number" min="1" max="9999" step="1" inputmode="numeric" placeholder="Enter class number" data-teacher-grade="'+esc(x.id)+'" style="width:100%;max-width:180px;padding:9px 10px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:#0c1022;color:#fff"><div style="display:flex;gap:8px;margin-top:9px"><button type="button" data-teacher-approve="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Approve & create class</button><button type="button" class="delete-button" data-teacher-reject="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Reject</button></div></div>').join(""):'<div class="empty">No teacher requests are waiting.</div>';
   status.textContent=rows.length+" teacher verification request(s) awaiting review.";
   card.querySelectorAll("[data-teacher-approve]").forEach(button=>button.addEventListener("click",async()=>{
-   button.disabled=true;const id=button.dataset.teacherApprove,uid=button.dataset.user;
-   const {error:profileError}=await supabaseClient.from("profiles").update({account_type:"teacher",teacher_verified:true}).eq("id",uid);
-   if(profileError){status.textContent="Teacher verification failed: "+profileError.message;button.disabled=false;return;}
-   const {error}=await supabaseClient.from("classroom_teacher_applications").update({status:"approved",reviewed_by:currentAdminUser.id,reviewed_at:new Date().toISOString()}).eq("id",id);
-   if(error){status.textContent="Profile verified, but request status did not update: "+error.message;button.disabled=false;return;}await load();
+   const id=button.dataset.teacherApprove;
+   const gradeInput=card.querySelector('[data-teacher-grade="'+id+'"]');
+   const grade=Number(gradeInput?.value);
+   if(!Number.isInteger(grade)||grade<1||grade>9999){status.textContent="Enter the class number you want to assign (1–9999) before approving.";gradeInput?.focus();return;}
+   button.disabled=true;status.textContent="Creating the teacher's class…";
+   const {data,error}=await supabaseClient.rpc("dh_approve_teacher_application",{p_application_id:id,p_grade:grade});
+   if(error){status.textContent="Teacher approval failed: "+error.message;button.disabled=false;return;}
+   status.textContent="Teacher approved and Class "+grade+" created.";
+   await load();
   }));
   card.querySelectorAll("[data-teacher-reject]").forEach(button=>button.addEventListener("click",async()=>{
    button.disabled=true;const uid=button.dataset.user;
