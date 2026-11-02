@@ -1697,7 +1697,7 @@ async function loadSettings() {
     await supabaseClient
       .from("profiles")
       .select(
-        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge, equipped_badge_style, seasonal_theme, account_type, teacher_verified"
+        "username, avatar_url, is_admin, staff_role, show_staff_badge, username_changed_at, reward_badges, equipped_badge, equipped_badge_style, seasonal_theme"
       )
       .eq(
         "id",
