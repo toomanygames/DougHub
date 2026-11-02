@@ -1,3 +1,3 @@
 # DougHub Classes
 
-Classroom pages are organized in this folder. The shared classroom styles and scripts remain at the repository root for compatibility. Old root page URLs redirect here.
+All classroom pages and their shared classroom styles/scripts live in this folder. Root-level legacy page URLs redirect here, and legacy shared-asset paths load the files from this folder for compatibility.
