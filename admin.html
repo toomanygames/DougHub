@@ -9,6 +9,7 @@
 
 <!-- display.js loads Supabase JS if needed and creates the single shared authenticated client. -->
 <script src="display.js"></script>
+<script src="chat-access-admin.js?v=1" defer></script>
 
 <style>
 * {
@@ -1455,18 +1456,6 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 
 <div id="adminArea" style="display:none;">
 
-<div class="card" id="wholeSchoolModeCard" style="margin-bottom:16px">
-  <h2>Whole School Mode</h2>
-  <p class="admin-card-help">When enabled, the Whole School classroom home becomes the default home for everyone. People with an assigned class still use their own class chat; unassigned people share the Whole School chat. Only the Owner can change this setting.</p>
-  <label class="admin-toggle-line" for="wholeSchoolModeToggle"><input id="wholeSchoolModeToggle" type="checkbox" disabled> Enable Whole School Mode</label>
-  <div id="wholeSchoolModeStatus" class="status" aria-live="polite">Loading school setting…</div>
-</div>
-
-
-<div class="card" id="classroomScheduleShortcut">
-  <h2>Classroom Schedule &amp; Student Exits</h2>
-  <p class="admin-card-help">Manage school-day exceptions for student class exits. On half days or days off, allow students to leave at any time. The DougHub Owner can also review student removal requests.</p>
-  <div class="admin-card-actions"><a class="admin-inline-link" href="/classrooms.html">Open classroom schedule controls and leave requests ↗</a></div>
 </div>
 
 <div class="card admin-ui-preference" id="adminUiPreferenceCard">
@@ -1504,7 +1493,7 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
     <div><b class="rank-helper">HELPER</b><span>Basic community support</span></div>
     <div><b class="rank-admin">ADMIN</b><span>Community moderation</span></div>
     <div><b class="rank-developer">DEVELOPER</b><span>Technical and project tools</span></div>
-    <div><b class="rank-tech">TECH</b><span>Can enter and inspect any classroom</span></div>
+    <div><b class="rank-tech">TECH</b><span>Technical diagnostics and support tools</span></div>
     <div><b class="rank-owner">OWNER</b><span>Full site control</span></div>
   </div>
   <div class="staff-manage-form">
@@ -1929,12 +1918,6 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 <div class="status" id="codeProjectStatus">Loading code projects...</div>
 <div id="codeProjects" class="admin-scroll-area"></div>
 </div>
-</div>
-<div class="card" id="classroomApprovalCard" style="display:none;margin:18px 0">
- <h2>🏫 Teacher verification</h2>
- <p class="admin-card-help">Owner-only teacher verification. Verify teacher accounts here. Student enrollment requests are handled directly by each classroom's teacher.</p>
- <div class="admin-card-actions"><span id="classroomApprovalStatus" class="status">Loading classroom requests…</span><button type="button" id="refreshClassroomApprovals">↻ Refresh</button></div>
- <h3 style="margin:18px 0 8px">Teacher verification requests</h3><div id="classroomTeacherApplications" class="admin-scroll-area"></div>
 </div>
 </div>
 
@@ -6055,52 +6038,6 @@ async function loadAdminActivityFlags() {
 }
 document.getElementById("refreshAdminActivityFlagsButton")?.addEventListener("click", loadAdminActivityFlags);
 
-async function setupWholeSchoolModeControl() {
-    const card = document.getElementById("wholeSchoolModeCard");
-    const toggle = document.getElementById("wholeSchoolModeToggle");
-    const status = document.getElementById("wholeSchoolModeStatus");
-    if (!card || !toggle || !status) return;
-    if (String(currentAdminRole || "").toLowerCase() !== "owner") {
-        card.hidden = true;
-        return;
-    }
-    try {
-        const { data, error } = await supabaseClient
-            .from("classroom_school_settings")
-            .select("whole_school_enabled")
-            .eq("singleton", true)
-            .maybeSingle();
-        if (error) throw error;
-        toggle.checked = data?.whole_school_enabled === true;
-        toggle.disabled = false;
-        status.textContent = toggle.checked
-            ? "Enabled · Whole School is the default home for everyone."
-            : "Off · Students use their approved class as usual.";
-    } catch (error) {
-        status.textContent = "Could not load the school setting: " + (error?.message || "Please refresh.");
-        console.error("Whole School Mode settings failed", error);
-    }
-    toggle.addEventListener("change", async () => {
-        const requested = toggle.checked;
-        toggle.disabled = true;
-        status.textContent = requested ? "Turning on Whole School Mode…" : "Turning off Whole School Mode…";
-        try {
-            const { data, error } = await supabaseClient.rpc("dh_set_whole_school_mode", { p_enabled: requested });
-            if (error) throw error;
-            toggle.checked = data === true;
-            status.textContent = toggle.checked
-                ? "Enabled · Whole School is now the default home for everyone."
-                : "Disabled · Students will need an approved class to use Class Chat.";
-        } catch (error) {
-            toggle.checked = !requested;
-            status.textContent = "Could not update the setting: " + (error?.message || "Please try again.");
-            console.error("Whole School Mode update failed", error);
-        } finally {
-            toggle.disabled = false;
-        }
-    });
-}
-
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -6241,7 +6178,7 @@ startAdminPanel();
   chatGamesDailyScheduleCard:"chat",
   communityGames:"content",dougHubMusicModerationCard:"content",dougTubeModerationCard:"content",dougHubCodeProjectsCard:"content",
   siteFeatureCard:"site",siteAnnouncementCard:"site",pageScheduleCard:"site",adminUiPreferenceCard:"site",
-  customBadgeManagerCard:"users",dougBaseAccessRequestsCard:"users",classroomApprovalCard:"users"
+  customBadgeManagerCard:"users",dougBaseAccessRequestsCard:"users"
  };
  function getCategory(card){
   if(categories[card.id])return categories[card.id];
@@ -6275,55 +6212,6 @@ startAdminPanel();
 })();
 </script>
 
-
-<script id="classroom-owner-approval-tools">
-(function(){
- "use strict";
- const card=document.getElementById("classroomApprovalCard");
- if(!card)return;
- const status=document.getElementById("classroomApprovalStatus");
- const teacherList=document.getElementById("classroomTeacherApplications");
- const esc=value=>typeof escapeHtml==="function"?escapeHtml(String(value??"")):String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- let started=false;
- async function load(){
-  if(typeof supabaseClient==="undefined"||!supabaseClient?.from||!currentAdminUser?.id)return;
-  status.textContent="Loading teacher requests…";
-  const {data:apps,error:appsError}=await supabaseClient.from("classroom_teacher_applications").select("id,user_id,message,created_at,assigned_grade").eq("status","pending").order("created_at",{ascending:true});
-  if(appsError){status.textContent="Could not load teacher requests: "+appsError.message;return;}
-  const rows=apps||[],ids=[...new Set(rows.map(x=>x.user_id))];
-  const {data:users,error:userError}=ids.length?await supabaseClient.from("profiles").select("id,username,account_type,teacher_verified").in("id",ids):{data:[],error:null};
-  if(userError){status.textContent="Could not load teacher names: "+userError.message;return;}
-  const names=Object.fromEntries((users||[]).map(x=>[x.id,x.username||"Unknown user"]));
-  teacherList.innerHTML=rows.length?rows.map(x=>'<div class="admin-list-item" style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin:8px 0;background:rgba(255,255,255,.025)"><strong>'+esc(names[x.user_id]||"Unknown user")+'</strong><div class="admin-card-help">'+esc(x.message||"No note provided")+' · Requested '+esc(new Date(x.created_at).toLocaleDateString())+'</div><label style="display:block;margin:10px 0 6px;font-size:11px;font-weight:800">Assign grade / class number</label><input type="number" min="1" max="9999" step="1" inputmode="numeric" placeholder="Enter class number (e.g. 6)" data-teacher-grade="'+esc(x.id)+'" style="width:100%;max-width:180px;padding:9px 10px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:#0c1022;color:#fff"><div style="display:flex;gap:8px;margin-top:9px"><button type="button" data-teacher-approve="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Approve & create class</button><button type="button" class="delete-button" data-teacher-reject="'+esc(x.id)+'" data-user="'+esc(x.user_id)+'">Reject</button></div></div>').join(""):'<div class="empty">No teacher requests are waiting.</div>';
-  status.textContent=rows.length+" teacher verification request(s) awaiting review.";
-  card.querySelectorAll("[data-teacher-approve]").forEach(button=>button.addEventListener("click",async()=>{
-   const id=button.dataset.teacherApprove;
-   const gradeInput=card.querySelector('[data-teacher-grade="'+id+'"]');
-   const grade=Number(gradeInput?.value);
-   if(!Number.isInteger(grade)||grade<1||grade>9999){status.textContent="Enter the class number you want to assign (1–9999) before approving.";gradeInput?.focus();return;}
-   button.disabled=true;status.textContent="Creating the teacher's class…";
-   const {data,error}=await supabaseClient.rpc("dh_approve_teacher_application",{p_application_id:id,p_grade:grade});
-   if(error){status.textContent="Teacher approval failed: "+error.message;button.disabled=false;return;}
-   status.textContent="Teacher approved and Class "+grade+" created.";
-   await load();
-  }));
-  card.querySelectorAll("[data-teacher-reject]").forEach(button=>button.addEventListener("click",async()=>{
-   button.disabled=true;const uid=button.dataset.user;
-   const {error:profileError}=await supabaseClient.from("profiles").update({teacher_verified:false}).eq("id",uid);
-   if(profileError){status.textContent="Could not update teacher verification: "+profileError.message;button.disabled=false;return;}
-   const {error}=await supabaseClient.from("classroom_teacher_applications").update({status:"rejected",reviewed_by:currentAdminUser.id,reviewed_at:new Date().toISOString()}).eq("id",button.dataset.teacherReject);
-   if(error){status.textContent=error.message;button.disabled=false;return;}await load();
-  }));
- }
- function start(){
-  if(started)return;
-  if(typeof currentAdminRole==="undefined"||String(currentAdminRole).toLowerCase()!=="owner")return;
-  started=true;card.style.display="block";load();
- }
- document.getElementById("refreshClassroomApprovals")?.addEventListener("click",load);
- const timer=setInterval(start,300);start();setTimeout(()=>clearInterval(timer),120000);
-})();
-</script>
 
 </body>
 </html>
