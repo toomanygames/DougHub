@@ -1455,6 +1455,14 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 
 <div id="adminArea" style="display:none;">
 
+<div class="card" id="wholeSchoolModeCard" style="margin-bottom:16px">
+  <h2>Whole School Mode</h2>
+  <p class="admin-card-help">When enabled, student accounts without an approved class are automatically placed in one shared Whole School class chat. Students who already belong to a class keep using their normal class chat.</p>
+  <label class="admin-toggle-line" for="wholeSchoolModeToggle"><input id="wholeSchoolModeToggle" type="checkbox" disabled> Enable Whole School Mode</label>
+  <div id="wholeSchoolModeStatus" class="status" aria-live="polite">Loading school setting…</div>
+</div>
+
+
 <div class="card" id="classroomScheduleShortcut">
   <h2>Classroom Schedule &amp; Student Exits</h2>
   <p class="admin-card-help">Manage school-day exceptions for student class exits. On half days or days off, allow students to leave at any time. The DougHub Owner can also review student removal requests.</p>
@@ -6047,6 +6055,52 @@ async function loadAdminActivityFlags() {
 }
 document.getElementById("refreshAdminActivityFlagsButton")?.addEventListener("click", loadAdminActivityFlags);
 
+async function setupWholeSchoolModeControl() {
+    const card = document.getElementById("wholeSchoolModeCard");
+    const toggle = document.getElementById("wholeSchoolModeToggle");
+    const status = document.getElementById("wholeSchoolModeStatus");
+    if (!card || !toggle || !status) return;
+    if (!["admin", "owner"].includes(String(currentAdminRole || "").toLowerCase())) {
+        card.hidden = true;
+        return;
+    }
+    try {
+        const { data, error } = await supabaseClient
+            .from("classroom_school_settings")
+            .select("whole_school_enabled")
+            .eq("singleton", true)
+            .maybeSingle();
+        if (error) throw error;
+        toggle.checked = data?.whole_school_enabled === true;
+        toggle.disabled = false;
+        status.textContent = toggle.checked
+            ? "Enabled · Students without an approved class use the Whole School chat."
+            : "Off · Students need to join an approved class as usual.";
+    } catch (error) {
+        status.textContent = "Could not load the school setting: " + (error?.message || "Please refresh.");
+        console.error("Whole School Mode settings failed", error);
+    }
+    toggle.addEventListener("change", async () => {
+        const requested = toggle.checked;
+        toggle.disabled = true;
+        status.textContent = requested ? "Turning on Whole School Mode…" : "Turning off Whole School Mode…";
+        try {
+            const { data, error } = await supabaseClient.rpc("dh_set_whole_school_mode", { p_enabled: requested });
+            if (error) throw error;
+            toggle.checked = data === true;
+            status.textContent = toggle.checked
+                ? "Enabled · Unassigned students are now routed to the Whole School chat."
+                : "Disabled · Students will need an approved class to use Class Chat.";
+        } catch (error) {
+            toggle.checked = !requested;
+            status.textContent = "Could not update the setting: " + (error?.message || "Please try again.");
+            console.error("Whole School Mode update failed", error);
+        } finally {
+            toggle.disabled = false;
+        }
+    });
+}
+
 /* =========================================
    START ADMIN PANEL
 ========================================= */
@@ -6069,6 +6123,7 @@ async function startAdminPanel() {
         return;
     }
 
+    await setupWholeSchoolModeControl();
     renderStaffManager();
     setupAdminQuickNav();
     setupAdminAccordions();
