@@ -109,7 +109,7 @@ async function boot(){
 async function openClass(id){
  currentClass=classes.find(c=>c.id===id);if(!currentClass)return;
  if(poll){clearInterval(poll);poll=null;}
- $("classSelect").value=currentClass.id;const isWholeSchool=currentClass.class_name==="Whole School";const scopeBadge=$("chatScopeBadge");if(scopeBadge)scopeBadge.textContent=isWholeSchool?"WHOLE SCHOOL":"CLASS ONLY";const gradeTitle=gradeLabel(currentClass.grade,currentClass);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=isWholeSchool?"Shared school chat for students who are not assigned to a class.":"Only members of this class can see these messages.";
+ $("classSelect").value=currentClass.id;const isWholeSchool=currentClass.class_name==="Whole School";const scopeBadge=$("chatScopeBadge");if(scopeBadge)scopeBadge.textContent=isWholeSchool?"WHOLE SCHOOL":"CLASS ONLY";const gradeTitle=gradeLabel(currentClass.grade,currentClass);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=isWholeSchool?"Shared school chat for people who are not assigned to a class.":"Only members of this class can see these messages.";
  $("classSubtitle").textContent=isWholeSchool?"This is the shared chat for people who are not assigned to a class.":currentClass.class_name+" · Talk with your classmates and teacher.";
  $("state").hidden=true;$("chatCard").hidden=false;say("");await loadMessages();poll=setInterval(loadMessages,5000);
 }
