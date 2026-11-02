@@ -25,7 +25,7 @@ async function addTeacherPanel(nav){
   const {data:p}=await db.from("profiles").select("account_type,teacher_verified,is_owner,staff_role").eq("id",user.id).maybeSingle();
   const role=String(p?.staff_role||"").toLowerCase(),owner=p?.is_owner===true||role==="owner";
   if(!owner&&!(p?.account_type==="teacher"&&p?.teacher_verified===true))return;
-  const a=document.createElement("a");a.href="//Classes/class-chat-teacher.html";a.dataset.dhTeacherPanel="1";
+  const a=document.createElement("a");a.href="/Classes/class-chat-teacher.html";a.dataset.dhTeacherPanel="1";
   const nativeNav=nav.classList.contains("nav");
   a.innerHTML='<span class="'+(nativeNav?"nav-icon":"dh-nav-icon")+'" aria-hidden="true">⚒</span><span class="'+(nativeNav?"nav-label":"dh-nav-label")+'">Teacher Panel</span>';
   nav.appendChild(a);
