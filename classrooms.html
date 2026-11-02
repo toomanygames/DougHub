@@ -42,7 +42,8 @@ async function boot(){
 }
 async function loadClasses(){
  let q=db.from("classroom_spaces").select("id,teacher_id,grade,class_name").order("grade").order("class_name");
- const {data,error}=await q;if(error)throw error;classes=data||[];\n const {data:schoolSettings}=await db.from("classroom_school_settings").select("whole_school_classroom_id").eq("singleton",true).maybeSingle();\n const wholeSchoolId=schoolSettings?.whole_school_classroom_id||null;
+ const {data,error}=await q;if(error)throw error;classes=data||[];
+ const {data:schoolSettings}=await db.from("classroom_school_settings").select("whole_school_classroom_id").eq("singleton",true).maybeSingle();\n const wholeSchoolId=schoolSettings?.whole_school_classroom_id||null;
  const teachers=[...new Set(classes.map(c=>c.teacher_id))];let names={};
  if(teachers.length){const {data:ps,error:pe}=await db.from("profiles").select("id,username").in("id",teachers);if(!pe)(ps||[]).forEach(p=>names[p.id]=p.username||"Teacher");}
  const isTeacher=profile.account_type==="teacher"&&profile.teacher_verified===true;const visible=classes.filter(c=>c.id!==wholeSchoolId);
