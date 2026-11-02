@@ -55,7 +55,7 @@
       return;
     }
     const role = String(profile?.staff_role || "").toLowerCase();
-    const adminPlus = ["admin","developer","owner"].includes(role) ||
+    const adminPlus = ["admin","developer","tech","owner"].includes(role) ||
       profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
     if (!user.email_confirmed_at) {
       showGate("Verify your email first", "Confirm your email address before using Community Chat, Class Chat, or direct messages.", true, db, user);
