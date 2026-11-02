@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<base href="/">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17233e">
+<title>DougHub Community & Class • DougHub</title>
+<link rel="icon" href="DougHub-classroom.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#172642;--navy2:#213657;--ink:#202b46;--muted:#78849c;--line:#e4eaf3;--paper:#fff;--blue:#4e8df5;--purple:#7257e8;--pink:#f36fae;--mint:#55cdb2;--orange:#ffad58;--bg:#f5f7fc}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:226px minmax(0,1fr)}
+.sidebar{background:linear-gradient(165deg,#1b2d4d,#12213b);color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:25px;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 7px;font:900 21px Nunito,sans-serif;letter-spacing:-.5px}.brand-icon{width:36px;height:36px;border-radius:11px;background:var(--blue);display:grid;place-items:center;font-size:19px}
+.nav{display:grid;gap:5px}.nav a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:8px;color:#d7e1f1;font-size:12px;font-weight:650;transition:.15s}.nav a:hover{background:#ffffff12;color:#fff}.nav a.current{background:#ffffff19;color:#fff;box-shadow:inset 3px 0 #76a9ff}.nav-icon{width:18px;text-align:center;color:#b8c9e2;font-size:15px}
+.sidebar-note{margin-top:auto;border:1px solid #405474;background:#ffffff08;border-radius:10px;padding:12px;color:#d8e2f1;font-size:10px;line-height:1.6}.sidebar-note strong{display:block;color:#fff;font-size:11px;margin-bottom:3px}
+.profile{display:flex;gap:9px;align-items:center;padding:4px 7px}.avatar{width:33px;height:33px;border-radius:50%;display:grid;place-items:center;background:#e7efff;color:#3977cf;font-size:10px;font-weight:900;flex-shrink:0}.profile strong{display:block;font-size:10px}.profile small{font-size:9px;color:#b9c9df}
+main{min-width:0}.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,3vw,34px);gap:14px}.crumb{font-size:11px;color:var(--muted)}.crumb strong{color:#304464}.top-actions{display:flex;gap:8px;align-items:center}.top-actions a{font-size:10px;color:#526a8d;font-weight:750;padding:8px 10px;border:1px solid var(--line);border-radius:7px}.top-actions a:hover{background:#f3f7fd}
+.content{max-width:1480px;margin:auto;padding:23px clamp(14px,2.5vw,30px) 42px}.welcome{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px}.eyebrow{font-size:9px;color:#6687b8;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.welcome h1{font:900 clamp(22px,3vw,30px) Nunito,sans-serif;letter-spacing:-.6px;margin:5px 0 3px}.welcome p{margin:0;color:var(--muted);font-size:11px}.grade-chip{background:#eaf1ff;color:#376fc2;border-radius:7px;padding:8px 11px;font-size:10px;font-weight:800;white-space:nowrap}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(275px,.8fr);gap:13px;align-items:start}.stack{display:grid;gap:13px;min-width:0}.panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px;min-width:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.panel h2{font-size:12px;margin:0;font-weight:850}.sub{font-size:9px;color:var(--muted);margin:4px 0 0;line-height:1.5}.link{font-size:9px;color:#477dce;font-weight:800;white-space:nowrap}.reminder{border:1px solid #f2e6d9;background:#fffaf4;border-left:3px solid var(--orange);border-radius:7px;padding:11px 12px}.reminder-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.tag{font-size:8px;font-weight:900;letter-spacing:.06em;color:#ad753c;background:#ffefd9;padding:4px 7px;border-radius:5px}.reminder strong{font-size:11px}.reminder p{font-size:10px;line-height:1.6;color:#596a84;margin:7px 0 0}.reminder-foot{font-size:8px;color:#9b8a78;margin-top:7px}
+.task-list{display:grid;gap:0}.task{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid #edf1f6}.task:first-child{border-top:0}.task-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);flex-shrink:0}.task strong{font-size:10px;display:block}.task small{font-size:8px;color:var(--muted)}.task time{margin-left:auto;font-size:8px;color:#8290a8;white-space:nowrap}
+.action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.action{border:1px solid var(--line);border-radius:8px;padding:11px 8px;background:#fff;text-align:left;display:flex;gap:9px;align-items:center;transition:.15s}.action:hover{border-color:#a8c3ed;background:#f8fbff}.action-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:#edf3ff;color:#4b7fc9;font-size:14px;flex-shrink:0}.action strong{display:block;font-size:9px}.action small{display:block;font-size:8px;color:var(--muted);margin-top:3px}
+.chat-preview{display:grid;gap:10px;max-height:220px;overflow:auto;padding:2px 0 9px}.message{display:flex;gap:8px;align-items:flex-start}.message .avatar{width:27px;height:27px}.message strong{font-size:9px}.message small{float:right;font-size:8px;color:#9aa6b9}.message p{margin:3px 0 0;color:#566985;font-size:9px;line-height:1.5}.chat-note{font-size:9px;color:var(--muted);line-height:1.5}.button{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:7px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:9px 12px}.button:hover{filter:brightness(.97)}.button.soft{background:#edf3ff;color:#3e70bd}.button.ghost{background:#fff;border:1px solid var(--line);color:#607492}
+.lookup{display:flex;gap:7px}.lookup input,.field input,.field textarea{width:100%;min-width:0;border:1px solid #dfe7f1;border-radius:7px;padding:9px 10px;font-size:10px;color:#263b5b;outline-color:#9dbcf0}.lookup-result{display:none;margin-top:9px;background:#f5f8fd;padding:10px;border-radius:7px;color:#526783;font-size:10px;line-height:1.6}.lookup-result strong{color:#253d62}.tab-buttons{display:flex;gap:6px;margin-bottom:10px}.tab-buttons button{border:1px solid var(--line);background:#fff;color:#6d7e98;border-radius:6px;padding:6px 9px;font-size:9px}.tab-buttons button.active{background:#edf3ff;border-color:#d5e3fa;color:#3e70bd;font-weight:800}
+.tool-output{margin-top:10px;padding:10px;border-radius:7px;background:#f5f8fd;color:#506580;font-size:10px;line-height:1.6;white-space:pre-wrap}.timer{font:900 32px Nunito;color:#6d5cda;text-align:center;padding:8px}.timer-controls{display:flex;justify-content:center;gap:7px}
+footer{text-align:center;color:#9aa5b8;font-size:9px;padding:20px}
+@media(max-width:900px){.app{grid-template-columns:68px minmax(0,1fr)}.sidebar{padding:18px 7px}.brand{justify-content:center;padding:0}.brand-name,.nav-label,.sidebar-note,.profile-info{display:none}.nav a{justify-content:center;padding:12px 4px;font-size:0}.nav-icon{font-size:16px}.profile{justify-content:center}.grid{grid-template-columns:1fr}.content{padding-top:17px}}
+@media(max-width:560px){.topbar{height:60px}.top-actions a:nth-child(2){display:none}.welcome{align-items:flex-start;flex-direction:column}.action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:12px}.content{padding-left:10px;padding-right:10px}}
+
+/* Compact nav pills: do not stretch across the sidebar */
+.nav{align-items:start}
+.nav a{width:max-content;max-width:100%;padding:9px 11px}
+@media(max-width:900px){.nav{align-items:stretch}.nav a{width:100%;max-width:100%;justify-content:center;padding:12px 4px}}
+/* Original anchored navy classroom sidebar */
+.sidebar{position:sticky;top:0;height:100dvh;align-self:start;overflow:hidden;}
+</style>
+<script src="classroom-unified.js?v=16" defer></script>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <a class="brand" href="/Classes/community-classroom.html"><span class="brand-icon">D</span><span class="brand-name">DougHub</span></a>
+ <nav class="nav" aria-label="DougHub sections">
+  <a class="current" href="/Classes/community-classroom.html"><span class="nav-icon">⌂</span><span class="nav-label">Home</span></a>
+  
+  <a href="/Classes/class-chat.html"><span class="nav-icon">◉</span><span class="nav-label">Class Chat</span></a>
+  <a href="/Classes/classroom-dms.html"><span class="nav-icon">◎</span><span class="nav-label">Chat & DMs</span></a>
+  <a href="/Classes/classroom-community.html"><span class="nav-icon">▤</span><span class="nav-label">Community</span></a>
+  <a href="/Classes/classroom-games.html"><span class="nav-icon">▦</span><span class="nav-label">Games</span></a>
+  <a href="/Classes/classroom-create.html"><span class="nav-icon">＋</span><span class="nav-label">Create</span></a>
+  <a href="/Classes/classroom-dictionary.html"><span class="nav-icon">▤</span><span class="nav-label">Dictionary</span></a>
+  <a href="/Classes/classroom-tools.html"><span class="nav-icon">⚒</span><span class="nav-label">Student Tools</span></a>
+  <a href="/Classes/classroom-settings.html"><span class="nav-icon">⚙</span><span class="nav-label">Settings</span></a>
+ </nav>
+ 
+ <div class="profile"><div class="avatar" id="userAvatar">DH</div><div class="profile-info"><strong id="userName">DougHub Student</strong><small>Student space</small></div></div>
+</aside>
+<main>
+ <header class="topbar"><div class="crumb">DougHub / <strong>Community & Class</strong></div><div class="top-actions"><a href="/Classes/classrooms.html">Choose Class</a><a href="/Classes/community-classroom.html">Open classroom</a><a href="/Classes/classroom-settings.html">Settings</a></div></header>
+ <div class="content">
+  <section class="welcome"><div><div class="eyebrow">YOUR SCHOOL DAY, YOUR COMMUNITY</div><h1>Welcome back<span id="welcomeName"></span>.</h1><p>A place to keep up with class, catch up with friends and explore DougHub.</p></div><div class="grade-chip" id="gradeChip">Your classroom</div></section>
+  <div class="grid">
+   <div class="stack">
+    <section class="panel"><div class="panel-head"><div><h2>Classroom reminder</h2><p class="sub">The latest update from your teacher.</p></div><a class="link" href="/Classes/community-classroom.html">Open class ↗</a></div><div class="reminder"><div class="reminder-top"><strong>Check your classroom</strong><span class="tag">CLASS UPDATE</span></div><p>Open your classroom to see your teacher's latest reminders, assignments and class information. Updates stay in the classroom so you always see the current version.</p><div class="reminder-foot">Your selected class · Teacher announcements</div></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Coming up in class</h2><p class="sub">Check the classroom for current due dates and reminders.</p></div><a class="link" href="/Classes/community-classroom.html">Assignments ↗</a></div><div class="task-list"><div class="task"><span class="task-dot"></span><div><strong>Teacher reminders</strong><small>Announcements and class updates</small></div><time>Classroom</time></div><div class="task"><span class="task-dot" style="background:var(--blue)"></span><div><strong>Class assignments</strong><small>What to work on next</small></div><time>Classroom</time></div><div class="task"><span class="task-dot" style="background:var(--mint)"></span><div><strong>Class resources</strong><small>Materials shared by your teacher</small></div><time>Classroom</time></div></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Student tools</h2><p class="sub">Quick tools for learning, planning and creating.</p></div><a class="link" href="#student-tools">All tools</a></div><div class="action-grid" id="student-tools">
+     <button class="action" data-tool="calculator"><span class="action-icon">▦</span><span><strong>Calculator</strong><small>Basic maths</small></span></button>
+     <button class="action" data-tool="notes"><span class="action-icon">▤</span><span><strong>Quick notes</strong><small>Write and save notes</small></span></button>
+     <button class="action" data-tool="timer"><span class="action-icon">◷</span><span><strong>Focus timer</strong><small>Study sessions</small></span></button>
+     <button class="action" data-tool="graph"><span class="action-icon">▥</span><span><strong>Graph helper</strong><small>Linear equations</small></span></button>
+     <button class="action" data-tool="mindmap"><span class="action-icon">✣</span><span><strong>Idea map</strong><small>Organize thoughts</small></span></button>
+     <button class="action" data-tool="grammar"><span class="action-icon">✓</span><span><strong>Writing check</strong><small>Basic sentence check</small></span></button>
+    </div><div class="tool-output" id="toolOutput" hidden>Select a tool to open it here.</div></section>
+    <section class="panel" id="dictionary"><div class="panel-head"><div><h2>Dictionary & thesaurus</h2><p class="sub">Look up meanings and find other ways to say it.</p></div><span class="tag">WORD STUDIO</span></div><div class="tab-buttons"><button class="active" data-wordtab="definition">Dictionary</button><button data-wordtab="synonyms">Thesaurus</button></div><form class="lookup" id="wordForm"><input id="wordInput" maxlength="60" placeholder="Search for a word…" required><button class="button" type="submit">Search</button></form><div class="lookup-result" id="wordResult" aria-live="polite"></div></section>
+   </div>
+   <div class="stack">
+    <section class="panel"><div class="panel-head"><div><h2>Class chat</h2><p class="sub">Talk with your classmates and teacher.</p></div><a class="link" href="/Classes/class-chat.html">Open chat ↗</a></div><div class="chat-preview"><div class="message"><div class="avatar">DH</div><div><strong>Class chat lives in your classroom</strong><p>Messages are shared with the students and teacher in your class. Open the real class chat to read and send messages.</p></div></div></div><a class="button" href="/Classes/class-chat.html">Go to class chat</a></section>
+    <section class="panel"><div class="panel-head"><div><h2>Direct messages</h2><p class="sub">Continue conversations with your friends.</p></div><a class="link" href="/Classes/classroom-dms.html">Open messages ↗</a></div><div class="message"><div class="avatar" style="background:#e9f6ef;color:#32815e">DM</div><div><strong>Your DougHub inbox</strong><p>Open Chat to see your conversations, find friends and send private messages.</p></div></div><a class="button soft" href="/Classes/classroom-dms.html">Open direct messages</a></section>
+    <section class="panel"><div class="panel-head"><div><h2>Explore DougHub</h2><p class="sub">There's more to do beyond class.</p></div></div><div class="task-list"><a class="task" href="/Classes/classroom-community.html"><span class="task-dot" style="background:var(--pink)"></span><div><strong>Community</strong><small>Meet people and join conversations</small></div><span class="link">Open ↗</span></a><a class="task" href="/Classes/classroom-games.html"><span class="task-dot" style="background:var(--orange)"></span><div><strong>Games</strong><small>Play DougHub games</small></div><span class="link">Open ↗</span></a><a class="task" href="/Classes/classroom-create.html"><span class="task-dot" style="background:var(--purple)"></span><div><strong>Create</strong><small>Build and share something</small></div><span class="link">Open ↗</span></a></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Focus timer</h2><p class="sub">Set aside a little time for one task.</p></div></div><div class="timer" id="timerDisplay">15:00</div><div class="timer-controls"><button class="button" id="timerStart">Start</button><button class="button ghost" id="timerReset">Reset</button></div><p class="sub" id="timerStatus" style="text-align:center;margin-top:9px">Ready when you are.</p></section>
+   </div>
+  </div>
+ </div>
+ <footer>DougHub · A community that fits into your school day and beyond.</footer>
+</main>
+</div>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);let wordMode="definition",savedNotes="",timerId=null,remaining=900;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function loadProfile(){
+ try{
+  const url="https://agsqdqcsmsppcdqxlppj.supabase.co",key="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+  let db=window.DougHubSupabaseClient;
+  if(!db&&window.supabase?.createClient)db=window.DougHubSupabaseClient=window.supabase.createClient(url,key);
+  if(!db)return;
+  const {data:{user}}=await db.auth.getUser();if(!user)return;
+  const {data:profile}=await db.from("profiles").select("username,avatar_url,account_type,is_owner,is_admin,is_developer,staff_role").eq("id",user.id).maybeSingle();
+  if(profile?.username){$("userName").textContent=profile.username;$("welcomeName").textContent=", "+profile.username;}
+  if(profile?.avatar_url)$("userAvatar").innerHTML='<img alt="" src="'+esc(profile.avatar_url)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+  const params=new URLSearchParams(location.search),selectedClass=params.get("class");
+  if(selectedClass){
+   const {data:room,error}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder").eq("id",selectedClass).maybeSingle();
+   if(error)throw error;
+   if(!room){location.replace("/Classes/classrooms.html");return;}
+   const role=String(profile?.staff_role||"").toLowerCase();
+   const isStaff=profile?.is_owner===true||profile?.is_admin===true||profile?.is_developer===true||["owner","admin","developer","tech"].includes(role);
+   let allowed=isStaff||room.teacher_id===user.id;
+   if(!allowed){const {data:membership,error:membershipError}=await db.from("classroom_enrollments").select("id").eq("classroom_id",room.id).eq("student_id",user.id).eq("status","approved").maybeSingle();if(membershipError)throw membershipError;allowed=!!membership;}
+   if(!allowed){location.replace("/Classes/classrooms.html");return;}
+   $("gradeChip").textContent=room.class_name==="Whole School"?"Whole School":"Class "+room.grade;
+   document.querySelector(".eyebrow").textContent=room.class_name==="Whole School"?"YOUR WHOLE SCHOOL CLASSROOM":"YOUR CLASSROOM";
+   document.querySelector(".welcome p").textContent=room.class_name==="Whole School"?"Your shared school-wide classroom home.":"Your classroom home for "+room.class_name+".";
+   const reminder=document.querySelector(".reminder p");if(reminder&&room.reminder)reminder.textContent=room.reminder;
+   document.querySelectorAll('a[href="/Classes/class-chat.html"]').forEach(a=>a.href="/Classes/class-chat.html?class="+encodeURIComponent(room.id));
+   return;
+  }
+  const {data:schoolSettings,error:settingsError}=await db.from("classroom_school_settings").select("whole_school_enabled").eq("singleton",true).maybeSingle();
+  if(settingsError)throw settingsError;
+  if(schoolSettings?.whole_school_enabled){
+   $("gradeChip").textContent="Whole School";
+   document.querySelector(".eyebrow").textContent="YOUR WHOLE SCHOOL CLASSROOM";
+   document.querySelector(".welcome p").textContent="Your shared classroom home for the whole school.";
+   const reminder=document.querySelector(".reminder p");if(reminder)reminder.textContent="Welcome to the whole-school classroom. Use the Class Chat to connect with everyone at school.";
+  }
+ }catch(e){console.warn("DougHub classroom profile unavailable",e);}
+}
+function showTool(type){const out=$("toolOutput");out.hidden=false;out.innerHTML="";const title={calculator:"Calculator",notes:"Quick notes",timer:"Focus timer",graph:"Graph helper",mindmap:"Idea map",grammar:"Writing check"}[type];const h=document.createElement("strong");h.textContent=title;out.append(h,document.createElement("br"));
+if(type==="calculator"){const input=document.createElement("input");input.placeholder="Example: (12 + 8) × 3";input.style.cssText="width:100%;padding:8px;margin-top:7px;border:1px solid #dfe7f1;border-radius:6px";const btn=document.createElement("button");btn.className="button";btn.style.marginTop="7px";btn.textContent="Calculate";const result=document.createElement("div");result.style.marginTop="7px";btn.onclick=()=>{const v=input.value;if(!/^[0-9+\-*/().%\s]+$/.test(v)){result.textContent="Use numbers and basic arithmetic operators.";return}try{const n=Function('"use strict";return ('+v+')')();result.textContent=Number.isFinite(n)?"Result: "+n:"That calculation is not valid."}catch{result.textContent="That calculation is not valid."}};out.append(input,btn,result)}
+if(type==="notes"){const area=document.createElement("textarea");area.rows=4;area.style.cssText="width:100%;margin-top:7px;padding:8px;border:1px solid #dfe7f1;border-radius:6px";area.placeholder="Write notes here…";area.value=savedNotes;const btn=document.createElement("button");btn.className="button";btn.style.marginTop="7px";btn.textContent="Save notes";btn.onclick=()=>{savedNotes=area.value;status.textContent="Notes saved in this browser session."};const status=document.createElement("div");status.style.marginTop="6px";out.append(area,btn,status)}
+if(type==="graph"){const input=document.createElement("input");input.placeholder="Enter y=2x+1";input.style.cssText="width:100%;margin-top:7px;padding:8px;border:1px solid #dfe7f1;border-radius:6px";const btn=document.createElement("button");btn.className="button";btn.style.marginTop="7px";btn.textContent="Calculate values";const result=document.createElement("div");result.style.marginTop="7px";btn.onclick=()=>{const m=input.value.match(/^y\s*=\s*(-?\d*\.?\d*)\s*x\s*([+-]\s*\d+\.?\d*)?$/i);if(!m){result.textContent="Enter a linear equation such as y=2x+1.";return}const a=m[1]===""||m[1]==="+"?1:m[1]==="-"?-1:Number(m[1]),b=Number((m[2]||"0").replace(/\s/g,""));result.textContent=[-2,-1,0,1,2].map(x=>"("+x+", "+(a*x+b)+")").join(" · ")};out.append(input,btn,result)}
+if(type==="mindmap"){const topic=document.createElement("input");topic.placeholder="Main topic";topic.style.cssText="width:100%;margin-top:7px;padding:8px;border:1px solid #dfe7f1;border-radius:6px";const area=document.createElement("textarea");area.rows=3;area.placeholder="One idea per line";area.style.cssText="width:100%;margin-top:7px;padding:8px;border:1px solid #dfe7f1;border-radius:6px";const btn=document.createElement("button");btn.className="button";btn.style.marginTop="7px";btn.textContent="Build idea list";const result=document.createElement("div");result.style.marginTop="7px";btn.onclick=()=>result.textContent=(topic.value||"Main topic")+"\\n"+area.value.split("\\n").filter(Boolean).map(x=>"↳ "+x).join("\\n");out.append(topic,area,btn,result)}
+if(type==="grammar"){const area=document.createElement("textarea");area.rows=3;area.placeholder="Write a sentence to check…";area.style.cssText="width:100%;margin-top:7px;padding:8px;border:1px solid #dfe7f1;border-radius:6px";const btn=document.createElement("button");btn.className="button";btn.style.marginTop="7px";btn.textContent="Check sentence";const result=document.createElement("div");result.style.marginTop="7px";btn.onclick=()=>{const s=area.value.trim();result.textContent=!s?"Enter a sentence first.":(s[0]===s[0].toUpperCase()?"Starts with a capital letter. ":"Consider capitalizing the first word. ")+(/[.!?]$/.test(s)?"Has ending punctuation.":"Consider adding ending punctuation.")+" This is a basic check, not a full grammar checker."};out.append(area,btn,result)}
+if(type==="timer"){out.append(document.createTextNode("Use the timer panel on the right."));$("timerDisplay").scrollIntoView({behavior:"smooth",block:"center"})}
+}
+document.querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>showTool(b.dataset.tool)));
+document.querySelectorAll("[data-wordtab]").forEach(b=>b.addEventListener("click",()=>{wordMode=b.dataset.wordtab;document.querySelectorAll("[data-wordtab]").forEach(x=>x.classList.toggle("active",x===b));$("wordInput").placeholder=wordMode==="definition"?"Search for a word…":"Find synonyms for a word…";$("wordResult").style.display="none"}));
+$("wordForm").addEventListener("submit",async e=>{e.preventDefault();const word=$("wordInput").value.trim();if(!word)return;const result=$("wordResult");result.style.display="block";result.textContent="Searching…";try{if(wordMode==="definition"){const res=await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(word));if(!res.ok)throw new Error("No definition found for that word.");const data=await res.json();const entry=data[0],meanings=(entry.meanings||[]).slice(0,3);result.innerHTML="<strong>"+esc(entry.word)+"</strong>"+meanings.map(m=>"<p><b>"+esc(m.partOfSpeech)+"</b><br>"+(m.definitions||[]).slice(0,2).map(d=>esc(d.definition)+(d.example?"<br><i>Example: "+esc(d.example)+"</i>":"")).join("<br>")).join("</p>")}else{const res=await fetch("https://api.datamuse.com/words?rel_syn="+encodeURIComponent(word)+"&max=18");if(!res.ok)throw new Error("The thesaurus service could not be reached.");const data=await res.json();result.innerHTML=data.length?"<strong>Words similar to "+esc(word)+":</strong><p>"+data.map(x=>esc(x.word)).join(" · ")+"</p>":"No synonyms found for that word."}}catch(err){result.textContent=err.message||"Search unavailable. Please try again."}});
+function updateTimer(){$("timerDisplay").textContent=String(Math.floor(remaining/60)).padStart(2,"0")+":"+String(remaining%60).padStart(2,"0")}
+$("timerStart").onclick=()=>{if(timerId){clearInterval(timerId);timerId=null;$("timerStart").textContent="Resume";$("timerStatus").textContent="Paused.";return}if(remaining<=0)remaining=900;$("timerStart").textContent="Pause";$("timerStatus").textContent="Focus time is running.";timerId=setInterval(()=>{remaining--;updateTimer();if(remaining<=0){clearInterval(timerId);timerId=null;$("timerStart").textContent="Start again";$("timerStatus").textContent="Focus session complete."}},1000)};
+$("timerReset").onclick=()=>{clearInterval(timerId);timerId=null;remaining=900;updateTimer();$("timerStart").textContent="Start";$("timerStatus").textContent="Ready when you are."};
+loadProfile();
+})();
+</script>
+</body>
+</html>

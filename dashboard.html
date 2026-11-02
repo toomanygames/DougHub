@@ -8,7 +8,7 @@
 <link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
-<script src="nav.js?v=20261101-class-join" defer></script>
+<script src="nav.js?v=20261102-chat-approval" defer></script>
 <script src="search-autofill-fix.js" defer></script>
 <style>
 :root{color-scheme:dark;--bg:#070812;--panel:#101225;--panel2:#14172e;--line:#ffffff12;--muted:#969ab7;--text:#f7f7ff;--indigo:#7778ff;--purple:#b16cff;--green:#7ce4ad}
@@ -250,7 +250,7 @@ async function loadDashboard(){
  if(profileResult.error)console.warn("Dashboard profile:",profileResult.error.message);
  const profile=profileResult.data||{},name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
  const {data:schoolSettings,error:schoolSettingsError}=await supabaseClient.from("classroom_school_settings").select("whole_school_enabled").eq("singleton",true).maybeSingle();
- if(!schoolSettingsError&&schoolSettings?.whole_school_enabled){location.replace("community-classroom.html?wholeSchool=1");return;}
+ if(!schoolSettingsError&&schoolSettings?.whole_school_enabled){location.replace("/Classes/community-classroom.html?wholeSchool=1");return;}
  document.body.style.visibility="visible";
  $("welcomeTitle").textContent="Welcome back, "+name; document.title="Home · DougHub";
  $("profileName").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed in";

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<base href="/">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050611">
+<title>Classroom Community • DougHub</title>
+<meta name="description" content="Discuss games, share projects, ask questions, and connect with the DougHub community.">
+<link rel="icon" href="DougHub-classroom.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="nav.js?v=20261030-no-class" defer></script>
+<script src="search-autofill-fix.js" defer></script>
+<style>
+:root{color-scheme:dark;--bg:#050611;--panel:#0d1127;--line:#ffffff14;--muted:#a0a1bb;--indigo:#6366f1;--purple:#a855f7;--text:#f8f7ff}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:100px}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 4% 0%,#312e8145,transparent 35%),radial-gradient(ellipse at 92% 9%,#701a7530,transparent 32%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+header{height:76px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,56px);background:#050611dc;border-bottom:1px solid var(--line);backdrop-filter:blur(20px)}header .logo{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:850;letter-spacing:-.6px;white-space:nowrap}header .logo-icon{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 26px #6366f14d;font-weight:950}
+main{width:min(1250px,calc(100% - 36px));margin:auto;padding:34px 0 58px}.hero{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:clamp(25px,4vw,43px);border:1px solid #ffffff1b;border-radius:25px;background:linear-gradient(145deg,#151a37f5,#0b0d1df5);box-shadow:0 30px 90px #0004}.hero:before{content:"";position:absolute;z-index:-1;right:-90px;top:-190px;width:420px;height:420px;border:1px solid #a5b4fc20;border-radius:50%;box-shadow:0 0 0 35px #a78bfa05,0 0 0 75px #a78bfa04}.hero-copy{max-width:760px}.eyebrow{display:flex;align-items:center;gap:9px;color:#c4b5fd;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:#86efac;box-shadow:0 0 13px #86efac}.hero h1{margin:15px 0 10px;font-size:clamp(34px,5vw,55px);line-height:1;letter-spacing:-.06em;font-weight:850}.gradient{background:linear-gradient(100deg,#a5b4fc,#d8b4fe 56%,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent}.hero p{max-width:650px;margin:0;color:#b4b5cc;font-size:14px;line-height:1.8}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;padding:0 15px;border:1px solid #ffffff17;border-radius:13px;background:#ffffff06;color:white;font-size:12px;font-weight:800;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}.button:hover{transform:translateY(-2px);border-color:#a78bfa70;background:#ffffff0d}.button.primary{border-color:transparent;background:linear-gradient(120deg,#6366f1,#a855f7);box-shadow:0 10px 30px #6366f133}.button.primary:hover{background:linear-gradient(120deg,#7477ff,#b367ff);box-shadow:0 14px 36px #6366f144}.hero-mark{width:105px;height:105px;flex:0 0 105px;display:grid;place-items:center;border:1px solid #a78bfa3a;border-radius:28px;background:linear-gradient(145deg,#6366f126,#a855f729);box-shadow:0 0 55px #8b5cf626}.hero-mark span{font-size:44px;font-weight:950;letter-spacing:-.08em;background:linear-gradient(135deg,#a5b4fc,#d8b4fe 65%,#67e8f9);background-clip:text;color:transparent}
+.layout{display:grid;grid-template-columns:225px minmax(0,1fr);gap:20px;align-items:start;margin-top:22px}.side,.panel{border:1px solid var(--line);border-radius:19px;background:linear-gradient(150deg,#10142bef,#090b19ed);backdrop-filter:blur(16px)}.side{position:sticky;top:94px;padding:14px}.side-title{padding:9px 10px;color:#777b9d;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.community-nav{display:grid;gap:5px}.community-choice{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:1px solid transparent;border-radius:11px;background:transparent;color:#b7b8d0;text-align:left;font-size:12px;font-weight:750;cursor:pointer;transition:.18s}.community-choice:hover{background:#ffffff09;color:white}.community-choice.active{color:white;border-color:#a78bfa38;background:linear-gradient(100deg,#6366f126,#a855f71b);box-shadow:inset 3px 0 #a78bfa}.community-letter{width:31px;height:31px;display:grid;place-items:center;flex:0 0 31px;border:1px solid #ffffff12;border-radius:10px;background:linear-gradient(135deg,#6366f126,#a855f71c);color:#d9d5ff;font-size:11px;font-weight:900}.side-note{margin-top:13px;padding:13px;border:1px solid #ffffff12;border-radius:13px;background:#ffffff04}.side-note strong{font-size:11px}.side-note p{margin:6px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+.feed{min-width:0}.feed-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:0 0 14px}.feed-head h2{margin:0;font-size:21px;letter-spacing:-.04em}.feed-head p{margin:6px 0 0;color:var(--muted);font-size:11px}.feed-controls{display:flex;gap:8px;align-items:center}.select,.search{min-height:40px;border:1px solid #ffffff17;border-radius:12px;background:#080a17;color:#e8e8fa;padding:0 12px;font-size:11px}.search{width:min(240px,100%)}.search:focus,.select:focus{border-color:#a78bfa80;outline:0;box-shadow:0 0 0 3px #8b5cf626}.compose{margin-bottom:14px;padding:17px;border:1px solid #a78bfa32;border-radius:17px;background:linear-gradient(110deg,#6366f115,#a855f70b)}.compose-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.compose-top strong{font-size:13px}.compose-top span{font-size:10px;color:var(--muted)}.form-grid{display:grid;grid-template-columns:1fr 180px;gap:9px}.field{width:100%;min-width:0;border:1px solid #ffffff17;border-radius:11px;background:#070916;color:white;padding:11px 12px;font-size:12px}.field::placeholder{color:#777b98}.field:focus{outline:0;border-color:#a78bfa80;box-shadow:0 0 0 3px #8b5cf622}.form-grid .full{grid-column:1/-1}.compose textarea{min-height:86px;resize:vertical;line-height:1.6}.compose-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.helper{color:#898baa;font-size:10px;line-height:1.5}.message{display:none;margin-bottom:12px;padding:11px 13px;border:1px solid #a78bfa38;border-radius:12px;background:#6366f112;color:#dcd8ff;font-size:11px;line-height:1.6}.message.show{display:block}
+.post-list{display:grid;gap:12px}.post{display:grid;grid-template-columns:53px minmax(0,1fr);gap:14px;padding:17px;border:1px solid #ffffff13;border-radius:17px;background:linear-gradient(145deg,#10142bef,#090b19ed);transition:border-color .18s,transform .18s,box-shadow .18s}.post:hover{border-color:#a78bfa35;box-shadow:0 15px 38px #0002}.vote-column{display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:3px}.vote{width:35px;height:32px;display:grid;place-items:center;border:1px solid #ffffff13;border-radius:10px;background:#ffffff05;color:#c8c8df;font-size:16px;cursor:pointer;transition:.16s}.vote:hover{border-color:#a78bfa65;color:white;background:#8b5cf61c}.vote.up.active{color:#c4b5fd;border-color:#a78bfa75;background:#8b5cf629}.vote.down.active{color:#fca5a5;border-color:#fb718555;background:#ef444418}.score{color:#d8d8ee;font-size:11px;font-weight:850;font-variant-numeric:tabular-nums}.post-content{min-width:0}.post-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#898baa;font-size:10px}.community-tag{padding:4px 7px;border:1px solid #a78bfa25;border-radius:7px;background:#8b5cf612;color:#d6c9ff;font-weight:800}.post h3{margin:10px 0 8px;font-size:17px;line-height:1.35;letter-spacing:-.025em;overflow-wrap:anywhere}.post-body{color:#c2c3d8;font-size:12px;line-height:1.75;overflow-wrap:anywhere;white-space:pre-wrap}.post-link{display:inline-block;margin-top:9px;color:#a5b4fc;font-size:11px;font-weight:800;overflow-wrap:anywhere}.post-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:11px;border-top:1px solid #ffffff0d}.text-button{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:8px;background:transparent;color:#a9abc6;padding:6px 8px;font-size:10px;font-weight:800;cursor:pointer}.text-button:hover{background:#ffffff0a;color:white}.text-button .mini{font-size:12px;color:#c4b5fd}.comments{display:none;margin-top:13px;padding-top:13px;border-top:1px solid #ffffff12}.comments.open{display:block}.comment-list{display:grid;gap:10px;margin-bottom:12px}.comment{padding:10px 12px;border-left:2px solid #8b5cf655;border-radius:0 10px 10px 0;background:#ffffff04}.comment-meta{margin-bottom:5px;color:#8587a5;font-size:10px}.comment-body{color:#c9c9dc;font-size:11px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}.comment-form{display:flex;gap:8px}.comment-form input{flex:1;min-width:0}.empty{padding:38px 18px;border:1px dashed #ffffff1b;border-radius:16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}.empty strong{display:block;margin-bottom:6px;color:#ecebff;font-size:14px}.loading{padding:30px;text-align:center;color:#a0a1bb;font-size:12px}.footer{padding:25px 0 0;color:#6f718d;text-align:center;font-size:10px}
+@media(max-width:900px){.layout{grid-template-columns:190px minmax(0,1fr);gap:13px}.side{padding:10px}.feed-controls{flex-wrap:wrap;justify-content:flex-end}.search{width:100%}.hero-mark{width:82px;height:82px;flex-basis:82px}.form-grid{grid-template-columns:1fr 150px}}
+@media(max-width:700px){main{width:calc(100% - 24px);padding-top:18px}.hero{padding:23px 19px;border-radius:19px}.hero h1{font-size:38px}.hero p{font-size:12px}.hero-mark{display:none}.layout{grid-template-columns:1fr}.side{position:static;overflow:hidden}.community-nav{display:flex;overflow-x:auto;padding-bottom:3px}.community-choice{width:auto;flex:0 0 auto;padding:7px 9px}.community-choice span:last-child{white-space:nowrap}.side-title,.side-note{display:none}.feed-head{align-items:flex-start;flex-direction:column}.feed-controls{width:100%;justify-content:stretch}.search{flex:1;width:auto}.select{max-width:140px}.post{grid-template-columns:40px minmax(0,1fr);gap:10px;padding:12px}.vote{width:31px;height:29px}.post h3{font-size:15px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.compose-footer{align-items:flex-start;flex-direction:column}.compose-footer .button{width:100%}.comment-form{flex-direction:column}.comment-form .button{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Shared DougHub atmosphere and crisp line icons instead of button glyphs. */
+html{background:#050611}
+body{background-color:#050611!important;background-image:
+radial-gradient(ellipse 75% 48% at 8% -8%,rgba(79,70,229,.22),transparent 70%),
+radial-gradient(ellipse 58% 42% at 100% 8%,rgba(147,51,234,.16),transparent 68%),
+radial-gradient(ellipse 65% 55% at 50% 110%,rgba(49,46,129,.17),transparent 72%),
+linear-gradient(rgba(165,180,252,.025) 1px,transparent 1px),
+linear-gradient(90deg,rgba(165,180,252,.025) 1px,transparent 1px),
+linear-gradient(180deg,#070817 0%,#050611 48%,#080715 100%)!important;
+background-size:auto,auto,auto,44px 44px,44px 44px,auto!important;background-attachment:fixed!important}
+header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+header .logo-icon{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 28px #6366f144}
+.hero{border-color:#ffffff12;background:linear-gradient(145deg,rgba(13,17,39,.88),rgba(8,10,25,.76));box-shadow:0 28px 80px #0003}
+.side,.post{background:linear-gradient(145deg,rgba(13,17,39,.88),rgba(7,9,22,.9));border-color:#ffffff12}
+.button{min-height:44px;border-radius:12px;font-size:12px}
+.button.primary{background:linear-gradient(120deg,#6366f1,#a855f7)}
+.button.primary:hover{background:linear-gradient(120deg,#7477ff,#b367ff)}
+.ui-icon{width:16px;height:16px;flex:0 0 auto;display:inline-block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.hero-actions .ui-icon{width:15px;height:15px}
+.vote-icon{width:17px;height:17px;stroke-width:2.2}
+.text-button .mini{width:15px;height:15px;color:#c4b5fd}
+.post-link{display:inline-flex;align-items:center;gap:7px}
+.post-actions .text-button{min-height:32px;border:1px solid transparent}
+.post-actions .text-button:hover{border-color:#ffffff10}
+.community-choice.active{background:linear-gradient(100deg,#6366f126,#a855f71b)}
+.field,.select,.search{background:rgba(4,6,17,.78);border-color:#ffffff15}
+.footer{color:#777995}
+@media(max-width:700px){header{padding-left:14px;padding-right:14px}.hero{background:linear-gradient(145deg,rgba(13,17,39,.92),rgba(8,10,25,.88))}}
+
+/* Larger, more readable forum layout; floating intro matches DougTools. */
+main{width:min(1380px,calc(100% - 48px));padding:44px 0 76px}
+.hero{display:block;overflow:visible;padding:10px 0 28px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important}
+.hero:before,.hero-mark{display:none!important}
+.hero-copy{max-width:980px}
+.eyebrow{font-size:12px;letter-spacing:.17em}
+.hero h1{font-size:clamp(42px,6vw,68px);margin:18px 0 14px}
+.hero p{max-width:780px;font-size:16px;line-height:1.85}
+.hero-actions{margin-top:26px;gap:12px}
+.button{min-height:49px;padding:0 19px;font-size:13px;border-radius:14px}
+.forum-stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.forum-stat{display:flex;align-items:baseline;gap:9px;padding:12px 16px;border:1px solid #ffffff12;border-radius:13px;background:rgba(13,17,39,.42)}
+.forum-stat strong{font-size:20px;letter-spacing:-.04em;color:#f5f3ff;font-variant-numeric:tabular-nums}
+.forum-stat span{font-size:12px;color:#a5a6c2}
+.layout{grid-template-columns:260px minmax(0,1fr);gap:24px;margin-top:14px}
+.side{padding:18px;border-radius:20px}
+.side-title{font-size:11px;padding:11px}
+.community-choice{font-size:14px;padding:12px;gap:12px}
+.community-letter{width:36px;height:36px;flex-basis:36px;border-radius:11px;font-size:12px}
+.side-note{padding:15px}
+.side-note strong{font-size:13px}
+.side-note p{font-size:12px;line-height:1.75}
+.feed-head{align-items:center;margin-bottom:18px}
+.feed-head h2{font-size:26px}
+.feed-head p{font-size:13px}
+.search,.select{min-height:46px;font-size:13px;padding:0 14px;border-radius:13px}
+.search{width:min(300px,100%)}
+.compose{padding:22px;margin-bottom:18px;border-radius:20px}
+.compose-top{margin-bottom:16px}
+.compose-top strong{font-size:16px}
+.compose-top span,.helper{font-size:12px}
+.form-grid{grid-template-columns:minmax(0,1fr) 220px;gap:12px}
+.field{padding:14px 15px;font-size:14px;border-radius:13px}
+.compose textarea{min-height:120px;line-height:1.75}
+.compose-footer{margin-top:14px}
+.post-list{gap:16px}
+.post{grid-template-columns:58px minmax(0,1fr);gap:17px;padding:22px;border-radius:20px}
+.vote-column{gap:8px}
+.vote{width:42px;height:39px;border-radius:12px}
+.score{font-size:13px}
+.post-meta{gap:9px;font-size:12px}
+.post h3{font-size:21px;margin:13px 0 10px}
+.post-body{font-size:14px;line-height:1.85}
+.post-link{font-size:13px;margin-top:12px}
+.post-actions{gap:10px;margin-top:17px;padding-top:14px}
+.text-button{font-size:12px;padding:8px 10px}
+.comments{margin-top:16px;padding-top:16px}
+.comment-list{gap:12px;margin-bottom:14px}
+.comment{padding:13px 15px}
+.comment-meta{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:12px}
+.comment-body{font-size:13px;line-height:1.8}
+.comment-form .field{min-height:45px}
+.empty{padding:48px 22px;font-size:14px}
+.empty strong{font-size:17px}
+.loading{padding:38px;font-size:14px}
+.user-avatar{position:relative;display:inline-grid;place-items:center;flex:0 0 auto;width:30px;height:30px;overflow:hidden;border:1px solid #a78bfa55;border-radius:50%;background:linear-gradient(135deg,#6366f133,#a855f733);color:#e4ddff;font-size:12px;font-weight:850}
+.user-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.avatar-fallback{position:relative;z-index:0}
+.post-avatar{width:31px;height:31px}
+.author-name{color:#e7e4ff;font-weight:750}
+.comment-avatar{width:27px;height:27px;margin-right:2px}
+@media(max-width:900px){main{width:calc(100% - 32px)}.layout{grid-template-columns:210px minmax(0,1fr);gap:16px}.post{padding:18px}.post h3{font-size:19px}.form-grid{grid-template-columns:1fr 180px}}
+@media(max-width:700px){main{width:calc(100% - 24px);padding-top:24px}.hero{padding:0 0 22px}.hero h1{font-size:clamp(37px,10vw,48px)}.hero p{font-size:14px}.forum-stats{gap:8px}.forum-stat{flex:1;min-width:calc(33.333% - 8px);display:flex;flex-direction:column;gap:3px;padding:10px}.forum-stat strong{font-size:18px}.forum-stat span{font-size:10px}.layout{grid-template-columns:1fr;gap:15px}.side{padding:12px}.community-choice{font-size:12px}.feed-head h2{font-size:23px}.compose{padding:16px}.post{grid-template-columns:38px minmax(0,1fr);gap:10px;padding:13px}.vote{width:31px;height:30px}.post h3{font-size:17px}.post-body{font-size:13px}.post-meta{font-size:10px}.post-avatar{width:25px;height:25px}.comment-avatar{width:24px;height:24px}.comment-meta{flex-wrap:wrap}.button{min-height:45px}}
+
+/* Community navigation: consistent illustrative line icons, never cramped initials. */
+main{width:min(1540px,calc(100% - 64px))}
+.layout{grid-template-columns:290px minmax(0,1fr);gap:28px}
+.community-choice{min-height:58px;gap:13px;padding:11px 12px;font-size:14px}
+.community-letter{width:42px;height:42px;flex:0 0 42px;border-radius:13px;background:linear-gradient(145deg,rgba(99,102,241,.2),rgba(168,85,247,.16));border-color:#a78bfa2b;box-shadow:inset 0 1px #ffffff0b}
+.community-icon{width:20px;height:20px;stroke:#c4b5fd;stroke-width:1.8}
+.community-choice.active .community-letter{background:linear-gradient(145deg,#6366f13b,#a855f72e);border-color:#a78bfa70;box-shadow:0 5px 20px #6366f11a}
+.community-choice.active .community-icon{stroke:#e5ddff}
+.feed-controls{flex:1;min-width:0}
+.feed-head{gap:22px}
+.search{flex:1;width:auto;min-width:170px}
+@media(min-width:1200px){.post-list{gap:18px}.post{padding:25px}.post h3{font-size:22px}.post-body{font-size:15px}.compose{padding:25px}.compose textarea{min-height:135px}}
+@media(max-width:900px){main{width:calc(100% - 32px)}.layout{grid-template-columns:235px minmax(0,1fr);gap:16px}.community-choice{min-height:49px;padding:8px}.community-letter{width:35px;height:35px;flex-basis:35px}.community-icon{width:18px;height:18px}}
+@media(max-width:700px){main{width:calc(100% - 24px)}.layout{grid-template-columns:1fr}.community-nav{gap:7px}.community-choice{min-height:43px}.community-letter{width:30px;height:30px;flex-basis:30px;border-radius:9px}.community-icon{width:16px;height:16px}.feed-controls{width:100%}}
+
+/* Final hero pass: open, centered homepage-style intro with no enclosing panel. */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;width:100%;padding:clamp(42px,6vw,78px) 0 42px;margin:0 auto;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;position:relative;isolation:isolate}
+.hero:after{content:"";position:absolute;z-index:-1;top:5%;left:50%;width:min(780px,90vw);height:290px;transform:translateX(-50%);pointer-events:none;background:radial-gradient(ellipse at center,rgba(99,102,241,.11),rgba(168,85,247,.055) 38%,transparent 72%);filter:blur(18px)}
+.hero-copy{display:flex;flex-direction:column;align-items:center;width:100%;max-width:1000px}
+.eyebrow{justify-content:center;gap:10px;color:#c4b5fd;font-size:11px;letter-spacing:.18em}
+.hero h1{max-width:100%;margin:22px 0 18px;font-size:clamp(46px,7.2vw,82px);line-height:.98;letter-spacing:-.07em;text-wrap:balance}
+.hero p{max-width:700px;margin:0 auto;color:#b4b5cc;font-size:clamp(15px,1.5vw,18px);line-height:1.85;text-wrap:pretty}
+.forum-stats{justify-content:center;gap:0;margin-top:30px;padding:0;border:0;background:transparent}
+.forum-stat{min-width:145px;justify-content:center;flex-direction:column;align-items:center;gap:5px;padding:4px 28px;border:0;border-right:1px solid #ffffff17;border-radius:0;background:transparent}
+.forum-stat:last-child{border-right:0}
+.forum-stat strong{font-size:25px;line-height:1.1;background:linear-gradient(100deg,#f5f3ff,#c4b5fd);background-clip:text;-webkit-background-clip:text;color:transparent}
+.forum-stat span{font-size:11px;letter-spacing:.035em;color:#9295b2}
+.hero-actions{justify-content:center;margin-top:30px;gap:12px}
+.hero-actions .button{min-height:48px;padding:0 20px}
+.layout{margin-top:18px}
+@media(max-width:700px){
+ .hero{padding:34px 0 28px}
+ .hero h1{font-size:clamp(40px,11vw,56px);margin:18px 0 14px}
+ .hero p{font-size:14px;line-height:1.8;padding:0 3px}
+ .forum-stats{width:100%;margin-top:24px}
+ .forum-stat{min-width:0;flex:1;padding:4px 8px}
+ .forum-stat strong{font-size:22px}
+ .forum-stat span{font-size:10px}
+ .hero-actions{width:100%;margin-top:25px}
+ .hero-actions .button{flex:1;padding:0 12px}
+ .layout{margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){.hero:after{filter:none}}
+
+/* Compact DougForum hero: tighter spacing, smaller stats and controls. */
+main{padding-top:24px;padding-bottom:52px}
+.hero{padding:24px 0 18px!important;gap:0!important}
+.hero:after{top:0!important;width:min(560px,82vw)!important;height:175px!important;filter:blur(12px)!important;opacity:.8}
+.hero-copy{max-width:820px!important}
+.eyebrow{font-size:10px!important;letter-spacing:.14em!important}
+.hero h1{font-size:clamp(34px,4.5vw,52px)!important;line-height:1.02!important;margin:12px 0 9px!important;letter-spacing:-.06em!important}
+.hero p{max-width:640px!important;font-size:14px!important;line-height:1.65!important}
+.forum-stats{margin-top:17px!important;gap:0!important}
+.forum-stat{min-width:112px!important;padding:3px 20px!important;gap:4px!important}
+.forum-stat strong{font-size:21px!important}
+.forum-stat span{font-size:10px!important}
+.hero-actions{margin-top:18px!important;gap:9px!important}
+.hero-actions .button,.button{min-height:40px!important;padding:0 15px!important;font-size:12px!important;border-radius:11px!important}
+.layout{margin-top:8px!important}
+@media(max-width:700px){
+ main{padding-top:16px!important;padding-bottom:38px!important}
+ .hero{padding:18px 0 15px!important}
+ .hero h1{font-size:clamp(32px,9vw,42px)!important;margin:10px 0 8px!important}
+ .hero p{font-size:13px!important;line-height:1.65!important}
+ .forum-stats{margin-top:14px!important}
+ .forum-stat{min-width:0!important;padding:3px 10px!important}
+ .forum-stat strong{font-size:18px!important}
+ .forum-stat span{font-size:9px!important}
+ .hero-actions{margin-top:15px!important;gap:8px!important}
+ .hero-actions .button,.button{min-height:38px!important;padding:0 12px!important;font-size:11px!important}
+ .layout{margin-top:6px!important}
+}
+
+
+/* Match the compact, open intro used by DougHub Games and index. */
+main{padding-top:18px!important;padding-bottom:48px!important}
+.hero{padding:16px 0 12px!important;margin:0!important;gap:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.hero:before,.hero:after,.hero-mark{display:none!important}
+.hero-copy{width:100%!important;max-width:900px!important}
+.eyebrow{font-size:10px!important;letter-spacing:.13em!important}
+.hero h1{font-size:clamp(32px,4vw,48px)!important;line-height:1.06!important;margin:8px 0 7px!important;letter-spacing:-.055em!important}
+.hero p{max-width:670px!important;font-size:13px!important;line-height:1.65!important}
+.forum-stats{justify-content:center!important;margin-top:12px!important;gap:0!important}
+.forum-stat{min-width:100px!important;padding:2px 16px!important;gap:3px!important;border:0!important;border-right:1px solid #ffffff17!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.forum-stat:last-child{border-right:0!important}
+.forum-stat strong{font-size:19px!important}
+.forum-stat span{font-size:10px!important}
+.hero-actions{justify-content:center!important;margin-top:13px!important;gap:8px!important}
+.hero-actions .button,.hero-actions a.button{min-height:37px!important;padding:0 13px!important;font-size:11px!important;border-radius:10px!important}
+.layout{margin-top:8px!important}
+/* Keep profile photos clean: show an initial only when no photo exists. */
+.user-avatar img{z-index:1!important}
+.user-avatar img:not([src=""]){background:transparent}
+.user-avatar:has(img) .avatar-fallback{display:none!important}
+@media(max-width:700px){
+ main{padding-top:12px!important;padding-bottom:34px!important}
+ .hero{padding:12px 0 10px!important}
+ .hero h1{font-size:clamp(30px,8.5vw,40px)!important;margin:7px 0!important}
+ .hero p{font-size:12px!important;line-height:1.6!important}
+ .forum-stats{margin-top:10px!important}
+ .forum-stat{min-width:0!important;flex:1!important;padding:2px 8px!important}
+ .forum-stat strong{font-size:17px!important}
+ .forum-stat span{font-size:9px!important}
+ .hero-actions{margin-top:11px!important}
+ .hero-actions .button,.hero-actions a.button{min-height:35px!important;padding:0 11px!important;font-size:10px!important}
+ .layout{margin-top:6px!important}
+}
+
+
+/* Wide, shallow index/Games-style forum banner. */
+main{padding-top:16px!important}
+.hero{width:100%!important;min-height:0!important;padding:18px 24px 16px!important;margin:0 0 8px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important;text-align:center!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.hero:before,.hero:after,.hero-mark{display:none!important}
+.hero-copy{width:100%!important;max-width:1120px!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.eyebrow{justify-content:center!important;margin:0!important;font-size:10px!important;letter-spacing:.15em!important}
+.hero h1{margin:7px 0 6px!important;font-size:clamp(30px,3.3vw,43px)!important;line-height:1.05!important;letter-spacing:-.055em!important}
+.hero p{max-width:850px!important;margin:0 auto!important;font-size:13px!important;line-height:1.55!important}
+.forum-stats{display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;gap:0!important;margin-top:11px!important;padding:0!important;border:0!important;background:transparent!important}
+.forum-stat{min-width:125px!important;display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:center!important;gap:8px!important;padding:2px 20px!important;border:0!important;border-right:1px solid #ffffff1c!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.forum-stat:last-child{border-right:0!important}
+.forum-stat strong{font-size:17px!important;line-height:1.1!important}
+.forum-stat span{font-size:10px!important;white-space:nowrap!important}
+.hero-actions{display:flex!important;justify-content:center!important;align-items:center!important;gap:8px!important;margin-top:12px!important}
+.hero-actions .button,.hero-actions a.button{min-height:35px!important;padding:0 13px!important;font-size:11px!important;border-radius:10px!important}
+.layout{margin-top:7px!important}
+@media(min-width:1000px){
+ .hero{padding-left:40px!important;padding-right:40px!important}
+ .hero p{max-width:950px!important}
+}
+@media(max-width:700px){
+ main{padding-top:10px!important}
+ .hero{padding:12px 0 10px!important}
+ .eyebrow{font-size:9px!important}
+ .hero h1{font-size:clamp(29px,7.5vw,38px)!important;margin:6px 0!important}
+ .hero p{font-size:12px!important;line-height:1.55!important}
+ .forum-stats{width:100%!important;margin-top:9px!important}
+ .forum-stat{min-width:0!important;flex:1!important;gap:5px!important;padding:2px 7px!important}
+ .forum-stat strong{font-size:16px!important}
+ .forum-stat span{font-size:9px!important}
+ .hero-actions{margin-top:10px!important}
+ .hero-actions .button,.hero-actions a.button{min-height:34px!important;padding:0 10px!important;font-size:10px!important}
+ .layout{margin-top:5px!important}
+}
+
+
+
+/* Compact the anchored community rail so its full contents fit without scrolling. */
+@media(min-width:901px){
+ .side{padding:9px!important}
+ .side-title{padding:5px 8px!important;font-size:9px!important}
+ .community-nav{gap:3px!important}
+ .community-choice{gap:7px!important;padding:6px 7px!important;font-size:11px!important;border-radius:9px!important}
+ .community-letter{width:26px!important;height:26px!important;flex-basis:26px!important;border-radius:8px!important;font-size:9px!important}
+ .side-note{margin-top:8px!important;padding:9px!important;border-radius:10px!important}
+ .side-note strong{font-size:10px!important}
+ .side-note p{margin-top:4px!important;font-size:9px!important;line-height:1.45!important}
+}
+/* Keep the community rail anchored while the discussion feed scrolls. */
+@media(min-width:901px){
+ .layout{grid-template-columns:225px minmax(0,1fr)!important}
+ .side{position:fixed!important;top:104px!important;left:0!important;width:225px!important;max-height:calc(100vh - 122px)!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;scrollbar-width:none!important;-ms-overflow-style:none!important;z-index:30!important;border-top-left-radius:0!important;border-bottom-left-radius:0!important}
+ .side::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+ .layout>.feed{grid-column:2!important;grid-column-start:2!important}
+}
+@media(max-width:900px){
+ .side{position:relative!important;top:auto!important;left:auto!important;width:auto!important;max-height:none!important;overflow:visible!important}
+}
+
+/* DougForum interactions: inline editing and staff moderation */
+.post,.comment{transition:border-color .18s,background .18s,transform .18s}
+.post:focus-within{border-color:#a78bfa40}
+.vote{position:relative;overflow:hidden}
+.vote:active{transform:scale(.92)}
+.vote.up.active{box-shadow:0 0 0 3px #a78bfa12,0 5px 18px #8b5cf620}
+.vote.down.active{box-shadow:0 0 0 3px #fb718512}
+.vote .vote-label{font-size:9px;font-weight:850;letter-spacing:.04em}
+.post-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:auto}
+.text-button.danger{color:#fca5a5}
+.text-button.staff-action{color:#c4b5fd;border:1px solid #a78bfa24;background:#8b5cf60d}
+.staff-chip{display:inline-flex;align-items:center;padding:3px 6px;border:1px solid #a78bfa2e;border-radius:6px;background:#8b5cf612;color:#c4b5fd;font-size:9px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.edit-post-form{display:grid;gap:9px;margin:12px 0;padding:14px;border:1px solid #a78bfa36;border-radius:13px;background:#080a18}
+.edit-post-form textarea{min-height:100px;resize:vertical}
+.edit-post-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.post-edit-status{font-size:11px;color:#a5b4fc}
+@media(max-width:700px){.post-tools{margin-left:0;width:100%}.edit-post-form{padding:10px}}
+
+</style><link rel="stylesheet" href="classroom.css"><style>body{background:radial-gradient(ellipse at 4% 0%,#c6c5ff88,transparent 32%),radial-gradient(ellipse at 92% 4%,#ffd2e388,transparent 28%),#f7f7ff;color:#172642}header{background:#ffffffdf;border-bottom:1px solid #e4eaf3}.logo{color:#172642}.logo-icon{background:linear-gradient(135deg,#4e8df5,#7257e8 62%,#d66dbb);box-shadow:0 8px 20px #7257e82b}.classroom-top-links a{background:#f0efff;color:#6555d2;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:900}</style>
+<link rel="stylesheet" href="classroom-unified.css?v=10"><script src="classroom-unified.js?v=16" defer></script>
+<style>
+.class-connection{margin:16px 0 26px;padding:22px;border:1px solid #ffffff16;border-radius:20px;background:linear-gradient(145deg,rgba(13,17,39,.9),rgba(8,10,25,.94));box-shadow:0 20px 55px #0002}
+.class-connection-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}
+.class-connection-kicker{color:#a5b4fc;font-size:10px;font-weight:900;letter-spacing:.16em}
+.class-connection-head h2{margin:7px 0 5px;color:#f8f7ff;font-size:23px;letter-spacing:-.04em}
+.class-connection-head p{margin:0;color:#a0a1bb;font-size:12px;line-height:1.6}
+.class-room-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
+.class-room-card{min-width:0;padding:15px;border:1px solid #ffffff14;border-radius:14px;background:#ffffff06}
+.class-room-card strong{display:block;color:#f4f5ff;font-size:13px}
+.class-room-card small{display:block;margin-top:5px;color:#9ea2c1;font-size:10px}
+.class-room-card p{min-height:30px;margin:9px 0;color:#b9bad0;font-size:11px;line-height:1.5}
+.class-room-card a{display:inline-flex;align-items:center;min-height:34px;padding:0 11px;border-radius:9px;background:#4e8df5;color:#fff;font-size:10px;font-weight:850}
+.class-room-empty{padding:18px;border:1px dashed #ffffff20;border-radius:13px;color:#a0a1bb;font-size:11px;line-height:1.7}
+.class-community-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.class-community-actions a{padding:8px 11px;border:1px solid #ffffff17;border-radius:9px;color:#c9d2ff;font-size:10px;font-weight:800}
+.class-community-actions a:hover{background:#ffffff0b}
+@media(max-width:700px){.class-connection{padding:16px}.class-connection-head{align-items:flex-start;flex-direction:column}.class-connection-head h2{font-size:20px}.class-room-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><a href="/Classes/community-classroom.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="classroom-top-links" aria-label="Classroom navigation"><a href="/Classes/community-classroom.html">Home</a><a href="/Classes/class-chat.html">Class Chat</a><a href="/Classes/classroom-dms.html">Chat &amp; DMs</a><a href="/Classes/classroom-community.html">Community</a><a href="/Classes/classroom-games.html">Games</a><a href="/Classes/classroom-create.html">Create</a><a href="/Classes/classroom-dictionary.html">Dictionary</a><a href="/Classes/classroom-tools.html">Student Tools</a><a href="/Classes/classroom-settings.html">Settings</a></nav></header>
+<main>
+<section class="hero">
+ <div class="hero-copy"><div class="eyebrow">YOUR CLASSROOM COMMUNITY</div><h1>Welcome to <span class="gradient">Class Community.</span></h1><p>Connect with the other classes, open your class chat, share ideas, and talk about what everyone is creating. Find your community and join the conversation.</p><div class="forum-stats" aria-label="Live forum activity"><div class="forum-stat"><strong id="statPosts">—</strong><span>Discussions</span></div><div class="forum-stat"><strong id="statCommunities">—</strong><span>Communities</span></div><div class="forum-stat"><strong id="statReplies">—</strong><span>Replies</span></div></div><div class="hero-actions"><button class="button primary" id="startPost"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Create a post</button><a class="button" href="/Classes/community-classroom.html"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6M9 12h12M3 5v14"/></svg>Back to Dashboard</a></div></div>
+ <div class="hero-mark" aria-hidden="true"><span>DF</span></div>
+</section>
+<section class="class-connection" id="classConnections">
+ <div class="class-connection-head"><div><span class="class-connection-kicker">YOUR CLASS SPACES</span><h2>All your classes, connected.</h2><p>Jump into a class conversation or see what your classmates are working on.</p></div><a class="button primary" href="/Classes/class-chat.html">Open Class Chat ↗</a></div>
+ <div class="class-room-grid" id="classRoomGrid"><div class="class-room-empty">Loading your class spaces…</div></div>
+ <div class="class-community-actions"><a href="/Classes/class-chat.html">Class chat</a><a href="/Classes/classroom-dms.html">Private messages</a><a href="/Classes/classroom-create.html">Create something</a><a href="/Classes/classroom-games.html">Class games</a></div>
+</section>
+<div class="layout">
+ <aside class="side" aria-label="Forum communities"><div class="side-title">Communities</div><div class="community-nav" id="communityNav"><button class="community-choice active" data-community="all"><span class="community-letter">ALL</span><span>All posts</span></button></div><div class="side-note"><strong>Keep it constructive</strong><p>Be kind, protect private information, and keep posts relevant to the selected community.</p></div></aside>
+ <section class="feed" id="feed">
+  <div class="feed-head"><div><h2 id="feedTitle">All posts</h2><p id="feedDescription">Ideas, questions, projects, and conversations from across the classroom.</p></div><div class="feed-controls"><input class="search" id="searchPosts" type="search" placeholder="Search posts..." autocomplete="off" spellcheck="false" aria-label="Search posts"><select class="select" id="sortPosts" aria-label="Sort posts"><option value="new">Newest</option><option value="top">Top voted</option></select></div></div>
+  <div class="message" id="statusMessage" role="status" aria-live="polite"></div>
+  <section class="compose" id="compose">
+   <div class="compose-top"><strong>Start a discussion</strong><span id="composeAccount">Sign in to post</span></div>
+   <form id="postForm">
+    <div class="form-grid"><input class="field" id="postTitle" maxlength="180" required placeholder="Give your post a clear title"><select class="field" id="postCommunity" required aria-label="Choose a community"></select><textarea class="field full" id="postBody" maxlength="12000" placeholder="What's on your mind? Add context, details, or a question."></textarea><input class="field full" id="postLink" type="url" maxlength="1500" placeholder="Optional link (https://...)"></div>
+    <div class="compose-footer"><span class="helper" id="postHelp">Posts are public. Don't share passwords or private information.</span><button class="button primary" type="submit" id="publishPost">Publish post</button></div>
+   </form>
+  </section>
+  <div class="post-list" id="postList"><div class="loading">Loading DougForum…</div></div>
+ </section>
+</div>
+<div class="footer">DougForum · Part of DougHub</div>
+</main>
+<script>
+"use strict";
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const $=id=>document.getElementById(id);
+let db=null,currentUser=null,currentProfile=null,communities=[],posts=[],commentCache=new Map(),activeCommunity="all",expandedComments=new Set(),editingPosts=new Set(),busy=false;
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function dateLabel(value){const d=new Date(value);if(!Number.isFinite(d.getTime()))return "Recently";return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:d.getFullYear()!==new Date().getFullYear()?"numeric":undefined})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});}
+function tell(message){const el=$("statusMessage");el.textContent=message;el.classList.add("show");}
+function clearMessage(){$("statusMessage").textContent="";$("statusMessage").classList.remove("show");}
+function getCommunity(id){return communities.find(c=>c.id===id)||{name:"Community",slug:"general"};}
+function staffRank(profile){const role=String(profile?.staff_role||"").toLowerCase();return ({none:0,helper:1,admin:2,developer:3,owner:4})[role]||((profile?.is_admin===true)?2:0);}
+function isAdminPlus(){return staffRank(currentProfile)>=2;}
+function isStaffProfile(profile){return staffRank(profile)>=2;}
+function canManagePost(post){return !!currentUser&&(currentUser.id===post.author_id||isAdminPlus());}
+function canDeleteComment(post,comment){return !!currentUser&&(isAdminPlus()||(!isStaffProfile(comment)&&(currentUser.id===comment.author_id||currentUser.id===post.author_id)));}
+function myVote(post){return (post.dougforum_votes||[]).find(v=>v.user_id===currentUser?.id)?.value||0;}
+function score(post){return (post.dougforum_votes||[]).reduce((n,v)=>n+Number(v.value||0),0);}
+function displayName(id){return postNames[id]||"DougHub member";}
+function avatarMarkup(url,name,extra=""){const safe=String(url||"");const valid=safe.startsWith("https://")||safe.startsWith("http://");const initial=esc(String(name||"D").trim().charAt(0).toUpperCase()||"D");return `<span class="user-avatar ${extra}">${valid?`<img src="${esc(safe)}" alt="" loading="lazy" onerror="this.remove()">`:""}<span class="avatar-fallback">${initial}</span></span>`;}
+let postNames={},postAvatars={},postStaff={};
+function communityIcon(name){
+ const n=String(name||"").toLowerCase();
+ let paths;
+ if(n==="all"||n.includes("all posts"))paths='<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>';
+ else if(/game|gaming|play/.test(n))paths='<path d="M6.5 9h11a4 4 0 0 1 3.8 5.2l-.7 2.3a2 2 0 0 1-3.3.9L14.5 15h-5l-2.8 2.4a2 2 0 0 1-3.3-.9l-.7-2.3A4 4 0 0 1 6.5 9Z"/><path d="M7 11v4M5 13h4M16.5 12h.01M18.5 14h.01"/>';
+ else if(/help|question|support/.test(n))paths='<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.4 1.6c-1.2 1.1-2 1.3-2 3M12 17h.01"/>';
+ else if(/project|showcase|creation|build|maker|code/.test(n))paths='<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>';
+ else if(/news|announcement|update/.test(n))paths='<path d="M4 11v2a2 2 0 0 0 2 2h2l7 4V5l-7 4H6a2 2 0 0 0-2 2Z"/><path d="m8 15 1.5 4M18 9a4 4 0 0 1 0 6"/>';
+ else if(/idea|suggest|feedback/.test(n))paths='<path d="M9 18h6M10 22h4M8.5 14.5A6 6 0 1 1 15.5 14.5c-.8.6-1.3 1.6-1.5 2.5h-4c-.2-.9-.7-1.9-1.5-2.5Z"/>';
+ else if(/music|song|audio/.test(n))paths='<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>';
+ else if(/art|design|draw/.test(n))paths='<path d="m12 19 7-7 2 2-7 7-3 1 1-3Z"/><path d="M18 13 11 6l-2-2-6 6 2 2M3 20h6"/>';
+ else if(/chat|general|discussion|community/.test(n))paths='<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2v-6.5a8.5 8.5 0 1 1 19-4Z"/><path d="M8 11h8M8 15h5"/>';
+ else paths='<path d="M12 3 14.8 8.7 21 9.6l-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>';
+ return '<svg class="ui-icon community-icon" viewBox="0 0 24 24" aria-hidden="true">'+paths+'</svg>';
+}
+function renderCommunities(){
+ const nav=$("communityNav");nav.innerHTML='<button class="community-choice '+(activeCommunity==="all"?"active":"")+'" data-community="all"><span class="community-letter">'+communityIcon("all")+'</span><span>All posts</span></button>'+communities.map(c=>'<button class="community-choice '+(activeCommunity===c.id?"active":"")+'" data-community="'+esc(c.id)+'"><span class="community-letter">'+communityIcon(c.slug+" "+c.name)+'</span><span>'+esc(c.name)+'</span></button>').join("");
+ const options=communities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");$("postCommunity").innerHTML=options;
+ if(activeCommunity!=="all"&&!communities.some(c=>c.id===activeCommunity))activeCommunity="all";
+ nav.querySelectorAll("[data-community]").forEach(b=>b.addEventListener("click",()=>{activeCommunity=b.dataset.community;renderCommunities();renderPosts();}));
+ const c=getCommunity(activeCommunity);$("feedTitle").textContent=activeCommunity==="all"?"All posts":c.name;$("feedDescription").textContent=activeCommunity==="all"?"Recent conversations from across DougHub.":c.description||"Posts shared with this community.";
+}
+function renderPosts(){
+ const query=$("searchPosts").value.trim().toLowerCase(),sort=$("sortPosts").value;
+ let rows=posts.filter(p=>(activeCommunity==="all"||p.community_id===activeCommunity)&&[p.title,p.body,p.authorName,getCommunity(p.community_id).name].some(v=>String(v||"").toLowerCase().includes(query)));
+ rows.sort((a,b)=>sort==="top"?(score(b)-score(a)||new Date(b.created_at)-new Date(a.created_at)):new Date(b.created_at)-new Date(a.created_at));
+ if(!rows.length){$("postList").innerHTML='<div class="empty"><strong>No posts found</strong>'+(query?"Try a different search.":"Be the first to start a conversation in this community.")+'</div>';return;}
+ $("postList").innerHTML=rows.map(p=>{
+  const c=getCommunity(p.community_id),vote=myVote(p),commentsOpen=expandedComments.has(p.id),comments=commentCache.get(p.id)||[],editing=editingPosts.has(p.id),adminMode=isAdminPlus(),canEdit=canManagePost(p);
+  const link=p.link_url&&/^https?:\/\//i.test(p.link_url)?'<a class="post-link" href="'+esc(p.link_url)+'" target="_blank" rel="noopener noreferrer">Open linked resource ↗</a>':"";
+  const authorStaff=postStaff[p.author_id]||null;
+  const editForm=editing?'<form class="edit-post-form" data-edit-post="'+esc(p.id)+'"><input class="field" name="title" maxlength="180" required aria-label="Post title" value="'+esc(p.title)+'"><textarea class="field" name="body" maxlength="12000" aria-label="Post text" placeholder="Post text">'+esc(p.body||"")+'</textarea><input class="field" name="link" type="url" maxlength="1500" aria-label="Optional link" placeholder="Optional link (https://…)" value="'+esc(p.link_url||"")+'"><div class="edit-post-actions"><button class="button" type="button" data-cancel-edit="'+esc(p.id)+'">Cancel</button><button class="button primary" type="submit">Save changes</button></div><span class="post-edit-status" role="status"></span></form>':"";
+  return '<article class="post" id="post-'+esc(p.id)+'"><div class="vote-column"><button class="vote up '+(vote===1?"active":"")+'" data-vote="1" data-post="'+esc(p.id)+'" aria-label="Upvote post" aria-pressed="'+(vote===1)+'" title="Upvote"><svg class="ui-icon vote-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><span class="score" aria-label="Score '+score(p)+'">'+score(p)+'</span><button class="vote down '+(vote===-1?"active":"")+'" data-vote="-1" data-post="'+esc(p.id)+'" aria-label="Downvote post" aria-pressed="'+(vote===-1)+'" title="Downvote"><svg class="ui-icon vote-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button></div><div class="post-content"><div class="post-meta">'+avatarMarkup(postAvatars[p.author_id],p.authorName,"post-avatar")+'<span class="community-tag">d/'+esc(c.slug)+'</span><span>Posted by <strong class="author-name">'+esc(p.authorName||"DougHub member")+'</strong></span>'+(isStaffProfile(authorStaff)?'<span class="staff-chip">'+esc(authorStaff?.staff_role&&authorStaff.staff_role!=="none"?authorStaff.staff_role:"Admin")+'</span>':"")+'<span>·</span><time>'+esc(dateLabel(p.created_at))+'</time>'+(p.updated_at&&new Date(p.updated_at)>new Date(p.created_at)?'<span class="staff-chip">Edited</span>':"")+'</div><h3>'+esc(p.title)+'</h3>'+(p.body?'<div class="post-body">'+esc(p.body)+'</div>':"")+link+editForm+'<div class="post-actions"><button class="text-button" data-comments="'+esc(p.id)+'" aria-expanded="'+commentsOpen+'"><svg class="ui-icon mini" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10h8M8 14h5"/><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-5.5A7.5 7.5 0 1 1 20 11.5Z"/></svg>'+(commentsOpen?"Hide comments":"Comments")+' ('+(p.commentCount||0)+')</button><span class="post-tools">'+(canEdit&&!editing?'<button class="text-button '+(adminMode&&currentUser.id!==p.author_id?'staff-action':'')+'" data-edit="'+esc(p.id)+'">'+(adminMode&&currentUser.id!==p.author_id?'Moderate / edit':'Edit post')+'</button>':"")+(canEdit?'<button class="text-button danger '+(adminMode&&currentUser.id!==p.author_id?'staff-action':'')+'" data-delete="'+esc(p.id)+'">'+(adminMode&&currentUser.id!==p.author_id?'Moderate / delete':'Delete post')+'</button>':"")+'</span></div><div class="comments '+(commentsOpen?"open":"")+'" id="comments-'+esc(p.id)+'"><div class="comment-list">'+(comments.length?comments.map(cm=>{
+   const canRemove=canDeleteComment(p,cm),staffComment=isStaffProfile(cm);
+   return '<div class="comment"><div class="comment-meta">'+avatarMarkup(cm.authorAvatar,cm.authorName,"comment-avatar")+'<strong>'+esc(cm.authorName||"DougHub member")+'</strong>'+(staffComment?'<span class="staff-chip">'+esc(cm.staff_role&&cm.staff_role!=="none"?cm.staff_role:"Admin")+'</span>':"")+'<span> · '+esc(dateLabel(cm.created_at))+'</span></div><div class="comment-body">'+esc(cm.body)+'</div>'+(canRemove?'<button class="text-button danger '+(adminMode&&currentUser.id!==cm.author_id?'staff-action':'')+'" data-delete-comment="'+esc(cm.id)+'">'+(adminMode&&currentUser.id!==cm.author_id?'Moderate / remove':'Remove comment')+'</button>':"")+'</div>';
+  }).join(""):'<div class="helper">No comments yet. Start the conversation.</div>')+'</div><form class="comment-form" data-comment-form="'+esc(p.id)+'"><input class="field" name="body" maxlength="5000" required placeholder="'+(currentUser?"Write a comment…":"Sign in to comment")+'" '+(!currentUser?"disabled":"")+'><button class="button" type="submit" '+(!currentUser?"disabled":"")+'>Reply</button></form></div></div></article>';
+ }).join("");
+ $("postList").querySelectorAll("[data-vote]").forEach(b=>b.addEventListener("click",()=>castVote(b.dataset.post,Number(b.dataset.vote))));
+ $("postList").querySelectorAll("[data-comments]").forEach(b=>b.addEventListener("click",()=>toggleComments(b.dataset.comments)));
+ $("postList").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>{editingPosts.add(b.dataset.edit);renderPosts();$("post-"+b.dataset.edit)?.querySelector('[name="title"]')?.focus();}));
+ $("postList").querySelectorAll("[data-cancel-edit]").forEach(b=>b.addEventListener("click",()=>{editingPosts.delete(b.dataset.cancelEdit);renderPosts();}));
+ $("postList").querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deletePost(b.dataset.delete)));
+ $("postList").querySelectorAll("[data-delete-comment]").forEach(b=>b.addEventListener("click",()=>deleteComment(b.dataset.deleteComment)));
+ $("postList").querySelectorAll("[data-comment-form]").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();submitComment(f.dataset.commentForm,new FormData(f).get("body"));}));
+ $("postList").querySelectorAll("[data-edit-post]").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const id=f.dataset.editPost;const p=posts.find(x=>x.id===id);if(!p||!canManagePost(p))return;const fd=new FormData(f),title=String(fd.get("title")||"").trim(),body=String(fd.get("body")||"").trim(),link=String(fd.get("link")||"").trim();if(title.length<3){tell("Use a title with at least 3 characters.");return;}if(link&&!/^https?:\/\//i.test(link)){tell("Links must start with https:// or http://.");return;}const save=f.querySelector('[type="submit"]');save.disabled=true;save.textContent="Saving…";try{const {error}=await db.from("dougforum_posts").update({title,body,link_url:link||null,updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;editingPosts.delete(id);await loadPosts();tell("Post updated.");}catch(err){tell("The post could not be updated. Check your permissions and try again.");console.error(err);}finally{save.disabled=false;}}));
+}
+
+async function loadClient(){
+ if(window.DougHubSupabaseClient)return window.DougHubSupabaseClient;
+ if(window.__dhNavClientPromise){const client=await window.__dhNavClientPromise;if(client)return client;}
+ if(!window.supabase)return null;
+ return window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+}
+async function loadCommunities(){
+ const {data,error}=await db.from("dougforum_communities").select("id,slug,name,description,created_at").order("name");
+ if(error)throw error;communities=data||[];renderCommunities();
+}
+async function loadPosts(){
+ const {data,error}=await db.from("dougforum_posts").select("id,community_id,author_id,title,body,link_url,created_at,updated_at,dougforum_votes(value,user_id),dougforum_comments(count)").order("created_at",{ascending:false}).limit(100);
+ if(error)throw error;
+ posts=(data||[]).map(p=>({...p,commentCount:p.dougforum_comments?.[0]?.count||0,authorName:""}));
+ const ids=[...new Set(posts.map(p=>p.author_id))];
+ if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username,avatar_url,staff_role,is_admin").in("id",ids);postNames={};postAvatars={};postStaff={};(profiles||[]).forEach(p=>{postNames[p.id]=p.username||"DougHub member";postAvatars[p.id]=p.avatar_url||"";postStaff[p.id]=p;});}
+ posts.forEach(p=>p.authorName=postNames[p.author_id]||"DougHub member");
+ $("statPosts").textContent=posts.length.toLocaleString();$("statCommunities").textContent=communities.length.toLocaleString();$("statReplies").textContent=posts.reduce((n,p)=>n+(p.commentCount||0),0).toLocaleString();
+ renderPosts();
+}
+async function loadComments(postId){
+ const {data,error}=await db.from("dougforum_comments").select("id,post_id,author_id,body,created_at").eq("post_id",postId).order("created_at",{ascending:true});
+ if(error)throw error;const rows=data||[],ids=[...new Set(rows.map(c=>c.author_id))],names={};
+ if(ids.length){const {data:profiles}=await db.from("profiles").select("id,username,avatar_url,staff_role,is_admin").in("id",ids);(profiles||[]).forEach(p=>{names[p.id]=p.username||"DougHub member";names[p.id+"__avatar"]=p.avatar_url||"";names[p.id+"__staff_role"]=p.staff_role||"";names[p.id+"__is_admin"]=p.is_admin===true?"true":"";});}
+ commentCache.set(postId,rows.map(c=>({...c,authorName:names[c.author_id]||"DougHub member",authorAvatar:names[c.author_id+"__avatar"]||"",staff_role:names[c.author_id+"__staff_role"]||"",is_admin:names[c.author_id+"__is_admin"]==="true"})));
+}
+async function toggleComments(id){
+ if(expandedComments.has(id)){expandedComments.delete(id);renderPosts();return;}
+ expandedComments.add(id);renderPosts();
+ try{await loadComments(id);renderPosts();}catch(e){tell("Comments couldn't be loaded. Please try again.");console.error(e);}
+}
+async function castVote(postId,value){
+ if(!currentUser){location.href="/log-in.html?redirect=/Classes/classroom-community.html";return;}
+ const p=posts.find(x=>x.id===postId);if(!p||busy)return;busy=true;
+ try{
+  const existing=(p.dougforum_votes||[]).find(v=>v.user_id===currentUser.id);
+  if(existing&&existing.value===value){const {error}=await db.from("dougforum_votes").delete().eq("post_id",postId).eq("user_id",currentUser.id);if(error)throw error;}
+  else{const {error}=await db.from("dougforum_votes").upsert({post_id:postId,user_id:currentUser.id,value},{onConflict:"post_id,user_id"});if(error)throw error;}
+  await loadPosts();
+ }catch(e){tell("Your vote could not be saved. Please try again.");console.error(e);}finally{busy=false;}
+}
+async function submitComment(postId,body){
+ if(!currentUser){location.href="/log-in.html?redirect=/Classes/classroom-community.html";return;}
+ const text=String(body||"").trim();if(!text)return;
+ try{const {error}=await db.from("dougforum_comments").insert({post_id:postId,author_id:currentUser.id,body:text});if(error)throw error;await loadComments(postId);await loadPosts();expandedComments.add(postId);renderPosts();tell("Comment posted.");}
+ catch(e){tell("Your comment could not be posted. Please try again.");console.error(e);}
+}
+async function deletePost(id){
+ const post=posts.find(p=>p.id===id);
+ if(!currentUser||!post||!canManagePost(post)||!confirm("Delete this post? This also deletes its comments and votes."))return;
+ try{
+  let q=db.from("dougforum_posts").delete().eq("id",id);
+  if(!isAdminPlus())q=q.eq("author_id",currentUser.id);
+  const {error}=await q;if(error)throw error;
+  posts=posts.filter(p=>p.id!==id);commentCache.delete(id);expandedComments.delete(id);editingPosts.delete(id);renderPosts();tell("Post deleted.");
+ }catch(e){tell("The post could not be deleted. Check your permissions and try again.");console.error(e);}
+}
+async function deleteComment(id){
+ if(!currentUser||!confirm("Remove this comment?"))return;
+ try{
+  const {data:target,error:findError}=await db.from("dougforum_comments").select("id,post_id,author_id").eq("id",id).maybeSingle();
+  if(findError)throw findError;if(!target)throw new Error("Comment not found");
+  const post=posts.find(p=>p.id===target.post_id);
+  if(!post)throw new Error("Post not found");
+  const cached=(commentCache.get(target.post_id)||[]).find(c=>c.id===id);
+  if(!cached||!canDeleteComment(post,cached))throw new Error("You cannot remove this comment.");
+  const {error}=await db.from("dougforum_comments").delete().eq("id",id);if(error)throw error;
+  for(const postId of expandedComments)await loadComments(postId);
+  await loadPosts();renderPosts();tell("Comment removed.");
+ }catch(e){tell("The comment could not be removed. The author may be DougHub staff, or you may not have permission.");console.error(e);}
+}
+$("postForm").addEventListener("submit",async e=>{
+ e.preventDefault();clearMessage();if(!currentUser){location.href="/log-in.html?redirect=/Classes/classroom-community.html";return;}if(busy)return;
+ const title=$("postTitle").value.trim(),body=$("postBody").value.trim(),link=$("postLink").value.trim(),communityId=$("postCommunity").value;
+ if(title.length<3){tell("Use a title with at least 3 characters.");return;}
+ if(link&&!/^https?:\/\//i.test(link)){tell("Links must start with https:// or http://.");return;}
+ busy=true;$("publishPost").disabled=true;$("publishPost").textContent="Publishing…";
+ try{const {error}=await db.from("dougforum_posts").insert({community_id:communityId,author_id:currentUser.id,title,body,link_url:link||null});if(error)throw error;$("postForm").reset();if(communities.length)$("postCommunity").value=activeCommunity!=="all"?activeCommunity:communities[0].id;await loadPosts();tell("Your post is live.");$("feed").scrollIntoView({behavior:"smooth",block:"start"});}
+ catch(e){tell("Your post could not be published. Check your connection and try again.");console.error(e);}
+ finally{busy=false;$("publishPost").disabled=false;$("publishPost").textContent="Publish post";}
+});
+$("searchPosts").addEventListener("input",renderPosts);$("sortPosts").addEventListener("change",renderPosts);
+$("startPost").addEventListener("click",()=>{$("compose").scrollIntoView({behavior:"smooth",block:"center"});$("postTitle").focus({preventScroll:true});});
+async function loadClassRooms(){
+ const box=$("classRoomGrid");if(!box)return;
+ if(!currentUser){box.innerHTML='<div class="class-room-empty">Log in to see your approved class spaces here. Your class chats and shared spaces will appear once you are enrolled.</div>';return;}
+ try{
+  const {data:profile}=await db.from("profiles").select("account_type,teacher_verified,is_owner,staff_role").eq("id",currentUser.id).maybeSingle();
+  const isTeacher=profile?.account_type==="teacher"&&profile?.teacher_verified===true;
+  const isOwner=profile?.is_owner===true||String(profile?.staff_role||"").toLowerCase()==="owner";
+  let spaces=[];
+  if(isTeacher||isOwner){
+   let q=db.from("classroom_spaces").select("id,class_name,grade,reminder,session_active,teacher_id").order("class_name");
+   if(!isOwner)q=q.eq("teacher_id",currentUser.id);
+   const {data,error}=await q;if(error)throw error;spaces=data||[];
+  }else{
+   const {data:enrollments,error}=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",currentUser.id).eq("status","approved");
+   if(error)throw error;
+   const ids=[...new Set((enrollments||[]).map(x=>x.classroom_id))];
+   if(ids.length){const {data,error:spaceError}=await db.from("classroom_spaces").select("id,class_name,grade,reminder,session_active").in("id",ids).order("class_name");if(spaceError)throw spaceError;spaces=data||[];}
+  }
+  if(!spaces.length){box.innerHTML='<div class="class-room-empty">No approved class spaces yet. Ask your teacher to approve your class enrollment. In the meantime, you can still share ideas and join the community discussions below.</div>';return;}
+  box.innerHTML=spaces.map(room=>'<article class="class-room-card"><strong>'+esc(room.class_name)+'</strong><small>Grade '+esc(room.grade)+' · '+(room.session_active?'Class available':'Class currently closed')+'</small><p>'+esc(room.reminder||"No class reminder right now.")+'</p><a href="/Classes/class-chat.html?class='+encodeURIComponent(room.id)+'">Open class chat ↗</a></article>').join("");
+ }catch(error){console.warn("Could not load classroom spaces",error);box.innerHTML='<div class="class-room-empty">Your class spaces could not load right now. You can still use the shared ideas and discussion feed below.</div>';}
+}
+(async function init(){
+ try{db=await loadClient();if(!db)throw new Error("Supabase client is unavailable");
+  const {data,error}=await db.auth.getSession();if(error)throw error;currentUser=data?.session?.user||null;
+  if(currentUser){const {data:profile}=await db.from("profiles").select("username,staff_role,is_admin").eq("id",currentUser.id).maybeSingle();currentProfile=profile;$("composeAccount").textContent="Posting as "+(profile?.username||currentUser.email?.split("@")[0]||"member");$("postHelp").textContent="Posts are public. Keep personal details private.";$("publishPost").textContent="Publish post";}
+  else{$("composeAccount").innerHTML='<a href="/log-in.html?redirect=/Classes/classroom-community.html" style="color:#c4b5fd;font-weight:800">Log in to post</a>';$("postHelp").textContent="You can browse freely. Log in to post, vote, or comment.";$("publishPost").textContent="Log in to post";}
+  await loadCommunities();await loadPosts();await loadClassRooms();
+ }catch(e){console.error("DougForum initialization failed:",e);$("postList").innerHTML='<div class="empty"><strong>DougForum could not connect</strong>Try refreshing the page. If this continues, the database permissions may need checking.</div>';tell("The forum could not load its data.");}
+})();
+</script>
+</body>
+</html>
