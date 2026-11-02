@@ -21,8 +21,8 @@ function apply(){
  .brand-icon,.brand-mark,.logo-icon,.dh-classroom-brand-mark,header .brand-icon,header .brand-mark{background:var(--classroom-accent)!important;background-image:none!important}
  .btn:not(.soft):not(.ghost),.button:not(.soft):not(.ghost),button.primary,.btn.primary,.send,.class-actions .btn:not(.soft),.top-actions .btn:not(.soft){background:var(--classroom-accent)!important;border-color:var(--classroom-accent)!important;color:#fff!important}
  .btn.soft,.button.soft,.btn.ghost,.button.ghost{background:var(--classroom-accent-soft)!important;border-color:color-mix(in srgb,var(--classroom-accent) 24%,transparent)!important;color:var(--classroom-accent)!important}
- button:not(.action):not(.switch):not(.soft):not(.ghost):not(.primary):not(.send):not([data-theme]):not(.tab-buttons button){accent-color:var(--classroom-accent)}
- .action:hover,.panel a.link:hover,.top-actions a:hover{border-color:var(--classroom-accent)!important}
+ button:not(.action):not(.switch):not(.soft):not(.ghost):not([data-theme]):not(.tab-buttons button){background:var(--classroom-accent)!important;border-color:var(--classroom-accent)!important;color:#fff!important;accent-color:var(--classroom-accent)}
+ .action{border-color:color-mix(in srgb,var(--classroom-accent) 25%,#e4eaf3)!important}.action:hover,.panel a.link:hover,.top-actions a:hover{border-color:var(--classroom-accent)!important}
   .action-icon{background:var(--classroom-accent-soft)!important;color:var(--classroom-accent)!important}
  .grade-chip{background:var(--classroom-accent-soft)!important;color:var(--classroom-accent)!important}
  .link,.eyebrow,.nav a.current .nav-icon{color:var(--classroom-accent)!important}
