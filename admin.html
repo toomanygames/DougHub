@@ -5316,6 +5316,8 @@ async function loadSiteAnnouncement() {
     if (error) { status.textContent = "Could not load event: " + error.message; return; }
     toggle.checked = !!data?.enabled;
     message.value = data?.message || "";
+    const prankToggle = document.getElementById("privacyPrankEnabled");
+    if (prankToggle) prankToggle.checked = !!data?.privacy_prank_enabled;
     status.textContent = toggle.checked ? "Banner is active." : "No active banner.";
 }
 async function saveSiteAnnouncement() {
