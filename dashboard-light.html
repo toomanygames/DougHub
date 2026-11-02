@@ -318,5 +318,22 @@ async function loadDashboardAnnouncement(){
 loadDashboardAnnouncement();
 loadDashboard().catch(error=>{console.error("Dashboard failed to initialize:",error);document.body.style.visibility="visible";$("welcomeTitle").textContent="Your DougHub home";if($("myCreations").textContent.includes("Loading"))$("myCreations").innerHTML='<div class="empty"><strong>Could not load dashboard data</strong>Please refresh to try again.</div>';if($("recentForumPosts").textContent.includes("Loading"))$("recentForumPosts").innerHTML='<div class="empty">Community activity could not load.</div>';});
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+ const style=document.createElement("style");
+ style.textContent=`
+ header .nav>a,header nav[aria-label="Main navigation"]>a{color:#475467!important}
+ header .nav>a:hover,header nav[aria-label="Main navigation"]>a:hover{background:#edf2ff!important;color:#182230!important}
+ header .nav>a.active,header .nav>a[aria-current="page"],header nav[aria-label="Main navigation"]>a.active{background:#edf2ff!important;color:#182230!important;border-color:#dce5f0!important}
+ .dh-shared-account .account-btn{color:#182230!important;background:#fff!important;border-color:#dfe5ee!important}
+ .dh-shared-account .account-menu{background:#fff!important;border-color:#dfe5ee!important;box-shadow:0 14px 35px #1f29371c!important}
+ .dh-shared-account .account-menu a,.dh-shared-account .account-menu button{color:#344054!important}
+ .dh-shared-account .account-menu a:hover,.dh-shared-account .account-menu button:hover{background:#f1f5fb!important;color:#182230!important}
+ `;
+ document.head.appendChild(style);
+});
+</script>
+
 </body>
 </html>
