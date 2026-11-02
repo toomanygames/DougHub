@@ -6,7 +6,7 @@
 <header class="top"><a class="brand" href="/dashboard.html">DougHub <span style="color:#4e8df5">Classes</span></a><div class="top-actions"><a class="btn soft" href="/dashboard.html">Normal DougHub</a><a class="btn soft" href="/community-classroom.html">Classroom Home</a></div></header>
 <section class="hero"><div class="eyebrow">YOUR CLASSROOMS</div><h1>Find your class.</h1><p>Request to join a class. Your teacher must approve your request before it becomes available in the Class navigation.</p></section>
 <div class="grid"><div>
-<section class="panel"><h2>Available classes</h2><p class="hint">Browse classrooms for grades 5–8 and request to join one.</p><div id="available" class="class-list"><div class="empty">Loading classes…</div></div><div id="browseStatus" class="status" role="status"></div></section>
+<section class="panel"><h2>Available classes</h2><p class="hint">Browse available classes and request to join one.</p><div id="available" class="class-list"><div class="empty">Loading classes…</div></div><div id="browseStatus" class="status" role="status"></div></section>
 <section class="panel"><h2>My classes</h2><p class="hint">Approved classes open directly from the Class link in the main DougHub navigation.</p><div id="mine" class="class-list"><div class="empty">Loading your classes…</div></div></section>
 </div><div>
 <section class="panel"><h2>My requests</h2><p class="hint">Requests stay pending until a teacher approves or rejects them.</p><div id="requests"><div class="empty">Loading requests…</div></div></section>
@@ -42,15 +42,15 @@ async function boot(){
 }
 async function loadClasses(){
  let q=db.from("classroom_spaces").select("id,teacher_id,grade,class_name").order("grade").order("class_name");
- const {data,error}=await q;if(error)throw error;classes=data||[];
+ const {data,error}=await q;if(error)throw error;classes=data||[];\n const {data:schoolSettings}=await db.from("classroom_school_settings").select("whole_school_classroom_id").eq("singleton",true).maybeSingle();\n const wholeSchoolId=schoolSettings?.whole_school_classroom_id||null;
  const teachers=[...new Set(classes.map(c=>c.teacher_id))];let names={};
  if(teachers.length){const {data:ps,error:pe}=await db.from("profiles").select("id,username").in("id",teachers);if(!pe)(ps||[]).forEach(p=>names[p.id]=p.username||"Teacher");}
- const isTeacher=profile.account_type==="teacher"&&profile.teacher_verified===true;const visible=classes.filter(c=>(Number(c.grade)>=5&&Number(c.grade)<=8)||owner()||tech()||(isTeacher&&c.teacher_id===user.id));
+ const isTeacher=profile.account_type==="teacher"&&profile.teacher_verified===true;const visible=classes.filter(c=>c.id!==wholeSchoolId);
  $("available").innerHTML=visible.length?visible.map(c=>{
   const e=enrollments.find(x=>x.classroom_id===c.id)||mine.find(x=>x.classroom_id===c.id);
   const state=e?.status==="approved"?"In your classes":e?.status==="pending"?"Request pending":e?.status==="rejected"?"Request declined":"";
   const privileged=owner()||tech()||(isTeacher&&c.teacher_id===user.id);const action=e?.status==="approved"||privileged?'<a class="btn soft" href="'+approvedClassHref(c.id)+'">Open class</a>':e?.status==="pending"?'<button class="btn soft" disabled>Pending</button>':'<button class="btn" data-join="'+esc(c.id)+'">Request to join</button>';
-  return '<article class="class-card"><div class="class-icon">'+esc(c.grade)+'</div><div class="class-info"><strong>'+esc(c.class_name||("Grade "+c.grade+" classroom"))+'</strong><small>Grade '+esc(c.grade)+' · Teacher: '+esc(names[c.teacher_id]||"Teacher")+(state?" · "+state:"")+'</small></div><div class="class-actions">'+action+'</div></article>';
+  return '<article class="class-card"><div class="class-icon">'+esc(c.grade)+'</div><div class="class-info"><strong>'+esc(c.class_name||("Class "+c.grade+" classroom"))+'</strong><small>Class '+esc(c.grade)+' · Teacher: '+esc(names[c.teacher_id]||"Teacher")+(state?" · "+state:"")+'</small></div><div class="class-actions">'+action+'</div></article>';
  }).join(""):'<div class="empty">No classes are available yet.</div>';
  $("available").querySelectorAll("[data-join]").forEach(b=>b.addEventListener("click",()=>joinClass(b.dataset.join,b)));
 }
@@ -63,7 +63,7 @@ async function loadMine(){
 async function loadRequests(){
  const {data,error}=await db.from("classroom_enrollments").select("id,classroom_id,status,created_at").eq("student_id",user.id).in("status",["pending","rejected"]).order("created_at",{ascending:false});if(error)throw error;enrollments=data||[];
  const ids=[...new Set(enrollments.map(x=>x.classroom_id))];let rows=[];if(ids.length){const {data:cs}=await db.from("classroom_spaces").select("id,class_name,grade").in("id",ids);rows=cs||[];}
- $("requests").innerHTML=enrollments.length?enrollments.map(e=>{const c=rows.find(x=>x.id===e.classroom_id)||{};return '<div class="request"><strong>'+esc(c.class_name||"Classroom")+'</strong><small>Grade '+esc(c.grade??"?")+' · '+esc(e.status)+'</small>'+(e.status==="rejected"?'<button class="btn" data-retry="'+esc(e.classroom_id)+'">Request again</button>':'')+'</div>'}).join(""):'<div class="empty">No pending requests.</div>';
+ $("requests").innerHTML=enrollments.length?enrollments.map(e=>{const c=rows.find(x=>x.id===e.classroom_id)||{};return '<div class="request"><strong>'+esc(c.class_name||"Classroom")+'</strong><small>Class '+esc(c.grade??"?")+' · '+esc(e.status)+'</small>'+(e.status==="rejected"?'<button class="btn" data-retry="'+esc(e.classroom_id)+'">Request again</button>':'')+'</div>'}).join(""):'<div class="empty">No pending requests.</div>';
  $("requests").querySelectorAll("[data-retry]").forEach(b=>b.addEventListener("click",()=>joinClass(b.dataset.retry,b)));
 }
 async function joinClass(id,b){
