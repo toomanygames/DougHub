@@ -26,7 +26,8 @@ async function addTeacherPanel(nav){
   const role=String(p?.staff_role||"").toLowerCase(),owner=p?.is_owner===true||role==="owner";
   if(!owner&&!(p?.account_type==="teacher"&&p?.teacher_verified===true))return;
   const a=document.createElement("a");a.href="/class-chat-teacher.html";a.dataset.dhTeacherPanel="1";
-  a.innerHTML='<span class="dh-nav-icon" aria-hidden="true">⚒</span><span class="dh-nav-label">Teacher Panel</span>';
+  const nativeNav=nav.classList.contains("nav");
+  a.innerHTML='<span class="'+(nativeNav?"nav-icon":"dh-nav-icon")+'" aria-hidden="true">⚒</span><span class="'+(nativeNav?"nav-label":"dh-nav-label")+'">Teacher Panel</span>';
   nav.appendChild(a);
  }catch(e){console.warn("Teacher panel navigation unavailable",e);}
 }
