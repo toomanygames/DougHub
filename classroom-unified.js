@@ -10,7 +10,7 @@ const items=[
  ["classroom-dictionary.html","Dictionary","▤"],
  ["classroom-tools.html","Student Tools","⚒"],
  ["classroom-settings.html","Settings","⚙"],
- ["../dashboard.html","Normal DougHub","↗"]
+ ["/dashboard.html","Normal DougHub","↗"]
 ];
 const path=(location.pathname.split("/").pop()||"community-classroom.html").toLowerCase();
 const css=`
