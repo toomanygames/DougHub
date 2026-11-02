@@ -8,9 +8,9 @@ body{color:var(--classroom-ink);font-family:"DM Sans",system-ui,sans-serif}
 .dh-classroom-nav{display:grid!important;grid-auto-rows:min-content!important;gap:5px!important;flex:none!important;min-height:0!important;overflow:hidden!important}
 .dh-classroom-nav a{display:flex!important;align-items:center!important;gap:12px!important;width:max-content!important;max-width:100%!important;min-height:0!important;padding:11px 12px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#d7e1f1!important;text-decoration:none!important;font-size:12px!important;font-weight:650!important;white-space:nowrap!important;box-shadow:none!important}
 .dh-classroom-nav a:hover{background:#ffffff12!important;color:#fff!important}
-.dh-classroom-nav a.active{background:#ffffff19!important;color:#fff!important;box-shadow:inset 3px 0 #76a9ff!important}
+.dh-classroom-nav a.active{background:#ffffff19!important;color:#fff!important;box-shadow:inset 3px 0 var(--classroom-accent,#76a9ff)!important}
 .dh-classroom-nav svg{display:none!important}
-.dh-classroom-nav .dh-nav-icon{width:18px!important;flex:0 0 18px!important;text-align:center!important;color:#b8c9e2!important;font-size:15px!important}
+.dh-classroom-nav .dh-nav-icon{width:18px!important;flex:0 0 18px!important;text-align:center!important;color:var(--classroom-accent,#b8c9e2)!important;font-size:15px!important}
 .dh-classroom-note{margin-top:auto!important;border:1px solid #405474!important;background:#ffffff08!important;border-radius:10px!important;padding:12px!important;color:#d8e2f1!important;font-size:10px!important;line-height:1.6!important}
 .dh-classroom-note strong{display:block!important;color:#fff!important;font-size:11px!important;margin-bottom:3px!important}
 .dh-classroom-profile{display:flex!important;gap:9px!important;align-items:center!important;padding:4px 7px!important;flex:none!important;color:#fff!important}
@@ -55,7 +55,7 @@ header .logo-icon,
 header .brand-mark,
 header .brand-icon,
 .dh-classroom-brand-mark{
- background:#4e8df5!important;
+ background:var(--classroom-accent,#4e8df5)!important;
  background-image:none!important;
  color:#fff!important;
  box-shadow:none!important;
