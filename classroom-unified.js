@@ -9,8 +9,7 @@ const items=[
  ["classroom-create.html","Create","＋"],
  ["classroom-dictionary.html","Dictionary","▤"],
  ["classroom-tools.html","Student Tools","⚒"],
- ["classroom-settings.html","Settings","⚙"],
- ["/dashboard.html","Normal DougHub","↗"]
+ ["classroom-settings.html","Settings","⚙"]
 ];
 const path=(location.pathname.split("/").pop()||"community-classroom.html").toLowerCase();
 const css=`
@@ -70,13 +69,12 @@ function mount(){
   native.querySelectorAll(".dh-classroom-student-label,.dh-sidebar-toggle").forEach(el=>el.remove());
   const oldLink=[...native.querySelectorAll("a")].find(a=>(a.querySelector(".nav-label")?.textContent||"").trim()==="My Class"||(a.textContent||"").trim()==="My Class");
   if(oldLink)oldLink.remove();
-  const nativeNav=native.querySelector(".nav");
-  if(nativeNav&&!nativeNav.querySelector('a[data-dh-normal-home]')){const back=document.createElement("a");back.href="/dashboard.html";back.dataset.dhNormalHome="true";back.innerHTML='<span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Normal DougHub</span>';nativeNav.prepend(back);}
+  const nativeBrand=native.querySelector(".brand");if(nativeBrand)nativeBrand.href="/dashboard.html";
   return;
  }
  if(document.querySelector(".dh-classroom-sidebar"))return;
  const aside=document.createElement("aside");aside.className="dh-classroom-sidebar";aside.setAttribute("aria-label","Classroom navigation");
- const brand=document.createElement("a");brand.className="dh-classroom-brand";brand.href="community-classroom.html";brand.innerHTML='<span class="dh-classroom-brand-mark">D</span><span class="dh-classroom-brand-name">DougHub</span>';
+ const brand=document.createElement("a");brand.className="dh-classroom-brand";brand.href="/dashboard.html";brand.innerHTML='<span class="dh-classroom-brand-mark">D</span><span class="dh-classroom-brand-name">DougHub</span>';
  const nav=document.createElement("nav");nav.className="dh-classroom-nav";nav.setAttribute("aria-label","Classroom pages");
  items.forEach(([href,label,glyph])=>{const a=document.createElement("a");a.href=href;a.innerHTML='<span class="dh-nav-icon" aria-hidden="true">'+glyph+'</span><span class="dh-nav-label">'+label+'</span>';if(path===href)a.classList.add("active");nav.append(a);});
  const profile=document.createElement("div");profile.className="dh-classroom-profile";profile.innerHTML='<span class="dh-classroom-avatar">DH</span><span class="dh-classroom-profile-copy"><strong>DougHub</strong><small>Classroom</small></span>';
