@@ -20,7 +20,7 @@
         .eq("id", user.id).maybeSingle();
       if (staffError) throw staffError;
       const role = String(staff?.staff_role || "").toLowerCase();
-      const allowed = ["admin","developer","owner"].includes(role) ||
+      const allowed = ["admin","developer","tech","owner"].includes(role) ||
         staff?.is_admin === true || staff?.is_developer === true || staff?.is_owner === true;
       if (!allowed) return;
 
