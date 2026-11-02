@@ -433,8 +433,8 @@
       // The database staff_role is authoritative. A stale is_admin flag must not
       // keep a demoted account's Admin Panel link visible.
       const storedRole = String(profile?.staff_role || "").trim().toLowerCase();
-      const staffRole = ["helper","admin","developer","owner"].includes(storedRole) ? storedRole : "none";
-      const staffRank = ({ none: 0, helper: 1, admin: 2, developer: 3, owner: 4 })[staffRole] || 0;
+      const staffRole = ["helper","admin","developer","tech","owner"].includes(storedRole) ? storedRole : "none";
+      const staffRank = ({ none: 0, helper: 1, admin: 2, developer: 3, tech: 4, owner: 5 })[staffRole] || 0;
       if (adminLink) {
         adminLink.style.display = staffRank >= 1 ? "" : "none";
         adminLink.href = "/admin.html";
