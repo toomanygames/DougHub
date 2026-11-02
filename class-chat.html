@@ -72,7 +72,7 @@ function linkifyMessage(value){
  return out;
 }
 function initials(name){return String(name||"?").trim().slice(0,1).toUpperCase();}
-function gradeLabel(grade){const n=Number(grade),lastTwo=n%100;const suffix=lastTwo>=11&&lastTwo<=13?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th");return n+suffix+" Grade Chat";}
+function gradeLabel(grade,room){if(room?.class_name==="Whole School")return "Whole School Chat";const n=Number(grade),lastTwo=n%100;const suffix=lastTwo>=11&&lastTwo<=13?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th");return n+suffix+" Grade Chat";}
 async function boot(){
  try{
   db=await C.client();const {data:{user:u},error}=await db.auth.getUser();
@@ -83,9 +83,18 @@ async function boot(){
   if(profile.avatar_url)$("userAvatar").innerHTML='<img alt="" src="'+C.esc(profile.avatar_url)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
   if(staff){const {data,error}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").order("grade").order("class_name");if(error)throw error;classes=data||[];}
   else if(profile.account_type==="teacher"){const {data,error}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("teacher_id",user.id).order("grade").order("class_name");if(error)throw error;classes=data||[];}
-  else if(profile.account_type==="student"){const {data,error}=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",user.id).eq("status","approved");if(error)throw error;const ids=[...new Set((data||[]).map(x=>x.classroom_id))];if(ids.length){const result=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").in("id",ids).order("grade").order("class_name");if(result.error)throw result.error;classes=result.data||[];}}
+  else if(profile.account_type==="student"){
+   const {data,error}=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",user.id).eq("status","approved");if(error)throw error;
+   const ids=[...new Set((data||[]).map(x=>x.classroom_id))];
+   if(ids.length){const result=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").in("id",ids).order("grade").order("class_name");if(result.error)throw result.error;classes=result.data||[];}
+   if(!classes.length){
+    const {data:wholeSchoolId,error:wholeSchoolError}=await db.rpc("dh_get_whole_school_classroom_id");
+    if(wholeSchoolError)throw wholeSchoolError;
+    if(wholeSchoolId){const {data:room,error:roomError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("id",wholeSchoolId).maybeSingle();if(roomError)throw roomError;if(room)classes=[room];}
+   }
+  }
   else{showState("Student or teacher account required","Choose Student or Teacher in Settings, then join a class or create one.");return;}
-  if(!classes.length){showState("No class chat available yet",profile.account_type==="teacher"?"Ask your teacher to set up a class chat for your classroom.":"Join a classroom and wait for its teacher to approve your request.");return;}
+  if(!classes.length){showState("No class chat available yet",profile.account_type==="teacher"?"Ask your teacher to set up a class chat for your classroom.":"Join a classroom and wait for its teacher to approve your request. If your school has enabled Whole School Mode, it will appear here automatically.");return;}
   $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
   $("classSelect").addEventListener("change",()=>openClass($("classSelect").value));
   const requestedClass=new URLSearchParams(location.search).get('class');
@@ -95,8 +104,8 @@ async function boot(){
 async function openClass(id){
  currentClass=classes.find(c=>c.id===id);if(!currentClass)return;
  if(poll){clearInterval(poll);poll=null;}
- $("classSelect").value=currentClass.id;const gradeTitle=gradeLabel(currentClass.grade);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=currentClass.class_name+" · Only members of this class can see these messages.";
- $("classSubtitle").textContent=currentClass.class_name+" · Talk with your classmates and teacher.";
+ $("classSelect").value=currentClass.id;const isWholeSchool=currentClass.class_name==="Whole School";const gradeTitle=gradeLabel(currentClass.grade,currentClass);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=isWholeSchool?"Shared school chat for students who are not assigned to a class.":"Only members of this class can see these messages.";
+ $("classSubtitle").textContent=isWholeSchool?"Everyone currently without an approved class is together here.":" "+currentClass.class_name+" · Talk with your classmates and teacher.";
  $("state").hidden=true;$("chatCard").hidden=false;say("");await loadMessages();poll=setInterval(loadMessages,5000);
 }
 async function loadMessages(){
