@@ -72,7 +72,7 @@ function linkifyMessage(value){
  return out;
 }
 function initials(name){return String(name||"?").trim().slice(0,1).toUpperCase();}
-function gradeLabel(grade,room){if(room?.class_name==="Whole School")return "Whole School Chat";const n=Number(grade),lastTwo=n%100;const suffix=lastTwo>=11&&lastTwo<=13?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th");return n+suffix+" Grade Chat";}
+function gradeLabel(grade,room){if(room?.class_name==="Whole School")return "Whole School Chat";return "Class "+Number(grade)+" Chat";}
 async function boot(){
  try{
   db=await C.client();const {data:{user:u},error}=await db.auth.getUser();
@@ -93,9 +93,14 @@ async function boot(){
     if(wholeSchoolId){const {data:room,error:roomError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("id",wholeSchoolId).maybeSingle();if(roomError)throw roomError;if(room)classes=[room];}
    }
   }
-  else{showState("Student or teacher account required","Choose Student or Teacher in Settings, then join a class or create one.");return;}
+  else{classes=[];}
+  if(!classes.length&&!staff){
+   const {data:wholeSchoolId,error:wholeSchoolError}=await db.rpc("dh_get_whole_school_classroom_id");
+   if(wholeSchoolError)throw wholeSchoolError;
+   if(wholeSchoolId){const {data:room,error:roomError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("id",wholeSchoolId).maybeSingle();if(roomError)throw roomError;if(room)classes=[room];}
+  }
   if(!classes.length){showState("No class chat available yet",profile.account_type==="teacher"?"Ask your teacher to set up a class chat for your classroom.":"Join a classroom and wait for its teacher to approve your request. If your school has enabled Whole School Mode, it will appear here automatically.");return;}
-  $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Grade "+c.grade+" · "+c.class_name)+'</option>').join("");
+  $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Class "+c.grade+" · "+c.class_name)+'</option>').join("");
   $("classSelect").addEventListener("change",()=>openClass($("classSelect").value));
   const requestedClass=new URLSearchParams(location.search).get('class');
   await openClass(classes.some(c=>c.id===requestedClass)?requestedClass:classes[0].id);
@@ -105,7 +110,7 @@ async function openClass(id){
  currentClass=classes.find(c=>c.id===id);if(!currentClass)return;
  if(poll){clearInterval(poll);poll=null;}
  $("classSelect").value=currentClass.id;const isWholeSchool=currentClass.class_name==="Whole School";const scopeBadge=$("chatScopeBadge");if(scopeBadge)scopeBadge.textContent=isWholeSchool?"WHOLE SCHOOL":"CLASS ONLY";const gradeTitle=gradeLabel(currentClass.grade,currentClass);$("classChatHeading").textContent=gradeTitle;$("roomTitle").textContent=gradeTitle;$("roomSub").textContent=isWholeSchool?"Shared school chat for students who are not assigned to a class.":"Only members of this class can see these messages.";
- $("classSubtitle").textContent=isWholeSchool?"Everyone currently without an approved class is together here.":currentClass.class_name+" · Talk with your classmates and teacher.";
+ $("classSubtitle").textContent=isWholeSchool?"This is the shared classroom chat for the whole school.":currentClass.class_name+" · Talk with your classmates and teacher.";
  $("state").hidden=true;$("chatCard").hidden=false;say("");await loadMessages();poll=setInterval(loadMessages,5000);
 }
 async function loadMessages(){
