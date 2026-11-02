@@ -12,6 +12,24 @@ const items=[
  ["classroom-settings.html","Settings","⚙"]
 ];
 const path=(location.pathname.split("/").pop()||"community-classroom.html").toLowerCase();
+if(!document.querySelector('script[data-dh-classroom-theme]')){
+ const themeScript=document.createElement("script");themeScript.src="/classroom-theme.js";themeScript.defer=true;themeScript.dataset.dhClassroomTheme="1";document.head.appendChild(themeScript);
+}
+async function addTeacherPanel(nav){
+ if(!nav||document.querySelector('a[href="class-chat-teacher.html"]'))return;
+ try{
+  let db=window.DougHubSupabaseClient;
+  if(!db&&window.supabase?.createClient)db=window.DougHubSupabaseClient=window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co","sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52");
+  if(!db)return;
+  const {data:{user}}=await db.auth.getUser();if(!user)return;
+  const {data:p}=await db.from("profiles").select("account_type,teacher_verified,is_owner,staff_role").eq("id",user.id).maybeSingle();
+  const role=String(p?.staff_role||"").toLowerCase(),owner=p?.is_owner===true||role==="owner";
+  if(!owner&&!(p?.account_type==="teacher"&&p?.teacher_verified===true))return;
+  const a=document.createElement("a");a.href="/class-chat-teacher.html";a.dataset.dhTeacherPanel="1";
+  a.innerHTML='<span class="dh-nav-icon" aria-hidden="true">⚒</span><span class="dh-nav-label">Teacher Panel</span>';
+  nav.appendChild(a);
+ }catch(e){console.warn("Teacher panel navigation unavailable",e);}
+}
 const css=`
 :root{--dh-classroom-sidebar-width:236px}
 html,body{min-height:100%;width:100%;max-width:100%;overflow-x:hidden}
@@ -70,6 +88,7 @@ function mount(){
   const oldLink=[...native.querySelectorAll("a")].find(a=>(a.querySelector(".nav-label")?.textContent||"").trim()==="My Class"||(a.textContent||"").trim()==="My Class");
   if(oldLink)oldLink.remove();
   const nativeBrand=native.querySelector(".brand");if(nativeBrand)nativeBrand.href="/dashboard.html";
+  addTeacherPanel(native.querySelector(".nav"));
   return;
  }
  if(document.querySelector(".dh-classroom-sidebar"))return;
@@ -77,6 +96,7 @@ function mount(){
  const brand=document.createElement("a");brand.className="dh-classroom-brand";brand.href="/dashboard.html";brand.innerHTML='<span class="dh-classroom-brand-mark">D</span><span class="dh-classroom-brand-name">DougHub</span>';
  const nav=document.createElement("nav");nav.className="dh-classroom-nav";nav.setAttribute("aria-label","Classroom pages");
  items.forEach(([href,label,glyph])=>{const a=document.createElement("a");a.href=href;a.innerHTML='<span class="dh-nav-icon" aria-hidden="true">'+glyph+'</span><span class="dh-nav-label">'+label+'</span>';if(path===href)a.classList.add("active");nav.append(a);});
+ addTeacherPanel(nav);
  const profile=document.createElement("div");profile.className="dh-classroom-profile";profile.innerHTML='<span class="dh-classroom-avatar">DH</span><span class="dh-classroom-profile-copy"><strong>DougHub</strong><small>Classroom</small></span>';
  aside.append(brand,nav,profile);document.body.prepend(aside);
 }
