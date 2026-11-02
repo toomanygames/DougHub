@@ -39,7 +39,7 @@ async function boot(){
   if(owner()||(profile.account_type==="teacher"&&profile.teacher_verified===true)){
    const actions=document.querySelector(".top-actions");
    if(actions&&!actions.querySelector('[data-teacher-panel-link]')){
-    const link=document.createElement("a");link.className="btn soft";link.href="//Classes/class-chat-teacher.html";link.textContent="Teacher Panel";link.dataset.teacherPanelLink="1";actions.append(link);
+    const link=document.createElement("a");link.className="btn soft";link.href="/Classes/class-chat-teacher.html";link.textContent="Teacher Panel";link.dataset.teacherPanelLink="1";actions.append(link);
    }
   }
   if(admin())await loadControl();
