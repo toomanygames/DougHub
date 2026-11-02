@@ -1,10 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f4f0e7">
-<meta name="description" content="Your DougHub home: pick up where you left off, make something, and find your people.">
+<meta name="theme-color" content="#050611">
 <title>Home • DougHub</title>
 <link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,191 +11,165 @@
 <script src="nav.js?v=20261102-chat-approval-records" defer></script>
 <script src="search-autofill-fix.js" defer></script>
 <style>
-:root{
- color-scheme:light;
- --paper:#f4f0e7;--paper-deep:#e9e2d4;--ink:#242720;--muted:#77796f;
- --line:#d8d2c5;--white:#fffdf8;--green:#315b45;--green-soft:#e2eadf;
- --orange:#c45c36;--orange-soft:#f5e4d9;--blue:#456c83;--blue-soft:#e3ebef;
- --yellow:#e8c56d;--shadow:0 12px 32px #332b1b0d;
-}
+:root{color-scheme:light;--dh-ink:#17242b;--dh-muted:#66757d;--dh-paper:#f3f6f7;--dh-white:#fff;--dh-line:#dce4e6;--dh-blue:#2463eb;--dh-coral:#f0644e;--dh-yellow:#ffd45b;--dh-lime:#c9ed68;--dh-teal:#54c7c5}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:90px}
-body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{visibility:hidden;margin:0;min-height:100vh;background:var(--dh-paper)!important;color:var(--dh-ink)!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}button{font:inherit}
-a:focus-visible,button:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
-.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 clamp(18px,4vw,58px);background:var(--white);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;letter-spacing:-.7px}
-.brand-mark{display:grid;place-items:center;width:34px;height:34px;background:var(--green);color:white;border-radius:9px;font-weight:950;font-size:17px}
-.topbar nav{display:flex;align-items:center;gap:8px}
-.dashboard-shell{width:min(1480px,100%);margin:auto;padding:30px clamp(16px,3.5vw,48px) 54px;display:grid;grid-template-columns:205px minmax(0,1fr);gap:36px;align-items:start}
-.rail{position:sticky;top:24px;align-self:start;padding:8px 0}
-.rail-heading{margin:0 0 12px;padding:0 12px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
-.rail-link{display:flex;align-items:center;gap:11px;min-height:43px;margin:3px 0;padding:0 12px;border-radius:9px;color:#5e6259;font-size:13px;font-weight:700;transition:background .15s,color .15s}
-.rail-link:hover{background:#e9e3d8;color:var(--ink)}
-.rail-link.active{background:var(--green);color:white}
-.rail-icon{display:grid;place-items:center;width:23px;height:23px;font-size:15px}
-.rail-divider{height:1px;background:var(--line);margin:20px 8px}
-.rail-note{margin-top:28px;padding:16px 14px;background:var(--green-soft);border-radius:10px}
-.rail-note strong{font-size:12px}
-.rail-note p{margin:6px 0 11px;color:#596b5c;font-size:11px;line-height:1.55}
-.rail-note a{font-size:11px;font-weight:850;color:var(--green)}
-.main{min-width:0}
-.date-line{display:flex;align-items:center;gap:9px;margin:0 0 17px;color:var(--muted);font-size:11px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
-.date-line:before{content:"";width:22px;height:2px;background:var(--orange)}
-.announcement{display:none;align-items:center;gap:12px;margin:0 0 18px;padding:13px 15px;border:1px solid #d9bd8c;background:#fbf3df;border-radius:9px}
-.announcement.show{display:flex}
-.announcement-mark{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:var(--yellow);font-weight:900}
-.announcement-copy{min-width:0;flex:1}
-.announcement-copy strong{display:block;margin-bottom:2px;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
-.announcement-copy p{margin:0;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
-.announcement button{width:29px;height:29px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
-.welcome{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);align-items:center;gap:20px;min-height:280px;padding:clamp(26px,4vw,46px);background:var(--green);color:#fffdf7;border-radius:13px;overflow:hidden}
-.welcome:after{content:"";position:absolute;width:310px;height:310px;right:-100px;top:-145px;border:1px solid #ffffff30;border-radius:50%;box-shadow:0 0 0 30px #ffffff0b,0 0 0 62px #ffffff08}
-.welcome-copy{position:relative;z-index:1}
-.welcome-kicker{display:flex;align-items:center;gap:8px;color:#d9e7d9;font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
-.welcome-kicker:before{content:"";width:7px;height:7px;background:var(--yellow);border-radius:50%}
-.welcome h1{max-width:630px;margin:17px 0 12px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(38px,5.4vw,66px);font-weight:500;line-height:.99;letter-spacing:-.045em}
-.welcome p{max-width:500px;margin:0;color:#e1e9de;font-size:14px;line-height:1.75}
-.welcome-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:23px}
-.action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1px solid transparent;border-radius:7px;background:var(--white);color:var(--ink);font-size:12px;font-weight:850;transition:transform .15s,background .15s}
-.action:hover{transform:translateY(-2px);background:#fff}
-.action.outline{border-color:#ffffff70;background:transparent;color:white}
-.action.outline:hover{background:#ffffff16}
-.welcome-art{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,94px);gap:12px;justify-content:center;transform:rotate(-4deg)}
-.art-tile{display:grid;place-items:center;width:94px;height:94px;border:1px solid #ffffff40;border-radius:13px;background:#ffffff18;box-shadow:0 8px 20px #172d2030}
-.art-tile:nth-child(2){transform:translateY(16px) rotate(7deg);background:#e8c56d}
-.art-tile:nth-child(3){transform:translateY(-4px) rotate(5deg);background:#e9e2d4}
-.art-tile:nth-child(4){transform:translateY(12px) rotate(-5deg);background:#e6a27f}
-.art-tile img{width:54px;height:54px;object-fit:contain}
-.section{margin-top:35px}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:14px}
-.section-kicker{margin:0 0 5px;color:var(--orange);font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
-.section-head h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(25px,3vw,34px);font-weight:500;letter-spacing:-.035em}
-.section-head>p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.stat{min-height:112px;padding:18px 19px;background:var(--white);border:1px solid var(--line);border-radius:10px}
-.stat-label{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px;font-weight:750}
-.stat-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--orange-soft);color:var(--orange);font-size:14px}
-.stat-value{margin-top:9px;font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1}
-.stat-foot{margin-top:6px;color:var(--muted);font-size:10px}
-.columns{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:13px}
-.panel{min-width:0;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 18px;border-bottom:1px solid var(--line)}
-.panel-head h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:21px;font-weight:500}
-.panel-head p{margin:4px 0 0;color:var(--muted);font-size:11px}
-.panel-link{color:var(--green);font-size:11px;font-weight:900;white-space:nowrap}
-.panel-body{padding:9px 18px}
-.item-list{display:grid}
-.list-item{display:flex;align-items:center;gap:11px;min-width:0;padding:12px 0;border-bottom:1px solid #eae5da}
-.list-item:last-child{border-bottom:0}
-.item-icon{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:950}
+a:focus-visible,button:focus-visible{outline:3px solid var(--dh-coral);outline-offset:3px}
+header{height:68px;position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 clamp(16px,4vw,54px);background:#fff!important;border-bottom:1px solid var(--dh-line)!important;box-shadow:0 2px 0 #17242b05}
+header .logo{display:flex;align-items:center;gap:10px;color:var(--dh-ink)!important;font-size:20px;font-weight:950;letter-spacing:-.8px;white-space:nowrap}
+header .logo-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--dh-blue)!important;color:#fff;box-shadow:3px 3px 0 var(--dh-yellow);font-weight:950}
+header .nav{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0}
+.dashboard-layout{width:min(1480px,100%);margin:auto;padding:24px clamp(14px,3vw,42px) 48px;display:grid;grid-template-columns:205px minmax(0,1fr);gap:28px;align-items:start}
+.dashboard-sidebar{position:sticky;top:88px;display:flex;flex-direction:column;gap:4px;min-height:calc(100vh - 110px);padding:8px 12px 10px 0;border-right:1px solid var(--dh-line)}
+.sidebar-label{padding:10px 11px 8px;color:#829098;font-size:10px;font-weight:950;letter-spacing:.15em;text-transform:uppercase}
+.sidebar-label-spaced{margin-top:17px}
+.dashboard-side-link{display:flex;align-items:center;gap:11px;min-height:43px;margin:0;padding:0 11px;border:1px solid transparent;border-radius:9px;color:#51616a;font-size:12px;font-weight:800;transition:background .16s,color .16s,transform .16s}
+.dashboard-side-link:hover{background:#fff;color:var(--dh-ink);transform:translateX(2px)}
+.dashboard-side-link.active{background:var(--dh-blue)!important;color:white!important;box-shadow:3px 3px 0 var(--dh-yellow)}
+.ds-icon{width:27px;height:27px;display:grid;place-items:center;flex:0 0 27px;border-radius:8px;background:#e8efff;color:var(--dh-blue);font-size:12px;font-weight:950}
+.dashboard-side-link.active .ds-icon{background:#ffffff24;color:#fff}
+.ds-arrow{margin-left:auto;color:#91a0a6}
+.dashboard-side-link.active .ds-arrow{color:#fff}
+.sidebar-settings{margin-top:auto}
+.dashboard-main{min-width:0}
+.dh-dashboard-announcement{display:none;align-items:center;gap:12px;margin:0 0 18px;padding:13px 15px;border:1px solid #e6c66a;border-radius:10px;background:#fff4ce;color:var(--dh-ink)}
+.dh-dashboard-announcement.show{display:flex}
+.dh-dashboard-announcement-mark{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:var(--dh-yellow);font-weight:950}
+.dh-dashboard-announcement-copy{min-width:0;flex:1}
+.dh-dashboard-announcement-label{margin:0 0 3px;color:#8b6612;font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase}
+.dh-dashboard-announcement-message{margin:0;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.dh-dashboard-announcement-close{width:30px;height:30px;border:1px solid #e7d49a;border-radius:8px;background:#fff9e9;color:#775d20;cursor:pointer}
+.dashboard-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);align-items:center;gap:20px;min-height:315px;margin:0 0 18px;padding:clamp(26px,4vw,48px);overflow:hidden;border:0;border-radius:18px;background:#2463eb!important;color:white;box-shadow:0 8px 0 #d8e2e7}
+.dashboard-hero:before{content:"";position:absolute;z-index:-1;width:380px;height:380px;right:10%;top:-240px;border:1px solid #ffffff35;border-radius:50%;box-shadow:0 0 0 32px #ffffff0c,0 0 0 65px #ffffff09}
+.dashboard-hero:after{content:"";position:absolute;z-index:-1;width:180px;height:180px;left:42%;bottom:-130px;border-radius:50%;background:var(--dh-teal);opacity:.9}
+.dashboard-hero-copy{position:relative;z-index:2}
+.dashboard-eyebrow{display:flex;align-items:center;gap:9px;color:#d9e7ff;font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+.dashboard-live-dot{width:8px;height:8px;border-radius:50%;background:var(--dh-lime);box-shadow:0 0 0 4px #c9ed6830}
+.dashboard-hero h1{max-width:650px;margin:18px 0 12px;color:#fff;font-size:clamp(38px,5.2vw,67px);font-weight:950;line-height:.98;letter-spacing:-.065em}
+.dashboard-hero-copy>p{max-width:510px;margin:0;color:#e2ebff;font-size:14px;line-height:1.75}
+.dashboard-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:23px}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1.5px solid #ffffff60;border-radius:8px;background:#ffffff12;color:white;font-size:11px;font-weight:950;cursor:pointer;transition:transform .16s,box-shadow .16s,background .16s}
+.button:hover{transform:translateY(-2px);background:#ffffff22}
+.button-primary{border-color:var(--dh-yellow)!important;background:var(--dh-yellow)!important;color:#24313a!important;box-shadow:3px 3px 0 #17242b}
+.button-primary:hover{background:#ffe08a!important}
+.dashboard-hero-art{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(90px,130px));gap:13px;justify-content:center;align-content:center;min-height:235px;transform:rotate(-4deg)}
+.hero-orbit{display:none}
+.hero-glass-card{display:contents}
+.hero-glass-top,.hero-glass-lines,.hero-glass-bottom{display:none}
+.hero-glass-icon{display:none}
+.hero-art-tile{position:relative;display:grid;place-items:center;aspect-ratio:1;border:2px solid #17242b;border-radius:17px;background:var(--dh-yellow);box-shadow:5px 6px 0 #17242b;transform:rotate(5deg);transition:transform .2s}
+.hero-art-tile:nth-child(2){background:var(--dh-coral);transform:translateY(14px) rotate(-7deg)}
+.hero-art-tile:nth-child(3){background:var(--dh-lime);transform:translateY(-6px) rotate(-5deg)}
+.hero-art-tile:nth-child(4){background:#fff;transform:translateY(9px) rotate(7deg)}
+.hero-art-tile img{width:68%;height:68%;object-fit:contain;filter:drop-shadow(2px 3px 0 #17242b20)}
+.hero-float-tag{position:absolute;right:-8px;bottom:1px;padding:9px 13px;border:2px solid var(--dh-ink);border-radius:8px;background:var(--dh-coral);color:white;font-size:10px;font-weight:950;box-shadow:3px 3px 0 var(--dh-ink);transform:rotate(3deg)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.stat{min-height:104px;padding:15px 17px;border:1px solid var(--dh-line);border-radius:12px;background:#fff;box-shadow:0 3px 0 #dfe7e8}
+.stat-top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#66757d;font-size:11px;font-weight:850}
+.stat-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;background:#e8efff;color:var(--dh-blue);font-size:13px;font-weight:950}
+.stat:nth-child(2) .stat-icon{background:#fff0e9;color:var(--dh-coral)}
+.stat-value{margin-top:9px;color:var(--dh-ink);font-size:31px;font-weight:950;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.stat-foot{margin-top:2px;color:#87949a;font-size:10px}
+.dashboard-columns{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(255px,.7fr);gap:14px;margin-top:18px;align-items:start}
+.panel{min-width:0;overflow:hidden;border:1px solid var(--dh-line);border-radius:12px;background:#fff;box-shadow:0 3px 0 #dfe7e8}
+.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 17px;border-bottom:1px solid var(--dh-line)}
+.panel-heading h2{margin:0;color:var(--dh-ink);font-size:15px;font-weight:950;letter-spacing:-.4px}
+.panel-heading p{margin:4px 0 0;color:#819097;font-size:10px;line-height:1.5}
+.text-link{color:var(--dh-blue);font-size:10px;font-weight:950;white-space:nowrap}
+.text-link:hover{color:var(--dh-coral)}
+.panel-body{padding:10px 13px}
+.item-list{display:grid;gap:4px}
+.list-item{display:flex;align-items:center;gap:10px;min-width:0;padding:10px;border:1px solid transparent;border-radius:9px;transition:background .16s,border-color .16s}
+.list-item:hover{border-color:#dce7ff;background:#f3f7ff}
+.item-icon{width:36px;height:36px;display:grid;place-items:center;flex:0 0 36px;border:1px solid #d9e5ff;border-radius:9px;background:#edf3ff;color:var(--dh-blue);font-size:9px;font-weight:950}
 .item-copy{min-width:0;flex:1}
-.item-copy strong,.item-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item-copy strong{font-size:12px}
-.item-copy small{margin-top:4px;color:var(--muted);font-size:10px}
-.item-arrow{color:var(--muted);font-size:15px}
-.empty{padding:23px 8px;color:var(--muted);font-size:12px;line-height:1.65}
-.empty strong{display:block;margin-bottom:5px;color:var(--ink);font-size:13px}
-.empty a{color:var(--green);font-weight:850}
-.account-body{padding:18px}
-.identity{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line)}
-.avatar{display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;border-radius:50%;background:var(--orange-soft);color:var(--orange);font-size:17px;font-weight:900;overflow:hidden}
+.item-copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dh-ink);font-size:11px;font-weight:900}
+.item-copy small{display:block;margin-top:4px;color:#829097;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arrow{color:#829097;font-size:14px}
+.empty{padding:23px 10px;color:#78878e;font-size:11px;line-height:1.7;text-align:center}
+.empty strong{display:block;margin-bottom:4px;color:var(--dh-ink);font-size:12px}
+.empty a{color:var(--dh-blue);font-weight:900}
+.account-body{padding:15px}
+.identity{display:flex;align-items:center;gap:11px;min-width:0}
+.avatar{width:44px;height:44px;display:grid;place-items:center;flex:0 0 44px;overflow:hidden;border:2px solid var(--dh-ink);border-radius:12px;background:var(--dh-yellow);color:var(--dh-ink);font-size:17px;font-weight:950}
 .avatar img{width:100%;height:100%;object-fit:cover}
-.identity-name{font-size:13px;font-weight:850}
-.identity-email{margin-top:4px;color:var(--muted);font-size:10px;overflow-wrap:anywhere}
-.details{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:15px 0}
-.detail span,.detail strong{display:block}
-.detail span{color:var(--muted);font-size:10px}
-.detail strong{margin-top:5px;font-size:12px}
-.account-actions{display:flex;flex-wrap:wrap;gap:8px}
-.small-action{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 11px;border:1px solid var(--line);border-radius:7px;color:var(--green);font-size:10px;font-weight:850}
-.small-action:hover{background:var(--green-soft)}
-.shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.shortcut{display:flex;flex-direction:column;align-items:flex-start;min-height:120px;padding:15px;background:var(--white);border:1px solid var(--line);border-radius:9px;transition:transform .15s,border-color .15s}
-.shortcut:hover{transform:translateY(-3px);border-color:#9ba994}
-.shortcut-art{display:grid;place-items:center;width:36px;height:36px;margin-bottom:11px;border-radius:8px;background:var(--green-soft)}
-.shortcut-art img{width:24px;height:24px}
-.shortcut strong{font-size:12px}
-.shortcut small{margin-top:4px;color:var(--muted);font-size:10px}
-footer{display:flex;justify-content:space-between;gap:12px;margin-top:35px;padding-top:17px;border-top:1px solid var(--line);color:var(--muted);font-size:10px}
-footer a{color:var(--green);font-weight:800}
-@media(max-width:980px){.dashboard-shell{grid-template-columns:170px minmax(0,1fr);gap:22px}.welcome{grid-template-columns:minmax(0,1fr) 190px}.welcome-art{grid-template-columns:repeat(2,78px)}.art-tile{width:78px;height:78px}.art-tile img{width:46px;height:46px}.shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){.topbar{height:60px;padding:0 16px}.dashboard-shell{display:block;padding:16px 14px 36px}.rail{position:static;display:flex;gap:4px;overflow-x:auto;padding:0 0 12px;margin-bottom:17px;border-bottom:1px solid var(--line)}.rail-heading,.rail-divider,.rail-note{display:none}.rail-link{flex:0 0 auto;min-height:37px;margin:0;padding:0 10px;font-size:11px}.rail-icon{width:19px}.welcome{grid-template-columns:1fr;min-height:0;padding:25px 22px}.welcome h1{font-size:clamp(39px,10vw,55px)}.welcome-art{grid-template-columns:repeat(4,1fr);gap:7px;margin-top:18px;transform:none}.art-tile,.art-tile:nth-child(n){width:auto;height:64px;transform:none}.art-tile img{width:39px;height:39px}.section{margin-top:27px}.columns{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.section-head>p{font-size:11px}}
-@media(max-width:390px){.stats{gap:8px}.stat{padding:14px}.stat-value{font-size:29px}.shortcuts{gap:8px}.shortcut{min-height:110px;padding:12px}footer{flex-direction:column}}
+.identity-name{color:var(--dh-ink);font-size:12px;font-weight:950;overflow-wrap:anywhere}
+.identity-email{margin-top:4px;color:#829097;font-size:10px;overflow-wrap:anywhere}
+.details{display:grid;gap:11px;margin-top:16px;padding-top:14px;border-top:1px solid var(--dh-line)}
+.detail{display:flex;justify-content:space-between;gap:12px;font-size:10px}
+.detail span{color:#829097}.detail strong{text-align:right;color:var(--dh-ink);font-size:10px}
+.account-buttons{display:flex;gap:8px;margin-top:15px}
+.account-buttons .button{flex:1;min-height:35px;border-color:var(--dh-line);background:#f5f8f9;color:var(--dh-ink);font-size:10px}
+.account-buttons .button:hover{background:#eaf1ff;border-color:#b9ceff}
+.quick-panel{margin-top:14px}
+.simple-shortcuts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:14px}
+.simple-shortcut{display:flex;flex-direction:column;align-items:flex-start;min-width:0;min-height:112px;padding:12px;border:1px solid var(--dh-line);border-radius:10px;background:#f8fafb;transition:transform .16s,border-color .16s,box-shadow .16s}
+.simple-shortcut:hover{transform:translateY(-3px);border-color:#9cb8fa;box-shadow:0 4px 0 #dce7ff}
+.simple-shortcut>span{display:grid;place-items:center;width:34px;height:34px;margin-bottom:11px;border:1.5px solid var(--dh-ink);border-radius:9px;background:var(--dh-yellow);color:var(--dh-ink);font-size:13px;font-weight:950}
+.simple-shortcut:nth-child(2)>span{background:#c9ed68}
+.simple-shortcut:nth-child(3)>span{background:#f8a38f}
+.simple-shortcut:nth-child(4)>span{background:#a8e3e3}
+.simple-shortcut:nth-child(5)>span{background:#b9ccff}
+.simple-shortcut:nth-child(6)>span{background:#f6d5a2}
+.simple-shortcut strong{overflow:hidden;max-width:100%;color:var(--dh-ink);font-size:10px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
+.simple-shortcut small{margin-top:4px;color:#87949a;font-size:9px}
+footer{display:flex;justify-content:space-between;gap:12px;margin-top:25px;padding-top:15px;border-top:1px solid var(--dh-line);color:#849198;font-size:10px}
+footer a{color:var(--dh-blue);font-weight:850}
+@media(max-width:1050px){.dashboard-layout{grid-template-columns:180px minmax(0,1fr);gap:20px}.dashboard-hero{grid-template-columns:minmax(0,1fr) 235px}.dashboard-hero-art{grid-template-columns:repeat(2,105px)}.hero-art-tile{width:105px}.simple-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.dashboard-layout{display:flex;flex-direction:column;gap:13px;padding-top:13px}.dashboard-sidebar{position:static;order:0;display:flex;flex-direction:row;align-items:center;gap:4px;width:100%;min-height:0;overflow-x:auto;padding:4px 0 10px;border-right:0;border-bottom:1px solid var(--dh-line)}.sidebar-label,.sidebar-label-spaced{display:none}.dashboard-side-link{flex:0 0 auto;min-height:37px;padding:0 10px;font-size:11px}.dashboard-side-link .ds-icon{width:23px;height:23px;flex-basis:23px}.dashboard-side-link .ds-arrow{display:none}.sidebar-settings{margin-top:0}.dashboard-main{width:100%}.dashboard-hero{grid-template-columns:minmax(0,1fr) 205px;min-height:0;padding:26px 22px}.dashboard-hero h1{font-size:clamp(34px,7vw,49px)}.dashboard-hero-art{grid-template-columns:repeat(2,82px);min-height:180px}.hero-art-tile{width:82px}.hero-float-tag{right:-4px;bottom:-4px;font-size:8px}.dashboard-columns{grid-template-columns:minmax(0,1fr) minmax(220px,.8fr)}}
+@media(max-width:560px){header{height:60px;padding:0 13px}.dashboard-hero{grid-template-columns:1fr;padding:25px 20px}.dashboard-hero h1{font-size:clamp(37px,10vw,50px)}.dashboard-hero-art{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-height:0;margin:12px 3px 10px;transform:rotate(-2deg)}.hero-art-tile{width:auto;min-width:0}.hero-art-tile:nth-child(n){transform:none}.hero-float-tag{right:0;bottom:-8px}.dashboard-columns{grid-template-columns:1fr}.stats{gap:8px}.stat{padding:13px}.stat-value{font-size:27px}.simple-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.simple-shortcut{min-height:100px}.panel-heading{padding:14px}.account-buttons .button{padding:0 8px}footer{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header class="topbar">
- <a class="brand" href="index.html"><span class="brand-mark">D</span><span>DougHub</span></a>
- <nav class="nav" aria-label="Main navigation"></nav>
-</header>
-<div class="dashboard-shell">
- <aside class="rail" aria-label="Dashboard sections">
-  <p class="rail-heading">Your space</p>
-  <a class="rail-link active" href="#overview"><span class="rail-icon">⌂</span>Overview</a>
-  <a class="rail-link" href="#activity"><span class="rail-icon">▤</span>Activity</a>
-  <a class="rail-link" href="#creations"><span class="rail-icon">✎</span>Creations</a>
-  <a class="rail-link" href="#account"><span class="rail-icon">◎</span>Account</a>
-  <div class="rail-divider"></div>
-  <p class="rail-heading">Explore</p>
-  <a class="rail-link" href="douggames.html"><span class="rail-icon">▣</span>Games ↗</a>
-  <a class="rail-link" href="dougforum.html"><span class="rail-icon">☷</span>Community ↗</a>
-  <a class="rail-link" href="Scripting/scripting.html"><span class="rail-icon">⌘</span>Create ↗</a>
-  <a class="rail-link" href="settings.html"><span class="rail-icon">⚙</span>Settings</a>
-  <div class="rail-note"><strong>Got an idea?</strong><p>Make a little something, share it, and see where it goes.</p><a href="Scripting/scripting.html">Open DougCode ↗</a></div>
+<header><a href="index.html" class="logo"><span class="logo-icon">D</span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<div class="simple-dashboard dashboard-layout">
+ <aside class="dashboard-sidebar" aria-label="Dashboard sidebar">
+  <div class="sidebar-label">WORKSPACE</div>
+  <a class="dashboard-side-link active" href="#overview"><span class="ds-icon">◫</span><span>Overview</span></a>
+  <a class="dashboard-side-link" href="#activity"><span class="ds-icon">↗</span><span>Activity</span></a>
+  <a class="dashboard-side-link" href="#creations"><span class="ds-icon">✦</span><span>My creations</span></a>
+  <a class="dashboard-side-link" href="#quick-access"><span class="ds-icon">⌘</span><span>Quick access</span></a>
+  <div class="sidebar-label sidebar-label-spaced">EXPLORE</div>
+  <a class="dashboard-side-link" href="douggames.html"><span class="ds-icon">▣</span><span>DougGames</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link" href="dougforum.html"><span class="ds-icon">☷</span><span>DougForum</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link" href="tools.html"><span class="ds-icon">✳</span><span>DougTools</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link" href="nova.html"><span class="ds-icon">✧</span><span>Nova AI</span><span class="ds-arrow">↗</span></a>
+  <a class="dashboard-side-link sidebar-settings" href="settings.html"><span class="ds-icon">⚙</span><span>Settings</span></a>
  </aside>
- <main class="main">
-  <p class="date-line" id="todayLabel">YOUR DOUGHUB HOME</p>
-  <section class="announcement" id="dhDashboardAnnouncement" aria-live="polite" hidden>
-   <span class="announcement-mark">!</span><div class="announcement-copy"><strong>DougHub notice</strong><p id="dhDashboardAnnouncementMessage"></p></div>
-   <button type="button" id="dhDashboardAnnouncementClose" aria-label="Dismiss announcement">×</button>
+ <main class="dashboard-main">
+  <section class="dh-dashboard-announcement" id="dhDashboardAnnouncement" aria-live="polite" aria-label="DougHub announcement" hidden>
+   <span class="dh-dashboard-announcement-mark" aria-hidden="true">!</span><div class="dh-dashboard-announcement-copy"><p class="dh-dashboard-announcement-label">DougHub announcement</p><p class="dh-dashboard-announcement-message" id="dhDashboardAnnouncementMessage"></p></div><button type="button" class="dh-dashboard-announcement-close" id="dhDashboardAnnouncementClose" aria-label="Dismiss announcement">×</button>
   </section>
-  <section class="welcome" id="overview">
-   <div class="welcome-copy">
-    <div class="welcome-kicker">A place to play, make, and share</div>
-    <h1 id="welcomeTitle">Your corner of DougHub.</h1>
-    <p>Your own starting point. Jump back into a project, find something fun to play, or catch up with the community.</p>
-    <div class="welcome-actions"><a class="action" href="Scripting/scripting.html">＋ Make something <span>↗</span></a><a class="action outline" href="douggames.html">Find a game <span>→</span></a></div>
+  <section class="dashboard-hero" id="overview" aria-labelledby="welcomeTitle">
+   <div class="dashboard-hero-copy">
+    <div class="dashboard-eyebrow"><span class="dashboard-live-dot"></span><span id="todayLabel">YOUR DOUGHUB HOME</span></div>
+    <h1 id="welcomeTitle">Your DougHub home</h1>
+    <p>Play something. Make something. Share it with the community. Your DougHub starts here.</p>
+    <div class="dashboard-hero-actions"><a class="button button-primary" href="Scripting/scripting.html">＋ Create a project <span aria-hidden="true">↗</span></a><a class="button" href="douggames.html">Browse games <span aria-hidden="true">→</span></a></div>
    </div>
-   <div class="welcome-art" aria-label="Open-source Twemoji illustrations">
-    <div class="art-tile"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f3ae.svg" alt="Game controller"></div>
-    <div class="art-tile"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/270f.svg" alt="Pencil"></div>
-    <div class="art-tile"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4ac.svg" alt="Speech bubble"></div>
-    <div class="art-tile"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4a1.svg" alt="Light bulb"></div>
-   </div>
+   <div class="dashboard-hero-art" aria-label="OpenMoji illustrations"><div class="hero-art-tile"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F3AE.svg" alt="Game controller"></div><div class="hero-art-tile"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F4BB.svg" alt="Laptop"></div><div class="hero-art-tile"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F3A8.svg" alt="Artist palette"></div><div class="hero-art-tile"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F680.svg" alt="Rocket"></div><div class="hero-float-tag">Made for your next idea!</div></div>
   </section>
-  <section class="section" id="activity">
-   <div class="section-head"><div><p class="section-kicker">Your activity</p><h2>A quick look</h2></div><p>Small milestones from around your DougHub account.</p></div>
-   <div class="stats">
-    <div class="stat"><div class="stat-label"><span>Your published games</span><span class="stat-icon">✦</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Projects you've shared</div></div>
-    <div class="stat"><div class="stat-label"><span>Community games</span><span class="stat-icon">▣</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Made by the community</div></div>
-   </div>
+  <section class="stats compact-stats" id="activity" aria-label="Your activity">
+   <div class="stat"><div class="stat-top"><span>Your published games</span><span class="stat-icon">✦</span></div><div class="stat-value" id="myGameTotal">—</div><div class="stat-foot">Your creations</div></div>
+   <div class="stat"><div class="stat-top"><span>Community games</span><span class="stat-icon">G</span></div><div class="stat-value" id="communityTotal">—</div><div class="stat-foot">Shared with everyone</div></div>
   </section>
-  <section class="section columns">
-   <section class="panel" id="creations">
-    <div class="panel-head"><div><h2>Your latest creations</h2><p>Projects you've published on DougHub.</p></div><a class="panel-link" href="my-games.html">All creations ↗</a></div>
-    <div class="panel-body"><div class="item-list" id="myCreations"><div class="empty">Loading your projects…</div></div></div>
-   </section>
-   <section class="panel" id="account">
-    <div class="panel-head"><div><h2>Your account</h2><p>Your profile at a glance.</p></div><a class="panel-link" href="settings.html">Settings ↗</a></div>
-    <div class="account-body">
-     <div class="identity"><div class="avatar" id="profileAvatar">D</div><div><div class="identity-name" id="profileName">Loading profile…</div><div class="identity-email" id="profileEmail">Checking sign-in</div></div></div>
-     <div class="details"><div class="detail"><span>Member since</span><strong id="memberSince">—</strong></div><div class="detail"><span>Account type</span><strong id="accountType">Member</strong></div></div>
-     <div class="account-actions"><a class="small-action" href="settings.html">Edit profile</a><a class="small-action" href="my-games.html">My creations</a></div>
-    </div>
-   </section>
-  </section>
-  <section class="section" id="quick-access">
-   <div class="section-head"><div><p class="section-kicker">Go somewhere</p><h2>Quick access</h2></div><p>The main places, without the extra digging.</p></div>
-   <div class="shortcuts">
-    <a class="shortcut" href="douggames.html"><span class="shortcut-art"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f3ae.svg" alt=""></span><strong>DougGames</strong><small>Play community games</small></a>
-    <a class="shortcut" href="dougforum.html"><span class="shortcut-art"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4ac.svg" alt=""></span><strong>Community</strong><small>See what's being shared</small></a>
-    <a class="shortcut" href="Scripting/scripting.html"><span class="shortcut-art"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4bb.svg" alt=""></span><strong>DougCode</strong><small>Build a project</small></a>
-    <a class="shortcut" href="settings.html"><span class="shortcut-art"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2699.svg" alt=""></span><strong>Settings</strong><small>Manage your account</small></a>
-   </div>
-  </section>
-  <footer><span>DougHub · Your space on the internet.</span><span>Illustrations: Twemoji, CC BY 4.0 · <a href="https://creativecommons.org/licenses/by/4.0/">License</a></span></footer>
+  <div class="dashboard-columns">
+   <section class="panel" id="creations"><div class="panel-heading"><div><h2>Recent creations</h2><p>Your latest published projects.</p></div><a class="text-link" href="my-games.html">View all ↗</a></div><div class="panel-body"><div class="item-list" id="myCreations"><div class="empty">Loading your projects…</div></div></div></section>
+   <section class="panel account-panel"><div class="panel-heading"><div><h2>Your account</h2><p>Profile and account details.</p></div><a class="text-link" href="settings.html">Settings ↗</a></div><div class="account-body"><div class="identity"><div class="avatar" id="profileAvatar">D</div><div><div class="identity-name" id="profileName">Loading profile…</div><div class="identity-email" id="profileEmail">Checking sign-in</div></div></div><div class="details"><div class="detail"><span>Member since</span><strong id="memberSince">—</strong></div><div class="detail"><span>Account type</span><strong id="accountType">Member</strong></div></div><div class="account-buttons"><a class="button" href="settings.html">Edit profile</a><a class="button" href="my-games.html">My creations</a></div></div></section>
+  </div>
+  <section class="panel quick-panel" id="quick-access"><div class="panel-heading"><div><h2>Quick access</h2><p>Go straight to the places you use most.</p></div><a class="text-link" href="tools.html">All pages &amp; tools ↗</a></div><div class="simple-shortcuts">
+   <a class="simple-shortcut" href="douggames.html"><span>🎮</span><strong>DougGames</strong><small>Play</small></a>
+   <a class="simple-shortcut" href="dougforum.html"><span>DF</span><strong>DougForum</strong><small>Discuss</small></a>
+   <a class="simple-shortcut" href="tools.html"><span>✳</span><strong>DougTools</strong><small>Utilities</small></a>
+   <a class="simple-shortcut" href="nova.html"><span>✧</span><strong>Nova AI</strong><small>Explore ideas</small></a>
+   <a class="simple-shortcut" href="Scripting/scripting.html"><span>⌘</span><strong>DougCode</strong><small>Create</small></a>
+   <a class="simple-shortcut" href="settings.html"><span>⚙</span><strong>Settings</strong><small>Account</small></a>
+  </div></section>
+  <section class="panel quick-panel community-panel"><div class="panel-heading"><div><h2>From the community</h2><p>Fresh conversations from DougForum.</p></div><a class="text-link" href="dougforum.html">Join in ↗</a></div><div class="panel-body"><div class="item-list" id="recentForumPosts"><div class="empty">Loading community posts…</div></div></div></section><div hidden aria-hidden="true"><span id="memberTotal">—</span><span id="recentTotal">—</span></div>
+  <footer><span>DougHub · Play, create, share.</span><span>Illustrations: OpenMoji, CC BY-SA 4.0 · <a href="https://openmoji.org/">OpenMoji</a></span></footer>
  </main>
 </div>
 <script>
@@ -208,55 +181,52 @@ const $=id=>document.getElementById(id);
 let currentUser=null,myCommunityGames=[];
 function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function dateLabel(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Recently":d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:d.getFullYear()!==new Date().getFullYear()?"numeric":undefined});}
-function renderMyCreations(){
- const host=$("myCreations");
- if(!myCommunityGames.length){host.innerHTML='<div class="empty"><strong>No published projects yet</strong>Your projects will show up here when you publish one.<br><a href="Scripting/scripting.html">Create your first project ↗</a></div>';return;}
- host.innerHTML=myCommunityGames.slice(0,5).map(g=>'<a class="list-item" href="my-games.html"><span class="item-icon">'+escapeHTML(String(g.category||"GAME").slice(0,3).toUpperCase())+'</span><span class="item-copy"><strong>'+escapeHTML(g.title||"Untitled project")+'</strong><small>'+escapeHTML(g.category||"Community game")+' · '+escapeHTML(dateLabel(g.created_at))+'</small></span><span class="item-arrow">↗</span></a>').join("");
-}
+
+function renderMyCreations(){const host=$("myCreations");if(!myCommunityGames.length){host.innerHTML='<div class="empty"><strong>No published projects yet</strong>Your projects will appear here when you publish one.<br><a href="Scripting/scripting.html">Create your first project ↗</a></div>';return;}host.innerHTML=myCommunityGames.slice(0,5).map(g=>'<a class="list-item" href="my-games.html"><span class="item-icon">'+escapeHTML(String(g.category||"GAME").slice(0,3).toUpperCase())+'</span><span class="item-copy"><strong>'+escapeHTML(g.title||"Untitled project")+'</strong><small>'+escapeHTML(g.category||"Community game")+' · '+escapeHTML(dateLabel(g.created_at))+'</small></span><span class="arrow">↗</span></a>').join("");}
+function renderForumPosts(rows,names){const host=$("recentForumPosts");if(!rows.length){host.innerHTML='<div class="empty"><strong>No recent discussions</strong>Start a conversation in the community forum.<br><a href="dougforum.html">Open DougForum ↗</a></div>';return;}host.innerHTML=rows.slice(0,4).map(p=>{const c=p.dougforum_communities||{};return '<a class="list-item" href="dougforum.html#post-'+encodeURIComponent(p.id)+'"><span class="item-icon">DF</span><span class="item-copy"><strong>'+escapeHTML(p.title||"Untitled discussion")+'</strong><small>'+escapeHTML(c.name||"DougForum")+' · '+escapeHTML(names[p.author_id]||"DougHub member")+' · '+escapeHTML(dateLabel(p.created_at))+'</small></span><span class="arrow">↗</span></a>';}).join("");}
 async function loadDashboard(){
  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
  if(sessionError)console.warn("Dashboard session check:",sessionError.message);
  currentUser=sessionData?.session?.user||null;
  if(!currentUser){location.replace("log-in.html?redirect=dashboard.html");return;}
- const today=new Date();
- $("todayLabel").textContent=today.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"}).toUpperCase();
- const [profileResult,ownResult,gamesResult]=await Promise.all([
+ document.body.style.visibility="hidden";
+ const now=new Date();
+ $("todayLabel").textContent=now.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}).toUpperCase()+" / WORKSPACE";
+ const [profileResult,ownResult,gamesResult,membersResult,recentResult,forumResult]=await Promise.all([
   supabaseClient.from("profiles").select("username,avatar_url,is_admin,account_type").eq("id",currentUser.id).maybeSingle(),
   supabaseClient.from("community_games").select("id,title,category,created_at,creator_id").eq("creator_id",currentUser.id).order("created_at",{ascending:false}).limit(30),
-  supabaseClient.from("community_games").select("id",{count:"exact",head:true})
+  supabaseClient.from("community_games").select("id",{count:"exact",head:true}),
+  supabaseClient.from("profiles").select("id",{count:"exact",head:true}),
+  supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",new Date(Date.now()-7*86400000).toISOString()),
+  supabaseClient.from("dougforum_posts").select("id,title,author_id,created_at,dougforum_communities(name,slug)").order("created_at",{ascending:false}).limit(4)
  ]);
  if(profileResult.error)console.warn("Dashboard profile:",profileResult.error.message);
- const profile=profileResult.data||{};
- const name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
- $("welcomeTitle").textContent="Welcome back, "+name+".";
- document.title="Home · DougHub";
- $("profileName").textContent=name;
- $("profileEmail").textContent=currentUser.email||"Signed in";
- $("profileAvatar").innerHTML=profile.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="">':escapeHTML(name.charAt(0).toUpperCase());
+ const profile=profileResult.data||{},name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
+ const {data:schoolSettings,error:schoolSettingsError}=await supabaseClient.from("classroom_school_settings").select("whole_school_enabled").eq("singleton",true).maybeSingle();
+ if(!schoolSettingsError&&schoolSettings?.whole_school_enabled){location.replace("/Classes/community-classroom.html?wholeSchool=1");return;}
+ document.body.style.visibility="visible";
+ $("welcomeTitle").textContent="Welcome back, "+name; document.title="Home · DougHub";
+ $("profileName").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed in";
+ $("profileAvatar").innerHTML=profile.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
  $("memberSince").textContent=currentUser.created_at?new Date(currentUser.created_at).toLocaleDateString(undefined,{month:"short",year:"numeric"}):"Active";
- $("accountType").textContent=profile.is_admin===true?"Administrator":(profile.account_type||"Member");
- if(ownResult.error){console.warn("Your creations:",ownResult.error.message);$("myGameTotal").textContent="—";$("myCreations").innerHTML='<div class="empty"><strong>Could not load your projects</strong><a href="my-games.html">Open My Content ↗</a></div>';}
- else{myCommunityGames=ownResult.data||[];$("myGameTotal").textContent=String(myCommunityGames.length);renderMyCreations();}
+ $("accountType").textContent=profile.is_admin===true?"Administrator":"Member";
+ $("myGameTotal").textContent=ownResult.error?"—":Number(ownResult.data?.length||0).toLocaleString();
+ if(ownResult.error){console.warn("Your creations:",ownResult.error.message);$("myCreations").innerHTML='<div class="empty"><strong>Could not load your projects</strong><a href="my-games.html">Open My Content ↗</a></div>';}else{myCommunityGames=ownResult.data||[];renderMyCreations();}
  $("communityTotal").textContent=gamesResult.error?"—":Number(gamesResult.count||0).toLocaleString();
+ $("memberTotal").textContent=membersResult.error?"—":Number(membersResult.count||0).toLocaleString();
+ $("recentTotal").textContent=recentResult.error?"—":Number(recentResult.count||0).toLocaleString();
+ if(forumResult.error){console.warn("DougForum activity:",forumResult.error.message);$("recentForumPosts").innerHTML='<div class="empty"><strong>Forum activity is unavailable</strong><a href="dougforum.html">Open DougForum ↗</a></div>';}else{const rows=forumResult.data||[],ids=[...new Set(rows.map(p=>p.author_id).filter(Boolean))],names={};if(ids.length){const {data:profiles,error}=await supabaseClient.from("profiles").select("id,username").in("id",ids);if(!error)(profiles||[]).forEach(p=>names[p.id]=p.username||"DougHub member");}renderForumPosts(rows,names);}
 }
 async function loadDashboardAnnouncement(){
- const banner=$("dhDashboardAnnouncement"),message=$("dhDashboardAnnouncementMessage"),close=$("dhDashboardAnnouncementClose");
- if(!banner||!message||!close)return;
+ const banner=$("dhDashboardAnnouncement"),message=$("dhDashboardAnnouncementMessage"),close=$("dhDashboardAnnouncementClose");if(!banner||!message||!close)return;
  close.addEventListener("click",()=>{banner.classList.remove("show");banner.hidden=true;});
- try{
-  const response=await fetch(SUPABASE_URL+"/rest/v1/site_announcements?select=enabled,message&id=eq.1",{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,Accept:"application/json"},cache:"no-store"});
-  if(!response.ok)return;
-  const rows=await response.json(),item=rows&&rows[0];
-  if(!item||item.enabled!==true||!String(item.message||"").trim())return;
-  message.textContent=item.message;banner.hidden=false;banner.classList.add("show");
+ try{const response=await fetch(SUPABASE_URL+"/rest/v1/site_announcements?select=enabled,message&id=eq.1",{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,Accept:"application/json"},cache:"no-store"});if(!response.ok)return;
+ const rows=await response.json(),item=rows&&rows[0];if(!item||item.enabled!==true||!String(item.message||"").trim())return;
+ message.textContent=item.message;banner.hidden=false;banner.classList.add("show");
  }catch(error){console.warn("Dashboard announcement could not load:",error);}
 }
 loadDashboardAnnouncement();
-loadDashboard().catch(error=>{
- console.error("Dashboard failed to initialize:",error);
- $("welcomeTitle").textContent="Your corner of DougHub.";
- $("myCreations").innerHTML='<div class="empty"><strong>Could not load dashboard data</strong>Please refresh to try again.</div>';
-});
+loadDashboard().catch(error=>{console.error("Dashboard failed to initialize:",error);document.body.style.visibility="visible";$("welcomeTitle").textContent="Your DougHub home";if($("myCreations").textContent.includes("Loading"))$("myCreations").innerHTML='<div class="empty"><strong>Could not load dashboard data</strong>Please refresh to try again.</div>';if($("recentForumPosts").textContent.includes("Loading"))$("recentForumPosts").innerHTML='<div class="empty">Community activity could not load.</div>';});
 </script>
 </body>
 </html>
