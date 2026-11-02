@@ -48,7 +48,7 @@
       return;
     }
     const { data: profile, error: profileError } = await db.from("profiles")
-      .select("chat_verified,staff_role,is_admin,is_developer,is_owner")
+      .select("staff_role,is_admin,is_developer,is_owner")
       .eq("id", user.id).maybeSingle();
     if (profileError) {
       showGate("Chat access unavailable", "We couldn't check your chat access. Please refresh or contact an administrator.", false);
@@ -61,7 +61,13 @@
       showGate("Verify your email first", "Confirm your email address before using Community Chat, Class Chat, or direct messages.", true, db, user);
       return;
     }
-    if (!profile?.chat_verified && !adminPlus) {
+    const { data: approval, error: approvalError } = await db.from("chat_access_approvals")
+      .select("user_id").eq("user_id", user.id).maybeSingle();
+    if (approvalError) {
+      showGate("Chat access unavailable", "We couldn't check your chat approval. Please refresh or contact an administrator.", false);
+      return;
+    }
+    if (!approval && !adminPlus) {
       showGate("Chat access is awaiting approval", "An Admin or higher staff member must approve your account before you can view or send chat messages or direct messages. You can still use the rest of DougHub.", false);
     }
   }
