@@ -99,7 +99,7 @@ async function loadProfile(){
   if(!db&&window.supabase?.createClient)db=window.DougHubSupabaseClient=window.supabase.createClient(url,key);
   if(!db)return;
   const {data:{user}}=await db.auth.getUser();if(!user)return;
-  const {data:profile}=await db.from("profiles").select("username,avatar_url,account_type,is_owner,staff_role").eq("id",user.id).maybeSingle();
+  const {data:profile}=await db.from("profiles").select("username,avatar_url,account_type,is_owner,is_admin,is_developer,staff_role").eq("id",user.id).maybeSingle();
   if(profile?.username){$("userName").textContent=profile.username;$("welcomeName").textContent=", "+profile.username;}
   if(profile?.avatar_url)$("userAvatar").innerHTML='<img alt="" src="'+esc(profile.avatar_url)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
   const params=new URLSearchParams(location.search),selectedClass=params.get("class");
@@ -107,8 +107,9 @@ async function loadProfile(){
    const {data:room,error}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name,reminder").eq("id",selectedClass).maybeSingle();
    if(error)throw error;
    if(!room){location.replace("classrooms.html");return;}
-   const isOwner=profile?.is_owner===true||String(profile?.staff_role||"").toLowerCase()==="owner";
-   let allowed=isOwner||room.teacher_id===user.id;
+   const role=String(profile?.staff_role||"").toLowerCase();
+   const isStaff=profile?.is_owner===true||profile?.is_admin===true||profile?.is_developer===true||["owner","admin","developer","tech"].includes(role);
+   let allowed=isStaff||room.teacher_id===user.id;
    if(!allowed){const {data:membership,error:membershipError}=await db.from("classroom_enrollments").select("id").eq("classroom_id",room.id).eq("student_id",user.id).eq("status","approved").maybeSingle();if(membershipError)throw membershipError;allowed=!!membership;}
    if(!allowed){location.replace("classrooms.html");return;}
    $("gradeChip").textContent=room.class_name==="Whole School"?"Whole School":"Class "+room.grade;
