@@ -417,7 +417,7 @@
       }
       const user = session.user;
       let profile = null;
-      const result = await client.from("profiles").select("username,avatar_url,is_admin,is_developer,is_owner,staff_role,account_type,teacher_verified,chat_verified")
+      const result = await client.from("profiles").select("username,avatar_url,is_admin,is_developer,is_owner,staff_role,account_type,teacher_verified")
         .eq("id", user.id).maybeSingle();
       if (!result.error) profile = result.data;
       const username = profile?.username || user.user_metadata?.username ||
@@ -442,7 +442,13 @@
       }
       const chatLink = document.getElementById("communityChatLink");
       const adminPlus = staffRank >= 2 || profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
-      const chatAllowed = !!user.email_confirmed_at && (profile?.chat_verified === true || adminPlus);
+      let chatApproved = false;
+      if (user.email_confirmed_at) {
+        const { data: approval } = await client.from("chat_access_approvals")
+          .select("user_id").eq("user_id", user.id).maybeSingle();
+        chatApproved = !!approval;
+      }
+      const chatAllowed = !!user.email_confirmed_at && (chatApproved || adminPlus);
       if (chatLink) chatLink.style.display = chatAllowed ? "" : "none";
       if (feedbackLink) {
         feedbackLink.style.display = staffRank >= 3 ? "" : "none";
