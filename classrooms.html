@@ -46,7 +46,7 @@ async function loadClasses(){
  if(teachers.length){const {data:ps,error:pe}=await db.from("profiles").select("id,username").in("id",teachers);if(!pe)(ps||[]).forEach(p=>names[p.id]=p.username||"Teacher");}
  const isTeacher=profile.account_type==="teacher"&&profile.teacher_verified===true;const visible=classes.filter(c=>(Number(c.grade)>=5&&Number(c.grade)<=8)||owner()||tech()||(isTeacher&&c.teacher_id===user.id));
  $("available").innerHTML=visible.length?visible.map(c=>{
-  const e=enrollments.find(x=>x.classroom_id===c.id);
+  const e=enrollments.find(x=>x.classroom_id===c.id)||mine.find(x=>x.classroom_id===c.id);
   const state=e?.status==="approved"?"In your classes":e?.status==="pending"?"Request pending":e?.status==="rejected"?"Request declined":"";
   const privileged=owner()||tech()||(isTeacher&&c.teacher_id===user.id);const action=e?.status==="approved"||privileged?'<a class="btn soft" href="'+approvedClassHref(c.id)+'">Open class</a>':e?.status==="pending"?'<button class="btn soft" disabled>Pending</button>':'<button class="btn" data-join="'+esc(c.id)+'">Request to join</button>';
   return '<article class="class-card"><div class="class-icon">'+esc(c.grade)+'</div><div class="class-info"><strong>'+esc(c.class_name||("Grade "+c.grade+" classroom"))+'</strong><small>Grade '+esc(c.grade)+' · Teacher: '+esc(names[c.teacher_id]||"Teacher")+(state?" · "+state:"")+'</small></div><div class="class-actions">'+action+'</div></article>';
