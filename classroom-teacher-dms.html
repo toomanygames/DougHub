@@ -59,11 +59,11 @@ function avatarHtml(person){return person.avatar_url?'<img alt="" src="'+C.esc(p
 async function boot(){
  try{
   db=await C.client();const {data:{user:u},error}=await db.auth.getUser();if(error||!u){location.replace("log-in.html?next="+encodeURIComponent(location.pathname));return;}user=u;
-  const {data:p,error:pe}=await db.from("profiles").select("username,avatar_url,account_type,is_owner,is_developer,is_admin,staff_role").eq("id",user.id).maybeSingle();if(pe)throw pe;profile=p||{};
-  const role=String(profile.staff_role||"").toLowerCase(),staff=profile.is_owner||profile.is_developer||profile.is_admin||["owner","developer","admin"].includes(role);
-  if(!staff&&profile.account_type!=="teacher"){showState("Teacher access only","This separate inbox is for classroom teachers. Open the regular Chat & DMs page to use the student inbox.","Open student messages","classroom-dms.html");return;}
+  const {data:p,error:pe}=await db.from("profiles").select("username,avatar_url,account_type,teacher_verified,is_owner,staff_role").eq("id",user.id).maybeSingle();if(pe)throw pe;profile=p||{};
+  const role=String(profile.staff_role||"").toLowerCase(),staff=profile.is_owner===true||role==="owner",teacher=profile.account_type==="teacher"&&profile.teacher_verified===true;
+  if(!staff&&!teacher){showState("Teacher access only","This separate inbox is for classroom teachers. Open the regular Chat & DMs page to use the student inbox.","Open student messages","classroom-dms.html");return;}
   if(staff){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").order("grade");if(r.error)throw r.error;classes=r.data||[];}
-  else if(profile.account_type==="teacher"){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("teacher_id",user.id).order("grade");if(r.error)throw r.error;classes=r.data||[];}
+  else if(teacher){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("teacher_id",user.id).order("grade");if(r.error)throw r.error;classes=r.data||[];}
   else if(profile.account_type==="student"){const e=await db.from("classroom_enrollments").select("classroom_id").eq("student_id",user.id).eq("status","approved");if(e.error)throw e.error;const ids=[...new Set((e.data||[]).map(x=>x.classroom_id))];if(ids.length){const r=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").in("id",ids).order("grade");if(r.error)throw r.error;classes=r.data||[];}}
   else{showState("Classroom account required","Choose Student or Teacher in Settings, then join a classroom.");return;}
   if(!classes.length){showState("No classroom assigned","Teacher account does not have a classroom assigned yet.","Open student messages","classroom-dms.html");return;}
