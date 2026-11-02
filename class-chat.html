@@ -100,7 +100,7 @@ async function boot(){
    if(wholeSchoolId){const {data:room,error:roomError}=await db.from("classroom_spaces").select("id,teacher_id,grade,class_name").eq("id",wholeSchoolId).maybeSingle();if(roomError)throw roomError;if(room)classes=[room];}
   }
   if(!classes.length){showState("No class chat available yet",profile.account_type==="teacher"?"Ask your teacher to set up a class chat for your classroom.":"Join a classroom and wait for its teacher to approve your request. If your school has enabled Whole School Mode, it will appear here automatically.");return;}
-  $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc("Class "+c.grade+" · "+c.class_name)+'</option>').join("");
+  $("classSelect").hidden=classes.length<2;$("classSelect").innerHTML=classes.map(c=>'<option value="'+C.esc(c.id)+'">'+C.esc(c.class_name==="Whole School"?"Whole School":"Class "+c.grade+" · "+c.class_name)+'</option>').join("");
   $("classSelect").addEventListener("change",()=>openClass($("classSelect").value));
   const requestedClass=new URLSearchParams(location.search).get('class');
   await openClass(classes.some(c=>c.id===requestedClass)?requestedClass:classes[0].id);
