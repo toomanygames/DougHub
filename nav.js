@@ -262,7 +262,6 @@
     const links = [
       ["/dashboard.html","Home"],
       ["/douggames.html","Games"],
-      ["/classrooms.html","Class"],
       ["/Scripting/scripting.html","Create"],
       ["/chat.html","Chat"]
     ];
@@ -272,7 +271,6 @@
       a.href = href;
       a.className = "nav-link";
       a.textContent = label;
-      if (label === "Class") { a.id = "classNavLink"; a.addEventListener("click", async event => { event.preventDefault(); const client = await getNavSupabase(); if (!client) { location.href = "/classrooms.html"; return; } try { const {data:{user}} = await client.auth.getUser(); if (!user) { location.href = "/log-in.html?redirect=classrooms.html"; return; } const {data:p} = await client.from("profiles").select("account_type,is_owner,staff_role").eq("id",user.id).maybeSingle(); const role=String(p?.staff_role||"").toLowerCase(); const owner=p?.is_owner===true||role==="owner"; if (p?.account_type==="student"&&!owner&&!["admin","developer","tech"].includes(role)) { const {data:en,error} = await client.from("classroom_enrollments").select("classroom_id,verified_at").eq("student_id",user.id).eq("status","approved").order("verified_at",{ascending:false}).limit(1); if (!error&&en?.[0]?.classroom_id) { location.href="/class-chat.html?class="+encodeURIComponent(en[0].classroom_id); return; } } location.href="/classrooms.html"; } catch (_) { location.href="/classrooms.html"; } }); }
       if (label === "Chat") {
         a.id = "communityChatLink";
         const dot = document.createElement("span");
@@ -419,7 +417,7 @@
       }
       const user = session.user;
       let profile = null;
-      const result = await client.from("profiles").select("username,avatar_url,is_admin,staff_role,account_type,is_owner,teacher_verified")
+      const result = await client.from("profiles").select("username,avatar_url,is_admin,is_developer,is_owner,staff_role,account_type,teacher_verified,chat_verified")
         .eq("id", user.id).maybeSingle();
       if (!result.error) profile = result.data;
       const username = profile?.username || user.user_metadata?.username ||
@@ -442,6 +440,10 @@
         adminLink.href = "/admin.html";
         adminLink.textContent = "Admin Panel";
       }
+      const chatLink = document.getElementById("communityChatLink");
+      const adminPlus = staffRank >= 2 || profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
+      const chatAllowed = !!user.email_confirmed_at && (profile?.chat_verified === true || adminPlus);
+      if (chatLink) chatLink.style.display = chatAllowed ? "" : "none";
       if (feedbackLink) {
         feedbackLink.style.display = staffRank >= 3 ? "" : "none";
         feedbackLink.href = "/admin.html#feedbackManagementCard";
