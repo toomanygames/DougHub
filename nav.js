@@ -422,12 +422,6 @@
       const result = await client.from("profiles").select("username,avatar_url,is_admin,staff_role,account_type,is_owner,teacher_verified")
         .eq("id", user.id).maybeSingle();
       if (!result.error) profile = result.data;
-      if (pathKey() === "index.html" && profile?.account_type === "student" && profile?.is_owner !== true && String(profile?.staff_role||"").toLowerCase() !== "owner") {
-        try {
-          const {data:en,error:enError}=await client.from("classroom_enrollments").select("classroom_id,verified_at").eq("student_id",user.id).eq("status","approved").order("verified_at",{ascending:false}).limit(1);
-          if(!enError&&en?.[0]?.classroom_id){location.replace("/class-chat.html?class="+encodeURIComponent(en[0].classroom_id));return;}
-        } catch (_) {}
-      }
       const username = profile?.username || user.user_metadata?.username ||
         user.user_metadata?.full_name || user.email?.split("@")[0] || "Account";
       name.textContent = username;
