@@ -35,6 +35,7 @@ async function boot(){
   const {data:p,error:pe}=await db.from("profiles").select("username,account_type,staff_role,is_owner,is_admin,is_developer,teacher_verified").eq("id",user.id).maybeSingle();if(pe)throw pe;profile=p||{};
   if(admin()){$("dayControls").hidden=false;$("controlDate").value=today;}
   if(owner()){$("ownerRequests").hidden=false;loadOwnerRequests();}
+  if(admin())await loadControl();
   await Promise.all([loadMine(),loadRequests()]);await loadClasses();
   await loadLeavePanel();
  }catch(e){$("available").innerHTML='<div class="empty">'+esc(e.message||"Could not load classrooms.")+'</div>';}
