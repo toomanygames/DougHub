@@ -240,7 +240,7 @@ async function loadDashboard(){
  const now=new Date();
  $("todayLabel").textContent=now.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}).toUpperCase()+" / WORKSPACE";
  const [profileResult,ownResult,gamesResult,membersResult,recentResult,forumResult]=await Promise.all([
-  supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle(),
+  supabaseClient.from("profiles").select("username,avatar_url,is_admin,account_type").eq("id",currentUser.id).maybeSingle(),
   supabaseClient.from("community_games").select("id,title,category,created_at,creator_id").eq("creator_id",currentUser.id).order("created_at",{ascending:false}).limit(30),
   supabaseClient.from("community_games").select("id",{count:"exact",head:true}),
   supabaseClient.from("profiles").select("id",{count:"exact",head:true}),
@@ -249,6 +249,13 @@ async function loadDashboard(){
  ]);
  if(profileResult.error)console.warn("Dashboard profile:",profileResult.error.message);
  const profile=profileResult.data||{},name=profile.username||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Member";
+ if(profile.account_type==="student"){
+  const {data:approved,error:approvedError}=await supabaseClient.from("classroom_enrollments").select("id").eq("student_id",currentUser.id).eq("status","approved").limit(1);
+  if(!approvedError&&!approved?.length){
+   const {data:wholeSchoolId,error:wholeSchoolError}=await supabaseClient.rpc("dh_get_whole_school_classroom_id");
+   if(!wholeSchoolError&&wholeSchoolId){location.replace("community-classroom.html?wholeSchool=1");return;}
+  }
+ }
  $("welcomeTitle").textContent="Welcome back, "+name; document.title="Home · DougHub";
  $("profileName").textContent=name;$("profileEmail").textContent=currentUser.email||"Signed in";
  $("profileAvatar").innerHTML=profile.avatar_url?'<img src="'+escapeHTML(profile.avatar_url)+'" alt="Profile avatar">':escapeHTML(name.charAt(0).toUpperCase());
