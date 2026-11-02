@@ -42,7 +42,7 @@ html,body{min-height:100%;width:100%;max-width:100%;overflow-x:hidden}
 }
 .dh-classroom-sidebar{border:0!important}
 .dh-classroom-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:0 7px!important;flex:none!important;color:#fff!important;text-decoration:none!important;font:900 21px Nunito,sans-serif!important}
-.dh-classroom-brand-mark{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:11px!important;background:#4e8df5!important;display:grid!important;place-items:center!important;color:#fff!important;font-size:19px!important;font-weight:900!important}
+.dh-classroom-brand-mark{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:11px!important;background:var(--classroom-accent,#4e8df5)!important;display:grid!important;place-items:center!important;color:#fff!important;font-size:19px!important;font-weight:900!important}
 .dh-classroom-nav{display:grid!important;grid-auto-rows:min-content!important;gap:5px!important;flex:none!important;min-height:0!important;overflow:visible!important}
 .dh-classroom-nav a{display:flex!important;align-items:center!important;gap:12px!important;width:100%!important;min-height:38px!important;padding:10px 12px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#d7e1f1!important;text-decoration:none!important;font-size:12px!important;font-weight:700!important;white-space:nowrap!important;box-shadow:none!important}
 .dh-classroom-nav a:hover,.dh-classroom-nav a.active{background:#ffffff19!important;color:#fff!important}
