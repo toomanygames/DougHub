@@ -26,7 +26,7 @@ function role(){return String(profile.staff_role||"").toLowerCase();}
 function owner(){return profile.is_owner===true||role()==="owner";}
 function admin(){return owner()||profile.is_admin===true||["admin"].includes(role());}
 function tech(){return role()==="tech";}
-function approvedClassHref(id){return "/community-classroom.html?classroom="+encodeURIComponent(id);}
+function approvedClassHref(id){return "/class-chat.html?class="+encodeURIComponent(id);}
 async function boot(){
  try{
   db=window.DougHubSupabaseClient;if(!db&&window.supabase?.createClient)db=window.DougHubSupabaseClient=window.supabase.createClient(URL,KEY);
@@ -35,7 +35,7 @@ async function boot(){
   const {data:p,error:pe}=await db.from("profiles").select("username,account_type,staff_role,is_owner,is_admin,is_developer,teacher_verified").eq("id",user.id).maybeSingle();if(pe)throw pe;profile=p||{};
   if(admin()){$("dayControls").hidden=false;$("controlDate").value=today;}
   if(owner()){$("ownerRequests").hidden=false;loadOwnerRequests();}
-  await Promise.all([loadClasses(),loadMine(),loadRequests()]);
+  await Promise.all([loadMine(),loadRequests()]);await loadClasses();
   await loadLeavePanel();
  }catch(e){$("available").innerHTML='<div class="empty">'+esc(e.message||"Could not load classrooms.")+'</div>';}
 }
@@ -44,11 +44,11 @@ async function loadClasses(){
  const {data,error}=await q;if(error)throw error;classes=data||[];
  const teachers=[...new Set(classes.map(c=>c.teacher_id))];let names={};
  if(teachers.length){const {data:ps,error:pe}=await db.from("profiles").select("id,username").in("id",teachers);if(!pe)(ps||[]).forEach(p=>names[p.id]=p.username||"Teacher");}
- const visible=classes.filter(c=>Number(c.grade)>=5&&Number(c.grade)<=8||owner()||tech());
+ const isTeacher=profile.account_type==="teacher"&&profile.teacher_verified===true;const visible=classes.filter(c=>(Number(c.grade)>=5&&Number(c.grade)<=8)||owner()||tech()||(isTeacher&&c.teacher_id===user.id));
  $("available").innerHTML=visible.length?visible.map(c=>{
   const e=enrollments.find(x=>x.classroom_id===c.id);
   const state=e?.status==="approved"?"In your classes":e?.status==="pending"?"Request pending":e?.status==="rejected"?"Request declined":"";
-  const action=e?.status==="approved"?'<a class="btn soft" href="'+approvedClassHref(c.id)+'">Open class</a>':e?.status==="pending"?'<button class="btn soft" disabled>Pending</button>':'<button class="btn" data-join="'+esc(c.id)+'">Request to join</button>';
+  const privileged=owner()||tech()||(isTeacher&&c.teacher_id===user.id);const action=e?.status==="approved"||privileged?'<a class="btn soft" href="'+approvedClassHref(c.id)+'">Open class</a>':e?.status==="pending"?'<button class="btn soft" disabled>Pending</button>':'<button class="btn" data-join="'+esc(c.id)+'">Request to join</button>';
   return '<article class="class-card"><div class="class-icon">'+esc(c.grade)+'</div><div class="class-info"><strong>'+esc(c.class_name||("Grade "+c.grade+" classroom"))+'</strong><small>Grade '+esc(c.grade)+' · Teacher: '+esc(names[c.teacher_id]||"Teacher")+(state?" · "+state:"")+'</small></div><div class="class-actions">'+action+'</div></article>';
  }).join(""):'<div class="empty">No classes are available yet.</div>';
  $("available").querySelectorAll("[data-join]").forEach(b=>b.addEventListener("click",()=>joinClass(b.dataset.join,b)));
