@@ -14,6 +14,36 @@
 #panel .card{text-align:left;max-height:85vh;overflow:auto}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.panel-head h2{margin:0}.items{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:15px 0}.item{padding:13px;border-radius:15px;background:#eff8f5}.item b{display:block;font-size:19px}.item small{color:var(--muted)}
 #touch{display:none;position:fixed;left:12px;bottom:15px;gap:5px}.pad{display:grid;grid-template-columns:repeat(3,43px);gap:4px}.pad button{width:43px;height:43px;padding:0;background:#ffffffd9}.pad button:nth-child(1){grid-column:2}.pad button:nth-child(2){grid-column:1}.pad button:nth-child(3){grid-column:2}.pad button:nth-child(4){grid-column:3}
 #hospital .card{background:#ffffffd9;border:2px solid #fff;border-radius:25px;box-shadow:0 16px 60px #6a94a322}.doctor{width:92px;height:92px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;font-size:48px;background:#d8f2ed;border:5px solid white;box-shadow:0 5px 18px #567a8a20}.dialogue{background:#f0f8ff;border-radius:17px;padding:17px;margin-top:15px;color:#38576c;font-size:15px;line-height:1.65}
+#wakeScene{display:none;position:fixed;inset:0;z-index:20;place-items:center;padding:18px;background:linear-gradient(#d9f2ff,#f7f4eb 70%,#d7e9e6);overflow:hidden}
+#wakeScene.active{display:grid;animation:wakeFade .5s ease both}
+.wake-room{position:relative;width:min(900px,96vw);height:min(620px,88vh);border:10px solid #fff;border-radius:28px;background:linear-gradient(#eaf7ff 0 62%,#d7e7ed 62%);box-shadow:0 22px 80px #29445a30;overflow:hidden}
+.wake-window{position:absolute;top:8%;left:8%;width:23%;height:25%;border:10px solid #fff;border-radius:12px;background:linear-gradient(#a8def4 60%,#b7e6b4 60%)}
+.wake-window:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:5px solid white}
+.wake-monitor{position:absolute;right:8%;top:16%;width:70px;height:80px;border:8px solid #fff;border-radius:12px;background:#b8d9dc}
+.wake-bed{position:absolute;left:12%;bottom:18%;width:55%;height:24%;border-radius:24px 24px 8px 8px;background:#fff;box-shadow:0 12px 0 #a9c4d1}
+.wake-bed:before{content:"";position:absolute;left:8%;right:8%;top:12%;height:50%;border-radius:20px;background:#dceef7}
+.wake-patient{position:absolute;left:34%;bottom:34%;font-size:clamp(48px,9vw,88px);filter:drop-shadow(0 5px 2px #5675)}
+.wake-doctor{position:absolute;right:18%;bottom:18%;font-size:clamp(66px,10vw,100px);transform-origin:bottom center;transition:transform 1.2s ease}
+.wake-doctor.walking{transform:translateX(190px) rotate(-8deg)}
+.wake-dialogue{position:absolute;left:50%;top:7%;transform:translateX(-50%);width:min(580px,90%);padding:18px 22px;border:3px solid white;border-radius:20px;background:#fffef2;box-shadow:0 10px 30px #29445a25;text-align:center;color:#29445a;font-size:clamp(16px,2.5vw,23px);font-weight:850;line-height:1.4}
+.wake-dialogue small{display:block;margin-bottom:6px;color:#6d9c9c;font-size:11px;letter-spacing:.16em}
+.wake-roof{position:absolute;inset:-30% -5% auto;height:32%;background:repeating-linear-gradient(90deg,#8c9cac 0 80px,#a9b6c2 80px 90px);border-bottom:14px solid #647789;transform:translateY(-140%);z-index:4}
+#wakeScene.crash .wake-roof{animation:roofDrop .8s cubic-bezier(.3,.8,.3,1) forwards}
+.wake-fall{position:absolute;z-index:5;top:-30%;left:50%;font-size:clamp(48px,10vw,92px);opacity:0;transform:translateX(-50%)}
+.wake-fall.drop{animation:objectDrop 1s cubic-bezier(.3,.7,.5,1) forwards}
+#wakeScene.crash .wake-room{animation:roomShake .3s linear 4}
+.wake-flash{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;z-index:8}
+#wakeScene.flash .wake-flash{animation:flashOut 1.3s ease forwards}
+@keyframes wakeFade{from{opacity:0}to{opacity:1}}
+@keyframes roofDrop{to{transform:translateY(155%)}}
+@keyframes objectDrop{0%{opacity:0;transform:translate(-50%,-20vh) rotate(-15deg)}15%{opacity:1}100%{opacity:1;transform:translate(-50%,85vh) rotate(22deg)}}
+@keyframes roomShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes flashOut{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+#wakeWin{display:none;position:fixed;inset:0;z-index:21;place-items:center;background:#132b3570;backdrop-filter:blur(5px);padding:20px}
+#wakeWin.active{display:grid}
+#wakeWin .win-card{padding:35px;border-radius:28px;background:linear-gradient(145deg,#fff7c9,#d9ffed,#d8f1ff);text-align:center;box-shadow:0 20px 70px #172e4440;max-width:520px}
+#wakeWin h1{font-size:clamp(48px,10vw,82px);margin:0;color:#278b6b;letter-spacing:-.07em}
+#wakeWin p{color:#38576c;font-weight:800}
 @media(max-width:720px){#top{top:8px;left:8px;right:8px}.brand{padding:7px}.logo{width:31px;height:31px}.brand b{font-size:10px}.brand small{font-size:8px}.stats{gap:7px;padding:8px}.stat{min-width:38px}.stat b{font-size:13px}.stat small{font-size:8px}#quest{top:65px;left:8px;width:46vw;padding:10px}.quest-title{font-size:12px}.quest-sub{font-size:10px}#resources{top:65px;right:8px;max-width:47vw;gap:4px}.resource{padding:6px 8px;font-size:10px}#actions{left:auto;right:8px;bottom:9px;transform:none;max-width:52vw;flex-wrap:wrap;justify-content:flex-end;gap:5px}.action{min-width:65px;padding:9px 7px}.action b{font-size:10px}#touch{display:flex}#tip{bottom:125px;left:52%}}
 </style></head><body>
 <div id="world"></div>
@@ -25,6 +55,15 @@
 <div id="tip" class="glass"></div><div id="toast"></div>
 <div id="menu"><div class="card glass"><div class="eyebrow2">A BRIGHT LITTLE BIG ADVENTURE</div><h1>99 Nights<br><em>in the Wonder Woods</em></h1><p>Make friends with forest animals, discover secret places, collect treasures, decorate your campsite, and see what happens after your 99th night!</p><div class="row"><button class="primary" id="start">🌟 START ADVENTURE</button><button id="continue" style="display:none">CONTINUE</button></div><p class="note">WASD / arrows to move · Mouse drag to look · E to collect · I backpack · J adventure notes</p></div></div>
 <div id="panel"><div class="card glass"><div class="panel-head"><h2 id="panelTitle">🎒 Your Backpack</h2><button id="closePanel">CLOSE ✕</button></div><div id="panelContent"></div></div></div>
+<div id="wakeScene" aria-live="polite">
+ <div class="wake-room">
+  <div class="wake-window"></div><div class="wake-monitor"></div>
+  <div class="wake-bed"></div><div class="wake-patient">🛌</div><div class="wake-doctor" id="wakeDoctor">👨‍⚕️</div>
+  <div class="wake-dialogue" id="wakeDialogue"><small>DOCTOR</small>Oh good, you're awake.</div>
+  <div class="wake-roof"></div><div class="wake-fall" id="wakeFall"></div><div class="wake-flash"></div>
+ </div>
+</div>
+<div id="wakeWin"><div class="win-card"><div style="font-size:42px">🌈⭐🌼</div><h1>YOU WIN!</h1><p>You made it back to the Wonder Woods!</p><button class="primary" id="wakeContinue">KEEP EXPLORING</button></div></div>
 <div id="hospital"><div class="card"><div class="eyebrow2">SOMEWHERE VERY DIFFERENT…</div><div class="doctor">👩‍⚕️</div><h1 id="hospitalTitle">You're awake!</h1><div class="dialogue" id="doctorText">“Hello! Can you hear me? You're in the hospital. You've been in a coma for four years. We've been waiting for you to wake up.”</div><p id="hospitalExtra">The Wonder Woods slowly fade into a memory. Was it a dream, or somewhere your mind went while you were asleep?</p><div class="row"><button class="primary" id="finish">THE END ✨</button></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
@@ -52,7 +91,7 @@ const memories=[
 'A friendly voice on a crackly radio says, “We are all still here. Take your time.”',
 'The sky fills with soft lights. For a moment, you hear someone say your name from very far away.'
 ];
-let scene,camera,renderer,clock,world,player,playerGroup,objects=[],animals=[],fireGroup,fireLight,dayLight,hemi,homeGroup,look={x:0,y:0},drag=null,nearObj=null,nightClock=0,nightLength=8,dayLength=5,nightStarted=false,modal=null,animalFriend=false,caveVisited=false,finalShown=false;
+let scene,camera,renderer,clock,world,player,playerGroup,objects=[],animals=[],fireGroup,fireLight,dayLight,hemi,homeGroup,look={x:0,y:0},drag=null,nearObj=null,nightClock=0,nightLength=8,dayLength=5,nightStarted=false,modal=null,animalFriend=false,caveVisited=false,finalShown=false,wakeSequenceRunning=false;
 const keys=S.keys;
 function mat(color,rough=1,em=0){return new THREE.MeshStandardMaterial({color,roughness:rough,emissive:em,emissiveIntensity:em?.25:0})}
 function mesh(parent,geo,material,x,y,z){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);parent.add(m);return m}
@@ -85,7 +124,7 @@ fireGroup=new THREE.Group();world.add(fireGroup);for(let i=0;i<3;i++){const l=bo
 homeGroup=new THREE.Group();homeGroup.position.set(-6,0,-5);world.add(homeGroup);const woodMat=mat(0xb98355),roofMat=mat(0xe88d83),windowMat=mat(0x9be4ee,.4,0x2c7a89);box(homeGroup,0,1.1,0,4.2,2.2,3.4,woodMat);const roofA=mesh(homeGroup,new THREE.ConeGeometry(2.9,2.1,4),roofMat,0,3.1,0);roofA.rotation.y=Math.PI/4;roofA.scale.set(1,1,.8);box(homeGroup,0,.8,1.73,.85,1.6,.12,mat(0x76503d));for(const sx of [-1.25,1.25]){box(homeGroup,sx,1.35,1.76,.75,.75,.1,windowMat);box(homeGroup,sx,1.35,1.83,.08,.85,.06,mat(0xffffff));box(homeGroup,sx,1.35,1.83,.85,.08,.06,mat(0xffffff));}box(homeGroup,1.1,3.1,-.6,.45,1.4,.45,mat(0xd77e69));homeGroup.visible=false;const garden=new THREE.Group();homeGroup.add(garden);for(let i=0;i<9;i++)ball(garden,-2+rand(0,4),.35,2.2+rand(0,1.2),.13,mat([0xffa9cb,0xffdf79,0xa8c6ff][i%3]));garden.visible=false;homeGroup.userData.garden=garden;
 renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button===0)drag={x:e.clientX,y:e.clientY};});renderer.domElement.addEventListener('pointermove',e=>{if(!drag||S.paused)return;look.x-=(e.clientX-drag.x)*.006;look.y=clamp(look.y+(e.clientY-drag.y)*.003,-.35,.7);drag={x:e.clientX,y:e.clientY}});window.addEventListener('pointerup',()=>drag=null);window.addEventListener('resize',resize);document.addEventListener('keydown',keyDown);document.addEventListener('keyup',e=>keys[e.code]=false);setupTouch();resize();updateUI();loadSave();animate();}
 function resize(){if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
-function keyDown(e){if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.repeat)return;keys[e.code]=true;if(e.code==='KeyE'||e.code==='Space')collectNearby();if(e.code==='KeyI')openPanel('bag');if(e.code==='KeyJ')openPanel('notes');if(e.code==='Escape'&&modal)closePanel()}
+function keyDown(e){if(e.code==='KeyQ'&&!e.repeat){e.preventDefault();beginWakeSequence();return}if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.repeat)return;keys[e.code]=true;if(e.code==='KeyE'||e.code==='Space')collectNearby();if(e.code==='KeyI')openPanel('bag');if(e.code==='KeyJ')openPanel('notes');if(e.code==='Escape'&&modal)closePanel()}
 function setupTouch(){document.querySelectorAll('[data-key]').forEach(b=>{const code={forward:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD'}[b.dataset.key];b.addEventListener('pointerdown',e=>{e.preventDefault();keys[code]=true;b.setPointerCapture(e.pointerId)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>keys[code]=false))})}
 function currentQuest(){return quests[Math.min(S.quest,quests.length-1)]}
 function questValue(q){if(q.kind==='fire')return S.fire?1:0;if(q.kind==='home')return S.home>=1?1:0;if(q.kind==='upgrade')return S.home>=2?1:0;if(q.kind==='friend')return animalFriend?1:0;if(q.kind==='cave')return caveVisited?1:0;return S[q.kind]||0}
@@ -102,7 +141,29 @@ function save(){try{localStorage.setItem(SAVE,JSON.stringify({night:S.night,wood
 function loadSave(){try{const d=JSON.parse(localStorage.getItem(SAVE)||'null');if(!d)return;for(const k of ['night','wood','stone','berries','stars','fire','home','quest'])if(Number.isFinite(d[k])||typeof d[k]==='boolean')S[k]=d[k];animalFriend=!!d.animalFriend;caveVisited=!!d.caveVisited;if(S.fire){fireGroup.visible=true;fireLight.intensity=2.5}if(S.home>0)homeGroup.visible=true;if(S.home>1)homeGroup.userData.garden.visible=true;$('continue').style.display='inline-block';updateUI()}catch(e){}}
 function start(fresh){if(fresh){localStorage.removeItem(SAVE);S.night=1;S.wood=0;S.stone=0;S.berries=0;S.stars=0;S.fire=false;S.home=0;S.quest=0;animalFriend=false;caveVisited=false;S.phaseTime=0;S.finished=false;fireGroup.visible=false;fireLight.intensity=0;homeGroup.visible=false;homeGroup.userData.garden.visible=false;player.x=0;player.z=6;playerGroup.position.set(0,0,6)}S.started=true;S.paused=false;$('menu').style.display='none';updateUI();save()}
 function endNight(){nightStarted=false;S.night++;S.phaseTime=0;nightClock=0;nightMemory();if(S.night>99){S.night=99;finishStory();return}toast('A brand new morning! Day '+S.night+' 🌞');if(S.night%10===0){toast('Chapter '+(S.night/10)+' complete! Keep exploring! 🌟')}updateUI();save()}
-function finishStory(){if(finalShown)return;finalShown=true;S.paused=true;S.finished=true;save();$('hospital').style.display='grid';}
+function finishStory(){beginWakeSequence()}
+function beginWakeSequence(){
+ if(wakeSequenceRunning||!S.started||S.finished&&finalShown)return;
+ wakeSequenceRunning=true;finalShown=true;S.paused=true;S.finished=true;save();
+ const sceneEl=$('wakeScene'),dialogue=$('wakeDialogue'),doctor=$('wakeDoctor'),fall=$('wakeFall');
+ const say=(speaker,line)=>{dialogue.innerHTML='<small>'+speaker+'</small>'+line};
+ sceneEl.classList.add('active');$('hospital').style.display='none';$('wakeWin').classList.remove('active');
+ say('DOCTOR',"Oh good, you're awake.");
+ setTimeout(()=>say('YOU',"Where am I?"),2300);
+ setTimeout(()=>say('DOCTOR',"You're in the hospital. You've been in a coma for four years."),4300);
+ setTimeout(()=>say('DOCTOR',"Anyway, I should get going. I loved my pet couch, but it died. A tragic day for furniture."),7600);
+ setTimeout(()=>{doctor.classList.add('walking');say('DOCTOR',"I'll… leave you to recover. Goodbye!");},10800);
+ setTimeout(()=>{sceneEl.classList.add('crash');say('NARRATOR',"…Wait. Is the ceiling supposed to do that?");},13500);
+ const drops=[['🛏️',"A BED?!"],['⚒️',"AN ANVIL?!"],['🏚️',"A SHED?!"],['🏠',"A WHOLE HOUSE?!"],['🧍',"AND… A GUY?!"]];
+ drops.forEach(([emoji,line],i)=>setTimeout(()=>{fall.textContent=emoji;fall.classList.remove('drop');void fall.offsetWidth;fall.classList.add('drop');say('NARRATOR',line);},14600+i*1150));
+ setTimeout(()=>{sceneEl.classList.add('flash');say('NARRATOR',"…");},20800);
+ setTimeout(()=>{
+  sceneEl.classList.remove('active','crash','flash');doctor.classList.remove('walking');fall.classList.remove('drop');
+  S.finished=false;S.paused=true;S.phaseTime=0;nightStarted=false;
+  $('wakeWin').classList.add('active');toast('You made it back to the Wonder Woods! 🌈');
+ },22200);
+}
+
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);if(S.started&&!S.paused&&!S.finished)update(dt);renderer.render(scene,camera)}
 function update(dt){const forward=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),side=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);const l=Math.hypot(forward,side)||1,speed=keys.ShiftLeft?9:6;const angle=look.x;const fx=forward/l,sx=side/l;player.x+=(-Math.sin(angle)*fx+Math.cos(angle)*sx)*speed*dt;player.z+=(-Math.cos(angle)*fx-Math.sin(angle)*sx)*speed*dt;player.x=clamp(player.x,-78,78);player.z=clamp(player.z,-78,78);playerGroup.position.set(player.x,0,player.z);if(forward||side)playerGroup.rotation.y=Math.atan2(-Math.sin(angle)*fx+Math.cos(angle)*sx,-Math.cos(angle)*fx-Math.sin(angle)*sx);
 const camDist=10,cx=player.x+Math.sin(angle)*camDist,cz=player.z+Math.cos(angle)*camDist;camera.position.set(cx,6.3+look.y*5,cz);camera.lookAt(player.x,1,player.z);
@@ -112,7 +173,7 @@ S.phaseTime+=dt;const total=nightStarted?nightLength:dayLength;if(S.phaseTime>=t
 const nightMix=nightStarted?1:0;scene.background.set(nightStarted?0x627aab:0x9bdce7);scene.fog.color.set(nightStarted?0x627aab:0x9bdce7);hemi.intensity=nightStarted?.95:2;dayLight.intensity=nightStarted?.5:2;if(fireGroup.visible){fireLight.intensity=2.3+Math.sin(performance.now()*.006)*.25;fireGroup.rotation.y+=dt*.1}
 S.saveTimer+=dt;if(S.saveTimer>8){S.saveTimer=0;save()}nearObj=closest();const q=currentQuest();if(nearObj){$('tip').textContent='Press E / tap COLLECT · '+nearObj.kind.toUpperCase();$('tip').classList.add('show')}else $('tip').classList.remove('show');
 }
-$('start').onclick=()=>start(true);$('continue').onclick=()=>start(false);$('gather').onclick=collectNearby;$('buildFire').onclick=buildCamp;$('buildHome').onclick=buildHome;$('bag').onclick=()=>openPanel('bag');$('journal').onclick=()=>openPanel('notes');$('closePanel').onclick=closePanel;$('finish').onclick=()=>{$('hospitalTitle').textContent='A new day begins';$('doctorText').textContent='“Take your time. You have a lot of catching up to do, and we are right here with you.”';$('hospitalExtra').textContent='Thank you for exploring the Wonder Woods. THE END.';$('finish').textContent='BACK TO DOUGHUB';$('finish').onclick=()=>location.href='../douggames.html'};
+$('start').onclick=()=>start(true);$('continue').onclick=()=>start(false);$('gather').onclick=collectNearby;$('buildFire').onclick=buildCamp;$('buildHome').onclick=buildHome;$('bag').onclick=()=>openPanel('bag');$('journal').onclick=()=>openPanel('notes');$('closePanel').onclick=closePanel;$('finish').onclick=()=>location.href='../douggames.html';$('wakeContinue').onclick=()=>{$('wakeWin').classList.remove('active');S.paused=false;S.finished=false;};
 buildWorld();
 })();
 </script></body></html>
