@@ -9,7 +9,8 @@ const items=[
  ["classroom-create.html","Create","＋"],
  ["classroom-dictionary.html","Dictionary","▤"],
  ["classroom-tools.html","Student Tools","⚒"],
- ["classroom-settings.html","Settings","⚙"]
+ ["classroom-settings.html","Settings","⚙"],
+ ["../dashboard.html","Normal DougHub","↗"]
 ];
 const path=(location.pathname.split("/").pop()||"community-classroom.html").toLowerCase();
 const css=`
@@ -69,6 +70,8 @@ function mount(){
   native.querySelectorAll(".dh-classroom-student-label,.dh-sidebar-toggle").forEach(el=>el.remove());
   const oldLink=[...native.querySelectorAll("a")].find(a=>(a.querySelector(".nav-label")?.textContent||"").trim()==="My Class"||(a.textContent||"").trim()==="My Class");
   if(oldLink)oldLink.remove();
+  const nativeNav=native.querySelector(".nav");
+  if(nativeNav&&!nativeNav.querySelector('a[data-dh-normal-home]')){const back=document.createElement("a");back.href="/dashboard.html";back.dataset.dhNormalHome="true";back.innerHTML='<span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Normal DougHub</span>';nativeNav.prepend(back);}
   return;
  }
  if(document.querySelector(".dh-classroom-sidebar"))return;
