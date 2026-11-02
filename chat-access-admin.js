@@ -77,7 +77,7 @@
         data.forEach(person => {
           person.chat_verified = approvedIds.has(person.id);
           const personRole = String(person.staff_role || "").toLowerCase();
-          const isStaff = ["admin","developer","owner"].includes(personRole) ||
+          const isStaff = ["admin","developer","tech","owner"].includes(personRole) ||
             person.is_admin === true || person.is_developer === true || person.is_owner === true;
           const row = document.createElement("div");
           row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px;border:1px solid #ffffff14;border-radius:10px;background:#ffffff04";
