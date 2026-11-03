@@ -45,8 +45,8 @@ button.primary,input[type=submit]{background:linear-gradient(135deg,#6366f1,#a85
 <div class="note">DougBase uses a separate account system from DougHub. Your DougHub account is not automatically shared with this database.</div>
 </div>
 <script>
-const URL="https://tolvtmuolnzhkegphevw.supabase.co",KEY="sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3";
-const client=supabase.createClient(URL,KEY);let signup=false;
+const SB_URL="https://tolvtmuolnzhkegphevw.supabase.co",KEY="sb_publishable_nj7z92WGz6tu9KcWWX97CQ_r0Yv7BD3";
+const client=supabase.createClient(SB_URL,KEY);let signup=false;
 const $=id=>document.getElementById(id);
 function mode(v){signup=v;$("loginTab").classList.toggle("active",!v);$("signupTab").classList.toggle("active",v);$("usernameWrap").style.display=v?"block":"none";$("sub").textContent=v?"Create a DougBase account":"Sign in to your DougBase project";$("action").textContent=v?"Create Account":"Log In";$("password").autocomplete=v?"new-password":"current-password";$("msg").textContent=""}
 $("loginTab").onclick=()=>mode(false);$("signupTab").onclick=()=>mode(true);

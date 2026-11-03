@@ -58,7 +58,7 @@
   // the common navigation but do not otherwise load display.js.
   if (!document.querySelector('script[src*="display.js"]')) {
     const sharedDisplay = document.createElement("script");
-    sharedDisplay.src = "display.js";
+    sharedDisplay.src = new URL("display.js", NAV_SCRIPT_URL).href;
     sharedDisplay.defer = true;
     document.head.appendChild(sharedDisplay);
   }
@@ -852,11 +852,11 @@
       ["Games","/douggames.html","Browse games and find Game Maker","Play & create","🎮","games play"],
       
       ["Nova AI","/nova.html","Ask questions and explore ideas","Tools","✧","ai assistant questions"],
-      ["DougCode / Game Maker","/dougcode.html","Build projects or make a game","Create","⌘","code coding editor project game maker"],
+      ["DougCode / Game Maker","/Scripting/scripting.html","Build projects or make a game","Create","⌘","code coding editor project game maker"],
       ["Community Chat","/chat.html","Talk with the DougHub community","Community","◌","chat messages conversation"],
       ["DougForum","/dougforum.html","Browse discussions and ask questions","Community","☷","forum discussions posts"],
       ["DougHub Music","/douqhub-music.html","Listen to community music","Entertainment","♫","music songs albums audio"],
-      ["DougTube","/dougtube.html","Watch and share videos","Entertainment","▶","youtube video watch"],
+      ["DougTube","/DougTube.html","Watch and share videos","Entertainment","▶","youtube video watch"],
       ["DougDrive","/dougdrive.html","Open your DougDrive files","Your space","▤","drive files storage"],
       ["My Games & Videos","/my-games.html","Find your saved creations","Your space","▣","uploads creations videos"],
       ["DMail","/DMail.html","Open direct messages","Community","✉","mail messages"],

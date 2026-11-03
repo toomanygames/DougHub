@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <base href="/"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#172642">
-<title>Classroom Games • DougHub</title><link rel="icon" href="/DougHub-classroom.svg" type="image/svg+xml">
+<title>Classroom Games • DougHub</title><link rel="icon" href="/DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="display.js"></script><script src="/Classes/classroom-shared.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -103,11 +103,7 @@ body.dh-games-sidebar-collapsed .dh-classroom-native-sidebar .profile{justify-co
 </aside>
 <main><header class="topbar"><div class="crumb">DougHub / Classroom / <strong>Games</strong></div><div class="top-actions"><a href="/Classes/community-classroom.html">Class home</a><a href="/Classes/classroom-settings.html">Settings</a></div></header>
 <div class="content">
-<section class="hero"><div class="hero-inner"><div class="hero-copy"><div class="eyebrow">DOUGHUB CLASSROOM ARCADE</div><h1>Take a quick game break.</h1><p>Choose a puzzle, racing game, arcade challenge or brain teaser. Search the collection or filter by the kind of game you want to play.</p><div class="hero-actions"><a class="hero-btn primary" href="#gameLibrary">Browse games ↓</a><a class="hero-btn" href="/Classes/classroom-create.html">Create a game ↗</a></div><div class="character-links" aria-label="Your classroom character">
-<a href="Games/classroom-character-shop.html"><span class="character-link-icon" aria-hidden="true">✦</span><span class="character-link-copy">Character Shop<small>Open packs, discover rare characters and collect accessories</small></span><span class="character-link-arrow" aria-hidden="true">↗</span></a>
-<a href="Games/classroom-character-editor.html"><span class="character-link-icon" aria-hidden="true">✎</span><span class="character-link-copy">Edit Character<small>Choose your avatar, equip items and save your look</small></span><span class="character-link-arrow" aria-hidden="true">↗</span></a>
-<a href="Games/classroom-avatar.html"><span class="character-link-icon" aria-hidden="true">☺</span><span class="character-link-copy">My Avatar<small>View your saved classroom profile character</small></span><span class="character-link-arrow" aria-hidden="true">↗</span></a>
-</div></div><div class="hero-art" aria-hidden="true"><div class="art-tile">✦</div><div class="art-tile">▦</div><div class="art-tile">◈</div><div class="art-tile">◎</div></div></div></section>
+<section class="hero"><div class="hero-inner"><div class="hero-copy"><div class="eyebrow">DOUGHUB CLASSROOM ARCADE</div><h1>Take a quick game break.</h1><p>Choose a puzzle, racing game, arcade challenge or brain teaser. Search the collection or filter by the kind of game you want to play.</p><div class="hero-actions"><a class="hero-btn primary" href="#gameLibrary">Browse games ↓</a><a class="hero-btn" href="/Classes/classroom-create.html">Create a game ↗</a></div></div><div class="hero-art" aria-hidden="true"><div class="art-tile">✦</div><div class="art-tile">▦</div><div class="art-tile">◈</div><div class="art-tile">◎</div></div></div></section>
 
 <section class="daily-games" aria-labelledby="dailyGamesTitle">
  <div class="daily-head"><div><div class="kicker">FRESH EVERY DAY</div><h2 id="dailyGamesTitle">Daily Games</h2><p>Complete today's challenges to earn credits for character packs and accessories.</p></div><span class="daily-reset">Resets at midnight UTC</span></div>
@@ -155,7 +151,7 @@ function apply(){const q=search.value.trim().toLowerCase();let shown=0;cards.for
 filters.forEach(b=>b.addEventListener("click",()=>{active=b.dataset.filter;filters.forEach(x=>{x.classList.toggle("active",x===b);x.setAttribute("aria-pressed",String(x===b));});apply();}));search.addEventListener("input",apply);
 sort.addEventListener("change",()=>{const ordered=[...cards].sort((a,b)=>sort.value==="az"?a.dataset.title.localeCompare(b.dataset.title):(Number(b.dataset.featured||0)-Number(a.dataset.featured||0))||cards.indexOf(a)-cards.indexOf(b));ordered.forEach(c=>grid.append(c));apply();});
 const player=$("gamePlayer"),frame=$("gameFrame");
-function applyClassroomFavicon(doc){try{if(!doc?.head)return;let icon=doc.querySelector('link[rel~="icon"]');if(!icon){icon=doc.createElement("link");icon.rel="icon";doc.head.appendChild(icon);}icon.href="/DougHub-classroom.svg";icon.type="image/svg+xml";}catch(e){console.debug("Could not set classroom game icon:",e);}}
+function applyClassroomFavicon(doc){try{if(!doc?.head)return;let icon=doc.querySelector('link[rel~="icon"]');if(!icon){icon=doc.createElement("link");icon.rel="icon";doc.head.appendChild(icon);}icon.href="/DougHub.svg";icon.type="image/svg+xml";}catch(e){console.debug("Could not set classroom game icon:",e);}}
 applyClassroomFavicon(document);
 frame.addEventListener("load",()=>applyClassroomFavicon(frame.contentDocument));
 function exit(){player.classList.remove("open");document.body.classList.remove("dh-game-player-open");frame.src="about:blank";document.body.style.overflow="";if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});}
