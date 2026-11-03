@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../display.js"></script>
 <script src="../game-analytics.js" data-game-key="honk-empire" data-game-title="Honk Empire" defer></script>
@@ -125,6 +126,9 @@ img{-webkit-user-drag:none;user-select:none}
 .rhythm .layers{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .rhythm .layers span{padding:1px 7px;border:2px solid var(--ink);border-radius:8px;background:var(--paper-2);color:var(--ink-soft);font-size:11px}
 .rhythm .layers span.on{background:var(--leaf);color:#fff}
+.rhythm .song-pick{display:flex;align-items:center;gap:6px;margin:2px 0 4px}
+.rhythm .song-pick b{flex:1;text-align:center;font-size:12.5px}
+.rhythm .song-pick button{width:26px;height:26px;padding:0;border:2px solid var(--ink);border-radius:8px;background:var(--butter);font-weight:900;box-shadow:0 2px 0 var(--ink)}
 .rhythm .judge{font-family:var(--display);font-weight:600;font-size:14px}
 .rhythm .judge.good{color:var(--leaf-dk)}.rhythm .judge.bad{color:var(--berry-dk)}
 
@@ -322,6 +326,7 @@ img{-webkit-user-drag:none;user-select:none}
   <div class="pill" title="Golden Feathers">🪶 <span id="featherChip">0</span></div>
   <div class="pill opt" title="Rebirths">♻️ <span id="rebirthChip">0</span></div>
   <div class="pill opt" title="Total multiplier"><small>Boost</small> x<span id="multChip">1</span></div>
+  <button class="sq-btn" id="musicBtn" type="button" aria-label="Toggle background music"><img src="kenney/icon-musicOn.png" alt=""></button>
   <button class="sq-btn" id="muteBtn" type="button" aria-label="Toggle sound"><img src="kenney/icon-audioOn.png" alt=""></button>
  </div>
 </header>
@@ -467,11 +472,12 @@ const ACH=[
  {id:"secret",name:"Secret Honker",desc:"Type the magic word.",test:s=>!!s.stats.secret},
  {id:"oneJob",name:"You Had One Job",desc:"Click the title 10 times. Why?",test:s=>s.stats.titleClicks>=10},
  {id:"mute",name:"Indecisive",desc:"Toggle sound 20 times.",test:s=>s.stats.muteToggles>=20},
- {id:"tax",name:"Tax Season",desc:"Survive the IRS Goose.",test:s=>!!s.stats.taxed}
+ {id:"tax",name:"Tax Season",desc:"Survive the IRS Goose.",test:s=>!!s.stats.taxed},
+ {id:"concert",name:"Goose on Tour",desc:"A secret. Some say it starts with a perfect rhythm…",test:s=>!!s.stats.concert}
 ];
 
 /* ---------- State ---------- */
-function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false,maxCombo:false}};}
+function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,music:true,buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false,maxCombo:false,concert:false}};}
 let S=freshState();
 try{const raw=localStorage.getItem(SAVE_KEY);if(raw){const loaded=JSON.parse(raw);S=Object.assign(freshState(),loaded);S.stats=Object.assign(freshState().stats,loaded.stats||{});while(S.gens.length<GENERATORS.length)S.gens.push(0);}}catch(e){console.warn("Honk Empire save could not load",e);}
 function save(){S.lastSave=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
@@ -543,47 +549,58 @@ function chime(){if(S.muted)return;[1,1.26,1.5,2].forEach((p,i)=>setTimeout(()=>
    adding instruments the longer you stay in time. Off-beat clicks just honk and reset the build-up.
    Deliberately not saved: reloading turns it off. */
 const BEAT_MS=400,BEAT_SLACK=90;
-// "Goose Overture": 8 bars of 4 beats in A minor. Each beat holds 1-4 melody notes (MIDI numbers, null = rest).
-const SONG={
- chords:[[57,60,64],[53,57,60],[48,52,55],[55,59,62],[57,60,64],[53,57,60],[50,53,57],[52,56,59]], // Am F C G Am F Dm E
- bass:[45,41,36,43,45,41,38,40],
- melody:[
-  [76,72],[74,72],[71,72],[69,null],
-  [72,74],[76,77],[76,74],[72,null],
-  [79,76],[74,76],[72,74,76,79],[81,null],
-  [79,77],[76,74],[71,74],[79,null],
-  [81,79],[76,79],[81,84],[83,81],
-  [77,76],[77,81],[79,77],[76,null],
-  [74,77],[81,77],[74,72],[71,74],
-  [76,null],[80,null],[83,80],[76,null]
- ],
- drums:["k","h","s","h","k","k","s","h"] // per beat across two bars: kick, hat, snare
-};
+// Original songs. chords/bass are per bar, melody per beat (1-4 notes, MIDI numbers, null = rest),
+// bassPat offsets the bass on each beat of a bar, drums is a pattern of k(ick)/s(nare)/h(at) per beat.
+const SONGS=[
+ {name:"Goose Overture",lead:["square",.07,2600],bassPat:[0,7,0,7],
+  chords:[[57,60,64],[53,57,60],[48,52,55],[55,59,62],[57,60,64],[53,57,60],[50,53,57],[52,56,59]], // Am F C G Am F Dm E
+  bass:[45,41,36,43,45,41,38,40],
+  melody:[[76,72],[74,72],[71,72],[69,null],[72,74],[76,77],[76,74],[72,null],[79,76],[74,76],[72,74,76,79],[81,null],[79,77],[76,74],[71,74],[79,null],
+   [81,79],[76,79],[81,84],[83,81],[77,76],[77,81],[79,77],[76,null],[74,77],[81,77],[74,72],[71,74],[76,null],[80,null],[83,80],[76,null]],
+  drums:["k","h","s","h","k","k","s","h"]},
+ {name:"Pond Funk",lead:["square",.065,2200],bassPat:[0,12,0,10],
+  chords:[[50,53,57],[55,59,62],[53,57,60],[57,61,64]], // Dm G F A
+  bass:[38,43,41,45],
+  melody:[[74,null,72,74],[null,77,null,74],[72,71,69,null],[67,null,null,69],[71,null,74,null],[72,71,69,67],[69,null,null,null],[62,65,67,69],
+   [74,null,72,74],[null,77,null,79],[77,76,74,null],[72,null,71,null],[69,72,null,77],[76,74,72,null],[74,null,null,74],[73,null,76,null]],
+  drums:["k","h","s","h","h","k","s","h"]},
+ {name:"Moonwalk Lullaby",lead:["triangle",.13,3000],bassPat:[0,7,12,7],
+  chords:[[48,52,55],[45,48,52],[41,45,48],[43,47,50]], // C Am F G
+  bass:[36,33,41,43],
+  melody:[[72,76],[79,null],[77,76],[74,null],[76,72],[69,72],[76,null],[74,null],[77,81],[79,77],[76,77],[79,null],[79,77],[76,74],[71,74],[72,null]],
+  drums:["k","h","h","h","s","h","h","h"]},
+ {name:"Glitch Rush",lead:["sawtooth",.045,3500],bassPat:[0,0,12,0],
+  chords:[[52,55,59],[48,52,55],[55,59,62],[50,54,57]], // Em C G D
+  bass:[40,36,43,38],
+  melody:[[64,67,71,76],[76,71,67,64],[64,67,71,79],[76,74,71,67],[60,64,67,72],[72,67,64,60],[60,64,67,76],[74,72,67,64],
+   [67,71,74,79],[79,74,71,67],[67,71,74,83],[81,79,74,71],[62,66,69,74],[74,69,66,62],[62,66,69,78],[76,74,69,66]],
+  drums:["k","k","s","k","k","k","s","h"]}
+];
 const LAYERS=[{name:"Drums",at:0},{name:"Bass",at:4},{name:"Melody",at:8},{name:"Chords",at:16},{name:"Sparkle",at:32}];
-const rhythm={on:false,step:0,streak:0,best:0,last:0,beat:BEAT_MS,judge:""};
+const rhythm={on:false,song:0,step:0,streak:0,best:0,last:0,beat:BEAT_MS,judge:""};
 const midi=n=>440*Math.pow(2,(n-69)/12);
 let noiseBuf=null;
-function voice(freq,t,dur,type,gain,cutoff){
+function voice(freq,t,dur,type,gain,cutoff,out=audio.destination){
  const o=audio.createOscillator(),g=audio.createGain(),f=audio.createBiquadFilter();
  o.type=type;o.frequency.setValueAtTime(freq,t);f.type="lowpass";f.frequency.value=cutoff||4000;
  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
- o.connect(f);f.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+dur+.03);
+ o.connect(f);f.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.03);
 }
-function drum(kind,t){
- if(kind==="k"){const o=audio.createOscillator(),g=audio.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.16);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.25);return;}
+function drum(kind,t,out=audio.destination,vol=1){
+ if(kind==="k"){const o=audio.createOscillator(),g=audio.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.16);g.gain.setValueAtTime(.5*vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g);g.connect(out);o.start(t);o.stop(t+.25);return;}
  if(!noiseBuf){noiseBuf=audio.createBuffer(1,audio.sampleRate*.3,audio.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
  const n=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain(),snare=kind==="s",len=snare?.16:.045;
  n.buffer=noiseBuf;f.type=snare?"bandpass":"highpass";f.frequency.value=snare?1800:7000;
- g.gain.setValueAtTime(snare?.35:.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+len);
- n.connect(f);f.connect(g);g.connect(audio.destination);n.start(t);n.stop(t+len+.02);
+ g.gain.setValueAtTime((snare?.35:.12)*vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+len);
+ n.connect(f);f.connect(g);g.connect(out);n.start(t);n.stop(t+len+.02);
 }
 function playBeat(step,beatSec,layers){
- const t=audio.currentTime+.01,bar=Math.floor(step/4)%8,inBar=step%4,mel=SONG.melody[step%32];
- if(layers>=1){drum(SONG.drums[step%8],t);drum("h",t+beatSec/2);}
- if(layers>=2){const root=SONG.bass[bar]+(inBar%2?7:0);voice(midi(root),t,beatSec*.9,"triangle",.32,900);}
- if(layers>=3)mel.forEach((n,i)=>{if(n!==null)voice(midi(n),t+i*beatSec/mel.length,beatSec/mel.length*1.15,"square",.07,2600);});
- if(layers>=4&&inBar===0)SONG.chords[bar].forEach(n=>voice(midi(n+12),t,beatSec*3.8,"sawtooth",.025,1400));
- if(layers>=5)SONG.chords[bar].concat(SONG.chords[bar][0]+12).forEach((n,i)=>voice(midi(n+24),t+i*beatSec/4,beatSec/4,"sine",.05,6000));
+ const song=SONGS[rhythm.song],bars=song.chords.length,t=audio.currentTime+.01,bar=Math.floor(step/4)%bars,inBar=step%4,mel=song.melody[step%song.melody.length];
+ if(layers>=1){drum(song.drums[step%song.drums.length],t);drum("h",t+beatSec/2);}
+ if(layers>=2)voice(midi(song.bass[bar]+song.bassPat[inBar]),t,beatSec*.9,"triangle",.32,900);
+ if(layers>=3)mel.forEach((n,i)=>{if(n!==null)voice(midi(n),t+i*beatSec/mel.length,beatSec/mel.length*1.15,song.lead[0],song.lead[1],song.lead[2]);});
+ if(layers>=4&&inBar===0)song.chords[bar].forEach(n=>voice(midi(n+12),t,beatSec*3.8,"sawtooth",.025,1400));
+ if(layers>=5)song.chords[bar].concat(song.chords[bar][0]+12).forEach((n,i)=>voice(midi(n+24),t+i*beatSec/4,beatSec/4,"sine",.05,6000));
 }
 function rhythmClick(){
  const now=performance.now(),gap=now-rhythm.last;rhythm.last=now;
@@ -591,6 +608,8 @@ function rhythmClick(){
  else if(Math.abs(gap-BEAT_MS)<=BEAT_SLACK){rhythm.streak++;rhythm.beat=gap;rhythm.judge=Math.abs(gap-BEAT_MS)<=35?"Perfect!":"Good";}
  else{rhythm.streak=0;rhythm.judge=gap<BEAT_MS?"Too fast":"Too slow";}
  rhythm.best=Math.max(rhythm.best,rhythm.streak);
+ // Easter egg: holding the beat until Sparkle has played a couple of beats opens the concert.
+ if(rhythm.streak===LAYERS[4].at+3&&!concert.active&&!concert.done)setTimeout(launchConcert,450);
  if(S.muted){renderRhythm();return;}
  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
  if(rhythm.streak>0){const layers=LAYERS.filter(l=>rhythm.streak>l.at).length;playBeat(rhythm.step,rhythm.beat/1000,layers);rhythm.step++;}
@@ -600,14 +619,72 @@ function rhythmClick(){
 function renderRhythm(){
  const el=$("rhythmHud");el.classList.toggle("hidden",!rhythm.on);if(!rhythm.on)return;
  const cls=rhythm.judge==="Perfect!"||rhythm.judge==="Good"||rhythm.judge==="Go!"?"good":rhythm.judge?"bad":"";
- el.innerHTML=emojify(`<h4>🎶 Rhythm mode</h4><div class="metro"><i></i><span>Click every ${(BEAT_MS/1000).toFixed(2)}s</span></div>`+
+ el.innerHTML=emojify(`<h4>🎶 Rhythm mode</h4><div class="song-pick"><button type="button" data-song="-1" aria-label="Previous song">‹</button><b>${SONGS[rhythm.song].name}</b><button type="button" data-song="1" aria-label="Next song">›</button></div><div class="metro"><i></i><span>Click every ${(BEAT_MS/1000).toFixed(2)}s</span></div>`+
   `<div><span class="judge ${cls}">${rhythm.judge||"Start clicking!"}</span> · streak ${rhythm.streak} · best ${rhythm.best}</div>`+
   `<div class="layers">${LAYERS.map(l=>`<span class="${rhythm.streak>l.at?"on":""}">${l.name}</span>`).join("")}</div><div style="margin-top:5px;color:var(--ink-soft);font-size:11px">Press Q to turn off</div>`);
 }
+$("rhythmHud").addEventListener("click",e=>{const b=e.target.closest("[data-song]");if(!b)return;rhythm.song=(rhythm.song+ +b.dataset.song+SONGS.length)%SONGS.length;rhythm.step=0;renderRhythm();toast("🎶 Now playing: "+SONGS[rhythm.song].name);});
 function toggleRhythm(){
+ if(concert.active)return;
  rhythm.on=!rhythm.on;rhythm.streak=0;rhythm.step=0;rhythm.judge="";rhythm.last=0;
  renderRhythm();toast(rhythm.on?`🎶 Rhythm mode on: click every ${(BEAT_MS/1000).toFixed(2)}s to play the song`:"Rhythm mode off");
  if(rhythm.on&&S.muted)toast("Sound is muted. Unmute to hear the song.");
+ updateMusic();
+}
+
+/* ---------- Background music: "Pond Promenade" ----------
+   A calmer original in the same A-minor style as Goose Overture, scheduled a little ahead on the audio clock.
+   Pauses during rhythm mode and the concert so songs never clash. */
+const BG={beat:.6,
+ chords:[[57,60,64],[53,57,60],[48,52,55],[55,59,62],[57,60,64],[53,57,60],[55,59,62],[52,56,59]], // Am F C G Am F G E
+ bass:[45,41,36,43,45,41,43,40],
+ melody:[[69,72],[76,null],[74,72],[71,null],[72,null],[69,72],[77,76],[74,null],[76,79],[81,null],[79,76],[74,72],[71,null],[74,null],[79,77],[76,null],
+  [69,72],[76,81],[79,76],[74,null],[72,74],[77,null],[76,74],[72,null],[71,72],[74,76],[79,null],[77,76],[76,null],[null,null],[80,null],[76,null]]};
+const music={playing:false,step:0,next:0,timer:0,out:null};
+function playBgBeat(step,t){
+ const bar=Math.floor(step/4)%8,inBar=step%4,mel=BG.melody[step%32],b=BG.beat,out=music.out;
+ if(inBar===0||inBar===2){drum("k",t,out,.35);voice(midi(BG.bass[bar]+(inBar?7:0)),t,b*1.8,"sine",.2,600,out);}
+ drum("h",t+b/2,out,.45);
+ if(inBar===0){BG.chords[bar].forEach(n=>voice(midi(n+12),t,b*3.9,"triangle",.035,1200,out));voice(midi(BG.chords[bar][0]+36),t,b*1.5,"sine",.03,6000,out);}
+ mel.forEach((n,i)=>{if(n!==null)voice(midi(n),t+i*b/2,b/2*1.3,"triangle",.075,2200,out);});
+}
+function scheduleMusic(){while(music.next<audio.currentTime+.5){playBgBeat(music.step,music.next);music.next+=BG.beat;music.step++;}}
+function updateMusic(){
+ const want=S.music&&!S.muted&&!rhythm.on&&!concert.active&&document.visibilityState==="visible"&&audioUnlocked;
+ if(want&&!music.playing){
+  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
+  music.out=audio.createGain();music.out.gain.setValueAtTime(.0001,audio.currentTime);music.out.gain.exponentialRampToValueAtTime(.55,audio.currentTime+1.5);music.out.connect(audio.destination);
+  music.next=audio.currentTime+.1;music.playing=true;scheduleMusic();music.timer=setInterval(scheduleMusic,120);
+ }else if(!want&&music.playing){
+  clearInterval(music.timer);music.playing=false;const out=music.out;
+  out.gain.cancelScheduledValues(audio.currentTime);out.gain.setValueAtTime(out.gain.value,audio.currentTime);out.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.4);setTimeout(()=>out.disconnect(),600);
+ }
+}
+// Browsers only allow sound after the player interacts, so music starts on the first click or key press.
+let audioUnlocked=false;
+["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(!audioUnlocked){audioUnlocked=true;updateMusic();}},{once:false,passive:true}));
+document.addEventListener("visibilitychange",updateMusic);
+
+/* ---------- Secret concert (3D, loaded only when triggered) ---------- */
+const concert={active:false,done:false};
+async function launchConcert(){
+ if(concert.active)return;
+ concert.active=true;concert.done=true;
+ rhythm.on=false;renderRhythm();updateMusic();
+ toast("🎸 Something is happening on the main stage…","gold");
+ try{
+  const mod=await import("./honk-concert.js");
+  audio=audio||new (window.AudioContext||window.webkitAudioContext)();await audio.resume?.();
+  mod.startConcert({audio,muted:S.muted,onFinish:res=>{
+   concert.active=false;
+   // Rewards and the trophy are only for finishing the show, so quitting early can't be farmed by reloading.
+   if(res.quit){toast("🎸 The goose left the stage. Hold the beat to Sparkle again after a reload to retry.");updateMusic();return;}
+   const mult={S:5,A:3.5,B:2.5,C:1.5,D:1}[res.grade]||1,v=Math.max(500,cps()*300*mult);
+   earn(v);S.stats.concert=true;checkAch();save();
+   toast(`🎸 Concert over! Grade ${res.grade}: +${fmt(v)} honks`,"gold");
+   updateMusic();
+  }});
+ }catch(e){concert.active=false;concert.done=false;console.warn("Concert failed to load",e);toast("The concert couldn't load. Try again later.");updateMusic();}
 }
 
 /* ---------- World scenes (Kenney CC0 art) ---------- */
@@ -948,7 +1025,9 @@ function tick(t){
  requestAnimationFrame(tick);
 }
 function setMuteIcon(){$("muteBtn").innerHTML=ki(S.muted?"audioOff":"audioOn");}
-$("muteBtn").addEventListener("click",()=>{S.muted=!S.muted;S.stats.muteToggles++;setMuteIcon();});
+$("muteBtn").addEventListener("click",()=>{S.muted=!S.muted;S.stats.muteToggles++;setMuteIcon();updateMusic();});
+function setMusicIcon(){$("musicBtn").innerHTML=ki(S.music?"musicOn":"musicOff");}
+$("musicBtn").addEventListener("click",()=>{S.music=!S.music;setMusicIcon();updateMusic();toast(S.music?"🎶 Music on: Pond Promenade":"Music off");});
 $("dailyBtn").addEventListener("click",claimDaily);
 setInterval(()=>{checkAch();save();},2000);
 setInterval(()=>{submitScore();if(tab==="leaders")loadLeaderboard();},15000);
@@ -960,7 +1039,7 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 // Swap the emoji in the static header, tabs and gift button for OpenMoji art.
 document.querySelectorAll(".top-stats .pill,.tab .ti,#dailyBtn").forEach(el=>{el.innerHTML=emojify(el.innerHTML);});
 breakShown=Math.floor(S.playMs/2700000);
-setMuteIcon();
+setMuteIcon();setMusicIcon();
 showNews(NEWS[Math.floor(Math.random()*3)][0]);
 applyWorld();
 offlineEarnings();
