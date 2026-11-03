@@ -103,6 +103,11 @@ img{-webkit-user-drag:none;user-select:none}
 .goose-btn.squish .goose-img{animation:squish .18s}
 @keyframes squish{40%{transform:scale(1.08,.86)}70%{transform:scale(.96,1.05)}}
 .goose-hat{position:absolute;left:21%;top:-3%;width:30%;height:30%;pointer-events:none;transform:rotate(-12deg)}
+/* The goose wanders: .goose-body flips to face where it walks and waddles while moving. */
+.goose-body{position:absolute;inset:0;display:block;transition:transform .3s}
+.goose-body.right{transform:scaleX(-1)}
+.goose-btn.walking .goose-body{animation:waddle .55s ease-in-out infinite}
+@keyframes waddle{0%,100%{rotate:-4deg;translate:0 0}50%{rotate:4deg;translate:0 -3%}}
 
 .flock{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;padding:8px 10px;overflow-x:auto;scrollbar-width:none;background:linear-gradient(0deg,#00000038,transparent);z-index:3}
 .flock::-webkit-scrollbar{display:none}
@@ -532,9 +537,24 @@ function sceneHTML(w){
 }
 
 /* ---------- Goose ---------- */
+// The goose strolls slowly between random spots, pausing now and then (x is % across the stage).
+const wander={x:50,target:50,pauseUntil:performance.now()+3000,facingRight:false,on:!matchMedia("(prefers-reduced-motion: reduce)").matches};
+function walkGoose(dt){
+ if(!wander.on)return;
+ const now=performance.now(),walking=now>=wander.pauseUntil;
+ if(walking){
+  const step=5*dt,d=wander.target-wander.x; // 5% of the stage per second
+  if(Math.abs(d)<=step){wander.x=wander.target;wander.pauseUntil=now+2000+Math.random()*4500;wander.target=24+Math.random()*52;}
+  else wander.x+=Math.sign(d)*step;
+  const right=wander.target>wander.x;
+  if(right!==wander.facingRight){wander.facingRight=right;gooseBtn.querySelector(".goose-body")?.classList.toggle("right",right);}
+  gooseBtn.style.left=wander.x.toFixed(2)+"%";
+ }
+ gooseBtn.classList.toggle("walking",walking);
+}
 function gooseHTML(){
  const hat=WORLDS[S.world].hat||(S.rebirths>0?"👑":"");
- return `<span class="shadow"></span>`+em("🪿","goose-img")+(hat?em(hat,"goose-hat"):"");
+ return `<span class="shadow"></span><span class="goose-body${wander.facingRight?" right":""}">`+em("🪿","goose-img")+(hat?em(hat,"goose-hat"):"")+`</span>`;
 }
 
 /* ---------- Clicking, combo & particles ---------- */
@@ -828,6 +848,7 @@ let last=performance.now(),breakShown=0;
 function tick(t){
  const dt=Math.min(1,(t-last)/1000);last=t;
  earn(cps()*dt);
+ walkGoose(dt);
  if(performance.now()-lastClick>900&&combo>1)combo=Math.max(1,combo-dt*1.5);
  if(document.visibilityState==="visible")S.playMs+=dt*1000;
  const now=Date.now();
