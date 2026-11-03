@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#26283b">
+<title>DougWorld 3D</title>
+<link rel="icon" href="art/dougworld.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="dougworld" data-game-title="DougWorld 3D" defer></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<style>
+:root{
+ --ink:#26283b;--ink-2:#3d4160;--ink-soft:#6b6d82;
+ --paper:#fffaf0;--paper-2:#f6edda;--paper-3:#eadcc0;
+ --beak:#f28c28;--butter:#f7c948;--leaf:#5fae4e;--pond:#3a8fb7;--berry:#e05a4f;--plum:#8a5cc9;
+ --hard:0 4px 0 var(--ink);--hard-sm:0 3px 0 var(--ink);
+ --display:"Fredoka","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#bfe6f7}
+body{font-family:var(--body);font-weight:700;font-size:14px;color:var(--ink);-webkit-tap-highlight-color:transparent;user-select:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--butter);outline-offset:2px}
+#view{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none}
+.hidden{display:none!important}
+
+/* Shared chunky widgets */
+.card{border:3px solid var(--ink);border-radius:16px;background:var(--paper);box-shadow:var(--hard)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border:3px solid var(--ink);border-radius:13px;background:var(--beak);color:#fff;font-family:var(--display);font-weight:600;font-size:15px;box-shadow:var(--hard-sm);text-shadow:0 2px 0 #0003;white-space:nowrap}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn:disabled{background:var(--paper-3);color:var(--ink-soft);text-shadow:none;cursor:not-allowed}
+.btn.ghost{background:var(--paper);color:var(--ink);text-shadow:none}
+.btn.leaf{background:var(--leaf)}.btn.pond{background:var(--pond)}.btn.plum{background:var(--plum)}.btn.berry{background:var(--berry)}.btn.butter{background:var(--butter);color:var(--ink);text-shadow:none}
+.btn.sm{padding:5px 10px;font-size:13px;border-radius:10px}
+.btn.on{background:var(--ink);color:var(--paper)}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:900;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+.input{width:100%;padding:8px 10px;border:3px solid var(--ink);border-radius:11px;background:#fff;font-weight:800;text-transform:none;letter-spacing:0;color:var(--ink)}
+textarea.input{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.5;resize:vertical;min-height:120px;user-select:text}
+input[type=range]{width:100%;accent-color:var(--beak)}
+input[type=color]{width:42px;height:34px;padding:0;border:3px solid var(--ink);border-radius:9px;background:none}
+.row{display:flex;gap:8px;align-items:center}
+.wrap{flex-wrap:wrap}
+.muted{color:var(--ink-soft)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:2px solid var(--ink);border-radius:999px;background:#fff;font-weight:900;font-size:12.5px}
+.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.swatch{aspect-ratio:1;border:2px solid var(--ink);border-radius:7px;padding:0}
+.swatch.on{outline:3px solid var(--beak);outline-offset:1px}
+
+/* Lobby */
+#lobby{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 50% 45%,#fffaf000,#26283b66)}
+.lobby-card{width:min(440px,100%);padding:24px;text-align:center}
+.lobby-card h1{margin:4px 0 2px;font-family:var(--display);font-size:38px;font-weight:700}
+.lobby-card h1 b{color:var(--beak)}
+.lobby-card p{margin:0 0 14px;color:var(--ink-soft);line-height:1.5}
+.lobby-card .btn{width:100%;margin-top:10px;font-size:17px;padding:11px}
+.code-input{text-align:center;font-family:var(--display);font-size:24px;letter-spacing:.2em;text-transform:uppercase}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0 4px;color:var(--ink-soft);font-size:12px;font-weight:900}
+.divider:before,.divider:after{content:"";flex:1;height:3px;border-radius:3px;background:var(--paper-3)}
+.notice{margin-top:12px;padding:10px;border:3px dashed var(--ink-soft);border-radius:12px;color:var(--ink-soft);font-size:13px;line-height:1.5}
+.notice a{color:#c4640f;font-weight:900}
+
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+#hud>*{pointer-events:auto}
+.top{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+.top>*{pointer-events:auto}
+.brand-pill{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px}
+.brand-pill a{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--ink);color:var(--paper);text-decoration:none;font-size:18px}
+.brand-pill strong{font-family:var(--display);font-size:18px}
+.room-pill{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;font-weight:900}
+.room-pill code{font-family:var(--display);font-size:17px;letter-spacing:.12em}
+.top-actions{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#players{position:absolute;top:66px;left:10px;width:210px;padding:10px;max-height:40vh;overflow:auto}
+#players h3{margin:0 0 6px;font-family:var(--display);font-size:16px}
+.p-row{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:13px}
+.p-dot{width:12px;height:12px;border:2px solid var(--ink);border-radius:50%}
+.p-row .pts{margin-left:auto;font-family:var(--display)}
+#banner{position:absolute;top:66px;left:50%;transform:translateX(-50%);padding:8px 18px;text-align:center;font-family:var(--display);font-size:18px;font-weight:600;background:var(--butter)}
+#banner small{display:block;font-family:var(--body);font-size:12px;font-weight:800}
+.bottom-left{position:absolute;left:10px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:60vw}
+#quickMenu{position:absolute;left:10px;bottom:62px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;width:280px}
+#feed{position:absolute;left:10px;bottom:62px;display:flex;flex-direction:column;gap:4px;max-width:320px;pointer-events:none}
+.feed-item{padding:4px 10px;border:2px solid var(--ink);border-radius:10px;background:#fffaf0e6;font-size:12.5px;animation:fade 6s forwards}
+@keyframes fade{0%,80%{opacity:1}100%{opacity:0}}
+.crosshair{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 2px var(--ink);pointer-events:none}
+
+/* Build palette */
+#buildBar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(980px,calc(100% - 20px));padding:10px;display:grid;grid-template-columns:auto auto 1fr auto;gap:12px;align-items:start}
+#buildBar h4{margin:0 0 5px;font-size:11px;font-weight:900;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg .btn{padding:5px 9px;font-size:13px}
+.tools{display:flex;flex-wrap:wrap;gap:4px}
+.sizes{display:grid;grid-template-columns:auto 1fr 34px;gap:2px 6px;align-items:center;font-size:12px}
+#props{position:absolute;right:10px;top:66px;bottom:10px;width:320px;padding:12px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+#props h3{margin:0;font-family:var(--display);font-size:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ref{margin:0;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--paper-2);font-family:ui-monospace,Consolas,monospace;font-size:11.5px;line-height:1.55;white-space:pre-wrap;user-select:text}
+.err{color:var(--berry);font-size:12px;font-weight:900;white-space:pre-wrap}
+.ok{color:#3d8132;font-size:12px;font-weight:900}
+
+/* Mobile controls */
+#joy{position:absolute;left:18px;bottom:80px;width:120px;height:120px;border:3px solid #26283b88;border-radius:50%;background:#fffaf055;touch-action:none}
+#joy i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border:3px solid var(--ink);border-radius:50%;background:var(--paper)}
+#jumpBtn{position:absolute;right:22px;bottom:96px;width:78px;height:78px;border-radius:50%;font-size:16px}
+
+/* Modals */
+.modal-bg{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:12px;background:#26283b99}
+.modal{position:relative;width:min(560px,100%);max-height:calc(100vh - 24px);overflow:auto;padding:18px}
+.modal h2{margin:0 0 10px;font-family:var(--display);font-size:26px}
+.modal .x{position:absolute;top:10px;right:10px;width:36px;height:36px;padding:0;border-radius:10px;font-size:18px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.save-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.save-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:2px solid var(--ink);border-radius:12px;background:#fff}
+.save-row b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{padding:1px 7px;border-radius:7px;font-size:11px;font-weight:900;color:#fff}
+.tag.cloud{background:var(--pond)}.tag.local{background:var(--ink-soft)}
+
+/* Character editor */
+#charModal .modal{width:min(980px,100%);display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px}
+#charPreview{width:100%;height:min(560px,62vh);border:3px solid var(--ink);border-radius:14px;background:linear-gradient(#cfeefb,#fffaf0);touch-action:none}
+.part-chips{display:flex;flex-wrap:wrap;gap:5px}
+.editor-side{display:flex;flex-direction:column;gap:10px}
+#paintModal .modal{width:min(460px,100%);text-align:center}
+#paintCanvas{width:288px;height:288px;border:3px solid var(--ink);border-radius:10px;image-rendering:pixelated;touch-action:none;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/24px 24px;cursor:crosshair}
+
+#toasts{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+.toast{padding:8px 14px;border:3px solid var(--ink);border-radius:13px;background:var(--paper);box-shadow:var(--hard-sm);font-weight:900;animation:fade 4s forwards}
+
+@media(max-width:820px){
+ #charModal .modal{grid-template-columns:1fr}
+ #charPreview{height:38vh}
+ #buildBar{grid-template-columns:1fr 1fr;max-height:46vh;overflow:auto}
+ #props{left:10px;width:auto;top:auto;height:55vh}
+ #players{display:none}
+ .top-actions .btn span{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<div id="lobby">
+ <div class="card lobby-card">
+  <h1>Doug<b>World</b> 3D</h1>
+  <p>Hang out, build houses with working gadgets, design your character and play games with your friends.</p>
+  <div id="whoami" class="chip" style="margin-bottom:12px">Checking sign-in…</div>
+  <label class="field">Room code<input class="input code-input" id="roomInput" maxlength="6" placeholder="ABC123" autocomplete="off"></label>
+  <button class="btn" id="joinBtn" type="button">Join friends</button>
+  <button class="btn pond" id="createBtn" type="button">Start a new room</button>
+  <div class="divider">OR</div>
+  <button class="btn ghost" id="soloBtn" type="button">Play solo</button>
+  <div class="notice hidden" id="loginNotice"><a href="../log-in.html?redirect=Games/dougworld.html">Log in</a> to play with friends and save to the cloud. You can still play solo and save on this device.</div>
+ </div>
+</div>
+
+<div id="hud" class="hidden">
+ <div class="top">
+  <div class="card brand-pill"><a href="../douggames.html" aria-label="Back to DougGames">←</a><strong>DougWorld</strong></div>
+  <div class="card room-pill" id="roomPill">Room <code id="roomCode">SOLO</code><button class="btn sm butter" id="inviteBtn" type="button">Copy invite</button></div>
+  <div class="top-actions">
+   <button class="btn plum" id="charBtn" type="button">🧍 <span>Character</span></button>
+   <button class="btn leaf" id="buildBtn" type="button">🧱 <span>Build</span></button>
+   <button class="btn pond" id="gamesBtn" type="button">🎮 <span>Games</span></button>
+   <button class="btn butter" id="stuffBtn" type="button">💾 <span>My stuff</span></button>
+   <button class="btn ghost" id="helpBtn" type="button">?</button>
+  </div>
+ </div>
+ <div class="card" id="players"><h3>Players</h3><div id="playerList"></div></div>
+ <div class="card hidden" id="banner"></div>
+ <div id="feed"></div>
+ <div class="bottom-left" id="socialBar">
+  <button class="btn ghost sm" id="quickBtn" type="button">💬 Say</button>
+  <button class="btn ghost sm" data-emote="wave" type="button">👋</button>
+  <button class="btn ghost sm" data-emote="dance" type="button">🕺</button>
+  <button class="btn ghost sm" data-emote="flip" type="button">🤸</button>
+  <button class="btn ghost sm" data-emote="sit" type="button">🪑</button>
+ </div>
+ <div class="card hidden" id="quickMenu"></div>
+ <div class="card hidden" id="buildBar"></div>
+ <div class="card hidden" id="props"></div>
+ <div id="joy" class="hidden"><i></i></div>
+ <button class="btn hidden" id="jumpBtn" type="button">Jump</button>
+</div>
+
+<div class="modal-bg hidden" id="charModal"><div class="card modal">
+ <div><canvas id="charPreview"></canvas><p class="muted" style="margin:6px 2px 0;font-size:12px">Drag to spin your character.</p></div>
+ <div class="editor-side" id="charSide"></div>
+ <button class="btn berry x" type="button" data-close>×</button>
+</div></div>
+
+<div class="modal-bg hidden" id="paintModal"><div class="card modal">
+ <h2>Draw</h2>
+ <canvas id="paintCanvas" width="96" height="96"></canvas>
+ <div id="paintTools" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;align-items:center"></div>
+</div></div>
+
+<div class="modal-bg hidden" id="stuffModal"><div class="card modal" id="stuffBody"></div></div>
+<div class="modal-bg hidden" id="gamesModal"><div class="card modal" id="gamesBody"></div></div>
+<div class="modal-bg hidden" id="helpModal"><div class="card modal" id="helpBody"></div></div>
+<input type="file" id="uploadInput" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+<div id="toasts"></div>
+
+<script type="module" src="dougworld/main.js"></script>
+</body>
+</html>
