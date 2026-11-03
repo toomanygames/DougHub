@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1440">
+<title>Honk Empire</title>
+<link rel="icon" href="art/honk-empire.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="honk-empire" data-game-title="Honk Empire" defer></script>
+<style>
+:root{
+ --ink:#fff;--muted:#cbc6ea;--faint:#9c96c4;
+ --panel:#1d1746e6;--panel-2:#272058;--line:#ffffff1f;
+ --gold:#fcd34d;--orange:#fb923c;--pink:#f472b6;--green:#86efac;--cyan:#67e8f9;--purple:#a78bfa;
+ --common:#cbd5e1;--rare:#60a5fa;--epic:#c084fc;--legendary:#fbbf24;--mythic:#f472b6;
+ --sky-a:#7dd3fc;--sky-b:#bae6fd;--ground:#4ade80;--ground-2:#22c55e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{display:flex;flex-direction:column;background:#120d2e;color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:14px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;gap:14px;padding:10px 16px;background:#0e0a26;border-bottom:1px solid var(--line);flex:0 0 auto}
+.back{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#ffffff10;color:var(--muted);text-decoration:none;font-size:18px}
+.back:hover{background:#ffffff1c;color:#fff}
+.brand{font-weight:900;font-size:18px;letter-spacing:-.3px;white-space:nowrap}
+.brand span{color:var(--gold)}
+.top-stats{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:#ffffff10;border:1px solid var(--line);font-weight:800;font-size:13px;white-space:nowrap}
+.chip small{color:var(--muted);font-weight:700}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:#ffffff10;font-size:16px}
+.icon-btn:hover{background:#ffffff1c}
+
+/* Hourly event banner + news ticker */
+.event-banner{display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 12px;background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b);font-weight:800;font-size:13px;text-align:center;flex:0 0 auto}
+.event-banner small{opacity:.85;font-weight:700}
+.ticker{overflow:hidden;white-space:nowrap;background:#0b0820;border-bottom:1px solid var(--line);color:var(--muted);font-size:12.5px;padding:5px 0;flex:0 0 auto}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 22s linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+
+/* Main layout */
+.game{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 420px}
+.stage{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--sky-a),var(--sky-b) 62%,var(--ground) 62%,var(--ground-2));transition:background .6s}
+.stage.world-4{animation:glitch-bg 4s linear infinite}
+@keyframes glitch-bg{0%,100%{filter:none}48%{filter:none}50%{filter:hue-rotate(90deg) saturate(1.6)}52%{filter:none}}
+.stars{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .6s;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 20%,#fff,transparent),radial-gradient(2px 2px at 40% 12%,#fff,transparent),radial-gradient(1.5px 1.5px at 85% 45%,#fff,transparent),radial-gradient(1px 1px at 10% 55%,#fff,transparent),radial-gradient(1.5px 1.5px at 55% 40%,#fff,transparent)}
+.stage.world-3 .stars,.stage.world-4 .stars{opacity:1}
+.world-label{position:absolute;top:12px;left:12px;padding:6px 12px;border-radius:999px;background:#0008;font-weight:800;font-size:12.5px;backdrop-filter:blur(4px)}
+.world-label b{color:var(--gold)}
+.counter{position:relative;z-index:2;text-align:center;margin-bottom:6px;text-shadow:0 3px 0 #0005,0 0 18px #0006}
+.counter .big{font-size:clamp(30px,5vw,48px);font-weight:900;letter-spacing:-1px;line-height:1}
+.counter .sub{margin-top:4px;font-weight:800;font-size:14px;color:#fff}
+.goose-btn{position:relative;z-index:2;border:0;background:none;padding:0;width:min(300px,62vw);aspect-ratio:1;transition:transform .07s;touch-action:manipulation}
+.goose-btn:active{transform:scale(.93)}
+.goose-btn svg{width:100%;height:100%;filter:drop-shadow(0 14px 18px #0004)}
+.goose-btn.squish{animation:squish .16s}
+@keyframes squish{50%{transform:scale(.9,1.06)}}
+.buffs{position:relative;z-index:2;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:30px;margin-top:8px}
+.buff{padding:5px 10px;border-radius:999px;background:#000a;font-size:12px;font-weight:800;border:1px solid #fff3}
+.daily-btn{position:absolute;top:12px;right:12px;z-index:3;padding:8px 13px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--gold),var(--orange));color:#3b1d05;font-weight:900;box-shadow:0 6px 16px #0005;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.float{position:absolute;z-index:5;pointer-events:none;font-weight:900;font-size:20px;color:#fff;text-shadow:0 2px 0 #000a;animation:floatup .9s ease-out forwards}
+.float.crit{color:var(--gold);font-size:28px}
+@keyframes floatup{to{transform:translateY(-80px);opacity:0}}
+.bubble{position:absolute;z-index:4;pointer-events:none;padding:6px 10px;border-radius:12px;background:#fff;color:#1e1b4b;font-weight:800;font-size:13px;box-shadow:0 4px 12px #0004;animation:bubble 1.6s ease-out forwards;white-space:nowrap}
+@keyframes bubble{0%{transform:scale(.6);opacity:0}15%{transform:scale(1);opacity:1}80%{opacity:1}100%{opacity:0;transform:translateY(-12px)}}
+.golden-bread{position:absolute;z-index:6;border:0;background:none;font-size:46px;padding:0;filter:drop-shadow(0 0 12px #fcd34d);animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(8deg)}}
+.mini-goose{position:absolute;z-index:6;border:0;background:none;font-size:34px;padding:0;animation:walk linear forwards}
+@keyframes walk{from{left:-60px}to{left:calc(100% + 60px)}}
+
+/* Panel */
+.panel{display:flex;flex-direction:column;min-height:0;background:#18123a;border-left:1px solid var(--line)}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:8px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border:1px solid transparent;border-radius:10px;background:none;color:var(--muted);font-size:11px;font-weight:800}
+.tab .ti{font-size:18px}
+.tab:hover{background:#ffffff0c;color:#fff}
+.tab.active{background:#ffffff14;border-color:#ffffff22;color:#fff}
+.tab .dot{position:absolute;top:4px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--pink);display:none}
+.tab.alert .dot{display:block}
+.tab-body{flex:1;min-height:0;overflow-y:auto;padding:12px;scrollbar-width:thin}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;font-weight:900;font-size:15px}
+.section-title small{color:var(--muted);font-size:12px;font-weight:700}
+.hint{color:var(--muted);font-size:12.5px;line-height:1.5;margin:0 2px 12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:none;padding:4px 9px;font-size:12px;font-weight:800;color:var(--muted)}
+.seg button.on{background:#ffffff1c;color:#fff}
+
+/* Shop rows */
+.row{display:flex;align-items:center;gap:11px;width:100%;margin-bottom:7px;padding:10px;border:1px solid var(--line);border-radius:13px;background:var(--panel-2);text-align:left;transition:transform .1s,border-color .15s,background .15s}
+.row:not(:disabled):hover{border-color:#ffffff40;background:#2f2766}
+.row:not(:disabled):active{transform:scale(.98)}
+.row:disabled{opacity:.55;cursor:not-allowed}
+.row.locked{filter:grayscale(1) brightness(.7)}
+.row-icon{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;border-radius:12px;background:#ffffff12;font-size:24px}
+.row-copy{flex:1;min-width:0}
+.row-copy strong{display:block;font-size:14px}
+.row-copy small{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:1px}
+.row-side{text-align:right;flex:0 0 auto}
+.row-side .owned{font-size:20px;font-weight:900;color:#ffffff55}
+.cost{font-weight:900;font-size:13px;color:var(--gold)}
+.cost.no{color:#fca5a5}
+.big-btn{width:100%;padding:12px;border:0;border-radius:13px;font-weight:900;font-size:15px;background:linear-gradient(135deg,var(--purple),var(--pink));box-shadow:0 6px 18px #0004}
+.big-btn:disabled{opacity:.45;cursor:not-allowed}
+.big-btn.gold{background:linear-gradient(135deg,var(--gold),var(--orange));color:#3b1d05}
+
+/* Pets */
+.egg-card{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:12px;border-radius:14px;background:linear-gradient(135deg,#3b2f7a,#2a2160);border:1px solid #ffffff22}
+.egg-card .egg{font-size:42px}
+.egg-card .row-copy{flex:1}
+.odds{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.odds span{font-size:11px;font-weight:800}
+.pet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
+.pet{position:relative;padding:8px 4px 7px;border-radius:12px;border:2px solid var(--rc,#fff3);background:#ffffff0a;text-align:center}
+.pet.equipped{background:#ffffff1f;box-shadow:0 0 0 2px #fff inset}
+.pet.golden{background:linear-gradient(160deg,#fcd34d33,#ffffff0a)}
+.pet .pe{font-size:28px;display:block}
+.pet .pn{display:block;font-size:11px;font-weight:800;line-height:1.2;margin-top:2px;min-height:26px}
+.pet .pb{display:block;font-size:11px;color:var(--green);font-weight:800}
+.pet .tag{position:absolute;top:4px;left:5px;font-size:10px}
+.pet-actions{display:flex;gap:8px;margin:10px 0}
+.pet-actions button{flex:1;padding:8px;border-radius:10px;border:1px solid var(--line);background:#ffffff10;font-weight:800;font-size:12.5px}
+
+/* Worlds */
+.world{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel-2)}
+.world.current{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.world .we{font-size:34px}
+.world button{padding:8px 12px;border-radius:10px;border:0;font-weight:900;background:#ffffff1c}
+.world button.buy{background:linear-gradient(135deg,var(--gold),var(--orange));color:#3b1d05}
+.world button:disabled{opacity:.45;cursor:not-allowed}
+
+/* Rebirth */
+.rebirth-card{padding:16px;border-radius:16px;background:radial-gradient(circle at 80% 0,#f472b655,transparent 55%),linear-gradient(160deg,#3b2f7a,#231b55);border:1px solid #ffffff22;text-align:center;margin-bottom:12px}
+.rebirth-card .feather{font-size:44px}
+.rebirth-card .gain{font-size:30px;font-weight:900;color:var(--gold);margin:4px 0}
+.list{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px;line-height:1.7}
+
+/* Trophies */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:7px}
+.ach{padding:9px;border-radius:12px;background:#ffffff08;border:1px solid var(--line);font-size:11.5px;color:var(--faint)}
+.ach strong{display:block;font-size:12.5px;color:var(--muted);margin-bottom:2px}
+.ach.got{background:linear-gradient(160deg,#fcd34d26,#ffffff08);border-color:#fcd34d66;color:var(--muted)}
+.ach.got strong{color:#fff}
+.stat-list{display:grid;grid-template-columns:1fr auto;gap:6px 10px;margin:0 2px 14px;font-size:13px}
+.stat-list dt{color:var(--muted)}.stat-list dd{margin:0;font-weight:800;text-align:right}
+
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;margin-bottom:5px;background:#ffffff08}
+.lb-row.me{background:#fcd34d22;border:1px solid #fcd34d66}
+.lb-rank{width:30px;font-weight:900;text-align:center;color:var(--muted)}
+.lb-row:nth-child(1) .lb-rank{color:var(--gold)}.lb-row:nth-child(2) .lb-rank{color:#e5e7eb}.lb-row:nth-child(3) .lb-rank{color:#f59e0b}
+.lb-avatar{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;font-weight:900;overflow:hidden;flex:0 0 30px}
+.lb-avatar img{width:100%;height:100%;object-fit:cover}
+.lb-name{flex:1;min-width:0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-name small{display:block;color:var(--muted);font-weight:700;font-size:11px}
+.lb-score{font-weight:900;color:var(--gold)}
+.notice{padding:14px;border-radius:13px;background:#ffffff0c;color:var(--muted);text-align:center;line-height:1.6}
+.notice a{color:var(--gold);font-weight:800}
+
+/* Modals & toasts */
+.modal-bg{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:16px;background:#05031acc;backdrop-filter:blur(4px)}
+.modal-bg.show{display:grid}
+.modal{width:min(380px,100%);padding:22px;border-radius:20px;background:linear-gradient(160deg,#30276b,#1b1543);border:1px solid #ffffff26;text-align:center;box-shadow:0 30px 80px #0008}
+.modal h2{margin:4px 0 6px;font-size:22px}
+.modal p{margin:0 0 16px;color:var(--muted);line-height:1.55}
+.hatch-egg{font-size:84px;display:inline-block}
+.hatch-egg.shake{animation:shake .5s ease-in-out 3}
+@keyframes shake{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.reveal{font-size:84px;display:inline-block;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(0)}}
+.rarity{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:900;font-size:13px;letter-spacing:.06em;color:#111}
+.toasts{position:fixed;left:50%;bottom:18px;z-index:60;display:flex;flex-direction:column;gap:8px;align-items:center;transform:translateX(-50%);pointer-events:none;width:min(440px,calc(100% - 24px))}
+.toast{padding:10px 16px;border-radius:13px;background:#0e0a26f2;border:1px solid #ffffff2a;font-weight:800;font-size:13.5px;box-shadow:0 10px 30px #0006;animation:toast-in .25s ease-out;text-align:center}
+.toast.gold{border-color:var(--gold);color:var(--gold)}
+@keyframes toast-in{from{transform:translateY(16px);opacity:0}}
+
+@media(max-width:860px){
+ body{overflow:auto}
+ .game{grid-template-columns:1fr;grid-template-rows:auto auto}
+ .stage{min-height:56vh;padding:54px 0 14px}
+ .panel{border-left:0;border-top:1px solid var(--line);min-height:70vh}
+ .tab-body{overflow:visible}
+ .top-stats .chip.opt{display:none}
+ .brand{font-size:16px}
+}
+@media(max-width:420px){.topbar{gap:8px;padding:8px 10px}.chip{padding:5px 8px;font-size:12px}.tab{font-size:10px}.tab .ti{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}.ticker span{animation:none;padding-left:12px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <a class="back" href="../douggames.html" aria-label="Back to DougGames">←</a>
+ <div class="brand">Honk <span>Empire</span></div>
+ <div class="top-stats">
+  <div class="chip" title="Golden Feathers (rebirth currency)">🪶 <span id="featherChip">0</span></div>
+  <div class="chip opt" title="Rebirths">♻️ <span id="rebirthChip">0</span></div>
+  <div class="chip opt" title="Total multiplier">✖️ <span id="multChip">1</span></div>
+  <button class="icon-btn" id="muteBtn" type="button" aria-label="Toggle sound">🔊</button>
+ </div>
+</header>
+<div class="event-banner" id="eventBanner"></div>
+<div class="ticker" aria-hidden="true"><span id="ticker">Loading the goose news…</span></div>
+
+<div class="game">
+ <section class="stage" id="stage" aria-label="Goose clicking area">
+  <div class="stars"></div>
+  <div class="world-label" id="worldLabel"></div>
+  <button class="daily-btn" id="dailyBtn" type="button" hidden>🎁 Daily gift</button>
+  <div class="counter"><div class="big" id="honkCount">0</div><div class="sub"><span id="cpsText">0</span> honks/sec · <span id="clickText">1</span> per click</div></div>
+  <button class="goose-btn" id="goose" type="button" aria-label="Click the goose"></button>
+  <div class="buffs" id="buffs"></div>
+ </section>
+
+ <aside class="panel">
+  <nav class="tabs" role="tablist">
+   <button class="tab active" data-tab="shop" type="button"><span class="ti">🛒</span>Shop<span class="dot"></span></button>
+   <button class="tab" data-tab="pets" type="button"><span class="ti">🥚</span>Pets<span class="dot"></span></button>
+   <button class="tab" data-tab="worlds" type="button"><span class="ti">🌍</span>Worlds<span class="dot"></span></button>
+   <button class="tab" data-tab="rebirth" type="button"><span class="ti">♻️</span>Rebirth<span class="dot"></span></button>
+   <button class="tab" data-tab="trophies" type="button"><span class="ti">🏆</span>Trophies<span class="dot"></span></button>
+   <button class="tab" data-tab="leaders" type="button"><span class="ti">👑</span>Ranks<span class="dot"></span></button>
+  </nav>
+  <div class="tab-body" id="tabBody"></div>
+ </aside>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Honk Empire — an original DougHub clicker.
+   All progress lives in localStorage; only the leaderboard talks to Supabase.
+   ============================================================ */
+const SUPABASE_URL="https://agsqdqcsmsppcdqxlppj.supabase.co";
+const SUPABASE_KEY="sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const SAVE_KEY="honk-empire-save-v1";
+const $=id=>document.getElementById(id);
+
+/* ---------- Content ---------- */
+const GENERATORS=[
+ {id:"gosling",name:"Angry Gosling",icon:"🐣",cost:15,cps:.5,desc:"Small. Furious. Honks on principle."},
+ {id:"bench",name:"Park Bench Gang",icon:"🪑",cost:100,cps:4,desc:"They own this bench now. Legally."},
+ {id:"choir",name:"Honk Choir",icon:"🎶",cost:1100,cps:20,desc:"Every note is the same note. It slaps."},
+ {id:"knife",name:"Goose With a Knife",icon:"🔪",cost:12000,cps:110,desc:"Nobody knows where it got the knife."},
+ {id:"mafia",name:"Pond Mafia",icon:"🕶️",cost:130000,cps:600,desc:"Bread protection racket. Pay up."},
+ {id:"influencer",name:"Goose Influencer",icon:"📱",cost:1.4e6,cps:3300,desc:"'Smash that honk button.' 12M followers."},
+ {id:"mine",name:"Honkcoin Mine",icon:"⛏️",cost:2e7,cps:18000,desc:"Mining a currency that is just honks."},
+ {id:"gov",name:"Goose Government",icon:"🏛️",cost:3.3e8,cps:1e5,desc:"Passed a law making bread a human right. For geese."},
+ {id:"time",name:"Time-Traveling Goose",icon:"⏳",cost:5.1e9,cps:5.6e5,desc:"Went back and honked at the dinosaurs."},
+ {id:"portal",name:"Interdimensional Goose",icon:"🌀",cost:7.5e10,cps:3.2e6,desc:"There is a goose in every universe. All of them are yours."},
+ {id:"final",name:"The Final Honk",icon:"📯",cost:1e12,cps:2e7,desc:"When it honks, reality takes notes."}
+];
+const WORLDS=[
+ {name:"The Pond",icon:"🦆",mult:1,req:0,cost:0,egg:"Pond Egg",eggCost:500,sky:["#7dd3fc","#bae6fd"],ground:["#4ade80","#22c55e"],hat:""},
+ {name:"Suburbia",icon:"🏡",mult:3,req:1,cost:1e6,egg:"Lawn Egg",eggCost:2e6,sky:["#c4b5fd","#fbcfe8"],ground:["#86efac","#16a34a"],hat:"🧢"},
+ {name:"The Mall",icon:"🛍️",mult:8,req:3,cost:1e9,egg:"Food-Court Egg",eggCost:5e9,sky:["#f9a8d4","#fde68a"],ground:["#e5e7eb","#9ca3af"],hat:"🕶️"},
+ {name:"The Moon",icon:"🌙",mult:25,req:6,cost:1e12,egg:"Moon Egg",eggCost:5e12,sky:["#0f172a","#312e81"],ground:["#cbd5e1","#94a3b8"],hat:"🧑‍🚀"},
+ {name:"Glitch Dimension",icon:"👾",mult:100,req:10,cost:1e15,egg:"Corrupted Egg",eggCost:5e15,sky:["#701a75","#0e7490"],ground:["#22d3ee","#a21caf"],hat:"👑"}
+];
+const RARITIES=[
+ {name:"Common",chance:60,boost:.1,color:"var(--common)"},
+ {name:"Rare",chance:25,boost:.25,color:"var(--rare)"},
+ {name:"Epic",chance:11,boost:.6,color:"var(--epic)"},
+ {name:"Legendary",chance:3.5,boost:1.5,color:"var(--legendary)"},
+ {name:"Mythic",chance:.5,boost:4,color:"var(--mythic)"}
+];
+// One pet per rarity per world (index = rarity).
+const PETS=[
+ [["Bread Slice","🍞"],["Frog in a Hat","🐸"],["Suspicious Duck","🦆"],["Swan (Evil)","🦢"],["Pond Overlord","🐉"]],
+ [["Garden Gnome","🍄"],["Roomba","🤖"],["Grill Dad","🍔"],["Trampoline Cat","🐈"],["HOA President","📋"]],
+ [["Soft Pretzel","🥨"],["Mall Cop","👮"],["Escalator Rat","🐀"],["Fountain Wish","⛲"],["Black Friday","🛒"]],
+ [["Moon Cheese","🧀"],["Space Rock","🪨"],["Alien Intern","👽"],["Astro Goose","🚀"],["The Sun (Small)","☀️"]],
+ [["Missing Texture","🟪"],["NaN Goose","❓"],["404 Error","🚫"],["Goose.exe","💾"],["The Developer","🧑‍💻"]]
+];
+const HOURLY=[
+ {id:"honkhour",name:"Happy Honk Hour",icon:"🎉",desc:"Production x2"},
+ {id:"lucky",name:"Lucky Hour",icon:"🍀",desc:"Pet luck x3"},
+ {id:"eggsale",name:"Egg Sale",icon:"🏷️",desc:"Eggs 40% off"},
+ {id:"crit",name:"Crit Party",icon:"💥",desc:"Crit chance 20%"},
+ {id:"bread",name:"Bread Festival",icon:"🥖",desc:"Golden Bread spawns 3x faster"}
+];
+const QUOTES=["HONK","pay me","skill issue","I have no thoughts, only honk","respectfully: honk","bread or riot","ratio + honk","touch grass? I AM grass-adjacent","certified honk moment","no cap, just beak","this is my pond now","I'm not loud, I'm passionate","main character energy","honk responsibly","the audacity","goose mode: activated","*aggressive waddling*","404: chill not found"];
+const NEWS=[
+ ["Local goose refuses to explain itself.",0],
+ ["Scientists confirm honks are 40% louder than last year.",0],
+ ["Man asks goose to stop. Goose does not stop.",0],
+ ["Bread prices soar after goose buys three bakeries.",1e3],
+ ["Pond declared 'goose territory' by goose.",1e4],
+ ["Breaking: goose seen holding a knife. Police 'not getting involved'.",1.2e4],
+ ["Stock market replaced with a single goose. Economy unchanged.",1e6],
+ ["Goose Influencer's apology video gets 40M views. It just says HONK.",1.4e6],
+ ["Honkcoin now accepted at 3 gas stations and 1 confused dentist.",2e7],
+ ["Goose Government bans the word 'duck'.",3.3e8],
+ ["Historians baffled by goose footprints in ancient pyramid.",5e9],
+ ["Multiverse experts: 'it's geese all the way down.'",7.5e10],
+ ["Moon lands on goose. Wait, other way round.",1e12],
+ ["Reality patch notes: 'fixed bug where geese could not be stopped' (not fixed).",1e15],
+ ["Parents unsure why teen keeps yelling HONK at the screen.",0],
+ ["Study: 9 out of 10 geese prefer chaos.",0],
+ ["Weather today: 100% chance of honk.",0],
+ ["Goose wins 'Employee of the Month' at a company it does not work for.",1e5]
+];
+
+/* ---------- Achievements (each gives +2% production) ---------- */
+const ACH=[
+ {id:"click1",name:"Honk Initiate",desc:"Click the goose once.",test:s=>s.clicks>=1},
+ {id:"click1k",name:"Carpal Tunnel Speedrun",desc:"Click 1,000 times.",test:s=>s.clicks>=1000},
+ {id:"click10k",name:"Finger of Steel",desc:"Click 10,000 times.",test:s=>s.clicks>=10000},
+ {id:"crit50",name:"Critical Honker",desc:"Land 50 crit honks.",test:s=>s.stats.crits>=50},
+ {id:"h1k",name:"Pocket Honks",desc:"Earn 1K honks.",test:s=>s.lifetime>=1e3},
+ {id:"h1m",name:"Honkillionaire",desc:"Earn 1M honks.",test:s=>s.lifetime>=1e6},
+ {id:"h1b",name:"Billion With a B",desc:"Earn 1B honks.",test:s=>s.lifetime>=1e9},
+ {id:"h1t",name:"Too Many Honks",desc:"Earn 1T honks.",test:s=>s.lifetime>=1e12},
+ {id:"h1qa",name:"Honk Singularity",desc:"Earn 1Qa honks.",test:s=>s.lifetime>=1e15},
+ {id:"gen50",name:"Gosling Daycare",desc:"Own 50 Angry Goslings.",test:s=>s.gens[0]>=50},
+ {id:"knife",name:"Who Gave It a Knife",desc:"Own a Goose With a Knife.",test:s=>s.gens[3]>=1},
+ {id:"final",name:"It Is Done",desc:"Own The Final Honk.",test:s=>s.gens[10]>=1},
+ {id:"reb1",name:"Born Again Goose",desc:"Rebirth once.",test:s=>s.rebirths>=1},
+ {id:"reb5",name:"Serial Reincarnator",desc:"Rebirth 5 times.",test:s=>s.rebirths>=5},
+ {id:"reb10",name:"Goose Cycle",desc:"Rebirth 10 times.",test:s=>s.rebirths>=10},
+ {id:"w1",name:"Moved to the Suburbs",desc:"Unlock Suburbia.",test:s=>s.worlds>=2},
+ {id:"w2",name:"Mall Rat (Goose)",desc:"Unlock The Mall.",test:s=>s.worlds>=3},
+ {id:"w3",name:"One Small Honk",desc:"Unlock The Moon.",test:s=>s.worlds>=4},
+ {id:"w4",name:"Out of Bounds",desc:"Unlock the Glitch Dimension.",test:s=>s.worlds>=5},
+ {id:"pet1",name:"Pet Parent",desc:"Hatch your first pet.",test:s=>s.stats.eggs>=1},
+ {id:"pet50",name:"Egg Addict",desc:"Hatch 50 eggs.",test:s=>s.stats.eggs>=50},
+ {id:"leg",name:"Lucky Duck (It's a Goose)",desc:"Hatch a Legendary pet.",test:s=>s.pets.some(p=>p.r>=3)},
+ {id:"myth",name:"Statistically Impossible",desc:"Hatch a Mythic pet.",test:s=>s.pets.some(p=>p.r>=4)},
+ {id:"gold",name:"Goldfinger",desc:"Fuse a Golden pet.",test:s=>s.pets.some(p=>p.g)},
+ {id:"bread10",name:"Carb Loader",desc:"Catch 10 Golden Breads.",test:s=>s.stats.breads>=10},
+ {id:"invade",name:"Goose Patrol",desc:"Catch 25 invading geese.",test:s=>s.stats.invaders>=25},
+ {id:"secret",name:"Secret Honker",desc:"Type the magic word.",test:s=>!!s.stats.secret},
+ {id:"oneJob",name:"You Had One Job",desc:"Click the title 10 times. Why?",test:s=>s.stats.titleClicks>=10},
+ {id:"mute",name:"Indecisive",desc:"Toggle sound 20 times.",test:s=>s.stats.muteToggles>=20},
+ {id:"tax",name:"Tax Season",desc:"Survive the IRS Goose.",test:s=>!!s.stats.taxed}
+];
+
+/* ---------- State ---------- */
+function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false}};}
+let S=freshState();
+try{const raw=localStorage.getItem(SAVE_KEY);if(raw){const loaded=JSON.parse(raw);S=Object.assign(freshState(),loaded);S.stats=Object.assign(freshState().stats,loaded.stats||{});while(S.gens.length<GENERATORS.length)S.gens.push(0);}}catch(e){console.warn("Honk Empire save could not load",e);}
+function save(){S.lastSave=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- Numbers ---------- */
+const SUFFIX=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc","Ud","Dd","Td"];
+function fmt(n){if(!isFinite(n))return"∞";if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();const e=Math.floor(Math.log10(n)/3);if(e>=SUFFIX.length)return n.toExponential(2).replace("+","");const v=n/Math.pow(1000,e);return(v<10?v.toFixed(2):v<100?v.toFixed(1):Math.floor(v))+SUFFIX[e];}
+function fmtTime(ms){const s=Math.max(0,Math.ceil(ms/1000));const m=Math.floor(s/60);return m?m+"m "+(s%60).toString().padStart(2,"0")+"s":s+"s";}
+
+/* ---------- Buffs & hourly events ---------- */
+let buffs=[]; // {id,label,until,prod,click}
+function addBuff(id,label,secs,prod=1,click=1){buffs=buffs.filter(b=>b.id!==id);buffs.push({id,label,until:Date.now()+secs*1000,prod,click});}
+function hourly(){const h=Math.floor(Date.now()/3600000);return HOURLY[h%HOURLY.length];}
+function hourlyLeft(){return 3600000-(Date.now()%3600000);}
+
+/* ---------- Multipliers ---------- */
+function petBonus(p){const base=RARITIES[p.r].boost*(1+p.w*.6);return p.g?base*3:base;}
+function petMult(){return 1+S.equipped.map(id=>S.pets.find(p=>p.id===id)).filter(Boolean).reduce((a,p)=>a+petBonus(p),0);}
+function slots(){return 3+(S.rebirths>=2?1:0)+(S.rebirths>=5?1:0)+(S.rebirths>=10?1:0);}
+function achCount(){return Object.keys(S.ach).length;}
+function globalMult(){
+ let m=WORLDS[S.worlds-1].mult*(1+.1*S.feathers)*petMult()*(1+.02*achCount());
+ if(hourly().id==="honkhour")m*=2;
+ buffs.forEach(b=>m*=b.prod);
+ return m;
+}
+function genMilestone(i){return Math.pow(2,Math.floor(S.gens[i]/25));} // every 25 owned doubles that building
+function baseCps(){return GENERATORS.reduce((a,g,i)=>a+g.cps*S.gens[i]*genMilestone(i),0);}
+function cps(){return baseCps()*globalMult();}
+function clickPower(){
+ const base=(1+S.clickLvl)*Math.pow(2,Math.floor(S.clickLvl/10));
+ let v=(base+baseCps()*.04)*globalMult();
+ buffs.forEach(b=>v*=b.click);
+ return v;
+}
+function critChance(){return hourly().id==="crit"?.2:.05;}
+
+/* ---------- Costs ---------- */
+function genCost(i,n=1){const g=GENERATORS[i];let total=0;for(let k=0;k<n;k++)total+=g.cost*Math.pow(1.15,S.gens[i]+k);return total;}
+function maxAffordable(i){let n=0,c=0;while(n<1000){const next=GENERATORS[i].cost*Math.pow(1.15,S.gens[i]+n);if(c+next>S.honks)break;c+=next;n++;}return n;}
+function clickCost(){return 50*Math.pow(1.6,S.clickLvl);}
+function eggCost(w){let c=WORLDS[w].eggCost*Math.pow(1.06,S.pets.filter(p=>p.w===w).length);if(hourly().id==="eggsale")c*=.6;return c;}
+function rebirthGain(){return S.run<1e7?0:Math.floor(Math.sqrt(S.run/1e7));}
+
+/* ---------- Earning ---------- */
+function earn(n){S.honks+=n;S.run+=n;S.lifetime+=n;}
+
+/* ---------- Sound ---------- */
+let audio=null;
+function honkSound(pitch=1,len=.13){
+ if(S.muted)return;
+ try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const t=audio.currentTime,o=audio.createOscillator(),f=audio.createBiquadFilter(),g=audio.createGain();
+  o.type="sawtooth";o.frequency.setValueAtTime(420*pitch,t);o.frequency.exponentialRampToValueAtTime(300*pitch,t+len);
+  f.type="lowpass";f.frequency.value=1400;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+len);
+  o.connect(f);f.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+len+.02);}catch(e){}
+}
+function chime(){if(S.muted)return;[1,1.26,1.5,2].forEach((p,i)=>setTimeout(()=>honkSound(p*1.6,.09),i*70));}
+
+/* ---------- Goose art (original SVG) ---------- */
+function gooseSVG(){
+ const hat=WORLDS[S.world].hat,crown=S.rebirths>0&&!hat;
+ return `<svg viewBox="0 0 200 200" aria-hidden="true">
+ <ellipse cx="100" cy="182" rx="62" ry="10" fill="#0003"/>
+ <path d="M70 172 l-8 12 h18z M118 172 l-6 12 h18z" fill="#f97316"/>
+ <ellipse cx="100" cy="135" rx="62" ry="44" fill="#fff"/>
+ <path d="M48 128 q-26 -6 -30 -26 q22 4 40 14z" fill="#e5e7eb"/>
+ <path d="M108 120 q30 -4 40 20 q-26 6 -44 -6z" fill="#e5e7eb"/>
+ <path d="M128 112 C132 80 120 64 122 44" stroke="#fff" stroke-width="26" stroke-linecap="round" fill="none"/>
+ <circle cx="124" cy="40" r="24" fill="#fff"/>
+ <path d="M140 38 q26 2 30 10 q-14 8 -30 4z" fill="#fb923c"/>
+ <path d="M140 46 q16 2 30 2" stroke="#c2410c" stroke-width="2" fill="none"/>
+ <circle cx="130" cy="34" r="4.5" fill="#111827"/><circle cx="131.5" cy="32.5" r="1.4" fill="#fff"/>
+ <path d="M121 25 l15 5" stroke="#111827" stroke-width="3.5" stroke-linecap="round"/>
+ ${crown?'<path d="M104 20 l6 -14 l8 10 l6 -12 l6 12 l8 -10 l4 14z" fill="#fcd34d" stroke="#b45309" stroke-width="2"/>':""}
+ ${hat?`<text x="124" y="22" font-size="30" text-anchor="middle">${hat}</text>`:""}
+ </svg>`;
+}
+
+/* ---------- Clicking ---------- */
+const stage=$("stage"),gooseBtn=$("goose");
+function floatText(x,y,text,cls=""){const el=document.createElement("div");el.className="float "+cls;el.textContent=text;el.style.left=x+"px";el.style.top=y+"px";stage.appendChild(el);setTimeout(()=>el.remove(),900);}
+function bubble(text){const r=gooseBtn.getBoundingClientRect(),sr=stage.getBoundingClientRect();const el=document.createElement("div");el.className="bubble";el.textContent=text;el.style.left=(r.left-sr.left+r.width*.55)+"px";el.style.top=(r.top-sr.top+8)+"px";stage.appendChild(el);setTimeout(()=>el.remove(),1600);}
+gooseBtn.addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ const crit=Math.random()<critChance();
+ const amount=clickPower()*(crit?10:1);
+ earn(amount);S.clicks++;
+ if(crit)S.stats.crits++;
+ const sr=stage.getBoundingClientRect();
+ floatText(e.clientX-sr.left-20,e.clientY-sr.top-30,(crit?"CRIT! +":"+")+fmt(amount),crit?"crit":"");
+ honkSound(crit?1.4:.9+Math.random()*.25);
+ gooseBtn.classList.remove("squish");void gooseBtn.offsetWidth;gooseBtn.classList.add("squish");
+ if(Math.random()<.045)bubble(QUOTES[Math.floor(Math.random()*QUOTES.length)]);
+});
+document.querySelector(".brand").addEventListener("click",()=>{S.stats.titleClicks++;if(S.stats.titleClicks===10)toast("Stop clicking the title. Click the GOOSE.");});
+
+// Secret word: type "honk"
+let typed="";
+document.addEventListener("keydown",e=>{if(e.key.length!==1)return;typed=(typed+e.key.toLowerCase()).slice(-4);if(typed==="honk"){typed="";const bonus=Math.max(100,cps()*120);earn(bonus);S.stats.secret=true;chime();toast("🤫 SECRET HONK! +"+fmt(bonus),"gold");addBuff("secret","🤫 Secret Honk x3",20,3,3);}});
+
+/* ---------- Random events ---------- */
+let nextBread=Date.now()+45000,nextInvasion=Date.now()+240000;
+function spawnBread(){
+ const b=document.createElement("button");b.className="golden-bread";b.type="button";b.textContent="🍞";b.setAttribute("aria-label","Golden bread");
+ b.style.left=(10+Math.random()*75)+"%";b.style.top=(15+Math.random()*55)+"%";
+ const timer=setTimeout(()=>b.remove(),12000);
+ b.addEventListener("click",()=>{clearTimeout(timer);b.remove();S.stats.breads++;chime();breadReward();});
+ stage.appendChild(b);
+}
+function breadReward(){
+ const roll=Math.random();
+ if(roll<.08){earn(1);toast("🧽 The bread was a sponge. +1 honk. Sorry.");return;}
+ if(roll<.14){S.stats.taxed=true;const tax=Math.min(S.honks,1);S.honks-=tax;toast("🧾 The IRS Goose took 1 honk. Just one. It's about respect.");return;}
+ if(roll<.40){addBuff("frenzy","🔥 Bread Frenzy x7",30,7,1);toast("🔥 BREAD FRENZY! Production x7 for 30s","gold");return;}
+ if(roll<.62){addBuff("storm","⚡ Honk Storm x10 clicks",15,1,10);toast("⚡ HONK STORM! Clicks x10 for 15s","gold");return;}
+ if(roll<.85){const v=Math.max(13,Math.min(S.honks*.15,cps()*900)+13);earn(v);toast("💰 Lucky Loaf! +"+fmt(v)+" honks","gold");return;}
+ hatch(S.world,true);
+}
+function spawnInvasion(){
+ toast("🚨 GOOSE INVASION! Catch them before they escape!");
+ for(let i=0;i<8;i++)setTimeout(()=>{
+  const g=document.createElement("button");g.className="mini-goose";g.type="button";g.textContent="🪿";g.setAttribute("aria-label","Invading goose");
+  g.style.top=(14+Math.random()*60)+"%";const dur=4+Math.random()*3;g.style.animationDuration=dur+"s";
+  if(Math.random()<.5){g.style.animationDirection="reverse";g.style.transform="scaleX(-1)";}
+  g.addEventListener("click",()=>{g.remove();S.stats.invaders++;const v=Math.max(20,cps()*20);earn(v);honkSound(1.6,.08);const sr=stage.getBoundingClientRect();floatText(sr.width/2-30,sr.height*.3,"+"+fmt(v),"crit");});
+  g.addEventListener("animationend",()=>g.remove());stage.appendChild(g);
+ },i*550);
+}
+
+/* ---------- Pets ---------- */
+function rollRarity(){
+ const luck=hourly().id==="lucky"?3:1;
+ const w=RARITIES.map((r,i)=>i===0?r.chance:r.chance*luck),total=w.reduce((a,b)=>a+b,0);
+ let x=Math.random()*total;for(let i=0;i<w.length;i++){if((x-=w[i])<0)return i;}return 0;
+}
+function hatch(w,free=false){
+ if(!free){const c=eggCost(w);if(S.honks<c)return;S.honks-=c;}
+ const r=rollRarity(),pet={id:S.nextPetId++,w,r,g:false};
+ S.pets.push(pet);S.stats.eggs++;
+ if(S.equipped.length<slots())S.equipped.push(pet.id);
+ showHatch(pet,free);save();render(true);
+}
+function showHatch(pet,free){
+ const def=PETS[pet.w][pet.r],rar=RARITIES[pet.r];
+ openModal(`<div class="hatch-egg shake">🥚</div><h2>${free?"Free egg!":"Hatching…"}</h2><p>${WORLDS[pet.w].egg}</p>`,false);
+ honkSound(.7,.3);
+ setTimeout(()=>{
+  openModal(`<div class="reveal">${def[1]}</div><h2>${def[0]}</h2><p><span class="rarity" style="background:${rar.color}">${rar.name.toUpperCase()}</span><br><br>+${Math.round(petBonus(pet)*100)}% production${S.equipped.includes(pet.id)?" · auto-equipped":""}</p><button class="big-btn" type="button" data-close>Nice</button>`);
+  if(pet.r>=3){chime();setTimeout(chime,300);}else honkSound(1.3,.1);
+ },1500);
+}
+function autoEquip(){S.equipped=[...S.pets].sort((a,b)=>petBonus(b)-petBonus(a)).slice(0,slots()).map(p=>p.id);}
+function fuseAll(){
+ let fused=0,again=true;
+ while(again){again=false;const groups={};S.pets.filter(p=>!p.g).forEach(p=>{(groups[p.w+"-"+p.r]=groups[p.w+"-"+p.r]||[]).push(p);});
+  for(const k in groups){if(groups[k].length>=3){const [a,b,c]=groups[k];S.pets=S.pets.filter(p=>p!==b&&p!==c);a.g=true;S.equipped=S.equipped.filter(id=>id!==b.id&&id!==c.id);fused++;again=true;}}}
+ if(fused){autoEquip();chime();toast("✨ Fused "+fused+" Golden pet"+(fused>1?"s":"")+"!","gold");}else toast("Need 3 of the same pet to fuse a Golden one.");
+ render(true);
+}
+
+/* ---------- Worlds & rebirth ---------- */
+function unlockWorld(i){const w=WORLDS[i];if(S.worlds!==i||S.rebirths<w.req||S.honks<w.cost)return;S.honks-=w.cost;S.worlds=i+1;S.world=i;chime();toast(w.icon+" Welcome to "+w.name+"! Production x"+w.mult,"gold");applyWorld();render(true);}
+function travel(i){if(i>=S.worlds)return;S.world=i;applyWorld();render(true);}
+function applyWorld(){const w=WORLDS[S.world];const st=document.documentElement.style;st.setProperty("--sky-a",w.sky[0]);st.setProperty("--sky-b",w.sky[1]);st.setProperty("--ground",w.ground[0]);st.setProperty("--ground-2",w.ground[1]);stage.className="stage world-"+S.world;$("worldLabel").innerHTML=w.icon+" <b>"+w.name+"</b>";gooseBtn.innerHTML=gooseSVG();}
+function rebirth(){
+ const gain=rebirthGain();if(!gain)return;
+ openModal(`<div class="reveal">🪶</div><h2>Rebirth for ${fmt(gain)} feather${gain>1?"s":""}?</h2><p>Your honks, buildings and beak upgrades reset. You keep pets, worlds, feathers and trophies.</p><button class="big-btn gold" type="button" id="confirmRebirth">Rebirth!</button><br><br><button class="big-btn" type="button" data-close>Not yet</button>`);
+ $("confirmRebirth").addEventListener("click",()=>{
+  S.feathers+=gain;S.rebirths++;S.honks=0;S.run=0;S.gens=GENERATORS.map(()=>0);S.clickLvl=0;buffs=[];
+  closeModal();chime();setTimeout(chime,250);toast("♻️ REBORN! +"+fmt(gain)+" Golden Feathers","gold");
+  if([2,5,10].includes(S.rebirths))toast("🐾 New pet slot unlocked!","gold");
+  autoEquip();applyWorld();save();submitScore(true);render(true);
+ });
+}
+
+/* ---------- Daily gift & offline earnings ---------- */
+function today(){return new Date().toISOString().slice(0,10);}
+function claimDaily(){if(S.lastDaily===today())return;S.lastDaily=today();const v=Math.max(100,cps()*600);earn(v);toast("🎁 Daily gift: +"+fmt(v)+" honks and a free egg!","gold");hatch(S.world,true);}
+function offlineEarnings(){
+ const away=Date.now()-(S.lastSave||Date.now());if(away<60000)return;
+ const v=cps()*Math.min(away,2*3600000)/1000*.5;if(v<1)return;earn(v);
+ openModal(`<div class="reveal">😴</div><h2>Welcome back!</h2><p>While you were gone (${fmtTime(Math.min(away,7200000))}${away>7200000?", max 2h":""}), your geese honked <b>${fmt(v)}</b> honks.</p><button class="big-btn" type="button" data-close>HONK</button>`);
+}
+
+/* ---------- Achievements ---------- */
+function checkAch(){ACH.forEach(a=>{if(!S.ach[a.id]&&a.test(S)){S.ach[a.id]=Date.now();toast("🏆 "+a.name+" (+2% production)","gold");chime();}});}
+
+/* ---------- UI: modal & toast ---------- */
+function openModal(html,closable=true){const bg=$("modalBg");$("modal").innerHTML=html;bg.classList.add("show");bg.dataset.closable=closable?"1":"";}
+function closeModal(){$("modalBg").classList.remove("show");}
+$("modalBg").addEventListener("click",e=>{if(e.target.closest("[data-close]")||(e.target===e.currentTarget&&e.currentTarget.dataset.closable))closeModal();});
+function toast(msg,cls=""){const el=document.createElement("div");el.className="toast "+cls;el.textContent=msg;$("toasts").appendChild(el);setTimeout(()=>el.remove(),3600);while($("toasts").children.length>4)$("toasts").firstChild.remove();}
+
+/* ---------- UI: tabs ---------- */
+let tab="shop",lbMode="lifetime",lbCache=null,lbLoadedAt=0;
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{tab=t.dataset.tab;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===t));if(tab==="leaders")loadLeaderboard();render(true);$("tabBody").scrollTop=0;}));
+$("tabBody").addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b||b.disabled)return;
+ const a=b.dataset;
+ if(a.buy!==undefined){const i=+a.buy,n=S.buyAmt==="max"?maxAffordable(i):S.buyAmt;if(n<1)return;const c=genCost(i,n);if(S.honks<c)return;S.honks-=c;S.gens[i]+=n;honkSound(1.2,.06);render(true);}
+ else if(a.amt){S.buyAmt=a.amt==="max"?"max":+a.amt;render(true);}
+ else if(a.click!==undefined){const c=clickCost();if(S.honks<c)return;S.honks-=c;S.clickLvl++;honkSound(1.3,.06);render(true);}
+ else if(a.egg!==undefined)hatch(+a.egg);
+ else if(a.equip){const id=+a.equip;if(S.equipped.includes(id))S.equipped=S.equipped.filter(x=>x!==id);else if(S.equipped.length<slots())S.equipped.push(id);else toast("All "+slots()+" pet slots are full. Unequip one first.");render(true);}
+ else if(a.action==="autoequip"){autoEquip();toast("Equipped your best pets.");render(true);}
+ else if(a.action==="fuse")fuseAll();
+ else if(a.unlock!==undefined)unlockWorld(+a.unlock);
+ else if(a.travel!==undefined)travel(+a.travel);
+ else if(a.action==="rebirth")rebirth();
+ else if(a.lb){lbMode=a.lb;render(true);}
+ else if(a.action==="reset"){if(confirm("Delete ALL Honk Empire progress? This cannot be undone.")){localStorage.removeItem(SAVE_KEY);S=freshState();buffs=[];applyWorld();render(true);}}
+});
+
+/* ---------- UI: rendering ---------- */
+function shopHTML(){
+ const cc=clickCost();
+ let h=`<div class="section-title">Upgrades <span class="seg">${[1,10,"max"].map(n=>`<button type="button" data-amt="${n}" class="${S.buyAmt===n?"on":""}">${n==="max"?"MAX":"x"+n}</button>`).join("")}</span></div>`;
+ h+=`<button class="row" type="button" data-click ${S.honks<cc?"disabled":""}><span class="row-icon">💪</span><span class="row-copy"><strong>Stronger Beak · Lv ${S.clickLvl}</strong><small>+1 per click, doubles every 10 levels. Clicks also get 4% of your honks/sec.</small></span><span class="row-side"><span class="cost ${S.honks<cc?"no":""}">${fmt(cc)}</span></span></button>`;
+ let shownLocked=0;
+ GENERATORS.forEach((g,i)=>{
+  const visible=S.gens[i]>0||i===0||S.gens[i-1]>0||S.lifetime>=g.cost*.5;
+  if(!visible){if(shownLocked++>0)return;h+=`<div class="row locked"><span class="row-icon">❔</span><span class="row-copy"><strong>???</strong><small>Keep honking to discover.</small></span></div>`;return;}
+  const n=S.buyAmt==="max"?Math.max(1,maxAffordable(i)):S.buyAmt,c=genCost(i,n),can=S.honks>=c&&(S.buyAmt!=="max"||maxAffordable(i)>0);
+  const next=25-(S.gens[i]%25);
+  h+=`<button class="row" type="button" data-buy="${i}" ${can?"":"disabled"}><span class="row-icon">${g.icon}</span><span class="row-copy"><strong>${g.name}${n>1?" ×"+n:""}</strong><small>${g.desc}</small><small>+${fmt(g.cps*genMilestone(i)*globalMult())}/s each · x2 in ${next}</small></span><span class="row-side"><div class="owned">${S.gens[i]}</div><span class="cost ${can?"":"no"}">${fmt(c)}</span></span></button>`;
+ });
+ return h;
+}
+function petsHTML(){
+ const w=S.world,c=eggCost(w),can=S.honks>=c,luck=hourly().id==="lucky";
+ let h=`<div class="egg-card"><span class="egg">🥚</span><span class="row-copy"><strong>${WORLDS[w].egg}</strong><small>Hatch pets from ${WORLDS[w].name}. Better worlds = stronger pets.</small><span class="odds">${RARITIES.map((r,i)=>`<span style="color:${r.color}">${r.name} ${luck&&i?(r.chance*3).toFixed(1):r.chance}%</span>`).join("")}</span></span><button class="big-btn" style="width:auto;padding:10px 14px" type="button" data-egg="${w}" ${can?"":"disabled"}>${fmt(c)}</button></div>`;
+ h+=`<div class="section-title">Your pets <small>${S.equipped.length}/${slots()} equipped · x${petMult().toFixed(2)}</small></div>`;
+ h+=`<div class="pet-actions"><button type="button" data-action="autoequip">⭐ Equip best</button><button type="button" data-action="fuse">✨ Fuse 3 → Golden</button></div>`;
+ if(!S.pets.length)return h+`<p class="notice">No pets yet. Hatch an egg! Pets stay with you forever, even after rebirth.</p>`;
+ const sorted=[...S.pets].sort((a,b)=>(S.equipped.includes(b.id)-S.equipped.includes(a.id))||petBonus(b)-petBonus(a));
+ h+=`<div class="pet-grid">`+sorted.slice(0,120).map(p=>{const d=PETS[p.w][p.r];return`<button type="button" class="pet ${S.equipped.includes(p.id)?"equipped":""} ${p.g?"golden":""}" style="--rc:${RARITIES[p.r].color}" data-equip="${p.id}" title="${RARITIES[p.r].name} · click to ${S.equipped.includes(p.id)?"unequip":"equip"}"><span class="tag">${p.g?"⭐":""}${S.equipped.includes(p.id)?"✅":""}</span><span class="pe">${d[1]}</span><span class="pn">${p.g?"Golden ":""}${d[0]}</span><span class="pb">+${Math.round(petBonus(p)*100)}%</span></button>`;}).join("")+`</div>`;
+ if(S.pets.length>120)h+=`<p class="hint" style="margin-top:8px">Showing your best 120 of ${S.pets.length} pets.</p>`;
+ return h;
+}
+function worldsHTML(){
+ let h=`<p class="hint">Each world multiplies <b>all</b> production and has its own egg with stronger pets. Unlocked worlds stay unlocked after rebirth.</p>`;
+ WORLDS.forEach((w,i)=>{
+  const unlocked=i<S.worlds,isNext=i===S.worlds;
+  let btn;
+  if(unlocked)btn=i===S.world?`<button type="button" disabled>Here</button>`:`<button type="button" data-travel="${i}">Travel</button>`;
+  else if(isNext)btn=S.rebirths<w.req?`<button type="button" disabled>♻️ ${w.req} rebirth${w.req>1?"s":""}</button>`:`<button class="buy" type="button" data-unlock="${i}" ${S.honks<w.cost?"disabled":""}>${fmt(w.cost)}</button>`;
+  else btn=`<button type="button" disabled>🔒</button>`;
+  h+=`<div class="world ${i===S.world?"current":""}" style="${unlocked||isNext?"":"opacity:.5"}"><span class="we">${unlocked||isNext?w.icon:"❔"}</span><span class="row-copy"><strong>${unlocked||isNext?w.name:"???"}</strong><small>x${w.mult} production · ${w.egg}</small></span>${btn}</div>`;
+ });
+ return h;
+}
+function rebirthHTML(){
+ const gain=rebirthGain(),need=1e7;
+ const pct=Math.min(100,S.run/need*100);
+ return `<div class="rebirth-card"><div class="feather">🪶</div><div>Rebirth now for</div><div class="gain">${fmt(gain)} Golden Feather${gain===1?"":"s"}</div><div class="hint" style="margin:0">Each feather = +10% production forever. You have ${fmt(S.feathers)} (+${fmt(S.feathers*10)}%).</div></div>
+ ${gain?"":`<p class="hint">Earn ${fmt(need)} honks this run to unlock rebirth. Progress: ${pct.toFixed(1)}%</p>`}
+ <button class="big-btn gold" type="button" data-action="rebirth" ${gain?"":"disabled"}>♻️ Rebirth</button>
+ <div class="section-title" style="margin-top:16px">What you keep</div>
+ <ul class="list"><li>Golden Feathers, pets, worlds and trophies</li><li>Extra pet slot at 2, 5 and 10 rebirths</li><li>A shiny crown on your goose 👑</li></ul>
+ <div class="section-title" style="margin-top:12px">Next milestones</div>
+ <ul class="list">${WORLDS.filter(w=>w.req>S.rebirths).slice(0,2).map(w=>`<li>${w.req} rebirths: unlock ${w.icon} ${w.name}</li>`).join("")||"<li>All worlds available. You are the goose now.</li>"}</ul>`;
+}
+function trophiesHTML(){
+ const mins=Math.floor(S.playMs/60000);
+ return `<div class="section-title">Stats</div><dl class="stat-list"><dt>Lifetime honks</dt><dd>${fmt(S.lifetime)}</dd><dt>Clicks</dt><dd>${fmt(S.clicks)}</dd><dt>Crit honks</dt><dd>${fmt(S.stats.crits)}</dd><dt>Eggs hatched</dt><dd>${fmt(S.stats.eggs)}</dd><dt>Golden breads caught</dt><dd>${fmt(S.stats.breads)}</dd><dt>Time played</dt><dd>${Math.floor(mins/60)}h ${mins%60}m</dd></dl>
+ <div class="section-title">Trophies <small>${achCount()}/${ACH.length} · +${achCount()*2}%</small></div>
+ <div class="ach-grid">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?"got":""}"><strong>${S.ach[a.id]?"🏆 ":"🔒 "}${a.name}</strong>${a.desc}</div>`).join("")}</div>
+ <button class="big-btn" style="margin-top:16px;background:#7f1d1d" type="button" data-action="reset">Reset all progress</button>`;
+}
+function leadersHTML(){
+ let h=`<div class="section-title">Leaderboard <span class="seg"><button type="button" data-lb="lifetime" class="${lbMode==="lifetime"?"on":""}">Honks</button><button type="button" data-lb="rebirths" class="${lbMode==="rebirths"?"on":""}">Rebirths</button></span></div>`;
+ if(lb.error)return h+`<div class="notice">${lb.error}</div>`;
+ if(!lbCache)return h+`<div class="notice">Loading the top geese…</div>`;
+ const rows=[...lbCache].sort((a,b)=>lbMode==="lifetime"?b.lifetime_honks-a.lifetime_honks:(b.rebirths-a.rebirths)||(b.lifetime_honks-a.lifetime_honks)).slice(0,50);
+ if(!lb.user)h+=`<div class="notice" style="margin-bottom:10px"><a href="../log-in.html?redirect=Games/honk-empire.html">Log in</a> to put your goose on the board.</div>`;
+ else h+=`<p class="hint">Your score uploads automatically every minute.${lb.lastMsg?" "+lb.lastMsg:""}</p>`;
+ if(!rows.length)return h+`<div class="notice">Nobody here yet. Be the first goose!</div>`;
+ return h+rows.map((r,i)=>`<div class="lb-row ${lb.user&&r.user_id===lb.user.id?"me":""}"><span class="lb-rank">${i<3?["🥇","🥈","🥉"][i]:i+1}</span><span class="lb-avatar">${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:esc((r.username||"?").charAt(0).toUpperCase())}</span><span class="lb-name">${esc(r.username)}<small>${WORLDS[Math.min(4,Math.max(0,r.worlds_unlocked-1))].icon} ${r.pets_found} pets</small></span><span class="lb-score">${lbMode==="lifetime"?fmt(r.lifetime_honks):"♻️ "+r.rebirths}</span></div>`).join("");
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+let lastPanelHTML="",lastPanelRender=0,panelPressed=false;
+$("tabBody").addEventListener("pointerdown",()=>{panelPressed=true;});
+addEventListener("pointerup",()=>setTimeout(()=>{panelPressed=false;},0));
+addEventListener("pointercancel",()=>{panelPressed=false;});
+function render(force=false){
+ $("honkCount").textContent=fmt(S.honks);
+ $("cpsText").textContent=fmt(cps());$("clickText").textContent=fmt(clickPower());
+ $("featherChip").textContent=fmt(S.feathers);$("rebirthChip").textContent=S.rebirths;$("multChip").textContent=fmt(globalMult());
+ document.title=fmt(S.honks)+" honks · Honk Empire";
+ const now=Date.now();buffs=buffs.filter(b=>b.until>now);
+ $("buffs").innerHTML=buffs.map(b=>`<span class="buff">${b.label} · ${fmtTime(b.until-now)}</span>`).join("");
+ const ev=hourly();$("eventBanner").innerHTML=`${ev.icon} ${ev.name}: ${ev.desc} <small>· next event in ${fmtTime(hourlyLeft())}</small>`;
+ $("dailyBtn").hidden=S.lastDaily===today();
+ // Tab alert dots
+ const alerts={shop:GENERATORS.some((g,i)=>S.honks>=genCost(i))&&tab!=="shop",pets:S.honks>=eggCost(S.world)&&tab!=="pets",worlds:S.worlds<5&&S.rebirths>=WORLDS[S.worlds].req&&S.honks>=WORLDS[S.worlds].cost,rebirth:rebirthGain()>0&&tab!=="rebirth"};
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("alert",!!alerts[t.dataset.tab]));
+ // Never swap panel buttons out from under a press, or the click would be lost.
+ if(panelPressed||(!force&&now-lastPanelRender<250))return;
+ lastPanelRender=now;
+ const html={shop:shopHTML,pets:petsHTML,worlds:worldsHTML,rebirth:rebirthHTML,trophies:trophiesHTML,leaders:leadersHTML}[tab]();
+ if(html!==lastPanelHTML){const body=$("tabBody"),y=body.scrollTop;body.innerHTML=html;body.scrollTop=y;lastPanelHTML=html;}
+}
+
+/* ---------- Leaderboard (Supabase) ---------- */
+const lb={client:null,user:null,error:"",lastSent:0,lastMsg:""};
+async function initLeaderboard(){
+ try{if(!window.supabase)throw new Error("offline");lb.client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const {data}=await lb.client.auth.getSession();lb.user=data?.session?.user||null;}
+ catch(e){lb.error="The leaderboard is offline right now. Your progress is still saved on this device.";}
+}
+async function loadLeaderboard(){
+ if(!lb.client||Date.now()-lbLoadedAt<15000)return;lbLoadedAt=Date.now();
+ const {data,error}=await lb.client.from("honk_empire_scores").select("user_id,username,avatar_url,lifetime_honks,rebirths,worlds_unlocked,pets_found").order("lifetime_honks",{ascending:false}).limit(100);
+ if(error){lb.error="The leaderboard is warming up. Check back soon! Your progress is still saved on this device.";console.warn("Honk Empire leaderboard:",error.message);}
+ else{lb.error="";lbCache=data||[];if(lb.user&&!lbCache.some(r=>r.user_id===lb.user.id)){/* also fetch the player's own rank row by rebirths ordering */const {data:r2}=await lb.client.from("honk_empire_scores").select("user_id,username,avatar_url,lifetime_honks,rebirths,worlds_unlocked,pets_found").order("rebirths",{ascending:false}).limit(100);(r2||[]).forEach(r=>{if(!lbCache.some(x=>x.user_id===r.user_id))lbCache.push(r);});}}
+ render(true);
+}
+async function submitScore(force=false){
+ if(!lb.client||!lb.user||lb.error.includes("offline"))return;
+ if(!force&&Date.now()-lb.lastSent<60000)return;lb.lastSent=Date.now();
+ const {data,error}=await lb.client.rpc("honk_empire_submit",{p_lifetime:Math.min(S.lifetime,1e300),p_rebirths:S.rebirths,p_worlds:S.worlds,p_pets:S.stats.eggs});
+ if(error){console.warn("Honk Empire submit:",error.message);lb.lastMsg="";}
+ else{lb.lastMsg=data?.recorded?"Last upload: just now.":"";lbLoadedAt=0;if(tab==="leaders")loadLeaderboard();}
+}
+
+/* ---------- Main loop ---------- */
+let last=performance.now(),breakShown=0;
+function tick(t){
+ const dt=Math.min(1,(t-last)/1000);last=t;
+ earn(cps()*dt);
+ if(document.visibilityState==="visible")S.playMs+=dt*1000;
+ const now=Date.now();
+ if(now>nextBread){spawnBread();nextBread=now+(hourly().id==="bread"?20000:60000)+Math.random()*(hourly().id==="bread"?20000:90000);}
+ if(now>nextInvasion&&S.lifetime>500){spawnInvasion();nextInvasion=now+240000+Math.random()*180000;}
+ // Friendly break reminder every 45 minutes of active play.
+ const block=Math.floor(S.playMs/2700000);if(block>breakShown&&S.playMs>0){breakShown=block;toast("💧 The goose demands you drink some water and stretch. It has spoken.");}
+ render();
+ requestAnimationFrame(tick);
+}
+$("muteBtn").addEventListener("click",()=>{S.muted=!S.muted;S.stats.muteToggles++;$("muteBtn").textContent=S.muted?"🔇":"🔊";});
+$("dailyBtn").addEventListener("click",claimDaily);
+setInterval(()=>{checkAch();save();},2000);
+setInterval(()=>{submitScore();if(tab==="leaders")loadLeaderboard();},15000);
+setInterval(()=>{const pool=NEWS.filter(n=>S.lifetime>=n[1]);const n=pool[Math.floor(Math.random()*pool.length)][0];const el=$("ticker");el.textContent="📰 "+n;el.style.animation="none";void el.offsetWidth;el.style.animation="";},22000);
+addEventListener("pagehide",save);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")save();else last=performance.now();});
+
+breakShown=Math.floor(S.playMs/2700000);
+$("muteBtn").textContent=S.muted?"🔇":"🔊";
+$("ticker").textContent="📰 "+NEWS[Math.floor(Math.random()*3)][0];
+applyWorld();
+offlineEarnings();
+initLeaderboard().then(()=>{submitScore(true);if(tab==="leaders")loadLeaderboard();});
+render(true);
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
