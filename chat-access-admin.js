@@ -33,101 +33,78 @@
         <p class="admin-card-help">Only email-confirmed accounts approved here can use Community Chat, Class Chat, and direct messages. Staff of every rank already have access. Admins and higher can approve, deny, or revoke, and every decision is logged.</p>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;margin:4px 0 8px"><h3 style="margin:0;font-size:15px">Waiting for approval <span id="chatAccessPendingCount" style="color:#a7aec9;font-weight:700"></span></h3><button type="button" id="chatAccessRefresh">Refresh</button></div>
         <div id="chatAccessPending" class="admin-scroll-area" style="display:grid;gap:8px;margin-bottom:16px"></div>
-        <h3 style="margin:0 0 8px;font-size:15px">Find any account</h3>
-        <form id="chatAccessSearchForm" role="search" autocomplete="off" style="display:flex;gap:9px;flex-wrap:wrap">
-          <input id="chatAccessSearch" type="search" name="dh-member-find" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-autofill-safe maxlength="32" placeholder="Find a member…" aria-label="Find a member" style="flex:1;min-width:180px;padding:10px 12px;border:1px solid #ffffff20;border-radius:9px;background:#080b18;color:#fff">
-          <button type="submit">Find</button>
-        </form>
-        <div id="chatAccessStatus" class="status" role="status" aria-live="polite">Search for a username to approve chat access.</div>
-        <div id="chatAccessResults" class="admin-scroll-area" style="display:grid;gap:8px"></div>
+        <h3 style="margin:0 0 8px;font-size:15px">Approve or revoke any member</h3>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <select id="chatAccessMember" aria-label="Choose a member" style="flex:1;min-width:200px"><option value="">Loading members…</option></select>
+          <button type="button" id="chatAccessToggle" disabled>Approve chat</button>
+        </div>
+        <div id="chatAccessStatus" class="status" role="status" aria-live="polite" style="margin-top:8px">Pick a member to see their chat access.</div>
       `;
       host.prepend(card);
 
-      const form = card.querySelector("#chatAccessSearchForm");
-      const input = card.querySelector("#chatAccessSearch");
+      // Dropdown of every non-staff member, grouped by whether they can chat yet.
+      const memberSelect = card.querySelector("#chatAccessMember");
+      const toggle = card.querySelector("#chatAccessToggle");
       const status = card.querySelector("#chatAccessStatus");
-      const results = card.querySelector("#chatAccessResults");
+      const members = new Map();
+      const STAFF = ["helper","admin","developer","tech","owner"];
 
-      async function search() {
-        const term = input.value.trim();
-        if (term.length < 2) {
-          status.textContent = "Enter at least 2 characters.";
-          results.replaceChildren();
-          return;
-        }
-        status.textContent = "Searching…";
-        results.replaceChildren();
-        const { data, error } = await db.from("profiles")
-          .select("id,username,staff_role,is_admin,is_developer,is_owner")
-          .ilike("username", "%" + term.replace(/[%_]/g, "") + "%")
-          .order("username").limit(20);
-        if (error) {
-          status.textContent = "Search failed: " + error.message;
-          return;
-        }
-        if (!data?.length) {
-          status.textContent = "No matching accounts found.";
-          return;
-        }
-        const { data: approvalRows, error: approvalError } = await db.from("chat_access_approvals")
-          .select("user_id").in("user_id", data.map(person => person.id));
-        if (approvalError) {
-          status.textContent = "Could not load chat approvals: " + approvalError.message;
-          return;
-        }
-        const approvedIds = new Set((approvalRows || []).map(row => row.user_id));
-        status.textContent = data.length + " account(s) found.";
-        data.forEach(person => {
-          person.chat_verified = approvedIds.has(person.id);
-          const personRole = String(person.staff_role || "").toLowerCase();
-          const isStaff = ["helper","admin","developer","tech","owner"].includes(personRole) || person.is_owner === true;
-          const row = document.createElement("div");
-          row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px;border:1px solid #ffffff14;border-radius:10px;background:#ffffff04";
-          const meta = document.createElement("div");
-          meta.style.cssText = "min-width:0;display:grid;gap:4px";
-          const name = document.createElement("strong");
-          name.textContent = "@" + (person.username || "Unknown");
-          const detail = document.createElement("small");
-          detail.style.color = "#a7aec9";
-          const describe = () => {
-            const state = isStaff ? "Staff" : person.chat_verified ? "Approved" : "Not approved";
-            detail.innerHTML = '<span class="dh-pill dh-pill-' + (isStaff ? "staff" : person.chat_verified ? "approved" : "none") + '">' + state + "</span>" + (isStaff ? " access included" : "");
-          };
-          describe();
-          meta.append(name, detail);
-          row.append(meta);
-          if (!isStaff) {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.textContent = person.chat_verified ? "Revoke access" : "Approve chat";
-            button.className = person.chat_verified ? "dh-btn-danger" : "";
-            button.disabled = false;
-            button.addEventListener("click", async () => {
-              if (person.chat_verified && !confirm("Revoke chat access for @" + (person.username || "this user") + "? They lose Community Chat, Class Chat, and DMs until approved again.")) return;
-              button.disabled = true;
-              status.textContent = (person.chat_verified ? "Revoking" : "Approving") + " chat access…";
-              const { error: updateError } = await db.rpc("dh_set_chat_verified", {
-                p_user_id: person.id,
-                p_verified: !person.chat_verified
-              });
-              if (updateError) {
-                status.textContent = "Could not update access: " + updateError.message;
-                button.disabled = false;
-                return;
-              }
-              person.chat_verified = !person.chat_verified;
-              describe();
-              button.textContent = person.chat_verified ? "Revoke access" : "Approve chat";
-              button.className = person.chat_verified ? "dh-btn-danger" : "";
-              button.disabled = false;
-              status.textContent = "Updated @" + (person.username || "user") + ".";
-            });
-            row.append(button);
-          }
-          results.append(row);
-        });
+      function syncToggle() {
+        const person = members.get(memberSelect.value);
+        toggle.disabled = !person;
+        toggle.textContent = person?.approved ? "Revoke access" : "Approve chat";
+        toggle.className = person?.approved ? "dh-btn-danger" : "";
+        if (!person) { status.textContent = "Pick a member to see their chat access."; return; }
+        status.innerHTML = person.approved
+          ? '<span class="dh-pill dh-pill-approved">Approved</span> @' + esc(person.username) + " can use chat and DMs."
+          : '<span class="dh-pill dh-pill-none">Not approved</span> @' + esc(person.username) + " can't chat yet.";
       }
-      form.addEventListener("submit", event => { event.preventDefault(); search(); });
+
+      async function loadMembers() {
+        const keep = memberSelect.value;
+        const [{ data: people, error }, { data: approvals, error: approvalError }] = await Promise.all([
+          db.from("profiles").select("id,username,staff_role,is_owner").order("username").limit(2000),
+          db.from("chat_access_approvals").select("user_id").limit(5000)
+        ]);
+        if (error || approvalError) {
+          memberSelect.innerHTML = '<option value="">Couldn’t load members</option>';
+          status.textContent = "Couldn't load members: " + (error || approvalError).message;
+          return;
+        }
+        const approved = new Set((approvals || []).map(row => row.user_id));
+        members.clear();
+        (people || []).forEach(p => {
+          if (p.is_owner === true || STAFF.includes(String(p.staff_role || "").toLowerCase())) return;
+          members.set(p.id, { id: p.id, username: p.username || "unknown", approved: approved.has(p.id) });
+        });
+        const list = [...members.values()];
+        const group = (label, rows) => rows.length
+          ? '<optgroup label="' + label + " (" + rows.length + ')">' + rows.map(m => '<option value="' + m.id + '">@' + esc(m.username) + "</option>").join("") + "</optgroup>"
+          : "";
+        memberSelect.innerHTML = '<option value="">Choose a member…</option>' +
+          group("Not approved", list.filter(m => !m.approved)) + group("Approved", list.filter(m => m.approved));
+        if (keep && members.has(keep)) memberSelect.value = keep;
+        syncToggle();
+      }
+
+      memberSelect.addEventListener("change", syncToggle);
+      toggle.addEventListener("click", async () => {
+        const person = members.get(memberSelect.value);
+        if (!person) return;
+        if (person.approved && !confirm("Revoke chat access for @" + person.username + "? They lose Community Chat, Class Chat, and DMs until approved again.")) return;
+        toggle.disabled = true;
+        status.textContent = (person.approved ? "Revoking" : "Approving") + " chat access…";
+        const { error: updateError } = await db.rpc("dh_set_chat_verified", { p_user_id: person.id, p_verified: !person.approved });
+        if (updateError) {
+          status.textContent = "Couldn't update access: " + updateError.message;
+          toggle.disabled = false;
+          return;
+        }
+        await loadMembers();
+        loadPending();
+        status.innerHTML += " Saved.";
+      });
+      loadMembers();
 
       // Queue of members who pressed "Request chat access" on the locked chat screen.
       const pending = card.querySelector("#chatAccessPending");
@@ -190,6 +167,7 @@
               return;
             }
             status.textContent = (ok ? "Approved " : "Denied ") + label + ".";
+            if (ok) loadMembers();
             row.remove();
             const left = pending.children.length;
             pendingCount.textContent = left ? "(" + left + ")" : "";
@@ -202,7 +180,7 @@
           pending.append(row);
         });
       }
-      card.querySelector("#chatAccessRefresh").addEventListener("click", loadPending);
+      card.querySelector("#chatAccessRefresh").addEventListener("click", () => { loadPending(); loadMembers(); });
       loadPending();
     } catch (error) {
       console.error("Chat access approvals failed to load:", error);
