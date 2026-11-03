@@ -26,7 +26,20 @@ function toast(msg) { const el = document.createElement("div"); el.className = "
 // OpenMoji art (CC BY-SA 4.0) for the few interface icons, matching the rest of DougHub's games.
 const EMOJI_RE = /\p{Extended_Pictographic}️?(?:‍\p{Extended_Pictographic}️?)*/gu;
 const emojiFile = e => [...e].map(c => c.codePointAt(0).toString(16).toUpperCase()).filter(h => h !== "FE0F").join("-");
-function emojify(el) { el.innerHTML = el.innerHTML.replace(EMOJI_RE, e => `<img src="openmoji/${emojiFile(e)}.svg" alt="" style="width:1.35em;height:1.35em;vertical-align:-.32em" draggable="false">`); }
+// Swaps emoji in text nodes only, so buttons keep their click handlers (rewriting innerHTML would drop them).
+function emojify(el) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.search(EMOJI_RE) >= 0) nodes.push(walker.currentNode);
+  for (const node of nodes) {
+    const frag = document.createDocumentFragment(); let last = 0; const s = node.nodeValue;
+    for (const m of s.matchAll(EMOJI_RE)) {
+      frag.append(s.slice(last, m.index));
+      const img = document.createElement("img"); img.src = `openmoji/${emojiFile(m[0])}.svg`; img.alt = ""; img.draggable = false; img.style.cssText = "width:1.35em;height:1.35em;vertical-align:-.32em";
+      frag.append(img); last = m.index + m[0].length;
+    }
+    frag.append(s.slice(last)); node.replaceWith(frag);
+  }
+}
 
 /* ============================== constants ============================== */
 const PLOTS = 8, PLOT_HALF = 15, PLOT_R = 58, HUB_R = 20, MAX_PARTS = 800, MAX_Y = 40;
