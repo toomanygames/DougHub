@@ -114,6 +114,20 @@ img{-webkit-user-drag:none;user-select:none}
 .flock-chip{display:flex;align-items:center;gap:3px;padding:2px 8px 2px 3px;border:2px solid var(--ink);border-radius:999px;background:var(--paper);font-family:var(--display);font-weight:600;font-size:13px;flex:0 0 auto}
 .flock-chip .em{width:22px;height:22px;vertical-align:0}
 
+/* Rhythm mode guide (toggled with Q) */
+.rhythm{position:absolute;left:12px;top:60px;z-index:4;width:210px;padding:9px 12px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);box-shadow:var(--hard-sm);font-size:12px;font-weight:800}
+.rhythm.hidden{display:none}
+.rhythm h4{display:flex;align-items:center;gap:6px;margin:0 0 4px;font-family:var(--display);font-weight:600;font-size:16px}
+.rhythm h4 .em{width:20px;height:20px;vertical-align:0}
+.rhythm .metro{display:flex;align-items:center;gap:8px;margin:6px 0}
+.rhythm .metro i{width:16px;height:16px;border:2px solid var(--ink);border-radius:50%;background:var(--butter);animation:metro .4s steps(1) infinite}
+@keyframes metro{0%{background:var(--beak);transform:scale(1.25)}35%{background:var(--paper-2);transform:scale(1)}}
+.rhythm .layers{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.rhythm .layers span{padding:1px 7px;border:2px solid var(--ink);border-radius:8px;background:var(--paper-2);color:var(--ink-soft);font-size:11px}
+.rhythm .layers span.on{background:var(--leaf);color:#fff}
+.rhythm .judge{font-family:var(--display);font-weight:600;font-size:14px}
+.rhythm .judge.good{color:var(--leaf-dk)}.rhythm .judge.bad{color:var(--berry-dk)}
+
 .reb-bar{position:absolute;left:12px;right:12px;bottom:46px;height:14px;border:3px solid var(--ink);border-radius:999px;background:var(--paper-2);overflow:hidden;z-index:3}
 .reb-bar i{display:block;height:100%;background:repeating-linear-gradient(-45deg,var(--plum) 0 10px,#9d72d8 10px 20px);transition:width .4s}
 .reb-bar span{position:absolute;inset:0;display:grid;place-items:center;font-size:10px;font-weight:900;letter-spacing:.06em;color:var(--ink)}
@@ -323,6 +337,7 @@ img{-webkit-user-drag:none;user-select:none}
   <div class="buffs" id="buffs"></div>
   <button class="goose-btn" id="goose" type="button" aria-label="Click the goose"></button>
   <div id="rebHud"></div>
+  <div class="rhythm hidden" id="rhythmHud" aria-live="polite"></div>
   <div class="flock" id="flock"></div>
  </section>
 
@@ -523,6 +538,78 @@ function honkSound(pitch=1,len=.13){
 }
 function chime(){if(S.muted)return;[1,1.26,1.5,2].forEach((p,i)=>setTimeout(()=>honkSound(p*1.6,.09),i*70));}
 
+/* ---------- Rhythm mode (Q) ----------
+   Each click is one beat of an original song. Click every BEAT_MS and the song keeps going,
+   adding instruments the longer you stay in time. Off-beat clicks just honk and reset the build-up.
+   Deliberately not saved: reloading turns it off. */
+const BEAT_MS=400,BEAT_SLACK=90;
+// "Goose Overture": 8 bars of 4 beats in A minor. Each beat holds 1-4 melody notes (MIDI numbers, null = rest).
+const SONG={
+ chords:[[57,60,64],[53,57,60],[48,52,55],[55,59,62],[57,60,64],[53,57,60],[50,53,57],[52,56,59]], // Am F C G Am F Dm E
+ bass:[45,41,36,43,45,41,38,40],
+ melody:[
+  [76,72],[74,72],[71,72],[69,null],
+  [72,74],[76,77],[76,74],[72,null],
+  [79,76],[74,76],[72,74,76,79],[81,null],
+  [79,77],[76,74],[71,74],[79,null],
+  [81,79],[76,79],[81,84],[83,81],
+  [77,76],[77,81],[79,77],[76,null],
+  [74,77],[81,77],[74,72],[71,74],
+  [76,null],[80,null],[83,80],[76,null]
+ ],
+ drums:["k","h","s","h","k","k","s","h"] // per beat across two bars: kick, hat, snare
+};
+const LAYERS=[{name:"Drums",at:0},{name:"Bass",at:4},{name:"Melody",at:8},{name:"Chords",at:16},{name:"Sparkle",at:32}];
+const rhythm={on:false,step:0,streak:0,best:0,last:0,beat:BEAT_MS,judge:""};
+const midi=n=>440*Math.pow(2,(n-69)/12);
+let noiseBuf=null;
+function voice(freq,t,dur,type,gain,cutoff){
+ const o=audio.createOscillator(),g=audio.createGain(),f=audio.createBiquadFilter();
+ o.type=type;o.frequency.setValueAtTime(freq,t);f.type="lowpass";f.frequency.value=cutoff||4000;
+ g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+ o.connect(f);f.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+dur+.03);
+}
+function drum(kind,t){
+ if(kind==="k"){const o=audio.createOscillator(),g=audio.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.16);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.25);return;}
+ if(!noiseBuf){noiseBuf=audio.createBuffer(1,audio.sampleRate*.3,audio.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+ const n=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain(),snare=kind==="s",len=snare?.16:.045;
+ n.buffer=noiseBuf;f.type=snare?"bandpass":"highpass";f.frequency.value=snare?1800:7000;
+ g.gain.setValueAtTime(snare?.35:.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+len);
+ n.connect(f);f.connect(g);g.connect(audio.destination);n.start(t);n.stop(t+len+.02);
+}
+function playBeat(step,beatSec,layers){
+ const t=audio.currentTime+.01,bar=Math.floor(step/4)%8,inBar=step%4,mel=SONG.melody[step%32];
+ if(layers>=1){drum(SONG.drums[step%8],t);drum("h",t+beatSec/2);}
+ if(layers>=2){const root=SONG.bass[bar]+(inBar%2?7:0);voice(midi(root),t,beatSec*.9,"triangle",.32,900);}
+ if(layers>=3)mel.forEach((n,i)=>{if(n!==null)voice(midi(n),t+i*beatSec/mel.length,beatSec/mel.length*1.15,"square",.07,2600);});
+ if(layers>=4&&inBar===0)SONG.chords[bar].forEach(n=>voice(midi(n+12),t,beatSec*3.8,"sawtooth",.025,1400));
+ if(layers>=5)SONG.chords[bar].concat(SONG.chords[bar][0]+12).forEach((n,i)=>voice(midi(n+24),t+i*beatSec/4,beatSec/4,"sine",.05,6000));
+}
+function rhythmClick(){
+ const now=performance.now(),gap=now-rhythm.last;rhythm.last=now;
+ if(gap>1500){rhythm.step=0;rhythm.streak=1;rhythm.judge="Go!";} // a fresh start counts as the first beat
+ else if(Math.abs(gap-BEAT_MS)<=BEAT_SLACK){rhythm.streak++;rhythm.beat=gap;rhythm.judge=Math.abs(gap-BEAT_MS)<=35?"Perfect!":"Good";}
+ else{rhythm.streak=0;rhythm.judge=gap<BEAT_MS?"Too fast":"Too slow";}
+ rhythm.best=Math.max(rhythm.best,rhythm.streak);
+ if(S.muted){renderRhythm();return;}
+ try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
+ if(rhythm.streak>0){const layers=LAYERS.filter(l=>rhythm.streak>l.at).length;playBeat(rhythm.step,rhythm.beat/1000,layers);rhythm.step++;}
+ else honkSound(.75,.12);
+ renderRhythm();
+}
+function renderRhythm(){
+ const el=$("rhythmHud");el.classList.toggle("hidden",!rhythm.on);if(!rhythm.on)return;
+ const cls=rhythm.judge==="Perfect!"||rhythm.judge==="Good"||rhythm.judge==="Go!"?"good":rhythm.judge?"bad":"";
+ el.innerHTML=emojify(`<h4>🎶 Rhythm mode</h4><div class="metro"><i></i><span>Click every ${(BEAT_MS/1000).toFixed(2)}s</span></div>`+
+  `<div><span class="judge ${cls}">${rhythm.judge||"Start clicking!"}</span> · streak ${rhythm.streak} · best ${rhythm.best}</div>`+
+  `<div class="layers">${LAYERS.map(l=>`<span class="${rhythm.streak>l.at?"on":""}">${l.name}</span>`).join("")}</div><div style="margin-top:5px;color:var(--ink-soft);font-size:11px">Press Q to turn off</div>`);
+}
+function toggleRhythm(){
+ rhythm.on=!rhythm.on;rhythm.streak=0;rhythm.step=0;rhythm.judge="";rhythm.last=0;
+ renderRhythm();toast(rhythm.on?`🎶 Rhythm mode on: click every ${(BEAT_MS/1000).toFixed(2)}s to play the song`:"Rhythm mode off");
+ if(rhythm.on&&S.muted)toast("Sound is muted. Unmute to hear the song.");
+}
+
 /* ---------- World scenes (Kenney CC0 art) ---------- */
 function clouds(n){let h="";for(let i=0;i<n;i++)h+=`<img class="cloud" src="kenney/el-cloud${[1,3,5,7][i%4]}.png" alt="" style="--y:${4+i*9}%;--w:${18+((i*7)%10)}%;--d:${70+i*25}s;--delay:-${i*23}s">`;return h;}
 function stars(n){let h="";for(let i=0;i<n;i++){const x=(i*37)%100,y=(i*53)%55;h+=`<img class="twinkle" src="kenney/fx-star_04.png" alt="" style="left:${x}%;top:${y}%;--s:${10+(i%4)*6}px;--d:${2+(i%5)}s;animation-delay:-${i*.7}s">`;}return h;}
@@ -587,12 +674,13 @@ gooseBtn.addEventListener("pointerdown",e=>{
  floatText(x-24,y-40,(crit?"CRIT +":"+")+fmt(amount),crit?"crit":"");
  burst(x,y,crit);
  if(crit){stage.classList.remove("shake");void stage.offsetWidth;stage.classList.add("shake");}
- honkSound(crit?1.4:.9+Math.random()*.25);
+ if(rhythm.on)rhythmClick();else honkSound(crit?1.4:.9+Math.random()*.25);
  gooseBtn.classList.remove("squish");void gooseBtn.offsetWidth;gooseBtn.classList.add("squish");
  if(Math.random()<.045)bubble(QUOTES[Math.floor(Math.random()*QUOTES.length)]);
 });
 $("brand").addEventListener("click",()=>{S.stats.titleClicks++;if(S.stats.titleClicks===10)toast("Stop clicking the title. Click the GOOSE.");});
 
+document.addEventListener("keydown",e=>{if(e.code==="KeyQ"&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||""))toggleRhythm();});
 // Secret word: type "honk"
 let typed="";
 document.addEventListener("keydown",e=>{if(e.key.length!==1)return;typed=(typed+e.key.toLowerCase()).slice(-4);if(typed==="honk"){typed="";const bonus=Math.max(100,cps()*120);earn(bonus);S.stats.secret=true;chime();toast("🤫 Secret honk! +"+fmt(bonus)+" honks","gold");addBuff("secret","🤫","Secret Honk x3",20,3,3);}});
