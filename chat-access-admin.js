@@ -20,8 +20,8 @@
         .eq("id", user.id).maybeSingle();
       if (staffError) throw staffError;
       const role = String(staff?.staff_role || "").toLowerCase();
-      // Any staff rank can approve; staff_role is authoritative, matching the database's approver check.
-      const allowed = ["helper","admin","developer","tech","owner"].includes(role) || staff?.is_owner === true;
+      // Admin and higher approve (Helpers do not); staff_role is authoritative, matching the database's approver check.
+      const allowed = ["admin","developer","tech","owner"].includes(role) || staff?.is_owner === true;
       if (!allowed) return;
 
       const card = document.createElement("section");
@@ -30,7 +30,7 @@
       card.style.cssText = "margin:0 0 14px;grid-column:1/-1";
       card.innerHTML = `
         <h2>Chat access approvals</h2>
-        <p class="admin-card-help">Only email-confirmed accounts approved here can use Community Chat, Class Chat, and direct messages. Staff of any rank already have access, and any staff rank can approve.</p>
+        <p class="admin-card-help">Only email-confirmed accounts approved here can use Community Chat, Class Chat, and direct messages. Staff of every rank already have access. Admins and higher can approve, deny, or revoke, and every decision is logged.</p>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;margin:4px 0 8px"><h3 style="margin:0;font-size:15px">Waiting for approval <span id="chatAccessPendingCount" style="color:#a7aec9;font-weight:700"></span></h3><button type="button" id="chatAccessRefresh">Refresh</button></div>
         <div id="chatAccessPending" class="admin-scroll-area" style="display:grid;gap:8px;margin-bottom:16px"></div>
         <h3 style="margin:0 0 8px;font-size:15px">Find any account</h3>
@@ -89,7 +89,11 @@
           name.textContent = "@" + (person.username || "Unknown");
           const detail = document.createElement("small");
           detail.style.color = "#a7aec9";
-          detail.textContent = isStaff ? "Staff · access included" : person.chat_verified ? "Chat access approved" : "Not approved";
+          const describe = () => {
+            const state = isStaff ? "Staff" : person.chat_verified ? "Approved" : "Not approved";
+            detail.innerHTML = '<span class="dh-pill dh-pill-' + (isStaff ? "staff" : person.chat_verified ? "approved" : "none") + '">' + state + "</span>" + (isStaff ? " access included" : "");
+          };
+          describe();
           meta.append(name, detail);
           row.append(meta);
           if (!isStaff) {
@@ -98,6 +102,7 @@
             button.textContent = person.chat_verified ? "Revoke access" : "Approve chat";
             button.disabled = false;
             button.addEventListener("click", async () => {
+              if (person.chat_verified && !confirm("Revoke chat access for @" + (person.username || "this user") + "? They lose Community Chat, Class Chat, and DMs until approved again.")) return;
               button.disabled = true;
               status.textContent = (person.chat_verified ? "Revoking" : "Approving") + " chat access…";
               const { error: updateError } = await db.rpc("dh_set_chat_verified", {
@@ -110,7 +115,7 @@
                 return;
               }
               person.chat_verified = !person.chat_verified;
-              detail.textContent = person.chat_verified ? "Chat access approved" : "Not approved";
+              describe();
               button.textContent = person.chat_verified ? "Revoke access" : "Approve chat";
               button.disabled = false;
               status.textContent = "Updated @" + (person.username || "user") + ".";
@@ -151,7 +156,8 @@
           name.textContent = "@" + (names.get(request.user_id) || "Unknown");
           const when = document.createElement("small");
           when.style.color = "#a7aec9";
-          when.textContent = "Asked " + new Date(request.requested_at).toLocaleString();
+          when.innerHTML = '<span class="dh-pill dh-pill-pending">Pending</span> ';
+          when.append("Asked " + new Date(request.requested_at).toLocaleString());
           meta.append(name, when);
           const actions = document.createElement("div");
           actions.style.cssText = "display:flex;gap:8px";
@@ -164,10 +170,17 @@
           const decide = async ok => {
             approve.disabled = deny.disabled = true;
             const label = "@" + (names.get(request.user_id) || "user");
-            // Approving goes through the checked RPC; denying just removes the request so they can ask again later.
-            const { error: decideError } = ok
+            if (!ok && !confirm("Deny chat access for " + label + "? They can ask again later.")) {
+              approve.disabled = deny.disabled = false;
+              return;
+            }
+            // Both go through checked, logged database functions; denying lets them ask again later.
+            let { error: decideError } = ok
               ? await db.rpc("dh_set_chat_verified", { p_user_id: request.user_id, p_verified: true })
-              : await db.from("chat_access_requests").delete().eq("user_id", request.user_id);
+              : await db.rpc("dh_deny_chat_request", { p_user_id: request.user_id });
+            if (!ok && decideError && /dh_deny_chat_request/.test(decideError.message || "")) {
+              ({ error: decideError } = await db.from("chat_access_requests").delete().eq("user_id", request.user_id));
+            }
             if (decideError) {
               status.textContent = "Couldn't update " + label + ": " + decideError.message;
               approve.disabled = deny.disabled = false;

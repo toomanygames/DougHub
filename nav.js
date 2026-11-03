@@ -258,6 +258,8 @@
     }
     ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
     ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
+    // Every signed-in member can report a person or a problem to staff.
+    ensureAccountMenuLink("reportLink", "/report.html", "Report a problem").style.display = "";
 
     const links = [
       ["/dashboard.html","Home"],

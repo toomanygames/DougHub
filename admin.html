@@ -9,7 +9,9 @@
 
 <!-- display.js loads Supabase JS if needed and creates the single shared authenticated client. -->
 <script src="display.js"></script>
-<script src="chat-access-admin.js?v=5" defer></script>
+<script src="chat-access-admin.js?v=6" defer></script>
+<link rel="stylesheet" href="admin-shell.css?v=1">
+<script src="admin-shell.js?v=1" defer></script>
 
 <style>
 * {
@@ -1447,9 +1449,6 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 </nav>
 
 
-<section id="adminRankPages" aria-label="Rank workspaces"></section>
-<section id="adminCurrentRank" class="admin-current-rank"><div><span class="admin-eyebrow">CURRENT WORKSPACE</span><h1 id="adminCurrentRankTitle">Staff workspace</h1><p id="adminCurrentRankDescription">Loading your available commands…</p></div><a href="admin.html" class="admin-all-ranks-link">My highest rank →</a></section>
-<div id="adminCategoryBar" aria-label="Filter admin sections"><div class="admin-category-title">ADMIN WORKSPACE</div><div class="admin-category-buttons"><button type="button" class="active" data-admin-category="all">All sections</button><button type="button" data-admin-category="users">Users &amp; staff</button><button type="button" data-admin-category="chat">Chat</button><button type="button" data-admin-category="content">Content</button><button type="button" data-admin-category="site">Site settings</button><button type="button" data-admin-category="logs">Logs &amp; feedback</button></div></div>
 <div id="loading">
     Checking admin permissions...
 </div>
@@ -5471,84 +5470,10 @@ function toggleAdminCard(card,title){
   title.setAttribute("aria-expanded",String(opening));
 }
 function applyStaffPermissions(){
-  const role=currentAdminRole||"none";
-  const rank={none:0,helper:1,admin:2,developer:3,owner:4}[role]||0;
-  const adminArea=document.getElementById("adminArea");
-  if(!adminArea)return;
-  const cards=[...adminArea.querySelectorAll(":scope > .card, :scope > .admin-function-group .admin-rank-cards > .card, :scope > .admin-rank-group .admin-rank-cards > .card")];
-  const rankForCard=card=>{
-    const id=(card.id||"").toLowerCase();
-    const title=(card.querySelector(":scope > h2, :scope > h3")?.textContent||"").toLowerCase();
-    if(/adminuipreferencecard|staffmanagementcard|siteannouncementcard|pageschedulecard|chatgamesdailyschedulecard|auditlogcard|ownerstaffactivitycard|ownerbanrequestscard|adminactivityflagscard/.test(id))return 4;
-    if(/staff & permissions|event banner|page availability|system activity log|audit log|audit history/.test(title))return 4;
-    if(/custombadgemanagercard|feedbackmanagementcard|gamerequestsmanagementcard|codeprojects|code projects|sitefeaturecard/.test(id))return 3;
-    if(/code projects|developer tools|site features/.test(title))return 3;
-    if(/userwarningscard|recentwarningscard|user warnings|recent warnings|group moderation/.test(id+" "+title))return 1;
-    if(/users|banaccounts|chat messages|chat message retention|community games|music moderation|video moderation|access requests|chat group moderation|dougbaset/.test(id+" "+title))return 2;
-    return 2;
-  };
-  adminArea.querySelectorAll(":scope > .admin-rank-section,:scope > .admin-rank-group,:scope > .admin-function-group").forEach(node=>node.remove());
-  const names={1:"Helper",2:"Admin",3:"Developer",4:"Owner"};
-  const descriptions={1:"Community support, reports, and member safety tools.",2:"All Helper tools plus account, chat, and content moderation.",3:"All Admin and Helper tools plus developer, feedback, and site feature controls.",4:"Every staff command, including full site and staff management."};
-  const icons={1:"H",2:"A",3:"D",4:"O"};
-  const requested=new URLSearchParams(location.search).get("rank");
-  const requestedRank=({helper:1,admin:2,developer:3,owner:4})[String(requested||"").toLowerCase()];
-  const selectedRank=requestedRank&&requestedRank<=rank?requestedRank:rank;
-  const pageNav=document.getElementById("adminRankPages");
-  if(pageNav){
-    pageNav.replaceChildren();
-    const intro=document.createElement("div");
-    intro.className="admin-rank-pages-heading";
-    intro.innerHTML='<span class="admin-eyebrow">STAFF CONSOLE</span><strong>Rank workspaces</strong><small>Each workspace includes its own commands and every lower rank.</small>';
-    pageNav.appendChild(intro);
-    const links=document.createElement("div");
-    links.className="admin-rank-page-links";
-    for(let value=1;value<=rank;value++){
-      const link=document.createElement("a");
-      link.className="admin-rank-page-link"+(value===selectedRank?" active":"");
-      link.href="admin.html?rank="+names[value].toLowerCase();
-      link.innerHTML='<span class="admin-rank-icon">'+icons[value]+'</span><span><strong>'+names[value]+' workspace</strong><small>'+descriptions[value]+'</small></span><span class="admin-rank-arrow">›</span>';
-      links.appendChild(link);
-    }
-    pageNav.appendChild(links);
-  }
-  const pageTitle=document.getElementById("adminCurrentRankTitle");
-  const pageDescription=document.getElementById("adminCurrentRankDescription");
-  if(pageTitle)pageTitle.textContent=names[selectedRank]+" workspace";
-  if(pageDescription)pageDescription.textContent="Tools are organized by what they do, not by staff rank. This workspace includes all permissions available to "+names[selectedRank]+".";
-  const categoryBar=document.getElementById("adminCategoryBar");
-  if(categoryBar)categoryBar.hidden=false;
-  const categories=[
-    {key:"people",title:"People & Accounts",test:/user|account|profile|ban|staff|permission|warning|access request|member/},
-    {key:"chat",title:"Chat & Community",test:/chat|group|message|community|retention|video call/},
-    {key:"content",title:"Content, Games & Media",test:/game|music|video|badge|moderation|report|announcement/},
-    {key:"developer",title:"Developer Tools & Feedback",test:/developer|code|project|feedback|feature|script|api/},
-    {key:"system",title:"Site & System Controls",test:/site|page|schedule|system|audit|activity|log|setting|preference|database|dougbase/},
-    {key:"other",title:"Other Tools",test:/.*/}
-  ];
-  const buckets=Object.fromEntries(categories.map(item=>[item.key,[]]));
-  cards.forEach(card=>{
-    const required=rankForCard(card);
-    card.dataset.requiredRank=String(required);
-    if(required>selectedRank){card.remove();return;}
-    const label=((card.id||"")+" "+(card.querySelector(":scope > h2, :scope > h3")?.textContent||"")).toLowerCase();
-    const category=categories.find(item=>item.test.test(label))||categories[categories.length-1];
-    buckets[category.key].push(card);
-  });
-  categories.filter(item=>buckets[item.key].length).forEach(category=>{
-    const section=document.createElement("section");
-    section.className="admin-function-group";
-    section.dataset.function=category.key;
-    const heading=document.createElement("div");
-    heading.className="admin-function-heading";
-    heading.textContent=category.title;
-    section.appendChild(heading);
-    const grid=document.createElement("div");
-    grid.className="admin-rank-cards";
-    buckets[category.key].forEach(card=>{card.style.display="";card.style.gridColumn="";grid.appendChild(card);});
-    section.appendChild(grid);
-    adminArea.appendChild(section);
-  });
+  // The admin shell (admin-shell.js) lays out the sidebar, dashboard and sections and hides tools above this rank.
+  // The database enforces every permission on its own; this only keeps the panel clear.
+  window.__dhAdminReady={role:currentAdminRole||"none",user:currentAdminUser};
+  if(window.DHAdminShell)window.DHAdminShell.start(currentAdminRole||"none",currentAdminUser);
 }
 
 const DOUGHUB_OWNER_ID = "f145067b-724c-40aa-9ab1-60ddaa351d27";
@@ -6166,50 +6091,7 @@ startAdminPanel();
 })();
 </script>
 
-<script>
-(function(){
- const bar=document.getElementById("adminCategoryBar");
- if(!bar)return;
- const categories={
-  feedbackManagementCard:"logs",auditLogCard:"logs",recentWarningsCard:"logs",userWarningsCard:"users",
-  staffManagementCard:"users",banAccountsCard:"users",ownerBanRequestsCard:"users",
-  chatRetentionCard:"chat",chatGroupModerationCard:"chat",chatPollModerationCard:"chat",chatPinnedModerationCard:"chat",
-  chatGamesDailyScheduleCard:"chat",
-  communityGames:"content",dougHubMusicModerationCard:"content",dougTubeModerationCard:"content",dougHubCodeProjectsCard:"content",
-  siteFeatureCard:"site",siteAnnouncementCard:"site",pageScheduleCard:"site",adminUiPreferenceCard:"site",
-  customBadgeManagerCard:"users",dougBaseAccessRequestsCard:"users"
- };
- function getCategory(card){
-  if(categories[card.id])return categories[card.id];
-  const text=((card.id||"")+" "+(card.querySelector("h2,h3")?.textContent||"")).toLowerCase();
-  if(/chat|poll|pinned/.test(text))return "chat";
-  if(/user|staff|ban|badge|access request/.test(text))return "users";
-  if(/feedback|audit|warning|deleted|activity/.test(text))return "logs";
-  if(/feature|schedule|announcement|side-conversations/.test(text))return "site";
-  return "content";
- }
- let selected="all";
- function apply(){
-  document.querySelectorAll("#adminArea .admin-rank-cards > .card").forEach(card=>{
-   const visible=(selected==="all"||getCategory(card)===selected);
-   card.hidden=!visible;
-  });
-  document.querySelectorAll("#adminArea .admin-rank-group").forEach(group=>{
-   const visible=[...group.querySelectorAll(".admin-rank-cards > .card")].some(card=>!card.hidden);
-   group.hidden=!visible;
-  });
- }
- bar.querySelectorAll("[data-admin-category]").forEach(button=>button.addEventListener("click",()=>{
-  selected=button.dataset.adminCategory;
-  bar.querySelectorAll("[data-admin-category]").forEach(b=>b.classList.toggle("active",b===button));
-  apply();
- }));
- const area=document.getElementById("adminArea");
- if(area)new MutationObserver(()=>apply()).observe(area,{childList:true,subtree:true});
- document.addEventListener("click",event=>{if(event.target.closest(".rank-section-toggle"))setTimeout(apply,0);});
- setTimeout(apply,500);
-})();
-</script>
+
 
 
 </body>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Report a Problem · DougHub</title>
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="auth-guard.js" data-require-auth="true"></script>
+<script src="nav.js?v=20261104-reports" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4;--accent:#818cf8}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;color:#f5f6ff;background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+body{padding:26px 16px}
+main{width:min(640px,100%);margin:40px auto 0}
+.card{padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#111631ed,#080b1bed);box-shadow:0 18px 48px #0004}
+h1{margin:0 0 6px;font-size:24px;letter-spacing:-.02em}
+.help{margin:0 0 18px;color:var(--muted);font-size:13px;line-height:1.55}
+label{display:block;margin:14px 0 6px;font-size:12px;font-weight:800;color:#c7d2fe}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #ffffff22;border-radius:10px;background:#080b18;color:#fff;font:inherit;font-size:14px}
+textarea{min-height:120px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid #818cf8;outline-offset:1px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+button{padding:11px 18px;border:0;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-weight:850;font-size:14px;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+.status{color:#a5b4fc;font-size:13px;min-height:18px}
+.status.bad{color:#fca5a5}.status.good{color:#86efac}
+h2{margin:26px 0 8px;font-size:15px}
+.mine{display:grid;gap:8px}
+.mine div{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid #ffffff14;border-radius:10px;background:#ffffff05;font-size:13px}
+.mine small{color:var(--muted)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800}
+.pill.open{background:#f59e0b22;color:#fcd34d}.pill.resolved{background:#22c55e22;color:#86efac}.pill.dismissed{background:#94a3b822;color:#cbd5e1}
+</style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <h1>Report a problem</h1>
+    <p class="help">Tell DougHub staff about someone breaking the rules, something unsafe, or a problem on the site. Only staff see reports. Please be specific.</p>
+    <form id="reportForm">
+      <label for="reportUser">Username (optional)</label>
+      <input id="reportUser" maxlength="32" autocomplete="off" placeholder="Who is this about? Leave blank for a site problem">
+      <label for="reportCategory">Where did it happen?</label>
+      <select id="reportCategory">
+        <option value="chat">Community or class chat</option>
+        <option value="dm">Direct messages</option>
+        <option value="game">A game</option>
+        <option value="profile">A profile or username</option>
+        <option value="other">Something else</option>
+      </select>
+      <label for="reportReason">What happened?</label>
+      <textarea id="reportReason" maxlength="500" required placeholder="Describe what happened (3–500 characters)"></textarea>
+      <label for="reportContext">Link or extra detail (optional)</label>
+      <input id="reportContext" maxlength="300" placeholder="e.g. the page, time, or message">
+      <div class="row"><span id="reportStatus" class="status" role="status" aria-live="polite"></span><button id="reportSubmit" type="submit">Send report</button></div>
+    </form>
+    <h2>Your recent reports</h2>
+    <div id="myReports" class="mine"><small style="color:#9ba4c4">Loading…</small></div>
+  </section>
+</main>
+<script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const $ = id => document.getElementById(id);
+  if (params.get("user")) $("reportUser").value = params.get("user").slice(0, 32);
+  if (params.get("category")) $("reportCategory").value = params.get("category");
+  if (params.get("context")) $("reportContext").value = params.get("context").slice(0, 300);
+  const status = (text, kind) => { $("reportStatus").textContent = text; $("reportStatus").className = "status " + (kind || ""); };
+  function client() {
+    return new Promise(resolve => {
+      if (window.DougHubSupabaseClient) return resolve(window.DougHubSupabaseClient);
+      window.addEventListener("douqhub:supabase-ready", () => resolve(window.DougHubSupabaseClient), { once: true });
+      setTimeout(() => resolve(window.DougHubSupabaseClient || window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co", "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52")), 4000);
+    });
+  }
+  async function loadMine(db, userId) {
+    const box = $("myReports");
+    const { data, error } = await db.from("user_reports").select("id,category,reason,status,created_at").eq("reporter_id", userId).order("created_at", { ascending: false }).limit(10);
+    box.replaceChildren();
+    if (error || !data?.length) { box.innerHTML = '<small style="color:#9ba4c4">' + (error ? "Reports aren't available right now." : "You haven't sent any reports.") + "</small>"; return; }
+    data.forEach(r => {
+      const row = document.createElement("div");
+      const text = document.createElement("span");
+      text.textContent = r.reason.length > 70 ? r.reason.slice(0, 70) + "…" : r.reason;
+      const meta = document.createElement("small");
+      meta.innerHTML = '<span class="pill ' + r.status + '">' + r.status[0].toUpperCase() + r.status.slice(1) + "</span> ";
+      meta.append(new Date(r.created_at).toLocaleDateString());
+      row.append(text, meta);
+      box.append(row);
+    });
+  }
+  (async () => {
+    const db = await client();
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { location.href = "log-in.html?redirect=report.html"; return; }
+    loadMine(db, user.id);
+    $("reportForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const reason = $("reportReason").value.trim();
+      if (reason.length < 3) { status("Please describe what happened.", "bad"); return; }
+      $("reportSubmit").disabled = true;
+      status("Sending…");
+      try {
+        let target = null;
+        const name = $("reportUser").value.trim().replace(/^@/, "");
+        if (name) {
+          const { data: person, error } = await db.from("profiles").select("id").ilike("username", name.replace(/[%_]/g, "")).maybeSingle();
+          if (error) throw error;
+          if (!person) { status("No account named @" + name + ". Check the spelling or leave it blank.", "bad"); return; }
+          if (person.id === user.id) { status("You can't report yourself.", "bad"); return; }
+          target = person.id;
+        }
+        const { error } = await db.from("user_reports").insert({
+          reporter_id: user.id, target_user_id: target, category: $("reportCategory").value,
+          reason, context: $("reportContext").value.trim() || null
+        });
+        if (error) throw error;
+        status("Thanks. Staff will review your report.", "good");
+        $("reportForm").reset();
+        loadMine(db, user.id);
+      } catch (error) {
+        status("Couldn't send the report: " + (error.message || error), "bad");
+      } finally {
+        $("reportSubmit").disabled = false;
+      }
+    });
+  })();
+})();
+</script>
+</body>
+</html>
