@@ -20,7 +20,8 @@
         .eq("id", user.id).maybeSingle();
       if (staffError) throw staffError;
       const role = String(staff?.staff_role || "").toLowerCase();
-      const allowed = ["admin","developer","tech","owner"].includes(role) ||
+      const allowed = ["helper","admin","developer","tech","owner"].includes(role) || staff?.is_owner === true; // any staff rank
+      const _legacy =
         staff?.is_admin === true || staff?.is_developer === true || staff?.is_owner === true;
       if (!allowed) return;
 
@@ -30,7 +31,7 @@
       card.style.cssText = "margin:0 0 14px;grid-column:1/-1";
       card.innerHTML = `
         <h2>Chat access approvals</h2>
-        <p class="admin-card-help">Only email-confirmed accounts approved here can use Community Chat, Class Chat, and direct messages. Admin+ staff already have access.</p>
+        <p class="admin-card-help">Only email-confirmed accounts approved here can use Community Chat, Class Chat, and direct messages. Staff of any rank already have access, and any staff rank can approve.</p>
         <form id="chatAccessSearchForm" style="display:flex;gap:9px;flex-wrap:wrap">
           <input id="chatAccessSearch" type="search" maxlength="32" placeholder="Search by username" aria-label="Search by username" style="flex:1;min-width:180px;padding:10px 12px;border:1px solid #ffffff20;border-radius:9px;background:#080b18;color:#fff">
           <button type="submit">Search users</button>
@@ -77,7 +78,8 @@
         data.forEach(person => {
           person.chat_verified = approvedIds.has(person.id);
           const personRole = String(person.staff_role || "").toLowerCase();
-          const isStaff = ["admin","developer","tech","owner"].includes(personRole) ||
+          const isStaff = ["helper","admin","developer","tech","owner"].includes(personRole) || person.is_owner === true;
+          const _legacyStaff =
             person.is_admin === true || person.is_developer === true || person.is_owner === true;
           const row = document.createElement("div");
           row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px;border:1px solid #ffffff14;border-radius:10px;background:#ffffff04";
@@ -87,7 +89,7 @@
           name.textContent = "@" + (person.username || "Unknown");
           const detail = document.createElement("small");
           detail.style.color = "#a7aec9";
-          detail.textContent = isStaff ? "Admin+ · access included" : person.chat_verified ? "Chat access approved" : "Not approved";
+          detail.textContent = isStaff ? "Staff · access included" : person.chat_verified ? "Chat access approved" : "Not approved";
           meta.append(name, detail);
           row.append(meta);
           if (!isStaff) {
