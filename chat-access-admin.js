@@ -20,9 +20,8 @@
         .eq("id", user.id).maybeSingle();
       if (staffError) throw staffError;
       const role = String(staff?.staff_role || "").toLowerCase();
-      const allowed = ["helper","admin","developer","tech","owner"].includes(role) || staff?.is_owner === true; // any staff rank
-      const _legacy =
-        staff?.is_admin === true || staff?.is_developer === true || staff?.is_owner === true;
+      // Any staff rank can approve; staff_role is authoritative, matching the database's approver check.
+      const allowed = ["helper","admin","developer","tech","owner"].includes(role) || staff?.is_owner === true;
       if (!allowed) return;
 
       const card = document.createElement("section");
@@ -32,6 +31,9 @@
       card.innerHTML = `
         <h2>Chat access approvals</h2>
         <p class="admin-card-help">Only email-confirmed accounts approved here can use Community Chat, Class Chat, and direct messages. Staff of any rank already have access, and any staff rank can approve.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;margin:4px 0 8px"><h3 style="margin:0;font-size:15px">Waiting for approval <span id="chatAccessPendingCount" style="color:#a7aec9;font-weight:700"></span></h3><button type="button" id="chatAccessRefresh">Refresh</button></div>
+        <div id="chatAccessPending" class="admin-scroll-area" style="display:grid;gap:8px;margin-bottom:16px"></div>
+        <h3 style="margin:0 0 8px;font-size:15px">Find any account</h3>
         <form id="chatAccessSearchForm" style="display:flex;gap:9px;flex-wrap:wrap">
           <input id="chatAccessSearch" type="search" maxlength="32" placeholder="Search by username" aria-label="Search by username" style="flex:1;min-width:180px;padding:10px 12px;border:1px solid #ffffff20;border-radius:9px;background:#080b18;color:#fff">
           <button type="submit">Search users</button>
@@ -79,8 +81,6 @@
           person.chat_verified = approvedIds.has(person.id);
           const personRole = String(person.staff_role || "").toLowerCase();
           const isStaff = ["helper","admin","developer","tech","owner"].includes(personRole) || person.is_owner === true;
-          const _legacyStaff =
-            person.is_admin === true || person.is_developer === true || person.is_owner === true;
           const row = document.createElement("div");
           row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px;border:1px solid #ffffff14;border-radius:10px;background:#ffffff04";
           const meta = document.createElement("div");
@@ -121,6 +121,73 @@
         });
       }
       form.addEventListener("submit", event => { event.preventDefault(); search(); });
+
+      // Queue of members who pressed "Request chat access" on the locked chat screen.
+      const pending = card.querySelector("#chatAccessPending");
+      const pendingCount = card.querySelector("#chatAccessPendingCount");
+      const rowStyle = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px;border:1px solid #ffffff14;border-radius:10px;background:#ffffff04";
+      async function loadPending() {
+        pending.replaceChildren();
+        const { data: requests, error } = await db.from("chat_access_requests")
+          .select("user_id,requested_at").order("requested_at", { ascending: true }).limit(100);
+        if (error) {
+          pendingCount.textContent = "";
+          pending.innerHTML = `<small style="color:#a7aec9">Couldn't load requests: ${esc(error.message)}</small>`;
+          return;
+        }
+        pendingCount.textContent = requests.length ? "(" + requests.length + ")" : "";
+        if (!requests.length) {
+          pending.innerHTML = `<small style="color:#a7aec9">No one is waiting right now.</small>`;
+          return;
+        }
+        const { data: people } = await db.from("profiles").select("id,username").in("id", requests.map(r => r.user_id));
+        const names = new Map((people || []).map(p => [p.id, p.username]));
+        requests.forEach(request => {
+          const row = document.createElement("div");
+          row.style.cssText = rowStyle;
+          const meta = document.createElement("div");
+          meta.style.cssText = "min-width:0;display:grid;gap:4px";
+          const name = document.createElement("strong");
+          name.textContent = "@" + (names.get(request.user_id) || "Unknown");
+          const when = document.createElement("small");
+          when.style.color = "#a7aec9";
+          when.textContent = "Asked " + new Date(request.requested_at).toLocaleString();
+          meta.append(name, when);
+          const actions = document.createElement("div");
+          actions.style.cssText = "display:flex;gap:8px";
+          const approve = document.createElement("button");
+          approve.type = "button";
+          approve.textContent = "Approve";
+          const deny = document.createElement("button");
+          deny.type = "button";
+          deny.textContent = "Deny";
+          const decide = async ok => {
+            approve.disabled = deny.disabled = true;
+            const label = "@" + (names.get(request.user_id) || "user");
+            // Approving goes through the checked RPC; denying just removes the request so they can ask again later.
+            const { error: decideError } = ok
+              ? await db.rpc("dh_set_chat_verified", { p_user_id: request.user_id, p_verified: true })
+              : await db.from("chat_access_requests").delete().eq("user_id", request.user_id);
+            if (decideError) {
+              status.textContent = "Couldn't update " + label + ": " + decideError.message;
+              approve.disabled = deny.disabled = false;
+              return;
+            }
+            status.textContent = (ok ? "Approved " : "Denied ") + label + ".";
+            row.remove();
+            const left = pending.children.length;
+            pendingCount.textContent = left ? "(" + left + ")" : "";
+            if (!left) pending.innerHTML = `<small style="color:#a7aec9">No one is waiting right now.</small>`;
+          };
+          approve.addEventListener("click", () => decide(true));
+          deny.addEventListener("click", () => decide(false));
+          actions.append(approve, deny);
+          row.append(meta, actions);
+          pending.append(row);
+        });
+      }
+      card.querySelector("#chatAccessRefresh").addEventListener("click", loadPending);
+      loadPending();
     } catch (error) {
       console.error("Chat access approvals failed to load:", error);
     }
