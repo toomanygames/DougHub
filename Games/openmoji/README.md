@@ -1,6 +1,6 @@
 # OpenMoji artwork for Honk Empire
 
-The SVG files in this folder are unmodified color emoji from **OpenMoji** by the OpenMoji project contributors. Honk Empire (`Games/honk-empire.html`) uses them for the goose, pets, buildings, worlds, events and interface icons.
+The SVG files in this folder are unmodified color emoji from **OpenMoji** by the OpenMoji project contributors. Honk Empire (`Games/honk-empire.html`) uses them for the goose, pets, buildings, worlds, events and icons. Backgrounds, particles and UI icons come from Kenney (CC0), in `Games/kenney`.
 
 - Project: https://openmoji.org/
 - Source: https://github.com/hfg-gmuend/openmoji (release 15.1.0, `color/svg`)
