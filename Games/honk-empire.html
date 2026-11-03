@@ -118,6 +118,13 @@ img{-webkit-user-drag:none;user-select:none}
 /* Rhythm mode guide (toggled with Q) */
 .rhythm{position:absolute;left:12px;top:60px;z-index:4;width:210px;padding:9px 12px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);box-shadow:var(--hard-sm);font-size:12px;font-weight:800}
 .rhythm.hidden{display:none}
+.arcade-btn{position:absolute;top:62px;right:12px;z-index:3;display:flex;align-items:center;gap:6px;padding:7px 14px 7px 8px;border:3px solid var(--ink);border-radius:14px;background:var(--pond);color:#fff;font-family:var(--display);font-weight:600;font-size:15px;box-shadow:var(--hard-sm)}
+.arcade-btn .em{width:26px;height:26px;vertical-align:0}
+.arcade-list{display:grid;gap:10px;margin:4px 0 6px;text-align:left}
+.arcade-row{padding:12px;border:3px solid var(--ink);border-radius:14px;background:#fff}
+.arcade-row h3{margin:0;font-family:var(--display);font-weight:600;font-size:19px}
+.arcade-row p{margin:3px 0 8px;font-size:12.5px;color:var(--ink-soft)}
+.arcade-row .meta{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:900}
 /* Game cursor (Kenney Cursor Pack, CC0) that can ride along with the goose. */
 .stage.fake-on,.stage.fake-on *{cursor:none!important}
 .fake-cursor{position:fixed;left:0;top:0;width:34px;height:34px;pointer-events:none;z-index:9999;filter:drop-shadow(0 2px 0 #0003)}
@@ -341,6 +348,7 @@ img{-webkit-user-drag:none;user-select:none}
   <div class="scene" id="scene"></div>
   <div class="world-tag" id="worldLabel"></div>
   <button class="gift" id="dailyBtn" type="button" hidden>🎁 Daily gift</button>
+  <button class="arcade-btn" id="arcadeBtn" type="button">🎮 Arcade</button>
   <div class="plaque" id="plaque"><span class="combo" id="combo"></span><div class="big" id="honkCount">0</div><div class="unit">honks</div><div class="rate"><span id="cpsText">0</span>/sec · <span id="clickText">1</span> per click</div></div>
   <div class="buffs" id="buffs"></div>
   <button class="goose-btn" id="goose" type="button" aria-label="Click the goose"></button>
@@ -477,11 +485,12 @@ const ACH=[
  {id:"oneJob",name:"You Had One Job",desc:"Click the title 10 times. Why?",test:s=>s.stats.titleClicks>=10},
  {id:"mute",name:"Indecisive",desc:"Toggle sound 20 times.",test:s=>s.stats.muteToggles>=20},
  {id:"tax",name:"Tax Season",desc:"Survive the IRS Goose.",test:s=>!!s.stats.taxed},
+ {id:"arcade",name:"Arcade Goose",desc:"Win an arcade minigame.",test:s=>Object.values(s.arcade||{}).some(a=>a.wins>0)},
  {id:"concert",name:"Goose on Tour",desc:"A secret. Some say it starts with a perfect rhythm…",test:s=>!!s.stats.concert}
 ];
 
 /* ---------- State ---------- */
-function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,music:true,buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false,maxCombo:false,concert:false}};}
+function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,music:true,arcade:{},buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false,maxCombo:false,concert:false}};}
 let S=freshState();
 try{const raw=localStorage.getItem(SAVE_KEY);if(raw){const loaded=JSON.parse(raw);S=Object.assign(freshState(),loaded);S.stats=Object.assign(freshState().stats,loaded.stats||{});while(S.gens.length<GENERATORS.length)S.gens.push(0);}}catch(e){console.warn("Honk Empire save could not load",e);}
 function save(){S.lastSave=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
@@ -629,7 +638,7 @@ function renderRhythm(){
 }
 $("rhythmHud").addEventListener("click",e=>{const b=e.target.closest("[data-song]");if(!b)return;rhythm.song=(rhythm.song+ +b.dataset.song+SONGS.length)%SONGS.length;rhythm.step=0;renderRhythm();toast("🎶 Now playing: "+SONGS[rhythm.song].name);});
 function toggleRhythm(){
- if(concert.active)return;
+ if(concert.active||arcade.active)return;
  rhythm.on=!rhythm.on;rhythm.streak=0;rhythm.step=0;rhythm.judge="";rhythm.last=0;
  renderRhythm();toast(rhythm.on?`🎶 Rhythm mode on: click every ${(BEAT_MS/1000).toFixed(2)}s to play the song`:"Rhythm mode off");
  if(rhythm.on&&S.muted)toast("Sound is muted. Unmute to hear the song.");
@@ -654,7 +663,7 @@ function playBgBeat(step,t){
 }
 function scheduleMusic(){while(music.next<audio.currentTime+.5){playBgBeat(music.step,music.next);music.next+=BG.beat;music.step++;}}
 function updateMusic(){
- const want=S.music&&!S.muted&&!rhythm.on&&!concert.active&&document.visibilityState==="visible"&&audioUnlocked;
+ const want=S.music&&!S.muted&&!rhythm.on&&!concert.active&&!arcade.active&&document.visibilityState==="visible"&&audioUnlocked;
  if(want&&!music.playing){
   try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
   music.out=audio.createGain();music.out.gain.setValueAtTime(.0001,audio.currentTime);music.out.gain.exponentialRampToValueAtTime(.55,audio.currentTime+1.5);music.out.connect(audio.destination);
@@ -702,6 +711,45 @@ function sceneHTML(w){
   case 3:return stars(16)+`<img class="planet" src="kenney/planet03.png" alt="" style="right:6%;top:8%;width:min(170px,22%)"><img class="planet" src="kenney/planet07.png" alt="" style="left:6%;top:16%;width:min(80px,11%);animation-delay:-4s">`;
   default:return clouds(2)+`<div class="scanlines"></div>`;
  }
+}
+
+/* ---------- Arcade: 3D minigames (honk-arcade.js, loaded on demand) ----------
+   Winning pays 10% of your current honks. Each game's prize then cools down for 5 minutes,
+   so replaying can't snowball honks forever; you can still play for fun and best scores meanwhile. */
+const arcade={active:false};
+const ARCADE_INFO=[
+ {id:"catch",name:"Bread Catch",icon:"🍞",desc:"Steer the goose to catch falling bread. Golden bread is worth 3, burnt toast costs 2. Reach 15 in 45s."},
+ {id:"dash",name:"Lane Dash",icon:"🪿",desc:"Run down three lanes, dodge rocks, jump fences and grab feathers. Survive 40 seconds."},
+ {id:"toss",name:"Bread Toss",icon:"🥖",desc:"Aim and lob bread onto drifting lily pads. Land 6 points from 10 throws."}
+];
+const ARCADE_COOLDOWN=5*60*1000;
+const arcadePrize=()=>Math.max(S.honks*.10,cps()*30,100);
+function arcadeStat(id){S.arcade=S.arcade||{};return S.arcade[id]=S.arcade[id]||{best:0,wins:0,lastPrize:0};}
+function prizeWait(id){return Math.max(0,arcadeStat(id).lastPrize+ARCADE_COOLDOWN-Date.now());}
+function openArcade(){
+ if(concert.active||arcade.active)return;
+ openModal(`<div class="art-big" style="font-size:0">🎮</div><h2>Goose Arcade</h2><p>Win a game to earn <b>10% of your honks</b> (right now +${fmt(arcadePrize())}).</p>
+  <div class="arcade-list">${ARCADE_INFO.map(g=>{const st=arcadeStat(g.id),w=prizeWait(g.id);return`<div class="arcade-row"><h3>${g.icon} ${g.name}</h3><p>${g.desc}</p><div class="meta"><span>Best ${st.best} · ${w?`prize back in ${fmtTime(w)}`:"prize ready!"}</span><button class="btn small" type="button" data-arcade="${g.id}">Play</button></div></div>`;}).join("")}</div>`);
+}
+$("modal").addEventListener("click",e=>{const b=e.target.closest("[data-arcade]");if(b){closeModal();launchArcade(b.dataset.arcade);}});
+$("arcadeBtn").addEventListener("click",openArcade);
+async function launchArcade(id){
+ if(concert.active||arcade.active)return;
+ arcade.active=true;if(rhythm.on){rhythm.on=false;renderRhythm();}updateMusic();
+ try{
+  const mod=await import("./honk-arcade.js");
+  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();await audio.resume?.();}catch(e){}
+  const wait=prizeWait(id);
+  mod.startArcadeGame(id,{audio,muted:S.muted,prizeText:wait?`Prize on cooldown for ${fmtTime(wait)}. Good practice though!`:`Prize: +${fmt(arcadePrize())} honks (10%)!`,onFinish:res=>{
+   arcade.active=false;const st=arcadeStat(id);st.best=Math.max(st.best,res.score||0);
+   if(res.won){
+    st.wins++;
+    if(!prizeWait(id)){const v=arcadePrize();earn(v);st.lastPrize=Date.now();toast(`🏆 ${ARCADE_INFO.find(g=>g.id===id).name} won! +${fmt(v)} honks`,"gold");chime();}
+    else toast(`You won! The prize for this game is back in ${fmtTime(prizeWait(id))}.`);
+   }
+   checkAch();save();updateMusic();render(true);
+  }});
+ }catch(e){arcade.active=false;console.warn("Arcade failed to load",e);toast("The arcade couldn't load. Try again later.");updateMusic();}
 }
 
 /* ---------- Goose ---------- */
@@ -785,7 +833,7 @@ if(fcEnabled){
  document.addEventListener("pointermove",e=>{
   if(e.pointerType!=="mouse")return;
   const inStage=stage.contains(e.target)||e.target===fc.el;
-  if(!inStage||concert.active){fcSet(false);return;}
+  if(!inStage||concert.active||arcade.active){fcSet(false);return;}
   fcSet(true);
   const d=Math.hypot(e.clientX-fc.real.x,e.clientY-fc.real.y);
   fc.real.x=e.clientX;fc.real.y=e.clientY;fc.motion+=d;
@@ -812,7 +860,7 @@ if(fcEnabled){
 // Called every frame after the goose moves: carry a resting cursor along with it.
 function fcRide(dt){
  if(!fc.on)return;
- if(concert.active){fcSet(false);return;}
+ if(concert.active||arcade.active){fcSet(false);return;}
  fc.motion*=Math.exp(-dt*6); // recent mouse movement, fading over ~half a second
  const r=gooseBtn.getBoundingClientRect(),prev=fc.prev;fc.prev={left:r.left,top:r.top,right:r.right,bottom:r.bottom};
  if(!prev||fc.down)return;
@@ -1102,7 +1150,7 @@ addEventListener("pagehide",save);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")save();else last=performance.now();});
 
 // Swap the emoji in the static header, tabs and gift button for OpenMoji art.
-document.querySelectorAll(".top-stats .pill,.tab .ti,#dailyBtn").forEach(el=>{el.innerHTML=emojify(el.innerHTML);});
+document.querySelectorAll(".top-stats .pill,.tab .ti,#dailyBtn,#arcadeBtn").forEach(el=>{el.innerHTML=emojify(el.innerHTML);});
 breakShown=Math.floor(S.playMs/2700000);
 setMuteIcon();setMusicIcon();
 showNews(NEWS[Math.floor(Math.random()*3)][0]);

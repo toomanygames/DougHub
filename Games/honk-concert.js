@@ -353,8 +353,9 @@ class Concert {
   }
 }
 
-/* ---------------- The goose (built from simple shapes, with a guitar) ---------------- */
-function makeGoose() {
+/* ---------------- The goose (built from simple shapes; stage gear = shades, guitar and mic) ---------------- */
+// Also used by the arcade minigames (honk-arcade.js) with { stage: false } for a plain goose.
+export function makeGoose({ stage = true } = {}) {
   const root = new THREE.Group(), mat = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: .6, ...o });
   const white = mat("#fbfbf6"), orange = mat("#f28c28"), ink = mat(INK);
   const body = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 24), white); body.scale.set(1.15, .85, 1.4); body.position.y = 1.25; root.add(body);
@@ -370,18 +371,21 @@ function makeGoose() {
     const eye = new THREE.Mesh(new THREE.SphereGeometry(.08, 12, 10), ink); eye.position.set(x, .12, .4); head.add(eye);
     const brow = new THREE.Mesh(new THREE.BoxGeometry(.24, .06, .06), ink); brow.position.set(x, .26, .4); brow.rotation.z = x > 0 ? .45 : -.45; head.add(brow);
   }
+  const legs = [];
+  for (const x of [-.32, .32]) { const leg = new THREE.Group(); leg.position.set(x, .58, .2); root.add(leg); const shin = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .55, 8), orange); shin.position.y = -.28; leg.add(shin); const foot = new THREE.Mesh(new THREE.BoxGeometry(.38, .07, .5), orange); foot.position.set(0, -.54, .15); leg.add(foot); legs.push(leg); }
+  const guitar = new THREE.Group();
+  if (!stage) return { root, neckPivot, head, guitar, wingL, wingR, legs, bang: 0, strum: 0 };
   // Cool shades for the stage.
   const shades = new THREE.Mesh(new THREE.BoxGeometry(.66, .14, .06), ink); shades.position.set(0, .13, .45); head.add(shades);
-  for (const x of [-.32, .32]) { const leg = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .55, 8), orange); leg.position.set(x, .3, .2); root.add(leg); const foot = new THREE.Mesh(new THREE.BoxGeometry(.38, .07, .5), orange); foot.position.set(x, .04, .35); root.add(foot); }
   // Guitar: a red body, black neck and headstock, slung across the goose.
-  const guitar = new THREE.Group(); guitar.position.set(.1, 1.2, 1.25); guitar.rotation.set(0, 0, -.55); root.add(guitar);
+  guitar.position.set(.1, 1.2, 1.25); guitar.rotation.set(0, 0, -.55); root.add(guitar);
   const gb = new THREE.Mesh(new THREE.CylinderGeometry(.55, .62, .18, 24), mat("#e05a4f", { roughness: .3 })); gb.rotation.x = Math.PI / 2; guitar.add(gb);
   const gn = new THREE.Mesh(new THREE.BoxGeometry(.14, 1.6, .1), ink); gn.position.set(0, 1, 0); guitar.add(gn);
   const gh = new THREE.Mesh(new THREE.BoxGeometry(.26, .32, .12), ink); gh.position.set(0, 1.9, 0); guitar.add(gh);
   const mic = new THREE.Group(); mic.position.set(-1.1, 0, 1.9); root.add(mic);
   const stand = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, 3.4, 8), mat("#9aa1ad", { metalness: .8 })); stand.position.y = 1.7; mic.add(stand);
   const micHead = new THREE.Mesh(new THREE.SphereGeometry(.14, 12, 10), ink); micHead.position.y = 3.45; mic.add(micHead);
-  return { root, neckPivot, head, guitar, wingL, wingR, bang: 0, strum: 0 };
+  return { root, neckPivot, head, guitar, wingL, wingR, legs, bang: 0, strum: 0 };
 }
 function animateGoose(g, t, dt, pulse) {
   g.bang = Math.max(0, g.bang - dt * 4); g.strum = Math.max(0, g.strum - dt * 6);
