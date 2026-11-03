@@ -1,6 +1,7 @@
 /* Honk Empire arcade: three original 3D minigames drawn with three.js, loaded only when a game starts.
    Each game reports { won, score } and Honk Empire pays the prize (10% of current honks). */
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { makeGoose } from "./honk-concert.js";
 
 const INK = "#26283b";
@@ -9,7 +10,7 @@ const rand = (a, b) => a + Math.random() * (b - a);
 
 export const ARCADE_GAMES = [
   { id: "catch", name: "Bread Catch", goal: "Catch 15 points of bread in 45 seconds. Golden bread is worth 3, burnt toast costs 2.", controls: "Move with A/D, the arrow keys or your mouse." },
-  { id: "dash", name: "Lane Dash", goal: "Survive 40 seconds of rocks and fences. You have 3 lives.", controls: "Switch lanes with A/D or arrows (or click left/right). Jump fences with Space or W." },
+  { id: "dash", name: "Lane Dash", goal: "Run 1000 m through town. One crash ends the run unless you have a shield.", controls: "A/D or arrows to switch lanes, W/Space to jump barriers, S/Down to slide under bars. On touch: swipe." },
   { id: "toss", name: "Bread Toss", goal: "Land 6 of 10 breads on the drifting lily pads.", controls: "Aim with your mouse (or arrows), click or press Space to throw." }
 ];
 
@@ -86,7 +87,9 @@ class Arcade {
     if (this.dead) return;
     const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
     const el = (now - this.t0) / 1000;
-    if (this.state === "ready" && el > 2.6) { this.state = "play"; this.message("GO!"); this.playStart = now; setTimeout(() => { if (this.state === "play") this.message(""); }, 700); }
+    // Games that load models first (Lane Dash) hold the countdown until they are ready.
+    if (this.state === "ready" && this.game.isReady && !this.game.isReady()) { this.message("Loading…", this.def.goal); this.t0 = now; }
+    else if (this.state === "ready" && el > 2.6) { this.state = "play"; this.message("GO!"); this.playStart = now; setTimeout(() => { if (this.state === "play") this.message(""); }, 700); }
     this.game.update(dt, this.state === "play" ? (now - this.playStart) / 1000 : 0, this.state === "play");
     this.infoEl.textContent = this.game.info();
     if (this.state === "play" && this.game.over()) this.end();
@@ -173,59 +176,155 @@ function setupCatch(A) {
   };
 }
 
-/* ---------- 2. Lane Dash ---------- */
+/* ---------- 2. Lane Dash: an endless 3-lane runner through a Kenney suburb (CC0 models in Games/runner) ---------- */
+const RUN_DIR = "runner/";
+const RUN_KEYS = {
+  road: "city-roads/road-straight", barrier: "city-roads/construction-barrier", cone: "city-roads/construction-cone", lamp: "city-roads/light-square",
+  houses: [..."abcdefgh"].map(c => "city-suburban/building-type-" + c), treeL: "city-suburban/tree-large", treeS: "city-suburban/tree-small", planter: "city-suburban/planter",
+  cars: ["sedan", "taxi", "police", "van", "delivery", "suv", "truck"].map(c => "car/" + c), box: "car/box",
+  bread: "food/bread", coin: "platformer/coin-gold", crate: "platformer/crate",
+  heart: "platformer/heart", star: "platformer/star", jewel: "platformer/jewel", spring: "platformer/spring"
+};
+const DASH_GOAL = 1000; // metres to win the prize
 function setupDash(A) {
   const { scene, cam, goose } = A;
-  ground(scene, "#6aae4f", 200);
-  const road = new THREE.Mesh(new THREE.PlaneGeometry(9, 200), new THREE.MeshStandardMaterial({ color: "#c9b58f", roughness: 1 })); road.rotation.x = -Math.PI / 2; road.position.set(0, .01, -60); road.receiveShadow = true; scene.add(road);
-  const stripes = []; for (let i = 0; i < 24; i++) for (const lx of [-1.5, 1.5]) { const s = new THREE.Mesh(new THREE.PlaneGeometry(.12, 2), new THREE.MeshBasicMaterial({ color: "#fffaf0" })); s.rotation.x = -Math.PI / 2; s.position.set(lx, .02, -i * 6); scene.add(s); stripes.push(s); }
-  const side = []; for (let i = 0; i < 16; i++) for (const sx of [-8, 8]) { const g = new THREE.Group(); scene.add(g); side.push(g); g.position.set(sx + rand(-1, 1), 0, -i * 10); const tr = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3.6, 9), new THREE.MeshStandardMaterial({ color: "#4f9a43" })); tr.position.y = 2.6; g.add(tr); const tk = new THREE.Mesh(new THREE.CylinderGeometry(.25, .3, 1.4, 8), new THREE.MeshStandardMaterial({ color: "#8b5a3c" })); tk.position.y = .7; g.add(tk); }
-  cam.position.set(0, 5.5, 9); cam.lookAt(0, 1.5, -6);
-  goose.root.scale.setScalar(.6); goose.root.rotation.y = Math.PI;
-  const LANES = [-3, 0, 3], obs = []; let lane = 1, gx = 0, y = 0, vy = 0, lives = 3, hurt = 0, spawn = 1, timeLeft = 40, feathers = 0, alive = true;
-  const rockMat = new THREE.MeshStandardMaterial({ color: "#9aa1ad", roughness: .9 }), fenceMat = new THREE.MeshStandardMaterial({ color: "#8b5a3c" }), featherMat = new THREE.MeshStandardMaterial({ color: "#fffaf0", emissive: "#f7c948", emissiveIntensity: .3 });
-  function spawnRow(t) {
-    const kind = Math.random() < .35 ? "fence" : "rock", free = Math.floor(Math.random() * 3);
-    LANES.forEach((lx, i) => {
-      let m, type;
-      if (kind === "fence") { m = new THREE.Group(); for (const px of [-1.1, 1.1]) { const post = new THREE.Mesh(new THREE.BoxGeometry(.2, 1, .2), fenceMat); post.position.set(px, .5, 0); m.add(post); } const rail = new THREE.Mesh(new THREE.BoxGeometry(2.6, .2, .15), fenceMat); rail.position.y = .7; m.add(rail); type = "fence"; }
-      else if (i !== free) { m = new THREE.Mesh(new THREE.DodecahedronGeometry(.9), rockMat); m.position.y = .7; type = "rock"; }
-      else if (Math.random() < .7) { m = new THREE.Mesh(new THREE.ConeGeometry(.25, .9, 8), featherMat); m.position.y = 1.1; m.rotation.z = .5; type = "feather"; }
-      if (!m) return;
-      m.position.x = lx; m.position.z = -70; m.traverse(o => { if (o.isMesh) o.castShadow = true; }); scene.add(m);
-      obs.push({ m, type, lane: i, hit: false });
-    });
+  const LANES = [-2.6, 0, 2.6];
+  const models = new Map(); let ready = false;
+  const loader = new GLTFLoader(), keys = Object.values(RUN_KEYS).flat();
+  Promise.all(keys.map(k => loader.loadAsync(RUN_DIR + k + ".glb").then(g => {
+    const box = new THREE.Box3().setFromObject(g.scene);
+    models.set(k, { scene: g.scene, size: box.getSize(new THREE.Vector3()), center: box.getCenter(new THREE.Vector3()), min: box.min.clone() });
+  }))).then(() => { buildScenery(); ready = true; }).catch(err => { console.warn("Lane Dash models failed, using simple shapes", err); ready = true; });
+  // Clone a model scaled so one axis matches a size, resting on y=0 and centred in x/z. Falls back to a box.
+  function fit(key, size, axis = "y", fallbackColor = "#9aa1ad") {
+    const g = new THREE.Group(), m = models.get(key);
+    if (!m) { const b = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshStandardMaterial({ color: fallbackColor })); b.position.y = size / 2; g.add(b); }
+    else { const c = m.scene.clone(), s = size / m.size[axis]; c.scale.setScalar(s); c.position.set(-m.center.x * s, -m.min.y * s, -m.center.z * s); g.add(c); }
+    g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    return g;
   }
-  const left = () => { lane = Math.max(0, lane - 1); A.beep(500, .05); }, right = () => { lane = Math.min(2, lane + 1); A.beep(500, .05); }, jump = () => { if (y <= 0.01) { vy = 9; A.beep(700, .08, "triangle"); } };
+  const pick = list => list[Math.floor(Math.random() * list.length)];
+
+  // Ground, pavements and a recycled strip of road, houses, trees and streetlights.
+  ground(scene, "#6aae4f", 260);
+  for (const sx of [-6.1, 6.1]) { const walk = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 260), new THREE.MeshStandardMaterial({ color: "#c9c3b6", roughness: 1 })); walk.rotation.x = -Math.PI / 2; walk.position.set(sx, .015, -80); walk.receiveShadow = true; scene.add(walk); }
+  const scenery = []; const ROAD_TILE = 9.6, SPAN = ROAD_TILE * 14;
+  function buildScenery() {
+    for (let i = 0; i < 14; i++) { const r = fit(RUN_KEYS.road, ROAD_TILE, "x"); r.rotation.y = Math.PI / 2; r.position.set(0, .01, 12 - i * ROAD_TILE); scene.add(r); scenery.push(r); } // the Kenney tile runs along x, so turn it to run down the lanes
+    for (let i = 0; i < 15; i++) for (const side of [-1, 1]) {
+      const z = 10 - i * 9.3;
+      const h = fit(pick(RUN_KEYS.houses), rand(7, 9.5)); h.position.set(side * rand(12, 13.5), 0, z); h.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2; scene.add(h); scenery.push(h);
+      const t = fit(Math.random() < .5 ? RUN_KEYS.treeL : RUN_KEYS.treeS, rand(4, 6)); t.position.set(side * 8.4, 0, z - 4.6); scene.add(t); scenery.push(t);
+      if (i % 2 === 0) { const l = fit(RUN_KEYS.lamp, 5.2); l.position.set(side * 7, 0, z - 2); l.rotation.y = side < 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(l); scenery.push(l); }
+      else { const p = fit(RUN_KEYS.planter, 1.1); p.position.set(side * 7.1, 0, z - 2); scene.add(p); scenery.push(p); }
+    }
+  }
+
+  cam.fov = 62; cam.updateProjectionMatrix();
+  goose.root.scale.setScalar(.55); goose.root.rotation.y = Math.PI;
+  let lane = 1, gx = 0, y = 0, vy = 0, slide = 0, speed = 16, dist = 0, coins = 0, alive = true, crashT = 0, spawnIn = 8, dustT = 0;
+  const power = { shield: false, star: 0, magnet: 0, spring: 0 };
+  const things = []; // obstacles, coins and power-ups moving toward the goose
+  const dust = [], dustGeo = new THREE.SphereGeometry(.18, 8, 6), dustMat = new THREE.MeshBasicMaterial({ color: "#f6edda", transparent: true, opacity: .7 });
+  const shieldBubble = new THREE.Mesh(new THREE.SphereGeometry(1.5, 24, 16), new THREE.MeshBasicMaterial({ color: "#e05a4f", transparent: true, opacity: .18, depthWrite: false })); shieldBubble.visible = false; scene.add(shieldBubble);
+  const stripeTex = (() => { const c = document.createElement("canvas"); c.width = 128; c.height = 16; const g = c.getContext("2d"); for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? "#fffaf0" : "#e05a4f"; g.fillRect(i * 16, 0, 16, 16); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+
+  function add(obj, data) { scene.add(obj); things.push({ obj, ...data }); }
+  function obstacle(kind, li, z) {
+    let obj, len = 1.2;
+    if (kind === "barrier") obj = fit(RUN_KEYS.barrier, 2.3, "x", "#f28c28");
+    else if (kind === "overhead") {
+      obj = new THREE.Group();
+      for (const px of [-1.05, 1.05]) { const c = fit(RUN_KEYS.cone, 1.6, "y", "#f28c28"); c.position.x = px; obj.add(c); const pole = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 2.2, 8), new THREE.MeshStandardMaterial({ color: "#26283b" })); pole.position.set(px, 1.1, 0); obj.add(pole); }
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(2.5, .38, .2), new THREE.MeshStandardMaterial({ map: stripeTex })); bar.position.y = 1.85; bar.castShadow = true; obj.add(bar);
+    } else if (kind === "crates") { obj = new THREE.Group(); for (let i = 0; i < 2; i++) { const c = fit(RUN_KEYS.crate, 1.3, "y", "#c68642"); c.position.y = i * 1.3; c.rotation.y = rand(-.2, .2); obj.add(c); } len = 1.4; }
+    else { obj = fit(pick(RUN_KEYS.cars), 4.4, "z", "#3a8fb7"); obj.rotation.y = Math.PI; len = 4.4; } // cars face the goose
+    obj.position.set(LANES[li], 0, z);
+    add(obj, { kind, lane: li, len, moving: kind === "car" && Math.random() < .45 ? rand(5, 9) : 0 });
+  }
+  function coinLine(li, z, n, yArc) {
+    for (let i = 0; i < n; i++) {
+      const c = fit(RUN_KEYS.coin, .85, "y", "#f7c948"); const lift = yArc ? Math.sin(i / (n - 1) * Math.PI) * 2.2 : 0;
+      c.position.set(LANES[li], .7 + lift, z - i * 2.3); add(c, { kind: "coin", lane: li, len: .8 });
+    }
+  }
+  function spawnRow() {
+    const z = -100, r = Math.random(), lanes = [0, 1, 2].sort(() => Math.random() - .5);
+    if (r < .22) { const kind = Math.random() < .5 ? "barrier" : "overhead"; lanes.forEach(li => obstacle(kind, li, z)); if (kind === "barrier") coinLine(lanes[0], z + 3, 5, true); }
+    else if (r < .55) { obstacle(Math.random() < .5 ? "car" : "crates", lanes[0], z); obstacle(pick(["car", "crates", "barrier", "overhead"]), lanes[1], z - rand(0, 6)); coinLine(lanes[2], z, 6, false); }
+    else if (r < .85) { obstacle(pick(["car", "barrier", "overhead", "crates"]), lanes[0], z); coinLine(lanes[1], z + 2, 5, false); if (Math.random() < .3) { const b = fit(RUN_KEYS.bread, 1.1, "x", "#d9a05b"); b.position.set(LANES[lanes[2]], .8, z); add(b, { kind: "bread", lane: lanes[2], len: 1 }); } }
+    else { obstacle("car", lanes[0], z); coinLine(lanes[1], z, 8, false); }
+    if (Math.random() < .14) { const kind = pick(["heart", "star", "jewel", "spring"]); const p = fit(RUN_KEYS[kind], 1.1, "y", "#8a5cc9"); p.position.set(LANES[lanes[lanes.length - 1]], 1, z - 10); add(p, { kind: "power", power: kind, lane: lanes[lanes.length - 1], len: 1 }); }
+  }
+  const left = () => { if (alive && lane > 0) { lane--; A.beep(520, .05); } };
+  const right = () => { if (alive && lane < 2) { lane++; A.beep(520, .05); } };
+  const jump = () => { if (alive && y <= .01) { vy = power.spring > 0 ? 15.5 : 10.5; slide = 0; A.beep(720, .08, "triangle"); } };
+  const duck = () => { if (!alive) return; if (y > .01) vy = -22; slide = .75; A.beep(300, .06, "triangle"); };
+  // Swipes for phones and tablets; a tap jumps.
+  let swipe = null;
+  A.root.addEventListener("pointerdown", e => { if (!e.target.closest("button,.a-res")) swipe = { x: e.clientX, y: e.clientY }; });
+  A.root.addEventListener("pointerup", e => {
+    if (!swipe) return; const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y; swipe = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) return jump();
+    if (Math.abs(dx) > Math.abs(dy)) (dx < 0 ? left : right)(); else (dy < 0 ? jump : duck)();
+  });
+  function crash() {
+    if (power.shield) { power.shield = false; A.beep(300, .2, "square", .1); A.message("Shield saved you!"); setTimeout(() => { if (alive) A.message(""); }, 900); return false; }
+    alive = false; crashT = 0; A.beep(110, .5, "sawtooth", .14); A.message("Crash!", `${Math.floor(dist)} m run`); return true;
+  }
+  const powerName = { heart: "Shield", star: "Double points", jewel: "Coin magnet", spring: "Super jump" };
   return {
-    info: () => `${Math.ceil(timeLeft)}s · ${lives} ${lives === 1 ? "life" : "lives"}`,
-    key(code) { if (code === "KeyA" || code === "ArrowLeft") left(); if (code === "KeyD" || code === "ArrowRight") right(); if (code === "Space" || code === "KeyW" || code === "ArrowUp") jump(); },
-    click(p) { if (p.y > .35) jump(); else if (p.x < -.15) left(); else if (p.x > .15) right(); else jump(); },
+    isReady: () => ready,
+    info: () => { const p = []; if (power.shield) p.push("Shield"); if (power.star > 0) p.push(`x2 ${Math.ceil(power.star)}s`); if (power.magnet > 0) p.push(`Magnet ${Math.ceil(power.magnet)}s`); if (power.spring > 0) p.push(`Super jump ${Math.ceil(power.spring)}s`); return `${Math.floor(dist)} / ${DASH_GOAL} m · ${coins} coins${p.length ? " · " + p.join(" · ") : ""}`; },
+    key(code) { if (code === "KeyA" || code === "ArrowLeft") left(); if (code === "KeyD" || code === "ArrowRight") right(); if (code === "Space" || code === "KeyW" || code === "ArrowUp") jump(); if (code === "KeyS" || code === "ArrowDown") duck(); },
     update(dt, t, playing) {
-      const speed = playing && alive ? 16 + t * .45 : 0;
-      gx += (LANES[lane] - gx) * Math.min(1, dt * 14);
-      vy -= 28 * dt; y = Math.max(0, y + vy * dt); if (y === 0) vy = Math.max(0, vy);
-      goose.root.position.set(gx, y, 0); waddle(goose, performance.now() / 1000, speed > 0, 16);
-      hurt = Math.max(0, hurt - dt); goose.root.visible = hurt <= 0 || Math.floor(hurt * 12) % 2 === 0;
-      for (const s of stripes) { s.position.z += speed * dt; if (s.position.z > 10) s.position.z -= 144; }
-      for (const s of side) { s.position.z += speed * dt; if (s.position.z > 12) s.position.z -= 160; }
-      if (!playing || !alive) return;
-      timeLeft = Math.max(0, 40 - t); spawn -= dt;
-      if (spawn <= 0) { spawnRow(t); spawn = Math.max(.65, 1.5 - t * .02); }
-      for (let i = obs.length - 1; i >= 0; i--) {
-        const o = obs[i]; o.m.position.z += speed * dt; if (o.type === "feather") o.m.rotation.y += dt * 4;
-        if (!o.hit && Math.abs(o.m.position.z) < .9 && Math.abs(o.m.position.x - gx) < 1.3) {
-          if (o.type === "feather") { o.hit = true; feathers++; A.addScore(1, o.m.position.clone()); A.beep(1200, .08, "triangle"); scene.remove(o.m); obs.splice(i, 1); continue; }
-          const cleared = o.type === "fence" && y > .9;
-          if (!cleared && hurt <= 0) { o.hit = true; lives--; hurt = 1.5; A.beep(140, .3, "sawtooth", .12); if (lives <= 0) { alive = false; A.message("Ouch!", "Out of lives"); } }
+      const run = playing && alive;
+      if (run) speed = Math.min(34, 16 + t * .38);
+      const v = run ? speed : alive ? 0 : Math.max(0, speed * (1 - crashT * 2));
+      if (!alive) crashT += dt;
+      // Goose: slide between lanes, jump arcs, slide squash, fast waddle.
+      gx += (LANES[lane] - gx) * Math.min(1, dt * 15);
+      vy -= (power.spring > 0 ? 24 : 30) * dt; y = Math.max(0, y + vy * dt); if (y === 0 && vy < 0) vy = 0;
+      slide = Math.max(0, slide - dt);
+      goose.root.position.set(gx, y, 0);
+      goose.root.rotation.z = (gx - LANES[lane]) * .08; goose.root.rotation.x = alive ? 0 : Math.min(1.4, crashT * 5);
+      goose.root.scale.set(.55, slide > 0 ? .32 : .55, .55);
+      waddle(goose, performance.now() / 1000, run && y === 0, 18);
+      if (slide > 0) goose.neckPivot.rotation.x = 1.1;
+      shieldBubble.visible = power.shield; shieldBubble.position.set(gx, y + 1.1, 0);
+      // Camera chases the goose, widening a little as the run speeds up.
+      cam.position.x += (gx * .55 - cam.position.x) * Math.min(1, dt * 6); cam.position.y = 4.3 + y * .35; cam.position.z = 8.2;
+      cam.fov = 60 + (v - 16) * .45; cam.updateProjectionMatrix(); cam.lookAt(cam.position.x * .6, 1.3 + y * .3, -9);
+      for (const s of scenery) { s.position.z += v * dt; if (s.position.z > 16) s.position.z -= s.userData.span || (s.userData.span = (scenery.indexOf(s) < 14 ? SPAN : 15 * 9.3)); }
+      // Dust puffs from the goose's feet.
+      dustT -= dt; if (run && y === 0 && dustT <= 0) { dustT = .07; const d = new THREE.Mesh(dustGeo, dustMat.clone()); d.position.set(gx + rand(-.3, .3), .15, .6); scene.add(d); dust.push({ d, life: .5 }); }
+      for (let i = dust.length - 1; i >= 0; i--) { const p = dust[i]; p.life -= dt; p.d.position.z += v * dt * .6; p.d.scale.setScalar(1 + (.5 - p.life) * 2); p.d.material.opacity = Math.max(0, p.life * 1.4); if (p.life <= 0) { scene.remove(p.d); dust.splice(i, 1); } }
+      if (!run) return;
+      dist += v * dt; for (const k of ["star", "magnet", "spring"]) power[k] = Math.max(0, power[k] - dt);
+      spawnIn -= v * dt; if (spawnIn <= 0) { spawnRow(); spawnIn = rand(17, 26) * Math.pow(speed / 16, .35); }
+      const mult = power.star > 0 ? 2 : 1, inLane = Math.abs(gx - LANES[lane]) < 1.3 ? lane : -1;
+      for (let i = things.length - 1; i >= 0; i--) {
+        const th = things[i], o = th.obj; o.position.z += (v + (th.moving || 0)) * dt;
+        if (th.kind === "coin" || th.kind === "power") o.rotation.y += dt * 4;
+        if (th.kind === "coin" && power.magnet > 0 && o.position.z > -14 && o.position.z < 2) { o.position.x += (gx - o.position.x) * Math.min(1, dt * 8); o.position.y += (y + .8 - o.position.y) * Math.min(1, dt * 8); }
+        const near = Math.abs(o.position.z) < th.len / 2 + .55, sameLane = th.kind === "coin" && power.magnet > 0 ? Math.abs(o.position.x - gx) < 1.4 : th.lane === inLane;
+        if (near && sameLane) {
+          if (th.kind === "coin" && Math.abs(o.position.y - (y + .8)) < 1.6) { coins += mult; A.beep(1300 + (coins % 5) * 80, .05, "triangle", .05); scene.remove(o); things.splice(i, 1); continue; }
+          if (th.kind === "bread") { coins += 5 * mult; A.addScore(0); A.beep(990, .12, "triangle"); A.message("+5 bread bonus!"); setTimeout(() => { if (alive) A.message(""); }, 700); scene.remove(o); things.splice(i, 1); continue; }
+          if (th.kind === "power") {
+            const pw = th.power; if (pw === "heart") power.shield = true; else power[{ star: "star", jewel: "magnet", spring: "spring" }[pw]] = 10;
+            A.beep(880, .25, "triangle", .1); A.message(powerName[pw] + "!"); setTimeout(() => { if (alive) A.message(""); }, 900); scene.remove(o); things.splice(i, 1); continue;
+          }
+          const clear = th.kind === "barrier" ? y > .95 : th.kind === "overhead" ? slide > 0 : power.spring > 0 && y > 2.6;
+          if (!clear && !th.hit) { th.hit = true; if (!crash()) { scene.remove(o); things.splice(i, 1); } continue; }
         }
-        if (o.m.position.z > 12) { scene.remove(o.m); obs.splice(i, 1); }
+        if (o.position.z > 14) { scene.remove(o); things.splice(i, 1); }
       }
-      if (alive) { A.score = feathers + Math.floor(t * 2); A.scoreEl.textContent = A.score; }
+      A.score = coins + Math.floor(dist / 10) * mult; A.scoreEl.textContent = A.score;
     },
-    over: () => !alive || timeLeft <= 0,
-    won: () => alive && timeLeft <= 0,
-    summary: () => alive ? `Survived 40 seconds with ${lives} ${lives === 1 ? "life" : "lives"} · ${feathers} feathers` : `Knocked out with ${Math.ceil(timeLeft)}s left · ${feathers} feathers`
+    over: () => (!alive && crashT > 1.2) || dist >= DASH_GOAL,
+    won: () => dist >= DASH_GOAL,
+    summary: () => dist >= DASH_GOAL ? `You ran ${DASH_GOAL} m and grabbed ${coins} coins!` : `Ran ${Math.floor(dist)} of ${DASH_GOAL} m · ${coins} coins`
   };
 }
 
