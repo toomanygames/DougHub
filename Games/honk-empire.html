@@ -56,7 +56,23 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .counter .sub{margin-top:4px;font-weight:800;font-size:14px;color:#fff}
 .goose-btn{position:relative;z-index:2;border:0;background:none;padding:0;width:min(300px,62vw);aspect-ratio:1;transition:transform .07s;touch-action:manipulation}
 .goose-btn:active{transform:scale(.93)}
-.goose-btn svg{width:100%;height:100%;filter:drop-shadow(0 14px 18px #0004)}
+.goose-img{width:100%;height:100%;filter:drop-shadow(0 14px 18px #0004)}
+.goose-hat{position:absolute;left:21%;top:-3%;width:30%;height:30%;pointer-events:none;transform:rotate(-12deg)}
+
+/* OpenMoji artwork (CC BY-SA 4.0) replaces system emoji everywhere in the game. */
+.em{display:inline-block;width:1.25em;height:1.25em;vertical-align:-.3em;user-select:none;-webkit-user-drag:none}
+.tab .ti .em{width:24px;height:24px;vertical-align:0}
+.row-icon .em{width:34px;height:34px;vertical-align:0}
+.pet .pe .em{width:40px;height:40px;vertical-align:0}
+.egg-card .egg .em{width:54px;height:54px;vertical-align:0}
+.world .we .em{width:44px;height:44px;vertical-align:0}
+.rebirth-card .feather .em{width:56px;height:56px;vertical-align:0}
+.reveal .em,.hatch-egg .em{width:104px;height:104px;vertical-align:0}
+.golden-bread .em{width:60px;height:60px}
+.mini-goose .em{width:48px;height:48px}
+.lb-rank .em{width:24px;height:24px}
+.credit{margin-top:14px;color:var(--faint);font-size:11.5px;text-align:center;line-height:1.5}
+.credit a{color:var(--muted)}
 .goose-btn.squish{animation:squish .16s}
 @keyframes squish{50%{transform:scale(.9,1.06)}}
 .buffs{position:relative;z-index:2;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:30px;margin-top:8px}
@@ -401,24 +417,15 @@ function honkSound(pitch=1,len=.13){
 }
 function chime(){if(S.muted)return;[1,1.26,1.5,2].forEach((p,i)=>setTimeout(()=>honkSound(p*1.6,.09),i*70));}
 
-/* ---------- Goose art (original SVG) ---------- */
-function gooseSVG(){
- const hat=WORLDS[S.world].hat,crown=S.rebirths>0&&!hat;
- return `<svg viewBox="0 0 200 200" aria-hidden="true">
- <ellipse cx="100" cy="182" rx="62" ry="10" fill="#0003"/>
- <path d="M70 172 l-8 12 h18z M118 172 l-6 12 h18z" fill="#f97316"/>
- <ellipse cx="100" cy="135" rx="62" ry="44" fill="#fff"/>
- <path d="M48 128 q-26 -6 -30 -26 q22 4 40 14z" fill="#e5e7eb"/>
- <path d="M108 120 q30 -4 40 20 q-26 6 -44 -6z" fill="#e5e7eb"/>
- <path d="M128 112 C132 80 120 64 122 44" stroke="#fff" stroke-width="26" stroke-linecap="round" fill="none"/>
- <circle cx="124" cy="40" r="24" fill="#fff"/>
- <path d="M140 38 q26 2 30 10 q-14 8 -30 4z" fill="#fb923c"/>
- <path d="M140 46 q16 2 30 2" stroke="#c2410c" stroke-width="2" fill="none"/>
- <circle cx="130" cy="34" r="4.5" fill="#111827"/><circle cx="131.5" cy="32.5" r="1.4" fill="#fff"/>
- <path d="M121 25 l15 5" stroke="#111827" stroke-width="3.5" stroke-linecap="round"/>
- ${crown?'<path d="M104 20 l6 -14 l8 10 l6 -12 l6 12 l8 -10 l4 14z" fill="#fcd34d" stroke="#b45309" stroke-width="2"/>':""}
- ${hat?`<text x="124" y="22" font-size="30" text-anchor="middle">${hat}</text>`:""}
- </svg>`;
+/* ---------- Art: OpenMoji SVGs (CC BY-SA 4.0), stored in Games/openmoji ---------- */
+const EMOJI_RE=/\p{Extended_Pictographic}️?(?:‍\p{Extended_Pictographic}️?)*/gu;
+function emojiFile(e){return[...e].map(c=>c.codePointAt(0).toString(16).toUpperCase()).filter(h=>h!=="FE0F").join("-");}
+// Decorative: every image sits next to text naming it, and an empty alt keeps emojify() from re-matching its own output.
+function em(e,cls="em"){return`<img class="${cls}" src="openmoji/${emojiFile(e)}.svg" alt="" draggable="false">`;}
+function emojify(html){return html.replace(EMOJI_RE,e=>em(e));}
+function gooseHTML(){
+ const hat=WORLDS[S.world].hat||(S.rebirths>0?"👑":"");
+ return em("🪿","goose-img")+(hat?em(hat,"goose-hat"):"");
 }
 
 /* ---------- Clicking ---------- */
@@ -446,7 +453,7 @@ document.addEventListener("keydown",e=>{if(e.key.length!==1)return;typed=(typed+
 /* ---------- Random events ---------- */
 let nextBread=Date.now()+45000,nextInvasion=Date.now()+240000;
 function spawnBread(){
- const b=document.createElement("button");b.className="golden-bread";b.type="button";b.textContent="🍞";b.setAttribute("aria-label","Golden bread");
+ const b=document.createElement("button");b.className="golden-bread";b.type="button";b.innerHTML=em("🍞");b.setAttribute("aria-label","Golden bread");
  b.style.left=(10+Math.random()*75)+"%";b.style.top=(15+Math.random()*55)+"%";
  const timer=setTimeout(()=>b.remove(),12000);
  b.addEventListener("click",()=>{clearTimeout(timer);b.remove();S.stats.breads++;chime();breadReward();});
@@ -464,9 +471,10 @@ function breadReward(){
 function spawnInvasion(){
  toast("🚨 GOOSE INVASION! Catch them before they escape!");
  for(let i=0;i<8;i++)setTimeout(()=>{
-  const g=document.createElement("button");g.className="mini-goose";g.type="button";g.textContent="🪿";g.setAttribute("aria-label","Invading goose");
+  const g=document.createElement("button");g.className="mini-goose";g.type="button";g.innerHTML=em("🪿");g.setAttribute("aria-label","Invading goose");
   g.style.top=(14+Math.random()*60)+"%";const dur=4+Math.random()*3;g.style.animationDuration=dur+"s";
-  if(Math.random()<.5){g.style.animationDirection="reverse";g.style.transform="scaleX(-1)";}
+  // The OpenMoji goose faces left, so mirror it when it walks left-to-right.
+  if(Math.random()<.5)g.style.animationDirection="reverse";else g.style.transform="scaleX(-1)";
   g.addEventListener("click",()=>{g.remove();S.stats.invaders++;const v=Math.max(20,cps()*20);earn(v);honkSound(1.6,.08);const sr=stage.getBoundingClientRect();floatText(sr.width/2-30,sr.height*.3,"+"+fmt(v),"crit");});
   g.addEventListener("animationend",()=>g.remove());stage.appendChild(g);
  },i*550);
@@ -506,7 +514,7 @@ function fuseAll(){
 /* ---------- Worlds & rebirth ---------- */
 function unlockWorld(i){const w=WORLDS[i];if(S.worlds!==i||S.rebirths<w.req||S.honks<w.cost)return;S.honks-=w.cost;S.worlds=i+1;S.world=i;chime();toast(w.icon+" Welcome to "+w.name+"! Production x"+w.mult,"gold");applyWorld();render(true);}
 function travel(i){if(i>=S.worlds)return;S.world=i;applyWorld();render(true);}
-function applyWorld(){const w=WORLDS[S.world];const st=document.documentElement.style;st.setProperty("--sky-a",w.sky[0]);st.setProperty("--sky-b",w.sky[1]);st.setProperty("--ground",w.ground[0]);st.setProperty("--ground-2",w.ground[1]);stage.className="stage world-"+S.world;$("worldLabel").innerHTML=w.icon+" <b>"+w.name+"</b>";gooseBtn.innerHTML=gooseSVG();}
+function applyWorld(){const w=WORLDS[S.world];const st=document.documentElement.style;st.setProperty("--sky-a",w.sky[0]);st.setProperty("--sky-b",w.sky[1]);st.setProperty("--ground",w.ground[0]);st.setProperty("--ground-2",w.ground[1]);stage.className="stage world-"+S.world;$("worldLabel").innerHTML=em(w.icon)+" <b>"+w.name+"</b>";gooseBtn.innerHTML=gooseHTML();}
 function rebirth(){
  const gain=rebirthGain();if(!gain)return;
  openModal(`<div class="reveal">🪶</div><h2>Rebirth for ${fmt(gain)} feather${gain>1?"s":""}?</h2><p>Your honks, buildings and beak upgrades reset. You keep pets, worlds, feathers and trophies.</p><button class="big-btn gold" type="button" id="confirmRebirth">Rebirth!</button><br><br><button class="big-btn" type="button" data-close>Not yet</button>`);
@@ -531,10 +539,10 @@ function offlineEarnings(){
 function checkAch(){ACH.forEach(a=>{if(!S.ach[a.id]&&a.test(S)){S.ach[a.id]=Date.now();toast("🏆 "+a.name+" (+2% production)","gold");chime();}});}
 
 /* ---------- UI: modal & toast ---------- */
-function openModal(html,closable=true){const bg=$("modalBg");$("modal").innerHTML=html;bg.classList.add("show");bg.dataset.closable=closable?"1":"";}
+function openModal(html,closable=true){const bg=$("modalBg");$("modal").innerHTML=emojify(html);bg.classList.add("show");bg.dataset.closable=closable?"1":"";}
 function closeModal(){$("modalBg").classList.remove("show");}
 $("modalBg").addEventListener("click",e=>{if(e.target.closest("[data-close]")||(e.target===e.currentTarget&&e.currentTarget.dataset.closable))closeModal();});
-function toast(msg,cls=""){const el=document.createElement("div");el.className="toast "+cls;el.textContent=msg;$("toasts").appendChild(el);setTimeout(()=>el.remove(),3600);while($("toasts").children.length>4)$("toasts").firstChild.remove();}
+function toast(msg,cls=""){const el=document.createElement("div");el.className="toast "+cls;el.innerHTML=emojify(esc(msg));$("toasts").appendChild(el);setTimeout(()=>el.remove(),3600);while($("toasts").children.length>4)$("toasts").firstChild.remove();}
 
 /* ---------- UI: tabs ---------- */
 let tab="shop",lbMode="lifetime",lbCache=null,lbLoadedAt=0;
@@ -610,7 +618,8 @@ function trophiesHTML(){
  return `<div class="section-title">Stats</div><dl class="stat-list"><dt>Lifetime honks</dt><dd>${fmt(S.lifetime)}</dd><dt>Clicks</dt><dd>${fmt(S.clicks)}</dd><dt>Crit honks</dt><dd>${fmt(S.stats.crits)}</dd><dt>Eggs hatched</dt><dd>${fmt(S.stats.eggs)}</dd><dt>Golden breads caught</dt><dd>${fmt(S.stats.breads)}</dd><dt>Time played</dt><dd>${Math.floor(mins/60)}h ${mins%60}m</dd></dl>
  <div class="section-title">Trophies <small>${achCount()}/${ACH.length} · +${achCount()*2}%</small></div>
  <div class="ach-grid">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?"got":""}"><strong>${S.ach[a.id]?"🏆 ":"🔒 "}${a.name}</strong>${a.desc}</div>`).join("")}</div>
- <button class="big-btn" style="margin-top:16px;background:#7f1d1d" type="button" data-action="reset">Reset all progress</button>`;
+ <button class="big-btn" style="margin-top:16px;background:#7f1d1d" type="button" data-action="reset">Reset all progress</button>
+ <p class="credit">Art: <a href="https://openmoji.org/" target="_blank" rel="noopener">OpenMoji</a>, the open-source emoji project, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>`;
 }
 function leadersHTML(){
  let h=`<div class="section-title">Leaderboard <span class="seg"><button type="button" data-lb="lifetime" class="${lbMode==="lifetime"?"on":""}">Honks</button><button type="button" data-lb="rebirths" class="${lbMode==="rebirths"?"on":""}">Rebirths</button></span></div>`;
@@ -625,6 +634,8 @@ function leadersHTML(){
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
 let lastPanelHTML="",lastPanelRender=0,panelPressed=false;
+// Only touch the DOM when markup changes, so the art images are not re-created every frame.
+function setHTML(el,html){html=emojify(html);if(el._html!==html){el._html=html;el.innerHTML=html;}}
 $("tabBody").addEventListener("pointerdown",()=>{panelPressed=true;});
 addEventListener("pointerup",()=>setTimeout(()=>{panelPressed=false;},0));
 addEventListener("pointercancel",()=>{panelPressed=false;});
@@ -634,8 +645,8 @@ function render(force=false){
  $("featherChip").textContent=fmt(S.feathers);$("rebirthChip").textContent=S.rebirths;$("multChip").textContent=fmt(globalMult());
  document.title=fmt(S.honks)+" honks · Honk Empire";
  const now=Date.now();buffs=buffs.filter(b=>b.until>now);
- $("buffs").innerHTML=buffs.map(b=>`<span class="buff">${b.label} · ${fmtTime(b.until-now)}</span>`).join("");
- const ev=hourly();$("eventBanner").innerHTML=`${ev.icon} ${ev.name}: ${ev.desc} <small>· next event in ${fmtTime(hourlyLeft())}</small>`;
+ setHTML($("buffs"),buffs.map(b=>`<span class="buff">${b.label} · ${fmtTime(b.until-now)}</span>`).join(""));
+ const ev=hourly();setHTML($("eventBanner"),`${ev.icon} ${ev.name}: ${ev.desc} <small>· next event in ${fmtTime(hourlyLeft())}</small>`);
  $("dailyBtn").hidden=S.lastDaily===today();
  // Tab alert dots
  const alerts={shop:GENERATORS.some((g,i)=>S.honks>=genCost(i))&&tab!=="shop",pets:S.honks>=eggCost(S.world)&&tab!=="pets",worlds:S.worlds<5&&S.rebirths>=WORLDS[S.worlds].req&&S.honks>=WORLDS[S.worlds].cost,rebirth:rebirthGain()>0&&tab!=="rebirth"};
@@ -643,7 +654,7 @@ function render(force=false){
  // Never swap panel buttons out from under a press, or the click would be lost.
  if(panelPressed||(!force&&now-lastPanelRender<250))return;
  lastPanelRender=now;
- const html={shop:shopHTML,pets:petsHTML,worlds:worldsHTML,rebirth:rebirthHTML,trophies:trophiesHTML,leaders:leadersHTML}[tab]();
+ const html=emojify({shop:shopHTML,pets:petsHTML,worlds:worldsHTML,rebirth:rebirthHTML,trophies:trophiesHTML,leaders:leadersHTML}[tab]());
  if(html!==lastPanelHTML){const body=$("tabBody"),y=body.scrollTop;body.innerHTML=html;body.scrollTop=y;lastPanelHTML=html;}
 }
 
@@ -682,17 +693,19 @@ function tick(t){
  render();
  requestAnimationFrame(tick);
 }
-$("muteBtn").addEventListener("click",()=>{S.muted=!S.muted;S.stats.muteToggles++;$("muteBtn").textContent=S.muted?"🔇":"🔊";});
+$("muteBtn").addEventListener("click",()=>{S.muted=!S.muted;S.stats.muteToggles++;$("muteBtn").innerHTML=em(S.muted?"🔇":"🔊");});
 $("dailyBtn").addEventListener("click",claimDaily);
 setInterval(()=>{checkAch();save();},2000);
 setInterval(()=>{submitScore();if(tab==="leaders")loadLeaderboard();},15000);
-setInterval(()=>{const pool=NEWS.filter(n=>S.lifetime>=n[1]);const n=pool[Math.floor(Math.random()*pool.length)][0];const el=$("ticker");el.textContent="📰 "+n;el.style.animation="none";void el.offsetWidth;el.style.animation="";},22000);
+setInterval(()=>{const pool=NEWS.filter(n=>S.lifetime>=n[1]);const n=pool[Math.floor(Math.random()*pool.length)][0];const el=$("ticker");el.innerHTML=emojify("📰 "+esc(n));el.style.animation="none";void el.offsetWidth;el.style.animation="";},22000);
 addEventListener("pagehide",save);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")save();else last=performance.now();});
 
 breakShown=Math.floor(S.playMs/2700000);
-$("muteBtn").textContent=S.muted?"🔇":"🔊";
-$("ticker").textContent="📰 "+NEWS[Math.floor(Math.random()*3)][0];
+// Swap the emoji in the static header, tabs and gift button for OpenMoji art.
+document.querySelectorAll(".top-stats .chip,.tab .ti,#dailyBtn").forEach(el=>{el.innerHTML=emojify(el.innerHTML);});
+$("muteBtn").innerHTML=em(S.muted?"🔇":"🔊");
+$("ticker").innerHTML=emojify("📰 "+esc(NEWS[Math.floor(Math.random()*3)][0]));
 applyWorld();
 offlineEarnings();
 initLeaderboard().then(()=>{submitScore(true);if(tab==="leaders")loadLeaderboard();});
