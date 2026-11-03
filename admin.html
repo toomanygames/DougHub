@@ -9,9 +9,9 @@
 
 <!-- display.js loads Supabase JS if needed and creates the single shared authenticated client. -->
 <script src="display.js"></script>
-<script src="chat-access-admin.js?v=6" defer></script>
-<link rel="stylesheet" href="admin-shell.css?v=1">
-<script src="admin-shell.js?v=1" defer></script>
+<script src="chat-access-admin.js?v=7" defer></script>
+<link rel="stylesheet" href="admin-shell.css?v=2">
+<script src="admin-shell.js?v=2" defer></script>
 
 <style>
 * {
@@ -1067,7 +1067,7 @@ td,th{border-color:rgba(148,163,255,.12)}
 
 </style>  <script src="nav.js?v=20261102-chat-approval-records" defer></script>
 
-<script src="search-autofill-fix.js" defer></script>
+<script src="search-autofill-fix.js?v=2" defer></script>
 
 <style id="DOUGHUB_PAGE_REDESIGN_INLINE">
 
@@ -1486,32 +1486,25 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
 </div>
 
 <div class="card staff-management-card" id="staffManagementCard" style="display:none">
-  <h2>🛡️ Staff & Permissions</h2>
-  <p class="admin-card-help">Manage the staff ladder. Only the Owner account should be able to change roles. Promotions use the protected staff-role endpoint.</p>
-  <div class="staff-rank-grid">
-    <div><b class="rank-helper">HELPER</b><span>Basic community support</span></div>
-    <div><b class="rank-admin">ADMIN</b><span>Community moderation</span></div>
-    <div><b class="rank-developer">DEVELOPER</b><span>Technical and project tools</span></div>
-    <div><b class="rank-tech">TECH</b><span>Technical diagnostics and support tools</span></div>
-    <div><b class="rank-owner">OWNER</b><span>Full site control</span></div>
-  </div>
-  <div class="staff-manage-form">
-    <label class="admin-field-label" for="staffTarget">Account</label>
+  <h2>🛡️ Change a staff rank</h2>
+  <p class="admin-card-help">Promote or demote anyone except yourself. Doug's Owner account can't be changed.</p>
+  <!-- Its own form with a hidden username, so browsers pair the password here and never treat the panel's search box as a login field. -->
+  <form class="staff-manage-form" id="staffRankForm" autocomplete="on" onsubmit="return false">
+    <input type="text" name="username" autocomplete="username" id="staffConfirmUsername" tabindex="-1" aria-hidden="true" style="display:none">
+    <label class="admin-field-label" for="staffTarget">Member</label>
     <select id="staffTarget" class="staff-input"><option value="">Loading accounts…</option></select>
-    <label class="admin-field-label" for="staffRole">New rank (promote or demote)</label>
+    <label class="admin-field-label" for="staffRole">New rank</label>
     <select id="staffRole" class="staff-input">
-      <option value="none">Normal user — remove staff rank</option>
+      <option value="none">No rank (normal member)</option>
       <option value="helper">Helper</option>
       <option value="admin">Admin</option>
       <option value="developer">Developer</option>
-      <option value="tech">Tech</option>
       <option value="owner">Owner</option>
     </select>
-    <p class="staff-rank-help">Choose any rank to promote or demote an account. Doug's Owner account is permanently protected and cannot be changed.</p>
-    <label class="admin-field-label" for="staffConfirmPassword">Confirm your Owner password</label>
-    <input id="staffConfirmPassword" class="staff-input" type="password" autocomplete="current-password" placeholder="Enter your password to confirm" required>
-    <div class="admin-card-actions"><span id="staffManageStatus" class="status">Owner access required.</span><button id="saveStaffRoleButton" type="button" class="save-button">Save rank change</button></div>
-  </div>
+    <label class="admin-field-label" for="staffConfirmPassword">Your password</label>
+    <input id="staffConfirmPassword" name="password" class="staff-input" type="password" autocomplete="current-password" placeholder="Confirm it's you" required>
+    <div class="admin-card-actions"><span id="staffManageStatus" class="status"></span><button id="saveStaffRoleButton" type="button" class="save-button">Save rank</button></div>
+  </form>
   <div class="staff-current-list" id="staffCurrentList"></div>
 </div>
 

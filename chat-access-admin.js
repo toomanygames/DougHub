@@ -34,9 +34,9 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;margin:4px 0 8px"><h3 style="margin:0;font-size:15px">Waiting for approval <span id="chatAccessPendingCount" style="color:#a7aec9;font-weight:700"></span></h3><button type="button" id="chatAccessRefresh">Refresh</button></div>
         <div id="chatAccessPending" class="admin-scroll-area" style="display:grid;gap:8px;margin-bottom:16px"></div>
         <h3 style="margin:0 0 8px;font-size:15px">Find any account</h3>
-        <form id="chatAccessSearchForm" style="display:flex;gap:9px;flex-wrap:wrap">
-          <input id="chatAccessSearch" type="search" maxlength="32" placeholder="Search by username" aria-label="Search by username" style="flex:1;min-width:180px;padding:10px 12px;border:1px solid #ffffff20;border-radius:9px;background:#080b18;color:#fff">
-          <button type="submit">Search users</button>
+        <form id="chatAccessSearchForm" role="search" autocomplete="off" style="display:flex;gap:9px;flex-wrap:wrap">
+          <input id="chatAccessSearch" type="search" name="dh-member-find" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-autofill-safe maxlength="32" placeholder="Find a member…" aria-label="Find a member" style="flex:1;min-width:180px;padding:10px 12px;border:1px solid #ffffff20;border-radius:9px;background:#080b18;color:#fff">
+          <button type="submit">Find</button>
         </form>
         <div id="chatAccessStatus" class="status" role="status" aria-live="polite">Search for a username to approve chat access.</div>
         <div id="chatAccessResults" class="admin-scroll-area" style="display:grid;gap:8px"></div>
@@ -100,6 +100,7 @@
             const button = document.createElement("button");
             button.type = "button";
             button.textContent = person.chat_verified ? "Revoke access" : "Approve chat";
+            button.className = person.chat_verified ? "dh-btn-danger" : "";
             button.disabled = false;
             button.addEventListener("click", async () => {
               if (person.chat_verified && !confirm("Revoke chat access for @" + (person.username || "this user") + "? They lose Community Chat, Class Chat, and DMs until approved again.")) return;
@@ -117,6 +118,7 @@
               person.chat_verified = !person.chat_verified;
               describe();
               button.textContent = person.chat_verified ? "Revoke access" : "Approve chat";
+              button.className = person.chat_verified ? "dh-btn-danger" : "";
               button.disabled = false;
               status.textContent = "Updated @" + (person.username || "user") + ".";
             });
@@ -167,6 +169,7 @@
           const deny = document.createElement("button");
           deny.type = "button";
           deny.textContent = "Deny";
+          deny.className = "dh-btn-danger";
           const decide = async ok => {
             approve.disabled = deny.disabled = true;
             const label = "@" + (names.get(request.user_id) || "user");

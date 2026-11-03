@@ -29,6 +29,8 @@
 
   function protect(input) {
     if (!looksLikeSearch(input)) return;
+    // Fields marked data-autofill-safe already set their own hints (e.g. the admin panel search).
+    if (input.hasAttribute("data-autofill-safe")) return;
 
     // Chromium browsers sometimes ignore autocomplete="off" and still offer saved usernames.
     // "new-password" is a stronger autofill hint for non-credential search fields.
