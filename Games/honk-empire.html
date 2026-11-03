@@ -627,7 +627,7 @@ function rhythmClick(){
  else{rhythm.streak=0;rhythm.judge=gap<BEAT_MS?"Too fast":"Too slow";}
  rhythm.best=Math.max(rhythm.best,rhythm.streak);
  // Easter egg: holding the beat until Sparkle has played a couple of beats opens the concert.
- if(rhythm.streak===LAYERS[4].at+3&&!concert.active&&!concert.done)setTimeout(launchConcert,450);
+ if(rhythm.streak===LAYERS[4].at+3&&!concert.active)setTimeout(launchConcert,450);
  if(S.muted){renderRhythm();return;}
  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
  if(rhythm.streak>0){const layers=LAYERS.filter(l=>rhythm.streak>l.at).length;playBeat(rhythm.step,rhythm.beat/1000,layers);rhythm.step++;}
@@ -684,10 +684,12 @@ let audioUnlocked=false;
 document.addEventListener("visibilitychange",updateMusic);
 
 /* ---------- Secret concert (3D, loaded only when triggered) ---------- */
-const concert={active:false,done:false};
+// The concert starts every time anyone reaches Sparkle, on any song; only its honk reward has a cooldown.
+const concert={active:false},CONCERT_COOLDOWN=10*60*1000;
+const concertWait=()=>Math.max(0,(S.stats.concertPrizeAt||0)+CONCERT_COOLDOWN-Date.now());
 async function launchConcert(){
- if(concert.active)return;
- concert.active=true;concert.done=true;
+ if(concert.active||arcade.active)return;
+ concert.active=true;
  rhythm.on=false;renderRhythm();updateMusic();
  toast("🎸 Something is happening on the main stage…","gold");
  try{
@@ -695,14 +697,16 @@ async function launchConcert(){
   audio=audio||new (window.AudioContext||window.webkitAudioContext)();await audio.resume?.();
   mod.startConcert({audio,muted:S.muted,onFinish:res=>{
    concert.active=false;
-   // Rewards and the trophy are only for finishing the show, so quitting early can't be farmed by reloading.
-   if(res.quit){toast("🎸 The goose left the stage. Hold the beat to Sparkle again after a reload to retry.");updateMusic();return;}
-   const mult={S:5,A:3.5,B:2.5,C:1.5,D:1}[res.grade]||1,v=Math.max(500,cps()*300*mult);
-   earn(v);S.stats.concert=true;checkAch();save();
-   toast(`🎸 Concert over! Grade ${res.grade}: +${fmt(v)} honks`,"gold");
+   // Rewards and the trophy are only for finishing the show, and the honk reward cools down for 10 minutes.
+   if(res.quit){toast("🎸 The goose left the stage. Hold the beat to Sparkle again to retry.");updateMusic();return;}
+   S.stats.concert=true;
+   const wait=concertWait();
+   if(wait)toast(`🎸 Great show, grade ${res.grade}! The honk reward is back in ${fmtTime(wait)}.`,"gold");
+   else{const mult={S:5,A:3.5,B:2.5,C:1.5,D:1}[res.grade]||1,v=Math.max(500,cps()*300*mult);earn(v);S.stats.concertPrizeAt=Date.now();toast(`🎸 Concert over! Grade ${res.grade}: +${fmt(v)} honks`,"gold");}
+   checkAch();save();
    updateMusic();
   }});
- }catch(e){concert.active=false;concert.done=false;console.warn("Concert failed to load",e);toast("The concert couldn't load. Try again later.");updateMusic();}
+ }catch(e){concert.active=false;console.warn("Concert failed to load",e);toast("The concert couldn't load. Try again later.");updateMusic();}
 }
 
 /* ---------- World scenes (Kenney CC0 art) ---------- */
