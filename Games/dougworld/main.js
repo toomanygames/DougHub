@@ -4,6 +4,8 @@
    Player scripts use a small built-in command language, never JavaScript, so a friend's build
    can never run code that reads your login or the rest of the site. */
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
 
 const SB_URL = "https://agsqdqcsmsppcdqxlppj.supabase.co";
 const SB_KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
@@ -52,6 +54,25 @@ const MATERIALS = ["solid", "glass", "neon", "metal", "grid"];
 const AV_PARTS = { head: "Head", torso: "Body", armL: "Left arm", armR: "Right arm", legL: "Left leg", legR: "Right leg", hat: "Hat", back: "Backpack" };
 const OPTIONAL_PARTS = ["hat", "back"];
 const SWATCHES = ["#fffaf0", "#26283b", "#9aa1ad", "#e05a4f", "#f28c28", "#f7c948", "#5fae4e", "#2bb3a3", "#3a8fb7", "#8a5cc9", "#d96aa7", "#8b5a3c", "#f2c9a0", "#c68642", "#6b4423", "#ffffff"];
+/* Kenney 3D models (CC0), stored in Games/dougworld/models. Only these keys may appear in shared data. */
+const MODEL_DIR = "dougworld/models/";
+const CHAR_MODELS = [..."abcdefghijklmnopqr"].map(c => "blocky/character-" + c).concat(["female-a", "female-b", "female-c", "male-a", "male-b", "male-c"].map(c => "mini/character-" + c));
+const PET_MODELS = ["dog", "cat", "bunny", "fox", "panda", "penguin", "pig", "chick", "koala", "parrot", "tiger", "elephant"].map(a => "pets/animal-" + a);
+const BUILD_MODELS = {
+  Furniture: ["bedDouble", "bedSingle", "bedBunk", "bench", "chair", "chairCushion", "chairDesk", "desk", "table", "tableRound", "tableCoffee", "loungeSofa", "loungeSofaCorner", "loungeChair", "bookcaseOpen", "books", "televisionModern", "cabinetTelevision", "computerScreen", "laptop", "kitchenFridge", "kitchenStove", "kitchenSink", "kitchenCabinet", "kitchenMicrowave", "toaster", "bathtub", "toilet", "shower", "bathroomSink", "lampRoundFloor", "lampSquareTable", "ceilingFan", "pottedPlant", "plantSmall1", "rugRound", "rugRectangle", "speaker", "radio", "bear", "washer", "trashcan", "stairs", "cardboardBoxClosed", "coatRackStanding", "pillow"].map(n => "furniture/" + n),
+  Nature: ["tree_oak", "tree_default", "tree_detailed", "tree_fat", "tree_pineRoundA", "tree_pineDefaultA", "tree_cone", "tree_palmTall", "tree_blocks", "plant_bush", "plant_bushLarge", "flower_redA", "flower_yellowA", "flower_purpleA", "mushroom_red", "mushroom_redGroup", "rock_largeA", "rock_smallA", "rock_tallA", "stump_round", "log", "log_stack", "campfire_stones", "fence_simple", "fence_gate", "tent_detailedOpen", "statue_obelisk", "statue_head", "pot_large", "lily_large", "sign", "grass_large"].map(n => "nature/" + n)
+};
+const MODEL_PARTS = [...BUILD_MODELS.Furniture, ...BUILD_MODELS.Nature];
+const modelLabel = key => key.split("/").pop().replace(/^(animal|character)-/, "").replace(/_/g, " ").replace(/([a-z])([A-Z0-9])/g, "$1 $2").replace(/^./, c => c.toUpperCase());
+const gltfLoader = new GLTFLoader(), gltfCache = new Map(), MODEL_SIZE = new Map();
+function loadModel(key) {
+  if (!gltfCache.has(key)) gltfCache.set(key, gltfLoader.loadAsync(MODEL_DIR + key + ".glb").then(g => {
+    g.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    const box = new THREE.Box3().setFromObject(g.scene); g.size = box.getSize(new THREE.Vector3()); g.center = box.getCenter(new THREE.Vector3()); g.min = box.min.clone();
+    MODEL_SIZE.set(key, g.size); collidersDirty = true; return g;
+  }).catch(err => { console.warn("DougWorld model failed:", key, err); gltfCache.delete(key); throw err; }));
+  return gltfCache.get(key);
+}
 const QUICK = ["Hi!", "Come here!", "Follow me!", "Nice build!", "Let's play tag!", "GG!", "LOL", "Help!", "Wait for me!", "Brb", "Wow!", "Bye!"];
 
 /* ============================== account ============================== */
@@ -130,20 +151,30 @@ for (let i = 0; i < PLOTS; i++) {
   addMesh(new THREE.CylinderGeometry(0.12, 0.12, 2.6, 8), new THREE.MeshStandardMaterial({ color: "#8b5a3c" }), new THREE.Vector3(toward.x, 1.3, toward.z), { cast: true });
   plotSigns.push(sign);
 }
-// Trees in the gaps between plots, positioned from a fixed seed so every player sees the same park.
-(function trees() {
+// Park scenery from the Kenney Nature Kit, positioned from a fixed seed so every player sees the same park.
+function placeScenery(key, x, z, scale, yaw = 0, y = 0) {
+  loadModel(key).then(g => { const m = g.scene.clone(); m.scale.setScalar(scale); m.position.set(x, y, z); m.rotation.y = yaw; scene.add(m); }).catch(() => {});
+}
+(function park() {
   let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const trunk = new THREE.MeshStandardMaterial({ color: "#8b5a3c" }), leaf = new THREE.MeshStandardMaterial({ color: "#4f9a43", roughness: .9 }), leaf2 = new THREE.MeshStandardMaterial({ color: "#6bb84f", roughness: .9 });
-  for (let n = 0; n < 70; n++) {
-    const a = rnd() * Math.PI * 2, r = 26 + rnd() * 110, x = Math.cos(a) * r, z = Math.sin(a) * r;
-    if (Math.hypot(x, z) < HUB_R + 3) continue;
-    let blocked = false; for (let i = 0; i < PLOTS; i++) { const o = plotOrigin(i); if (Math.abs(x - o.x) < PLOT_HALF + 3 && Math.abs(z - o.z) < PLOT_HALF + 5) blocked = true; }
-    if (blocked) continue;
-    const h = 2 + rnd() * 2;
-    addMesh(new THREE.CylinderGeometry(.25, .35, h, 8), trunk, new THREE.Vector3(x, h / 2, z), { cast: true });
-    const top = rnd() < .5 ? new THREE.ConeGeometry(1.6, 3.2, 10) : new THREE.SphereGeometry(1.7, 14, 10);
-    addMesh(top, rnd() < .5 ? leaf : leaf2, new THREE.Vector3(x, h + 1.4, z), { cast: true });
+  const trees = ["nature/tree_oak", "nature/tree_default", "nature/tree_detailed", "nature/tree_fat", "nature/tree_pineRoundA", "nature/tree_pineDefaultA", "nature/tree_cone", "nature/tree_blocks"];
+  const smalls = ["nature/plant_bush", "nature/plant_bushLarge", "nature/flower_redA", "nature/flower_yellowA", "nature/flower_purpleA", "nature/mushroom_redGroup", "nature/rock_smallA", "nature/rock_largeA", "nature/stump_round", "nature/grass_large", "nature/log"];
+  const clear = (x, z, pad) => { if (Math.hypot(x, z) < HUB_R + pad) return false; for (let i = 0; i < PLOTS; i++) { const o = plotOrigin(i); if (Math.abs(x - o.x) < PLOT_HALF + pad && Math.abs(z - o.z) < PLOT_HALF + pad + 2) return false; } return true; };
+  for (let n = 0; n < 90; n++) {
+    const a = rnd() * Math.PI * 2, r = 25 + rnd() * 115, x = Math.cos(a) * r, z = Math.sin(a) * r;
+    if (clear(x, z, 3)) placeScenery(trees[Math.floor(rnd() * trees.length)], x, z, 4.5 + rnd() * 2.5, rnd() * 6.28);
   }
+  for (let n = 0; n < 160; n++) {
+    const a = rnd() * Math.PI * 2, r = 22 + rnd() * 120, x = Math.cos(a) * r, z = Math.sin(a) * r;
+    if (clear(x, z, 1.5)) placeScenery(smalls[Math.floor(rnd() * smalls.length)], x, z, 3 + rnd() * 2, rnd() * 6.28);
+  }
+  // Hub: a campfire circle with benches, a statue and flower beds.
+  placeScenery("nature/statue_obelisk", 0, -9, 6);
+  placeScenery("nature/campfire_stones", 9, -6, 4);
+  for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2 + .4; placeScenery("furniture/bench", 9 + Math.cos(a) * 3.6, -6 + Math.sin(a) * 3.6, 3.2, -a + Math.PI / 2); }
+  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; placeScenery(["nature/flower_redA", "nature/flower_yellowA", "nature/flower_purpleA"][i % 3], Math.cos(a) * (HUB_R - 1.2), Math.sin(a) * (HUB_R - 1.2), 3.5, a); }
+  placeScenery("nature/tent_detailedOpen", -10, -5, 5, 0.6);
+  placeScenery("nature/sign", -3, 8, 3.5, Math.PI);
 })();
 
 /* ============================== labels & bubbles ============================== */
@@ -165,11 +196,12 @@ function bubble(obj3d, str, height, at) {
   setTimeout(() => { obj3d.remove(s); s.material.map.dispose(); s.material.dispose(); }, 3500);
 }
 // Parts are scaled meshes, so their bubbles hang off the build group just above the part instead.
-function partBubble(b, pid, str) { const mesh = b.meshes.get(pid), p = b.parts.get(pid); if (mesh && p) bubble(b.group, str, p.s[1] / 2, mesh.position); }
+function partBubble(b, pid, str) { const mesh = b.meshes.get(pid), p = b.parts.get(pid); if (mesh && p) bubble(b.group, str, partSize(p)[1] / 2, mesh.position); }
 
 /* ============================== avatars ============================== */
+// base: "blocks" (fully custom block body) or one of CHAR_MODELS (an animated Kenney character).
 function defaultChar() {
-  return { v: 1, parts: {
+  return { v: 1, base: "blocky/character-a", tint: "", size: [1, 1], pet: "pets/animal-dog", parts: {
     head: { shape: "box", color: "#f2c9a0", scale: [0.8, 0.8, 0.8], tex: DEFAULT_FACE },
     torso: { shape: "box", color: "#3a8fb7", scale: [0.9, 1, 0.5] },
     armL: { shape: "box", color: "#f2c9a0", scale: [0.28, 0.9, 0.28] }, armR: { shape: "box", color: "#f2c9a0", scale: [0.28, 0.9, 0.28] },
@@ -177,10 +209,14 @@ function defaultChar() {
     hat: { shape: "none", color: "#e05a4f", scale: [0.9, 0.4, 0.9] }, back: { shape: "none", color: "#f28c28", scale: [0.6, 0.7, 0.3] } } };
 }
 function cleanChar(c) {
-  const base = defaultChar(), out = { v: 1, parts: {} };
+  const def = defaultChar(), out = { v: 1, parts: {} };
+  out.base = CHAR_MODELS.includes(c?.base) ? c.base : "blocks"; // older saves without a base are block bodies
+  out.tint = isHex(c?.tint) ? c.tint.toLowerCase() : "";
+  out.size = [num(c?.size?.[0], 1, 0.6, 1.6), num(c?.size?.[1], 1, 0.6, 1.6)];
+  out.pet = PET_MODELS.includes(c?.pet) ? c.pet : "";
   let textured = 0;
   for (const k of Object.keys(AV_PARTS)) {
-    const src = c?.parts?.[k] || {}, d = base.parts[k];
+    const src = c?.parts?.[k] || {}, d = def.parts[k];
     const shape = (OPTIONAL_PARTS.includes(k) && src.shape === "none") ? "none" : (AV_SHAPES.includes(src.shape) ? src.shape : d.shape);
     const sc = Array.isArray(src.scale) ? src.scale : d.scale;
     const p = { shape, color: hex(src.color, d.color), scale: [0, 1, 2].map(i => num(sc[i], d.scale[i], 0.15, 2.5)) };
@@ -208,7 +244,7 @@ function avatarMaterial(part) {
   // On boxes the picture goes on the front face only (BoxGeometry face order: +x, -x, +y, -y, +z, -z).
   return part.shape === "box" ? [plain, plain, plain, plain, textured, plain] : textured;
 }
-function buildAvatar(char) {
+function buildBlockAvatar(char) {
   const P = char.parts, root = new THREE.Group(), rig = {};
   const mesh = k => { const p = P[k]; const m = new THREE.Mesh(GEO[p.shape], avatarMaterial(p)); m.scale.set(...p.scale); m.castShadow = true; return m; };
   const legH = Math.max(P.legL.scale[1], P.legR.scale[1]), [tw, th, td] = P.torso.scale, headH = P.head.scale[1];
@@ -228,6 +264,94 @@ function buildAvatar(char) {
   return { body, root, rig, height: clamp(height, 1.2, 4.5) };
 }
 function disposeTree(obj) { obj.traverse(o => { if (o.isSprite) { o.material.map?.dispose(); o.material.dispose(); } else if (o.material && !o.isMesh) o.material.dispose?.(); }); }
+function buildAvatar(char, world = scene) {
+  const av = char.base !== "blocks" ? buildModelAvatar(char) : buildBlockAvatar(char);
+  if (char.pet) av.pet = buildPet(char.pet, world);
+  return av;
+}
+function disposeAvatar(av) {
+  if (!av) return; av.disposed = true;
+  av.body.parent?.remove(av.body); av.mixer?.stopAllAction(); disposeTree(av.body);
+  if (av.pet) { av.pet.disposed = true; av.pet.world.remove(av.pet.group); av.pet.mixer?.stopAllAction(); }
+}
+// Hats and backpacks from the block editor can be worn on Kenney characters too.
+function attachAccessories(char, root, top) {
+  const P = char.parts; let height = top;
+  const mk = k => { const p = P[k]; const m = new THREE.Mesh(GEO[p.shape], avatarMaterial(p)); m.scale.set(...p.scale); m.castShadow = true; return m; };
+  if (P.hat.shape !== "none") { const hat = mk("hat"); hat.position.y = top + P.hat.scale[1] / 2 - 0.1; root.add(hat); height += P.hat.scale[1] * 0.9; }
+  if (P.back.shape !== "none") { const b = mk("back"); b.position.set(0, top * 0.55, -0.3 - P.back.scale[2] / 2); root.add(b); }
+  return height;
+}
+function buildModelAvatar(char) {
+  const body = new THREE.Group(), root = new THREE.Group(); body.add(root);
+  const [sw, sh] = char.size, top = 1.8 * sh;
+  const av = { body, root, rig: null, isModel: true, height: top, mixer: null, actions: {}, cur: "" };
+  av.height = clamp(attachAccessories(char, root, top), 1.2, 4.5);
+  loadModel(char.base).then(g => {
+    if (av.disposed) return;
+    const inst = SkeletonUtils.clone(g.scene), s = top / g.size.y;
+    inst.scale.set(s * sw, s, s * sw); inst.position.y = -g.min.y * s;
+    if (char.tint) inst.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.color.set(char.tint); } });
+    root.add(inst); av.model = inst;
+    av.mixer = new THREE.AnimationMixer(inst);
+    for (const clip of g.animations) av.actions[clip.name] = av.mixer.clipAction(clip);
+    playAnim(av, "idle");
+  }).catch(() => {});
+  return av;
+}
+// Animation names differ a little between Kenney packs, so each state lists what to try in order.
+const ANIM_FALLBACK = { idle: ["idle"], walk: ["walk"], sprint: ["sprint", "run", "walk"], run: ["run", "sprint", "walk"], jump: ["jump", "walk"], fall: ["fall", "idle"], sit: ["sit", "idle"], wave: ["emote-yes", "interact-right", "idle"], dance: ["dance", "emote-yes", "idle"] };
+function playAnim(av, name) {
+  if (!av.mixer) return;
+  const pick = (ANIM_FALLBACK[name] || [name]).find(n => av.actions[n]) || "idle";
+  if (av.cur === pick || !av.actions[pick]) return;
+  const next = av.actions[pick], prev = av.actions[av.cur];
+  next.reset(); next.setLoop(pick === "jump" ? THREE.LoopOnce : THREE.LoopRepeat); next.clampWhenFinished = true; next.fadeIn(0.18).play();
+  if (prev) prev.fadeOut(0.18);
+  av.cur = pick;
+}
+function buildPet(key, world) {
+  const group = new THREE.Group(); world.add(group);
+  const pet = { key, group, world, mixer: null, actions: {}, cur: "", pos: new THREE.Vector3(), yaw: 0, placed: false };
+  loadModel(key).then(g => {
+    if (pet.disposed) return;
+    const inst = SkeletonUtils.clone(g.scene), s = 0.8 / g.size.y;
+    inst.scale.setScalar(s); inst.position.y = -g.min.y * s; group.add(inst);
+    pet.mixer = new THREE.AnimationMixer(inst);
+    for (const clip of g.animations) pet.actions[clip.name] = pet.mixer.clipAction(clip);
+    playAnim(pet, "idle");
+  }).catch(() => {});
+  return pet;
+}
+const UP = new THREE.Vector3(0, 1, 0);
+// Pets trot to a spot just behind and beside their owner, and catch up by teleporting if left far behind.
+function updatePet(pet, ownerPos, ownerYaw, dt) {
+  if (!pet) return;
+  const target = ownerPos.clone().add(new THREE.Vector3(0.9, 0, -1.1).applyAxisAngle(UP, ownerYaw));
+  if (!pet.placed || pet.pos.distanceTo(target) > 14) { pet.pos.copy(target); pet.placed = true; }
+  const d = target.clone().sub(pet.pos); d.y = 0; const dist = d.length();
+  const speed = dist > 4 ? 9 : dist > 0.45 ? 5 : 0;
+  if (speed) { pet.pos.addScaledVector(d.normalize(), Math.min(dist, speed * dt)); pet.yaw = Math.atan2(d.x, d.z); }
+  pet.pos.y += (ownerPos.y - pet.pos.y) * Math.min(1, dt * 8);
+  pet.group.position.copy(pet.pos);
+  let dy = pet.yaw - pet.group.rotation.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); pet.group.rotation.y += dy * Math.min(1, dt * 10);
+  playAnim(pet, speed > 6 ? "run" : speed ? "walk" : "idle");
+  pet.mixer?.update(dt);
+}
+// One entry point for both body types: block bodies swing procedurally, Kenney characters play their clips.
+function animateAv(av, t, dt, state, emote) {
+  if (!av.isModel) return animateRig(av, t, state === "walk" || state === "sprint", emote);
+  av.root.position.y = 0; av.root.rotation.set(0, 0, 0);
+  let name = state;
+  const k = emote ? (performance.now() - emote.at) / 1000 : Infinity;
+  if (emote && k <= emote.dur) {
+    if (emote.e === "wave") name = "wave";
+    if (emote.e === "sit") name = "sit";
+    if (emote.e === "dance") { name = "dance"; av.root.rotation.y = k * 6; av.root.position.y = Math.abs(Math.sin(k * 10)) * 0.3; }
+    if (emote.e === "flip") { av.root.position.y = Math.sin(Math.min(1, k / 0.8) * Math.PI) * 1.6; av.root.rotation.x = -Math.min(1, k / 0.8) * Math.PI * 2; }
+  }
+  playAnim(av, name); av.mixer?.update(dt);
+}
 
 /* Animate a rig: walking swings arms and legs; emotes override it for a moment. */
 function animateRig(av, t, moving, emote) {
@@ -248,11 +372,14 @@ const EMOTE_TIME = { wave: 2.2, dance: 4, flip: 0.8, sit: 9999 };
 function cleanPart(p) {
   if (!p || typeof p !== "object") return null;
   const s = Array.isArray(p.s) ? p.s : [1, 1, 1], pos = Array.isArray(p.p) ? p.p : [0, 0.5, 0];
+  // Model parts (Kenney furniture and nature) scale evenly, so their size is one number repeated.
+  const isModel = p.shape === "model" && MODEL_PARTS.includes(p.model), k = num(s[0], 1, 0.25, 6);
   return {
     id: text(p.id, 12) || rid(),
-    shape: PART_SHAPES.includes(p.shape) ? p.shape : "box",
+    shape: isModel ? "model" : PART_SHAPES.includes(p.shape) ? p.shape : "box",
+    model: isModel ? p.model : "",
     p: [num(pos[0], 0, -PLOT_HALF, PLOT_HALF), num(pos[1], .5, 0, MAX_Y), num(pos[2], 0, -PLOT_HALF, PLOT_HALF)],
-    s: [0, 1, 2].map(i => num(s[i], 1, 0.25, 30)),
+    s: isModel ? [k, k, k] : [0, 1, 2].map(i => num(s[i], 1, 0.25, 30)),
     r: Math.round(num(p.r, 0, 0, 3)),
     c: hex(p.c, "#f6edda"),
     m: MATERIALS.includes(p.m) ? p.m : "solid",
@@ -281,15 +408,42 @@ function partMaterial(c, m, ghost, twoSided) {
   matCache.set(key, mat); return mat;
 }
 function stateOf(b, id) { let s = b.state.get(id); if (!s) { s = { open: false, lit: false, hidden: false, c: null, off: [0, 0, 0], spin: 0, tween: null }; b.state.set(id, s); } return s; }
+// The real size of a part in blocks: model parts take their size from the model times their scale.
+function partSize(p) {
+  if (p.shape !== "model") return p.s;
+  const sz = MODEL_SIZE.get(p.model); if (!sz) loadModel(p.model).catch(() => {});
+  return sz ? [sz.x * p.s[0], sz.y * p.s[0], sz.z * p.s[0]] : [p.s[0], p.s[0], p.s[0]];
+}
+function makePartObject(b, part) {
+  let obj;
+  if (part.shape === "model") {
+    obj = new THREE.Group(); obj.userData = { kind: "model:" + part.model };
+    loadModel(part.model).then(g => {
+      if (b.meshes.get(part.id) !== obj) return;
+      const inst = g.scene.clone(); inst.position.copy(g.center).multiplyScalar(-1);
+      inst.traverse(o => { if (o.isMesh) o.userData = { owner: b.owner, pid: part.id }; });
+      obj.add(inst); const cur = b.parts.get(part.id); if (cur) refreshMesh(b, cur);
+    }).catch(() => {});
+  } else { obj = new THREE.Mesh(GEO[part.shape]); obj.castShadow = obj.receiveShadow = true; obj.userData = { kind: "prim" }; }
+  obj.userData.owner = b.owner; obj.userData.pid = part.id;
+  b.group.add(obj); b.meshes.set(part.id, obj); return obj;
+}
+function detachPartObject(b, id) {
+  const mesh = b.meshes.get(id); if (!mesh) return;
+  if (mesh.userData.light) { mesh.userData.light.dispose(); litCount--; }
+  if (mesh.userData.sign) b.group.remove(mesh.userData.sign);
+  b.group.remove(mesh); b.meshes.delete(id);
+}
 function refreshMesh(b, part) {
   let mesh = b.meshes.get(part.id);
-  if (!mesh) {
-    mesh = new THREE.Mesh(GEO[part.shape]); mesh.castShadow = mesh.receiveShadow = true; mesh.userData = { owner: b.owner, pid: part.id };
-    b.group.add(mesh); b.meshes.set(part.id, mesh);
+  const kind = part.shape === "model" ? "model:" + part.model : "prim";
+  if (mesh && mesh.userData.kind !== kind) { detachPartObject(b, part.id); mesh = null; }
+  if (!mesh) mesh = makePartObject(b, part);
+  const st = stateOf(b, part.id), size = partSize(part);
+  if (kind === "prim") {
+    mesh.geometry = GEO[part.shape];
+    mesh.material = partMaterial(st.c || part.c, st.lit ? "neon" : part.m, st.open, part.shape === "wedge");
   }
-  const st = stateOf(b, part.id);
-  mesh.geometry = GEO[part.shape];
-  mesh.material = partMaterial(st.c || part.c, st.lit ? "neon" : part.m, st.open, part.shape === "wedge");
   mesh.position.set(part.p[0] + st.off[0], part.p[1] + st.off[1], part.p[2] + st.off[2]);
   mesh.scale.set(...part.s);
   mesh.rotation.set(0, part.r * Math.PI / 2 + st.spin * Math.PI / 180, 0);
@@ -303,16 +457,15 @@ function refreshMesh(b, part) {
     const s = makeLabel(part.text); b.group.add(s); mesh.userData.sign = s;
   }
   if (!part.text && mesh.userData.sign) { b.group.remove(mesh.userData.sign); mesh.userData.sign = null; }
-  if (mesh.userData.sign) mesh.userData.sign.position.set(mesh.position.x, part.p[1] + part.s[1] / 2 + 0.6 + st.off[1], mesh.position.z);
+  if (mesh.userData.sign) mesh.userData.sign.position.set(mesh.position.x, part.p[1] + size[1] / 2 + 0.6 + st.off[1], mesh.position.z);
   collidersDirty = true;
 }
 let litCount = 0;
 function removeMesh(b, id) {
-  const mesh = b.meshes.get(id); if (!mesh) return;
-  if (mesh.userData.light) { mesh.userData.light.dispose(); litCount--; }
-  if (mesh.userData.sign) b.group.remove(mesh.userData.sign);
-  b.group.remove(mesh); b.meshes.delete(id); b.state.delete(id); b.prog.delete(id); stopTimers(b, id); collidersDirty = true;
+  detachPartObject(b, id); b.state.delete(id); b.prog.delete(id); stopTimers(b, id); collidersDirty = true;
 }
+// Raycasts hit the meshes inside model groups; walk up to whatever carries the part id.
+function hitPartData(hit) { let o = hit?.object; while (o && o.userData.pid === undefined) o = o.parent; return o?.userData; }
 function setParts(b, list) {
   for (const id of [...b.parts.keys()]) removeMesh(b, id);
   b.parts.clear();
@@ -336,7 +489,7 @@ function rebuildColliders() {
     for (const p of b.parts.values()) {
       const st = stateOf(b, p.id);
       if (st.hidden) continue;
-      const quarter = p.r % 2 === 1, hx = (quarter ? p.s[2] : p.s[0]) / 2, hz = (quarter ? p.s[0] : p.s[2]) / 2, hy = p.s[1] / 2;
+      const sz = partSize(p), quarter = p.r % 2 === 1, hx = (quarter ? sz[2] : sz[0]) / 2, hz = (quarter ? sz[0] : sz[2]) / 2, hy = sz[1] / 2;
       const cx = o.x + p.p[0] + st.off[0], cy = p.p[1] + st.off[1], cz = o.z + p.p[2] + st.off[2];
       const box = { b, p, min: [cx - hx, cy - hy, cz - hz], max: [cx + hx, cy + hy, cz + hz], wedge: p.shape === "wedge", dir: [[0, 1], [1, 0], [0, -1], [-1, 0]][p.r] };
       if (p.solid && !st.open) colliders.push(box);
@@ -360,7 +513,7 @@ function wedgeHeight(box, x, z) {
 const P = { pos: SPAWN.clone(), vel: new THREE.Vector3(), yaw: 0, onGround: true, w: 0.32, checkpoint: null, emote: null, av: null, tag: null, lastStep: 0 };
 function wearCharacter(char, broadcast = true) {
   me.char = cleanChar(char);
-  if (P.av) { scene.remove(P.av.body); disposeTree(P.av.body); }
+  disposeAvatar(P.av);
   P.av = buildAvatar(me.char); scene.add(P.av.body);
   P.tag = makeLabel(me.name, "#fff3c4"); P.tag.position.y = P.av.height + 0.45; P.av.body.add(P.tag);
   try { localStorage.setItem("dougworld-char", JSON.stringify(me.char)); } catch (e) { toast("This character is too big to autosave on this device."); }
@@ -421,7 +574,9 @@ function updatePlayer(dt, t) {
     P.av.body.position.copy(P.pos);
     const cur = P.av.body.rotation.y; let diff = P.yaw - cur; diff = Math.atan2(Math.sin(diff), Math.cos(diff));
     P.av.body.rotation.y = cur + diff * Math.min(1, dt * 14);
-    animateRig(P.av, t, moving && P.onGround, P.emote);
+    P.anim = !P.onGround ? (P.vel.y > 0 ? "jump" : "fall") : moving ? (speed > 7 ? "sprint" : "walk") : "idle";
+    animateAv(P.av, t, dt, P.anim, P.emote);
+    updatePet(P.av.pet, P.pos, P.yaw, dt);
     P.tag.position.y = P.av.height + 0.45;
   }
   netState(moving);
@@ -477,9 +632,9 @@ const pointer = new THREE.Vector2(), ray = new THREE.Raycaster();
 function partMeshes(owner) { const out = []; for (const b of builds.values()) if (!owner || b.owner === owner) out.push(...b.meshes.values()); return out.filter(m => m.visible); }
 function worldClick() {
   ray.setFromCamera(pointer, camera);
-  const hit = ray.intersectObjects(partMeshes(), false)[0];
+  const hit = ray.intersectObjects(partMeshes(), true)[0];
   if (!hit || hit.distance > 40) return;
-  const { owner, pid } = hit.object.userData, b = builds.get(owner), p = b?.parts.get(pid);
+  const { owner, pid } = hitPartData(hit) || {}, b = builds.get(owner), p = b?.parts.get(pid);
   if (p) fire(b, p, "click");
 }
 // Touch joystick + jump for phones and tablets.
@@ -577,14 +732,14 @@ async function run(b, p, actions) {
       case "spin": setState(b, p, { spin: st.spin + act.deg }, act.t); await sleep(act.t * 1000); break;
       case "teleport": {
         const o = plotOrigin(b.plot); let target = null;
-        if (act.to) { const dest = [...b.parts.values()].find(x => x.name.toLowerCase() === act.to.toLowerCase()); if (dest) target = new THREE.Vector3(o.x + dest.p[0], dest.p[1] + dest.s[1] / 2 + 0.1, o.z + dest.p[2]); else toast(`No part named "${act.to}" to teleport to.`); }
+        if (act.to) { const dest = [...b.parts.values()].find(x => x.name.toLowerCase() === act.to.toLowerCase()); if (dest) target = new THREE.Vector3(o.x + dest.p[0], dest.p[1] + partSize(dest)[1] / 2 + 0.1, o.z + dest.p[2]); else toast(`No part named "${act.to}" to teleport to.`); }
         else target = new THREE.Vector3(o.x + act.p[0], act.p[1], o.z + act.p[2]);
         if (target) { P.pos.copy(target); P.vel.set(0, 0, 0); sound("beep"); }
         break;
       }
       case "launch": P.vel.y = act.v; P.onGround = false; break;
       case "score": me.points += act.v; send("pts", { id: me.id, v: me.points }); renderPlayers(); if (act.v > 0) toast(`+${act.v} point${act.v === 1 ? "" : "s"}`); break;
-      case "checkpoint": { const o = plotOrigin(b.plot); P.checkpoint = new THREE.Vector3(o.x + p.p[0], p.p[1] + p.s[1] / 2, o.z + p.p[2]); toast("Checkpoint saved!"); break; }
+      case "checkpoint": { const o = plotOrigin(b.plot); P.checkpoint = new THREE.Vector3(o.x + p.p[0], p.p[1] + partSize(p)[1] / 2, o.z + p.p[2]); toast("Checkpoint saved!"); break; }
       case "respawn": respawn(); break;
       case "sound": sound(act.v); break;
       case "send": for (const other of b.parts.values()) if (b.prog.get(other.id)?.signal[act.v]) fire(b, other, "signal", act.v); break;
@@ -623,7 +778,7 @@ function startPartScripts(b, p) {
 function startBuildScripts(b) { for (const p of b.parts.values()) startPartScripts(b, p); }
 
 /* ============================== building ============================== */
-const build = { on: false, mode: "place", selected: null, undo: [] };
+const build = { on: false, mode: "place", selected: null, undo: [], modelCat: "Furniture" };
 const brush = { shape: "box", m: "solid", c: "#f28c28", s: [2, 1, 2], r: 0, solid: true, name: "", text: "", script: "" };
 const ghost = new THREE.Mesh(GEO.box, new THREE.MeshStandardMaterial({ color: "#5fae4e", transparent: true, opacity: .45, depthWrite: false }));
 ghost.visible = false; scene.add(ghost);
@@ -650,7 +805,7 @@ function myBuild() { return getBuild(me.id); }
 function halfExtents(s, r) { return r % 2 ? [s[2] / 2, s[1] / 2, s[0] / 2] : [s[0] / 2, s[1] / 2, s[2] / 2]; }
 function placementTarget() {
   ray.setFromCamera(pointer, camera);
-  const mine = myBuild(); const hits = ray.intersectObjects([...mine.meshes.values()].filter(m => m.visible).concat(groundMesh), false);
+  const mine = myBuild(); const hits = ray.intersectObjects([...mine.meshes.values()].filter(m => m.visible).concat(groundMesh), true);
   const hit = hits[0]; if (!hit || hit.distance > 80) return null;
   return hit;
 }
@@ -658,12 +813,12 @@ function updateGhost() {
   if (!build.on || build.mode !== "place") { ghost.visible = false; return; }
   const hit = placementTarget(); if (!hit) { ghost.visible = false; return; }
   const n = hit.object === groundMesh ? new THREE.Vector3(0, 1, 0) : hit.face.normal.clone().transformDirection(hit.object.matrixWorld).round();
-  const he = halfExtents(brush.s, brush.r);
+  const bs = partSize(brush), he = halfExtents(bs, brush.r);
   const c = hit.point.clone().add(new THREE.Vector3(n.x * he[0], n.y * he[1], n.z * he[2]));
   c.set(snap(c.x), Math.max(he[1], snap(c.y)), snap(c.z));
   const o = plotOrigin(me.plot), local = [c.x - o.x, c.y, c.z - o.z];
   const ok = Math.abs(local[0]) + he[0] <= PLOT_HALF + 0.01 && Math.abs(local[2]) + he[2] <= PLOT_HALF + 0.01 && local[1] + he[1] <= MAX_Y;
-  ghost.geometry = GEO[brush.shape]; ghost.scale.set(...brush.s); ghost.rotation.set(0, brush.r * Math.PI / 2, 0); ghost.position.copy(c);
+  ghost.geometry = GEO[brush.shape] || GEO.box; ghost.scale.set(...bs); ghost.rotation.set(0, brush.r * Math.PI / 2, 0); ghost.position.copy(c);
   ghost.material.color.set(ok ? brush.c : "#e05a4f"); ghost.visible = true; ghost.userData = { ok, local };
 }
 function myOp(op, record = true) {
@@ -690,9 +845,9 @@ function buildClick() {
     return;
   }
   ray.setFromCamera(pointer, camera);
-  const hit = ray.intersectObjects([...b.meshes.values()], false)[0];
+  const hit = ray.intersectObjects([...b.meshes.values()], true)[0];
   if (!hit) return;
-  const pid = hit.object.userData.pid;
+  const pid = hitPartData(hit)?.pid; if (!pid) return;
   if (build.mode === "erase") { myOp({ t: "del", pid }); if (build.selected === pid) selectPart(null); }
   else if (build.mode === "paint") myOp({ t: "upd", pid, props: { c: brush.c, m: brush.m } });
   else if (build.mode === "edit") selectPart(pid);
@@ -707,8 +862,12 @@ function renderBuildBar() {
    <h4 style="margin-top:8px">Material</h4><div class="seg">${seg(MATERIALS, brush.m, "mat")}</div></div>
   <div><h4>Colour</h4><div class="swatches" style="width:220px">${SWATCHES.map(c => `<button class="swatch ${c === brush.c ? "on" : ""}" style="background:${c}" data-color="${c}" type="button" aria-label="${c}"></button>`).join("")}</div>
    <div class="row" style="margin-top:6px"><input type="color" id="brushColor" value="${brush.c}"><span class="muted" style="font-size:12px">Custom colour</span></div></div>
-  <div><h4>Size (blocks)</h4><div class="sizes">${["Width", "Height", "Depth"].map((l, i) => `<span>${l}</span><input type="range" min="0.25" max="12" step="0.25" value="${brush.s[i]}" data-size="${i}"><b>${brush.s[i]}</b>`).join("")}</div>
-   <h4 style="margin-top:8px">Gadgets</h4><div class="tools">${Object.keys(PRESETS).map(k => `<button class="btn sm butter" data-preset="${k}" type="button">${k}</button>`).join("")}</div></div>
+  <div>${brush.shape === "model"
+    ? `<h4>Model: ${esc(modelLabel(brush.model))}</h4><div class="sizes"><span>Scale</span><input type="range" min="0.25" max="6" step="0.25" value="${brush.s[0]}" data-size="model"><b>${brush.s[0]}</b></div>`
+    : `<h4>Size (blocks)</h4><div class="sizes">${["Width", "Height", "Depth"].map((l, i) => `<span>${l}</span><input type="range" min="0.25" max="12" step="0.25" value="${brush.s[i]}" data-size="${i}"><b>${brush.s[i]}</b>`).join("")}</div>`}
+   <h4 style="margin-top:8px">Gadgets</h4><div class="tools">${Object.keys(PRESETS).map(k => `<button class="btn sm butter" data-preset="${k}" type="button">${k}</button>`).join("")}</div>
+   <h4 style="margin-top:8px">Models <span class="seg" style="display:inline-flex;margin-left:6px">${Object.keys(BUILD_MODELS).map(c => `<button class="btn sm ${c === build.modelCat ? "on" : "ghost"}" data-mcat="${c}" type="button">${c}</button>`).join("")}</span></h4>
+   <div class="tools" style="max-height:92px;overflow:auto">${BUILD_MODELS[build.modelCat].map(k => `<button class="btn sm ${brush.shape === "model" && brush.model === k ? "on" : "ghost"}" data-model="${k}" type="button">${esc(modelLabel(k))}</button>`).join("")}</div></div>
   <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">
    <button class="btn sm ghost" data-act="rotate" type="button">Rotate (R)</button>
    <button class="btn sm ghost" data-act="undo" type="button">Undo</button>
@@ -720,7 +879,10 @@ function renderBuildBar() {
 $("buildBar").addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return; const d = t.dataset;
   if (d.mode) { build.mode = d.mode; if (d.mode !== "edit") selectPart(null); }
-  if (d.shape) brush.shape = d.shape;
+  if (d.shape) { if (brush.shape === "model") brush.s = [2, 1, 2]; brush.shape = d.shape; brush.model = ""; }
+  if (d.mcat) build.modelCat = d.mcat;
+  // Picking a model loads it first so the placement preview gets its real size.
+  if (d.model) { Object.assign(brush, { shape: "model", model: d.model, s: [1, 1, 1], name: "", text: "", script: "", solid: true }); build.mode = "place"; loadModel(d.model).then(() => updateGhost()).catch(() => toast("That model couldn't load.")); }
   if (d.mat) brush.m = d.mat;
   if (d.color) brush.c = d.color;
   if (d.preset) { const pr = PRESETS[d.preset]; Object.assign(brush, { name: "", text: "", script: "", solid: true }, structuredClone(pr)); build.mode = "place"; toast(`${d.preset} ready: click your plot to place it. Edit it later to change its script.`); }
@@ -732,7 +894,8 @@ $("buildBar").addEventListener("click", e => {
 });
 $("buildBar").addEventListener("input", e => {
   if (e.target.id === "brushColor") { brush.c = e.target.value; updateGhost(); }
-  if (e.target.dataset.size) { brush.s[+e.target.dataset.size] = +e.target.value; e.target.nextElementSibling.textContent = e.target.value; updateGhost(); }
+  if (e.target.dataset.size === "model") { const k = +e.target.value; brush.s = [k, k, k]; e.target.nextElementSibling.textContent = e.target.value; updateGhost(); }
+  else if (e.target.dataset.size) { brush.s[+e.target.dataset.size] = +e.target.value; e.target.nextElementSibling.textContent = e.target.value; updateGhost(); }
 });
 const SCRIPT_HELP = `on click: toggle; sound ding
 on touch: launch 20
@@ -759,8 +922,10 @@ function selectPart(pid) {
    <label class="field">Name (for teleport to)<input class="input" data-k="name" maxlength="24" value="${esc(p.name)}"></label>
    <label class="field">Sign text<input class="input" data-k="text" maxlength="60" value="${esc(p.text)}"></label>
    <div class="field">Position<div class="grid3">${[0, 1, 2].map(i => `<input class="input" type="number" step="0.25" data-pos="${i}" value="${p.p[i]}">`).join("")}</div></div>
-   <div class="field">Size<div class="grid3">${[0, 1, 2].map(i => `<input class="input" type="number" step="0.25" min="0.25" max="30" data-sz="${i}" value="${p.s[i]}">`).join("")}</div></div>
-   <div class="row wrap"><input type="color" data-k="c" value="${p.c}"><select class="input" style="width:auto" data-k="m">${MATERIALS.map(m => `<option ${m === p.m ? "selected" : ""}>${m}</option>`).join("")}</select><select class="input" style="width:auto" data-k="shape">${PART_SHAPES.map(m => `<option ${m === p.shape ? "selected" : ""}>${m}</option>`).join("")}</select></div>
+   ${p.shape === "model"
+    ? `<div class="field">Model: ${esc(modelLabel(p.model))}<div class="grid3"><input class="input" type="number" step="0.25" min="0.25" max="6" data-sz="model" value="${p.s[0]}" aria-label="Scale"></div></div>`
+    : `<div class="field">Size<div class="grid3">${[0, 1, 2].map(i => `<input class="input" type="number" step="0.25" min="0.25" max="30" data-sz="${i}" value="${p.s[i]}">`).join("")}</div></div>
+   <div class="row wrap"><input type="color" data-k="c" value="${p.c}"><select class="input" style="width:auto" data-k="m">${MATERIALS.map(m => `<option ${m === p.m ? "selected" : ""}>${m}</option>`).join("")}</select><select class="input" style="width:auto" data-k="shape">${PART_SHAPES.map(m => `<option ${m === p.shape ? "selected" : ""}>${m}</option>`).join("")}</select></div>`}
    <div class="row wrap"><button class="btn sm ghost" data-p="rot" type="button">Rotate</button><label class="chip"><input type="checkbox" data-k="solid" ${p.solid ? "checked" : ""}> Solid</label><button class="btn sm ghost" data-p="dup" type="button">Duplicate</button><button class="btn sm berry" data-p="del" type="button">Delete</button></div>
    <label class="field">Script<textarea class="input" id="scriptBox" spellcheck="false" maxlength="2000" placeholder="on click: toggle">${esc(p.script)}</textarea></label>
    <div id="scriptStatus" class="${prog.errors.length ? "err" : "ok"}">${prog.errors.length ? esc(prog.errors.join("\n")) : p.script.trim() ? "Script looks good." : "No script yet."}</div>
@@ -772,6 +937,7 @@ $("props").addEventListener("change", e => {
   if (t.dataset.k === "solid") return myOp({ t: "upd", pid, props: { solid: t.checked } });
   if (t.dataset.k) return myOp({ t: "upd", pid, props: { [t.dataset.k]: t.value } });
   if (t.dataset.pos) { const pos = [...p.p]; pos[+t.dataset.pos] = num(t.value, pos[+t.dataset.pos]); return myOp({ t: "upd", pid, props: { p: pos } }); }
+  if (t.dataset.sz === "model") { const k = num(t.value, p.s[0], .25, 6); return myOp({ t: "upd", pid, props: { s: [k, k, k] } }); }
   if (t.dataset.sz) { const s = [...p.s]; s[+t.dataset.sz] = num(t.value, s[+t.dataset.sz], .25, 30); return myOp({ t: "upd", pid, props: { s } }); }
 });
 $("props").addEventListener("input", e => { if (e.target.id === "scriptBox") { const prog = compile(e.target.value), st = $("scriptStatus"); st.className = prog.errors.length ? "err" : "ok"; st.textContent = prog.errors.length ? prog.errors.join("\n") : "Script looks good. Press Save script."; } });
@@ -781,7 +947,7 @@ $("props").addEventListener("click", e => {
   if (a === "close") selectPart(null);
   if (a === "rot") myOp({ t: "upd", pid, props: { r: (p.r + 1) % 4 } });
   if (a === "del") { myOp({ t: "del", pid }); selectPart(null); return; }
-  if (a === "dup") { const copy = cleanPart({ ...p, id: rid(), p: [p.p[0], p.p[1] + p.s[1], p.p[2]] }); myOp({ t: "add", part: copy }); selectPart(copy.id); return; }
+  if (a === "dup") { const copy = cleanPart({ ...p, id: rid(), p: [p.p[0], p.p[1] + partSize(p)[1], p.p[2]] }); myOp({ t: "add", part: copy }); selectPart(copy.id); return; }
   if (a === "savescript") { myOp({ t: "upd", pid, props: { script: $("scriptBox").value } }); toast("Script saved."); }
   if (a === "test") fire(b, b.parts.get(pid), "click");
   if (a !== "close") selectPart(pid);
@@ -798,13 +964,13 @@ function ensurePlayer(id, name) {
 }
 function setPlayerChar(pl, char) {
   pl.char = cleanChar(char);
-  if (pl.av) { scene.remove(pl.av.body); disposeTree(pl.av.body); }
+  disposeAvatar(pl.av);
   pl.av = buildAvatar(pl.char); pl.av.body.position.copy(pl.pos); scene.add(pl.av.body);
   pl.tag = makeLabel(pl.name); pl.tag.position.y = pl.av.height + 0.45; pl.av.body.add(pl.tag);
 }
 function removePlayer(id) {
   const pl = players.get(id); if (!pl) return;
-  if (pl.av) { scene.remove(pl.av.body); disposeTree(pl.av.body); }
+  disposeAvatar(pl.av);
   players.delete(id);
   const b = builds.get(id); if (b) { for (const pid of [...b.parts.keys()]) removeMesh(b, pid); scene.remove(b.group); builds.delete(id); }
   renderPlayers(); updatePlotSigns();
@@ -815,7 +981,8 @@ function updateRemote(dt, t) {
     pl.pos.lerp(pl.target, 1 - Math.exp(-14 * dt));
     let d = pl.targetYaw - pl.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); pl.yaw += d * Math.min(1, dt * 12);
     pl.av.body.position.copy(pl.pos); pl.av.body.rotation.y = pl.yaw;
-    animateRig(pl.av, t, pl.moving, pl.emote);
+    animateAv(pl.av, t, dt, pl.anim || (pl.moving ? "walk" : "idle"), pl.emote);
+    updatePet(pl.av.pet, pl.pos, pl.yaw, dt);
     if (pl.tag) { const isIt = game?.type === "tag" && game.it === pl.id; setLabel(pl.tag, isIt ? `${pl.name} (IT!)` : pl.name, isIt ? "#ffb4ad" : "#fffaf0"); }
   }
   if (P.tag) { const isIt = game?.type === "tag" && game.it === me.id; setLabel(P.tag, isIt ? `${me.name} (IT!)` : me.name, isIt ? "#ffb4ad" : "#fff3c4"); }
@@ -827,10 +994,10 @@ function send(event, payload) { if (channel) channel.send({ type: "broadcast", e
 function netState(moving) {
   if (!channel) return;
   const now = performance.now(); if (now - lastSent < 80) return;
-  const key = [P.pos.x.toFixed(2), P.pos.y.toFixed(2), P.pos.z.toFixed(2), P.yaw.toFixed(2), moving].join();
+  const key = [P.pos.x.toFixed(2), P.pos.y.toFixed(2), P.pos.z.toFixed(2), P.yaw.toFixed(2), moving, P.anim].join();
   if (key === lastStateKey && now - lastSent < 2000) return;
   lastSent = now; lastStateKey = key;
-  send("st", { id: me.id, p: [+P.pos.x.toFixed(2), +P.pos.y.toFixed(2), +P.pos.z.toFixed(2)], r: +P.yaw.toFixed(2), m: moving });
+  send("st", { id: me.id, p: [+P.pos.x.toFixed(2), +P.pos.y.toFixed(2), +P.pos.z.toFixed(2)], r: +P.yaw.toFixed(2), m: moving, a: P.anim });
 }
 function sendHello(reply) {
   send("hello", { id: me.id, name: me.name, plot: me.plot, char: me.char, points: me.points, reply });
@@ -896,6 +1063,7 @@ async function joinRoom(code) {
     .on("broadcast", { event: "st" }, ({ payload: m }) => {
       const pl = players.get(m?.id); if (!pl || !Array.isArray(m.p)) return;
       pl.target.set(num(m.p[0]), num(m.p[1]), num(m.p[2])); pl.targetYaw = num(m.r); pl.moving = !!m.m;
+      pl.anim = ["idle", "walk", "sprint", "jump", "fall"].includes(m.a) ? m.a : null;
       if (pl.moving && pl.emote?.e === "sit") pl.emote = null;
     })
     .on("broadcast", { event: "char" }, ({ payload: m }) => { const pl = players.get(m?.id); if (pl) setPlayerChar(pl, m.char); })
@@ -1025,7 +1193,7 @@ $("helpBtn").addEventListener("click", () => openModal("helpModal", `<h2>How to 
   <div class="save-row"><b>Social</b><span>T for quick chat · 1-4 for emotes</span></div>
  </div>
  <h2 style="margin-top:14px">Scripts</h2><p class="muted">Pick a part in Edit mode and type commands. Each line starts with a trigger.</p><pre class="ref">${SCRIPT_HELP}</pre>
- <p class="muted" style="font-size:12px">Ground and plot textures: Kenney (CC0). Icons: OpenMoji (CC BY-SA 4.0). 3D engine: three.js (MIT).</p>`));
+ <p class="muted" style="font-size:12px">Characters, pets, furniture, nature models and textures: Kenney (CC0). Icons: OpenMoji (CC BY-SA 4.0). 3D engine: three.js (MIT).</p>`));
 
 /* ============================== character editor ============================== */
 const ed = { char: null, part: "head", renderer: null, scene: null, camera: null, av: null, yaw: 0.6, raf: 0 };
@@ -1045,21 +1213,36 @@ function openEditor() {
   }
   rebuildPreview(); renderEditorSide();
   cancelAnimationFrame(ed.raf);
-  const loop = () => {
+  let prev = performance.now();
+  const loop = now => {
+    const dt = Math.min(0.05, ((now || performance.now()) - prev) / 1000); prev = now || performance.now();
     const c = $("charPreview"), w = c.clientWidth, h = c.clientHeight;
     if (c.width !== Math.round(w * ed.renderer.getPixelRatio())) { ed.renderer.setSize(w, h, false); ed.camera.aspect = w / h; ed.camera.updateProjectionMatrix(); }
-    if (ed.av) { ed.av.body.rotation.y = ed.yaw; const ht = ed.av.height; ed.camera.position.set(0, ht * 0.62, ht * 2.3 + 1.5); ed.camera.lookAt(0, ht * 0.5, 0); animateRig(ed.av, performance.now() / 1000, false, null); }
+    if (ed.av) {
+      ed.av.body.rotation.y = ed.yaw; const ht = ed.av.height; ed.camera.position.set(0, ht * 0.62, ht * 2.3 + 1.5); ed.camera.lookAt(0, ht * 0.5, 0);
+      animateAv(ed.av, performance.now() / 1000, dt, "idle", null);
+      if (ed.av.pet) { ed.av.pet.group.position.set(1.05, 0, 0.35); ed.av.pet.group.rotation.y = ed.yaw - 0.5; playAnim(ed.av.pet, "idle"); ed.av.pet.mixer?.update(dt); }
+    }
     ed.renderer.render(ed.scene, ed.camera);
     if (!$("charModal").classList.contains("hidden")) ed.raf = requestAnimationFrame(loop);
   };
   loop();
 }
 function editorClosed() { cancelAnimationFrame(ed.raf); }
-function rebuildPreview() { if (ed.av) { ed.scene.remove(ed.av.body); disposeTree(ed.av.body); } ed.char = cleanChar(ed.char); ed.av = buildAvatar(ed.char); ed.scene.add(ed.av.body); }
+function rebuildPreview() { disposeAvatar(ed.av); ed.char = cleanChar(ed.char); ed.av = buildAvatar(ed.char, ed.scene); ed.scene.add(ed.av.body); }
+const optionList = (list, cur, none) => (none ? `<option value="" ${cur ? "" : "selected"}>${none}</option>` : "") + list.map(k => `<option value="${k}" ${k === cur ? "selected" : ""}>${k.startsWith("blocky/") ? "Blocky " + k.slice(-1).toUpperCase() : k.startsWith("mini/") ? "Mini " + modelLabel(k) : modelLabel(k)}</option>`).join("");
 function renderEditorSide() {
+  const isModel = ed.char.base !== "blocks";
+  // Kenney characters keep their own body; only the hat and backpack are block parts.
+  if (isModel && !OPTIONAL_PARTS.includes(ed.part)) ed.part = "hat";
   const part = ed.char.parts[ed.part], optional = OPTIONAL_PARTS.includes(ed.part);
+  const chips = Object.entries(AV_PARTS).filter(([k]) => !isModel || OPTIONAL_PARTS.includes(k));
   $("charSide").innerHTML = `<h2>Your character</h2>
-   <div class="part-chips">${Object.entries(AV_PARTS).map(([k, l]) => `<button class="btn sm ${k === ed.part ? "on" : "ghost"}" data-part="${k}" type="button">${l}</button>`).join("")}</div>
+   <div class="field">Body<div class="row"><button class="btn sm ghost" data-body="-1" type="button">‹</button><select class="input" id="bodySel">${optionList(CHAR_MODELS, isModel ? ed.char.base : "", "Custom blocks (build it yourself)")}</select><button class="btn sm ghost" data-body="1" type="button">›</button></div></div>
+   ${isModel ? `<div class="field">Tint<div class="row"><input type="color" id="tintColor" value="${ed.char.tint || "#ffffff"}"><button class="btn sm ghost" data-ed="notint" type="button" ${ed.char.tint ? "" : "disabled"}>No tint</button></div></div>
+   <div class="field">Body size<div class="sizes"><span>Width</span><input type="range" min="0.6" max="1.6" step="0.05" value="${ed.char.size[0]}" data-bsize="0"><b>${ed.char.size[0]}</b><span>Height</span><input type="range" min="0.6" max="1.6" step="0.05" value="${ed.char.size[1]}" data-bsize="1"><b>${ed.char.size[1]}</b></div></div>` : ""}
+   <div class="field">Pet<div class="row"><button class="btn sm ghost" data-pet="-1" type="button">‹</button><select class="input" id="petSel">${optionList(PET_MODELS, ed.char.pet, "No pet")}</select><button class="btn sm ghost" data-pet="1" type="button">›</button></div></div>
+   <div class="field">${isModel ? "Accessories" : "Parts"}<div class="part-chips">${chips.map(([k, l]) => `<button class="btn sm ${k === ed.part ? "on" : "ghost"}" data-part="${k}" type="button">${l}</button>`).join("")}</div></div>
    <div class="field">Shape<div class="seg">${(optional ? ["none", ...AV_SHAPES] : AV_SHAPES).map(s => `<button class="btn sm ${s === part.shape ? "on" : "ghost"}" data-shape="${s}" type="button">${s}</button>`).join("")}</div></div>
    <div class="field">Colour<div class="swatches">${SWATCHES.map(c => `<button class="swatch ${c === part.color ? "on" : ""}" style="background:${c}" data-color="${c}" type="button" aria-label="${c}"></button>`).join("")}</div><div class="row"><input type="color" id="partColor" value="${part.color}"><span class="muted" style="text-transform:none">Any colour</span></div></div>
    <div class="field">Size<div class="sizes">${["Width", "Height", "Depth"].map((l, i) => `<span>${l}</span><input type="range" min="0.15" max="2.5" step="0.05" value="${part.scale[i]}" data-scale="${i}"><b>${part.scale[i]}</b>`).join("")}</div></div>
@@ -1069,6 +1252,10 @@ function renderEditorSide() {
 }
 $("charSide").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return; const d = b.dataset, part = ed.char.parts[ed.part];
+  const cycle = (list, cur, dir, allowNone) => { const all = allowNone ? ["", ...list] : list; return all[(all.indexOf(cur) + dir + all.length) % all.length]; };
+  if (d.body) ed.char.base = cycle(CHAR_MODELS, ed.char.base === "blocks" ? "" : ed.char.base, +d.body, true) || "blocks";
+  if (d.pet) ed.char.pet = cycle(PET_MODELS, ed.char.pet, +d.pet, true);
+  if (d.ed === "notint") ed.char.tint = "";
   if (d.part) ed.part = d.part;
   if (d.shape) part.shape = d.shape;
   if (d.color) part.color = d.color;
@@ -1076,13 +1263,21 @@ $("charSide").addEventListener("click", e => {
   if (d.ed === "upload") return $("uploadInput").click();
   if (d.ed === "notex") delete part.tex;
   if (d.ed === "reset") ed.char = defaultChar();
-  if (d.ed === "random") { for (const [k, p] of Object.entries(ed.char.parts)) { p.color = SWATCHES[Math.floor(Math.random() * SWATCHES.length)]; if (OPTIONAL_PARTS.includes(k)) p.shape = Math.random() < .5 ? "none" : AV_SHAPES[Math.floor(Math.random() * 4)]; } }
+  if (d.ed === "random") {
+    const pick = list => list[Math.floor(Math.random() * list.length)];
+    if (ed.char.base !== "blocks") { ed.char.base = pick(CHAR_MODELS); ed.char.tint = ""; }
+    ed.char.pet = Math.random() < .8 ? pick(PET_MODELS) : "";
+    for (const [k, p] of Object.entries(ed.char.parts)) { p.color = SWATCHES[Math.floor(Math.random() * SWATCHES.length)]; if (OPTIONAL_PARTS.includes(k)) p.shape = Math.random() < .5 ? "none" : AV_SHAPES[Math.floor(Math.random() * 4)]; } }
   if (d.ed === "saves") return openStuff("character");
   if (d.ed === "wear") { wearCharacter(ed.char); $("charModal").classList.add("hidden"); editorClosed(); toast("Looking good!"); return; }
   rebuildPreview(); renderEditorSide();
 });
 $("charSide").addEventListener("input", e => {
-  const part = ed.char.parts[ed.part];
+  const part = ed.char.parts[ed.part], t = e.target;
+  if (t.id === "bodySel") { ed.char.base = t.value || "blocks"; rebuildPreview(); return renderEditorSide(); }
+  if (t.id === "petSel") { ed.char.pet = t.value; return rebuildPreview(); }
+  if (t.id === "tintColor") { ed.char.tint = t.value; rebuildPreview(); const nb = $("charSide").querySelector('[data-ed="notint"]'); if (nb) nb.disabled = false; return; }
+  if (t.dataset.bsize) { ed.char.size[+t.dataset.bsize] = +t.value; t.nextElementSibling.textContent = t.value; return rebuildPreview(); }
   if (e.target.id === "partColor") { part.color = e.target.value; rebuildPreview(); }
   if (e.target.dataset.scale) { part.scale[+e.target.dataset.scale] = +e.target.value; e.target.nextElementSibling.textContent = e.target.value; rebuildPreview(); }
 });
