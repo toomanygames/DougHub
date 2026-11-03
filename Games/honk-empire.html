@@ -118,6 +118,9 @@ img{-webkit-user-drag:none;user-select:none}
 /* Rhythm mode guide (toggled with Q) */
 .rhythm{position:absolute;left:12px;top:60px;z-index:4;width:210px;padding:9px 12px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);box-shadow:var(--hard-sm);font-size:12px;font-weight:800}
 .rhythm.hidden{display:none}
+/* Game cursor (Kenney Cursor Pack, CC0) that can ride along with the goose. */
+.stage.fake-on,.stage.fake-on *{cursor:none!important}
+.fake-cursor{position:fixed;left:0;top:0;width:34px;height:34px;pointer-events:none;z-index:9999;filter:drop-shadow(0 2px 0 #0003)}
 .rhythm h4{display:flex;align-items:center;gap:6px;margin:0 0 4px;font-family:var(--display);font-weight:600;font-size:16px}
 .rhythm h4 .em{width:20px;height:20px;vertical-align:0}
 .rhythm .metro{display:flex;align-items:center;gap:8px;margin:6px 0}
@@ -361,6 +364,7 @@ img{-webkit-user-drag:none;user-select:none}
 
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
+<img class="fake-cursor" id="fakeCursor" src="kenney/cursor-pointer_toon_a.png" alt="" hidden>
 
 <script>
 "use strict";
@@ -757,6 +761,66 @@ gooseBtn.addEventListener("pointerdown",e=>{
 });
 $("brand").addEventListener("click",()=>{S.stats.titleClicks++;if(S.stats.titleClicks===10)toast("Stop clicking the title. Click the GOOSE.");});
 
+/* ---------- Riding cursor ----------
+   Web pages can't move the real mouse pointer, so over the stage we hide it and draw a game cursor at
+   (mouse position + offset). If the cursor rests on the goose (or barely moves) while the goose walks,
+   the offset grows so the cursor rides along sideways. Moving the mouse still moves the cursor normally,
+   it is kept inside the stage, and leaving the stage drops the offset so the real pointer is back. */
+const fc={on:false,real:{x:0,y:0},off:{x:0,y:0},motion:0,down:false,target:null,suppressClick:false,prev:null,el:$("fakeCursor"),img:""};
+const FC_HOT={"cursor-pointer_toon_a":[4,4],"cursor-hand_point":[11,3],"cursor-hand_closed":[12,8]};
+const fcEnabled=matchMedia("(pointer:fine)").matches;
+const fcPos=()=>({x:fc.real.x+fc.off.x,y:fc.real.y+fc.off.y});
+function fcClamp(){const r=stage.getBoundingClientRect(),p=fcPos();fc.off.x=Math.min(r.right-3,Math.max(r.left+3,p.x))-fc.real.x;fc.off.y=Math.min(r.bottom-3,Math.max(r.top+3,p.y))-fc.real.y;}
+function fcSet(on){
+ if(fc.on===on)return;fc.on=on;stage.classList.toggle("fake-on",on);fc.el.hidden=!on;
+ if(!on){fc.off.x=fc.off.y=0;fc.motion=0;fc.prev=null;}
+}
+function fcDraw(){
+ if(!fc.on)return;const p=fcPos(),under=document.elementFromPoint(p.x,p.y);
+ const img=fc.down?"cursor-hand_closed":under&&under.closest("button,a")?"cursor-hand_point":"cursor-pointer_toon_a";
+ if(img!==fc.img){fc.img=img;fc.el.src="kenney/"+img+".png";}
+ const [hx,hy]=FC_HOT[img];fc.el.style.transform=`translate(${p.x-hx}px,${p.y-hy}px)`;
+}
+if(fcEnabled){
+ document.addEventListener("pointermove",e=>{
+  if(e.pointerType!=="mouse")return;
+  const inStage=stage.contains(e.target)||e.target===fc.el;
+  if(!inStage||concert.active){fcSet(false);return;}
+  fcSet(true);
+  const d=Math.hypot(e.clientX-fc.real.x,e.clientY-fc.real.y);
+  fc.real.x=e.clientX;fc.real.y=e.clientY;fc.motion+=d;
+  fcClamp();fcDraw();
+ },{passive:true});
+ document.documentElement.addEventListener("mouseleave",()=>fcSet(false)); // pointer left the browser window
+ addEventListener("blur",()=>fcSet(false));
+ // Clicks happen where the game cursor is drawn, even if the real pointer has drifted from it.
+ stage.addEventListener("pointerdown",e=>{
+  if(e.pointerType!=="mouse"||!fc.on||!e.isTrusted)return;
+  fc.down=true;fcDraw();
+  if(Math.abs(fc.off.x)<1&&Math.abs(fc.off.y)<1)return;
+  const p=fcPos(),target=document.elementFromPoint(p.x,p.y);
+  if(!target||!stage.contains(target))return;
+  e.stopPropagation();e.preventDefault();fc.target=target;fc.suppressClick=true;
+  target.dispatchEvent(new PointerEvent("pointerdown",{bubbles:true,cancelable:true,clientX:p.x,clientY:p.y,pointerType:"mouse",button:e.button,buttons:e.buttons,pointerId:e.pointerId}));
+ },true);
+ addEventListener("pointerup",e=>{
+  if(e.pointerType!=="mouse")return;fc.down=false;fcDraw();
+  if(fc.target){const p=fcPos(),t=fc.target;fc.target=null;t.dispatchEvent(new MouseEvent("click",{bubbles:true,cancelable:true,clientX:p.x,clientY:p.y,button:e.button}));}
+ },true);
+ addEventListener("click",e=>{if(fc.suppressClick&&e.isTrusted){fc.suppressClick=false;e.stopPropagation();e.preventDefault();}},true);
+}
+// Called every frame after the goose moves: carry a resting cursor along with it.
+function fcRide(dt){
+ if(!fc.on)return;
+ if(concert.active){fcSet(false);return;}
+ fc.motion*=Math.exp(-dt*6); // recent mouse movement, fading over ~half a second
+ const r=gooseBtn.getBoundingClientRect(),prev=fc.prev;fc.prev={left:r.left,top:r.top,right:r.right,bottom:r.bottom};
+ if(!prev||fc.down)return;
+ const dx=r.left-prev.left;if(!dx)return;
+ const p=fcPos(),onGoose=p.x>=prev.left&&p.x<=prev.right&&p.y>=prev.top&&p.y<=prev.bottom;
+ if(onGoose&&fc.motion<14){fc.off.x+=dx;fcClamp();fcDraw();}
+}
+
 document.addEventListener("keydown",e=>{if(e.code==="KeyQ"&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||""))toggleRhythm();});
 // Secret word: type "honk"
 let typed="";
@@ -1014,6 +1078,7 @@ function tick(t){
  const dt=Math.min(1,(t-last)/1000);last=t;
  earn(cps()*dt);
  walkGoose(dt);
+ if(fcEnabled)fcRide(dt);
  if(performance.now()-lastClick>900&&combo>1)combo=Math.max(1,combo-dt*1.5);
  if(document.visibilityState==="visible")S.playMs+=dt*1000;
  const now=Date.now();
