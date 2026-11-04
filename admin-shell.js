@@ -54,7 +54,9 @@
     ["#auditLogCard", "tools", "logs", 2],
     ["#adminActivityFlagsCard", "tools", "logs", 4]
   ];
+  // Tools with long lists or tables always get a full-width row.
   const WIDE = ["dhReportsCard", "dhStaffTeamCard", "chatAccessVerificationCard", "auditLogCard", "banAccountsCard"];
+  const WIDE_TITLES = ["users"];
 
   const state = { rank: 0, user: null, started: false, page: "home", errors: [], shown: 0, total: 0 };
   const $ = (sel, root) => (root || document).querySelector(sel);
@@ -180,13 +182,69 @@
     if (state.rank < rule.min) { $("#dhLocked").append(card); return; }
     card.dataset.page = rule.page;
     card.dataset.order = String(rule.order);
-    card.classList.toggle("dh-wide", WIDE.includes(card.id));
+    card.classList.toggle("dh-wide", WIDE.includes(card.id) || WIDE_TITLES.some(t => titleOf(card).toLowerCase().replace(/[^a-z ]/g, "").trim() === t));
     tidy(card);
     quietButtons(card);
     const grid = $("#dh-" + rule.page + "-" + rule.group + " .dh-grid");
     const after = [...grid.children].find(c => Number(c.dataset.order) > rule.order);
     grid.insertBefore(card, after || null);
   }
+  /* ---------- no empty gaps ----------
+     Two columns on wide screens. A card left alone in a row spans the full width, cards in the same row
+     stretch to the same height, and each card's main scrolling list grows to use the extra room. */
+  const SCROLLERS = ".admin-scroll-area, .dh-table-wrap, .audit-table-wrap, #usersList, #chatMessages, #communityGames, #dougTubeVideos, #dougHubMusicTracks, #codeProjects, #feedbackManagementList, #gameRequestsManagementList, #dougBaseAccessRequests, #adminActivityFlagsList, #ownerBanRequestsList, #chatAccessList, #recentWarningsList, #warningsList";
+  const visible = el => el.offsetParent !== null && getComputedStyle(el).display !== "none";
+  function mainScroller(card) {
+    let best = null, bestH = 0;
+    card.querySelectorAll(SCROLLERS).forEach(el => {
+      if (!visible(el) || el.closest(".dh-help")) return;
+      const h = el.scrollHeight;
+      if (h > bestH) { best = el; bestH = h; }
+    });
+    return best;
+  }
+  function balance() {
+    document.querySelectorAll(".dh-view:not([hidden]) .dh-grid").forEach(grid => {
+      const cards = [...grid.children].filter(visible);
+      let run = [];
+      const closeRun = () => { run.forEach((c, i) => c.classList.toggle("dh-span", i === run.length - 1 && run.length % 2 === 1)); run = []; };
+      cards.forEach(c => { if (c.classList.contains("dh-wide")) closeRun(); else run.push(c); });
+      closeRun();
+      cards.forEach(card => {
+        const sc = mainScroller(card);
+        const chain = new Set();
+        if (sc) for (let el = sc.parentElement; el && el !== card; el = el.parentElement) chain.add(el);
+        card.querySelectorAll(".dh-chain").forEach(el => { if (!chain.has(el)) el.classList.remove("dh-chain", "dh-chain-block"); });
+        // Plain blocks become flex columns so the list can grow; grids/rows keep their layout and just stretch.
+        chain.forEach(el => { el.classList.add("dh-chain"); el.classList.toggle("dh-chain-block", getComputedStyle(el).display === "block"); });
+        card.querySelectorAll(".dh-grow").forEach(el => { if (el !== sc) { el.classList.remove("dh-grow"); el.style.removeProperty("min-height"); } });
+        if (!sc) return;
+        // Natural size is capped; extra row height flows into the list instead of leaving a blank gap.
+        const cap = card.classList.contains("dh-wide") || card.classList.contains("dh-span") ? 520 : 380;
+        const want = Math.min(contentHeight(sc), cap) + "px";
+        sc.classList.add("dh-grow");
+        if (sc.style.minHeight !== want) sc.style.minHeight = want; // only touch it when it changes (no loops)
+      });
+    });
+  }
+  // Height of what's inside a scroller, independent of how tall the scroller has been stretched.
+  function contentHeight(el) {
+    const top = el.getBoundingClientRect().top - el.scrollTop;
+    let bottom = top;
+    for (const child of el.children) {
+      if (!visible(child)) continue;
+      const r = child.getBoundingClientRect();
+      bottom = Math.max(bottom, r.bottom + parseFloat(getComputedStyle(child).marginBottom || 0));
+    }
+    return Math.ceil(bottom - top + parseFloat(getComputedStyle(el).paddingBottom || 0));
+  }
+  let balanceQueued = false;
+  function queueBalance() {
+    if (balanceQueued) return;
+    balanceQueued = true;
+    setTimeout(() => { balanceQueued = false; balance(); }, 60);
+  }
+
   function placeAll() {
     topLevelCards().forEach(place);
     let shown = 0;
@@ -208,6 +266,7 @@
     });
     state.shown = shown;
     state.total = shown + $("#dhLocked").children.length;
+    queueBalance();
     const access = $("#dhAccess");
     if (access) access.textContent = state.shown + " of " + state.total + " tools";
   }
@@ -231,6 +290,7 @@
     $("#dhBlurb").textContent = page.blurb;
     document.documentElement.classList.remove("dh-nav-open");
     if (key === "home") refreshDashboard();
+    queueBalance();
     if (focus) {
       setTimeout(() => focus.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
       if (focus.classList.contains("card")) {
@@ -524,7 +584,9 @@
     if (rank >= 2) staffTeamCard();
     placeAll();
     // Cards added later (e.g. chat approvals) are sorted in as they appear.
-    new MutationObserver(() => { if (topLevelCards().length) placeAll(); }).observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(() => { if (topLevelCards().length) placeAll(); queueBalance(); }).observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(queueBalance).observe($("#dhViews"), { attributes: true, subtree: true, attributeFilter: ["style", "hidden"] });
+    window.addEventListener("resize", queueBalance);
     route();
     runStatus();
     setInterval(() => { if (!document.hidden && state.page === "home") refreshDashboard(); }, 30000);

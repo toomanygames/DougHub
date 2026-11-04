@@ -70,7 +70,8 @@ html.dh-shell-on #dhFindClear{padding:4px 8px!important;border:0!important;backg
 .dh-group-title{display:flex;align-items:center;gap:10px;margin:0 0 12px!important;color:#a5b4fc!important;font-size:12px!important;font-weight:800!important;letter-spacing:.1em;text-transform:uppercase}
 .dh-group-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--dha-line2),transparent)}
 html.dh-searching .dh-view:not([hidden])::before{content:attr(data-view);display:block;margin:6px 0 0;color:#fff;font-size:15px;font-weight:800;text-transform:capitalize}
-.dh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:16px;align-items:start}
+.dh-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+@media (max-width:1180px){.dh-grid{grid-template-columns:minmax(0,1fr)}}
 .dh-search-hide{display:none!important}
 .dh-none{color:var(--dha-muted)}
 
@@ -203,3 +204,22 @@ html.dh-shell-on #dhShell :is(.dh-pill-rank1,.dh-pill-rank2,.dh-pill-rank3){bord
 html.dh-shell-on #dhShell .dh-pill-rank4{background:linear-gradient(135deg,#f59e0b2b,#ec48992b)!important;border:1px solid #f59e0b4d!important}
 html.dh-shell-on #dhShell .dh-badge{background:#ef4444!important;padding:1px 6px!important}
 #dhViews .card :is(.admin-card-actions,.admin-card-heading){background:none!important;border:0!important;padding:0!important;box-shadow:none!important}
+
+/* ---------- full rows, equal heights, lists that fill the space ---------- */
+#dhViews .dh-grid>.card{display:flex;flex-direction:column;overflow:visible}
+#dhViews .dh-grid>.card>*{flex-shrink:0}
+#dhViews .dh-grid>.card>button{align-self:flex-start}
+#dhViews .dh-grid>.card.dh-span{grid-column:1/-1}
+#dhViews .dh-chain{flex:1 1 auto!important;min-height:0!important;max-height:none!important;height:auto!important}
+#dhViews .dh-chain-block{display:flex!important;flex-direction:column!important}
+#dhViews .dh-chain-block>*{flex-shrink:0}
+#dhViews .dh-grow{flex:1 1 0!important;max-height:none!important;height:auto!important;overflow-y:auto!important;overscroll-behavior:contain}
+
+/* ---------- roomy, unsquished rows ---------- */
+#dhViews #usersList{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))!important;gap:10px!important;align-content:start}
+#dhViews #usersList .user-item,#dhViews #bannedUsersList .user-item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 10px;margin:0!important}
+#dhViews .card :is(.user-item,.warning-item,.message,.game,.video-moderation-item,.activity-item) :is(button){flex:0 0 auto}
+#dhViews .card :is(.admin-card-actions,.top-row,.user-actions,.message-actions,.game-actions){flex-wrap:wrap!important;gap:8px!important}
+#dhViews .card :is(.user-item,.warning-item,.message,.game,.video-moderation-item,.activity-item) *{min-width:0;overflow-wrap:anywhere}
+#dhViews .card :is(.user-item,.warning-item,.message,.game,.video-moderation-item,.activity-item) button{overflow-wrap:normal;white-space:nowrap}
+#dhViews #chatAccessList{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));align-content:start}
