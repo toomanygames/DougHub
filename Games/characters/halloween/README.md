@@ -7,3 +7,8 @@ The Halloween characters are original DougHub SVG compositions built around Kenn
 - Space collection artwork: [Kenney Alien UFO Pack](https://kenney.nl/assets/alien-ufo-pack), CC0.
 
 The SVGs preserve the same clean, rounded character presentation as the existing DougHub animal collection.
+
+## Seasonal characters
+
+The Harvest, Winter, Valentine, Spring and Summer characters live in `../seasonal/` and are original DougHub SVG artwork
+drawn in the same rounded, outlined style as the Kenney Animal Pack Remastered animals. They are sold only while their season is open.
