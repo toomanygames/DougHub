@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0a1f">
+<title>Sparkroot</title>
+<link rel="icon" href="art/sparkroot.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="builtin:sparkroot" data-game-title="Sparkroot" defer></script>
+<style>
+/* Palette: "moonlit grove": deep violet night, moss green, ember orange, gold. */
+:root{
+  --night:#0c0a1f;--night2:#151233;--night3:#1f1a48;--line:#ffffff1a;--line2:#ffffff2e;
+  --text:#f4f1ff;--soft:#c9c2ef;--muted:#8e87b8;
+  --moss:#6ee7a0;--moss-dk:#2f9e63;--ember:#ff9a3c;--ember-dk:#d4661a;--gold:#ffd166;--gold-dk:#d6a12a;
+  --sky:#7cc6ff;--rose:#ff6b9a;--violet:#a78bfa;
+  --display:"Fredoka","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{display:flex;flex-direction:column;overflow:hidden;color:var(--text);font:700 14px/1.4 var(--body);background:radial-gradient(1200px 700px at 20% 110%,#2a1f5e 0%,transparent 60%),radial-gradient(900px 600px at 100% -10%,#173a3a 0%,transparent 55%),var(--night);-webkit-tap-highlight-color:transparent;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+img{-webkit-user-drag:none;pointer-events:none}
+.ico{width:1.25em;height:1.25em;vertical-align:-.25em}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:#0c0a1fcc;backdrop-filter:blur(8px);flex:0 0 auto;z-index:5}
+.back{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--night3);text-decoration:none;color:var(--soft);font-size:18px}
+.title{font:700 22px var(--display);letter-spacing:.01em;background:linear-gradient(90deg,var(--moss),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wallet{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--night2);border:1px solid var(--line);font:700 15px var(--display);white-space:nowrap}
+.chip small{font:800 11px var(--body);color:var(--muted)}
+.chip.seeds{color:var(--moss)}
+.iconbtn{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--night3)}
+
+/* layout */
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(320px,40%) 1fr}
+.grove{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;overflow:hidden;border-right:1px solid var(--line)}
+.grove::before{content:"";position:absolute;inset:0;background:url(kenney/bg-backgroundColorForest.png) center bottom/cover;opacity:.12;filter:hue-rotate(200deg) saturate(.7)}
+.stars{position:absolute;inset:0;pointer-events:none}
+.big{position:relative;text-align:center}
+.big .n{font:700 clamp(30px,5vw,48px)/1 var(--display);text-shadow:0 0 24px #ffd16655}
+.big .l{margin-top:4px;color:var(--soft);font-size:14px}
+.big .l b{color:var(--gold)}
+.orbwrap{position:relative;width:min(300px,62vw);aspect-ratio:1;display:grid;place-items:center}
+.orb{position:relative;width:78%;aspect-ratio:1;border-radius:50%;touch-action:manipulation;transition:transform .07s;
+  background:radial-gradient(circle at 36% 30%,#fff8 0 8%,transparent 22%),radial-gradient(circle at 50% 55%,#ffe7a3 0%,#ffb347 28%,#ff7a3c 52%,#a63b8f 78%,#3b1c6b 100%);
+  box-shadow:0 0 50px #ff9a3c88,0 0 120px #a78bfa55,inset 0 -18px 40px #3b1c6baa}
+.orb::after{content:"";position:absolute;inset:-14%;border-radius:50%;border:2px dashed #ffd16655;animation:spin 24s linear infinite}
+.orb .sprout{position:absolute;left:50%;top:-24%;width:46%;transform:translateX(-50%);filter:drop-shadow(0 0 10px #6ee7a088)}
+.orb:active{transform:scale(.94)}
+.orb.hot{box-shadow:0 0 70px #ff5e3aee,0 0 160px #ff9a3c99,inset 0 -18px 40px #3b1c6baa}
+@keyframes spin{to{transform:rotate(360deg)}}
+.orbwrap .ring{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 58%,#a78bfa22 60%,transparent 72%);animation:pulse 3s ease-in-out infinite;pointer-events:none}
+@keyframes pulse{50%{transform:scale(1.06);opacity:.6}}
+.hint{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:var(--gold);color:#3b2a00;font:700 14px var(--display);white-space:nowrap;animation:bob 1s ease-in-out infinite;pointer-events:none}
+@keyframes bob{50%{transform:translate(-50%,-6px)}}
+.heat{width:min(280px,70vw);position:relative}
+.heat .bar{height:12px;border-radius:999px;background:var(--night3);overflow:hidden;border:1px solid var(--line)}
+.heat .fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--ember),var(--rose));transition:width .1s}
+.heat .lbl{display:flex;justify-content:space-between;margin-top:4px;color:var(--muted);font-size:12px}
+.heat .lbl b{color:var(--ember)}
+.buffs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:30px}
+.buff{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#ffd16622;border:1px solid #ffd16655;color:var(--gold);font-size:12px}
+.buff i{display:block;height:3px;border-radius:2px;background:var(--gold);width:40px;position:relative}
+.goal{position:relative;width:min(340px,80vw);padding:10px 12px;border-radius:14px;background:var(--night2);border:1px solid var(--line);cursor:pointer;text-align:left}
+.goal .t{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.goal .t span{color:var(--muted)}
+.goal .p{margin-top:6px;height:6px;border-radius:9px;background:var(--night3);overflow:hidden}
+.goal .p i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--moss),var(--gold));transition:width .2s}
+
+/* right panel */
+.panel{display:flex;flex-direction:column;min-height:0;min-width:0}
+.tabs{display:flex;gap:6px;padding:10px 12px 0;flex:0 0 auto;overflow-x:auto}
+.tab{position:relative;padding:9px 14px;border-radius:12px 12px 0 0;background:transparent;color:var(--muted);font:600 15px var(--display);white-space:nowrap}
+.tab.on{background:var(--night2);color:var(--text)}
+.tab .dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--rose);box-shadow:0 0 8px var(--rose)}
+.tab.locked{opacity:.55}
+.view{display:none;flex:1;min-height:0;flex-direction:column;background:var(--night2);border-top:1px solid var(--line)}
+.view.on{display:flex}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;padding:3px;border-radius:11px;background:var(--night);border:1px solid var(--line)}
+.seg button{padding:5px 11px;border-radius:8px;color:var(--muted);font-size:12px}
+.seg button.on{background:var(--violet);color:#1a1240}
+.tog{padding:6px 11px;border-radius:10px;background:var(--night);border:1px solid var(--line);color:var(--soft);font-size:12px}
+.tog.on{background:#6ee7a022;border-color:#6ee7a077;color:var(--moss)}
+.toolbar .sp{flex:1}
+.toolbar .note{color:var(--muted);font-size:12px}
+
+/* trees */
+.treebox{position:relative;flex:1;min-height:0;overflow:auto;cursor:grab;scrollbar-width:none}
+.treebox::-webkit-scrollbar{display:none}
+.treebox.drag{cursor:grabbing}
+.tree{position:relative}
+.tree svg{position:absolute;inset:0;pointer-events:none}
+.tree svg line{stroke:#ffffff1f;stroke-width:4;stroke-linecap:round}
+.tree svg line.lit{stroke:url(#litgrad);stroke-width:5;filter:drop-shadow(0 0 4px #6ee7a0aa)}
+.tree.rb svg line.lit{stroke:#6ee7a0}
+.node{position:absolute;width:74px;height:74px;margin:-37px 0 0 -37px;border-radius:50%;display:grid;place-items:center;background:var(--night3);border:3px solid #ffffff22;transition:transform .12s,box-shadow .2s,border-color .2s;touch-action:manipulation}
+.node img{width:42px;height:42px}
+.node .lv{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);padding:1px 8px;border-radius:999px;background:var(--night);border:1px solid var(--line2);font:700 11px var(--display);white-space:nowrap;color:var(--soft)}
+.node .nm{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);width:110px;text-align:center;font-size:11px;color:var(--muted);line-height:1.15;pointer-events:none}
+.node.locked{filter:grayscale(1) brightness(.5)}
+.node.locked img{opacity:.35}
+.node.can{border-color:var(--moss);box-shadow:0 0 0 4px #6ee7a022,0 0 22px #6ee7a066;animation:breathe 1.6s ease-in-out infinite}
+.rb .node.can{border-color:var(--gold);box-shadow:0 0 0 4px #ffd16622,0 0 22px #ffd16677}
+.node.max{border-color:var(--gold);background:radial-gradient(circle,#ffd16633,var(--night3) 70%)}
+.node.max .lv{background:var(--gold);color:#3b2a00;border-color:var(--gold)}
+.node.sel{transform:scale(1.08)}
+.node:hover{transform:scale(1.07)}
+.node.pop{animation:popn .35s}
+@keyframes breathe{50%{box-shadow:0 0 0 6px #6ee7a011,0 0 30px #6ee7a088}}
+@keyframes popn{40%{transform:scale(1.25)}}
+.info{flex:0 0 auto;display:flex;gap:12px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:var(--night);min-height:74px}
+.info img{width:40px;height:40px;flex:0 0 40px}
+.info .txt{flex:1;min-width:0}
+.info .txt b{font:600 16px var(--display)}
+.info .txt p{margin:2px 0 0;color:var(--soft);font-size:13px}
+.info .txt .req{color:var(--rose)}
+.info .cost{text-align:right;font:700 15px var(--display);white-space:nowrap}
+.info .cost small{display:block;font:800 11px var(--body);color:var(--muted)}
+.rebirthbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#6ee7a014,transparent)}
+.rebirthbar .txt{flex:1;min-width:180px;font-size:13px;color:var(--soft)}
+.rebirthbar .txt b{color:var(--moss);font:700 18px var(--display)}
+.bigbtn{padding:11px 18px;border-radius:14px;background:linear-gradient(135deg,var(--moss),#2fc6a0);color:#06281a;font:700 16px var(--display);box-shadow:0 4px 0 var(--moss-dk),0 8px 22px #6ee7a044}
+.bigbtn:disabled{filter:grayscale(1) brightness(.6);cursor:not-allowed;box-shadow:none}
+.bigbtn:not(:disabled):active{transform:translateY(2px);box-shadow:0 2px 0 var(--moss-dk)}
+.teaser{margin:auto;max-width:380px;padding:30px 20px;text-align:center;color:var(--soft)}
+.teaser h3{margin:0 0 8px;font:700 22px var(--display);color:var(--text)}
+.teaser .p{margin:14px 0 6px;height:10px;border-radius:9px;background:var(--night3);overflow:hidden}
+.teaser .p i{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--gold))}
+
+/* lists */
+.scroll{flex:1;min-height:0;overflow:auto;padding:14px}
+.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.ach{display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;background:var(--night);border:1px solid var(--line)}
+.ach img{width:34px;height:34px;flex:0 0 34px}
+.ach b{display:block;font:600 14px var(--display)}
+.ach small{color:var(--muted);font-size:11.5px}
+.ach.no{opacity:.45}.ach.no img{filter:grayscale(1)}
+.ach.yes{border-color:#ffd16655;background:linear-gradient(135deg,#ffd16614,var(--night))}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px}
+.stat{padding:12px;border-radius:14px;background:var(--night);border:1px solid var(--line)}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font:700 20px var(--display)}
+.savebox{display:flex;gap:8px;flex-wrap:wrap}
+.savebox textarea{width:100%;min-height:70px;padding:10px;border-radius:12px;border:1px solid var(--line2);background:var(--night);color:var(--soft);font:600 12px monospace;user-select:text}
+.small{padding:8px 13px;border-radius:11px;background:var(--night3);border:1px solid var(--line2);font-size:13px}
+.small.red{background:#ff6b9a1f;border-color:#ff6b9a66;color:#ffb3c8}
+
+/* golden spark, floaters, toasts, modal */
+.golden{position:fixed;z-index:40;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#fff7d1,#ffd166 45%,#ff9a3c00 70%);animation:gold 1.2s ease-in-out infinite;cursor:pointer}
+.golden img{width:40px;height:40px}
+@keyframes gold{50%{transform:scale(1.15) rotate(12deg);filter:brightness(1.3)}}
+.float{position:fixed;z-index:50;pointer-events:none;font:700 20px var(--display);color:var(--gold);text-shadow:0 2px 0 #0008;animation:up .9s ease-out forwards}
+.float.crit{color:var(--rose);font-size:28px}
+@keyframes up{to{transform:translateY(-70px);opacity:0}}
+canvas.fx{position:fixed;inset:0;pointer-events:none;z-index:45}
+.toasts{position:fixed;top:66px;right:14px;z-index:60;display:grid;gap:8px;width:min(320px,calc(100vw - 28px))}
+.toast{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--night3);border:1px solid var(--line2);box-shadow:0 12px 30px #0008;animation:tin .3s ease-out}
+.toast img{width:32px;height:32px}
+.toast b{display:block;font:600 14px var(--display)}
+.toast small{color:var(--soft)}
+@keyframes tin{from{transform:translateX(30px);opacity:0}}
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:#05040fcc;backdrop-filter:blur(4px)}
+.modal[hidden]{display:none}
+.card{width:min(420px,100%);padding:24px;border-radius:22px;background:linear-gradient(160deg,var(--night3),var(--night2));border:1px solid var(--line2);text-align:center;box-shadow:0 30px 80px #000a}
+.card img{width:72px;height:72px}
+.card h2{margin:6px 0;font:700 26px var(--display)}
+.card p{color:var(--soft)}
+.card .row{display:flex;gap:10px;justify-content:center;margin-top:16px}
+.flash{position:fixed;inset:0;z-index:70;pointer-events:none;background:radial-gradient(circle,#fff,#6ee7a0 40%,transparent 75%);animation:flash 1.2s ease-out forwards}
+@keyframes flash{from{opacity:1}to{opacity:0}}
+
+@media (max-width:820px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  /* compact top: orb on the left, numbers + heat + next goal on the right */
+  .grove{display:grid;grid-template-columns:118px 1fr;grid-template-areas:"orb big" "orb heat" "goal goal" "buffs buffs";align-items:center;column-gap:14px;row-gap:6px;border-right:0;border-bottom:1px solid var(--line);padding:10px 14px}
+  .orbwrap{grid-area:orb;width:118px}
+  .big{grid-area:big;text-align:left}
+  .big .n{font-size:26px}.big .l{font-size:12.5px}
+  .heat{grid-area:heat;width:100%}
+  .goal{grid-area:goal;width:100%;padding:7px 10px}
+  .buffs{grid-area:buffs;min-height:0;justify-content:flex-start}
+  .buffs:empty{display:none}
+  .orb .sprout{top:-20%}
+  .tabs{padding-top:6px}.tab{padding:8px 11px;font-size:14px}
+  .toolbar .note{display:none}
+  .info{min-height:64px;padding:8px 12px}
+  .title{display:none}
+  .chip{padding:5px 10px;font-size:14px}
+  .node .nm{display:none}
+  .hint{font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="../douggames.html" title="Back to games" aria-label="Back to games">←</a>
+  <div class="title">Sparkroot</div>
+  <div class="wallet">
+    <div class="chip" title="Sparks"><img class="ico" src="openmoji/2728.svg" alt=""><span id="wSparks">0</span></div>
+    <div class="chip seeds" id="wSeedsChip" hidden title="Seeds (rebirth currency)"><img class="ico" src="openmoji/1F95A.svg" alt=""><span id="wSeeds">0</span></div>
+  </div>
+  <button class="iconbtn" id="muteBtn" aria-label="Sound on or off"><img class="ico" id="muteIco" src="openmoji/1F50A.svg" alt=""></button>
+</header>
+
+<div class="main">
+  <section class="grove" id="grove">
+    <canvas class="stars" id="stars"></canvas>
+    <div class="big">
+      <div class="n" id="bigSparks">0</div>
+      <div class="l"><b id="sps">0</b> sparks/sec · <b id="perTap">1</b> per tap</div>
+    </div>
+    <div class="orbwrap">
+      <div class="ring"></div>
+      <button class="orb" id="orb" aria-label="Tap the Sparkroot"><img class="sprout" src="openmoji/1F340.svg" alt=""></button>
+      <div class="hint" id="hint">Tap the Sparkroot!</div>
+    </div>
+    <div class="heat" title="Tap fast to heat up. Hotter means bigger taps.">
+      <div class="bar"><div class="fill" id="heatFill"></div></div>
+      <div class="lbl"><span>Heat</span><b id="heatTxt">×1.00 taps</b></div>
+    </div>
+    <div class="buffs" id="buffs"></div>
+    <button class="goal" id="goal"><div class="t"><b id="goalName">Next upgrade</b><span id="goalPct">0%</span></div><div class="p"><i id="goalBar"></i></div></button>
+  </section>
+
+  <section class="panel">
+    <nav class="tabs" role="tablist">
+      <button class="tab on" data-tab="up" role="tab">🌳 Upgrade Tree</button>
+      <button class="tab locked" data-tab="rb" role="tab" id="rbTab">🥚 Rebirth Tree</button>
+      <button class="tab" data-tab="ach" role="tab" id="achTab">🏆 Achievements</button>
+      <button class="tab" data-tab="stats" role="tab">📋 Stats</button>
+    </nav>
+
+    <div class="view on" data-view="up">
+      <div class="toolbar">
+        <div class="seg" id="buySeg"><button data-buy="1" class="on">Buy 1</button><button data-buy="10">×10</button><button data-buy="max">Max</button></div>
+        <button class="tog" id="autoBtn" hidden>🤖 Gardener: on</button>
+        <span class="sp"></span>
+        <span class="note">Drag to explore · glowing = can buy</span>
+      </div>
+      <div class="treebox" id="upBox"><div class="tree" id="upTree"></div></div>
+      <div class="info" id="upInfo"></div>
+    </div>
+
+    <div class="view" data-view="rb">
+      <div class="rebirthbar" id="rbBar">
+        <div class="txt">Rebirth resets your sparks and upgrade tree, but you keep your seeds and rebirth tree.<br>Rebirth now for <b id="rbGain">0</b> seeds <span id="rbNext"></span></div>
+        <button class="bigbtn" id="rbBtn" disabled>🥚 Rebirth</button>
+      </div>
+      <div class="teaser" id="rbTeaser">
+        <img src="openmoji/1F95A.svg" alt="" width="72" height="72">
+        <h3>The Rebirth Tree</h3>
+        <p>Earn <b>1M sparks</b> in one run to rebirth. You'll get seeds to grow a tree of permanent upgrades that keep working forever.</p>
+        <div class="p"><i id="teaserBar" style="width:0"></i></div>
+        <small id="teaserTxt"></small>
+      </div>
+      <div class="treebox" id="rbBox" hidden><div class="tree rb" id="rbTree"></div></div>
+      <div class="info" id="rbInfo" hidden></div>
+    </div>
+
+    <div class="view" data-view="ach"><div class="scroll"><p style="margin:0 0 12px;color:var(--soft)">Each achievement gives <b style="color:var(--gold)">+2% production</b> forever. <span id="achCount"></span></p><div class="achs" id="achList"></div></div></div>
+
+    <div class="view" data-view="stats"><div class="scroll">
+      <div class="stats" id="statList"></div>
+      <h3 style="font:600 17px var(--display);margin:0 0 8px">Save</h3>
+      <p style="margin:0 0 8px;color:var(--soft);font-size:13px">Your game saves automatically in this browser. Copy the code to move it to another device.</p>
+      <div class="savebox"><textarea id="saveCode" spellcheck="false" aria-label="Save code"></textarea>
+        <button class="small" id="exportBtn">Copy save code</button><button class="small" id="importBtn">Load save code</button><span style="flex:1"></span><button class="small red" id="resetBtn">Start over</button></div>
+    </div></div>
+  </section>
+</div>
+
+<canvas class="fx" id="fx"></canvas>
+<div class="toasts" id="toasts"></div>
+<div class="modal" id="modal" hidden><div class="card" id="modalCard"></div></div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const IMG = cp => "openmoji/" + cp + ".svg";
+
+/* ---------- numbers ---------- */
+const SUF = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "Ud", "Dd", "Td"];
+function fmt(n) {
+  if (!isFinite(n)) return "∞";
+  if (n < 0) return "-" + fmt(-n);
+  if (n < 10) return (Math.floor(n * 10) / 10).toString();
+  if (n < 1000) return Math.floor(n).toString();
+  const e = Math.floor(Math.log10(n) / 3);
+  if (e >= SUF.length) return n.toExponential(2).replace("+", "");
+  const v = n / Math.pow(1000, e);
+  return (v < 10 ? v.toFixed(2) : v < 100 ? v.toFixed(1) : Math.floor(v)) + SUF[e];
+}
+const fmtTime = s => { s = Math.floor(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? h + "h " + m + "m" : m ? m + "m " + (s % 60) + "s" : s + "s"; };
+
+/* ---------- upgrade tree ---------- */
+// x/y are grid positions. parents must reach `req` levels to unlock a node.
+const gen = (id, name, icon, x, y, parents, req, base, sps, max) => ({ id, name, icon, x, y, parents, req, max, gen: sps,
+  cost: l => base * Math.pow(1.14, l), desc: l => "Makes " + fmt(sps) + " sparks/sec each (" + fmt(sps * l) + "/sec base now)" });
+const boost = (id, name, icon, x, y, parent, target, base) => ({ id, name, icon, x, y, parents: [parent], req: 10, max: 4, target,
+  cost: l => base * Math.pow(10, l), desc: l => "Doubles " + UPMAP[target].name + " output (now ×" + Math.pow(2, l) + ")" });
+const UP = [
+  { id: "spark", name: "Spark", icon: "2728", x: 3, y: 8.4, parents: [], max: 15, cost: l => 10 * Math.pow(1.6, l), desc: l => "+1 spark per tap (now +" + (1 + l) + ")" },
+  { id: "sharper", name: "Strong Taps", icon: "1F4AA", x: 1.4, y: 7.4, parents: ["spark"], req: 3, max: 4, cost: l => 150 * Math.pow(12, l), desc: l => "Taps ×2 (now ×" + Math.pow(2, l) + ")" },
+  gen("wisp", "Wisps", "1FAB6", 3, 7.2, ["spark"], 1, 15, 1, 60),
+  { id: "luck", name: "Lucky Leaves", icon: "1F340", x: 4.6, y: 7.4, parents: ["spark"], req: 5, max: 5, cost: l => 3000 * Math.pow(5, l), desc: l => "Golden sparks show up 12% sooner (now " + (12 * l) + "%)" },
+  { id: "echo", name: "Echo Taps", icon: "1F50A", x: 0.4, y: 6.3, parents: ["sharper"], req: 1, max: 10, cost: l => 2000 * Math.pow(4, l), desc: l => "Each tap also gives 3% of your sparks/sec (now " + (3 * l) + "%)" },
+  boost("swarm", "Wisp Swarm", "1F300", 1.9, 6.2, "wisp", "wisp", 400),
+  gen("hearth", "Hearth", "1F525", 3.3, 6.0, ["wisp"], 5, 220, 9, 60),
+  { id: "rush", name: "Gold Rush", icon: "1F4B0", x: 5.6, y: 6.3, parents: ["luck"], req: 1, max: 5, cost: l => 15000 * Math.pow(6, l), desc: l => "Golden spark rewards +50% (now +" + (50 * l) + "%)" },
+  { id: "crit", name: "Crit Spark", icon: "1F4A5", x: 0.6, y: 5.0, parents: ["echo"], req: 2, max: 5, cost: l => 8000 * Math.pow(5, l), desc: l => "5% chance per level for a ×10 tap (now " + (5 * l) + "%)" },
+  boost("hearthBoost", "Stone Hearth", "1FAA8", 2.2, 4.9, "hearth", "hearth", 6000),
+  gen("forge", "Forge", "26CF", 3.7, 4.8, ["hearth"], 5, 3500, 70, 60),
+  { id: "night", name: "Night Growth", icon: "1F319", x: 5.6, y: 5.0, parents: ["rush"], req: 1, max: 5, cost: l => 40000 * Math.pow(6, l), desc: l => "Earn while away: " + (10 + 15 * l) + "% of normal speed (max 8 hours)" },
+  { id: "sink", name: "Cool Water", icon: "1F4A7", x: 1.0, y: 3.7, parents: ["crit"], req: 1, max: 4, cost: l => 25000 * Math.pow(6, l), desc: l => "Full heat gives a bigger bonus (now up to ×" + (2 + l) + ")" },
+  boost("forgeBoost", "Brick Forge", "1F9F1", 2.6, 3.7, "forge", "forge", 90000),
+  gen("furnace", "Sun Furnace", "2600", 4.1, 3.6, ["forge"], 5, 60000, 520, 60),
+  { id: "harmony", name: "Grove Song", icon: "1F3B6", x: 5.9, y: 3.7, parents: ["night"], req: 1, max: 3, cost: l => 2e6 * Math.pow(15, l), desc: l => "+1% production for every upgrade level you own, per level (now +" + (l * totalLevels()) + "%)" },
+  boost("furnaceBoost", "Lightning Bellows", "26A1", 3.0, 2.5, "furnace", "furnace", 1.5e6),
+  gen("nova", "Nova Engine", "1F680", 4.6, 2.4, ["furnace"], 5, 1.1e6, 4500, 60),
+  boost("novaLens", "World Lens", "1F30D", 5.9, 2.3, "nova", "nova", 3e7),
+  { id: "heart", name: "Heart of the Grove", icon: "1F451", x: 3.6, y: 1.25, parents: ["nova", "harmony", "sink"], req: 1, max: 1, cost: () => 5e7, desc: () => "×3 production and ×3 taps. The crown of your tree." },
+  // Celestial branch: revealed by the rebirth upgrade "Moon Seed".
+  gen("aurora", "Starweaver", "2B50", 2.1, 0.3, ["heart"], 1, 3e9, 9e4, 60),
+  gen("void", "Void Garden", "1F47D", 5.1, 0.3, ["heart"], 1, 8e10, 1.6e6, 60),
+  { id: "cosmic", name: "World Tree", icon: "1F409", x: 3.6, y: -0.7, parents: ["aurora", "void"], req: 10, max: 3, cost: l => 1e13 * Math.pow(25, l), desc: l => "Starweaver and Void Garden ×3 (now ×" + Math.pow(3, l) + ")" }
+];
+const CELESTIAL = ["aurora", "void", "cosmic"];
+const UPMAP = Object.fromEntries(UP.map(n => [n.id, n]));
+const GENS = UP.filter(n => n.gen);
+
+/* ---------- rebirth tree ---------- */
+const RB = [
+  { id: "soil", name: "Rich Soil", icon: "1F344", x: 3, y: 5.2, parents: [], max: 20, cost: l => Math.ceil(Math.pow(1.5, l)), desc: l => "+25% production per level (now +" + (25 * l) + "%)" },
+  { id: "quick", name: "Head Start", icon: "23F3", x: 1.5, y: 4.1, parents: ["soil"], req: 1, max: 5, cost: l => 2 * Math.pow(2, l), desc: l => "Start each run with sparks in the bank (now " + (l ? fmt(100 * Math.pow(10, l)) : "0") + ", next " + fmt(100 * Math.pow(10, l + 1)) + ")" },
+  { id: "twin", name: "Twin Hearts", icon: "1F947", x: 4.5, y: 4.1, parents: ["soil"], req: 1, max: 3, cost: l => 3 * Math.pow(3, l), desc: l => "Taps ×2 per level (now ×" + Math.pow(2, l) + ")" },
+  { id: "deep", name: "Deep Roots", icon: "1FAA8", x: 0.4, y: 3.0, parents: ["quick"], req: 1, max: 5, cost: l => 5 * Math.pow(2, l), desc: l => "Upgrades cost 6% less per level (now -" + (6 * l) + "%)" },
+  { id: "gardener", name: "Gardener Bot", icon: "1F916", x: 2.1, y: 3.0, parents: ["quick"], req: 1, max: 5, cost: l => 10 * Math.pow(2, l), desc: l => "Buys the cheapest upgrade for you every " + (l ? (4 - 0.6 * l).toFixed(1) : "3.4") + "s" + (l ? "" : " (once bought)") },
+  { id: "bloom", name: "Seed Bloom", icon: "1F95A", x: 3.9, y: 3.0, parents: ["twin"], req: 1, max: 10, cost: l => Math.ceil(8 * Math.pow(1.8, l)), desc: l => "+25% seeds from rebirth (now +" + (25 * l) + "%)" },
+  { id: "grove", name: "Golden Grove", icon: "1F31F", x: 5.6, y: 3.0, parents: ["twin"], req: 1, max: 5, cost: l => 6 * Math.pow(2, l), desc: l => "Golden sparks come 30% more often and last longer (now +" + (30 * l) + "%)" },
+  { id: "perennial", name: "Perennial", icon: "267B", x: 1.2, y: 1.8, parents: ["deep", "gardener"], req: 1, max: 1, cost: () => 50, desc: () => "Keep Spark, Strong Taps, Wisps and Lucky Leaves levels when you rebirth" },
+  { id: "overflow", name: "Seed Fountain", icon: "26F2", x: 3, y: 1.8, parents: ["gardener", "bloom"], req: 1, max: 1, cost: () => 40, desc: () => "Every seed you hold gives +2% production" },
+  { id: "eternal", name: "Moon Seed", icon: "1F319", x: 4.8, y: 1.8, parents: ["bloom", "grove"], req: 1, max: 1, cost: () => 150, desc: () => "Reveals the Celestial branch at the top of the upgrade tree" },
+  { id: "starseed", name: "Star Seed", icon: "1F409", x: 3, y: 0.6, parents: ["overflow", "eternal"], req: 1, max: 3, cost: l => 500 * Math.pow(4, l), desc: l => "×3 everything per level (now ×" + Math.pow(3, l) + ")" }
+];
+const RBMAP = Object.fromEntries(RB.map(n => [n.id, n]));
+// Golden Grove uses the sparkle-star icon; fall back to an available one.
+RBMAP.grove.icon = "2B50";
+
+/* ---------- achievements ---------- */
+const ACH = [
+  ["tap1", "First Spark", "Tap the Sparkroot", "2728", s => s.clicks >= 1],
+  ["tap100", "Busy Fingers", "Tap 100 times", "1F4AA", s => s.clicks >= 100],
+  ["tap1k", "Tap Master", "Tap 1,000 times", "1F947", s => s.clicks >= 1000],
+  ["tap10k", "Unstoppable", "Tap 10,000 times", "1F3C6", s => s.clicks >= 10000],
+  ["hot", "Overheated", "Reach full heat", "1F525", s => s.heatMax],
+  ["k1", "Kindling", "Earn 1,000 sparks in total", "1F525", s => s.allTotal >= 1e3],
+  ["m1", "Millionaire Moss", "Earn 1M sparks in total", "1F4B0", s => s.allTotal >= 1e6],
+  ["b1", "Billion Blossoms", "Earn 1B sparks in total", "2B50", s => s.allTotal >= 1e9],
+  ["t1", "Trillion Trees", "Earn 1T sparks in total", "1F30D", s => s.allTotal >= 1e12],
+  ["q1", "Cosmic Canopy", "Earn 1Qa sparks in total", "1F409", s => s.allTotal >= 1e15],
+  ["sps10", "Warm Glow", "Make 10 sparks/sec", "1FAB6", () => cache.sps >= 10],
+  ["sps1k", "Bonfire", "Make 1,000 sparks/sec", "1F525", () => cache.sps >= 1e3],
+  ["sps100k", "Supernova", "Make 100K sparks/sec", "1F680", () => cache.sps >= 1e5],
+  ["sps10m", "Galaxy Brain", "Make 10M sparks/sec", "1F47D", () => cache.sps >= 1e7],
+  ["lv25", "Branching Out", "Own 25 upgrade levels", "1F340", () => totalLevels() >= 25],
+  ["lv100", "Mighty Oak", "Own 100 upgrade levels", "1F3F0", () => totalLevels() >= 100],
+  ["heart", "Crowned", "Buy the Heart of the Grove", "1F451", s => (s.nodes.heart || 0) >= 1],
+  ["gold1", "Shiny!", "Catch a golden spark", "1FA99", s => s.golden >= 1],
+  ["gold25", "Gold Digger", "Catch 25 golden sparks", "1F4B0", s => s.golden >= 25],
+  ["rb1", "Born Again", "Rebirth once", "1F95A", s => s.rebirths >= 1],
+  ["rb5", "Old Soul", "Rebirth 5 times", "1F423", s => s.rebirths >= 5],
+  ["rb25", "Eternal Gardener", "Rebirth 25 times", "267B", s => s.rebirths >= 25],
+  ["seeds100", "Seed Hoarder", "Earn 100 seeds in total", "26F2", s => s.seedsTotal >= 100],
+  ["moon", "Over the Moon", "Unlock the Celestial branch", "1F319", s => (s.rnodes.eternal || 0) >= 1],
+  ["world", "World Tree", "Buy the World Tree", "1F409", s => (s.nodes.cosmic || 0) >= 1]
+];
+
+/* ---------- state ---------- */
+const SAVE_KEY = "sparkroot-save-v1";
+const fresh = () => ({ v: 1, sparks: 0, runTotal: 0, allTotal: 0, bestRun: 0, clicks: 0, nodes: {}, seeds: 0, seedsTotal: 0, rnodes: {}, rebirths: 0,
+  golden: 0, ach: {}, heatMax: false, played: 0, runStart: Date.now(), last: Date.now(), muted: false, buy: "1", auto: true, hinted: false });
+let S = fresh();
+const lv = id => S.nodes[id] || 0;
+const rl = id => S.rnodes[id] || 0;
+const totalLevels = () => UP.reduce((a, n) => a + lv(n.id), 0);
+let heat = 0, lastTap = 0;
+const buffs = {}; // name -> {until, mult, label}
+const cache = { sps: 0, tap: 1, mult: 1 };
+
+function recompute() {
+  let raw = 0;
+  for (const g of GENS) {
+    let m = 1;
+    for (const b of UP) if (b.target === g.id) m *= Math.pow(2, lv(b.id));
+    if ((g.id === "aurora" || g.id === "void")) m *= Math.pow(3, lv("cosmic"));
+    raw += lv(g.id) * g.gen * m;
+  }
+  const ach = Object.keys(S.ach).length;
+  let mult = (1 + 0.25 * rl("soil")) * (1 + 0.02 * ach) * (lv("heart") ? 3 : 1) * (1 + 0.01 * lv("harmony") * totalLevels()) * Math.pow(3, rl("starseed"));
+  if (rl("overflow")) mult *= 1 + 0.02 * S.seeds;
+  cache.mult = mult;
+  cache.base = raw * mult;
+  cache.sps = cache.base * (buffs.frenzy ? 7 : 1);
+  cache.tap = (1 + lv("spark")) * Math.pow(2, lv("sharper")) * Math.pow(2, rl("twin")) * (lv("heart") ? 3 : 1) * mult + 0.03 * lv("echo") * cache.base;
+}
+const heatMult = () => 1 + (heat / 100) * (1 + lv("sink"));
+const discount = () => 1 - 0.06 * rl("deep");
+const costOf = (def, l) => def.cost(l) * (def === RBMAP[def.id] ? 1 : discount());
+
+/* ---------- earning ---------- */
+function earn(n) { S.sparks += n; S.runTotal += n; S.allTotal += n; if (S.runTotal > S.bestRun) S.bestRun = S.runTotal; }
+
+function tap(x, y) {
+  const now = performance.now();
+  heat = Math.min(100, heat + 9);
+  if (heat >= 100) S.heatMax = true;
+  lastTap = now;
+  let amount = cache.tap * heatMult() * (buffs.storm ? 10 : 1);
+  const crit = Math.random() < 0.05 * lv("crit");
+  if (crit) amount *= 10;
+  earn(amount);
+  S.clicks++;
+  if (!S.hinted) { S.hinted = true; $("hint").remove(); }
+  floatText(x, y, "+" + fmt(amount), crit);
+  burst(x, y, crit ? 18 : 7, crit ? "#ff6b9a" : "#ffd166");
+  sfx.tap(crit);
+  const orb = $("orb"); orb.classList.toggle("hot", heat > 70);
+}
+
+/* ---------- trees ---------- */
+const UNIT_X = 112, UNIT_Y = 104, PAD = 70;
+function nodeVisible(def, isRb) {
+  if (!isRb && CELESTIAL.includes(def.id)) return rl("eternal") > 0;
+  return true;
+}
+function unlocked(def, isRb) {
+  const get = isRb ? rl : lv;
+  return def.parents.every(p => get(p) >= (def.req || 1));
+}
+function buildTree(box, treeEl, defs, isRb) {
+  const vis = defs.filter(d => nodeVisible(d, isRb));
+  const xs = vis.map(d => d.x), ys = vis.map(d => d.y);
+  const minX = Math.min(...xs), minY = Math.min(...ys);
+  const W = (Math.max(...xs) - minX) * UNIT_X + PAD * 2 + 40, H = (Math.max(...ys) - minY) * UNIT_Y + PAD * 2 + 30;
+  const pos = d => [(d.x - minX) * UNIT_X + PAD + 20, (d.y - minY) * UNIT_Y + PAD];
+  treeEl.style.width = W + "px"; treeEl.style.height = H + "px";
+  let svg = '<svg width="' + W + '" height="' + H + '"><defs><linearGradient id="litgrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#6ee7a0"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>';
+  for (const d of vis) for (const p of d.parents) {
+    const pd = defs.find(x => x.id === p); if (!pd || !nodeVisible(pd, isRb)) continue;
+    const [x1, y1] = pos(pd), [x2, y2] = pos(d);
+    svg += '<line data-from="' + p + '" data-to="' + d.id + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/>';
+  }
+  treeEl.innerHTML = svg + "</svg>";
+  for (const d of vis) {
+    const [x, y] = pos(d);
+    const b = document.createElement("button");
+    b.className = "node"; b.dataset.id = d.id; b.style.left = x + "px"; b.style.top = y + "px";
+    b.innerHTML = '<img src="' + IMG(d.icon) + '" alt=""><span class="lv"></span><span class="nm">' + d.name + "</span>";
+    b.setAttribute("aria-label", d.name);
+    b.addEventListener("mouseenter", () => showInfo(d, isRb));
+    b.addEventListener("focus", () => showInfo(d, isRb));
+    b.addEventListener("click", e => { if (box.dataset.dragged === "1") return; showInfo(d, isRb); buy(d, isRb, b); });
+    treeEl.append(b);
+  }
+  enablePan(box);
+}
+function enablePan(box) {
+  if (box.dataset.pan) return;
+  box.dataset.pan = "1";
+  let sx, sy, sl, st, down = false;
+  box.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") return; down = true; box.dataset.dragged = "0"; sx = e.clientX; sy = e.clientY; sl = box.scrollLeft; st = box.scrollTop; });
+  window.addEventListener("pointermove", e => {
+    if (!down) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 6) { box.dataset.dragged = "1"; box.classList.add("drag"); }
+    box.scrollLeft = sl - dx; box.scrollTop = st - dy;
+  });
+  window.addEventListener("pointerup", () => { down = false; box.classList.remove("drag"); setTimeout(() => { box.dataset.dragged = "0"; }, 0); });
+}
+let selUp = null, selRb = null;
+function showInfo(def, isRb) {
+  if (isRb) selRb = def; else selUp = def;
+  renderInfo(isRb);
+  document.querySelectorAll((isRb ? "#rbTree" : "#upTree") + " .node").forEach(n => n.classList.toggle("sel", n.dataset.id === def.id));
+}
+function renderInfo(isRb) {
+  const def = isRb ? selRb : selUp;
+  const el = $(isRb ? "rbInfo" : "upInfo");
+  if (!def) { el.innerHTML = '<div class="txt"><b>Pick an upgrade</b><p>Hover or tap a circle to see what it does. Tap again to buy.</p></div>'; return; }
+  const l = isRb ? rl(def.id) : lv(def.id);
+  const ok = unlocked(def, isRb);
+  const maxed = l >= def.max;
+  const cur = isRb ? S.seeds : S.sparks;
+  const [count, price] = isRb ? [1, def.cost(l)] : purchasePlan(def);
+  let req = "";
+  if (!ok) req = '<p class="req">🔒 Needs ' + def.parents.map(p => (isRb ? RBMAP : UPMAP)[p].name + " Lv " + (def.req || 1)).join(" + ") + "</p>";
+  el.innerHTML = '<img src="' + IMG(def.icon) + '" alt=""><div class="txt"><b>' + def.name + ' <small style="color:var(--muted);font:800 12px var(--body)">Lv ' + l + "/" + def.max + "</small></b><p>" + def.desc(l) + "</p>" + req + "</div>" +
+    '<div class="cost">' + (maxed ? '<span style="color:var(--gold)">MAXED ★</span>' : (count > 1 ? "×" + count + " · " : "") + '<span style="color:' + (cur >= price ? "var(--moss)" : "var(--rose)") + '">' + fmt(price) + "</span><small>" + (isRb ? "seeds" : "sparks") + "</small>") + "</div>";
+}
+// How many levels the current buy mode would purchase, and their total price.
+function purchasePlan(def) {
+  const l = lv(def.id), room = def.max - l;
+  if (room <= 0) return [0, 0];
+  const want = S.buy === "max" ? room : Math.min(room, Number(S.buy));
+  let total = 0, n = 0;
+  for (let i = 0; i < want; i++) {
+    const c = costOf(def, l + i);
+    if (S.buy === "max" && total + c > S.sparks && n > 0) break;
+    total += c; n++;
+    if (S.buy === "max" && total > S.sparks) break;
+  }
+  return [Math.max(1, n), total];
+}
+function buy(def, isRb, btn) {
+  if (!unlocked(def, isRb)) { sfx.no(); return; }
+  if (isRb) {
+    const l = rl(def.id); if (l >= def.max) return;
+    const c = def.cost(l); if (S.seeds < c) { sfx.no(); return; }
+    S.seeds -= c; S.rnodes[def.id] = l + 1;
+    if (def.id === "eternal") buildTree($("upBox"), $("upTree"), UP, false);
+    if (def.id === "gardener") $("autoBtn").hidden = false;
+  } else {
+    const [n, total] = purchasePlan(def);
+    if (!n || S.sparks < total) { sfx.no(); return; }
+    S.sparks -= total; S.nodes[def.id] = lv(def.id) + n;
+  }
+  sfx.buy();
+  if (btn) { btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop"); const r = btn.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 14, isRb ? "#6ee7a0" : "#ffd166"); }
+  recompute(); refreshTrees(); renderInfo(isRb);
+}
+function refreshTree(treeEl, defs, isRb) {
+  const cur = isRb ? S.seeds : S.sparks;
+  treeEl.querySelectorAll(".node").forEach(b => {
+    const d = defs.find(x => x.id === b.dataset.id);
+    const l = isRb ? rl(d.id) : lv(d.id), ok = unlocked(d, isRb), maxed = l >= d.max;
+    const price = isRb ? d.cost(l) : costOf(d, l);
+    b.classList.toggle("locked", !ok);
+    b.classList.toggle("max", maxed);
+    b.classList.toggle("can", ok && !maxed && cur >= price);
+    b.querySelector(".lv").textContent = maxed ? "MAX" : ok ? l + "/" + d.max : "🔒";
+  });
+  treeEl.querySelectorAll("line").forEach(line => {
+    const get = isRb ? rl : lv;
+    line.classList.toggle("lit", get(line.dataset.from) > 0 && get(line.dataset.to) > 0);
+  });
+}
+function refreshTrees() {
+  refreshTree($("upTree"), UP, false);
+  if (S.rebirths > 0) refreshTree($("rbTree"), RB, true);
+}
+
+/* ---------- rebirth ---------- */
+const seedGain = () => S.runTotal < 1e6 ? 0 : Math.floor(Math.sqrt(S.runTotal / 1e6) * (1 + 0.25 * rl("bloom")));
+function rebirth() {
+  const gain = seedGain();
+  if (!gain) return;
+  openModal('<img src="' + IMG("1F95A") + '" alt=""><h2>Rebirth?</h2><p>You\'ll get <b style="color:var(--moss)">' + fmt(gain) + " seeds</b>. Your sparks and upgrade tree reset" + (rl("perennial") ? " (Perennial keeps your first four upgrades)" : "") + ".</p>" +
+    '<div class="row"><button class="small" data-close>Not yet</button><button class="bigbtn" id="rbGo">Rebirth 🥚</button></div>');
+  $("rbGo").onclick = () => {
+    closeModal();
+    const keep = rl("perennial") ? ["spark", "sharper", "wisp", "luck"] : [];
+    const kept = Object.fromEntries(keep.map(k => [k, lv(k)]));
+    S.seeds += gain; S.seedsTotal += gain; S.rebirths++;
+    S.nodes = kept; S.sparks = rl("quick") ? 100 * Math.pow(10, rl("quick")) : 0; S.runTotal = 0; S.runStart = Date.now();
+    heat = 0;
+    const f = document.createElement("div"); f.className = "flash"; document.body.append(f); setTimeout(() => f.remove(), 1300);
+    sfx.rebirth();
+    $("wSeedsChip").hidden = false;
+    setupRebirthView();
+    recompute(); refreshTrees();
+    toast("1F95A", "Reborn!", "+" + fmt(gain) + " seeds. Spend them in the Rebirth Tree.");
+    switchTab("rb");
+    save();
+  };
+}
+function setupRebirthView() {
+  const has = S.rebirths > 0;
+  $("rbTab").classList.toggle("locked", !has);
+  $("rbTeaser").hidden = has; $("rbBox").hidden = !has; $("rbInfo").hidden = !has;
+  if (has && !$("rbTree").children.length) { buildTree($("rbBox"), $("rbTree"), RB, true); renderInfo(true); }
+  $("autoBtn").hidden = !rl("gardener");
+}
+
+/* ---------- golden sparks & buffs ---------- */
+let nextGolden = Date.now() + 40000;
+function scheduleGolden() {
+  const speed = (1 - 0.12 * lv("luck")) / (1 + 0.3 * rl("grove"));
+  nextGolden = Date.now() + (50 + Math.random() * 60) * 1000 * speed;
+}
+function spawnGolden() {
+  const g = document.createElement("button");
+  g.className = "golden"; g.setAttribute("aria-label", "Golden spark!");
+  g.innerHTML = '<img src="' + IMG("2B50") + '" alt="">';
+  const W = innerWidth, H = innerHeight;
+  let x = 60 + Math.random() * (W - 120), y = 90 + Math.random() * (H - 180);
+  const vx = (Math.random() - .5) * 40, vy = (Math.random() - .5) * 30;
+  g.style.left = x + "px"; g.style.top = y + "px";
+  document.body.append(g);
+  const life = 12000 * (1 + 0.2 * rl("grove")), born = Date.now();
+  const drift = setInterval(() => {
+    x = Math.max(40, Math.min(W - 40, x + vx * 0.05)); y = Math.max(80, Math.min(H - 40, y + vy * 0.05));
+    g.style.left = x + "px"; g.style.top = y + "px";
+    g.style.opacity = Math.min(1, (life - (Date.now() - born)) / 1500);
+    if (Date.now() - born > life) { clearInterval(drift); g.remove(); }
+  }, 50);
+  g.addEventListener("click", e => {
+    clearInterval(drift); g.remove(); S.golden++;
+    const rush = 1 + 0.5 * lv("rush"), r = Math.random();
+    sfx.golden(); burst(e.clientX, e.clientY, 30, "#ffd166");
+    if (r < 0.45) {
+      const amt = Math.max(15, Math.min(cache.base * 900, Math.max(cache.base * 90, S.sparks * 0.15))) * rush;
+      earn(amt); floatText(e.clientX, e.clientY, "+" + fmt(amt), true);
+      toast("1FA99", "Lucky!", "+" + fmt(amt) + " sparks");
+    } else if (r < 0.8) {
+      addBuff("frenzy", 20 * rush, "Frenzy ×7 sparks/sec"); toast("1F525", "Frenzy!", "Sparks/sec ×7 for " + Math.round(20 * rush) + "s");
+    } else {
+      addBuff("storm", 12 * rush, "Tap Storm ×10 taps"); toast("26A1", "Tap Storm!", "Taps ×10 for " + Math.round(12 * rush) + "s. Go go go!");
+    }
+    recompute();
+  });
+}
+function addBuff(name, secs, label) { buffs[name] = { until: Date.now() + secs * 1000, total: secs * 1000, label }; recompute(); }
+function renderBuffs() {
+  const el = $("buffs"), now = Date.now();
+  let html = "";
+  for (const [k, b] of Object.entries(buffs)) {
+    if (now > b.until) { delete buffs[k]; recompute(); continue; }
+    html += '<span class="buff">' + b.label + ' <i style="width:' + Math.round(40 * (b.until - now) / b.total) + 'px"></i></span>';
+  }
+  el.innerHTML = html;
+}
+
+/* ---------- gardener bot ---------- */
+let lastAuto = 0;
+function gardener(now) {
+  if (!rl("gardener") || !S.auto) return;
+  if (now - lastAuto < (4 - 0.6 * rl("gardener")) * 1000) return;
+  lastAuto = now;
+  let best = null, bestCost = Infinity;
+  for (const d of UP) {
+    if (!nodeVisible(d, false) || !unlocked(d, false) || lv(d.id) >= d.max) continue;
+    const c = costOf(d, lv(d.id));
+    if (c <= S.sparks && c < bestCost) { best = d; bestCost = c; }
+  }
+  if (best) {
+    S.sparks -= bestCost; S.nodes[best.id] = lv(best.id) + 1; recompute(); refreshTrees();
+    const btn = document.querySelector('#upTree .node[data-id="' + best.id + '"]');
+    if (btn) { btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop"); }
+  }
+}
+
+/* ---------- achievements ---------- */
+function checkAch() {
+  let got = false;
+  for (const [id, name, desc, icon, test] of ACH) {
+    if (S.ach[id]) continue;
+    if (test(S)) { S.ach[id] = Date.now(); got = true; toast(icon, "Achievement: " + name, desc + " · +2% production"); sfx.ach(); }
+  }
+  if (got) { recompute(); renderAch(); }
+}
+function renderAch() {
+  $("achList").innerHTML = ACH.map(([id, name, desc, icon]) => '<div class="ach ' + (S.ach[id] ? "yes" : "no") + '"><img src="' + IMG(icon) + '" alt=""><div><b>' + name + "</b><small>" + desc + "</small></div></div>").join("");
+  $("achCount").textContent = Object.keys(S.ach).length + " of " + ACH.length + " unlocked.";
+}
+
+/* ---------- UI ---------- */
+function switchTab(key) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.tab === key));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.dataset.view === key));
+  if (key === "stats") renderStats();
+  if (key === "ach") renderAch();
+}
+function renderStats() {
+  const rows = [
+    ["Sparks this run", fmt(S.runTotal)], ["Sparks all time", fmt(S.allTotal)], ["Best run", fmt(S.bestRun)],
+    ["Sparks per second", fmt(cache.sps)], ["Per tap", fmt(cache.tap)], ["Production bonus", "×" + fmt(cache.mult)],
+    ["Taps", fmt(S.clicks)], ["Golden sparks caught", fmt(S.golden)], ["Rebirths", fmt(S.rebirths)],
+    ["Seeds earned", fmt(S.seedsTotal)], ["Upgrade levels", fmt(totalLevels())], ["Time played", fmtTime(S.played)],
+    ["This run", fmtTime((Date.now() - S.runStart) / 1000)]
+  ];
+  $("statList").innerHTML = rows.map(([k, v]) => '<div class="stat"><small>' + k + "</small><b>" + v + "</b></div>").join("");
+}
+function nextGoal() {
+  let best = null, bestCost = Infinity;
+  for (const d of UP) {
+    if (!nodeVisible(d, false) || !unlocked(d, false) || lv(d.id) >= d.max) continue;
+    const c = costOf(d, lv(d.id));
+    if (c < bestCost) { best = d; bestCost = c; }
+  }
+  if (!best) { $("goalName").textContent = "Your tree is complete!"; $("goalPct").textContent = "★"; $("goalBar").style.width = "100%"; return null; }
+  const pct = Math.min(100, S.sparks / bestCost * 100);
+  $("goalName").textContent = (pct >= 100 ? "Ready: " : "Next: ") + best.name + " Lv " + (lv(best.id) + 1);
+  $("goalPct").textContent = pct >= 100 ? "Buy now!" : Math.floor(pct) + "%";
+  $("goalBar").style.width = pct + "%";
+  return best;
+}
+function updateUI() {
+  $("wSparks").textContent = fmt(S.sparks);
+  $("bigSparks").textContent = fmt(S.sparks) + " sparks";
+  $("sps").textContent = fmt(cache.sps);
+  $("perTap").textContent = fmt(cache.tap * heatMult() * (buffs.storm ? 10 : 1));
+  $("wSeeds").textContent = fmt(S.seeds);
+  $("heatFill").style.width = heat + "%";
+  $("heatTxt").textContent = "×" + heatMult().toFixed(2) + " taps";
+  const g = seedGain();
+  $("rbGain").textContent = fmt(g);
+  $("rbBtn").disabled = !g;
+  const nextAt = Math.pow((g / (1 + 0.25 * rl("bloom"))) + 1, 2) * 1e6;
+  $("rbNext").textContent = g ? "(next seed at " + fmt(nextAt) + " run sparks)" : "(needs 1M sparks this run · " + fmt(S.runTotal) + " so far)";
+  $("teaserBar").style.width = Math.min(100, S.runTotal / 1e6 * 100) + "%";
+  $("teaserTxt").textContent = fmt(S.runTotal) + " / 1M sparks this run";
+  const rbDot = g > 0 && !document.querySelector(".tab[data-tab=rb] .dot");
+  if (rbDot) $("rbTab").insertAdjacentHTML("beforeend", '<span class="dot"></span>');
+  if (!g) document.querySelector(".tab[data-tab=rb] .dot")?.remove();
+  $("autoBtn").textContent = "🤖 Gardener: " + (S.auto ? "on" : "off");
+  $("autoBtn").classList.toggle("on", S.auto);
+  document.title = fmt(S.sparks) + " sparks · Sparkroot";
+}
+
+/* ---------- effects ---------- */
+function floatText(x, y, text, crit) {
+  if (document.querySelectorAll(".float").length > 25) return;
+  const f = document.createElement("div");
+  f.className = "float" + (crit ? " crit" : "");
+  f.textContent = text;
+  f.style.left = (x - 20 + (Math.random() * 40 - 20)) + "px"; f.style.top = (y - 30) + "px";
+  document.body.append(f); setTimeout(() => f.remove(), 900);
+}
+const fx = $("fx"), fctx = fx.getContext("2d");
+let parts = [];
+function burst(x, y, n, color) {
+  for (let i = 0; i < n && parts.length < 300; i++) {
+    const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 5;
+    parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, life: 1, color, r: 2 + Math.random() * 3 });
+  }
+}
+function drawFx() {
+  if (fx.width !== innerWidth) { fx.width = innerWidth; fx.height = innerHeight; }
+  fctx.clearRect(0, 0, fx.width, fx.height);
+  parts = parts.filter(p => p.life > 0);
+  for (const p of parts) {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.life -= 0.03;
+    fctx.globalAlpha = Math.max(0, p.life); fctx.fillStyle = p.color;
+    fctx.beginPath(); fctx.arc(p.x, p.y, p.r, 0, 7); fctx.fill();
+  }
+  fctx.globalAlpha = 1;
+}
+// floating fireflies behind the orb
+const stars = $("stars"), sctx = stars.getContext("2d");
+const flies = Array.from({ length: 34 }, () => ({ x: Math.random(), y: Math.random(), s: Math.random() * 2 + 1, p: Math.random() * 6 }));
+function drawStars(t) {
+  const r = stars.parentElement.getBoundingClientRect();
+  if (stars.width !== Math.round(r.width)) { stars.width = r.width; stars.height = r.height; }
+  sctx.clearRect(0, 0, stars.width, stars.height);
+  for (const f of flies) {
+    const a = 0.3 + 0.5 * Math.sin(t / 900 + f.p);
+    sctx.fillStyle = "rgba(255,230,140," + a.toFixed(2) + ")";
+    sctx.beginPath(); sctx.arc((f.x + Math.sin(t / 7000 + f.p) * 0.03) * stars.width, (f.y + Math.cos(t / 9000 + f.p) * 0.03) * stars.height, f.s, 0, 7); sctx.fill();
+  }
+}
+
+/* ---------- sound (synthesized) ---------- */
+let actx = null;
+function tone(freq, dur, type, vol, when = 0, slide) {
+  if (S.muted) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + when, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + 0.02);
+  } catch (_) {}
+}
+const sfx = {
+  tap: crit => { tone(420 + heat * 4 + Math.random() * 60, 0.07, "sine", 0.08); if (crit) tone(1200, 0.15, "triangle", 0.06, 0.02); },
+  buy: () => { tone(660, 0.08, "triangle", 0.08); tone(990, 0.12, "triangle", 0.07, 0.07); },
+  no: () => tone(180, 0.12, "square", 0.03),
+  golden: () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.18, "triangle", 0.07, i * 0.06)),
+  ach: () => [523, 659, 784].forEach((f, i) => tone(f, 0.2, "sine", 0.07, i * 0.08)),
+  rebirth: () => { tone(200, 1.2, "sawtooth", 0.05, 0, 1600); [523, 784, 1047].forEach((f, i) => tone(f, 0.5, "sine", 0.06, 0.6 + i * 0.12)); }
+};
+
+/* ---------- toasts & modal ---------- */
+function toast(icon, title, text) {
+  const t = document.createElement("div"); t.className = "toast";
+  t.innerHTML = '<img src="' + IMG(icon) + '" alt=""><div><b>' + title + "</b><small>" + text + "</small></div>";
+  $("toasts").append(t);
+  while ($("toasts").children.length > 4) $("toasts").firstChild.remove();
+  setTimeout(() => t.remove(), 4200);
+}
+function openModal(html) { $("modalCard").innerHTML = html; $("modal").hidden = false; $("modalCard").querySelectorAll("[data-close]").forEach(b => b.onclick = closeModal); }
+function closeModal() { $("modal").hidden = true; }
+$("modal").addEventListener("click", e => { if (e.target === $("modal")) closeModal(); });
+
+/* ---------- save ---------- */
+function save() { S.last = Date.now(); try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (_) {} }
+function load() {
+  try { const raw = localStorage.getItem(SAVE_KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (_) {}
+}
+const encode = () => btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+$("exportBtn").onclick = async () => {
+  save(); $("saveCode").value = encode(); $("saveCode").select();
+  try { await navigator.clipboard.writeText($("saveCode").value); toast("1F4BE", "Copied!", "Paste it on another device to keep playing."); } catch (_) { toast("1F4BE", "Save code ready", "Copy the text in the box."); }
+};
+$("importBtn").onclick = () => {
+  try {
+    const data = JSON.parse(decodeURIComponent(escape(atob($("saveCode").value.trim()))));
+    if (typeof data.sparks !== "number") throw 0;
+    S = Object.assign(fresh(), data); save(); location.reload();
+  } catch (_) { toast("2716", "That code didn't work", "Make sure you pasted the whole save code."); }
+};
+$("resetBtn").onclick = () => {
+  openModal('<img src="' + IMG("1F6A8") + '" alt=""><h2>Start over?</h2><p>This deletes your sparks, seeds, trees and achievements. It can\'t be undone.</p><div class="row"><button class="small" data-close>Keep playing</button><button class="small red" id="wipeGo">Delete everything</button></div>');
+  $("wipeGo").onclick = () => { localStorage.removeItem(SAVE_KEY); S = fresh(); location.reload(); };
+};
+
+/* ---------- wiring ---------- */
+$("orb").addEventListener("pointerdown", e => { e.preventDefault(); tap(e.clientX, e.clientY); });
+$("orb").addEventListener("keydown", e => {
+  if ((e.key === " " || e.key === "Enter") && !e.repeat) { e.preventDefault(); const r = $("orb").getBoundingClientRect(); tap(r.left + r.width / 2, r.top + r.height / 3); }
+});
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => switchTab(t.dataset.tab)));
+$("buySeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+  S.buy = b.dataset.buy; $("buySeg").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); renderInfo(false);
+}));
+$("autoBtn").onclick = () => { S.auto = !S.auto; updateUI(); };
+$("rbBtn").onclick = rebirth;
+$("muteBtn").onclick = () => { S.muted = !S.muted; $("muteIco").src = IMG(S.muted ? "1F507" : "1F50A"); };
+$("goal").onclick = () => {
+  const d = nextGoal(); if (!d) return;
+  switchTab("up");
+  const b = document.querySelector('#upTree .node[data-id="' + d.id + '"]');
+  if (b) { b.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" }); showInfo(d, false); }
+};
+addEventListener("visibilitychange", () => { if (document.hidden) save(); });
+addEventListener("beforeunload", save);
+
+/* ---------- start ---------- */
+load();
+recompute();
+$("muteIco").src = IMG(S.muted ? "1F507" : "1F50A");
+$("buySeg").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.buy === S.buy));
+if (S.hinted) $("hint").remove();
+if (S.rebirths > 0) $("wSeedsChip").hidden = false;
+buildTree($("upBox"), $("upTree"), UP, false);
+setupRebirthView();
+refreshTrees(); renderInfo(false); renderAch();
+requestAnimationFrame(() => { const b = $("upBox"); b.scrollTop = b.scrollHeight; b.scrollLeft = (b.scrollWidth - b.clientWidth) / 2; });
+
+// Offline earnings
+const away = Math.min(8 * 3600, (Date.now() - S.last) / 1000);
+if (S.last && away > 60 && cache.base > 0) {
+  const gain = cache.base * away * (0.1 + 0.15 * lv("night"));
+  earn(gain);
+  openModal('<img src="' + IMG("1F319") + '" alt=""><h2>Welcome back!</h2><p>Your grove kept growing for ' + fmtTime(away) + ' and made <b style="color:var(--gold)">' + fmt(gain) + " sparks</b>.</p>" + (lv("night") < 5 ? '<p style="font-size:12px">Buy <b>Night Growth</b> to earn more while you\'re away.</p>' : "") + '<div class="row"><button class="bigbtn" data-close>Collect ✨</button></div>');
+}
+scheduleGolden();
+
+let lastTick = performance.now(), slow = 0, saveT = 0;
+setInterval(() => {
+  const now = performance.now(), dt = Math.min(3600, (now - lastTick) / 1000);
+  lastTick = now;
+  if (now - lastTap > 400) heat = Math.max(0, heat - 32 * dt);
+  if (heat < 70) $("orb").classList.remove("hot");
+  earn(cache.sps * dt);
+  S.played += dt;
+  gardener(now);
+  if (Date.now() > nextGolden && !document.hidden) { spawnGolden(); scheduleGolden(); }
+  updateUI();
+  slow += dt; saveT += dt;
+  if (slow >= 0.25) { slow = 0; refreshTrees(); renderBuffs(); nextGoal(); if (selUp) renderInfo(false); if (selRb && S.rebirths) renderInfo(true); }
+  if (saveT >= 1) { saveT = 0; checkAch(); if (Math.random() < 0.1) save(); }
+}, 100);
+(function frame(t) { drawFx(); drawStars(t); requestAnimationFrame(frame); })(0);
+if (/^(localhost|127.0.0.1)$/.test(location.hostname)) window.__sparkroot = { get S() { return S; }, cache, recompute, refreshTrees, spawnGolden, UP, RB, costOf, unlocked, nodeVisible, earn, seedGain, heatMult };
+})();
+</script>
+</body>
+</html>
