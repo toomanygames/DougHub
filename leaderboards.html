@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leaderboards · DougHub</title>
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="auth-guard.js" data-require-auth="true"></script>
+<script src="nav.js?v=20261104-usability" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4;--gold:#ffd23f}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;color:#f5f6ff;background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+body{padding:22px 14px 60px}
+a{color:inherit}
+main{width:min(820px,100%);margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.top a{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#ffffff08;text-decoration:none;font-size:13px;font-weight:800;color:#c7d2fe}
+h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px);letter-spacing:-.02em}
+.help{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.5}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#ffffff08;color:#c7d2fe;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border-color:transparent}
+.card{padding:16px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#111631ed,#080b1bed);box-shadow:0 18px 48px #0004}
+.meta{color:var(--muted);font-size:13px;margin:0 0 12px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:8px;border:1px solid #ffffff10;border-radius:14px;background:#ffffff05;text-decoration:none}
+.row:hover{border-color:#a5b4fc66}
+.row.me{background:#4f46e533;border-color:#818cf8aa}
+.rk{width:34px;font-weight:900;font-size:17px;color:var(--gold);text-align:center}
+.row:nth-child(n+4) .rk{color:#c7d2fe}
+.art{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center}
+.art img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 4px 4px #0006)}
+.art img.gold{filter:sepia(1) saturate(2.1) hue-rotate(2deg) brightness(1.08) drop-shadow(0 4px 4px #0006)}
+.who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.who small{display:block;color:var(--muted);font-weight:600;font-size:12px}
+.score{font-weight:900;font-size:17px;text-align:right}
+.score small{display:block;color:var(--muted);font-weight:600;font-size:11px}
+.rm{padding:5px 9px;border:1px solid #f8717166;border-radius:8px;background:#f8717122;color:#fecaca;font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.note{padding:26px;border:1px dashed var(--line);border-radius:16px;color:var(--muted);text-align:center}
+.me-line{margin-top:10px;padding:10px 12px;border-radius:12px;background:#4f46e533;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a href="douggames.html">&larr; Games</a><a href="profile.html">My showcase</a></div>
+  <h1>Leaderboards</h1>
+  <p class="help">Top players for DougHub games, plus the best character collectors. Only your best score counts. Tap a name to see their showcase.</p>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div class="card" id="board"><div class="note">Loading...</div></div>
+</main>
+<script>
+(function () {
+"use strict";
+const db = window.supabase.createClient("https://agsqdqcsmsppcdqxlppj.supabase.co", "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52");
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = u => /^(https:\/\/|\/?Games\/)/i.test(u || "") ? u : "";
+const SUF = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+function fmt(n) { n = Number(n) || 0; if (n < 1000) return String(Math.floor(n)); let i = 0; while (n >= 1000 && i < SUF.length - 1) { n /= 1000; i++; } return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + SUF[i]; }
+let games = [], current = "collectors", isStaff = false;
+
+function art(r) { const u = safeUrl(r.art_path); return '<div class="art">' + (u ? '<img class="' + (r.finish === "gold" ? "gold" : "") + '" src="' + esc(u) + '" alt="" loading="lazy">' : "") + '</div>'; }
+
+async function show(key) {
+  current = key;
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.key === key)));
+  history.replaceState(null, "", "#" + key);
+  const host = $("board"); host.innerHTML = '<div class="note">Loading...</div>';
+  try {
+    if (key === "collectors") {
+      const { data, error } = await db.rpc("dh_collectors", { p_limit: 50 });
+      if (error) throw error;
+      if (!data || !data.length) { host.innerHTML = '<div class="note">No collectors yet. Collect a character in the shop to join!</div>'; return; }
+      host.innerHTML = '<p class="meta">Collector points: common 1, uncommon 2, rare 4, epic 8, legendary 16.</p>' + data.map(r =>
+        '<a class="row ' + (r.is_me ? "me" : "") + '" href="profile.html?u=' + encodeURIComponent(r.username) + '"><div class="rk">' + r.rank + '</div>' + art(r) +
+        '<div class="who">' + esc(r.username) + '<small>' + r.owned + ' characters &middot; ' + r.badges + ' badges</small></div><div class="score">' + r.points + '<small>points</small></div></a>').join("");
+      return;
+    }
+    const { data, error } = await db.rpc("dh_game_leaderboard", { p_game: key, p_limit: 50 });
+    if (error) throw error;
+    const rows = data.rows || [];
+    let h = '<p class="meta">' + esc(data.game.title) + ' &middot; ' + (data.players || 0) + ' player' + (data.players === 1 ? "" : "s") + '</p>';
+    if (!rows.length) h += '<div class="note">No scores yet. Play ' + esc(data.game.title) + ' to be the first on the board!</div>';
+    h += rows.map(r => '<div class="row ' + (r.is_me ? "me" : "") + '"><div class="rk">' + r.rank + '</div>' + art(r) +
+      '<a class="who" style="text-decoration:none" href="profile.html?u=' + encodeURIComponent(r.username) + '">' + esc(r.username) + '</a><div class="score">' + fmt(r.score) + '<small>' + esc(data.game.unit || "") + '</small></div>' +
+      (isStaff && r.user_id ? '<button class="rm" type="button" data-user="' + esc(r.user_id) + '" data-name="' + esc(r.username) + '">Remove</button>' : "") + '</div>').join("");
+    if (data.me && !rows.some(r => r.is_me)) h += '<div class="me-line">Your best: <b>#' + data.me.rank + '</b> &middot; ' + fmt(data.me.score) + '</div>';
+    host.innerHTML = h;
+    host.querySelectorAll(".rm").forEach(b => b.addEventListener("click", async () => {
+      if (!confirm("Remove " + b.dataset.name + "'s score from this board? This is logged.")) return;
+      const r = await db.rpc("dh_remove_score", { p_game: key, p_user: b.dataset.user });
+      if (r.error) alert(r.error.message); else show(key);
+    }));
+  } catch (e) { host.innerHTML = '<div class="note">Could not load this board: ' + esc(e.message || e) + '</div>'; }
+}
+
+(async function init() {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) { location.href = "log-in.html"; return; }
+  try { const r = await db.rpc("dh_my_staff_rank"); isStaff = Number(r.data) >= 2; } catch (_) {}
+  const list = await db.rpc("dh_game_list");
+  games = (list.data || []);
+  const tabs = $("tabs");
+  const all = [{ game_key: "collectors", title: "Collectors" }].concat(games);
+  tabs.innerHTML = all.map(g => '<button type="button" data-key="' + esc(g.game_key) + '" aria-pressed="false">' + esc(g.title) + '</button>').join("");
+  tabs.addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(b.dataset.key); });
+  const hash = decodeURIComponent((location.hash || "").slice(1));
+  show(all.some(g => g.game_key === hash) ? hash : "collectors");
+})();
+})();
+</script>
+</body>
+</html>

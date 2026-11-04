@@ -818,6 +818,7 @@ h1.title{color:#f8fafc;font-size:clamp(54px,10vw,80px);letter-spacing:-.06em;tex
 @media(prefers-reduced-motion:reduce){.dh-back,.dh-credit-btn{transition:none}}
 </style>
 <script src="../game-art.js" defer></script>
+<script src="leaderboard.js" data-game-key="puzzle-2048" defer></script>
 </head>
 <body>
 <div class="dh-game-page">
@@ -1477,6 +1478,7 @@ LocalStorageManager.prototype.getBestScore = function () {
 };
 
 LocalStorageManager.prototype.setBestScore = function (score) {
+  try { if (window.DHScores) DHScores.submit('puzzle-2048', score); } catch (e) {}
   this.storage.setItem(this.bestScoreKey, score);
 };
 

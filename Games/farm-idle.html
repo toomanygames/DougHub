@@ -131,6 +131,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 }
 @media (prefers-reduced-motion:reduce){.plot.ready,.plot.ready .crop,.rainfx i,.cloud{animation:none}}
 </style>
+<script src="leaderboard.js" data-game-key="farm-idle" defer></script>
 </head>
 <body>
 <header class="top">
@@ -596,7 +597,7 @@ setInterval(()=>{
   uiT+=dt; saveT+=dt;
   paintPlots(); paintBanner();
   if(uiT>=0.4){ uiT=0; refreshBtns(); }
-  if(saveT>=5){ saveT=0; checkAch(); save(); }
+  if(saveT>=5){ saveT=0; checkAch(); save(); try{ if(window.DHScores) DHScores.submit('farm-idle', S.life); }catch(_){} }
 },100);
 window.__farm={S:()=>S,harvestAll,plantAll,buyUp,buyCrop,buyTree,festival,fmt,CROPS,startRain,renderPanel,setTab:t=>{tab=t;renderPanel();}};
 })();

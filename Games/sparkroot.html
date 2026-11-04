@@ -202,6 +202,7 @@ canvas.fx{position:fixed;inset:0;pointer-events:none;z-index:45}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
+<script src="leaderboard.js" data-game-key="sparkroot" defer></script>
 </head>
 <body>
 <header class="top">
@@ -807,7 +808,7 @@ function closeModal() { $("modal").hidden = true; }
 $("modal").addEventListener("click", e => { if (e.target === $("modal")) closeModal(); });
 
 /* ---------- save ---------- */
-function save() { S.last = Date.now(); try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (_) {} }
+function save() { S.last = Date.now(); try { if (window.DHScores && S.allTotal > 0) DHScores.submit('sparkroot', S.allTotal); } catch (_) {} try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (_) {} }
 function load() {
   try { const raw = localStorage.getItem(SAVE_KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (_) {}
 }

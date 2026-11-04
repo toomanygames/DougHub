@@ -89,7 +89,8 @@
   .footer a:hover { color: #ffd76e; }
 </style>
 <script>window.t=function(key,data){var values={"common.bestScore":"Best score","bubbleShooter.first":"First","common.bestLabel":"Best","bubbleShooter.next":"NEXT","bubbleShooter.share":"I scored {n} in Bubble Shooter! {url}","common.copied":"Copied!","common.shareScore":"Share score"};var value=values[key]||key;if(data){Object.keys(data).forEach(function(k){value=value.replace(new RegExp("\\{"+k+"\\}","g"),data[k]);});}return value;};</script>
-<script src="../game-art.js" defer></script>\n</head>
+<script src="../game-art.js" defer></script>\n<script src="leaderboard.js" data-game-key="bubble-grove" defer></script>
+</head>
 <body>
 
 <div class="wrap" id="wrap">
@@ -416,6 +417,7 @@
     sfx.over();
     var isRecord = score > best;
     if (isRecord) { best = score; saveBest(best); }
+    try { if (window.DHScores) DHScores.submit('bubble-grove', Math.max(score, best), { now: true }); } catch (e) {}
     document.getElementById('medal').textContent = isRecord ? '👑' : (score >= 600 ? '🥇' : '🥉');
     document.getElementById('new-record').classList.toggle('hidden', !isRecord);
     document.getElementById('final-score').textContent = score;

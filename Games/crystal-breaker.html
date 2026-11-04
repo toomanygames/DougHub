@@ -88,7 +88,8 @@
   .footer a:hover { color: #ffd76e; }
 </style>
 <script>window.t=function(key,data){var values={"common.bestScore":"Best score","breakout.first":"First","common.bestLabel":"Best","breakout.share":"I scored {n} in Breakout! {url}","common.copied":"Copied!","common.shareScore":"Share score","breakout.launch":"Launch"};var value=values[key]||key;if(data){Object.keys(data).forEach(function(k){value=value.replace(new RegExp("\\{"+k+"\\}","g"),data[k]);});}return value;};</script>
-<script src="../game-art.js" defer></script>\n</head>
+<script src="../game-art.js" defer></script>\n<script src="leaderboard.js" data-game-key="crystal-breaker" defer></script>
+</head>
 <body>
 
 <div class="wrap" id="wrap">
@@ -357,6 +358,7 @@
     state = STATE.OVER;
     var isRecord = score > best;
     if (isRecord) { best = score; saveBest(best); }
+    try { if (window.DHScores) DHScores.submit('crystal-breaker', Math.max(score, best), { now: true }); } catch (e) {}
     document.getElementById('final-score').textContent = score;
     document.getElementById('new-record').classList.toggle('hidden', !isRecord);
     refreshBest();

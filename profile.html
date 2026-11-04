@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Showcase · DougHub</title>
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="auth-guard.js" data-require-auth="true"></script>
+<script src="nav.js?v=20261104-usability" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4;--accent:#818cf8;--gold:#ffd23f;
+  --common:#9ca3af;--uncommon:#4ade80;--rare:#60a5fa;--epic:#c084fc;--legendary:#fbbf24}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;color:#f5f6ff;background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
+body{padding:22px 14px 60px}
+a{color:inherit}
+main{width:min(1100px,100%);margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.top a{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#ffffff08;text-decoration:none;font-size:13px;font-weight:800;color:#c7d2fe}
+.hero{display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:18px;padding:18px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,#111631ed,#080b1bed);box-shadow:0 18px 48px #0004}
+.stage{position:relative;display:grid;place-items:center;min-height:330px;overflow:hidden;border-radius:18px;background:radial-gradient(circle at 50% 52%,#8c75ff4a,transparent 60%),linear-gradient(145deg,#354184,#18234a)}
+.stage.empty{color:#c7d2fe;text-align:center;padding:20px;font-size:14px}
+.avatar{position:relative;width:250px;height:250px;display:grid;place-items:center;transform:scale(1.1)}
+.animal{position:relative;z-index:2;width:215px;height:215px;object-fit:contain;filter:drop-shadow(0 13px 15px #0008)}
+.avatar.finish-gold .animal{filter:sepia(1) saturate(2.1) hue-rotate(2deg) brightness(1.08) drop-shadow(0 13px 15px #0008)}
+.avatar.finish-rainbow .animal{opacity:0}
+.avatar.finish-rainbow:after{content:"";position:absolute;z-index:3;left:50%;top:50%;width:215px;height:215px;transform:translate(-50%,-50%);background:linear-gradient(125deg,#ff5b68,#ffb84c 20%,#f5e65b 38%,#62d88c 56%,#58aaff 74%,#bb78ff 90%);-webkit-mask-image:var(--sprite);mask-image:var(--sprite);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;filter:drop-shadow(0 13px 15px #0008)}
+.overlay{position:absolute;pointer-events:none;display:grid;place-items:center}
+.overlay svg{width:100%;height:100%;overflow:visible}
+.overlay.back{z-index:1;left:3px;bottom:23px;width:245px;height:180px}
+.overlay.effect{z-index:0;inset:-5px;width:260px;height:260px}
+.overlay.headwear{z-index:4;top:5px;left:67px;width:116px;height:90px}
+.overlay.hair{z-index:4;top:20px;left:76px;width:100px;height:70px}
+.overlay.face{z-index:5;top:83px;left:65px;width:120px;height:80px}
+.overlay.neck{z-index:4;bottom:5px;left:72px;width:110px;height:72px}
+.overlay.outfit{z-index:4;bottom:19px;left:78px;width:95px;height:86px}
+.overlay.pants{z-index:5;bottom:1px;left:88px;width:76px;height:68px}
+.overlay.shoes{z-index:6;bottom:-3px;left:91px;width:70px;height:38px}
+.overlay img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 7px #0007)}
+.who{display:flex;flex-direction:column;gap:12px;min-width:0}
+.name{display:flex;align-items:center;gap:12px}
+.name img,.name .ph{width:54px;height:54px;border-radius:50%;object-fit:cover;background:#26305f;display:grid;place-items:center;font-weight:900;font-size:22px}
+h1{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;overflow-wrap:anywhere}
+.sub{color:var(--muted);font-size:13px}
+.feat-name{font-size:15px;font-weight:850}
+.rar{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:#ffffff14}
+.rar.common{color:var(--common)}.rar.uncommon{color:var(--uncommon)}.rar.rare{color:var(--rare)}.rar.epic{color:var(--epic)}.rar.legendary{color:var(--legendary)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat{padding:12px;border:1px solid var(--line);border-radius:14px;background:#ffffff06}
+.stat b{display:block;font-size:22px}
+.stat span{color:var(--muted);font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+button,.btn{padding:10px 15px;border:0;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font:inherit;font-weight:850;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.alt,button.alt{background:#ffffff12;border:1px solid var(--line)}
+button:disabled{opacity:.55;cursor:wait}
+h2{margin:30px 0 6px;font-size:18px}
+.hint{margin:0 0 12px;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
+.cc{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(160deg,#141a3a,#0a0e24);text-align:center;font:inherit;color:inherit;cursor:default}
+.cc.pick{cursor:pointer}
+.cc.pick:hover{border-color:#a5b4fc99;transform:translateY(-2px)}
+.cc.featured{border-color:var(--gold);box-shadow:0 0 0 2px #ffd23f55}
+.cc img{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 6px 6px #0006)}
+.cc.gold img{filter:sepia(1) saturate(2.1) hue-rotate(2deg) brightness(1.08) drop-shadow(0 6px 6px #0006)}
+.cc strong{font-size:12px}
+.cc .tag{position:absolute;top:6px;right:6px;padding:1px 6px;border-radius:999px;background:var(--gold);color:#3a2a14;font-size:8px;font-weight:950;letter-spacing:.06em}
+.cc .tag.feat{left:6px;right:auto;background:#fff;color:#2a2050}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08;font-size:13px}
+.chip b{font-size:18px}
+.chip small{color:var(--muted);display:block}
+.rows{display:grid;gap:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:#ffffff05;font-size:14px;text-decoration:none}
+.row:hover{border-color:#a5b4fc66}
+.row .rk{color:var(--gold);font-weight:900}
+.note{padding:22px;border:1px dashed var(--line);border-radius:16px;color:var(--muted);text-align:center}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:#c7d2fe}
+.toggle input{width:18px;height:18px;accent-color:#8b5cf6}
+.status{min-height:18px;font-size:13px;color:#a5b4fc}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.stage{min-height:300px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <a href="douggames.html">&larr; Games</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="leaderboards.html">Leaderboards</a>
+      <a href="Games/shop.html#seasonal">Seasonal shop</a>
+    </div>
+  </div>
+  <div id="view"><div class="note">Loading showcase...</div></div>
+</main>
+<script>
+(function () {
+"use strict";
+const URL = "https://agsqdqcsmsppcdqxlppj.supabase.co";
+const KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
+const db = window.supabase.createClient(URL, KEY);
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = u => /^(https:\/\/|\/?Games\/)/i.test(u || "") ? u : "";
+const SEASON_PACKS = ["halloween", "harvest", "winter", "valentine", "spring", "summer"];
+const CATS = ["back", "effect", "headwear", "hair", "face", "neck", "outfit", "pants", "shoes"];
+const SUF = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+function fmt(n) { n = Number(n) || 0; if (n < 1000) return String(Math.floor(n)); let i = 0; while (n >= 1000 && i < SUF.length - 1) { n /= 1000; i++; } return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + SUF[i]; }
+const BADGES = {
+  summer: ["Summer Badge", "A little sunshine for your profile."], spring: ["Spring Badge", "Fresh blooms for a fresh season."],
+  fall: ["Autumn Badge", "A collectible for the changing leaves."], winter: ["Winter Badge", "A cool collectible for winter."],
+  halloween: ["Halloween Badge", "A spooky seasonal collectible."], christmas: ["Christmas Badge", "A festive badge for the holidays."],
+  og: ["OG Badge", "A special badge awarded by DougHub staff."]
+};
+let showcase = null, rewards = {};
+
+function stageHtml(f) {
+  if (!f) return '<div class="stage empty">No character yet.<br>Open the shop to collect one!</div>';
+  const slots = CATS.map(cat => {
+    const item = (f.cosmetics || []).find(x => x.category === cat);
+    if (!item) return "";
+    const inner = item.art_url ? '<img src="' + esc(safeUrl(item.art_url)) + '" alt="">' : '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="Games/characters/accessories/sprite.svg#' + esc(item.art_key) + '"></use></svg>';
+    return '<div class="overlay ' + cat + '">' + inner + '</div>';
+  }).join("");
+  return '<div class="stage"><div class="avatar finish-' + esc(f.finish || "normal") + '" style="--sprite:url(' + JSON.stringify(safeUrl(f.art_path)).replace(/"/g, "&quot;") + ')">' + slots +
+    '<img class="animal" src="' + esc(safeUrl(f.art_path)) + '" alt="' + esc(f.name) + '"></div></div>';
+}
+
+function render() {
+  const d = showcase, v = $("view");
+  if (!d || !d.found) { v.innerHTML = '<div class="note">That player could not be found.</div>'; return; }
+  if (d.private) { v.innerHTML = '<div class="note"><b>' + esc(d.username) + '</b> keeps their showcase private.</div>'; return; }
+  document.title = d.username + " · Showcase · DougHub";
+  const f = d.featured, owned = d.characters || [], stats = d.stats || {};
+  const avatar = safeUrl(d.avatar_url) ? '<img src="' + esc(safeUrl(d.avatar_url)) + '" alt="">' : '<div class="ph">' + esc((d.username || "?")[0].toUpperCase()) + '</div>';
+  const link = location.origin + location.pathname + "?u=" + encodeURIComponent(d.username);
+  let h = '<section class="hero">' + stageHtml(f) + '<div class="who"><div class="name">' + avatar + '<div><h1>' + esc(d.username) + '</h1><div class="sub">' +
+    (f ? 'Showing off <span class="feat-name">' + esc(f.name) + '</span> <span class="rar ' + esc(f.rarity) + '">' + esc(f.rarity) + '</span>' + (f.finish && f.finish !== "normal" ? ' <span class="rar">' + esc(f.finish) + '</span>' : "") : "No featured character yet") + '</div></div></div>' +
+    '<div class="stats"><div class="stat"><b>' + (stats.owned || 0) + ' / ' + (stats.total || 0) + '</b><span>characters collected</span></div><div class="stat"><b>' + (stats.points || 0) + '</b><span>collector points</span></div><div class="stat"><b>' + ((d.badges || []).length + (d.custom_badges || []).length) + '</b><span>badges</span></div></div>' +
+    '<div class="actions"><button id="copyLink" type="button">Copy showcase link</button>' + (d.is_self ? '<a class="btn alt" href="Games/character-editor.html">Edit look</a><a class="btn alt" href="Games/shop.html">Collect more</a>' : "") + '</div>';
+  if (d.is_self) h += '<label class="toggle"><input id="pubToggle" type="checkbox"' + (d.showcase_public ? " checked" : "") + '> Let other members see my showcase</label><div class="status" id="pubStatus" role="status"></div>';
+  h += '</div></section>';
+
+  h += '<h2>Collection</h2><p class="hint">' + (d.is_self ? "Tap a character to feature it. Gold-tagged ones are limited seasonal editions." : "Gold-tagged characters are limited seasonal editions.") + '</p>';
+  if (!owned.length) h += '<div class="note">No characters collected yet.</div>';
+  else {
+    h += '<div class="grid">' + owned.map(c => {
+      const limited = SEASON_PACKS.indexOf(c.pack_type) >= 0, isFeat = f && f.character_id === c.character_id;
+      return '<' + (d.is_self ? 'button type="button"' : 'div') + ' class="cc ' + (d.is_self ? "pick " : "") + (isFeat ? "featured " : "") + (c.finish === "gold" ? "gold" : "") + '" data-char="' + esc(c.character_id) + '">' +
+        (isFeat ? '<span class="tag feat">FEATURED</span>' : (limited ? '<span class="tag">LIMITED</span>' : "")) +
+        '<img src="' + esc(safeUrl(c.art_path)) + '" alt="" loading="lazy"><strong>' + esc(c.name) + '</strong><span class="rar ' + esc(c.rarity) + '">' + esc(c.rarity) + '</span></' + (d.is_self ? "button" : "div") + '>';
+    }).join("") + '</div>';
+  }
+
+  h += '<h2>Badges</h2><p class="hint">Every character you collect adds a badge, and some badges unlock a limited character.</p><div class="chips">';
+  const nameOf = id => { const m = owned.find(x => x.character_id === id); return m ? m.name : id.replace(/_/g, " "); };
+  const special = (d.badges || []).filter(b => BADGES[b]);
+  const charBadges = (d.badges || []).filter(b => !BADGES[b]).length;
+  special.forEach(b => { const unlock = rewards[b]; h += '<div class="chip"><div><b>' + esc(BADGES[b][0]) + '</b><small>' + esc(BADGES[b][1]) + (unlock ? " Unlocks " + esc(nameOf(unlock)) + "." : "") + '</small></div></div>'; });
+  (d.custom_badges || []).forEach(b => { h += '<div class="chip"><span style="font-size:20px">' + esc(b.icon || "") + '</span><div><b>' + esc(b.name) + '</b><small>' + esc(b.description || "") + '</small></div></div>'; });
+  if (charBadges) h += '<div class="chip"><div><b>' + charBadges + ' character badge' + (charBadges === 1 ? "" : "s") + '</b><small>One for each character collected</small></div></div>';
+  if (!special.length && !charBadges && !(d.custom_badges || []).length) h += '<div class="note" style="width:100%">No badges yet.</div>';
+  h += '</div>';
+
+  h += '<h2>Leaderboard ranks</h2>';
+  if (!(d.scores || []).length) h += '<p class="hint">No scores yet. Play a game with a leaderboard to get on the board.</p>';
+  else h += '<div class="rows">' + d.scores.map(s => '<a class="row" href="leaderboards.html#' + esc(s.game_key) + '"><span>' + esc(s.title) + '</span><span><span class="rk">#' + esc(s.rank) + '</span> &nbsp; ' + fmt(s.score) + ' <small style="color:#9ba4c4">' + esc(s.unit || "") + '</small></span></a>').join("") + '</div>';
+  v.innerHTML = h;
+
+  const copy = $("copyLink");
+  if (copy) copy.onclick = async () => { try { await navigator.clipboard.writeText(link); copy.textContent = "Link copied"; } catch (_) { prompt("Copy this link", link); } setTimeout(() => { copy.textContent = "Copy showcase link"; }, 1800); };
+  if (d.is_self) {
+    v.querySelectorAll(".cc.pick").forEach(b => b.addEventListener("click", async () => {
+      const r = await db.rpc("dh_set_showcase", { p_character_id: b.dataset.char, p_public: d.showcase_public });
+      if (r.error) { alert(r.error.message); return; }
+      await load(d.username);
+    }));
+    const t = $("pubToggle");
+    if (t) t.addEventListener("change", async () => {
+      const r = await db.rpc("dh_set_showcase", { p_character_id: d.featured_character_id || null, p_public: t.checked });
+      $("pubStatus").textContent = r.error ? r.error.message : (t.checked ? "Your showcase is public." : "Your showcase is private.");
+      if (!r.error) showcase.showcase_public = t.checked;
+    });
+  }
+}
+
+async function load(name) {
+  try {
+    const [s, r] = await Promise.all([db.rpc("dh_public_showcase", { p_username: name }), db.from("dh_badge_character_rewards").select("badge_id,character_id")]);
+    if (s.error) throw s.error;
+    rewards = {}; (r.data || []).forEach(x => { rewards[x.badge_id] = x.character_id; });
+    showcase = s.data;
+    render();
+  } catch (e) { $("view").innerHTML = '<div class="note">Could not load the showcase: ' + esc(e.message || e) + '</div>'; }
+}
+
+(async function init() {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) { location.href = "log-in.html?redirect=" + encodeURIComponent(location.pathname + location.search); return; }
+  let name = new URLSearchParams(location.search).get("u");
+  if (!name) {
+    const { data } = await db.from("profiles").select("username").eq("id", session.user.id).maybeSingle();
+    name = data && data.username;
+    if (name) history.replaceState(null, "", "?u=" + encodeURIComponent(name));
+    db.rpc("dh_claim_badge_characters");
+  }
+  if (!name) { $("view").innerHTML = '<div class="note">Pick a username in Settings to get your showcase.</div>'; return; }
+  load(name);
+})();
+})();
+</script>
+</body>
+</html>
