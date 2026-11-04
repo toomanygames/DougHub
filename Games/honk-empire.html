@@ -172,7 +172,7 @@ img{-webkit-user-drag:none;user-select:none}
 
 /* ---- Side panel ---- */
 .panel{display:flex;flex-direction:column;min-height:0;background:var(--paper);border-left:4px solid var(--ink)}
-.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:10px 10px 8px;background:var(--paper-2);border-bottom:3px solid var(--ink);flex:0 0 auto}
+.tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px 10px 8px;background:var(--paper-2);border-bottom:3px solid var(--ink);flex:0 0 auto}
 .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;border:0;background:none;font-size:11.5px;font-weight:900;color:var(--ink-soft)}
 .tab .ti{display:grid;place-items:center;width:44px;height:44px;border:3px solid var(--ink);border-radius:13px;background:var(--tc);box-shadow:var(--hard-sm);transition:transform .1s}
 .tab .ti img{width:26px;height:26px}
@@ -181,7 +181,7 @@ img{-webkit-user-drag:none;user-select:none}
 .tab.active .ti{transform:translateY(2px);box-shadow:0 1px 0 var(--ink);outline:3px solid var(--butter);outline-offset:2px}
 .tab .dot{position:absolute;top:-4px;right:calc(50% - 26px);width:14px;height:14px;border:2px solid var(--ink);border-radius:50%;background:var(--berry);display:none}
 .tab.alert .dot{display:block;animation:pop .3s}
-.t-shop{--tc:var(--beak)}.t-pets{--tc:var(--leaf)}.t-worlds{--tc:var(--pond)}.t-rebirth{--tc:var(--plum)}.t-trophies{--tc:var(--butter)}.t-leaders{--tc:var(--berry)}
+.t-tree{--tc:var(--leaf-dk)}.t-shop{--tc:var(--beak)}.t-pets{--tc:var(--leaf)}.t-worlds{--tc:var(--pond)}.t-rebirth{--tc:var(--plum)}.t-trophies{--tc:var(--butter)}.t-leaders{--tc:var(--berry)}
 .tab-body{flex:1;min-height:0;overflow-y:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--paper-3) transparent}
 .h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 12px}
 .h h2{margin:0;font-family:var(--display);font-weight:600;font-size:21px}
@@ -236,6 +236,43 @@ img{-webkit-user-drag:none;user-select:none}
 .pet{position:relative;padding:8px 4px 7px;border:3px solid var(--ink);border-radius:14px;background:#fff;text-align:center;box-shadow:inset 0 -6px 0 var(--rc)}
 .pet.equipped{background:#fff6dc;outline:3px solid var(--beak);outline-offset:1px}
 .pet.golden{background:linear-gradient(160deg,#fff3c4,#fff)}
+/* Mutations: Golden < Diamond < Rainbow < Void < Doug */
+.pet.m1{background:linear-gradient(160deg,#fff1b8,#fff 70%)}
+.pet.m2{background:linear-gradient(160deg,#d7f6ff,#fff 70%);box-shadow:inset 0 -6px 0 var(--rc),0 0 0 2px #7fdcff}
+.pet.m3{background:linear-gradient(160deg,#ffd6e7,#fff2c2,#d7ffe0,#d8e6ff);box-shadow:inset 0 -6px 0 var(--rc),0 0 12px #ff8ad8aa}
+.pet.m3 .pe{display:inline-block;animation:hue 3s linear infinite}
+.pet.m4{background:radial-gradient(circle at 50% 35%,#5b2b8f,#1a1033 75%);color:#f2e8ff;box-shadow:inset 0 -6px 0 var(--rc),0 0 14px #7b3fe4}
+.pet.m4 .pb{color:#c9a7ff}
+.pet.m5{background:linear-gradient(160deg,#6366f1,#a855f7);color:#fff;box-shadow:inset 0 -6px 0 var(--butter),0 0 16px #a855f7cc}
+.pet.m5 .pb{color:#fff1a8}
+.pet .mut-tag{position:absolute;top:-8px;left:-6px;padding:0 5px;border:2px solid var(--ink);border-radius:7px;font-size:10px;font-weight:900;color:var(--ink);background:var(--mc,var(--butter));white-space:nowrap}
+@keyframes hue{to{filter:hue-rotate(360deg)}}
+.mut-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.mut-row span{padding:1px 6px;border:2px solid var(--ink);border-radius:6px;font-size:10px;font-weight:900;background:var(--mc)}
+/* Upgrade tree */
+.tree-legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px;font-size:12px;font-weight:800;color:var(--ink-soft)}
+.tree-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:2px solid var(--ink);border-radius:999px;background:#fff}
+.tree-wrap{position:relative;overflow:auto;border:3px solid var(--ink);border-radius:16px;background:radial-gradient(circle at 50% 100%,#e8f6d9,#fffaf0 70%);box-shadow:var(--hard);max-height:62vh}
+.tree-map{position:relative;margin:0 auto}
+.tree-map svg{position:absolute;inset:0;pointer-events:none}
+.tree-map line{stroke:#26283b33;stroke-width:5;stroke-linecap:round}
+.tree-map line.lit{stroke:var(--leaf);stroke-width:6}
+.tnode{position:absolute;width:62px;height:62px;margin:-31px 0 0 -31px;padding:0;border:3px solid var(--ink);border-radius:50%;display:grid;place-items:center;box-shadow:var(--hard-sm);transition:transform .1s}
+.tnode .em{width:34px;height:34px;vertical-align:0}
+.tnode.f{background:#efe2ff}.tnode.h{background:#fff1c9;border-radius:16px}
+.tnode .tl{position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);padding:0 6px;border:2px solid var(--ink);border-radius:999px;background:#fff;font-size:10.5px;font-weight:900;white-space:nowrap}
+.tnode .tc{position:absolute;top:-9px;right:-12px;padding:0 4px;border:2px solid var(--ink);border-radius:7px;font-size:10px;font-weight:900;background:#fff;white-space:nowrap}
+.tnode .tc .em{width:14px;height:14px}
+.tnode.locked{filter:grayscale(1);opacity:.45}
+.tnode.can{outline:3px solid var(--leaf);outline-offset:2px;animation:breathe 1.4s ease-in-out infinite}
+.tnode.maxed{background:var(--butter)}
+.tnode.sel{transform:scale(1.12)}
+.tnode:hover{transform:scale(1.08)}
+@keyframes breathe{50%{outline-color:#5fae4e55;outline-offset:5px}}
+.tree-info{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px;border:3px solid var(--ink);border-radius:16px;background:#fff;box-shadow:var(--hard)}
+.tree-info>.em{width:42px;height:42px;flex:0 0 42px}
+.tree-info .row-copy{flex:1}
+.tree-info .btn{flex:0 0 auto}
 .pet .pe .em{width:44px;height:44px;vertical-align:0}
 .pet .pn{display:block;font-size:11.5px;font-weight:900;line-height:1.2;margin-top:2px;min-height:28px}
 .pet .pb{display:block;font-size:11.5px;color:var(--leaf-dk);font-weight:900;margin-bottom:4px}
@@ -362,6 +399,7 @@ img{-webkit-user-drag:none;user-select:none}
  <aside class="panel">
   <nav class="tabs" role="tablist">
    <button class="tab active" data-tab="shop" type="button"><span class="ti t-shop"><img src="kenney/icon-shoppingCart.png" alt=""></span>Shop<span class="dot"></span></button>
+   <button class="tab" data-tab="tree" type="button"><span class="ti t-tree">🌳</span>Tree<span class="dot"></span></button>
    <button class="tab" data-tab="pets" type="button"><span class="ti t-pets">🥚</span>Pets<span class="dot"></span></button>
    <button class="tab" data-tab="worlds" type="button"><span class="ti t-worlds">🗺️</span>Worlds<span class="dot"></span></button>
    <button class="tab" data-tab="rebirth" type="button"><span class="ti t-rebirth"><img src="kenney/icon-return.png" alt=""></span>Rebirth<span class="dot"></span></button>
@@ -414,8 +452,43 @@ const RARITIES=[
  {name:"Rare",chance:25,boost:.25,color:"var(--r-rare)"},
  {name:"Epic",chance:11,boost:.6,color:"var(--r-epic)"},
  {name:"Legendary",chance:3.5,boost:1.5,color:"var(--r-legendary)"},
- {name:"Mythic",chance:.5,boost:4,color:"var(--r-mythic)"}
+ {name:"Mythic",chance:.5,boost:4,color:"var(--r-mythic)"},
+ {name:"Celestial",chance:.1,boost:10,color:"#2bb6c9"},
+ {name:"Secret",chance:.02,boost:25,color:"#26283b"}
 ];
+// Mutations go up one stage each time you fuse 3 matching pets (same pet, same mutation).
+const MUTATIONS=[
+ {name:"Normal",mult:1,chance:0,color:"#fff"},
+ {name:"Golden",mult:3,chance:4,color:"#f7c948"},
+ {name:"Diamond",mult:8,chance:1,color:"#7fdcff"},
+ {name:"Rainbow",mult:20,chance:.3,color:"linear-gradient(90deg,#ff8a8a,#ffd36b,#8be38b,#7fb8ff,#c99bff)"},
+ {name:"Void",mult:50,chance:.08,color:"#9b6bff"},
+ {name:"Doug",mult:150,chance:.01,color:"#c4b5fd"}
+];
+/* Upgrade tree. Feather (🪶) upgrades are strong and permanent.
+   Coin (🪙) upgrades are weaker and reset when you rebirth. x/y are grid positions. */
+const TREE=[
+ {id:"f_prod",cur:"f",name:"Feather Power",icon:"🪶",x:3,y:6,parents:[],max:20,cost:l=>Math.ceil(Math.pow(1.45,l)),desc:l=>"+25% production per level (now +"+25*l+"%)"},
+ {id:"h_prod",cur:"h",name:"Bread Budget",icon:"🍞",x:1.2,y:6,parents:[],max:25,cost:l=>1e3*Math.pow(1.6,l),desc:l=>"+5% production per level (now +"+5*l+"%)"},
+ {id:"h_click",cur:"h",name:"Beak Polish",icon:"🧽",x:4.8,y:6,parents:[],max:20,cost:l=>500*Math.pow(1.55,l),desc:l=>"+10% click power per level (now +"+10*l+"%)"},
+ {id:"h_egg",cur:"h",name:"Coupon Clipping",icon:"✂️",x:0.3,y:4.9,parents:["h_prod"],max:10,cost:l=>2e4*Math.pow(2,l),desc:l=>"Eggs 2% cheaper per level (now -"+2*l+"%)"},
+ {id:"f_luck",cur:"f",name:"Lucky Egg",icon:"🍀",x:2.1,y:4.9,parents:["f_prod"],max:8,cost:l=>2+2*l,desc:l=>"Rare pets 25% more likely per level (now +"+25*l+"%)"},
+ {id:"f_click",cur:"f",name:"Mighty Beak",icon:"💪",x:3.9,y:4.9,parents:["f_prod"],max:10,cost:l=>Math.ceil(2*Math.pow(1.5,l)),desc:l=>"Clicks x1.5 per level (now x"+(Math.pow(1.5,l)).toFixed(2)+")"},
+ {id:"f_egg",cur:"f",name:"Egg Coupon",icon:"🏷️",x:5.7,y:4.9,parents:["h_click"],max:5,cost:l=>3+3*l,desc:l=>"Eggs 10% cheaper per level (now -"+10*l+"%)"},
+ {id:"h_luck",cur:"h",name:"Four-Leaf Bread",icon:"🍀",x:0.9,y:3.8,parents:["f_luck"],max:10,cost:l=>5e4*Math.pow(2,l),desc:l=>"Rare pets 5% more likely per level (now +"+5*l+"%)"},
+ {id:"f_mut",cur:"f",name:"Shiny Hatch",icon:"✨",x:2.4,y:3.6,parents:["f_luck"],max:6,cost:l=>4+4*l,desc:l=>"Mutations 50% more likely when hatching, per level (now +"+50*l+"%)"},
+ {id:"f_crit",cur:"f",name:"Crit Honk",icon:"💥",x:4.1,y:3.6,parents:["f_click"],max:5,cost:l=>3+3*l,desc:l=>"+3% crit chance per level (now +"+3*l+"%)"},
+ {id:"h_mut",cur:"h",name:"Glitter Snack",icon:"🍬",x:1.1,y:2.5,parents:["f_mut"],max:10,cost:l=>1e5*Math.pow(2.2,l),desc:l=>"Mutations 10% more likely per level (now +"+10*l+"%)"},
+ {id:"f_slot",cur:"f",name:"Pet Pen",icon:"🐾",x:3.2,y:2.4,parents:["f_mut","f_crit"],max:3,cost:l=>10*Math.pow(2,l),desc:l=>"+1 pet slot per level (now +"+l+")"},
+ {id:"f_start",cur:"f",name:"Head Start",icon:"🚀",x:5.3,y:3.4,parents:["f_crit","f_egg"],max:4,cost:l=>5*(l+1),desc:l=>"Start every rebirth with "+(l?fmt(1e4*Math.pow(10,l-1)):"0")+" honks"},
+ {id:"f_fuse",cur:"f",name:"Fusion Lab",icon:"⚗️",x:2.2,y:1.3,parents:["f_slot"],max:3,cost:l=>15*(l+1),desc:l=>"Fusing has a "+10*l+"% chance to jump 2 mutation stages"},
+ {id:"f_nap",cur:"f",name:"Nest Egg",icon:"😴",x:4.2,y:1.3,parents:["f_slot"],max:4,cost:l=>6*(l+1),desc:l=>"Away earnings last "+(2+2*l)+"h at "+(50+10*l)+"% speed"},
+ {id:"f_feather",cur:"f",name:"Feather Duster",icon:"🪶",x:5.6,y:2.1,parents:["f_start"],max:10,cost:l=>Math.ceil(8*Math.pow(1.4,l)),desc:l=>"+20% feathers from rebirth per level (now +"+20*l+"%)"},
+ {id:"f_doug",cur:"f",name:"Doug's Blessing",icon:"👑",x:3.2,y:0.2,parents:["f_fuse","f_nap","f_feather"],max:1,cost:()=>250,desc:()=>"x5 production and Doug mutations 3x more likely"}
+];
+const TREEMAP=Object.fromEntries(TREE.map(n=>[n.id,n]));
+// Coin prices grow with your best world so coin upgrades stay a real choice.
+const COIN_SCALE=[1,50,5e3,5e5,5e7];
 // One pet per rarity per world (index = rarity).
 const PETS=[
  [["Bread Slice","🍞"],["Frog in a Hat","🐸"],["Suspicious Duck","🦆"],["Swan (Evil)","🦢"],["Pond Overlord","🐉"]],
@@ -424,6 +497,8 @@ const PETS=[
  [["Moon Cheese","🧀"],["Space Rock","🪨"],["Alien Intern","👽"],["Astro Goose","🚀"],["The Sun (Small)","☀️"]],
  [["Missing Texture","🟪"],["NaN Goose","❓"],["404 Error","🚫"],["Goose.exe","💾"],["The Developer","🧑‍💻"]]
 ];
+// Celestial and Secret pets, one per world.
+[[["Lake Fairy","🧚"],["The First Goose","🪿"]],[["Ice Cream Truck","🍦"],["Flamingo King","🦩"]],[["Dragon Knight","🐲"],["The Holy Bread Cup","🏆"]],[["Comet Goose","☄️"],["Black Hole","🕳️"]],[["Admin Panel","🛠️"],["Doug Himself","😎"]]].forEach((extra,w)=>PETS[w].push(...extra));
 const HOURLY=[
  {id:"honkhour",name:"Happy Honk Hour",icon:"🎉",desc:"production x2"},
  {id:"lucky",name:"Lucky Hour",icon:"🍀",desc:"pet luck x3"},
@@ -480,7 +555,15 @@ const ACH=[
  {id:"pet50",name:"Egg Addict",desc:"Hatch 50 eggs.",test:s=>s.stats.eggs>=50},
  {id:"leg",name:"Lucky Duck (It's a Goose)",desc:"Hatch a Legendary pet.",test:s=>s.pets.some(p=>p.r>=3)},
  {id:"myth",name:"Statistically Impossible",desc:"Hatch a Mythic pet.",test:s=>s.pets.some(p=>p.r>=4)},
- {id:"gold",name:"Goldfinger",desc:"Fuse a Golden pet.",test:s=>s.pets.some(p=>p.g)},
+ {id:"gold",name:"Goldfinger",desc:"Get a Golden pet.",test:s=>s.pets.some(p=>p.m>=1)},
+ {id:"diamond",name:"Shine Bright",desc:"Get a Diamond pet.",test:s=>s.pets.some(p=>p.m>=2)},
+ {id:"rainbow",name:"Taste the Rainbow",desc:"Get a Rainbow pet.",test:s=>s.pets.some(p=>p.m>=3)},
+ {id:"void",name:"Stare Into the Void",desc:"Get a Void pet.",test:s=>s.pets.some(p=>p.m>=4)},
+ {id:"doug",name:"It's Doug",desc:"Get a Doug pet. The rarest mutation there is.",test:s=>s.pets.some(p=>p.m>=5)},
+ {id:"celestial",name:"Written in the Stars",desc:"Hatch a Celestial pet.",test:s=>s.pets.some(p=>p.r>=5)},
+ {id:"secretpet",name:"Shhh",desc:"Hatch a Secret pet.",test:s=>s.pets.some(p=>p.r>=6)},
+ {id:"tree1",name:"Branching Out",desc:"Buy a tree upgrade.",test:s=>Object.keys(s.tree||{}).length>=1},
+ {id:"treeDoug",name:"Blessed",desc:"Unlock Doug's Blessing.",test:s=>(s.tree||{}).f_doug>=1},
  {id:"bread10",name:"Carb Loader",desc:"Catch 10 Golden Breads.",test:s=>s.stats.breads>=10},
  {id:"invade",name:"Goose Patrol",desc:"Catch 25 invading geese.",test:s=>s.stats.invaders>=25},
  {id:"secret",name:"Secret Honker",desc:"Type the magic word.",test:s=>!!s.stats.secret},
@@ -492,9 +575,9 @@ const ACH=[
 ];
 
 /* ---------- State ---------- */
-function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,music:true,arcade:{},buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false,maxCombo:false,concert:false}};}
+function freshState(){return{v:1,honks:0,run:0,lifetime:0,clicks:0,feathers:0,rebirths:0,gens:GENERATORS.map(()=>0),clickLvl:0,worlds:1,world:0,pets:[],equipped:[],tree:{},featherTotal:0,ach:{},lastSave:Date.now(),lastDaily:"",playMs:0,muted:false,music:true,arcade:{},buyAmt:1,nextPetId:1,stats:{crits:0,eggs:0,breads:0,invaders:0,titleClicks:0,muteToggles:0,secret:false,taxed:false,maxCombo:false,concert:false}};}
 let S=freshState();
-try{const raw=localStorage.getItem(SAVE_KEY);if(raw){const loaded=JSON.parse(raw);S=Object.assign(freshState(),loaded);S.stats=Object.assign(freshState().stats,loaded.stats||{});while(S.gens.length<GENERATORS.length)S.gens.push(0);}}catch(e){console.warn("Honk Empire save could not load",e);}
+try{const raw=localStorage.getItem(SAVE_KEY);if(raw){const loaded=JSON.parse(raw);S=Object.assign(freshState(),loaded);S.stats=Object.assign(freshState().stats,loaded.stats||{});while(S.gens.length<GENERATORS.length)S.gens.push(0);S.tree=S.tree||{};if(!loaded.featherTotal)S.featherTotal=S.feathers;S.pets.forEach(p=>{if(p.m==null)p.m=p.g?1:0;delete p.g;});}}catch(e){console.warn("Honk Empire save could not load",e);}
 function save(){S.lastSave=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
 
 /* ---------- Numbers ---------- */
@@ -519,12 +602,15 @@ function hourly(){return HOURLY[Math.floor(Date.now()/3600000)%HOURLY.length];}
 function hourlyLeft(){return 3600000-(Date.now()%3600000);}
 
 /* ---------- Multipliers ---------- */
-function petBonus(p){const base=RARITIES[p.r].boost*(1+p.w*.6);return p.g?base*3:base;}
+function tl(id){return S.tree[id]||0;}
+function petBonus(p){return RARITIES[p.r].boost*(1+p.w*.6)*MUTATIONS[p.m||0].mult;}
 function petMult(){return 1+S.equipped.map(id=>S.pets.find(p=>p.id===id)).filter(Boolean).reduce((a,p)=>a+petBonus(p),0);}
-function slots(){return 3+(S.rebirths>=2?1:0)+(S.rebirths>=5?1:0)+(S.rebirths>=10?1:0);}
+function slots(){return 3+(S.rebirths>=2?1:0)+(S.rebirths>=5?1:0)+(S.rebirths>=10?1:0)+tl("f_slot");}
+function treeMult(){return(1+.25*tl("f_prod"))*(1+.05*tl("h_prod"))*(tl("f_doug")?5:1);}
 function achCount(){return Object.keys(S.ach).length;}
 function globalMult(){
- let m=WORLDS[S.worlds-1].mult*(1+.1*S.feathers)*petMult()*(1+.02*achCount());
+ // Feathers count everything you've ever earned, so spending them on the tree never lowers production.
+ let m=WORLDS[S.worlds-1].mult*(1+.1*S.featherTotal)*petMult()*(1+.02*achCount())*treeMult();
  if(hourly().id==="honkhour")m*=2;
  buffs.forEach(b=>m*=b.prod);
  return m;
@@ -534,11 +620,11 @@ function baseCps(){return GENERATORS.reduce((a,g,i)=>a+g.cps*S.gens[i]*genMilest
 function cps(){return baseCps()*globalMult();}
 function clickPower(){
  const base=(1+S.clickLvl)*Math.pow(2,Math.floor(S.clickLvl/10));
- let v=(base+baseCps()*.04)*globalMult();
+ let v=(base+baseCps()*.04)*globalMult()*Math.pow(1.5,tl("f_click"))*(1+.1*tl("h_click"));
  buffs.forEach(b=>v*=b.click);
  return v;
 }
-function critChance(){return hourly().id==="crit"?.2:.05;}
+function critChance(){return(hourly().id==="crit"?.2:.05)+.03*tl("f_crit");}
 
 /* ---------- Costs ---------- */
 function genCost(i,n=1){const g=GENERATORS[i];let total=0;for(let k=0;k<n;k++)total+=g.cost*Math.pow(1.15,S.gens[i]+k);return total;}
@@ -547,8 +633,8 @@ function clickCost(){return 50*Math.pow(1.6,S.clickLvl);}
 // Eggs cost 5% of the honks you have now, never less than the world's starting price, so they stay
 // worth thinking about as you get rich without ever being out of reach.
 const EGG_SHARE=.05;
-function eggCost(w){let c=Math.max(WORLDS[w].eggCost,S.honks*EGG_SHARE);if(hourly().id==="eggsale")c*=.6;return c;}
-function rebirthGain(){return S.run<1e7?0:Math.floor(Math.sqrt(S.run/1e7));}
+function eggCost(w){let c=Math.max(WORLDS[w].eggCost,S.honks*EGG_SHARE);if(hourly().id==="eggsale")c*=.6;return c*(1-.1*tl("f_egg"))*(1-.02*tl("h_egg"));}
+function rebirthGain(){return S.run<1e7?0:Math.floor(Math.sqrt(S.run/1e7)*(1+.2*tl("f_feather")));}
 function earn(n){S.honks+=n;S.run+=n;S.lifetime+=n;}
 
 /* ---------- Sound ---------- */
@@ -916,33 +1002,66 @@ function spawnInvasion(){
 
 /* ---------- Pets ---------- */
 function rollRarity(){
- const luck=hourly().id==="lucky"?3:1;
+ const luck=(hourly().id==="lucky"?3:1)*(1+.25*tl("f_luck")+.05*tl("h_luck"));
  const w=RARITIES.map((r,i)=>i===0?r.chance:r.chance*luck),total=w.reduce((a,b)=>a+b,0);
  let x=Math.random()*total;for(let i=0;i<w.length;i++){if((x-=w[i])<0)return i;}return 0;
 }
+function rollMutation(){
+ const boost=1+.5*tl("f_mut")+.1*tl("h_mut");
+ for(let m=MUTATIONS.length-1;m>=1;m--){const c=MUTATIONS[m].chance*boost*(m===5&&tl("f_doug")?3:1);if(Math.random()*100<c)return m;}
+ return 0;
+}
+function petName(p){const d=PETS[p.w][p.r];return(p.m?MUTATIONS[p.m].name+" ":"")+d[0];}
 function hatch(w,free=false){
  if(!free){const c=eggCost(w);if(S.honks<c)return;S.honks-=c;}
- const r=rollRarity(),pet={id:S.nextPetId++,w,r,g:false};
+ const r=rollRarity(),pet={id:S.nextPetId++,w,r,m:rollMutation()};
  S.pets.push(pet);S.stats.eggs++;
  if(S.equipped.length<slots())S.equipped.push(pet.id);
  showHatch(pet,free);save();render(true);
 }
 function showHatch(pet,free){
- const def=PETS[pet.w][pet.r],rar=RARITIES[pet.r];
+ const def=PETS[pet.w][pet.r],rar=RARITIES[pet.r],mut=MUTATIONS[pet.m||0];
  openModal(`<div class="art-big hatch-egg shake">🥚</div><h2>${free?"Free egg!":"Hatching…"}</h2><p>${WORLDS[pet.w].egg}</p>`,false);
  honkSound(.7,.3);
  setTimeout(()=>{
-  openModal(`<div class="art-big ${pet.r>=2?"rays":""}"><span class="reveal">${def[1]}</span></div><h2>${def[0]}</h2><p><span class="rarity" style="--rc:${rar.color}">${rar.name.toUpperCase()}</span><br><br>+${Math.round(petBonus(pet)*100)}% production${S.equipped.includes(pet.id)?" · auto-equipped":""}</p><button class="btn leaf" type="button" data-close>Nice</button>`);
-  if(pet.r>=3){chime();setTimeout(chime,300);}else honkSound(1.3,.1);
+  openModal(`<div class="art-big ${pet.r>=2?"rays":""}"><span class="reveal">${def[1]}</span></div><h2>${petName(pet)}</h2><p><span class="rarity" style="--rc:${rar.color}">${rar.name.toUpperCase()}</span>${pet.m?` <span class="rarity" style="--rc:#26283b">${mut.name.toUpperCase()} x${mut.mult}</span>`:""}<br><br>+${Math.round(petBonus(pet)*100)}% production${S.equipped.includes(pet.id)?" · auto-equipped":""}</p><button class="btn leaf" type="button" data-close>Nice</button>`);
+  if(pet.r>=3||pet.m>=2){chime();setTimeout(chime,300);}else honkSound(1.3,.1);
  },1500);
 }
 function autoEquip(){S.equipped=[...S.pets].sort((a,b)=>petBonus(b)-petBonus(a)).slice(0,slots()).map(p=>p.id);}
+function fuseGroups(){const groups={};S.pets.forEach(p=>{if((p.m||0)>=MUTATIONS.length-1)return;const k=p.w+"-"+p.r+"-"+(p.m||0);(groups[k]=groups[k]||[]).push(p);});return groups;}
+function fusableCount(){return Object.values(fuseGroups()).reduce((a,g)=>a+Math.floor(g.length/3),0);}
 function fuseAll(){
- let fused=0,again=true;
- while(again){again=false;const groups={};S.pets.filter(p=>!p.g).forEach(p=>{(groups[p.w+"-"+p.r]=groups[p.w+"-"+p.r]||[]).push(p);});
-  for(const k in groups){if(groups[k].length>=3){const [a,b,c]=groups[k];S.pets=S.pets.filter(p=>p!==b&&p!==c);a.g=true;S.equipped=S.equipped.filter(id=>id!==b.id&&id!==c.id);fused++;again=true;}}}
- if(fused){autoEquip();chime();toast("✨ Fused "+fused+" Golden pet"+(fused>1?"s":"")+"!","gold");}else toast("Need 3 of the same pet to fuse a Golden one.");
+ let fused=0,best=0,again=true,jumps=0;
+ while(again){again=false;const groups=fuseGroups();
+  for(const k in groups){const g=groups[k];while(g.length>=3){
+   // Keep an equipped pet as the survivor when there is one.
+   g.sort((x,y)=>S.equipped.includes(y.id)-S.equipped.includes(x.id));
+   const [a,b,c]=g.splice(0,3);
+   S.pets=S.pets.filter(p=>p!==b&&p!==c);S.equipped=S.equipped.filter(id=>id!==b.id&&id!==c.id);
+   const jump=Math.random()<.1*tl("f_fuse")?2:1;if(jump===2)jumps++;
+   a.m=Math.min(MUTATIONS.length-1,(a.m||0)+jump);best=Math.max(best,a.m);fused++;again=true;}}}
+ if(fused){S.stats.fused=(S.stats.fused||0)+fused;autoEquip();chime();toast("✨ Fused "+fused+" pet"+(fused>1?"s":"")+"! Best: "+MUTATIONS[best].name+(jumps?" ("+jumps+" lucky double jump"+(jumps>1?"s":"")+")":""),"gold");}
+ else toast("Fusing needs 3 of the same pet with the same mutation.");
  render(true);
+}
+
+/* ---------- Upgrade tree ---------- */
+function treeUnlocked(n){return n.parents.every(p=>tl(p)>=1);}
+function treeCost(n){const l=tl(n.id);return n.cur==="h"?n.cost(l)*COIN_SCALE[S.worlds-1]:n.cost(l);}
+function treeCan(n){if(!treeUnlocked(n)||tl(n.id)>=n.max)return false;return n.cur==="h"?S.honks>=treeCost(n):S.feathers>=treeCost(n);}
+let treeSel="f_prod";
+function buyTree(id){
+ const n=TREEMAP[id],wasSel=treeSel===id;treeSel=id;
+ // First tap on a node just selects it; tapping the selected node (or its price button) buys it.
+ if(!wasSel){render(true);return;}
+ if(!treeCan(n)){render(true);return;}
+ const c=treeCost(n);
+ if(n.cur==="h")S.honks-=c;else S.feathers-=c;
+ S.tree[id]=tl(id)+1;
+ if(id==="f_slot")autoEquip();
+ chime();toast(n.icon+" "+n.name+" is now level "+tl(id)+"!",n.cur==="f"?"gold":"");
+ save();render(true);
 }
 
 /* ---------- Worlds & rebirth ---------- */
@@ -956,9 +1075,10 @@ function applyWorld(){
 }
 function rebirth(){
  const gain=rebirthGain();if(!gain)return;
- openModal(`<div class="art-big rays">🪶</div><h2>Rebirth for ${fmt(gain)} feather${gain>1?"s":""}?</h2><p>Your honks, buildings and beak upgrades reset. You keep pets, worlds, feathers and trophies.</p><button class="btn plum" type="button" id="confirmRebirth">Rebirth!</button><button class="btn ghost" type="button" data-close>Not yet</button>`);
+ openModal(`<div class="art-big rays">🪶</div><h2>Rebirth for ${fmt(gain)} feather${gain>1?"s":""}?</h2><p>Your honks, buildings, beak upgrades and 🪙 coin tree upgrades reset. You keep pets, worlds, feathers, 🪶 feather tree upgrades and trophies.</p><button class="btn plum" type="button" id="confirmRebirth">Rebirth!</button><button class="btn ghost" type="button" data-close>Not yet</button>`);
  $("confirmRebirth").addEventListener("click",()=>{
-  S.feathers+=gain;S.rebirths++;S.honks=0;S.run=0;S.gens=GENERATORS.map(()=>0);S.clickLvl=0;buffs=[];
+  S.feathers+=gain;S.featherTotal+=gain;S.rebirths++;S.honks=tl("f_start")?1e4*Math.pow(10,tl("f_start")-1):0;S.run=0;S.gens=GENERATORS.map(()=>0);S.clickLvl=0;buffs=[];
+  TREE.forEach(n=>{if(n.cur==="h")delete S.tree[n.id];});
   closeModal();chime();setTimeout(chime,250);toast("♻️ Reborn! +"+fmt(gain)+" Golden Feathers","gold");
   const r=stage.getBoundingClientRect();burst(r.width/2,r.height/2,true);
   if([2,5,10].includes(S.rebirths))toast("🐾 New pet slot unlocked!","gold");
@@ -971,8 +1091,8 @@ function today(){return new Date().toISOString().slice(0,10);}
 function claimDaily(){if(S.lastDaily===today())return;S.lastDaily=today();const v=Math.max(100,cps()*600);earn(v);toast("🎁 Daily gift: +"+fmt(v)+" honks and a free egg!","gold");hatch(S.world,true);}
 function offlineEarnings(){
  const away=Date.now()-(S.lastSave||Date.now());if(away<60000)return;
- const v=cps()*Math.min(away,2*3600000)/1000*.5;if(v<1)return;earn(v);
- openModal(`<div class="art-big">😴</div><h2>Welcome back!</h2><p>While you were gone (${fmtTime(Math.min(away,7200000))}${away>7200000?", max 2h":""}), your geese honked <b>${fmt(v)}</b> honks.</p><button class="btn" type="button" data-close>HONK</button>`);
+ const cap=(2+2*tl("f_nap"))*3600000,v=cps()*Math.min(away,cap)/1000*(.5+.1*tl("f_nap"));if(v<1)return;earn(v);
+ openModal(`<div class="art-big">😴</div><h2>Welcome back!</h2><p>While you were gone (${fmtTime(Math.min(away,cap))}${away>cap?", max "+cap/3600000+"h":""}), your geese honked <b>${fmt(v)}</b> honks.</p><button class="btn" type="button" data-close>HONK</button>`);
 }
 
 /* ---------- Achievements ---------- */
@@ -998,11 +1118,13 @@ $("tabBody").addEventListener("click",e=>{
  else if(a.equip){const id=+a.equip;if(S.equipped.includes(id))S.equipped=S.equipped.filter(x=>x!==id);else if(S.equipped.length<slots())S.equipped.push(id);else toast("All "+slots()+" pet slots are full. Unequip one first.");render(true);}
  else if(a.action==="autoequip"){autoEquip();toast("Equipped your best pets.");render(true);}
  else if(a.action==="fuse")fuseAll();
+ else if(a.tnode)buyTree(a.tnode);
+ else if(a.tbuy){treeSel=a.tbuy;buyTree(a.tbuy);}
  else if(a.unlock!==undefined)unlockWorld(+a.unlock);
  else if(a.travel!==undefined)travel(+a.travel);
  else if(a.action==="rebirth")rebirth();
  else if(a.lb){lbMode=a.lb;render(true);}
- else if(a.action==="reset"){if(confirm("Delete ALL Honk Empire progress? This cannot be undone.")){localStorage.removeItem(SAVE_KEY);S=freshState();buffs=[];applyWorld();render(true);}}
+ else if(a.action==="reset"){if(confirm("Delete ALL Honk Empire progress? This cannot be undone.")){localStorage.removeItem(SAVE_KEY);S=freshState();treeSel="f_prod";buffs=[];applyWorld();render(true);}}
 });
 $("rebHud").addEventListener("click",e=>{if(e.target.closest(".reb-ready"))goTab("rebirth");});
 
@@ -1022,16 +1144,35 @@ function shopHTML(){
  });
  return h;
 }
+function rarityOdds(){const luck=(hourly().id==="lucky"?3:1)*(1+.25*tl("f_luck")+.05*tl("h_luck"));const w=RARITIES.map((r,i)=>i===0?r.chance:r.chance*luck),t=w.reduce((a,b)=>a+b,0);return w.map(x=>x/t*100);}
+function mutChance(m){return MUTATIONS[m].chance*(1+.5*tl("f_mut")+.1*tl("h_mut"))*(m===5&&tl("f_doug")?3:1);}
 function petsHTML(){
  const w=S.world,c=eggCost(w),can=S.honks>=c,luck=hourly().id==="lucky";
- let h=`<div class="egg-card"><span class="egg">🥚</span><span class="row-copy"><strong>${WORLDS[w].egg}</strong><small>Pets from ${WORLDS[w].name}. Later worlds hatch stronger pets. Eggs cost 5% of your honks (at least ${fmt(WORLDS[w].eggCost)}).</small><span class="odds">${RARITIES.map((r,i)=>`<span style="--rc:${r.color}">${r.name} ${luck&&i?(r.chance*3).toFixed(1):r.chance}%</span>`).join("")}</span></span><button class="btn leaf small" type="button" data-egg="${w}" ${can?"":"disabled"}>${HONK}${fmt(c)}</button></div>`;
+ let h=`<div class="egg-card"><span class="egg">🥚</span><span class="row-copy"><strong>${WORLDS[w].egg}</strong><small>Pets from ${WORLDS[w].name}. Later worlds hatch stronger pets. Eggs cost 5% of your honks (at least ${fmt(WORLDS[w].eggCost)}).</small><span class="odds">${rarityOdds().map((pct,i)=>`<span style="--rc:${RARITIES[i].color}">${RARITIES[i].name} ${pct<.1?pct.toFixed(2):pct<1?pct.toFixed(1):Math.round(pct)}%</span>`).join("")}</span><span class="mut-row">${MUTATIONS.slice(1).map((m,i)=>`<span style="--mc:${m.color}">${m.name} x${m.mult} · ${mutChance(i+1).toFixed(mutChance(i+1)<.1?2:1)}%</span>`).join("")}</span></span><button class="btn leaf small" type="button" data-egg="${w}" ${can?"":"disabled"}>${HONK}${fmt(c)}</button></div>`;
  h+=`<div class="h"><h2>Your pets</h2><small>${S.equipped.length}/${slots()} equipped · x${petMult().toFixed(2)}</small></div>`;
- h+=`<div class="pet-actions"><button class="btn ghost small" style="flex:1" type="button" data-action="autoequip">Equip best</button><button class="btn small" style="flex:1;background:var(--butter);color:var(--ink);text-shadow:none" type="button" data-action="fuse">Fuse 3 into Golden</button></div>`;
+ h+=`<div class="pet-actions"><button class="btn ghost small" style="flex:1" type="button" data-action="autoequip">Equip best</button><button class="btn small" style="flex:1;background:var(--butter);color:var(--ink);text-shadow:none" type="button" data-action="fuse">Fuse 3 → next mutation${fusableCount()?" ("+fusableCount()+")":""}</button></div><p class="hint" style="margin:-4px 0 10px">Fuse 3 of the same pet with the same mutation into 1 pet one stage better: Normal → Golden x3 → Diamond x8 → Rainbow x20 → Void x50 → Doug x150.</p>`;
  if(!S.pets.length)return h+`<p class="notice">No pets yet. Hatch an egg! Pets stay with you forever, even after rebirth.</p>`;
  const sorted=[...S.pets].sort((a,b)=>(S.equipped.includes(b.id)-S.equipped.includes(a.id))||petBonus(b)-petBonus(a));
- h+=`<div class="pet-grid">`+sorted.slice(0,120).map(p=>{const d=PETS[p.w][p.r],on=S.equipped.includes(p.id);return`<button type="button" class="pet ${on?"equipped":""} ${p.g?"golden":""}" style="--rc:${RARITIES[p.r].color}" data-equip="${p.id}" title="${RARITIES[p.r].name}: click to ${on?"unequip":"equip"}">${p.g?`<span class="gold-tag">GOLD</span>`:""}${on?`<span class="badge">${ki("checkmark")}</span>`:""}<span class="pe">${d[1]}</span><span class="pn">${d[0]}</span><span class="pb">+${Math.round(petBonus(p)*100)}%</span></button>`;}).join("")+`</div>`;
+ h+=`<div class="pet-grid">`+sorted.slice(0,120).map(p=>{const d=PETS[p.w][p.r],on=S.equipped.includes(p.id);return`<button type="button" class="pet ${on?"equipped":""} m${p.m||0}" style="--rc:${RARITIES[p.r].color}" data-equip="${p.id}" title="${MUTATIONS[p.m||0].name} ${RARITIES[p.r].name}: click to ${on?"unequip":"equip"}">${p.m?`<span class="mut-tag" style="--mc:${MUTATIONS[p.m].color}">${MUTATIONS[p.m].name.toUpperCase()}</span>`:""}${on?`<span class="badge">${ki("checkmark")}</span>`:""}<span class="pe">${d[1]}</span><span class="pn">${d[0]}</span><span class="pb">+${Math.round(petBonus(p)*100)}%</span></button>`;}).join("")+`</div>`;
  if(S.pets.length>120)h+=`<p class="hint" style="margin-top:8px">Showing your best 120 of ${S.pets.length} pets.</p>`;
  return h;
+}
+function treeHTML(){
+ const PAD=40,minX=Math.min(...TREE.map(n=>n.x)),maxX=Math.max(...TREE.map(n=>n.x)),maxY=Math.max(...TREE.map(n=>n.y));
+ // Fit the tree to the panel width (columns squeeze, rows keep their spacing).
+ const avail=Math.max(300,($("tabBody").clientWidth||420)-36),UX=Math.max(52,Math.min(80,(avail-PAD*2)/(maxX-minX))),U=72;
+ const W=(maxX-minX)*UX+PAD*2,H=maxY*U+PAD*2+10,pos=n=>[(n.x-minX)*UX+PAD,n.y*U+PAD];
+ let lines="";TREE.forEach(n=>n.parents.forEach(pid=>{const p=TREEMAP[pid],[x1,y1]=pos(p),[x2,y2]=pos(n);lines+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" class="'+(tl(pid)&&tl(n.id)?"lit":"")+'"/>';}));
+ const nodes=TREE.map(n=>{const [x,y]=pos(n),l=tl(n.id),ok=treeUnlocked(n),mx=l>=n.max;
+  return '<button type="button" class="tnode '+n.cur+' '+(ok?"":"locked")+' '+(mx?"maxed":treeCan(n)?"can":"")+' '+(treeSel===n.id?"sel":"")+'" style="left:'+x+'px;top:'+y+'px" data-tnode="'+n.id+'" title="'+n.name+'">'+n.icon+'<span class="tc">'+(n.cur==="f"?"🪶":"🪙")+'</span><span class="tl">'+(mx?"MAX":l+"/"+n.max)+'</span></button>';}).join("");
+ const n=TREEMAP[treeSel],l=tl(n.id),mx=l>=n.max,ok=treeUnlocked(n),c=treeCost(n),can=treeCan(n);
+ const need=ok?"":'<small style="color:var(--berry-dk)">Needs '+n.parents.map(p=>TREEMAP[p].name).join(" + ")+' first.</small>';
+ const buyBtn=mx?'<button class="btn small" type="button" disabled>MAXED</button>':'<button class="btn '+(n.cur==="f"?"plum":"leaf")+' small" type="button" data-tbuy="'+n.id+'" '+(can?"":"disabled")+'>'+(n.cur==="f"?"🪶"+fmt(c):HONK+fmt(c))+'</button>';
+ return '<div class="h"><h2>Upgrade tree</h2><small>🪶'+fmt(S.feathers)+' · '+HONK+fmt(S.honks)+'</small></div>'+
+  '<div class="tree-legend"><span>🪶 Feathers: strong, kept forever</span><span>🪙 Coins: weaker, reset on rebirth</span></div>'+
+  '<div class="tree-wrap"><div class="tree-map" style="width:'+W+'px;height:'+H+'px"><svg width="'+W+'" height="'+H+'">'+lines+'</svg>'+nodes+'</div></div>'+
+  '<div class="tree-info">'+n.icon+'<span class="row-copy"><strong>'+n.name+' · Lv '+l+'/'+n.max+' · '+(n.cur==="f"?"🪶 feather":"🪙 coin")+'</strong><small>'+n.desc(l)+'</small>'+need+'</span>'+buyBtn+'</div>'+
+  '<p class="hint" style="margin-top:10px">Tap a circle to see it, then tap it again or the price to buy. Spending feathers never lowers your feather bonus: it counts every feather you\'ve ever earned.</p>';
 }
 function worldsHTML(){
  let h=`<div class="h"><h2>Worlds</h2><small>${S.worlds}/5 unlocked</small></div><p class="hint">Each world multiplies all production and has its own egg. Unlocked worlds stay unlocked after rebirth.</p>`;
@@ -1047,7 +1188,7 @@ function worldsHTML(){
 }
 function rebirthHTML(){
  const gain=rebirthGain(),need=1e7,pct=Math.min(100,S.run/need*100);
- return `<div class="reb-card"><div>🪶</div><p>Rebirth now for</p><div class="gain">${fmt(gain)} feather${gain===1?"":"s"}</div><p>Each feather is +10% production forever. You have ${fmt(S.feathers)} (+${fmt(S.feathers*10)}%).</p></div>
+ return `<div class="reb-card"><div>🪶</div><p>Rebirth now for</p><div class="gain">${fmt(gain)} feather${gain===1?"":"s"}</div><p>Each feather you earn is +10% production forever (+${fmt(S.featherTotal*10)}% so far). You have ${fmt(S.feathers)} to spend in the 🌳 Tree.</p></div>
  ${gain?"":`<p class="hint">Earn ${fmt(need)} honks in this run to unlock rebirth (${pct.toFixed(1)}% there).</p>`}
  <button class="btn plum" type="button" data-action="rebirth" ${gain?"":"disabled"}>${ki("return")} Rebirth</button>
  <div class="h" style="margin-top:18px"><h2>You keep</h2></div>
@@ -1098,12 +1239,12 @@ function render(force=false){
  setHTML($("flock"),GENERATORS.map((g,i)=>S.gens[i]?`<span class="flock-chip" title="${g.name}">${g.icon}${S.gens[i]}</span>`:"").join(""));
  const gain=rebirthGain();
  setHTML($("rebHud"),gain?`<button class="reb-ready" type="button">Rebirth ready: +${fmt(gain)} feathers</button>`:S.run>1e5||S.rebirths?`<div class="reb-bar" title="Progress to rebirth"><i style="width:${Math.min(100,S.run/1e7*100).toFixed(1)}%"></i><span>REBIRTH ${Math.min(100,S.run/1e7*100).toFixed(0)}%</span></div>`:"");
- const alerts={shop:tab!=="shop"&&GENERATORS.some((g,i)=>S.honks>=genCost(i)),pets:tab!=="pets"&&S.honks>=eggCost(S.world),worlds:S.worlds<5&&S.rebirths>=WORLDS[S.worlds].req&&S.honks>=WORLDS[S.worlds].cost,rebirth:tab!=="rebirth"&&gain>0};
+ const alerts={tree:tab!=="tree"&&TREE.some(n=>n.cur==="f"&&treeCan(n)),shop:tab!=="shop"&&GENERATORS.some((g,i)=>S.honks>=genCost(i)),pets:tab!=="pets"&&S.honks>=eggCost(S.world),worlds:S.worlds<5&&S.rebirths>=WORLDS[S.worlds].req&&S.honks>=WORLDS[S.worlds].cost,rebirth:tab!=="rebirth"&&gain>0};
  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("alert",!!alerts[t.dataset.tab]));
  // Never swap panel buttons out from under a press, or the click would be lost.
  if(panelPressed||(!force&&now-lastPanelRender<250))return;
  lastPanelRender=now;
- const html=emojify({shop:shopHTML,pets:petsHTML,worlds:worldsHTML,rebirth:rebirthHTML,trophies:trophiesHTML,leaders:leadersHTML}[tab]());
+ const html=emojify({shop:shopHTML,tree:treeHTML,pets:petsHTML,worlds:worldsHTML,rebirth:rebirthHTML,trophies:trophiesHTML,leaders:leadersHTML}[tab]());
  if(html!==lastPanelHTML){const body=$("tabBody"),y=body.scrollTop;body.innerHTML=html;body.scrollTop=y;lastPanelHTML=html;}
 }
 
