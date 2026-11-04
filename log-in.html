@@ -652,6 +652,23 @@ function showMessage(text) {
 }
 
 
+// Shows a message with a "resend verification email" button.
+function showVerifyNotice(email, text) {
+  const box = document.getElementById("message");
+  box.textContent = text + " ";
+  const resend = document.createElement("button");
+  resend.type = "button";
+  resend.textContent = "Resend email";
+  resend.style.cssText = "margin-left:4px;padding:3px 10px;border-radius:8px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer";
+  resend.addEventListener("click", async function () {
+    resend.disabled = true;
+    const { error } = await supabaseClient.auth.resend({ type: "signup", email: email, options: { emailRedirectTo: location.origin + "/log-in.html?verified=1" } });
+    resend.textContent = error ? "Couldn't resend, try again in a minute" : "Sent! Check your inbox";
+    setTimeout(function () { resend.disabled = false; }, 60000);
+  });
+  box.appendChild(resend);
+}
+
 function clearMessage() {
 
   document.getElementById("message").textContent =
@@ -682,6 +699,16 @@ async function submitForm() {
 
     showMessage(
       "Please enter your email and password."
+    );
+
+    return;
+  }
+
+  // DougHub doesn't allow accounts for any email containing "hfk" (for example @hfkschool.org).
+  if (signupMode && /hfk/i.test(email)) {
+
+    showMessage(
+      "Sorry, this email address can't be used for a DougHub account. Please use a different email."
     );
 
     return;
@@ -725,7 +752,8 @@ async function submitForm() {
           options: {
             data: {
               username: username
-            }
+            },
+            emailRedirectTo: location.origin + "/log-in.html?verified=1"
           }
 
         });
@@ -741,9 +769,7 @@ async function submitForm() {
 
       } else {
 
-        showMessage(
-          "Account created! Check your email to confirm your account."
-        );
+        showVerifyNotice(email, "Account created! We sent a verification link to " + email + ". Open it to finish signing up (check your spam folder too).");
 
       }
 
@@ -776,10 +802,14 @@ async function submitForm() {
 
   } catch (error) {
 
-    showMessage(
-      error.message ||
-      "Something went wrong."
-    );
+    const text = String(error && error.message || "");
+    if (/not confirmed/i.test(text)) {
+      showVerifyNotice(email, "Please verify your email first. Open the link we sent to " + email + ".");
+    } else if (signupMode && /database error saving new user|can.t be used/i.test(text)) {
+      showMessage("Sorry, this email address can't be used for a DougHub account. Please use a different email.");
+    } else {
+      showMessage(text || "Something went wrong.");
+    }
 
   } finally {
 
@@ -858,6 +888,12 @@ document
     }
   );
 
+
+/* JUST VERIFIED */
+
+if (new URLSearchParams(location.search).get("verified") === "1") {
+  showMessage("Email verified! Welcome to DougHub.");
+}
 
 /* ALREADY LOGGED IN */
 
