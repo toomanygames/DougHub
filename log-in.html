@@ -145,6 +145,15 @@ input:focus {
   color: #c4b5fd;
 }
 
+.forgot-link {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 14px;
+  color: #a5b4fc;
+  text-decoration: none;
+}
+.forgot-link:hover { text-decoration: underline; }
 .back {
   display: block;
   margin-top: 22px;
@@ -436,6 +445,8 @@ body{background:radial-gradient(circle at 12% 8%,#29205d 0,transparent 35%),radi
       Log In
     </button>
 
+    <a href="#" id="forgotLink" class="forgot-link">Forgot your password?</a>
+
     <div
       class="message"
       id="message"
@@ -610,6 +621,8 @@ function showLogin() {
   document.getElementById("actionButton").textContent =
     "Log In";
 
+  document.getElementById("forgotLink").style.display = "";
+
   document.getElementById("password").autocomplete =
     "current-password";
 
@@ -636,6 +649,8 @@ function showSignup() {
 
   document.getElementById("actionButton").textContent =
     "Create Account";
+
+  document.getElementById("forgotLink").style.display = "none";
 
   document.getElementById("password").autocomplete =
     "new-password";
@@ -679,6 +694,7 @@ function clearMessage() {
 /* SUBMIT */
 
 async function submitForm() {
+  if (recoveryMode) { return saveNewPassword(); }
 
   const button =
     document.getElementById("actionButton");
@@ -889,6 +905,47 @@ document
   );
 
 
+/* FORGOT / RESET PASSWORD */
+
+var recoveryMode = /type=recovery/.test(location.hash) || /type=recovery/.test(location.search);
+
+function enterRecoveryMode() {
+  recoveryMode = true;
+  document.getElementById("subtitle").textContent = "Choose a new password";
+  document.querySelector('label[for="email"]').style.display = "none";
+  document.getElementById("email").style.display = "none";
+  document.getElementById("forgotLink").style.display = "none";
+  document.getElementById("loginTab").parentNode.style.display = "none";
+  var pw = document.getElementById("password");
+  pw.autocomplete = "new-password";
+  pw.placeholder = "New password (at least 6 characters)";
+  document.getElementById("actionButton").textContent = "Save new password";
+  clearMessage();
+}
+
+async function saveNewPassword() {
+  var pw = document.getElementById("password").value;
+  if (pw.length < 6) { showMessage("Your new password needs at least 6 characters."); return; }
+  var result = await supabaseClient.auth.updateUser({ password: pw });
+  if (result.error) { showMessage(result.error.message); return; }
+  showMessage("Password updated. Taking you to DougHub...");
+  setTimeout(function () { window.location.href = safeRedirect; }, 1200);
+}
+
+document.getElementById("forgotLink").addEventListener("click", async function (event) {
+  event.preventDefault();
+  var email = document.getElementById("email").value.trim();
+  if (!email) { showMessage("Type your email above first, then click Forgot your password."); return; }
+  var result = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/log-in.html" });
+  if (result.error) { showMessage(result.error.message); return; }
+  showMessage("If an account exists for that email, a reset link is on its way. Check your inbox.");
+});
+
+supabaseClient.auth.onAuthStateChange(function (event) {
+  if (event === "PASSWORD_RECOVERY") enterRecoveryMode();
+});
+if (recoveryMode) enterRecoveryMode();
+
 /* JUST VERIFIED */
 
 if (new URLSearchParams(location.search).get("verified") === "1") {
@@ -900,7 +957,7 @@ if (new URLSearchParams(location.search).get("verified") === "1") {
 supabaseClient.auth.getSession().then(
   function({ data }) {
 
-    if (data.session) {
+    if (data.session && !recoveryMode) {
 
       window.location.href =
         safeRedirect;

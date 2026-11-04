@@ -175,6 +175,10 @@
         .dh-shared-account .account-avatar { width:28px;height:28px;flex-basis:28px; }
         .dh-shared-account .account-menu { right:auto;left:0;transform-origin:top left; }
       }
+      @media(max-width:600px) {
+        html body header { padding-top:8px !important;padding-bottom:8px !important;gap:6px !important; }
+        html body header .nav > a, html body header nav[aria-label="Main navigation"] > a { padding:6px 9px !important; }
+      }
     `;
     document.head.appendChild(style);
   }
