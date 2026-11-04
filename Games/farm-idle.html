@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<script src="no-zoom.js"></script>
+<meta name="theme-color" content="#2f6b3a">
+<title>Farm Idle</title>
+<link rel="icon" href="art/farm-idle.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="builtin:farm-idle" data-game-title="Farm Idle" defer></script>
+<style>
+:root{
+  --ink:#3a2a14;--ink2:#6b5a3e;--cream:#fffbea;--cream2:#f6efcf;--line:#d9cca0;
+  --leaf:#3f9d3a;--leaf-dk:#2a7a2c;--soil:#8b5a2b;--soil-dk:#5e3a18;--sun:#ffd23f;--sun-dk:#d99a00;--sky:#8fd3ff;--rose:#e5486b;--berry:#7a4bd6;
+  --display:"Fredoka","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{display:flex;flex-direction:column;overflow:hidden;color:var(--ink);font:700 14px/1.4 var(--body);
+  background:linear-gradient(180deg,#a9dcff 0,#d9f3c8 26%,#8fd06b 60%,#5aa845 100%);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.top{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#2f6b3aee;color:#fff;flex:0 0 auto;z-index:5;box-shadow:0 2px 10px #0003}
+.back{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#ffffff26;text-decoration:none;color:#fff;font-size:18px}
+.title{font:700 21px var(--display);letter-spacing:.01em;white-space:nowrap}
+.wallet{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.chip{display:flex;align-items:baseline;gap:6px;padding:5px 12px;border-radius:999px;background:var(--cream);color:var(--ink);font:700 16px var(--display);white-space:nowrap;box-shadow:inset 0 -2px 0 #0001}
+.chip small{font:800 11px var(--body);color:var(--ink2)}
+.chip.sun{background:#fff3b0}
+.iconbtn{padding:0 12px;height:36px;border-radius:12px;background:#ffffff26;color:#fff;font:700 13px var(--display)}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(340px,48%) 1fr;gap:14px;padding:14px}
+.field{position:relative;display:flex;flex-direction:column;gap:10px;min-height:0;padding:12px;border-radius:22px;background:#ffffff40;border:2px solid #ffffff66}
+.banner{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:5px 12px;border-radius:999px;background:var(--sun);color:var(--ink);font:700 13px var(--display);box-shadow:0 2px 0 var(--sun-dk)}
+.badge.rain{background:var(--sky);box-shadow:0 2px 0 #4a9fd0}
+.picker{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;flex:0 0 auto}
+.seed{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:14px;background:var(--cream);border:2px solid transparent;font:700 13px var(--display);color:var(--ink);text-align:left}
+.seed svg{width:30px;height:30px}
+.seed[aria-pressed="true"]{border-color:var(--berry);background:#efe6ff}
+.seed small{display:block;font:800 10px var(--body);color:var(--ink2);line-height:1}
+.plots{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));grid-auto-rows:min-content;gap:10px;padding:4px;align-content:start}
+.plot{position:relative;aspect-ratio:1;border-radius:16px;background:radial-gradient(circle at 50% 30%,#a8733a,var(--soil) 55%,var(--soil-dk));box-shadow:inset 0 -6px 0 #0003,0 3px 0 #0003;overflow:hidden;touch-action:manipulation;transition:transform .08s}
+.plot:active{transform:scale(.95)}
+.plot .crop{position:absolute;inset:6% 6% 14% 6%}
+.plot .crop svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 2px #0004)}
+.plot .empty{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff66;font:700 30px var(--display)}
+.plot .bar{position:absolute;left:10%;right:10%;bottom:7%;height:7px;border-radius:9px;background:#0005;overflow:hidden}
+.plot .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9be564,#4cc13c)}
+.plot.ready{box-shadow:inset 0 -6px 0 #0003,0 3px 0 #0003,0 0 0 3px var(--sun),0 0 22px #ffd23fcc;animation:glow 1.1s ease-in-out infinite}
+.plot.ready .crop{animation:bob .9s ease-in-out infinite}
+.plot.ready .bar{display:none}
+@keyframes glow{50%{box-shadow:inset 0 -6px 0 #0003,0 3px 0 #0003,0 0 0 3px #fff0a8,0 0 34px #ffd23f}}
+@keyframes bob{50%{transform:translateY(-4px) scale(1.04)}}
+.float{position:absolute;left:50%;top:30%;transform:translateX(-50%);font:700 18px var(--display);color:#fff;text-shadow:0 2px 0 #0007,0 0 8px #0006;pointer-events:none;animation:rise .9s ease-out forwards;white-space:nowrap;z-index:3}
+.float.gold{color:var(--sun)}
+@keyframes rise{to{transform:translate(-50%,-46px);opacity:0}}
+.actions{display:flex;gap:8px;flex:0 0 auto}
+.big{flex:1;padding:12px;border-radius:16px;font:700 17px var(--display);color:#fff;background:linear-gradient(180deg,#58c84a,var(--leaf-dk));box-shadow:0 4px 0 #1d5a20;touch-action:manipulation}
+.big.plant{background:linear-gradient(180deg,#b27a43,var(--soil-dk));box-shadow:0 4px 0 #3b230d}
+.big:active{transform:translateY(3px);box-shadow:0 1px 0 #0006}
+.cloud{position:absolute;top:2px;left:20%;width:110px;height:56px;z-index:4;animation:drift 18s linear forwards;touch-action:manipulation}
+.cloud::before{content:"";position:absolute;inset:8px 0 0 0;border-radius:40px;background:#fff;box-shadow:-22px 8px 0 -4px #fff,26px 6px 0 -2px #fff,0 0 20px #4aa3e0aa}
+.cloud span{position:absolute;inset:0;display:grid;place-items:center;font:700 12px var(--display);color:#2b6a9c}
+@keyframes drift{from{transform:translateX(-30px)}to{transform:translateX(60px)}}
+.rainfx{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:22px;z-index:2;background:linear-gradient(180deg,#4aa3e022,transparent)}
+.rainfx i{position:absolute;top:-20px;width:2px;height:16px;background:#7cc4ffcc;border-radius:2px;animation:drop .7s linear infinite}
+@keyframes drop{to{transform:translateY(520px)}}
+.panel{display:flex;flex-direction:column;min-height:0;border-radius:22px;background:var(--cream);box-shadow:0 4px 0 #0002;overflow:hidden}
+.tabs{display:flex;gap:4px;padding:8px 8px 0;background:var(--cream2);flex:0 0 auto;overflow-x:auto}
+.tab{padding:9px 14px;border-radius:12px 12px 0 0;font:700 15px var(--display);color:var(--ink2);white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--cream);color:var(--ink)}
+.tab .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rose);margin-left:5px;vertical-align:middle}
+.body{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.sec{font:700 13px var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:6px 2px 0}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--cream2);align-self:flex-start}
+.seg button{padding:5px 12px;border-radius:9px;color:var(--ink2);font:700 13px var(--display)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 0 #0002}
+.card{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:#fff;border:2px solid var(--line)}
+.card .ic{flex:0 0 46px;width:46px;height:46px;border-radius:14px;background:var(--cream2);display:grid;place-items:center;font:700 22px var(--display);color:var(--leaf-dk)}
+.card .ic svg{width:38px;height:38px}
+.card .tx{flex:1;min-width:0}
+.card .nm{font:700 16px var(--display)}
+.card .ds{color:var(--ink2);font-size:12.5px;font-weight:700}
+.card .lv{font:800 11px var(--body);color:var(--leaf-dk)}
+.buy{flex:0 0 auto;min-width:96px;padding:8px 10px;border-radius:12px;font:700 14px var(--display);background:#d8d2b8;color:#8a8266;text-align:center;touch-action:manipulation;transition:transform .06s}
+.buy small{display:block;font:800 10px var(--body);opacity:.85}
+.buy.afford{background:linear-gradient(180deg,#58c84a,var(--leaf-dk));color:#fff;box-shadow:0 3px 0 #1d5a20}
+.buy.afford:active{transform:translateY(2px)}
+.buy.sunbuy.afford{background:linear-gradient(180deg,#ffd23f,var(--sun-dk));color:var(--ink);box-shadow:0 3px 0 #9a6c00}
+.card.locked{opacity:.55}
+.card.maxed .buy{background:#cfe9c8;color:var(--leaf-dk);box-shadow:none}
+.tier{display:flex;flex-direction:column;gap:8px;position:relative}
+.tier+.tier::before{content:"";align-self:center;width:3px;height:14px;background:var(--line);border-radius:2px;margin-top:-4px}
+.fest{padding:14px;border-radius:18px;background:linear-gradient(180deg,#fff3b0,#ffe27a);border:2px solid var(--sun-dk);display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.fest h3{margin:0;font:700 20px var(--display)}
+.fest p{margin:0;color:var(--ink2);font-size:13px}
+.fest .gain{font:700 26px var(--display);color:var(--ink)}
+.ach{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;background:#fff;border:2px solid var(--line)}
+.ach.done{border-color:var(--leaf);background:#effbe8}
+.ach .mk{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--cream2);color:var(--ink2);font:700 14px var(--display)}
+.ach.done .mk{background:var(--leaf);color:#fff}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{padding:10px 12px;border-radius:14px;background:#fff;border:2px solid var(--line)}
+.stat b{display:block;font:700 18px var(--display)}
+.stat span{color:var(--ink2);font-size:12px}
+.toasts{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;z-index:30;pointer-events:none}
+.toast{padding:8px 16px;border-radius:999px;background:#2f6b3a;color:#fff;font:700 14px var(--display);box-shadow:0 4px 14px #0005;animation:in .25s ease-out}
+@keyframes in{from{transform:translateY(12px);opacity:0}}
+.modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:#0008;padding:16px}
+.modal .box{max-width:380px;width:100%;padding:20px;border-radius:20px;background:var(--cream);box-shadow:0 12px 40px #0008;display:flex;flex-direction:column;gap:12px}
+.modal h2{margin:0;font:700 22px var(--display)}
+.modal p{margin:0;color:var(--ink2)}
+.modal .row{display:flex;gap:8px;justify-content:flex-end}
+.modal .row button{padding:9px 16px;border-radius:12px;font:700 15px var(--display);background:var(--cream2)}
+.modal .row .ok{background:linear-gradient(180deg,#58c84a,var(--leaf-dk));color:#fff}
+.modal .row .danger{background:var(--rose);color:#fff}
+@media (max-width:820px){
+  .main{grid-template-columns:1fr;grid-template-rows:minmax(0,46%) minmax(0,1fr);gap:8px;padding:8px}
+  .field{padding:8px;gap:6px}
+  .plots{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:7px}
+  .big{padding:9px;font-size:15px}
+  .title{font-size:18px}
+  .chip{padding:4px 9px;font-size:14px}
+  .top{gap:6px;padding:6px 10px}
+}
+@media (prefers-reduced-motion:reduce){.plot.ready,.plot.ready .crop,.rainfx i,.cloud{animation:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="../douggames.html" aria-label="Back to games">&larr;</a>
+  <div class="title">Farm Idle</div>
+  <div class="wallet">
+    <div class="chip" title="Coins"><span id="coins">0</span><small>coins</small></div>
+    <div class="chip sun" id="sunChip" hidden title="Sunseeds: permanent upgrade currency"><span id="sunseeds">0</span><small>sunseeds</small></div>
+  </div>
+  <button class="iconbtn" id="soundBtn" type="button">Sound on</button>
+</header>
+<main class="main">
+  <section class="field" id="field" aria-label="Your farm">
+    <div class="banner" id="banner"></div>
+    <div class="picker" id="picker" aria-label="Choose what to plant"></div>
+    <div class="plots" id="plots"></div>
+    <div class="actions">
+      <button class="big plant" id="plantAll" type="button">Plant all</button>
+      <button class="big" id="harvestAll" type="button">Harvest all</button>
+    </div>
+  </section>
+  <aside class="panel">
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-tab="up" aria-selected="true">Upgrades</button>
+      <button class="tab" role="tab" data-tab="fest" aria-selected="false">Festival <span class="dot" id="festDot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="ach" aria-selected="false">Awards</button>
+    </div>
+    <div class="body" id="body"></div>
+  </aside>
+</main>
+<div class="toasts" id="toasts"></div>
+<div id="modalHost"></div>
+<script>
+"use strict";
+(function(){
+const SAVE_KEY = "dh-farm-idle-v1";
+const FORCE_MUTE = /[?&]mute=1/.test(location.search);
+const $ = id => document.getElementById(id);
+
+/* ---------- data ---------- */
+const CROPS = [
+  {n:"Wheat",     t:4,    v:2,      unlock:0,        col:"#e8c04a"},
+  {n:"Carrot",    t:10,   v:8,      unlock:60,       col:"#ff8a1f"},
+  {n:"Tomato",    t:25,   v:36,     unlock:400,      col:"#e53935"},
+  {n:"Corn",      t:60,   v:170,    unlock:2500,     col:"#fbc02d"},
+  {n:"Strawberry",t:140,  v:820,    unlock:15000,    col:"#e6194b"},
+  {n:"Pumpkin",   t:300,  v:4100,   unlock:90000,    col:"#f57c00"},
+  {n:"Sunflower", t:700,  v:21000,  unlock:600000,   col:"#ffd600"},
+  {n:"Golden Melon",t:1500,v:120000, unlock:5000000,  col:"#ffca28"}
+];
+const UP = {
+  plots:{n:"New plot",   d:"Adds another plot to your farm.",               cost:l=>40*Math.pow(1.6,l)},
+  fert: {n:"Fertilizer", d:"Crops grow 15% faster.",                         cost:l=>80*Math.pow(2.0,l), max:40},
+  yield:{n:"Bigger harvest",d:"Every harvest is worth 25% more coins.",      cost:l=>120*Math.pow(2.2,l), max:60},
+  clover:{n:"Lucky clover",d:"+3% chance that a harvest is worth 5 times as much.",cost:l=>500*Math.pow(2.6,l), max:15},
+  hand: {n:"Farmhand",   d:"Harvests ready crops for you. Higher levels work faster and harvest more at once.",cost:l=>600*Math.pow(1.9,l), max:30},
+  auto: {n:"Auto-planter",d:"Replants empty plots with the crop you have selected.",cost:l=>2500, max:1},
+  scare:{n:"Scarecrow",  d:"Your farm keeps earning for 1 more hour while you are away.",cost:l=>2000*Math.pow(2.4,l), max:11},
+  rain: {n:"Rain dance", d:"Rain clouds visit your farm more often.",        cost:l=>1500*Math.pow(2.3,l), max:10}
+};
+const UP_ORDER = ["plots","fert","yield","hand","auto","clover","scare","rain"];
+const TREE = {
+  soil:    {n:"Rich soil",        d:"All coins x1.25 per level.",                        max:15, cost:l=>1+l,       req:null, tier:1},
+  sprout:  {n:"Quick sprouts",    d:"Crops grow 10% faster per level.",                  max:15, cost:l=>1+l,       req:"soil", tier:2},
+  head:    {n:"Head start",       d:"Start every season with 1 more plot per level.",    max:8,  cost:l=>2+l*2,     req:"soil", tier:2},
+  hands:   {n:"Tireless farmhand",d:"Level 1: start with a Farmhand. Level 2: start with the Auto-planter. Level 3: Farmhand starts at level 5.", max:3, cost:l=>[3,8,20][l], req:"sprout", tier:3},
+  seeds:   {n:"Seed bank",        d:"Start every season with better seeds already unlocked (Carrot, Tomato, Corn, Strawberry).", max:4, cost:l=>[2,6,15,40][l], req:"head", tier:3},
+  compound:{n:"Compound interest",d:"Festivals give 15% more sunseeds per level.",       max:10, cost:l=>5+3*l,     req:"hands", tier:4},
+  golden:  {n:"Golden hour",      d:"+2% chance per level that a harvest is golden (worth 10 times as much).", max:10, cost:l=>6+4*l, req:"seeds", tier:4},
+  slumber: {n:"Long slumber",     d:"Earn for 2 more hours per level while you are away.", max:6, cost:l=>4+2*l,    req:"hands", tier:4}
+};
+const TREE_ORDER = ["soil","sprout","head","hands","seeds","compound","golden","slumber"];
+const ACH = [
+  {id:"h1",   n:"First harvest",       d:"Harvest a crop.",              ok:s=>s.harvests>=1},
+  {id:"h100", n:"Green thumb",         d:"Harvest 100 crops.",           ok:s=>s.harvests>=100},
+  {id:"h1k",  n:"Farmer",              d:"Harvest 1,000 crops.",         ok:s=>s.harvests>=1000},
+  {id:"h10k", n:"Harvest master",      d:"Harvest 10,000 crops.",        ok:s=>s.harvests>=10000},
+  {id:"c1k",  n:"First savings",       d:"Earn 1,000 coins in total.",   ok:s=>s.life>=1e3},
+  {id:"c1m",  n:"Millionaire",         d:"Earn 1 million coins in total.",ok:s=>s.life>=1e6},
+  {id:"c1b",  n:"Billionaire",         d:"Earn 1 billion coins in total.",ok:s=>s.life>=1e9},
+  {id:"c1t",  n:"Tycoon",              d:"Earn 1 trillion coins in total.",ok:s=>s.life>=1e12},
+  {id:"crops",n:"Seed collector",      d:"Unlock every crop in one season.",ok:s=>s.unlocked.every(Boolean)},
+  {id:"p12",  n:"Big field",           d:"Own 12 plots.",                ok:s=>s.plots.length>=12},
+  {id:"p24",  n:"Whole farm",          d:"Own 24 plots.",                ok:s=>s.plots.length>=24},
+  {id:"hand10",n:"Hired help",         d:"Get the Farmhand to level 10.",ok:s=>(s.up.hand||0)>=10},
+  {id:"r1",   n:"First festival",      d:"Hold a Harvest Festival.",     ok:s=>s.rebirths>=1},
+  {id:"r5",   n:"Festival regular",    d:"Hold 5 Harvest Festivals.",    ok:s=>s.rebirths>=5},
+  {id:"sun100",n:"Sunseed hoarder",    d:"Earn 100 sunseeds in total.",  ok:s=>s.sunEver>=100}
+];
+
+/* ---------- state ---------- */
+function fresh(){
+  return {v:1,coins:0,run:0,life:0,sun:0,sunEver:0,rebirths:0,harvests:0,
+    plots:[{c:-1,t:0},{c:-1,t:0},{c:-1,t:0},{c:-1,t:0}],unlocked:[true,false,false,false,false,false,false,false],
+    sel:0,up:{},tree:{},ach:{},bulk:1,muted:false,last:Date.now(),played:0};
+}
+let S = fresh();
+function load(){
+  try{ const raw=localStorage.getItem(SAVE_KEY); if(raw){ S=Object.assign(fresh(),JSON.parse(raw)); } }catch(_){}
+  if(!Array.isArray(S.plots)||!S.plots.length) S.plots=fresh().plots;
+  if(!Array.isArray(S.unlocked)||S.unlocked.length!==CROPS.length) S.unlocked=fresh().unlocked;
+  if(FORCE_MUTE) S.muted=true;
+}
+function save(){ S.last=Date.now(); try{ localStorage.setItem(SAVE_KEY,JSON.stringify(S)); }catch(_){} }
+
+/* ---------- formatting ---------- */
+const SUF=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
+function fmt(n){
+  if(!isFinite(n)) return "0";
+  if(n<1000) return String(Math.floor(n));
+  let i=0; while(n>=1000 && i<SUF.length-1){ n/=1000; i++; }
+  if(n>=1000) return n.toExponential(2).replace("+","");
+  return (n>=100?n.toFixed(0):n>=10?n.toFixed(1):n.toFixed(2))+SUF[i];
+}
+function fmtTime(sec){ sec=Math.max(0,Math.round(sec)); if(sec<60) return sec+"s"; if(sec<3600) return Math.floor(sec/60)+"m "+(sec%60)+"s"; return Math.floor(sec/3600)+"h "+Math.floor(sec%3600/60)+"m"; }
+
+/* ---------- runtime-only state ---------- */
+let rainUntil=0, boom=null, cloudEl=null, nextCloud=Date.now()+25000, nextBoom=Date.now()+60000, handT=0;
+let tab="up";
+
+/* ---------- derived values ---------- */
+const lv = (obj,k)=> (obj[k]||0);
+function basePlots(){ return 4 + lv(S.tree,"head"); }
+function maxPlotUp(){ return Math.max(0, 24 - basePlots()); }
+function achCount(){ return Object.keys(S.ach).length; }
+function coinMult(){ return Math.pow(1.25,lv(S.up,"yield")) * Math.pow(1.25,lv(S.tree,"soil")) * (1+0.05*S.sunEver) * (1+0.03*achCount()); }
+function speedMult(){ return Math.pow(1.15,lv(S.up,"fert")) * Math.pow(1.1,lv(S.tree,"sprout")) * (Date.now()<rainUntil?2:1); }
+function farmhandLevel(){ return lv(S.up,"hand"); }
+function handInterval(){ return 4/(1+0.25*farmhandLevel()); }
+function handBatch(){ return 1+Math.floor(farmhandLevel()/3); }
+function hasAuto(){ return lv(S.up,"auto")>=1; }
+function awayCapHours(){ return 1 + lv(S.up,"scare") + 2*lv(S.tree,"slumber"); }
+function boomMult(c){ return (boom && boom.c===c && Date.now()<boom.until)?3:1; }
+function cropValue(c){ return CROPS[c].v * coinMult() * boomMult(c); }
+function sunGain(){ return Math.floor(Math.sqrt(S.run/20000) * Math.pow(1.15,lv(S.tree,"compound"))); }
+function upCost(k){ return UP[k].cost(lv(S.up,k)); }
+function upMax(k){ return k==="plots"?maxPlotUp():(UP[k].max||1); }
+
+/* ---------- audio (silent while muted) ---------- */
+let actx=null;
+function beep(freq,dur,type,vol,slide){
+  if(S.muted||FORCE_MUTE) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==="suspended") actx.resume();
+    const o=actx.createOscillator(), g=actx.createGain(); o.type=type||"sine"; o.frequency.value=freq;
+    if(slide) o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+dur);
+    g.gain.value=vol||0.05; g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+dur);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+dur);
+  }catch(_){}
+}
+const sfx={ plant:()=>beep(300,.08,"triangle",.04,420), harvest:()=>beep(620,.1,"sine",.05,900), buy:()=>beep(520,.12,"triangle",.05,780),
+  ach:()=>{beep(660,.12,"sine",.05);setTimeout(()=>beep(880,.18,"sine",.05),110);}, fest:()=>{[440,554,659,880].forEach((f,i)=>setTimeout(()=>beep(f,.25,"triangle",.05),i*120));} };
+
+/* ---------- crop art ---------- */
+function cropSVG(i,st){
+  const c=CROPS[i].col, g="#4caf50", g2="#2e7d32"; let s='<svg viewBox="0 0 64 64" aria-hidden="true">';
+  if(st===0){
+    s+=`<path d="M32 54V42" stroke="${g2}" stroke-width="3" stroke-linecap="round"/><path d="M32 44C24 44 20 38 20 34C28 34 32 38 32 44Z M32 44C40 44 44 38 44 34C36 34 32 38 32 44Z" fill="${g}"/>`;
+  } else if(st===1){
+    s+=`<path d="M32 56V30" stroke="${g2}" stroke-width="3.5" stroke-linecap="round"/><path d="M32 46C22 46 16 40 16 34C26 34 32 38 32 46Z M32 40C42 40 48 34 48 28C38 28 32 32 32 40Z" fill="${g}"/><circle cx="32" cy="26" r="5.5" fill="${c}"/>`;
+  } else {
+    switch(i){
+      case 0:
+        for(const x of [22,32,42]){
+          s+=`<path d="M${x} 58V20" stroke="#b8941f" stroke-width="2.5" stroke-linecap="round"/>`;
+          for(let k=0;k<4;k++){ s+=`<ellipse cx="${x-3.2}" cy="${20+k*7}" rx="3" ry="5" fill="${c}" transform="rotate(-25 ${x-3.2} ${20+k*7})"/><ellipse cx="${x+3.2}" cy="${23+k*7}" rx="3" ry="5" fill="${c}" transform="rotate(25 ${x+3.2} ${23+k*7})"/>`; }
+        }
+        break;
+      case 1: s+=`<path d="M32 28C22 20 20 10 24 6C28 12 31 18 32 28Z M32 28C32 16 34 8 38 6C42 12 38 22 32 28Z M32 28C26 22 14 18 12 22C18 26 26 28 32 28Z" fill="${g}"/><path d="M20 26H44L33 60Q32 62 31 60Z" fill="${c}"/><path d="M26 34H38M28 42H36M30 50H34" stroke="#c75d00" stroke-width="2" stroke-linecap="round"/>`; break;
+      case 2: s+=`<circle cx="32" cy="38" r="19" fill="${c}"/><ellipse cx="25" cy="30" rx="5" ry="3.5" fill="#fff" opacity=".35" transform="rotate(-30 25 30)"/><path d="M32 20L36 26L44 24L38 30L40 34L32 31L24 34L26 30L20 24L28 26Z" fill="${g2}"/>`; break;
+      case 3:
+        s+=`<path d="M32 54C16 48 12 34 20 20C24 28 28 38 32 54Z M32 54C48 48 52 34 44 20C40 28 36 38 32 54Z" fill="${g}"/><ellipse cx="32" cy="32" rx="10" ry="22" fill="${c}"/><g fill="#fff4b0" opacity=".7">`;
+        for(let r=0;r<6;r++){ for(let q=0;q<3;q++){ s+=`<circle cx="${27+q*5}" cy="${18+r*6}" r="1.6"/>`; } }
+        s+='</g>'; break;
+      case 4:
+        s+=`<path d="M32 58C14 46 12 28 22 22C28 19 36 19 42 22C52 28 50 46 32 58Z" fill="${c}"/><g fill="#ffe680">`;
+        for(const [x,y] of [[24,28],[32,26],[40,28],[27,36],[37,36],[32,44],[24,40],[40,40]]){ s+=`<ellipse cx="${x}" cy="${y}" rx="1.4" ry="2"/>`; }
+        s+=`</g><path d="M32 22L26 14L32 18L38 14Z M20 22L32 20L44 22L32 26Z" fill="${g2}"/>`; break;
+      case 5: s+=`<ellipse cx="32" cy="38" rx="23" ry="18" fill="${c}"/><path d="M20 22C14 34 14 44 22 54M44 22C50 34 50 44 42 54M32 20V56" stroke="#c25e00" stroke-width="2.2" fill="none" stroke-linecap="round"/><rect x="29" y="12" width="6" height="12" rx="2" fill="#6d4c2a"/><path d="M35 18C42 12 48 14 48 18C44 22 38 22 35 18Z" fill="${g}"/>`; break;
+      case 6:
+        s+=`<path d="M32 58V30" stroke="${g2}" stroke-width="4" stroke-linecap="round"/><path d="M32 50C42 50 48 44 48 40C40 40 34 44 32 50Z" fill="${g}"/>`;
+        for(let k=0;k<12;k++){ s+=`<ellipse cx="32" cy="14" rx="4" ry="9" fill="${c}" transform="rotate(${k*30} 32 28)"/>`; }
+        s+=`<circle cx="32" cy="28" r="9" fill="#7a4a1a"/><circle cx="29" cy="25" r="2" fill="#a06a38"/>`; break;
+      default: s+=`<circle cx="32" cy="36" r="21" fill="${c}"/><path d="M32 15C24 24 24 48 32 57M32 15C40 24 40 48 32 57M13 30C24 34 40 34 51 30M13 43C24 47 40 47 51 43" stroke="#b9800a" stroke-width="2" fill="none"/><path d="M48 12L50 18L56 20L50 22L48 28L46 22L40 20L46 18Z" fill="#fff"/><path d="M30 16C36 8 44 8 46 12C42 18 34 20 30 16Z" fill="${g}"/>`;
+    }
+  }
+  return s+'</svg>';
+}
+
+/* ---------- farm actions ---------- */
+function ensurePlots(){ const want=Math.min(24,basePlots()+lv(S.up,"plots")); while(S.plots.length<want) S.plots.push({c:-1,t:0}); }
+function isReady(p){ return p.c>=0 && p.t>=CROPS[p.c].t; }
+function plant(i,silent){ const p=S.plots[i]; if(!p||p.c>=0||!S.unlocked[S.sel]) return false; p.c=S.sel; p.t=0; if(!silent) sfx.plant(); return true; }
+function harvest(i,auto){
+  const p=S.plots[i]; if(!p||!isReady(p)) return 0;
+  let v=cropValue(p.c), tag="";
+  if(Math.random()<0.03*lv(S.up,"clover")){ v*=5; tag=" x5"; }
+  if(Math.random()<0.02*lv(S.tree,"golden")){ v*=10; tag=" GOLD"; }
+  S.coins+=v; S.run+=v; S.life+=v; S.harvests++; p.c=-1; p.t=0;
+  floatText(i,"+"+fmt(v)+tag,!!tag);
+  if(!auto||Math.random()<0.25) sfx.harvest();
+  return v;
+}
+function harvestAll(){ let n=0; for(let i=0;i<S.plots.length;i++){ if(harvest(i,true)) n++; } if(n) sfx.harvest(); checkAch(); return n; }
+function plantAll(){ let n=0; for(let i=0;i<S.plots.length;i++){ if(plant(i,true)) n++; } if(n) sfx.plant(); return n; }
+
+/* ---------- ticking ---------- */
+function simulate(dt){
+  const sp=speedMult();
+  for(const p of S.plots){ if(p.c>=0){ const need=CROPS[p.c].t; if(p.t<need) p.t=Math.min(need,p.t+dt*sp); } }
+  if(farmhandLevel()>0){
+    handT+=dt;
+    if(handT>=handInterval()){
+      handT=0; let left=handBatch();
+      for(let i=0;i<S.plots.length&&left>0;i++){ if(harvest(i,true)) left--; }
+      if(hasAuto()) plantAll();
+      checkAch();
+    }
+  }
+}
+function offline(sec){
+  const away=Math.min(sec,awayCapHours()*3600); if(away<30) return 0;
+  const sp=speedMult(); let earned=0;
+  if(farmhandLevel()>0 && hasAuto() && S.unlocked[S.sel]){
+    const c=S.sel, per=CROPS[c].t/sp;
+    const plotRate=S.plots.length/per, handRate=handBatch()/handInterval();
+    earned=Math.min(plotRate,handRate)*away*cropValue(c)*0.5;
+    S.coins+=earned; S.run+=earned; S.life+=earned;
+  }
+  for(const p of S.plots){ if(p.c>=0) p.t=Math.min(CROPS[p.c].t,p.t+away*sp); }
+  return earned;
+}
+
+/* ---------- events: rain and market boom ---------- */
+function spawnCloud(){
+  if(cloudEl) return;
+  cloudEl=document.createElement("button"); cloudEl.type="button"; cloudEl.className="cloud";
+  cloudEl.style.left=(10+Math.random()*55)+"%"; cloudEl.innerHTML="<span>Tap for rain</span>";
+  cloudEl.addEventListener("click",()=>{ startRain(); removeCloud(); });
+  $("field").appendChild(cloudEl); setTimeout(removeCloud,18000);
+}
+function removeCloud(){ if(cloudEl){ cloudEl.remove(); cloudEl=null; } }
+let rainEl=null;
+function startRain(){
+  rainUntil=Date.now()+30000; toast("Rain! Crops grow twice as fast for 30 seconds."); beep(400,.3,"sine",.04,200);
+  if(!rainEl){
+    rainEl=document.createElement("div"); rainEl.className="rainfx"; let h="";
+    for(let i=0;i<26;i++) h+=`<i style="left:${Math.random()*100}%;animation-delay:${(Math.random()*.7).toFixed(2)}s"></i>`;
+    rainEl.innerHTML=h; $("field").appendChild(rainEl);
+  }
+}
+function events(){
+  const now=Date.now();
+  if(now>=nextCloud){ spawnCloud(); nextCloud=now+(50000+Math.random()*50000)/(1+0.25*lv(S.up,"rain")); }
+  if(rainEl && now>=rainUntil){ rainEl.remove(); rainEl=null; }
+  if(now>=nextBoom){
+    const open=[]; S.unlocked.forEach((u,i)=>{ if(u) open.push(i); });
+    const c=open[Math.floor(Math.random()*open.length)];
+    boom={c,until:now+40000}; toast("Market boom: "+CROPS[c].n+" sells for 3x for 40 seconds!");
+    nextBoom=now+70000+Math.random()*60000;
+  }
+}
+
+/* ---------- UI: field ---------- */
+let plotEls=[];
+function buildPlots(){
+  const host=$("plots"); host.innerHTML=""; plotEls=[];
+  S.plots.forEach((p,i)=>{
+    const b=document.createElement("button"); b.type="button"; b.className="plot"; b.dataset.i=i; b.setAttribute("aria-label","Plot "+(i+1));
+    b.innerHTML='<div class="empty">+</div><div class="crop"></div><div class="bar"><i></i></div>';
+    host.appendChild(b); plotEls.push({el:b,crop:b.querySelector(".crop"),empty:b.querySelector(".empty"),bar:b.querySelector(".bar i"),st:-9,c:-9});
+  });
+}
+function paintPlots(){
+  if(plotEls.length!==S.plots.length) buildPlots();
+  S.plots.forEach((p,i)=>{
+    const e=plotEls[i]; let st=-1;
+    if(p.c>=0){ const pr=p.t/CROPS[p.c].t; st=pr>=1?2:pr>=0.34?1:0; e.bar.style.width=Math.min(100,pr*100)+"%"; }
+    if(st!==e.st||p.c!==e.c){
+      e.st=st; e.c=p.c;
+      e.crop.innerHTML=p.c>=0?cropSVG(p.c,st):"";
+      e.empty.style.display=p.c>=0?"none":"";
+      e.el.classList.toggle("ready",st===2);
+    }
+  });
+}
+function floatText(i,txt,gold){
+  const e=plotEls[i]; if(!e) return; const s=document.createElement("span"); s.className="float"+(gold?" gold":""); s.textContent=txt;
+  e.el.appendChild(s); setTimeout(()=>s.remove(),950);
+}
+function paintPicker(){
+  const host=$("picker"); host.innerHTML="";
+  CROPS.forEach((c,i)=>{
+    if(!S.unlocked[i]) return;
+    const b=document.createElement("button"); b.type="button"; b.className="seed"; b.setAttribute("aria-pressed",String(S.sel===i));
+    b.innerHTML=cropSVG(i,2)+'<span>'+c.n+'<small>'+fmt(cropValue(i))+' coins - '+fmtTime(c.t/speedMult())+'</small></span>';
+    b.addEventListener("click",()=>{ S.sel=i; paintPicker(); });
+    host.appendChild(b);
+  });
+}
+function paintBanner(){
+  const now=Date.now(); let h="";
+  if(now<rainUntil) h+='<span class="badge rain">Rain: crops grow 2x ('+Math.ceil((rainUntil-now)/1000)+'s)</span>';
+  if(boom && now<boom.until) h+='<span class="badge">Market boom: '+CROPS[boom.c].n+' sells 3x ('+Math.ceil((boom.until-now)/1000)+'s)</span>';
+  const b=$("banner"); if(b.dataset.h!==h){ b.dataset.h=h; b.innerHTML=h; }
+}
+
+/* ---------- UI: panel ---------- */
+let btnRefs=[];
+function card(o){
+  const d=document.createElement("div"); d.className="card"+(o.locked?" locked":"")+(o.maxed?" maxed":"");
+  d.innerHTML=`<div class="ic">${o.icon||""}</div><div class="tx"><div class="nm">${o.name}</div><div class="ds">${o.desc}</div>${o.level?`<div class="lv">${o.level}</div>`:""}</div>`;
+  if(o.btn){
+    const b=document.createElement("button"); b.type="button"; b.className="buy"+(o.sun?" sunbuy":""); b.innerHTML=o.btn; b.dataset.act=o.act; b.dataset.key=o.key; d.appendChild(b);
+    btnRefs.push({b,cost:o.cost,sun:!!o.sun,can:o.can!==false});
+  }
+  return d;
+}
+function renderPanel(){
+  const body=$("body"); body.innerHTML=""; btnRefs=[];
+  if(tab==="up") renderUpgrades(body); else if(tab==="fest") renderFest(body); else renderAwards(body);
+  refreshBtns();
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.tab===tab)));
+}
+function secTitle(body,text){ const d=document.createElement("div"); d.className="sec"; d.textContent=text; body.appendChild(d); }
+function renderUpgrades(body){
+  const seg=document.createElement("div"); seg.className="seg";
+  [[1,"x1"],[10,"x10"],[1000,"Max"]].forEach(([n,l])=>{ const b=document.createElement("button"); b.type="button"; b.textContent="Buy "+l; b.setAttribute("aria-pressed",String(S.bulk===n)); b.dataset.act="bulk"; b.dataset.key=n; seg.appendChild(b); });
+  body.appendChild(seg);
+  secTitle(body,"Seed shop");
+  CROPS.forEach((c,i)=>{
+    if(S.unlocked[i]) return;
+    const prev=i===0||S.unlocked[i-1];
+    body.appendChild(card({icon:cropSVG(i,2),name:c.n+" seeds",desc:prev?`Grows in ${fmtTime(c.t)}. Worth ${fmt(c.v)} coins each.`:"Unlock the crop before this one first.",locked:!prev,
+      btn:prev?`${fmt(c.unlock)}<small>unlock</small>`:`Locked`,act:"crop",key:i,cost:c.unlock,can:prev}));
+  });
+  if(S.unlocked.every(Boolean)){ const n=document.createElement("div"); n.className="ds"; n.textContent="Every crop is unlocked."; body.appendChild(n); }
+  secTitle(body,"Farm upgrades");
+  const icons={plots:"+",fert:"%",yield:"x",hand:"H",auto:"A",clover:"?",scare:"Z",rain:"R"};
+  UP_ORDER.forEach(k=>{
+    const L=lv(S.up,k), mx=upMax(k), u=UP[k], maxed=L>=mx;
+    body.appendChild(card({icon:icons[k],name:u.n,desc:u.d,level:`Level ${L}${mx>1?" / "+mx:""}`,maxed,
+      btn:maxed?"Maxed":`${fmt(upCost(k))}<small>${S.bulk>1?"buy "+(S.bulk>=1000?"max":"x"+S.bulk):"coins"}</small>`,act:"up",key:k,cost:maxed?Infinity:upCost(k),can:!maxed}));
+  });
+}
+function renderFest(body){
+  const gain=sunGain();
+  const f=document.createElement("div"); f.className="fest";
+  f.innerHTML=`<h3>Harvest Festival</h3><p>Hold a festival to start a new season. Your coins, plots, crops and farm upgrades reset, but you earn <b>sunseeds</b>. Sunseeds give a permanent +5% coins each and buy the permanent upgrades below.</p>
+    <div class="gain">${gain>0?"+"+fmt(gain)+" sunseeds":"Not enough yet"}</div><p>${gain>0?"This season you earned "+fmt(S.run)+" coins.":"Earn about "+fmt(20000)+" coins this season to get your first sunseed ("+fmt(S.run)+" so far)."}</p>`;
+  const b=document.createElement("button"); b.type="button"; b.className="big"; b.textContent="Hold the festival"; b.dataset.act="fest";
+  b.style.flex="0 0 auto"; b.style.padding="10px 22px"; b.disabled=gain<1; if(gain<1) b.style.opacity=".5";
+  f.appendChild(b); body.appendChild(f);
+  secTitle(body,"Sunseed upgrades (permanent) - you have "+fmt(S.sun));
+  let lastTier=0, tierEl=null;
+  TREE_ORDER.forEach(k=>{
+    const t=TREE[k];
+    if(t.tier!==lastTier){ tierEl=document.createElement("div"); tierEl.className="tier"; body.appendChild(tierEl); lastTier=t.tier; }
+    const L=lv(S.tree,k), maxed=L>=t.max, open=!t.req||lv(S.tree,t.req)>=1;
+    tierEl.appendChild(card({icon:t.n[0],name:t.n,desc:open?t.d:"Requires "+TREE[t.req].n+" level 1.",level:`Level ${L} / ${t.max}`,locked:!open,maxed,
+      btn:maxed?"Maxed":open?`${fmt(t.cost(L))}<small>sunseeds</small>`:"Locked",act:"tree",key:k,cost:maxed?Infinity:t.cost(L),sun:true,can:open&&!maxed}));
+  });
+}
+function renderAwards(body){
+  const st=document.createElement("div"); st.className="stats";
+  [[fmt(S.harvests),"crops harvested"],[fmt(S.life),"coins earned, all time"],[String(S.rebirths),"festivals held"],[fmtTime(S.played),"time played"]].forEach(([a,b])=>{
+    const d=document.createElement("div"); d.className="stat"; d.innerHTML=`<b>${a}</b><span>${b}</span>`; st.appendChild(d);
+  });
+  body.appendChild(st);
+  secTitle(body,`Awards ${achCount()} / ${ACH.length} (each gives +3% coins)`);
+  ACH.forEach(a=>{
+    const done=!!S.ach[a.id]; const d=document.createElement("div"); d.className="ach"+(done?" done":"");
+    d.innerHTML=`<div class="mk">${done?"&#10003;":""}</div><div><div style="font:700 15px var(--display)">${a.n}</div><div style="color:var(--ink2);font-size:12px">${a.d}</div></div>`;
+    body.appendChild(d);
+  });
+}
+function refreshBtns(){
+  btnRefs.forEach(r=>{ const have=r.sun?S.sun:S.coins; r.b.classList.toggle("afford",r.can&&have>=r.cost); });
+  $("coins").textContent=fmt(S.coins);
+  $("sunseeds").textContent=fmt(S.sun);
+  $("sunChip").hidden=!(S.sunEver>0);
+  $("festDot").hidden=!(sunGain()>=1 && tab!=="fest");
+}
+
+/* ---------- purchases ---------- */
+function buyUp(k){
+  let n=0; const mx=upMax(k);
+  while(n<S.bulk && lv(S.up,k)<mx && S.coins>=upCost(k)){ S.coins-=upCost(k); S.up[k]=lv(S.up,k)+1; n++; }
+  if(!n) return;
+  if(k==="plots"){ ensurePlots(); buildPlots(); paintPlots(); }
+  sfx.buy(); save(); renderPanel(); checkAch();
+}
+function buyCrop(i){
+  const c=CROPS[i]; if(S.unlocked[i]||S.coins<c.unlock||!(i===0||S.unlocked[i-1])) return;
+  S.coins-=c.unlock; S.unlocked[i]=true; S.sel=i; sfx.buy(); toast(c.n+" seeds unlocked!"); save(); paintPicker(); renderPanel(); checkAch();
+}
+function buyTree(k){
+  const t=TREE[k], L=lv(S.tree,k); if(L>=t.max) return; if(t.req && lv(S.tree,t.req)<1) return;
+  const c=t.cost(L); if(S.sun<c) return; S.sun-=c; S.tree[k]=L+1; sfx.buy(); save(); renderPanel();
+}
+function festival(){
+  const gain=sunGain(); if(gain<1) return;
+  ask("Hold the Harvest Festival?",`You will earn ${fmt(gain)} sunseeds. Your coins, plots, crops and farm upgrades reset. Sunseeds, sunseed upgrades and awards stay.`,"Hold festival",()=>{
+    S.sun+=gain; S.sunEver+=gain; S.rebirths++; S.coins=0; S.run=0; S.up={};
+    const h=lv(S.tree,"hands"); if(h>=1) S.up.hand= h>=3?5:1; if(h>=2) S.up.auto=1;
+    S.unlocked=CROPS.map((_,i)=>i===0||i<=lv(S.tree,"seeds")); S.sel=lv(S.tree,"seeds");
+    S.plots=[]; ensurePlots(); handT=0; boom=null;
+    sfx.fest(); toast("A new season begins. +"+fmt(gain)+" sunseeds!"); save(); buildPlots(); paintPlots(); paintPicker(); renderPanel(); checkAch();
+  });
+}
+
+/* ---------- awards, toast, modal ---------- */
+function checkAch(){ ACH.forEach(a=>{ if(!S.ach[a.id]&&a.ok(S)){ S.ach[a.id]=1; toast("Award: "+a.n); sfx.ach(); if(tab==="ach") renderPanel(); } }); }
+function toast(t){ const d=document.createElement("div"); d.className="toast"; d.textContent=t; $("toasts").appendChild(d); setTimeout(()=>d.remove(),3200); }
+function ask(title,text,okLabel,onYes,danger){
+  const host=$("modalHost");
+  host.innerHTML=`<div class="modal"><div class="box" role="dialog" aria-modal="true"><h2>${title}</h2><p>${text}</p><div class="row"><button type="button" id="mNo">Cancel</button><button type="button" id="mYes" class="${danger?"danger":"ok"}">${okLabel}</button></div></div></div>`;
+  $("mNo").onclick=()=>{ host.innerHTML=""; }; $("mYes").onclick=()=>{ host.innerHTML=""; onYes(); }; $("mYes").focus();
+}
+function info(title,text){
+  const host=$("modalHost");
+  host.innerHTML=`<div class="modal"><div class="box" role="dialog" aria-modal="true"><h2>${title}</h2><p>${text}</p><div class="row"><button type="button" id="mYes" class="ok">Nice</button></div></div></div>`;
+  $("mYes").onclick=()=>{ host.innerHTML=""; };
+}
+
+/* ---------- wiring ---------- */
+function wire(){
+  $("plots").addEventListener("click",e=>{
+    const b=e.target.closest(".plot"); if(!b) return; const i=+b.dataset.i, p=S.plots[i]; if(!p) return;
+    if(p.c<0){ if(plant(i)) paintPlots(); } else if(isReady(p)){ harvest(i); paintPlots(); checkAch(); refreshBtns(); }
+  });
+  $("plantAll").onclick=()=>{ plantAll(); paintPlots(); };
+  $("harvestAll").onclick=()=>{ harvestAll(); paintPlots(); refreshBtns(); };
+  $("tabs").addEventListener("click",e=>{ const t=e.target.closest(".tab"); if(!t) return; tab=t.dataset.tab; renderPanel(); });
+  $("body").addEventListener("click",e=>{
+    const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act, k=b.dataset.key;
+    if(a==="bulk"){ S.bulk=+k; renderPanel(); }
+    else if(a==="up") buyUp(k); else if(a==="crop") buyCrop(+k); else if(a==="tree") buyTree(k); else if(a==="fest") festival();
+  });
+  $("soundBtn").onclick=()=>{ if(FORCE_MUTE) return; S.muted=!S.muted; $("soundBtn").textContent=S.muted?"Sound off":"Sound on"; save(); };
+  $("soundBtn").textContent=(S.muted||FORCE_MUTE)?"Sound off":"Sound on";
+  const reset=document.createElement("button"); reset.type="button"; reset.className="iconbtn"; reset.textContent="Reset";
+  reset.onclick=()=>ask("Erase your farm?","This deletes all progress, including sunseeds and awards. It cannot be undone.","Erase everything",()=>{ localStorage.removeItem(SAVE_KEY); location.reload(); },true);
+  $("soundBtn").after(reset);
+  document.addEventListener("visibilitychange",()=>{ if(document.hidden) save(); });
+  window.addEventListener("pagehide",save);
+}
+
+/* ---------- boot ---------- */
+load(); ensurePlots();
+const away=(Date.now()-S.last)/1000;
+wire(); buildPlots(); paintPlots(); paintPicker(); renderPanel();
+if(away>=30 && S.harvests>0){
+  const e=offline(away); paintPlots(); renderPanel();
+  info("Welcome back!",`You were away for ${fmtTime(Math.min(away,awayCapHours()*3600))}.`+(e>0?` Your farm earned ${fmt(e)} coins while you were gone.`:` Your crops kept growing.`));
+} else if(S.harvests===0 && S.life===0){ toast("Tap a plot to plant. Tap it again when it glows to harvest."); }
+let lastT=Date.now(), uiT=0, saveT=0;
+setInterval(()=>{
+  const now=Date.now(); let dt=(now-lastT)/1000; lastT=now;
+  if(dt>5){ offline(dt); dt=0.1; }
+  S.played+=dt; simulate(dt); events();
+  uiT+=dt; saveT+=dt;
+  paintPlots(); paintBanner();
+  if(uiT>=0.4){ uiT=0; refreshBtns(); }
+  if(saveT>=5){ saveT=0; checkAch(); save(); }
+},100);
+window.__farm={S:()=>S,harvestAll,plantAll,buyUp,buyCrop,buyTree,festival,fmt,CROPS,startRain,renderPanel,setTab:t=>{tab=t;renderPanel();}};
+})();
+</script>
+</body>
+</html>
