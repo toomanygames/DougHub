@@ -344,7 +344,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 <div class="fast-chat-backdrop" id="fastChatBackdrop" hidden></div>
 <aside class="fast-chat-drawer" id="fastChatDrawer" aria-label="DougHub community chat" aria-hidden="true">
   <div class="fast-chat-head"><div><span class="panel-kicker">DOUGHUB COMMUNITY</span><h2>Chat</h2><p>Talk with the community while you build.</p></div><button class="dialog-close" id="fastChatClose" type="button" aria-label="Close chat">×</button></div>
-  <iframe id="fastChatFrame" title="DougHub community chat" src="../chat.html" loading="lazy"></iframe>
+  <iframe id="fastChatFrame" title="DougHub community chat" data-src="../chat.html"></iframe>
   <div class="fast-chat-foot"><span>Chat opens in a side panel.</span><a href="../chat.html" target="_blank" rel="noopener">Open full chat ↗</a></div>
 </aside>
 <dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewDialogTitle">
@@ -388,8 +388,8 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="community-preview-toolbar"><span id="codeCommunityPreviewPermissions"></span><div class="community-preview-actions"><button class="btn" id="codeCommunityCopyCodeBtn" type="button">Copy code</button><button class="btn" id="codeCommunityDownloadBtn" type="button">Download HTML</button></div></div>
     <iframe id="codeCommunityPreviewFrame" title="Community project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe>
     <div class="community-preview-bottom"><span id="codeCommunityPreviewAuthor"></span><button class="btn" id="editCodeProjectBtn" type="button" hidden>Edit my project</button></div>
-  </dialo
+  </dialog>
 
-<script src="scripting.js?v=25"></script>
+<script src="scripting.js?v=27"></script>
 </body>
 </html>
