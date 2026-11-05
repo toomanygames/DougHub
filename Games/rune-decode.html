@@ -32,7 +32,7 @@ footer{padding:18px 12px 34px;color:#8588a8;text-align:center;font-size:10px}foo
 @media(max-width:760px){main{padding-top:22px}.layout{grid-template-columns:1fr}.intro{align-items:flex-start;flex-direction:column}.panel{padding:16px}.key-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media(max-width:420px){.topbar{padding:0 12px}.toplinks a{padding:8px 7px;font-size:9px}.key-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.rune-code img{width:39px;height:70px}.answer-row{flex-direction:column}.answer-row button{height:43px}}
 </style>
-</head>
+<script src="dictionary.js"></script></head>
 <body>
 <header class="topbar"><a class="brand" href="../douggames.html">Doug<span>Hub</span> Games</a><nav class="toplinks"><a href="../douggames.html">All games</a><a href="journey.html">Game journey</a><a href="shop.html">Shop</a></nav></header>
 <main>
@@ -65,18 +65,36 @@ footer{padding:18px 12px 34px;color:#8588a8;text-align:center;font-size:10px}foo
  let target="",shift=0,attempts=0,solved=false;
  const mod=n=>(n%26+26)%26;
  function renderKey(){$("runeKey").innerHTML=Array.from({length:26},(_,i)=>'<div class="key-tile"><img src="'+imageFor(i+1)+'" alt=""><b>'+String.fromCharCode(65+i)+'</b></div>').join("");}
- function newPuzzle(){
-  let index=Math.floor(Math.random()*WORDS.length);target=WORDS[index];shift=3+Math.floor(Math.random()*9);attempts=0;solved=false;
+ let dictionary=null,loadingPuzzle=false;
+ async function getDictionary(){if(dictionary&&dictionary.ok)return dictionary;try{dictionary=await DHDictionary.load();}catch(_){dictionary=null;}return dictionary;}
+ async function newPuzzle(){
+  if(loadingPuzzle)return;loadingPuzzle=true;
+  $("answerInput").disabled=true;$("submitAnswer").disabled=true;
+  $("gameFeedback").className="feedback";$("gameFeedback").textContent="Loading the dictionary…";
+  const dict=await getDictionary();
+  let word;
+  if(dict&&dict.ok){
+    // Mostly everyday words from the dictionary, with the original themed words mixed in when they are real dictionary words.
+    const themed=WORDS.map(w=>w.toLowerCase()).filter(w=>dict.has(w));
+    word=(themed.length&&Math.random()<0.25)?themed[Math.floor(Math.random()*themed.length)]:dict.pick(6,8);
+  }
+  if(!word)word=WORDS[Math.floor(Math.random()*WORDS.length)].toLowerCase();   // offline fallback
+  target=word.toUpperCase();shift=3+Math.floor(Math.random()*9);attempts=0;solved=false;
+  const themedIndex=WORDS.indexOf(target),themedClue=themedIndex>=0?CLUES[themedIndex]:"";
+  const how=" Translate each rune to its letter, then move that letter backward by "+shift+" places in the alphabet.";
   $("shiftPill").textContent="SHIFT: +"+shift;
-  $("instructions").textContent=CLUES[index]+" Translate each rune to its letter, then move that letter backward by "+shift+" places in the alphabet.";
+  $("instructions").textContent=(themedClue||("A "+target.length+"-letter word."))+how;
   $("runeCode").innerHTML=[...target].map(ch=>'<img src="'+imageFor(mod(ch.charCodeAt(0)-65+shift)+1)+'" alt="Encoded rune" draggable="false">').join("");
   $("answerInput").value="";$("answerInput").maxLength=target.length;$("answerInput").placeholder="ENTER "+target.length+" LETTERS";
   $("answerInput").disabled=false;$("submitAnswer").disabled=false;$("attemptCount").textContent="0 guesses";
   $("gameFeedback").className="feedback";$("gameFeedback").textContent="Translate the runes, reverse the shift, and enter the original word.";
+  loadingPuzzle=false;
+  if(!themedClue&&dict&&dict.ok){const current=target;dict.define(current).then(def=>{if(def&&target===current&&!solved)$("instructions").textContent="Clue: "+def+how;});}
  }
  function check(){
-  if(solved)return;const guess=$("answerInput").value.trim().toUpperCase();
+  if(solved||loadingPuzzle)return;const guess=$("answerInput").value.trim().toUpperCase();
   if(guess.length!==target.length){$("gameFeedback").className="feedback error";$("gameFeedback").textContent="This code has "+target.length+" letters. Fill in every letter.";return;}
+  if(dictionary&&dictionary.ok&&!dictionary.has(guess)){$("gameFeedback").className="feedback error";$("gameFeedback").textContent=guess+" isn't in the dictionary. Decode the runes again.";$("answerInput").select();return;}
   attempts++;$("attemptCount").textContent=attempts+" guess"+(attempts===1?"":"es");
   if(guess===target){solved=true;$("gameFeedback").className="feedback success";$("gameFeedback").textContent="Decoded! The hidden word was "+target+". Start another puzzle whenever you're ready.";$("submitAnswer").disabled=true;$("answerInput").disabled=true;}
   else{$("gameFeedback").className="feedback error";$("gameFeedback").textContent="Not decoded yet. Check the alphabet shift and try again.";$("answerInput").select();}
