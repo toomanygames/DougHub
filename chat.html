@@ -1339,6 +1339,25 @@ messagesEl.addEventListener("pointerdown", event => {
   }
 }, { passive: true });
 
+/* Follow the newest message. After a send (or while the reader is already at the bottom) the list keeps
+   snapping to the bottom for a few seconds, so GIFs, images and avatars that finish loading late
+   can't leave the view stuck partway up. Scrolling up by hand cancels it. */
+let chatStickUntil = 0;
+function stickChatToBottom(ms = 4000) {
+  chatStickUntil = Date.now() + ms;
+  chatUserScrolledUp = false;
+  initialChatScrollCancelled = false;
+}
+function chatFollowBottom() {
+  if (Date.now() >= chatStickUntil || chatUserScrolledUp || !messagesEl.isConnected) return;
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+// Images and GIFs do not bubble "load", so listen in the capture phase.
+messagesEl.addEventListener("load", chatFollowBottom, true);
+if (window.MutationObserver) {
+  new MutationObserver(chatFollowBottom).observe(messagesEl, { childList: true, subtree: true });
+}
+
 function settleInitialChatScroll() {
   const scrollToBottom = () => {
     if (initialChatScrollCancelled || !messagesEl.isConnected) return;
@@ -2597,6 +2616,41 @@ async function enableChatDesktopNotifications() {
   }
 }
 
+/* Desktop notification cooldown.
+   A busy chat used to pop up one notification per message. Now each conversation shows at most one every
+   20 seconds. Messages that arrive during the cooldown are held and delivered together as a single
+   "N new messages" notification when it ends. Set localStorage "douqhub_chat_notify_cooldown_s" to change
+   the length in seconds (0 turns the cooldown off). */
+const CHAT_NOTIFY_COOLDOWN_MS = (() => {
+  try {
+    const raw = localStorage.getItem("douqhub_chat_notify_cooldown_s");
+    const seconds = raw === null ? NaN : Number(raw);
+    return Number.isFinite(seconds) && seconds >= 0 ? Math.min(seconds, 600) * 1000 : 20000;
+  } catch (_) { return 20000; }
+})();
+const chatNotifyScopes = new Map();
+function gateChatNotification(row, deliver) {
+  const scope = String(row.group_id || "community");
+  let state = chatNotifyScopes.get(scope);
+  if (!state) { state = { last: 0, held: [], timer: null }; chatNotifyScopes.set(scope, state); }
+  const now = Date.now();
+  if (CHAT_NOTIFY_COOLDOWN_MS === 0 || now - state.last >= CHAT_NOTIFY_COOLDOWN_MS) {
+    state.last = now;
+    deliver(row, 1);
+    return;
+  }
+  state.held.push(row);
+  if (!state.timer) {
+    state.timer = window.setTimeout(() => {
+      state.timer = null;
+      const held = state.held.splice(0);
+      if (!held.length) return;
+      state.last = Date.now();
+      deliver(held[held.length - 1], held.length);
+    }, Math.max(0, CHAT_NOTIFY_COOLDOWN_MS - (now - state.last)));
+  }
+}
+
 function notifyIncomingChatMessage(row) {
   if(!row||!currentUser||row.user_id===currentUser.id)return;
   if(isChatMuted(row.group_id))return;
@@ -2615,6 +2669,10 @@ function notifyIncomingChatMessage(row) {
     notifiedChatMessageIds.delete(oldestId);
   }
 
+  gateChatNotification(row, deliverChatNotification);
+}
+
+function deliverChatNotification(row, heldCount) {
   // Send incoming messages straight to the optional DougHub desktop app bridge.
   // This must happen before browser-notification permission and active-tab checks.
   // Otherwise the app's visible chat window suppresses its own quick-reply popups.
@@ -2644,7 +2702,7 @@ function notifyIncomingChatMessage(row) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
   const author = String(row.username || "Someone").slice(0, 60);
   const rawBody = String(row.message || (row.attachment_type ? "Sent an attachment" : "Sent a message"));
-  const body = rawBody.replace(/\s+/g, " ").slice(0, 180);
+  const body = (heldCount > 1 ? heldCount + " new messages. Latest: " : "") + rawBody.replace(/\s+/g, " ").slice(0, 180);
   try {
     const notification = new Notification("DougHub Chat · " + author, {
       body,
@@ -2827,6 +2885,7 @@ async function loadMessages() {
 
     lastRenderedMessageSignature = signature;
     await renderMessages(orderedMessages, shouldScrollBottom);
+    if (shouldScrollBottom) stickChatToBottom(3500);
 
     // Retry only on entry, since the layout may settle after the first paint.
     // Upward user scrolling cancels these retries so normal scroll-up behavior
@@ -2925,6 +2984,9 @@ async function sendMessage() {
     // Force the refresh to render at the bottom. This also survives a refresh
     // already in progress, which caused the previous scroll fix to be ignored.
     forceChatScrollBottom = true;
+    stickChatToBottom(5000);
+    // If a refresh is already running, wait for it, so the new message is in the list before we scroll.
+    for (let i = 0; i < 30 && loadingMessages; i++) await new Promise(resolve => setTimeout(resolve, 100));
     await loadMessages();
     const scrollToNewest = () => {
       messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -2962,7 +3024,7 @@ chatVideoInviteButton?.addEventListener("click",async()=>{
   const inviteUrl=new URL("/chat-calls.html",location.origin);inviteUrl.searchParams.set("room",roomId);
   const inviteMessage="📹 Join my DougHub group video call (up to 6 people): "+inviteUrl.href;
   const {error}=await supabaseClient.from("chat_messages").insert({user_id:currentUser.id,username:currentUsername,message:inviteMessage,attachment_url:null,attachment_type:null,attachment_name:null,attachment_source:null,group_id:activeChatGroupId});
-  if(error)throw error;await loadMessages();showError("Video-call invite sent to this chat. Anyone who can see the message can open the link to join.");chatVideoInviteButton.textContent="Invite sent ✓";setTimeout(()=>chatVideoInviteButton.textContent=oldText,2200);
+  if(error)throw error;forceChatScrollBottom=true;stickChatToBottom(5000);await loadMessages();showError("Video-call invite sent to this chat. Anyone who can see the message can open the link to join.");chatVideoInviteButton.textContent="Invite sent ✓";setTimeout(()=>chatVideoInviteButton.textContent=oldText,2200);
  }catch(error){console.error("Could not send video-call invite:",error);showError("Couldn't send the call invite: "+(error?.message||"please try again."));chatVideoInviteButton.textContent=oldText}
  finally{chatVideoInviteButton.disabled=false}
 });
