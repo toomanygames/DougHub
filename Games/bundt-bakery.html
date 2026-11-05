@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<script src="no-zoom.js"></script>
+<meta name="theme-color" content="#ffd6e0">
+<title>Bundt Bakery</title>
+<link rel="icon" href="art/bundt-bakery.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="builtin:bundt-bakery" data-game-title="Bundt Bakery" defer></script>
+<style>
+:root{--ink:#5b3a29;--ink2:#8a6650;--cream:#fff4e0;--cream2:#ffe8c4;--pink:#ff8fab;--pink2:#ffc2d1;--mint:#8fd6b5;--butter:#ffd36b;--butter2:#f2b134;--sky:#9ad8ff;--white:#fffdf8;--display:"Fredoka","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;color:var(--ink);font:800 15px/1.4 var(--body);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overscroll-behavior:none;
+  background:radial-gradient(circle at 12% 8%,#fff0d6 0,transparent 40%),radial-gradient(circle at 90% 90%,#ffd9e4 0,transparent 45%),#ffeccd}
+body::before{content:"";position:fixed;inset:0;background:repeating-conic-gradient(#ffffff40 0 25%,transparent 0 50%) 0 0/46px 46px;opacity:.35;pointer-events:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+#app{position:relative;height:100%;display:flex;flex-direction:column;max-width:1180px;margin:0 auto}
+header.top{display:flex;align-items:center;gap:10px;padding:10px 14px;flex:0 0 auto}
+.back{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--white);box-shadow:0 3px 0 #0001;text-decoration:none;color:var(--ink);font-size:18px}
+.brand{font:700 24px var(--display);color:#d9487a;text-shadow:0 2px 0 #fff;white-space:nowrap}
+.stats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--white);box-shadow:0 3px 0 #0001;font:700 15px var(--display);white-space:nowrap}
+.chip small{font:800 11px var(--body);color:var(--ink2)}
+.iconbtn{padding:0 12px;height:38px;border-radius:12px;background:var(--white);box-shadow:0 3px 0 #0001;font:700 13px var(--display)}
+main{flex:1;min-height:0;position:relative}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:14px;text-align:center;overflow:auto}
+.logo{font:700 clamp(42px,9vw,86px)/.95 var(--display);color:#e0457a;text-shadow:0 4px 0 #fff,0 9px 0 #f7b3c8,0 16px 26px #0002}
+.logo small{display:block;font-size:.34em;letter-spacing:.2em;color:var(--ink);text-shadow:0 2px 0 #fff;margin-top:8px}
+.tag{max-width:520px;color:var(--ink2);font-size:16px}
+.btn{padding:13px 26px;border-radius:18px;background:linear-gradient(180deg,#ffb3c8,#ff7a9e);color:#fff;font:700 21px var(--display);text-shadow:0 2px 0 #c0456a;box-shadow:0 5px 0 #c0456a,0 12px 22px #0002;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #c0456a}
+.btn.alt{background:linear-gradient(180deg,#b6e8d0,#6fc7a0);text-shadow:0 2px 0 #3f8a68;box-shadow:0 5px 0 #3f8a68,0 12px 22px #0002}
+.btn.warm{background:linear-gradient(180deg,#ffe08a,#f2b134);color:#5b3a29;text-shadow:0 2px 0 #fff3;box-shadow:0 5px 0 #b87a10,0 12px 22px #0002}
+.btn.small{padding:8px 16px;font-size:15px;border-radius:13px;box-shadow:0 3px 0 #c0456a}
+.btn.alt.small{box-shadow:0 3px 0 #3f8a68}.btn.warm.small{box-shadow:0 3px 0 #b87a10}
+.btn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.case{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:560px}
+.case img{width:62px;height:62px;border-radius:14px;background:var(--white);box-shadow:0 3px 0 #0001;object-fit:cover}
+/* gameplay layout */
+#bake{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:stretch;justify-content:stretch;text-align:left;padding:6px 14px 14px}
+#cust{display:flex;flex-direction:column;gap:10px;align-items:center}
+#custImg{width:150px;height:150px;object-fit:contain;filter:drop-shadow(0 8px 6px #0002);animation:sway 3s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(3deg) translateY(-3px)}}
+#bubble{position:relative;padding:10px 14px;border-radius:18px;background:var(--white);box-shadow:0 4px 0 #0001;font:700 14px/1.35 var(--body);text-align:center}
+#bubble::before{content:"";position:absolute;top:-9px;left:50%;margin-left:-9px;border:9px solid transparent;border-top:0;border-bottom-color:var(--white)}
+#ticket{width:100%;padding:12px;border-radius:16px;background:#fffbe8;border:2px dashed #e0b868;box-shadow:0 4px 0 #0001;font-size:14px}
+#ticket h4{margin:0 0 6px;font:700 15px var(--display);color:#d9487a;letter-spacing:.06em}
+#ticket li{margin:2px 0;list-style:none}
+#ticket ul{margin:0;padding:0}
+#work{display:flex;flex-direction:column;gap:8px;min-height:0;padding:14px;border-radius:26px;background:var(--white);box-shadow:0 6px 0 #0001,0 18px 40px #0001}
+#stepHead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#stepTitle{font:700 24px var(--display);color:#d9487a}
+#stepHint{color:var(--ink2);font-size:14px;flex:1;min-width:180px}
+#dots{display:flex;gap:6px}
+#dots i{width:11px;height:11px;border-radius:50%;background:#f0d9c2}
+#dots i.on{background:var(--pink)}#dots i.done{background:var(--mint)}
+#stage{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.jars{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.jar{position:relative;display:flex;flex-direction:column;align-items:center;width:88px;padding:6px 4px;border-radius:16px;background:#fff7ea;box-shadow:0 3px 0 #0001;transition:transform .08s}
+.jar:active{transform:scale(.93)}
+.jar svg{width:56px;height:62px}
+.jar b{font:700 13px var(--display)}
+.jar .cnt{position:absolute;top:-6px;right:-4px;min-width:26px;padding:1px 7px;border-radius:999px;background:var(--mint);font:700 13px var(--display);color:#1f5a40}
+.jar .cnt.bad{background:#ff9a9a;color:#7a1a1a}
+.jar .cnt.ok{background:#8fe0a8}
+.meter{width:min(420px,90%);height:22px;border-radius:999px;background:#f5e4d0;border:3px solid var(--ink);overflow:hidden;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#ffd36b,#ff9a5a)}
+.meter .zone{position:absolute;top:0;bottom:0;background:#8fe0a855;border-left:2px solid #3f8a68;border-right:2px solid #3f8a68}
+.meter .needle{position:absolute;top:-4px;bottom:-4px;width:5px;margin-left:-2px;border-radius:3px;background:var(--ink)}
+.note{min-height:24px;font:700 17px var(--display);color:#3f8a68;text-align:center}
+.note.bad{color:#d9487a}
+.stageSvg{width:min(430px,92%);max-height:100%;height:auto;touch-action:none}
+#deco{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%}
+#decoCanvas{width:min(340px,80vw);height:auto;aspect-ratio:1;touch-action:none;border-radius:50%;background:radial-gradient(circle,#fff 0,#ffe8d2 70%);box-shadow:0 6px 0 #0001,0 14px 30px #0002;cursor:crosshair}
+.tools{display:flex;flex-direction:column;gap:6px;max-width:210px}
+.tools h5{margin:2px 0;font:700 13px var(--display);letter-spacing:.1em;color:var(--ink2)}
+.tools .pal{display:flex;flex-wrap:wrap;gap:6px}
+.tool{padding:5px 10px;border-radius:12px;background:#fff7ea;box-shadow:0 3px 0 #0001;font:700 13px var(--display);border:3px solid transparent}
+.tool.sel{border-color:var(--pink);background:#ffe9f0}
+.tool i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid var(--ink)}
+.foot{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+/* shop */
+.shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;width:min(980px,100%);text-align:left}
+.shopCard{padding:12px;border-radius:18px;background:var(--white);box-shadow:0 4px 0 #0001;display:flex;flex-direction:column;gap:4px}
+.shopCard h4{margin:0;font:700 17px var(--display)}
+.shopCard p{margin:0;color:var(--ink2);font-size:13px}
+.shopCard.owned{background:#e9fbf1}
+.sec{width:min(980px,100%);text-align:left;font:700 16px var(--display);color:#d9487a;letter-spacing:.08em;margin:6px 2px 0}
+/* result */
+.stars{font-size:48px;letter-spacing:6px;color:#ffc72c;text-shadow:0 3px 0 #c9891a}
+.stars i{color:#e8d6c0;font-style:normal}
+#resultImg{width:170px;height:170px;border-radius:50%;box-shadow:0 8px 0 #0001,0 16px 34px #0002;background:#fff}
+.break{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:600px}
+.break div{padding:6px 12px;border-radius:14px;background:var(--white);box-shadow:0 3px 0 #0001;font-size:13px}
+.break b{display:block;font:700 15px var(--display)}
+.toasts{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:30;pointer-events:none;display:flex;flex-direction:column;gap:6px;align-items:center}
+.toast{padding:8px 18px;border-radius:999px;background:#5b3a29;color:#fff;font:700 15px var(--display);box-shadow:0 4px 12px #0004;animation:in .25s ease-out}
+@keyframes in{from{transform:translateY(-10px);opacity:0}}
+.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.steam{animation:steam 2.2s ease-in-out infinite}
+@keyframes steam{0%{opacity:0;transform:translateY(8px)}50%{opacity:.8}100%{opacity:0;transform:translateY(-22px)}}
+.dropin{animation:drop .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes drop{from{transform:translateY(-60px);opacity:0}}
+@media(max-width:820px){
+  #bake{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:8px;padding:4px 8px 8px}
+  #cust{flex-direction:row;align-items:center;gap:10px}
+  #custImg{width:78px;height:78px;flex:0 0 78px}
+  #bubble{display:none}
+  #ticket{font-size:12.5px;padding:8px 10px}
+  #ticket h4{margin-bottom:2px}
+  .brand{font-size:19px}
+  #stepTitle{font-size:20px}
+  #work{padding:10px;border-radius:20px}
+  .jar{width:72px}.jar svg{width:44px;height:50px}
+}
+@media(prefers-reduced-motion:reduce){#custImg,.steam,.pop,.dropin{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <a class="back" href="../douggames.html" aria-label="Back to games">&larr;</a>
+    <div class="brand">Bundt Bakery</div>
+    <div class="stats">
+      <div class="chip" title="Coins"><span id="coins">0</span><small>coins</small></div>
+      <div class="chip" title="Day"><span id="day">1</span><small>day</small></div>
+      <div class="chip" title="Stars earned"><span id="starTotal">0</span><small>stars</small></div>
+      <button class="iconbtn" id="soundBtn" type="button">Sound on</button>
+    </div>
+  </header>
+  <main>
+    <section id="title" class="screen">
+      <div class="logo">Bundt Bakery<small>BAKE &middot; GLAZE &middot; DELIGHT</small></div>
+      <p class="tag">Welcome to your very own bakery! Customers order bundt cakes. Measure, mix, pour, bake, flip and decorate each one to make it perfect.</p>
+      <div class="row"><button class="btn" id="playBtn" type="button">Start baking</button><button class="btn alt" id="shopBtn" type="button">Pantry shop</button></div>
+      <div id="caseWrap" hidden><div class="sec" style="text-align:center">Your display case</div><div class="case" id="case"></div></div>
+    </section>
+    <section id="bake" class="screen" hidden>
+      <div id="cust">
+        <img id="custImg" alt="Customer">
+        <div id="bubble"></div>
+        <div id="ticket"></div>
+      </div>
+      <div id="work">
+        <div id="stepHead"><div id="stepTitle"></div><div id="stepHint"></div><div id="dots"></div></div>
+        <div id="stage"></div>
+        <div class="foot" id="foot"></div>
+      </div>
+    </section>
+    <section id="result" class="screen" hidden>
+      <img id="resultImg" alt="Your cake">
+      <div class="stars" id="resultStars"></div>
+      <div id="resultLine" class="tag"></div>
+      <div class="break" id="resultBreak"></div>
+      <div class="row"><button class="btn" id="nextBtn" type="button">Next customer</button><button class="btn alt" id="resShopBtn" type="button">Pantry shop</button></div>
+    </section>
+    <section id="shop" class="screen" hidden>
+      <div class="logo" style="font-size:clamp(30px,6vw,52px)">Pantry Shop</div>
+      <div id="shopBody" style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%"></div>
+      <button class="btn" id="shopBack" type="button">Back to the bakery</button>
+    </section>
+  </main>
+</div>
+<div class="toasts" id="toasts"></div>
+<script src="leaderboard.js" data-game-key="bundt-bakery" defer></script>
+<script src="bundt-bakery.js?v=1"></script>
+</body>
+</html>
