@@ -228,6 +228,10 @@ main {
   gap: 9px;
 }
 
+.message-row.announcement{background:linear-gradient(135deg,#3b2f7a55,#1c2a5a55);border:1px solid #a78bfa88;border-radius:14px;padding:8px 10px;margin:8px 0}
+.announcement-tag{display:inline-block;margin:0 0 5px;padding:2px 9px;border-radius:999px;background:#a78bfa;color:#1a1140;font:900 10px/1.4 system-ui,sans-serif;letter-spacing:.1em}
+.announce-wrap{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#c7d2fe;cursor:pointer}
+.announce-wrap input{accent-color:#8b5cf6;width:15px;height:15px}
 .message-row.mine {
   justify-content: flex-end;
 }
@@ -1142,6 +1146,7 @@ main {
       ></textarea>
       <div class="chat-send-actions">
         
+        <label id="announceWrap" class="announce-wrap" hidden title="Posts a labeled staff announcement under your own name"><input type="checkbox" id="announceToggle"> Staff announcement</label>
         <button type="button" id="chatHelpButton" class="chat-help-button" aria-expanded="false" aria-controls="chatHelpPopover">Help</button>
         <button type="submit" id="sendButton">Send</button>
       </div>
@@ -1597,7 +1602,10 @@ groupDialogForm.addEventListener("submit", async event => {
     saveGroupDialog.textContent = groupDialogMode === "create" ? "Create group" : "Save changes";
   }
 });
+const announceToggle = document.getElementById("announceToggle");
 async function updateChannelAllowance() {
+  const announceWrap = document.getElementById("announceWrap");
+  if (announceWrap) announceWrap.hidden = !currentUserIsAdmin;
   if (!supabaseClient || !currentUser || !createGroupButton) return;
   try {
     const { data, error } = await supabaseClient.rpc("dh_my_channel_allowance");
@@ -2425,6 +2433,13 @@ async function renderMessages(
         "message-bubble";
 
       renderMessageText(bubble, message.message || "");
+      if (message.kind === "announcement") {
+        row.classList.add("announcement");
+        const tag = document.createElement("div");
+        tag.className = "announcement-tag";
+        tag.textContent = "STAFF ANNOUNCEMENT";
+        content.appendChild(tag);
+      }
       content.appendChild(header);
       if (message.message) content.appendChild(bubble);
 
@@ -2855,7 +2870,7 @@ async function loadMessages() {
     // Ordering ascending before limiting would keep returning the oldest 200 forever.
     let messageQuery = supabaseClient
       .from("chat_messages")
-      .select("id, user_id, username, message, created_at, attachment_url, attachment_type, attachment_name, attachment_source, group_id");
+      .select("id, user_id, username, message, created_at, attachment_url, attachment_type, attachment_name, attachment_source, group_id, kind");
     messageQuery = activeChatGroupId === null
       ? messageQuery.is("group_id", null)
       : messageQuery.eq("group_id", activeChatGroupId);
@@ -2964,6 +2979,9 @@ async function sendMessage() {
 
   }
 
+  const sendAsAnnouncement = !!(currentUserIsAdmin && announceToggle && announceToggle.checked);
+  if (sendAsAnnouncement && !confirm("Send this as a staff announcement?\n\nEveryone in this chat will see it labeled as a staff announcement from you.")) return;
+
   sendButton.disabled =
     true;
 
@@ -2983,7 +3001,8 @@ async function sendMessage() {
         attachment_type: pendingAttachment?.type || null,
         attachment_name: pendingAttachment?.name || null,
         attachment_source: pendingAttachment?.source || null,
-        group_id: activeChatGroupId
+        group_id: activeChatGroupId,
+        kind: sendAsAnnouncement ? "announcement" : "message"
       });
 
     if (error) {
@@ -2994,6 +3013,7 @@ async function sendMessage() {
     }
 
     messageInput.value = "";
+    if (announceToggle) announceToggle.checked = false;
     pendingAttachment = null;
     attachmentStatus.textContent = "";
     showAttachmentPreview(null);
