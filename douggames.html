@@ -2316,6 +2316,15 @@ footer{font-size:12px}
 .dh-request-footer button{padding:10px 15px;border:1px solid #ffffff22;border-radius:11px;background:linear-gradient(120deg,#6366f1,#a855f7);color:#fff;font-size:11px;font-weight:900;cursor:pointer}
 .dh-request-footer button:disabled{opacity:.55;cursor:wait}
 @media(max-width:540px){.dh-request-dialog{padding:20px}.dh-request-footer{align-items:stretch;flex-direction:column}.dh-request-footer button{width:100%}}
+/* Community games open full screen */
+.player-overlay{padding:0!important;background:#05060f!important;backdrop-filter:none!important}
+.player-window{width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;border-radius:0!important;border:0!important;box-shadow:none!important}
+.player-header{height:46px!important;flex:0 0 auto}
+#gameFrame{flex:1 1 auto;min-height:0}
+.player-fs{width:35px;height:35px;border:none;border-radius:9px;background:rgba(255,255,255,.07);color:#fff;cursor:pointer;font-size:17px;margin-right:8px}
+.player-fs:hover{background:rgba(255,255,255,.16)}
+.player-actions{display:flex;align-items:center}
+body.player-open{overflow:hidden}
 </style>
 </head>
 
@@ -2899,18 +2908,18 @@ footer{font-size:12px}
                 Game
             </div>
 
-            <button
+            <span class="player-actions"><button id="fullscreenPlayer" class="player-fs" type="button" aria-label="Toggle browser full screen" title="Full screen">&#x26F6;</button><button
                 id="closePlayer"
                 class="close-player"
                 type="button"
             >
                 ×
-            </button>
+            </button></span>
 
         </div>
 
         <iframe
-            id="gameFrame"
+            id="gameFrame" allow="fullscreen; autoplay; gamepad; clipboard-write" allowfullscreen
         ></iframe>
 
     </div>
@@ -3939,6 +3948,8 @@ async function openCommunityGame(
             "show"
         );
 
+    document.body.classList.add("player-open");
+    try { document.getElementById("gameFrame").focus(); } catch (_) {}
     await startPlaySession(
         game.id
     );
@@ -3950,6 +3961,13 @@ async function openCommunityGame(
 /* =========================================
    CLOSE GAME
 ========================================= */
+
+const fsBtn = document.getElementById("fullscreenPlayer");
+if (fsBtn) fsBtn.addEventListener("click", function () {
+    const o = document.getElementById("playerOverlay");
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (o.requestFullscreen) o.requestFullscreen().catch(function () {});
+});
 
 const closePlayer =
     document.getElementById(
@@ -4013,6 +4031,8 @@ async function closeGame() {
             "show"
         );
 
+    document.body.classList.remove("player-open");
+    if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (_) {} }
     currentGameId =
         null;
 
