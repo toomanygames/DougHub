@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<script src="no-zoom.js"></script>
+<meta name="theme-color" content="#1a1138">
+<title>Honk &amp; Roll: The Goose Gig</title>
+<link rel="icon" href="art/goose-gig.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="builtin:goose-gig" data-game-title="Honk &amp; Roll: The Goose Gig" defer></script>
+<style>
+:root{--ink:#1a1138;--cream:#fff7e3;--gold:#ffd23f;--pink:#ff6b8b;--sky:#4fd1ff;--panel:#241650ee;--display:"Fredoka","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:#12082b;color:#fff;font:800 15px/1.4 var(--body);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+#view{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn{padding:13px 24px;border-radius:16px;background:linear-gradient(180deg,#ffdf6b,#ffb02e);color:#3b2400;font:700 20px var(--display);box-shadow:0 5px 0 #a8650a,0 10px 24px #0006;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #a8650a}
+.btn.alt{background:linear-gradient(180deg,#6f5bd6,#4a3aa8);color:#fff;box-shadow:0 5px 0 #2b2070,0 10px 24px #0006}
+.btn.small{padding:8px 14px;font-size:14px;border-radius:12px;box-shadow:0 3px 0 #a8650a}
+.btn.alt.small{box-shadow:0 3px 0 #2b2070}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center;background:radial-gradient(ellipse at 50% 30%,#2a1a6288,#0a041bd0 75%);z-index:10;overflow:auto}
+.logo{font:700 clamp(40px,9vw,92px)/.95 var(--display);letter-spacing:.01em;color:var(--gold);text-shadow:0 4px 0 #a8650a,0 9px 0 #5a2e00,0 18px 34px #000a}
+.logo small{display:block;font-size:.34em;color:#fff;letter-spacing:.2em;text-shadow:0 3px 0 #1a1138;margin-top:6px}
+.tag{max-width:520px;color:#e6dcff;font-size:16px}
+.menu{display:flex;flex-direction:column;gap:12px;align-items:center}
+.dad{margin-top:6px;padding:8px 16px;border-radius:999px;background:#ffffff14;border:1px solid #ffffff2e;font-size:13px;color:#ffe9a8}
+h2.h{margin:0;font:700 clamp(26px,5vw,42px) var(--display);color:var(--gold);text-shadow:0 3px 0 #5a2e00}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;width:min(1000px,100%)}
+.card{position:relative;padding:16px;border-radius:20px;background:var(--panel);border:2px solid #ffffff22;text-align:left;display:flex;flex-direction:column;gap:6px;transition:transform .1s,border-color .1s}
+.card:not(.locked):hover{transform:translateY(-4px);border-color:var(--gold)}
+.card.locked{opacity:.5;filter:grayscale(.6)}
+.card .num{font:700 14px var(--display);color:var(--gold);letter-spacing:.12em}
+.card h3{margin:0;font:700 21px var(--display)}
+.card .meta{color:#cbbcff;font-size:13px}
+.card .rival{font-size:13px;color:#ffd0dc}
+.stars{font-size:20px;letter-spacing:3px;color:#ffd23f}
+.stars i{color:#ffffff33;font-style:normal}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:5}
+#hudTop{position:absolute;left:0;right:0;top:0;padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.side{min-width:92px}
+.side b{display:block;font:700 28px var(--display);text-shadow:0 3px 0 #0008}
+.side span{display:block;font-size:12px;color:#e6dcff;letter-spacing:.1em}
+.side.right{text-align:right}
+#meterWrap{flex:1;max-width:520px;padding-top:4px}
+#meter{height:20px;border-radius:999px;overflow:hidden;background:linear-gradient(90deg,#ff5d7a,#c53a5a);border:3px solid #1a1138;box-shadow:0 3px 0 #0006;position:relative}
+#meterFill{position:absolute;right:0;top:0;bottom:0;width:50%;background:linear-gradient(90deg,#ffe36b,#ffb02e);transition:width .25s}
+#meterMid{position:absolute;left:50%;top:-2px;bottom:-2px;width:3px;background:#fff8}
+#levelName{text-align:center;font:600 13px var(--display);letter-spacing:.12em;color:#fff;margin-top:5px;text-shadow:0 2px 0 #0008}
+#phaseBanner{position:absolute;left:50%;top:92px;transform:translateX(-50%);padding:6px 22px;border-radius:999px;font:700 26px var(--display);letter-spacing:.1em;box-shadow:0 5px 0 #0005;white-space:nowrap}
+#phaseBanner.listen{background:#ff5d7a;color:#fff}
+#phaseBanner.play{background:var(--gold);color:#3b2400}
+#judge{position:absolute;left:50%;bottom:34%;transform:translateX(-50%);font:700 40px var(--display);text-shadow:0 4px 0 #0008;opacity:0;white-space:nowrap}
+#judge.show{animation:pop .5s ease-out}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.15)}100%{opacity:0;transform:translate(-50%,-26px) scale(1)}}
+#combo{position:absolute;right:14px;bottom:30%;font:700 34px var(--display);color:var(--gold);text-shadow:0 3px 0 #0008;text-align:right}
+#combo small{display:block;font-size:12px;color:#fff;letter-spacing:.14em}
+#count{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font:700 110px var(--display);color:#fff;text-shadow:0 7px 0 #a8650a,0 16px 34px #000a}
+#hudBtns{position:absolute;right:10px;bottom:10px;display:flex;gap:8px;pointer-events:auto}
+#touch{position:fixed;left:0;right:0;bottom:0;height:24%;min-height:120px;display:flex;gap:8px;padding:8px 10px 14px;z-index:6}
+#touch button{flex:1;border-radius:20px;border:4px solid #1a1138;font:700 30px var(--display);color:#fff;text-shadow:0 3px 0 #0007;opacity:.88;touch-action:none}
+#touch button:active,#touch button.down{transform:scale(.95);opacity:1}
+#subtitle{position:fixed;left:50%;bottom:7%;transform:translateX(-50%);width:min(760px,94vw);z-index:8;padding:14px 20px 12px;border-radius:20px;background:#120a2bf0;border:3px solid #ffd23f;box-shadow:0 8px 0 #0006,0 18px 44px #000a;text-align:left;cursor:pointer}
+#subtitle b{display:block;font:700 15px var(--display);letter-spacing:.14em;color:var(--gold);margin-bottom:2px}
+#subtitle span{display:block;font:800 20px/1.35 var(--body);min-height:2.7em}
+#subtitle small{display:block;margin-top:4px;color:#a99be0;font-size:12px;text-align:right}
+#skipCut{position:fixed;right:12px;top:12px;z-index:9}
+#bars{position:fixed;left:0;right:0;z-index:7;height:7vh;background:#000;pointer-events:none}
+#barTop{top:0}#barBottom{bottom:0}
+#pause,#result{z-index:20}
+.big{font:700 clamp(30px,6vw,56px) var(--display);color:var(--gold);text-shadow:0 4px 0 #5a2e00}
+.stat{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:17px}
+.stat div{padding:8px 14px;border-radius:14px;background:#ffffff14}
+#sound{position:fixed;left:10px;top:10px;z-index:30}
+body.inbattle:not(.paused) #sound,body.inbattle:not(.paused) #dhLbBtn{display:none!important}
+@media(max-width:700px){#hudBtns{bottom:auto;top:66px;right:8px}.side b{font-size:22px}#phaseBanner{top:84px;font-size:20px}#count{font-size:80px}#subtitle span{font-size:17px}}
+@media(prefers-reduced-motion:reduce){#judge.show{animation:none;opacity:1}}
+</style>
+</head>
+<body>
+<canvas id="view" aria-label="Honk and Roll 3D stage"></canvas>
+
+<button id="sound" class="btn alt small" type="button" aria-pressed="false">Sound on</button>
+
+<div id="hud" hidden>
+  <div id="hudTop">
+    <div class="side"><b id="rivalScore">0</b><span id="rivalName">RIVAL</span></div>
+    <div id="meterWrap"><div id="meter"><div id="meterFill"></div><div id="meterMid"></div></div><div id="levelName"></div></div>
+    <div class="side right"><b id="gooseScore">0</b><span>GOOSE</span></div>
+  </div>
+  <div id="phaseBanner" class="listen" hidden>LISTEN</div>
+  <div id="judge"></div>
+  <div id="combo" hidden>0<small>COMBO</small></div>
+  <div id="count" hidden></div>
+  <div id="hudBtns"><button class="btn alt small" id="pauseBtn" type="button">Pause</button></div>
+</div>
+
+<div id="touch" hidden>
+  <button type="button" data-lane="0" style="background:#ff6b8b">HONK</button>
+  <button type="button" data-lane="1" style="background:#e0a516">HONK</button>
+  <button type="button" data-lane="2" style="background:#2f9fd0">HONK</button>
+</div>
+
+<div id="subtitle" hidden role="status" aria-live="polite"><b id="subWho"></b><span id="subText"></span><small>Click, tap or press Space to continue</small></div>
+<button id="skipCut" class="btn alt small" type="button" hidden>Skip scene &#9654;&#9654;</button>
+
+<section id="title" class="screen">
+  <div class="logo">HONK &amp; ROLL<small>THE GOOSE GIG</small></div>
+  <p class="tag">Kicked out of the nest at 19, one goose, one dream, and a very loud beak. Beat five rivals in music battles and make it big.</p>
+  <div class="menu">
+    <button class="btn" id="playBtn" type="button">Play</button>
+    <button class="btn alt" id="levelsBtn" type="button">Level select</button>
+    <button class="btn alt small" id="howBtn" type="button">How to play</button>
+  </div>
+  <div class="dad" id="dadCounter" hidden></div>
+</section>
+
+<section id="how" class="screen" hidden>
+  <h2 class="h">How to play</h2>
+  <p class="tag">Every level is a music battle. Your rival plays a phrase first: <b>watch the notes and listen</b>. Then it is <b>your turn</b>: honk the same notes as they reach the glowing line. The crowd cheers for whoever plays best.</p>
+  <p class="tag"><b>Keys:</b> A / S / D, or &larr; &darr; &rarr;, or J / K / L. <b>Touch:</b> tap the three big buttons. Perfect timing scores the most, and long combos add a bonus.</p>
+  <button class="btn" id="howBack" type="button">Got it</button>
+</section>
+
+<section id="levels" class="screen" hidden>
+  <h2 class="h">Pick your stage</h2>
+  <div class="cards" id="cards"></div>
+  <button class="btn alt" id="levelsBack" type="button">Back</button>
+</section>
+
+<section id="pause" class="screen" hidden>
+  <div class="big">Paused</div>
+  <div class="menu">
+    <button class="btn" id="resumeBtn" type="button">Resume</button>
+    <button class="btn alt" id="retryBtn" type="button">Restart battle</button>
+    <button class="btn alt" id="quitBtn" type="button">Quit to levels</button>
+  </div>
+</section>
+
+<section id="result" class="screen" hidden>
+  <div class="big" id="resultTitle">Victory!</div>
+  <div class="stars" id="resultStars" style="font-size:44px"></div>
+  <div class="stat" id="resultStats"></div>
+  <p class="tag" id="resultLine"></p>
+  <div class="row" id="resultBtns"></div>
+</section>
+
+<script src="leaderboard.js" data-game-key="goose-gig" defer></script>
+<script type="module" src="goose-gig.js?v=1"></script>
+</body>
+</html>
