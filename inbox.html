@@ -72,10 +72,9 @@ async function checkAccess(){
   const {data:{user},error:authError}=await supabaseClient.auth.getUser();
   if(authError)throw authError;
   if(!user){location.href="log-in.html?redirect=inbox.html";return false;}
-  const {data:profile,error}=await supabaseClient.from("profiles").select("staff_role,is_admin").eq("id",user.id).maybeSingle();
+  const {data:rank,error}=await supabaseClient.rpc("dh_my_staff_rank");
   if(error)throw error;
-  const role=String(profile?.staff_role||"").toLowerCase();
-  if(!(profile?.is_admin===true||["developer","owner"].includes(role))){
+  if(!(Number(rank)>=3)){
     loading.style.display="none";errorEl.style.display="block";return false;
   }
   inboxUser=user;loading.style.display="none";inboxContent.style.display="grid";return true;

@@ -1597,6 +1597,24 @@ groupDialogForm.addEventListener("submit", async event => {
     saveGroupDialog.textContent = groupDialogMode === "create" ? "Create group" : "Save changes";
   }
 });
+async function updateChannelAllowance() {
+  if (!supabaseClient || !currentUser || !createGroupButton) return;
+  try {
+    const { data, error } = await supabaseClient.rpc("dh_my_channel_allowance");
+    if (error || !data) return;
+    if (data.unlimited) {
+      createGroupButton.textContent = "＋ New group";
+      createGroupButton.disabled = false;
+      createGroupButton.title = "Admins can create as many channels as they need.";
+      return;
+    }
+    const limit = Number(data.limit) || 2, used = Number(data.used) || 0;
+    createGroupButton.textContent = "＋ New group (" + Math.min(used, limit) + "/" + limit + ")";
+    const full = used >= limit;
+    createGroupButton.disabled = full;
+    createGroupButton.title = full ? "You can only create " + limit + " channels. Delete one of yours to make a new one." : "You can create " + (limit - used) + " more.";
+  } catch (_) { /* the database still enforces the limit */ }
+}
 async function loadChatGroups() {
   if (!supabaseClient || !currentUser) {
     visibleChatGroups = [];
@@ -1632,6 +1650,7 @@ async function loadChatGroups() {
     );
   }
   renderChatGroupList();
+  updateChannelAllowance();
   await refreshGroupMentionDots();
 }
 async function refreshGroupMentionDots() {
