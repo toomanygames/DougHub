@@ -448,13 +448,14 @@
       }
       const chatLink = document.getElementById("communityChatLink");
       const adminPlus = staffRank >= 2 || profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
-      let chatApproved = false;
-      if (user.email_confirmed_at) {
-        const { data: approval } = await client.from("chat_access_approvals")
-          .select("user_id").eq("user_id", user.id).maybeSingle();
-        chatApproved = !!approval;
-      }
-      const chatAllowed = !!user.email_confirmed_at && (chatApproved || adminPlus);
+      // Ask the server, not the copy of the account saved in this browser. That saved copy can be out of date
+      // (for example it may still say the email is unconfirmed), which hid Chat from approved people.
+      // If the check itself fails, leave the link visible: the chat page does its own access check.
+      let chatAllowed = true;
+      try {
+        const access = await client.rpc("dh_my_chat_access");
+        if (!access.error && typeof access.data === "boolean") chatAllowed = access.data || adminPlus;
+      } catch (_) { chatAllowed = true; }
       if (chatLink) chatLink.style.display = chatAllowed ? "" : "none";
       if (feedbackLink) {
         feedbackLink.style.display = staffRank >= 3 ? "" : "none";
