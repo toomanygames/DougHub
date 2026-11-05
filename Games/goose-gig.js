@@ -22,7 +22,7 @@ const SAVE_KEY = "dh-goose-gig-v1";
 let save = { unlocked: 1, stars: {}, best: {}, seenIntro: false, seenFinale: false, volume: .8, muted: false, dadLeftAt: 0 };
 try { Object.assign(save, JSON.parse(localStorage.getItem(SAVE_KEY) || "{}")); } catch (_) {}
 if (FORCE_MUTE) save.muted = true;
-if (params.get("unlock")) save.unlocked = clamp(Number(params.get("unlock")) || 1, 1, 5);
+if (params.get("unlock")) save.unlocked = clamp(Number(params.get("unlock")) || 1, 1, 99);
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (_) {} }
 
 /* ====================== levels ====================== */
@@ -56,8 +56,59 @@ const LEVELS = [
     drums: { kick: "1000000010000000", snare: "0000000100000001", hat: "1001100110011001" }, bass: [0, -1, -1, -1, 4, -1, -1, -1, 7, -1, -1, -1, 5, -1, -1, -1], bassKind: "pluck",
     sky: ["#2a0a2e", "#7a2a4a"], fog: "#3a1030", crowd: ["#f5e6c8", "#d9a441", "#8a1f3a", "#2a2a3a"],
     intro: "The final stage: the legendary Grand Duck Theater. The Maestro has never lost. He also has never smiled.",
-    taunt: "Honk? How... provincial. Come, let me show you what a REAL note sounds like.", win: "Magnifique. I have not been moved like this since... never.", lose: "A charming amateur. Do try again, dear." }
+    taunt: "Honk? How... provincial. Come, let me show you what a REAL note sounds like.", win: "Magnifique. I have not been moved like this since... never.", lose: "A charming amateur. Do try again, dear." },
+  /* ---- Act Two: the world tour. Faster notes, two-note chords, and much sillier rivals. ---- */
+  { id: "swamp", name: "Midnight Swamp Sing-Along", genre: "Spooky Funk", bpm: 112, rival: "Count Quackula", kind: "vamp", acc: .9, density: .82, vary: .4, twin: .1, travel: 1.5,
+    root: 38, scale: [0, 3, 5, 7, 10], chordRoots: [0, 0, 5, 7], chordQual: [[0, 3, 7], [0, 3, 7], [0, 3, 7], [0, 4, 7]], swing: 0, voice: "organ", costume: "cape", padWave: "sawtooth",
+    drums: { kick: "1001000100100010", snare: "0000100000001000", hat: "1010101010101010" }, bass: [0, -1, 0, 12, -1, 0, -1, 7, 0, -1, 0, 12, -1, 10, -1, 7], bassKind: "pump",
+    sky: ["#0a1424", "#1c3a3a"], fog: "#10282a", crowd: ["#6b8f5a", "#8a7fb0", "#c9c9d6", "#4a4a5a"],
+    intro: "Deep in the swamp, a vampire duck hosts a sing-along. Nobody has left. Nobody CAN leave.",
+    taunt: "Vell, vell, vell. A fresh young goose. I vant to... suck your... bread.", win: "Blah! Your honks are... zo cheerful. I am going back to my coffin.", lose: "Mwahaha! Come back at dawn. Oh wait, I cannot go out in it." },
+  { id: "market", name: "Aisle 7 After Hours", genre: "Elevator Bossa Nova", bpm: 104, rival: "Muzak Mike", kind: "cart", acc: .91, density: .84, vary: .4, twin: .14, travel: 1.45,
+    root: 48, scale: [0, 2, 4, 7, 9], chordRoots: [0, 9, 2, 7], chordQual: [[0, 4, 7, 11], [0, 3, 7, 10], [0, 3, 7, 10], [0, 4, 7, 10]], swing: 0, voice: "vibes", costume: "badge", padWave: "triangle",
+    drums: { kick: "1001001000100100", snare: "0010010000100100", hat: "1010101010101010" }, bass: [0, -1, -1, 0, -1, -1, 7, -1, 0, -1, -1, 0, -1, -1, 7, -1], bassKind: "pluck",
+    sky: ["#9ab4d4", "#e8eef6"], fog: "#d8e2ee", crowd: ["#ffe27a", "#ff9a9a", "#9ad8ff", "#bfe6a0"],
+    intro: "The supermarket is closed, but Mike never stops. He is a shopping cart. He has been playing the same elevator song since 1994.",
+    taunt: "Attention shoppers: there is a cleanup on aisle YOU. Squeak squeak.", win: "Unexpected item in the bagging area... it's your talent.", lose: "Thank you for shopping at the Mike Show. Please come again, but better." },
+  { id: "laundry", name: "Spin Cycle Disco", genre: "Disco Fever", bpm: 120, rival: "Spin Cycle Sally", kind: "washer", acc: .92, density: .85, vary: .45, twin: .16, travel: 1.4,
+    root: 45, scale: [0, 3, 5, 7, 10], chordRoots: [0, 5, 10, 3], chordQual: [[0, 3, 7], [0, 3, 7], [0, 4, 7], [0, 4, 7]], swing: 0, voice: "disco", costume: "afro", padWave: "sawtooth",
+    drums: { kick: "1000100010001000", snare: "0000100000001000", hat: "0010001000100010" }, bass: [0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12], bassKind: "pump",
+    sky: ["#2a0a4a", "#7a2a8a"], fog: "#4a1a6a", crowd: ["#ffb02e", "#ff6bd6", "#6bd6ff", "#a8ff6b"],
+    intro: "Midnight at the laundromat. The dryers are warm, the floor is glowing, and a washing machine has hired a disco ball.",
+    taunt: "Honey, I have been through the spin cycle AND the dance floor. You will get wrung out.", win: "Oh! You really knocked the lint out of me, sugar.", lose: "Rinse and repeat, darling. Rinse and repeat." },
+  { id: "pizza", name: "Pizza Parlor Polka", genre: "Polka Party", bpm: 150, rival: "Sir Pepperoni", kind: "pizza", acc: .93, density: .86, vary: .45, twin: .18, travel: 1.35,
+    root: 53, scale: [0, 2, 4, 7, 9], chordRoots: [0, 7, 0, 5], chordQual: [[0, 4, 7], [0, 4, 7], [0, 4, 7], [0, 4, 7]], swing: 0, voice: "accordion", costume: "chef", padWave: "triangle",
+    drums: { kick: "1000100010001000", snare: "0000100000001000", hat: "1010101010101010" }, bass: [0, -1, -1, -1, 7, -1, -1, -1, 0, -1, -1, -1, 7, -1, -1, -1], bassKind: "pluck",
+    sky: ["#7a1a1a", "#e88a3a"], fog: "#b85a2a", crowd: ["#f4e4c2", "#e8584a", "#6aa84a", "#f2c04a"],
+    intro: "At the best pizza parlor in town, a slice with an accordion refuses to leave the stage. Customers have been seen weeping. Possibly from the polka.",
+    taunt: "Mamma mia! A goose? On MY pizza? You're not even a little bit cheesy!", win: "Okay okay, you can dance! Take a free breadstick.", lose: "You got crust-ed! Ha! Get it? Crust-ed!" },
+  { id: "dino", name: "Dino Dig Drum-Off", genre: "Primal Drums", bpm: 132, rival: "T-Wrecks", kind: "trex", acc: .94, density: .88, vary: .5, twin: .2, travel: 1.3,
+    root: 36, scale: [0, 3, 5, 7, 10], chordRoots: [0, 0, 0, 0], chordQual: [[0, 7, 12], [0, 7, 12], [0, 7, 12], [0, 7, 12]], swing: 0, voice: "drums", costume: "bone", padWave: "sawtooth",
+    drums: { kick: "1001001001001001", snare: "0000100000001010", hat: "0000000000000000" }, bass: [0, -1, 0, -1, 0, 0, -1, -1, 0, -1, 0, -1, 0, 0, -1, -1], bassKind: "pump",
+    sky: ["#d86a1a", "#ffcf6a"], fog: "#f0a850", crowd: ["#8a6a3a", "#d8a050", "#6a8a4a", "#c05a3a"],
+    intro: "Millions of years ago, a tyrannosaurus formed a drum band. The arms were a problem.",
+    taunt: "RAWR! I can't reach the drums! But I CAN reach YOUR... uh... no I can't. Stupid arms.", win: "ROAR... that was... tiny-arm-ly good. Okay, I'll go quietly.", lose: "RAWR! Extinction event! For YOUR music career!" },
+  { id: "library", name: "Library Lockdown", genre: "Boom-Bap Hip Hop", bpm: 92, rival: "Madame Hoots", kind: "owl", acc: .95, density: .9, vary: .5, twin: .22, travel: 1.25,
+    root: 43, scale: [0, 3, 5, 7, 10], chordRoots: [0, 5, 3, 10], chordQual: [[0, 3, 7, 10], [0, 4, 7], [0, 4, 7], [0, 4, 7]], swing: .12, voice: "boombap", costume: "glasses", padWave: "triangle",
+    drums: { kick: "1000000110100000", snare: "0000100000001000", hat: "1011101110111011" }, bass: [0, -1, -1, -1, -1, -1, 0, -1, 7, -1, -1, -1, 0, -1, -1, -1], bassKind: "pump",
+    sky: ["#3a2410", "#8a5a2a"], fog: "#5a3a1a", crowd: ["#c9a06a", "#8a6a4a", "#d8d0b8", "#6a4a3a"],
+    intro: "The library closes at 9 PM. Madame Hoots does not care. She has a boombox, a stack of overdue books, and a very strict shushing policy.",
+    taunt: "SHHHHH! You'll need an indoor voice, young goose. Or better yet: no voice. Hoo-hoo!", win: "...That was loud. And wonderful. I will allow it. Just this once.", lose: "SHHH! That's a fine. Ten dollars. And one overdue honk." },
+  { id: "beach", name: "Seagull Beach Ska-Bash", genre: "Beach Ska", bpm: 160, rival: "Steve the Seagull", kind: "gull", acc: .96, density: .9, vary: .55, twin: .25, travel: 1.2,
+    root: 57, scale: [0, 2, 4, 7, 9], chordRoots: [0, 5, 7, 0], chordQual: [[0, 4, 7], [0, 4, 7], [0, 4, 7], [0, 4, 7]], swing: 0, voice: "skank", costume: "lei", padWave: "square", chordSteps: [2, 6, 10, 14], chordLen: 1.5,
+    drums: { kick: "1000100010001000", snare: "0000100000001000", hat: "1010101010101010" }, bass: [0, -1, 7, -1, 0, -1, 7, -1, 0, -1, 7, -1, 0, -1, 7, -1], bassKind: "pluck",
+    sky: ["#4ab8ff", "#ffe8a0"], fog: "#cfeaff", crowd: ["#ff7a7a", "#ffd36a", "#6ad8ff", "#9aff7a"],
+    intro: "A sunny beach, a ska band, and a seagull who has stolen EVERYONE'S fries. The crowd is both thrilled and hungry.",
+    taunt: "SQUAWK! Nice fries. I mean, nice try. They're my fries now. SQUAWK!", win: "SQUAWK... fine. Here, have your fries back. I only licked three.", lose: "SQUAWK! Thanks for the fries, loser!" },
+  { id: "dairy", name: "The Dairy Dome", genre: "Symphonic Dairy Rock", bpm: 164, rival: "The Milkman", kind: "milkman", acc: .97, density: .93, vary: .55, twin: .3, travel: 1.15,
+    root: 41, scale: [0, 3, 5, 7, 10], chordRoots: [0, 8, 3, 10], chordQual: [[0, 7, 12], [0, 7, 12], [0, 7, 12], [0, 7, 12]], swing: 0, voice: "epic", costume: "crown", padWave: "sawtooth",
+    drums: { kick: "1011001010110010", snare: "0000100000001000", hat: "1111111111111111" }, bass: [0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0], bassKind: "pump",
+    sky: ["#0a1a3a", "#4a8ac0"], fog: "#2a5a8a", crowd: ["#ffffff", "#bfe0ff", "#fff3b0", "#ffcfe0"],
+    intro: "The Dairy Dome: the largest milk store in the world. Rumor says a lone milkman has kept a certain someone's dad waiting in line... for months.",
+    taunt: "So. You're the goose. Your father is still in line. The line... is FOREVER. Muahaha. Do you like cheese? I have SO much cheese.", win: "No... my perfect line... Fine. Take your father. He has been complaining anyway.", lose: "The line is forever, little goose. Take a number." }
 ];
+save.unlocked = Math.min(save.unlocked, LEVELS.length);
+if (!save.v) { save.v = 2; if (save.seenFinale) { save.unlocked = Math.max(save.unlocked, 6); save.seenFinale = false; } persist(); }
 
 /* ====================== sound: everything is synthesized ====================== */
 let clock = 0;                  // game seconds (pauses with the game, runs faster in test mode)
@@ -103,6 +154,14 @@ const sfx = {
     else if (voice === "synth") { o.type = "sawtooth"; const o2 = c.createOscillator(); o2.type = "sawtooth"; o2.frequency.setValueAtTime(f * 1.007, t); o2.connect(lp); o2.start(t); o2.stop(t + dur + .2); lp.frequency.setValueAtTime(3600, t); lp.frequency.exponentialRampToValueAtTime(500, t + dur); this.env(g, t, .008, dur * .9, .22 * v); }
     else if (voice === "guitar") { o.type = "sawtooth"; const ws = c.createWaveShaper(), curve = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(x * 6); } ws.curve = curve; o.connect(ws); ws.connect(lp); lp.frequency.value = 3200; this.env(g, t, .004, dur * 1.4, .22 * v); lp.connect(g); g.connect(this.master); o.start(t); o.stop(t + dur * 1.4 + .2); return; }
     else if (voice === "sax") { o.type = "sawtooth"; const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1100; bp.Q.value = 1.2; const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = 5; lg.gain.value = f * .01; lfo.connect(lg); lg.connect(o.frequency); lfo.start(t); lfo.stop(t + dur + .3); o.connect(bp); bp.connect(g); this.env(g, t, .05, dur, .5 * v); g.connect(this.master); o.start(t); o.stop(t + dur + .3); return; }
+    else if (voice === "organ") { o.type = "square"; const o2 = c.createOscillator(), g2 = c.createGain(); o2.type = "square"; o2.frequency.setValueAtTime(f * 2, t); g2.gain.value = .5; o2.connect(g2); g2.connect(lp); o2.start(t); o2.stop(t + dur + .3); lp.frequency.value = 1400; this.env(g, t, .02, dur * 1.1, .2 * v); }
+    else if (voice === "vibes") { o.type = "sine"; const o2 = c.createOscillator(), g2 = c.createGain(); o2.type = "sine"; o2.frequency.setValueAtTime(f * 4, t); g2.gain.value = .25; o2.connect(g2); g2.connect(lp); o2.start(t); o2.stop(t + 1); lp.frequency.value = 5000; this.env(g, t, .004, .9, .45 * v); }
+    else if (voice === "disco") { o.type = "sawtooth"; const o2 = c.createOscillator(); o2.type = "sawtooth"; o2.frequency.setValueAtTime(f * 2.003, t); o2.connect(lp); o2.start(t); o2.stop(t + dur + .3); lp.frequency.setValueAtTime(3500, t); lp.frequency.exponentialRampToValueAtTime(700, t + .25); this.env(g, t, .004, .3, .26 * v); }
+    else if (voice === "accordion") { o.type = "sawtooth"; const o2 = c.createOscillator(); o2.type = "square"; o2.frequency.setValueAtTime(f * 1.012, t); o2.connect(lp); o2.start(t); o2.stop(t + dur + .3); lp.frequency.value = 2000; this.env(g, t, .03, dur, .24 * v); }
+    else if (voice === "drums") { o.type = "sine"; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f * .7, t + .15); this.env(g, t, .002, .28, .7 * v); this.noiseHit(t, .05, .3 * v, 2000); lp.frequency.value = 3000; }
+    else if (voice === "boombap") { o.type = "triangle"; lp.frequency.setValueAtTime(1800, t); lp.frequency.exponentialRampToValueAtTime(300, t + .25); this.env(g, t, .004, .3, .5 * v); }
+    else if (voice === "skank") { o.type = "square"; lp.frequency.value = 2200; this.env(g, t, .002, .09, .28 * v); }
+    else if (voice === "epic") { o.type = "sawtooth"; const o2 = c.createOscillator(), o3 = c.createOscillator(); o2.type = o3.type = "sawtooth"; o2.frequency.setValueAtTime(f * 1.006, t); o3.frequency.setValueAtTime(f * .994, t); o2.connect(lp); o3.connect(lp); o2.start(t); o3.start(t); o2.stop(t + dur + .4); o3.stop(t + dur + .4); lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(3200, t + .12); this.env(g, t, .03, dur * 1.1, .2 * v); }
     else { o.type = "square"; lp.frequency.value = 1800; this.env(g, t, .01, dur, .2 * v); }
     o.connect(lp); lp.connect(g); g.connect(this.master); o.start(t); o.stop(t + dur + .3);
   },
@@ -180,8 +239,19 @@ function clearWorld() {
 const actors = {}; const animated = [];   // animated: functions (t, dt, ctx)
 
 /* ---------- characters ---------- */
-function costume(goose, kind) {
+function costume2(goose, kind) {
   const head = goose.head;
+  if (kind === "cape") { goose.root.add(mesh(G.box(1.7, 1.9, .08), "#14101c", [0, 1.55, -1.18], [1, 1, 1], [.3, 0, 0])); goose.root.add(mesh(G.box(1.5, 1.7, .06), "#b3122e", [0, 1.55, -1.12], [1, 1, 1], [.3, 0, 0])); for (const x of [-.1, .1]) head.add(mesh(G.cone(.07, .22, 6), "#ffffff", [x, -.3, .62], [1, 1, 1], [Math.PI, 0, 0])); }
+  if (kind === "badge") { goose.root.add(mesh(G.box(.75, .38, .05), "#ffffff", [.55, 1.45, 1.25], [1, 1, 1], [0, .3, 0])); goose.root.add(mesh(G.box(.75, .12, .06), "#e0453a", [.55, 1.58, 1.26], [1, 1, 1], [0, .3, 0])); }
+  if (kind === "afro") { head.add(mesh(G.sph(.78), "#3a2418", [0, .5, -.12])); goose.neckPivot.add(mesh(G.tor(.34, .05), "#ffd23f", [0, .6, 0], [1, 1, 1], [Math.PI / 2, 0, 0], { metalness: .7 })); head.add(mesh(G.box(.66, .14, .07), "#e0a516", [0, .14, .46])); }
+  if (kind === "chef") { head.add(mesh(G.cyl(.38, .42, .5), "#ffffff", [0, .72, 0])); head.add(mesh(G.sph(.5), "#ffffff", [0, 1.05, 0])); head.add(mesh(G.box(.5, .07, .06), "#3a2418", [0, -.12, .62])); }
+  if (kind === "bone") { const b = new THREE.Group(); b.add(mesh(G.cyl(.06, .06, .9, 8), "#f4ecd8", [0, 0, 0], [1, 1, 1], [0, 0, Math.PI / 2])); for (const s of [-1, 1]) { b.add(mesh(G.sph(.12), "#f4ecd8", [s * .45, .07, 0])); b.add(mesh(G.sph(.12), "#f4ecd8", [s * .45, -.07, 0])); } b.position.set(0, .62, -.05); head.add(b); goose.root.add(mesh(G.box(1.4, .2, .1), "#7a5230", [0, 1.55, 1.2], [1, 1, 1], [0, 0, .25])); }
+  if (kind === "glasses") { for (const x of [-.22, .22]) head.add(mesh(G.tor(.15, .025), "#222222", [x, .12, .48])); head.add(mesh(G.box(.14, .02, .02), "#222222", [0, .12, .48])); head.add(mesh(G.sph(.2), "#7a5230", [0, .55, -.35])); }
+  if (kind === "lei") { goose.neckPivot.add(mesh(G.tor(.4, .07), "#ff6bd6", [0, .45, 0], [1, 1, 1], [Math.PI / 2, 0, 0])); for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; goose.neckPivot.add(mesh(G.sph(.1), i % 2 ? "#ffd23f" : "#ff6b8b", [Math.cos(a) * .4, .45, Math.sin(a) * .4])); } head.add(mesh(G.box(.66, .14, .07), "#111111", [0, .14, .46])); }
+  if (kind === "crown") { head.add(mesh(G.cyl(.4, .34, .25, 5), "#ffd23f", [0, .58, 0], [1, 1, 1], [0, 0, 0], { metalness: .6, roughness: .3 })); for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; head.add(mesh(G.cone(.07, .22, 6), "#ffd23f", [Math.cos(a) * .34, .8, Math.sin(a) * .34])); } head.add(mesh(G.sph(.08), "#e0302a", [0, .58, .4])); goose.root.add(mesh(G.box(1.7, 1.8, .08), "#2a4aa0", [0, 1.55, -1.18], [1, 1, 1], [.3, 0, 0])); }
+}
+function costume(goose, kind) {
+  const head = goose.head; costume2(goose, kind);
   if (kind === "hat") { const h = new THREE.Group(); h.add(mesh(G.cyl(.7, .7, .08), "#7a4a22", [0, .45, 0])); h.add(mesh(G.cyl(.4, .45, .45), "#8a5a2c", [0, .7, 0])); h.add(mesh(G.cyl(.46, .46, .09), "#c93b3b", [0, .52, 0])); head.add(h); }
   if (kind === "phones") { head.add(mesh(G.tor(.52, .07), "#22222b", [0, .1, 0], [1, 1, 1], [Math.PI / 2, 0, 0])); for (const x of [-.52, .52]) head.add(mesh(G.cyl(.2, .2, .18, 16), "#ff4fd8", [x, .08, 0], [1, 1, 1], [0, 0, Math.PI / 2], { emissive: "#ff4fd8", emissiveIntensity: .6 })); head.add(mesh(G.box(.62, .14, .08), "#111", [0, .14, .46])); }
   if (kind === "punk") { for (let i = 0; i < 5; i++) head.add(mesh(G.cone(.1, .5 - Math.abs(i - 2) * .06, 6), "#ff3d6e", [0, .5 - Math.abs(i - 2) * .04, -.25 + i * .14], [1, 1, 1], [0, 0, 0])); head.add(mesh(G.box(.6, .1, .07), "#111", [0, .13, .45])); }
@@ -256,6 +326,98 @@ function makeRival(kind) {
     body.add(mesh(G.sph(.2), "#c0213b", [0, 2.0, .95], [1.4, .8, .5]));
     r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group(); r.parts.armR.position.set(.75, 1.7, .55); r.parts.armL.position.set(-.75, 1.7, .55); root.add(r.parts.armL, r.parts.armR);
     const sax = new THREE.Group(); sax.position.set(.3, 1.6, 1.15); sax.rotation.set(.2, 0, -.2); sax.add(mesh(G.cyl(.1, .14, 1.4), "#e8b830", [0, .3, 0], [1, 1, 1], [0, 0, 0], { metalness: .7, roughness: .3 })); sax.add(mesh(G.tor(.35, .1), "#e8b830", [.35, -.4, 0], [1, 1, 1], [0, 0, Math.PI * .5], { metalness: .7, roughness: .3 })); sax.add(mesh(G.cone(.3, .5, 14), "#e8b830", [.7, -.15, 0], [1, 1, 1], [0, 0, Math.PI], { metalness: .7, roughness: .3 })); root.add(sax); r.parts.inst = sax;
+  } else if (kind === "vamp") {
+    body.add(mesh(G.sph(1), "#e6e2ec", [0, 1.2, 0], [1, .9, .95]));
+    body.add(mesh(G.cone(1.5, 2.8, 4), "#16111f", [0, 1.5, -.65], [1.1, 1, .3], [.25, Math.PI / 4, 0])); body.add(mesh(G.cone(1.3, 2.4, 4), "#a3122c", [0, 1.45, -.5], [1.05, 1, .22], [.25, Math.PI / 4, 0]));
+    head.position.set(0, 2.45, .2); head.add(mesh(G.sph(.72), "#f1edf5")); head.add(mesh(G.cone(.2, .62, 12), "#ff9c2a", [0, -.12, .78], [1, 1, 1], [Math.PI / 2, 0, 0]));
+    for (const s of [-1, 1]) { head.add(mesh(G.cone(.05, .22, 6), "#ffffff", [s * .1, -.36, .9], [1, 1, 1], [Math.PI, 0, 0])); head.add(mesh(G.sph(.13), "#ffffff", [s * .3, .22, .52])); head.add(mesh(G.sph(.07), "#e0102a", [s * .3, .22, .63])); }
+    head.add(mesh(G.cone(.42, .5, 10), "#15101c", [0, .62, .02], [1, .7, 1]));
+    r.parts.mouth = mesh(G.box(.3, .05, .06), "#400818", [0, -.3, .84]); head.add(r.parts.mouth);
+    for (const x of [-.45, .45]) body.add(mesh(G.cyl(.09, .09, .6), "#ff9c2a", [x, .3, .3]));
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -.95], [r.parts.armR, .95]]) { a.position.set(x, 1.8, .5); a.add(mesh(G.cyl(.14, .12, .9), "#16111f", [0, -.4, .15], [1, 1, 1], [-.5, 0, 0])); root.add(a); }
+    const organ = new THREE.Group(); organ.position.set(0, .9, 1.5); organ.add(mesh(G.box(2.4, .9, .9), "#3a2a22")); organ.add(mesh(G.box(2.2, .12, .5), "#f4f0e0", [0, .52, .15]));
+    for (let i = 0; i < 7; i++) organ.add(mesh(G.cyl(.1, .1, 1.5 + (i % 3) * .4, 8), "#c9b27a", [-.9 + i * .3, 1.2 + (i % 3) * .2, -.25]));
+    root.add(organ); r.parts.inst = organ;
+  } else if (kind === "cart") {
+    const steel = "#b8c0cc";
+    body.add(mesh(G.box(2.1, .1, 1.4), steel, [0, .95, 0]));
+    for (const [w, h, d, x, y, z] of [[2.1, .9, .06, 0, 1.45, -.7], [2.1, .9, .06, 0, 1.45, .7], [.06, .9, 1.4, -1.05, 1.45, 0], [.06, .9, 1.4, 1.05, 1.45, 0]]) body.add(mesh(G.box(w, h, d), steel, [x, y, z]));
+    for (let i = 0; i < 5; i++) body.add(mesh(G.box(.04, .9, .08), "#8892a0", [-.8 + i * .4, 1.45, .74]));
+    for (const [x, z] of [[-.8, -.5], [.8, -.5], [-.8, .5], [.8, .5]]) { body.add(mesh(G.cyl(.22, .22, .16, 14), "#222222", [x, .25, z], [1, 1, 1], [0, 0, Math.PI / 2])); body.add(mesh(G.cyl(.05, .05, .6, 6), steel, [x, .6, z])); }
+    body.add(mesh(G.box(2.1, .08, .08), "#e0453a", [0, 2.0, -.7]));
+    head.position.set(0, 1.5, .78); for (const x of [-.45, .45]) { head.add(mesh(G.sph(.34), "#ffffff", [x, .1, 0])); head.add(mesh(G.sph(.15), "#111111", [x + (x < 0 ? .05 : -.05), .08, .22])); }
+    r.parts.mouth = mesh(G.box(.7, .08, .06), "#222222", [0, -.32, .04]); head.add(r.parts.mouth);
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -1.2], [r.parts.armR, 1.2]]) { a.position.set(x, 1.9, .2); a.add(mesh(G.cyl(.07, .06, .9), steel, [0, -.4, .2], [1, 1, 1], [-.6, 0, 0])); root.add(a); }
+    const vibes = new THREE.Group(); vibes.position.set(0, 2.15, .15); for (let i = 0; i < 7; i++) vibes.add(mesh(G.box(.18, .06, .95 - i * .08), ["#ff6b8b", "#ffd23f", "#4fd1ff"][i % 3], [-.9 + i * .3, 0, 0])); root.add(vibes); r.parts.inst = vibes;
+  } else if (kind === "washer") {
+    body.add(mesh(G.box(2.3, 2.7, 1.8), "#f3f5f9", [0, 1.55, 0])); body.add(mesh(G.box(2.3, .7, 1.82), "#d9dee8", [0, 2.95, 0]));
+    body.add(mesh(G.cyl(.85, .85, .2, 28), "#8a93a6", [0, 1.45, .92], [1, 1, 1], [Math.PI / 2, 0, 0])); body.add(mesh(G.cyl(.7, .7, .22, 28), "#8fd0f4", [0, 1.45, .96], [1, 1, 1], [Math.PI / 2, 0, 0], { emissive: "#4aa8e0", emissiveIntensity: .35 }));
+    for (const [x, y] of [[-.2, 1.3], [.25, 1.6], [.1, 1.2]]) body.add(mesh(G.sph(.14), "#ffffff", [x, y, 1.08]));
+    head.position.set(0, 2.98, .95); for (const x of [-.45, .45]) { head.add(mesh(G.sph(.22), "#ffffff", [x, 0, 0])); head.add(mesh(G.sph(.11), "#111111", [x, 0, .14])); head.add(mesh(G.cone(.08, .35, 6), "#111111", [x * 1.15, .36, 0])); }
+    r.parts.mouth = mesh(G.box(.5, .07, .05), "#c0213b", [0, -.3, .05]); head.add(r.parts.mouth);
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -1.3], [r.parts.armR, 1.3]]) { a.position.set(x, 2.2, .3); a.add(mesh(G.cyl(.14, .12, 1.0), "#ff9ad8", [0, -.45, .2], [1, 1, 1], [-.5, 0, 0])); root.add(a); }
+    const ball = new THREE.Group(); ball.position.set(0, 4.1, 0); ball.add(mesh(G.sph(.55), "#c9ced8", [0, 0, 0], [1, 1, 1], [0, 0, 0], { metalness: .8, roughness: .2, emissive: "#9aa4c0", emissiveIntensity: .4 }));
+    for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; ball.add(mesh(G.box(.15, .15, .15), "#ffffff", [Math.cos(a) * .55, Math.sin(i * 1.3) * .32, Math.sin(a) * .55], [1, 1, 1], [a, a, 0], { emissive: "#ffffff", emissiveIntensity: .6 })); }
+    root.add(ball); r.parts.inst = ball; r.parts.spin = ball;
+  } else if (kind === "pizza") {
+    body.add(mesh(G.cyl(1.6, 1.6, .45, 3), "#f6c64a", [0, 2.0, 0], [1, 1, 1], [Math.PI / 2, 0, 0])); body.add(mesh(G.cyl(.28, .28, 2.8, 14), "#d89a4a", [0, 3.4, 0], [1, 1, 1], [0, 0, Math.PI / 2]));
+    for (const [x, y] of [[-.55, 2.5], [.6, 2.7], [0, 1.75], [-.2, 2.9], [.55, 2.0]]) body.add(mesh(G.cyl(.28, .28, .1, 18), "#c0392b", [x, y, .24], [1, 1, 1], [Math.PI / 2, 0, 0]));
+    body.add(mesh(G.sph(.12), "#2a7a3a", [.3, 1.85, .3], [1, .5, 1])); for (const x of [-.2, .2]) body.add(mesh(G.cyl(.14, .12, .5), "#d89a4a", [x, .25, 0]));
+    head.position.set(0, 2.3, .28); for (const x of [-.4, .4]) { head.add(mesh(G.sph(.2), "#ffffff", [x, .1, 0])); head.add(mesh(G.sph(.1), "#111111", [x, .1, .13])); }
+    for (const s of [-1, 1]) head.add(mesh(G.sph(.3), "#2a1a10", [s * .22, -.15, .05], [1.4, .4, .5], [0, 0, s * -.2]));
+    r.parts.mouth = mesh(G.box(.3, .06, .05), "#7a1a1a", [0, -.33, .06]); head.add(r.parts.mouth);
+    body.add(mesh(G.cyl(.55, .5, .7), "#ffffff", [0, 4.1, 0])); body.add(mesh(G.sph(.6), "#ffffff", [0, 4.6, 0]));
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -1.2], [r.parts.armR, 1.2]]) { a.position.set(x, 2.0, .3); a.add(mesh(G.cyl(.14, .12, .9), "#f6c64a", [0, -.4, .3], [1, 1, 1], [-.7, 0, 0])); root.add(a); }
+    const acc = new THREE.Group(); acc.position.set(0, 1.5, 1.05); acc.add(mesh(G.box(.5, 1.2, .9), "#8a1f1f", [-.95, 0, 0])); acc.add(mesh(G.box(.5, 1.2, .9), "#8a1f1f", [.95, 0, 0]));
+    for (let i = 0; i < 6; i++) acc.add(mesh(G.box(1.5, .17, .85), i % 2 ? "#ffffff" : "#c0392b", [0, -.5 + i * .2, 0])); root.add(acc); r.parts.inst = acc;
+  } else if (kind === "trex") {
+    body.add(mesh(G.sph(1), "#59a048", [0, 2.0, -.2], [1.25, 1.25, 1.6])); body.add(mesh(G.sph(.7), "#cfe8a8", [0, 1.7, .6], [.9, 1, .6]));
+    const tail = mesh(G.cone(.8, 3.2, 12), "#59a048", [0, 1.7, -2.5], [1, 1, 1], [-Math.PI / 2 + .25, 0, 0]); body.add(tail); r.parts.tail = tail;
+    head.position.set(0, 3.5, 1.1); head.add(mesh(G.sph(.75), "#62ac4f", [0, 0, 0], [1.1, .95, 1.3])); head.add(mesh(G.box(1.0, .3, 1.1), "#7cc063", [0, -.45, .35]));
+    for (let i = 0; i < 6; i++) head.add(mesh(G.cone(.07, .22, 6), "#ffffff", [-.4 + i * .16, -.3, .85], [1, 1, 1], [Math.PI, 0, 0]));
+    for (const s of [-1, 1]) { head.add(mesh(G.sph(.17), "#ffffff", [s * .38, .3, .75])); head.add(mesh(G.sph(.09), "#111111", [s * .38, .3, .9])); }
+    head.add(mesh(G.cyl(.04, .04, 1.3), "#d8b070", [.4, -.25, 1.2], [1, 1, 1], [0, 0, .5]));
+    r.parts.mouth = mesh(G.box(.8, .06, .1), "#3a0f18", [0, -.28, .98]); head.add(r.parts.mouth);
+    for (const x of [-.7, .7]) body.add(mesh(G.cyl(.35, .3, 1.3), "#4f9540", [x, .65, .1]));
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -.55], [r.parts.armR, .55]]) { a.position.set(x, 2.1, 1.25); a.add(mesh(G.cyl(.1, .08, .4), "#59a048", [0, -.18, .08], [1, 1, 1], [-.5, 0, 0])); root.add(a); }
+    const kit = new THREE.Group(); kit.position.set(0, .9, 2.4); kit.add(mesh(G.cyl(.7, .7, .8, 20), "#c0392b", [0, .1, 0], [1, 1, 1], [Math.PI / 2, 0, 0])); kit.add(mesh(G.cyl(.42, .42, .3, 18), "#f4f0e0", [-1.2, .55, .2])); kit.add(mesh(G.cyl(.4, .4, .3, 18), "#2a4aa0", [1.2, .55, .2]));
+    for (const x of [-1.6, 1.6]) { kit.add(mesh(G.cyl(.03, .03, 1.6), "#9aa4b4", [x, .9, -.3])); kit.add(mesh(G.cyl(.5, .5, .04, 18), "#e0b020", [x, 1.7, -.3])); }
+    root.add(kit); r.parts.inst = kit;
+  } else if (kind === "owl") {
+    body.add(mesh(G.sph(1), "#7a5230", [0, 1.4, 0], [1.1, 1.25, .95])); body.add(mesh(G.sph(.8), "#d8b88a", [0, 1.25, .5], [.9, 1, .5]));
+    head.position.set(0, 3.0, .15); head.add(mesh(G.sph(.8), "#86593a", [0, 0, 0], [1.25, 1, 1]));
+    for (const s of [-1, 1]) { head.add(mesh(G.cone(.2, .5, 6), "#6a4528", [s * .7, .75, 0], [1, 1, 1], [0, 0, -s * .3])); head.add(mesh(G.sph(.34), "#fff3c0", [s * .38, .12, .6])); head.add(mesh(G.sph(.16), "#111111", [s * .38, .12, .85])); head.add(mesh(G.tor(.36, .04), "#222222", [s * .38, .12, .62])); }
+    head.add(mesh(G.box(.12, .05, .08), "#222222", [0, .12, .65])); head.add(mesh(G.cone(.14, .35, 8), "#ff9c2a", [0, -.18, .9], [1, 1, 1], [Math.PI / 2, 0, 0]));
+    r.parts.mouth = mesh(G.box(.2, .04, .05), "#5a2a10", [0, -.3, .86]); head.add(r.parts.mouth);
+    for (const x of [-.35, .35]) body.add(mesh(G.cyl(.1, .1, .5), "#ff9c2a", [x, .25, .3]));
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -1.2], [r.parts.armR, 1.2]]) { a.position.set(x, 1.9, .3); a.add(mesh(G.sph(.5), "#6a4528", [0, -.5, .2], [.35, 1, .8])); root.add(a); }
+    const box = new THREE.Group(); box.position.set(0, 1.5, 1.15); box.add(mesh(G.box(1.9, .95, .55), "#8a8f9c")); for (const x of [-.55, .55]) box.add(mesh(G.cyl(.33, .33, .1, 18), "#2a2a33", [x, 0, .3], [1, 1, 1], [Math.PI / 2, 0, 0])); box.add(mesh(G.box(.4, .15, .06), "#42f5e3", [0, .25, .3], [1, 1, 1], [0, 0, 0], { emissive: "#42f5e3", emissiveIntensity: .7 })); box.add(mesh(G.cyl(.02, .02, .9), "#cfd3dc", [.8, .7, 0], [1, 1, 1], [0, 0, .3])); root.add(box); r.parts.inst = box;
+  } else if (kind === "gull") {
+    body.add(mesh(G.sph(1), "#f6f7fa", [0, 1.3, 0], [1, .9, 1.25])); body.add(mesh(G.sph(.7), "#9aa4b4", [0, 1.45, -.5], [1.2, .6, .8]));
+    head.position.set(0, 2.45, .5); head.add(mesh(G.sph(.55), "#f6f7fa")); head.add(mesh(G.cone(.15, .7, 10), "#ffc12a", [0, -.05, .65], [1, 1, 1], [Math.PI / 2, 0, 0])); head.add(mesh(G.sph(.05), "#e0302a", [0, -.18, .85]));
+    for (const x of [.1, -.1]) head.add(mesh(G.box(.07, .07, .8), "#ffd23f", [x, -.08, 1.05], [1, 1, 1], [0, x * 3, 0]));
+    for (const s of [-1, 1]) { head.add(mesh(G.sph(.1), "#ffffff", [s * .25, .15, .4])); head.add(mesh(G.sph(.05), "#111111", [s * .25, .15, .48])); head.add(mesh(G.box(.28, .05, .05), "#111111", [s * .25, .28, .46], [1, 1, 1], [0, 0, s * .4])); }
+    r.parts.mouth = mesh(G.box(.2, .04, .05), "#7a3000", [0, -.22, .7]); head.add(r.parts.mouth);
+    for (const x of [-.3, .3]) body.add(mesh(G.cyl(.05, .05, .9), "#ffc12a", [x, .45, .2]));
+    head.add(mesh(G.cyl(.7, .7, .06), "#e8cf8a", [0, .5, 0])); head.add(mesh(G.cyl(.38, .42, .3), "#f0dc9a", [0, .66, 0]));
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -.95], [r.parts.armR, .95]]) { a.position.set(x, 1.6, .2); a.add(mesh(G.sph(.5), "#f6f7fa", [0, -.4, 0], [.3, 1, .9])); a.add(mesh(G.sph(.2), "#222222", [0, -.9, 0], [.3, .9, .9])); root.add(a); }
+    const uke = new THREE.Group(); uke.position.set(.2, 1.4, 1.1); uke.rotation.set(0, 0, -.6); uke.add(mesh(G.sph(.45), "#d8a050", [0, 0, 0], [1, 1.1, .35])); uke.add(mesh(G.box(.1, 1.0, .08), "#6a3a1c", [0, .85, 0])); root.add(uke); r.parts.inst = uke;
+  } else if (kind === "milkman") {
+    body.add(mesh(G.cyl(1.05, 1.2, 2.8, 24), "#fafcff", [0, 1.6, 0])); body.add(mesh(G.cyl(.55, 1.05, 1.1, 24), "#fafcff", [0, 3.55, 0])); body.add(mesh(G.cyl(.58, .58, .35, 24), "#4a7be0", [0, 4.3, 0])); body.add(mesh(G.cyl(1.07, 1.07, .35, 24), "#4a7be0", [0, 1.0, 0]));
+    head.position.set(0, 3.1, 1.0); for (const x of [-.34, .34]) { head.add(mesh(G.sph(.2), "#ffffff", [x, .1, 0])); head.add(mesh(G.sph(.1), "#111111", [x, .1, .14])); }
+    for (const s of [-1, 1]) head.add(mesh(G.sph(.4), "#fff6f0", [s * .2, -.2, .05], [1.5, .5, .5], [0, 0, s * -.25]));
+    r.parts.mouth = mesh(G.box(.3, .05, .05), "#7a2a2a", [0, -.4, .05]); head.add(r.parts.mouth);
+    body.add(mesh(G.cyl(.72, .78, .34), "#2a4aa0", [0, 4.75, 0])); body.add(mesh(G.box(.8, .08, .5), "#2a4aa0", [0, 4.6, .6]));
+    r.parts.armL = new THREE.Group(); r.parts.armR = new THREE.Group();
+    for (const [a, x] of [[r.parts.armL, -1.3], [r.parts.armR, 1.3]]) { a.position.set(x, 2.3, .3); a.add(mesh(G.cyl(.2, .17, 1.1), "#fafcff", [0, -.5, .2], [1, 1, 1], [-.5, 0, 0])); root.add(a); }
+    const kt = new THREE.Group(); kt.position.set(0, 1.9, 1.3); kt.add(mesh(G.box(1.9, .45, .6), "#4a7be0")); for (let i = 0; i < 8; i++) kt.add(mesh(G.box(.15, .06, .42), "#ffffff", [-.8 + i * .23, .27, .02])); root.add(kt); r.parts.inst = kt;
   }
   r.parts.head = head; r.parts.body = body; toonify(root); return r;
 }
@@ -267,6 +429,8 @@ function animateRival(r, t, beat, dt, energy) {
   if (r.parts.armL) { r.parts.armL.rotation.x = -.7 - r.hit * .5 + Math.sin(t * 8) * r.hit * .2; r.parts.armR.rotation.x = -.7 - r.hit * .3; }
   if (r.parts.inst) r.parts.inst.rotation.z += Math.sin(t * 30) * r.hit * .01;
   if (r.parts.discL) { r.parts.discL.rotation.y += dt * 4; r.parts.discR.rotation.y -= dt * 3; }
+  if (r.parts.spin) r.parts.spin.rotation.y += dt * 3;
+  if (r.parts.tail) r.parts.tail.rotation.y = Math.sin(t * 3) * .3 * (.5 + r.hit);
   if (r.parts.bow) r.parts.bow.rotation.z = 1.2 + Math.sin(t * 20) * r.hit * .3;
   r.root.position.y = (r.baseY || 0) + bob * .12;
 }
@@ -302,8 +466,11 @@ function beamCone(color) { const m = new THREE.Mesh(G.cone(1.6, 9, 20), new THRE
 function buildVenue(L) {
   const sky = L.sky; scene.background = skyTexture(sky[0], sky[1]); scene.fog = new THREE.Fog(L.fog, 28, 80);
   const v = { beams: [], neon: [], flames: [], extra: [] };
-  const ground = mesh(G.cyl(60, 60, .4, 40), L.id === "theater" ? "#4a2a1a" : L.id === "neon" ? "#1a1626" : L.id === "quarry" ? "#4a3a36" : L.id === "barn" ? "#8a6a3a" : "#4f9e4a", [0, -.2, 0]); world.add(ground);
-  const stage = stageBase(L.id === "neon" ? "#26203c" : L.id === "theater" ? "#7a4a2a" : L.id === "quarry" ? "#3a3a44" : "#a8793f", L.id === "neon" ? "#17122a" : L.id === "theater" ? "#4a2a18" : "#6e4a28"); world.add(stage);
+  const GROUND = { theater: "#4a2a1a", neon: "#1a1626", quarry: "#4a3a36", barn: "#8a6a3a", swamp: "#1c2a24", market: "#c8ccd4", laundry: "#2a1a3a", pizza: "#8a4a2a", dino: "#8a6a3a", library: "#4a2a18", beach: "#e8d49a", dairy: "#dfe8f2" };
+  const ground = mesh(G.cyl(60, 60, .4, 40), GROUND[L.id] || "#4f9e4a", [0, -.2, 0]); world.add(ground);
+  const STAGE_TOP = { neon: "#26203c", theater: "#7a4a2a", quarry: "#3a3a44", swamp: "#2a2030", market: "#9aa6b8", laundry: "#3a2a5a", pizza: "#b8352a", dino: "#9a6a3a", library: "#6a3a1c", beach: "#d8b46a", dairy: "#bcd8f0" };
+  const STAGE_SIDE = { neon: "#17122a", theater: "#4a2a18", quarry: "#26262e", swamp: "#16101c", market: "#6a7688", laundry: "#241a3a", pizza: "#7a2218", dino: "#6a4a2a", library: "#3a2010", beach: "#a88a4a", dairy: "#8ab0d8" };
+  const stage = stageBase(STAGE_TOP[L.id] || "#a8793f", STAGE_SIDE[L.id] || "#6e4a28"); world.add(stage);
   const dec = (m, x, y, z) => { m.position.set(x, y, z); world.add(m); return m; };
   if (L.id === "pond") {
     dec(mesh(G.cyl(9, 9, .2, 40), "#4bb0e6", [0, 0, 0]), -16, .02, -8).userData.noOutline = true;
@@ -327,19 +494,78 @@ function buildVenue(L) {
     const rng = rngFrom(11); for (let i = 0; i < 16; i++) { const a = rng() * Math.PI - Math.PI, r = 14 + rng() * 12; const rock = mesh(new THREE.DodecahedronGeometry(2.5 + rng() * 3, 0), "#5a5a66", [Math.cos(a) * r, 2 + rng() * 2, -8 - Math.abs(Math.sin(a)) * r], [1, 1.5 + rng(), 1], [rng(), rng(), 0]); world.add(rock); }
     for (const x of [-6.2, 6.2]) { const amp = new THREE.Group(); for (let i = 0; i < 3; i++) { amp.add(mesh(G.box(2, 1.6, 1.2), "#17171d", [0, .8 + i * 1.62, 0])); amp.add(mesh(G.cyl(.55, .55, .1, 18), "#2a2a33", [0, .8 + i * 1.62, .65], [1, 1, 1], [Math.PI / 2, 0, 0])); } amp.position.set(x, .9, -2); world.add(amp); }
     for (const x of [-16, 16, -9, 9]) { const f = new THREE.Group(); f.add(mesh(G.cyl(.6, .7, 1.3, 10), "#3a2a2a", [0, .65, 0])); const fl = mesh(G.cone(.7, 2, 8), "#ff8a2a", [0, 2.2, 0], [1, 1, 1], [0, 0, 0], { emissive: "#ff5a10", emissiveIntensity: 1.3 }); fl.userData.noOutline = true; f.add(fl); f.position.set(x, 0, 7.5 + (Math.abs(x) < 10 ? -4 : 0)); world.add(f); v.flames.push(fl); }
-  } else {
+  } else if (L.id === "theater") {
     for (const s of [-1, 1]) { const cur = new THREE.Group(); for (let i = 0; i < 8; i++) cur.add(mesh(G.box(1.2, 14, .5), i % 2 ? "#8a1f3a" : "#a8284a", [i * 1.05, 7, Math.sin(i * 1.7) * .2])); cur.position.set(s * (s < 0 ? 13 : 5.5), 0, -3); world.add(cur); }
     dec(mesh(G.box(30, 16, .6), "#2a1228"), 0, 8, -9);
     dec(mesh(G.tor(8, .5), "#d9a441", [0, 0, 0], [1, 1, 1], [0, 0, 0], { metalness: .6, roughness: .35 }), 0, 8, -8.5);
     for (const x of [-14, 14]) dec(mesh(G.cyl(.8, .9, 14, 14), "#d9a441"), x, 7, -3);
     const ch = new THREE.Group(); ch.add(mesh(G.tor(1.3, .12), "#d9a441", [0, 0, 0], [1, 1, 1], [Math.PI / 2, 0, 0])); for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; ch.add(mesh(G.sph(.16), "#fff3b0", [Math.cos(a) * 1.3, -.2, Math.sin(a) * 1.3], [1, 1, 1], [0, 0, 0], { emissive: "#fff3b0", emissiveIntensity: 1 })); } ch.position.set(0, 11, 2); world.add(ch); v.extra.push(ch);
     for (let i = 0; i < 3; i++) dec(mesh(G.box(24, .5, 1.6), "#6a3a22"), 0, .25 + i * .5, 10 + i * 2.2);
+  } else if (L.id === "swamp") {
+    const moon = mesh(G.sph(5), "#f4f0d0", [0, 0, 0], [1, 1, .1], [0, 0, 0], { emissive: "#d8d4a0", emissiveIntensity: .9 }); moon.userData.noOutline = true; dec(moon, -14, 16, -30);
+    const rng = rngFrom(21);
+    for (let i = 0; i < 14; i++) { const tb = new THREE.Group(); tb.add(mesh(G.box(1.1, 1.7, .35), "#6a7078", [0, .85, 0])); tb.add(mesh(G.cyl(.55, .55, .35, 12), "#6a7078", [0, 1.7, 0], [1, 1, 1], [Math.PI / 2, 0, 0])); tb.position.set(-26 + rng() * 52, 0, -6 - rng() * 14); tb.rotation.y = (rng() - .5) * .6; world.add(tb); }
+    for (let i = 0; i < 8; i++) { const tr = new THREE.Group(); tr.add(mesh(G.cyl(.3, .55, 6, 8), "#2a2018", [0, 3, 0])); for (let k = 0; k < 3; k++) tr.add(mesh(G.cone(.18, 2.4, 6), "#2a2018", [(k - 1) * .7, 5.2 + k * .2, 0], [1, 1, 1], [0, 0, (k - 1) * .9])); tr.position.set(-30 + i * 8.5 + rng() * 3, 0, -16 - rng() * 10); world.add(tr); }
+    for (let i = 0; i < 10; i++) { const b = mesh(G.cone(.3, .5, 4), "#15101c", [0, 0, 0], [1.6, .5, .5]); dec(b, -10 + i * 2.2, 9 + Math.sin(i) * 1.5, -6); v.extra.push(b); }
+    for (const x of [-7, 7]) { const c = new THREE.Group(); c.add(mesh(G.cyl(.08, .08, 2.6), "#c9b27a", [0, 1.3, 0])); const fl = mesh(G.sph(.2), "#9aff9a", [0, 2.7, 0], [1, 1.4, 1], [0, 0, 0], { emissive: "#6aff6a", emissiveIntensity: 1.2 }); fl.userData.noOutline = true; c.add(fl); c.position.set(x, .9, -2); world.add(c); v.flames.push(fl); }
+  } else if (L.id === "market") {
+    dec(mesh(G.box(40, 14, .8), "#e4e9f0"), 0, 7, -10);
+    const rng = rngFrom(31), cols = ["#e0453a", "#ffd23f", "#4fb0e0", "#6ac36a", "#ff9c2a", "#c06ad8"];
+    for (const x of [-13, 13]) for (let k = 0; k < 3; k++) { const sh = new THREE.Group(); sh.add(mesh(G.box(2.4, 6.4, 1.3), "#cdd3dc", [0, 3.2, 0])); for (let r2 = 0; r2 < 4; r2++) for (let i = 0; i < 4; i++) { const p = mesh(G.box(.45, .6, .8), cols[(r2 * 4 + i + k) % 6], [-.85 + i * .57, .7 + r2 * 1.5, .1]); p.userData.noOutline = true; sh.add(p); } sh.position.set(x, 0, -6 + k * 5.5); world.add(sh); }
+    for (let i = 0; i < 6; i++) { const l = mesh(G.box(6, .15, .6), "#ffffff", [0, 0, 0], [1, 1, 1], [0, 0, 0], { emissive: "#fffbe0", emissiveIntensity: .9 }); l.userData.noOutline = true; dec(l, -10 + i * 4, 12, 0); v.neon.push(l); }
+    const sign = new THREE.Group(); sign.add(mesh(G.box(2.6, .5, .4), "#ffd23f", [0, 1.1, 0], [1, 1, 1], [0, 0, 0], { emissive: "#ffd23f", emissiveIntensity: .8 })); sign.add(mesh(G.box(.55, 2.6, .4), "#ffd23f", [.7, 0, 0], [1, 1, 1], [0, 0, .35], { emissive: "#ffd23f", emissiveIntensity: .8 })); sign.position.set(0, 7.2, -9.5); world.add(sign);
+    for (let i = 0; i < 3; i++) dec(mesh(G.box(1.4, 1.1, .9), "#d8a050"), -9 + i * 9, .55, 14);
+  } else if (L.id === "laundry") {
+    dec(mesh(G.box(40, 14, .8), "#2a1a3a"), 0, 7, -10);
+    for (let i = 0; i < 9; i++) { const w = new THREE.Group(); w.add(mesh(G.box(2.2, 2.8, 1.6), "#e8ecf4", [0, 1.4, 0])); w.add(mesh(G.cyl(.7, .7, .16, 22), "#7fc0ea", [0, 1.4, .85], [1, 1, 1], [Math.PI / 2, 0, 0], { emissive: "#4aa8e0", emissiveIntensity: .4 })); w.position.set(-14 + i * 3.5, 0, -8.5); world.add(w); }
+    const ball = new THREE.Group(); ball.add(mesh(G.sph(1.4), "#c9ced8", [0, 0, 0], [1, 1, 1], [0, 0, 0], { metalness: .8, roughness: .2, emissive: "#9aa4c0", emissiveIntensity: .35 }));
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; ball.add(mesh(G.box(.4, .4, .4), "#ffffff", [Math.cos(a) * 1.4, Math.sin(i * 1.7) * .8, Math.sin(a) * 1.4], [1, 1, 1], [a, a, 0], { emissive: "#ffffff", emissiveIntensity: .7 })); }
+    ball.position.set(0, 10, 0); world.add(ball); v.extra.push(ball);
+    const col = ["#ff4fd8", "#42f5e3", "#ffe14f", "#a56bff"]; for (let i = 0; i < 14; i++) { const tl = mesh(G.box(1.1, .06, 1.1), "#111111", [0, 0, 0], [1, 1, 1], [0, 0, 0], { emissive: col[i % 4], emissiveIntensity: .7 }); tl.userData.noOutline = true; dec(tl, -7.15 + i * 1.1, .93, 2.7); v.neon.push(tl); }
+    const sign = mesh(G.tor(2.2, .22), "#111111", [0, 0, 0], [1, 1, 1], [0, 0, 0], { emissive: "#ffe14f", emissiveIntensity: 1 }); sign.userData.noOutline = true; dec(sign, 0, 7.6, -9.4); v.neon.push(sign);
+  } else if (L.id === "pizza") {
+    dec(mesh(G.box(40, 14, .8), "#9a3f2a"), 0, 7, -10);
+    const oven = new THREE.Group(); oven.add(mesh(G.sph(3.2), "#7a3a26", [0, 0, 0], [1.3, 1, 1])); oven.add(mesh(G.box(2.4, 1.6, .4), "#1a0f0a", [0, -.4, 2.9])); const fl = mesh(G.cone(.7, 1.4, 8), "#ff8a2a", [0, -.5, 2.7], [1, 1, 1], [0, 0, 0], { emissive: "#ff5a10", emissiveIntensity: 1.3 }); fl.userData.noOutline = true; oven.add(fl); v.flames.push(fl); oven.position.set(-10.5, 2.4, -5); world.add(oven);
+    for (let i = 0; i < 12; i++) { const bulb = mesh(G.sph(.15), "#fff3a0", [0, 0, 0], [1, 1, 1], [0, 0, 0], { emissive: "#fff3a0", emissiveIntensity: .9 }); bulb.userData.noOutline = true; dec(bulb, -11 + i * 2, 7.2 + Math.sin(i / 11 * Math.PI) * .9, -8.5); v.neon.push(bulb); }
+    for (let i = 0; i < 6; i++) { const g1 = new THREE.Group(); g1.add(mesh(G.cyl(.02, .02, 1.6), "#8a6a3a", [0, 0, 0])); for (let k = 0; k < 3; k++) g1.add(mesh(G.sph(.22), "#f4ecd8", [0, -.9 - k * .3, 0], [1, 1.2, 1])); g1.position.set(-8 + i * 3.2, 9, -8.2); world.add(g1); }
+    for (let i = 0; i < 4; i++) dec(mesh(G.box(1.6, .25 * (i + 3), 1.6), "#f4ecd8"), 9.5 + (i % 2) * .5, .2 + .13 * (i + 3), -4.5);
+    for (let i = 0; i < 10; i++) { const st = mesh(G.box(.7, .08, 6.2), i % 2 ? "#ffffff" : "#d93a3a"); st.userData.noOutline = true; dec(st, -6.3 + i * 1.4, .92, 0); }
+  } else if (L.id === "dino") {
+    const vol = new THREE.Group(); vol.add(mesh(G.cone(9, 11, 14), "#5a3a2a", [0, 5.5, 0])); const lava = mesh(G.cone(2.6, 2.2, 12), "#ff7a1a", [0, 11.4, 0], [1, 1, 1], [0, 0, 0], { emissive: "#ff4a00", emissiveIntensity: 1.4 }); lava.userData.noOutline = true; vol.add(lava); v.flames.push(lava); vol.position.set(14, 0, -16); world.add(vol);
+    const rng = rngFrom(41); for (let i = 0; i < 16; i++) { const f = new THREE.Group(); for (let k = 0; k < 5; k++) f.add(mesh(G.cone(.25, 3, 6), "#3f8f3a", [0, 1.5, 0], [1, 1, 1], [(k - 2) * .38, k * 1.26, 0])); f.position.set(-28 + rng() * 56, 0, -6 - rng() * 14); world.add(f); }
+    for (let i = 0; i < 6; i++) { const rib = mesh(G.tor(1.6, .18), "#f4ecd8", [0, 0, 0], [1, 1.4, 1]); dec(rib, -12 + i * 1.1, 1.4, 9); rib.rotation.y = 1.57; }
+    for (const [x, z] of [[-11, 6], [11, 7], [-8, -5]]) dec(mesh(G.sph(.9), "#e8e0c8", [0, 0, 0], [1, 1.3, 1]), x, .9, z);
+    const sk = new THREE.Group(); sk.add(mesh(G.sph(1.3), "#f4ecd8", [0, 1.3, 0], [1.2, 1, 1.5])); sk.position.set(-14, 0, -3); world.add(sk);
+  } else if (L.id === "library") {
+    dec(mesh(G.box(40, 14, .8), "#4a2a14"), 0, 7, -10);
+    const cols = ["#b3342a", "#2a6ab3", "#2a8a4a", "#d8a030", "#7a3aa0", "#c0c0c0"], rng = rngFrom(51);
+    for (const x of [-15, -8.5, 8.5, 15]) { const sh = new THREE.Group(); sh.add(mesh(G.box(5.2, 11, 1.4), "#6a3a1c", [0, 5.5, 0])); for (let r2 = 0; r2 < 5; r2++) for (let i = 0; i < 7; i++) { const bk = mesh(G.box(.5, 1.5 + rng() * .5, .9), cols[Math.floor(rng() * 6)], [-2.1 + i * .7, 1.6 + r2 * 2.0, .3]); bk.userData.noOutline = true; sh.add(bk); } sh.position.set(x, 0, -8.5); world.add(sh); }
+    for (const x of [-5.2, 5.2]) { const lamp = new THREE.Group(); lamp.add(mesh(G.cyl(.08, .08, 1.4), "#c9b27a", [0, .7, 0])); lamp.add(mesh(G.box(.9, .4, .5), "#1a7a4a", [0, 1.5, 0], [1, 1, 1], [0, 0, 0], { emissive: "#1a9a5a", emissiveIntensity: .6 })); lamp.position.set(x, .9, -1.2); world.add(lamp); }
+    const lad = new THREE.Group(); for (const s of [-1, 1]) lad.add(mesh(G.cyl(.06, .06, 6), "#c9a06a", [s * .5, 3, 0])); for (let i = 0; i < 6; i++) lad.add(mesh(G.cyl(.04, .04, 1), "#c9a06a", [0, .6 + i, 0], [1, 1, 1], [0, 0, Math.PI / 2])); lad.position.set(-11, 0, -7); lad.rotation.z = .12; world.add(lad);
+    dec(mesh(G.box(3.4, 1.0, .2), "#f4f0e0"), 0, 8.8, -9.4);
+    for (let i = 0; i < 6; i++) { const bk = mesh(G.box(.8, .12, .6), cols[i]); dec(bk, -10 + i * 4, 6 + (i % 2) * 2, -5); v.extra.push(bk); }
+  } else if (L.id === "beach") {
+    dec(mesh(G.box(80, .2, 60), "#2aa0e8"), 0, -.05, -42);
+    const rng = rngFrom(61); for (let i = 0; i < 7; i++) { const p = new THREE.Group(), lean = (rng() - .5) * .4; p.add(mesh(G.cyl(.25, .4, 6, 8), "#8a6a3a", [0, 3, 0], [1, 1, 1], [0, 0, lean])); for (let k = 0; k < 6; k++) p.add(mesh(G.cone(.35, 3.2, 6), "#3aa04a", [Math.cos(k) * 1.3 + lean * 3, 6.3, Math.sin(k) * 1.3], [1, 1, 1], [Math.sin(k) * 1.0, 0, -Math.cos(k) * 1.0])); p.position.set(-24 + i * 8 + rng() * 2, 0, -12 - rng() * 6); world.add(p); }
+    const sun = mesh(G.sph(4), "#ffe27a", [0, 0, 0], [1, 1, .1], [0, 0, 0], { emissive: "#ffd23f", emissiveIntensity: 1.2 }); sun.userData.noOutline = true; dec(sun, 16, 14, -34);
+    for (const x of [-7.5, 7.5]) { const t = new THREE.Group(); t.add(mesh(G.cyl(.07, .07, 3), "#7a5230", [0, 1.5, 0])); const fl = mesh(G.cone(.28, .8, 8), "#ff9a2a", [0, 3.3, 0], [1, 1, 1], [0, 0, 0], { emissive: "#ff6a10", emissiveIntensity: 1.2 }); fl.userData.noOutline = true; t.add(fl); v.flames.push(fl); t.position.set(x, 0, -2.4); world.add(t); }
+    for (const x of [-12, 12]) { const um = new THREE.Group(); um.add(mesh(G.cyl(.05, .05, 4), "#ffffff", [0, 2, 0])); um.add(mesh(G.cone(2.2, 1, 12), "#e0453a", [0, 4.2, 0])); um.position.set(x, 0, x < 0 ? 6 : 8); world.add(um); }
+    for (let i = 0; i < 4; i++) dec(mesh(G.sph(.6), ["#ff6b8b", "#ffd23f", "#4fd1ff", "#6ac36a"][i]), -9 + i * 6, .6, 12);
+    for (let i = 0; i < 6; i++) dec(mesh(G.box(.5, .08, .08), "#ffd23f"), -3 + i * 1.3, .5, 12.5 + (i % 2));
+  } else if (L.id === "dairy") {
+    for (let i = 0; i < 6; i++) { const door = new THREE.Group(); door.add(mesh(G.box(5, 12, .8), "#e8f2fb", [0, 6, 0])); door.add(mesh(G.box(4.2, 11, .1), "#bfe0ff", [0, 6, .45], [1, 1, 1], [0, 0, 0], { emissive: "#8ac4f0", emissiveIntensity: .35 })); door.add(mesh(G.cyl(.08, .08, 2.6), "#9aa4b4", [2.1, 6, .6])); door.position.set(-15 + i * 6, 0, -9.4); world.add(door); }
+    const cm = (x, z, s) => { const m = new THREE.Group(); m.add(mesh(G.box(2 * s, 3 * s, 2 * s), "#fafcff", [0, 1.5 * s, 0])); m.add(mesh(G.box(2 * s, .5 * s, 2 * s), "#4a7be0", [0, 3.25 * s, 0])); m.add(mesh(G.cone(1.45 * s, 1.1 * s, 4), "#4a7be0", [0, 4.1 * s, 0], [1, 1, 1], [0, Math.PI / 4, 0])); m.position.set(x, 0, z); world.add(m); };
+    cm(-12.5, -3, 1.4); cm(12.5, -2.5, 1.5); cm(-16, 6, 1.1); cm(16, 6, 1.2);
+    for (let i = 0; i < 7; i++) { const p = mesh(G.box(3.4, .12, .6), "#ffffff", [0, 0, 0], [1, 1, 1], [0, 0, 0], { emissive: "#dff0ff", emissiveIntensity: .9 }); p.userData.noOutline = true; dec(p, -10.2 + i * 3.4, 12.4, -3); v.neon.push(p); }
+    for (let i = 0; i < 5; i++) { const sp = mesh(G.sph(.7), "#1a1a22", [0, 0, 0], [1.4, 1, .1]); sp.userData.noOutline = true; dec(sp, -8 + i * 4, 8.5 + (i % 2) * 1.6, -8.9); }
+    const cream = mesh(G.tor(6.5, .35), "#ffffff", [0, 0, 0], [1, 1, 1], [0, 0, 0], { emissive: "#cfe8ff", emissiveIntensity: .6 }); cream.userData.noOutline = true; dec(cream, 0, 9, -8.6); v.extra.push(cream);
   }
   // spot beams over each performer
   for (const x of [-3, 3.2]) { const b = beamCone(x < 0 ? "#ffd23f" : "#ff5d7a"); b.position.set(x, 5.6, .6); world.add(b); v.beams.push(b); }
   // light colors for the level
-  lights.hemi.color.set(L.id === "neon" ? "#6a4aff" : L.id === "quarry" ? "#ff7a5a" : L.id === "theater" ? "#ffd7a8" : "#fff4dc"); lights.hemi.groundColor.set(L.id === "neon" ? "#1a0a3a" : "#5a4a3a");
-  lights.hemi.intensity = L.id === "neon" ? .9 : 1.15; lights.sun.color.set(L.id === "neon" ? "#9a7aff" : L.id === "quarry" ? "#ff9a6a" : "#fff0d0"); lights.sun.intensity = L.id === "neon" ? .8 : 1.1;
+  const LIGHT = { neon: ["#6a4aff", "#1a0a3a", .9, "#9a7aff", .8], quarry: ["#ff7a5a", "#5a4a3a", 1.15, "#ff9a6a", 1.1], theater: ["#ffd7a8", "#5a4a3a", 1.15, "#fff0d0", 1.1], swamp: ["#7aa89a", "#0a1a1a", .9, "#8ab0c0", .75], laundry: ["#ff9aff", "#2a0a4a", 1.0, "#ffd0ff", .9], dairy: ["#cfe6ff", "#8aa8c8", 1.2, "#ffffff", 1.2], beach: ["#fff4dc", "#c8b078", 1.25, "#fff6d8", 1.25] };
+  const LT = LIGHT[L.id] || ["#fff4dc", "#5a4a3a", 1.15, "#fff0d0", 1.1];
+  lights.hemi.color.set(LT[0]); lights.hemi.groundColor.set(LT[1]); lights.hemi.intensity = LT[2]; lights.sun.color.set(LT[3]); lights.sun.intensity = LT[4];
   toonify(world);
   return v;
 }
@@ -460,6 +686,11 @@ function levelIntroScript(L, i) {
   ];
 }
 function levelOutroScript(L, won) {
+  const shots = levelOutroBase(L, won);
+  if (won && L.id === "theater") shots.push({ dur: 4.4, who: "NARRATOR", text: "Word spreads fast. By morning, every stage on Earth wants the goose. ACT TWO: THE WORLD TOUR.", cam: { from: [0, 6, 24], to: [0, 5, 17], look: [0, 3, 0] }, update(k, t, dt) { stageIdle(t, dt, 1); } });
+  return shots;
+}
+function levelOutroBase(L, won) {
   return [
     { dur: 3.4, who: L.rival.toUpperCase(), text: won ? L.win : L.lose, cam: { from: [8, 3.2, 8], to: [6, 3.4, 6.4], look: [3.2, 2.4, -.2] }, setup() { sfx.ensure() && (won ? sfx.cheer(sfx.at(clock)) : sfx.boo(sfx.at(clock))); }, update(k, t, dt) { stageIdle(t, dt, won ? 1 : .3); actors.rival.hit = won ? 0 : Math.abs(Math.sin(t * 6)) * .5; if (won) actors.rival.root.rotation.z = Math.sin(clamp(k * 2, 0, 1) * Math.PI * .5) * .25; } }
   ];
@@ -488,7 +719,7 @@ function finaleScript() {
       }, update(k, t, dt) { still(t, dt); } },
     { dur: 7, who: "", text: "", linear: true, cam: { from: [0, 4.2, 21], to: [0, 3.2, 10], look: [0, 1.8, 16], lookTo: [0, 1.6, 4] },
       update(k, t, dt) { walkTo(A.dad, 30, DAD_END, k, t, .78); walkTo(A.mom, 31.5, MOM_END, k, t, .8); still(t, dt); } },
-    { dur: 3.6, who: "DAD", text: "Sorry I'm late, kid. Long line at the milk store.", cam: { from: [-.3, 3.3, 10.5], to: [.4, 3.1, 9], look: [1.6, 2.5, 1.7] }, update(k, t, dt) { still(t, dt, "dad"); } },
+    { dur: 3.6, who: "DAD", text: "Sorry I'm late, kid. The Milkman made me wait in line. For SEVEN months!", cam: { from: [-.3, 3.3, 10.5], to: [.4, 3.1, 9], look: [1.6, 2.5, 1.7] }, update(k, t, dt) { still(t, dt, "dad"); } },
     { dur: 3.2, who: "MOM", text: "It has been seven months.", cam: { from: [1.2, 3.3, 10.5], to: [1.8, 3.1, 9], look: [2.6, 2.5, 1.9] }, update(k, t, dt) { still(t, dt, "mom"); } },
     { dur: 3.6, who: "DAD", text: "The prices were wild. Anyway... I heard you on the radio. I'm proud of you.", cam: { from: [-.3, 3.3, 10.5], to: [.4, 3.1, 9], look: [1.6, 2.5, 1.7] }, update(k, t, dt) { still(t, dt, "dad"); } },
     { dur: 3.2, who: "GOOSE", text: "HONK.   (Translation: Dad... you came back.)", cam: { from: [-1.1, 3.3, 10], to: [-.6, 3.1, 8.8], look: [-1, 2.4, .5] }, update(k, t, dt) { actors.goose.hit = .6 + Math.sin(t * 8) * .3; still(t, dt); } },
@@ -527,7 +758,7 @@ function venueFx(t, beat, energy, turn) {
 }
 
 /* ====================== the battle ====================== */
-const LANES = 3, LANE_X = [-.62, 0, .62], LANE_COL = ["#ff6b8b", "#ffd23f", "#4fd1ff"], TRAVEL = 1.6, HW_SPEED = 2.3, PHRASE_BEATS = 16, PHRASES = 8, LEAD_BEATS = 4;
+const LANES = 3, LANE_X = [-.62, 0, .62], LANE_COL = ["#ff6b8b", "#ffd23f", "#4fd1ff"], TRAVEL = 1.6, HW_SPEED = 2.3, PHRASE_BEATS = 16, PHRASES = 8, LEAD_BEATS = 4, HW_LEN = 1.6 * 2.3;
 const highway = new THREE.Group(); highway.position.set(0, -1.25, -3.1); highway.rotation.x = .55; camera.add(highway); highway.visible = false; hwRef = highway; resize();
 const hwMats = { plane: new THREE.MeshBasicMaterial({ color: "#1a1138", transparent: true, opacity: .42, depthTest: false }), line: new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: .35, depthTest: false }) };
 const hwPlane = new THREE.Mesh(new THREE.PlaneGeometry(LANES * .62 + .26, TRAVEL * HW_SPEED + .6), hwMats.plane); hwPlane.rotation.x = -Math.PI / 2; hwPlane.position.set(0, -.02, -TRAVEL * HW_SPEED / 2 + .2); hwPlane.renderOrder = 1; highway.add(hwPlane);
@@ -541,7 +772,7 @@ function makePattern(rng, L) {
   for (let s = 0; s < 30; s++) {
     const p = L.density * (s % 2 === 0 ? 1.12 : .72); if (rng() > p) continue;
     let next = rng() < .55 ? clamp(lane + (rng() < .5 ? -1 : 1), 0, LANES - 1) : Math.floor(rng() * LANES); if (next === lane) run++; else run = 0; if (run >= 2) { next = (next + 1 + Math.floor(rng() * 2)) % LANES; run = 0; }
-    lane = next; notes.push({ beat: s * .5, lane });
+    lane = next; notes.push({ beat: s * .5, lane }); if (L.twin && rng() < L.twin) notes.push({ beat: s * .5, lane: (lane + 1 + Math.floor(rng() * 2)) % LANES });
   }
   return notes;
 }
@@ -558,7 +789,7 @@ function buildBattle(i, attempt) {
   }
   notes.sort((a, b) => a.t - b.t);
   const perSide = notes.filter(n => n.owner === "goose").length;
-  return { i, L, spb, t0, notes, step: 0, nextStep: 0, score: { goose: 0, rival: 0 }, combo: 0, maxCombo: 0, hits: { perfect: 0, good: 0, miss: 0 }, phrase: -1, perSide, over: false, endAt: t0 + PHRASES * PHRASE_BEATS * spb + 1.2, meter: 50, counted: -1 };
+  return { i, L, spb, t0, notes, step: 0, nextStep: 0, score: { goose: 0, rival: 0 }, combo: 0, maxCombo: 0, hits: { perfect: 0, good: 0, miss: 0 }, phrase: -1, perSide, over: false, endAt: t0 + PHRASES * PHRASE_BEATS * spb + 1.2, meter: 50, counted: -1, travel: L.travel || TRAVEL };
 }
 function startBattle(i, attempt = 0) {
   state.mode = "battle"; state.attempt = attempt; document.body.classList.add("inbattle"); document.body.classList.remove("paused"); showScreen(null); $("hud").hidden = false; showBars(false); $("touch").hidden = !isTouch();
@@ -608,9 +839,9 @@ function updateBattle(dt) {
   // notes
   for (const n of b.notes) {
     if (n.done) continue; const dtn = n.t - clock;
-    if (!n.mesh && dtn < TRAVEL + .1) n.mesh = noteMesh(n);
+    if (!n.mesh && dtn < b.travel + .1) n.mesh = noteMesh(n);
     if (n.mesh) {
-      n.mesh.position.z = -dtn * HW_SPEED; const pop = n.mesh.userData.pop || 0; if (pop) { n.mesh.userData.pop = Math.max(0, pop - dt * 6); n.mesh.scale.setScalar(1 + (1 - pop) * 1.2); if (n.mesh.userData.pop === 0) { highway.remove(n.mesh); n.done = true; continue; } }
+      n.mesh.position.z = -dtn * (HW_LEN / b.travel); const pop = n.mesh.userData.pop || 0; if (pop) { n.mesh.userData.pop = Math.max(0, pop - dt * 6); n.mesh.scale.setScalar(1 + (1 - pop) * 1.2); if (n.mesh.userData.pop === 0) { highway.remove(n.mesh); n.done = true; continue; } }
     }
     if (n.owner === "rival") {
       if (!n.played && dtn <= 0) { n.played = true; if (n.rivalHit) { b.score.rival += 100; actors.rival.hit = 1; if (n.mesh) { n.mesh.userData.pop = 1; } } else if (n.mesh) { n.mesh.material = noteMats.dead; } updateScores(); }
@@ -645,7 +876,8 @@ function scheduleBacking(b) {
     if (kick[s16] === "1") sfx.kick(t); if (snare[s16] === "1") sfx.snare(t); if (hat[s16] === "1") sfx.hat(t, i % 8 === 2 ? 1 : .6);
     if (bar % 4 === 3 && s16 >= 12 && L.id !== "pond") sfx.snare(t, .5);
     const deg = L.bass[s16]; if (deg >= 0) sfx.bass(t, midi(L.root + L.chordRoots[chord] + deg), stepDur * (L.bassKind === "pump" ? 1.6 : 3), L.bassKind);
-    if (s16 === 0 || (s16 === 8 && L.id !== "neon")) sfx.chord(t, L.chordQual[chord].map(x => L.root + 12 + L.chordRoots[chord] + x), stepDur * 7, L.id === "quarry" ? "sawtooth" : L.id === "neon" ? "sawtooth" : "triangle");
+    const chordSteps = L.chordSteps || (L.id === "neon" ? [0] : [0, 8]);
+    if (chordSteps.includes(s16)) sfx.chord(t, L.chordQual[chord].map(x => L.root + 12 + L.chordRoots[chord] + x), stepDur * (L.chordLen || 7), L.padWave || (L.id === "quarry" || L.id === "neon" ? "sawtooth" : "triangle"));
   }
   // rival lead voice, scheduled just ahead of its note
   for (const n of b.notes) { if (n.owner !== "rival" || n.sched) continue; if (n.t - clock > .3) break; n.sched = true; if (n.rivalHit && n.t >= clock - .05) sfx.lead(L.voice, sfx.at(n.t), midi(n.pitch), b.spb * .45); }
@@ -655,20 +887,20 @@ function finishBattle() {
   const g = Math.round(b.score.goose), r = Math.round(b.score.rival), won = g > r, total = b.hits.perfect + b.hits.good + b.hits.miss, acc = total ? (b.hits.perfect + b.hits.good * .6) / total : 0;
   let stars = 0; if (won) { stars = 1; if (g >= r * 1.05) stars = 2; if (g >= r * 1.2 && acc >= .85) stars = 3; }
   const res = { won, g, r, stars, acc, maxCombo: b.maxCombo, hits: b.hits, level: b.i };
-  if (won) { save.unlocked = Math.max(save.unlocked, Math.min(5, b.i + 2)); save.stars[b.i] = Math.max(save.stars[b.i] || 0, stars); save.best[b.i] = Math.max(save.best[b.i] || 0, g); persist(); const sum = Object.values(save.best).reduce((a, v) => a + v, 0); try { window.DHScores && DHScores.submit("goose-gig", sum, { now: true }); } catch (_) {} }
+  if (won) { save.unlocked = Math.max(save.unlocked, Math.min(LEVELS.length, b.i + 2)); save.stars[b.i] = Math.max(save.stars[b.i] || 0, stars); save.best[b.i] = Math.max(save.best[b.i] || 0, g); persist(); const sum = Object.values(save.best).reduce((a, v) => a + v, 0); try { window.DHScores && DHScores.submit("goose-gig", sum, { now: true }); } catch (_) {} }
   // reset the camera shot and play the outro before the result screen
   buildLevelWorld(b.i); camera.fov = 52; camera.updateProjectionMatrix();
   runCutscene(levelOutroScript(b.L, won), () => showResult(res));
 }
 function showResult(res) {
-  state.mode = "result"; const L = LEVELS[res.level], last = res.won && res.level === 4;
+  state.mode = "result"; const L = LEVELS[res.level], last = res.won && res.level === LEVELS.length - 1;
   $("resultTitle").textContent = res.won ? (res.stars === 3 ? "Perfect Show!" : "You won the crowd!") : "The crowd wasn't feeling it";
   $("resultStars").innerHTML = [1, 2, 3].map(n => n <= res.stars ? "&#9733;" : "<i>&#9733;</i>").join("");
   $("resultStats").innerHTML = `<div>You: <b>${res.g}</b></div><div>${L.rival}: <b>${res.r}</b></div><div>Accuracy: <b>${Math.round(res.acc * 100)}%</b></div><div>Best combo: <b>${res.maxCombo}</b></div>`;
   $("resultLine").textContent = res.won ? (last ? "You beat the Maestro. The theater is on its feet..." : `Next up: ${LEVELS[res.level + 1].name}.`) : "Listen to the rival's phrase, then play it back as the notes reach the glowing line.";
   const btns = $("resultBtns"); btns.innerHTML = "";
   const add = (txt, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.type = "button"; b.textContent = txt; b.addEventListener("click", fn); btns.appendChild(b); };
-  if (res.won) { if (last) add("Watch the ending", "", () => { showScreen(null); buildLevelWorld(4); runCutscene(finaleScript(), () => { save.seenFinale = true; persist(); showScreen("title"); toTitleWorld(); }); }); else add("Next level", "", () => playLevel(res.level + 1)); }
+  if (res.won) { if (last) add("Watch the ending", "", () => { showScreen(null); buildLevelWorld(LEVELS.length - 1); runCutscene(finaleScript(), () => { save.seenFinale = true; persist(); showScreen("title"); toTitleWorld(); }); }); else add("Next level", "", () => playLevel(res.level + 1)); }
   add("Retry", res.won ? "alt" : "", () => playLevel(res.level, true)); add("Level select", "alt", () => { showScreen("levels"); renderLevels(); toTitleWorld(); });
   showScreen("result");
 }
@@ -726,7 +958,7 @@ $("levelsBack").addEventListener("click", () => showScreen("title"));
 function rewatch(kind) {
   sfx.ensure(); highway.visible = false; battle = null; document.body.classList.remove("inbattle", "paused");
   if (kind === "opening") { clearWorld(); buildNestScene(); runCutscene(openingScript(), () => { toTitleWorld(); showScreen("title"); }); }
-  else { buildLevelWorld(4); runCutscene(finaleScript(), () => { toTitleWorld(); showScreen("title"); }); }
+  else { buildLevelWorld(LEVELS.length - 1); runCutscene(finaleScript(), () => { toTitleWorld(); showScreen("title"); }); }
 }
 $("rewatchBtn").addEventListener("click", () => rewatch("opening")); $("rewatchEndBtn").addEventListener("click", () => rewatch("ending"));
 $("howBtn").addEventListener("click", () => showScreen("how")); $("howBack").addEventListener("click", () => showScreen("title"));
@@ -755,4 +987,4 @@ function frame(now) {
 }
 syncSound(); toTitleWorld(); showScreen("title"); requestAnimationFrame(frame);
 /* test hooks (also handy for debugging) */
-window.__gig = { state, save, get battle() { return battle; }, get clock() { return clock; }, LEVELS, playLevel, startBattle, pressLane, skipCutscene() { if (cut) { cut.i = cut.script.length; endCutscene(); } }, advance, speaking() { return !!(cut && cut.speaking); }, advanceTime(sec) { const n = Math.max(1, Math.round(sec / .033)); for (let i = 0; i < n; i++) step(.033, performance.now()); renderer.render(scene, camera); }, jumpShot(i) { if (cut) { cut.i = i - 1; nextShot(); } }, runFinale() { buildLevelWorld(4); runCutscene(finaleScript(), () => toTitleWorld()); }, runOpening() { clearWorld(); buildNestScene(); runCutscene(openingScript(), () => toTitleWorld()); }, get cut() { return cut; }, scene, camera, renderer };
+window.__gig = { state, save, get battle() { return battle; }, get clock() { return clock; }, LEVELS, playLevel, startBattle, pressLane, skipCutscene() { if (cut) { cut.i = cut.script.length; endCutscene(); } }, advance, speaking() { return !!(cut && cut.speaking); }, advanceTime(sec) { const n = Math.max(1, Math.round(sec / .033)); for (let i = 0; i < n; i++) step(.033, performance.now()); renderer.render(scene, camera); }, jumpShot(i) { if (cut) { cut.i = i - 1; nextShot(); } }, runFinale() { buildLevelWorld(LEVELS.length - 1); runCutscene(finaleScript(), () => toTitleWorld()); }, runOpening() { clearWorld(); buildNestScene(); runCutscene(openingScript(), () => toTitleWorld()); }, get cut() { return cut; }, scene, camera, renderer };
