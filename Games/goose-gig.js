@@ -379,17 +379,42 @@ function runCutscene(script, done) {
 function nextShot() {
   if (!cut) return; cut.i++;
   if (cut.i >= cut.script.length) return endCutscene();
-  cut.shot = cut.script[cut.i]; cut.t = 0; cut.shot.setup && cut.shot.setup();
-  const s = cut.shot; say(s.who, s.text); cut.hold = s.text ? Math.max(1.2, s.text.length * .045) : 0;
+  cancelSpeech(); cut.shot = cut.script[cut.i]; cut.t = 0; cut.shot.setup && cut.shot.setup();
+  const s = cut.shot; say(s.who, s.text); cut.hold = s.text ? Math.max(1.2, s.text.length * .045) : 0; speakShot(s);
 }
-function endCutscene() { const d = cut && cut.done; cut = null; say(null, null); showBars(false); $("skipCut").hidden = true; if (d) d(); }
+function endCutscene() { cancelSpeech(); const d = cut && cut.done; cut = null; say(null, null); showBars(false); $("skipCut").hidden = true; if (d) d(); }
 function advance() { if (!cut) return; const box = $("subtitle"); if (box.hidden || cut.t < .35) return; if ($("subText").textContent.length < (box.dataset.full || "").length) { finishText(); return; } nextShot(); }
 function updateCutscene(dt) {
   if (!cut) return; cut.t += dt; const s = cut.shot; if (!s) return;
   const k = clamp(cut.t / s.dur, 0, 1), e = s.linear ? k : ease(k);
   if (s.cam) { const c = s.cam; camera.position.set(lerp(c.from[0], c.to[0], e), lerp(c.from[1], c.to[1], e), lerp(c.from[2], c.to[2], e)); const l = c.lookTo || c.look; camera.lookAt(lerp(c.look[0], l[0], e), lerp(c.look[1], l[1], e), lerp(c.look[2], l[2], e)); }
   s.update && s.update(k, cut.t, dt);
-  if (cut.t >= s.dur + (cut.hold || 0) * .0 && (!s.text ? true : cut.t >= s.dur)) nextShot();
+  if (cut.t >= s.dur && (!cut.speaking || cut.t > s.dur + 9)) nextShot();
+}
+
+/* ---------- voices: Mom and Dad speak with the browser's built-in voices (like Siri); the goose honks ---------- */
+let voiceList = [];
+function loadVoices() { try { voiceList = (window.speechSynthesis && speechSynthesis.getVoices() || []).filter(v => /^en/i.test(v.lang)); } catch (_) { voiceList = []; } }
+if ("speechSynthesis" in window) { loadVoices(); try { speechSynthesis.addEventListener("voiceschanged", loadVoices); } catch (_) {} }
+function pickVoice(role) {
+  const male = /\b(David|Mark|Daniel|Alex|Fred|James|George|Guy|Ryan|Aaron|Thomas|Oliver|Arthur|Gordon)\b|\bMale\b/i, female = /\b(Zira|Samantha|Victoria|Karen|Susan|Hazel|Aria|Jenny|Moira|Tessa|Serena|Fiona|Allison|Ava|Kate|Joanna)\b|\bFemale\b/i;
+  const m = voiceList.find(v => male.test(v.name)), f = voiceList.find(v => female.test(v.name));
+  return role === "dad" ? (m || voiceList[0] || null) : (f || voiceList.find(v => v !== m) || voiceList[0] || null);
+}
+function cancelSpeech() { try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (_) {} if (cut) { clearTimeout(cut.speakGuard); cut.speaking = false; } }
+function speakShot(s) {
+  cancelSpeech();
+  if (!sfx.on || !s.text) return;
+  if (s.who === "GOOSE") { if (sfx.ensure()) { const t = sfx.ctx.currentTime; sfx.honk(t, 330, .18, .9); sfx.honk(t + .27, 392, .24, .9); } return; }
+  const role = s.who === "DAD" ? "dad" : s.who === "MOM" ? "mom" : null;
+  if (!role || !("speechSynthesis" in window)) return;
+  const text = s.text.replace(/\(.*?\)/g, "").replace(/\.\.\./g, ", ").replace(/\s+/g, " ").trim(); if (!text) return;
+  try {
+    loadVoices(); const u = new SpeechSynthesisUtterance(text); u.voice = pickVoice(role); u.lang = "en-US";
+    u.pitch = role === "dad" ? .6 : 1.35; u.rate = role === "dad" ? .92 : 1.04; u.volume = clamp(save.volume, 0, 1);
+    cut.speaking = true; const done = () => { if (cut && cut.shot === s) cut.speaking = false; }; u.onend = done; u.onerror = done;
+    cut.speakGuard = setTimeout(done, Math.max(4000, text.length * 130)); speechSynthesis.speak(u);
+  } catch (_) { cut.speaking = false; }
 }
 
 /* ---------- cutscene scripts ---------- */
@@ -665,7 +690,7 @@ function playLevel(i, retry = false) {
 }
 function toTitleWorld() {
   state.mode = "title"; clearWorld(); buildLevelWorld(0); highway.visible = false; $("hud").hidden = true; $("touch").hidden = true; showBars(false);
-  camera.fov = 52; camera.updateProjectionMatrix(); updateDadCounter();
+  camera.fov = 52; camera.updateProjectionMatrix(); updateDadCounter(); $("rewatchEndBtn").hidden = !save.seenFinale;
 }
 function updateDadCounter() {
   const el = $("dadCounter"); if (!save.dadLeftAt) { el.hidden = true; return; }
@@ -698,6 +723,12 @@ $("skipCut").addEventListener("click", () => { if (cut) { cut.i = cut.script.len
 $("playBtn").addEventListener("click", startGame);
 $("levelsBtn").addEventListener("click", () => { sfx.ensure(); showScreen("levels"); renderLevels(); });
 $("levelsBack").addEventListener("click", () => showScreen("title"));
+function rewatch(kind) {
+  sfx.ensure(); highway.visible = false; battle = null; document.body.classList.remove("inbattle", "paused");
+  if (kind === "opening") { clearWorld(); buildNestScene(); runCutscene(openingScript(), () => { toTitleWorld(); showScreen("title"); }); }
+  else { buildLevelWorld(4); runCutscene(finaleScript(), () => { toTitleWorld(); showScreen("title"); }); }
+}
+$("rewatchBtn").addEventListener("click", () => rewatch("opening")); $("rewatchEndBtn").addEventListener("click", () => rewatch("ending"));
 $("howBtn").addEventListener("click", () => showScreen("how")); $("howBack").addEventListener("click", () => showScreen("title"));
 $("pauseBtn").addEventListener("click", () => pause(true)); $("resumeBtn").addEventListener("click", () => pause(false));
 $("retryBtn").addEventListener("click", () => { state.paused = false; document.body.classList.remove("paused"); if (sfx.ctx) sfx.ctx.resume(); playLevel(battle.i, true); });
@@ -724,4 +755,4 @@ function frame(now) {
 }
 syncSound(); toTitleWorld(); showScreen("title"); requestAnimationFrame(frame);
 /* test hooks (also handy for debugging) */
-window.__gig = { state, save, get battle() { return battle; }, get clock() { return clock; }, LEVELS, playLevel, startBattle, pressLane, skipCutscene() { if (cut) { cut.i = cut.script.length; endCutscene(); } }, advance, advanceTime(sec) { const n = Math.max(1, Math.round(sec / .033)); for (let i = 0; i < n; i++) step(.033, performance.now()); renderer.render(scene, camera); }, jumpShot(i) { if (cut) { cut.i = i - 1; nextShot(); } }, runFinale() { buildLevelWorld(4); runCutscene(finaleScript(), () => toTitleWorld()); }, runOpening() { clearWorld(); buildNestScene(); runCutscene(openingScript(), () => toTitleWorld()); }, get cut() { return cut; }, scene, camera, renderer };
+window.__gig = { state, save, get battle() { return battle; }, get clock() { return clock; }, LEVELS, playLevel, startBattle, pressLane, skipCutscene() { if (cut) { cut.i = cut.script.length; endCutscene(); } }, advance, speaking() { return !!(cut && cut.speaking); }, advanceTime(sec) { const n = Math.max(1, Math.round(sec / .033)); for (let i = 0; i < n; i++) step(.033, performance.now()); renderer.render(scene, camera); }, jumpShot(i) { if (cut) { cut.i = i - 1; nextShot(); } }, runFinale() { buildLevelWorld(4); runCutscene(finaleScript(), () => toTitleWorld()); }, runOpening() { clearWorld(); buildNestScene(); runCutscene(openingScript(), () => toTitleWorld()); }, get cut() { return cut; }, scene, camera, renderer };
