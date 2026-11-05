@@ -915,6 +915,16 @@
             catch (_) { return true; }
         }
 
+        // Beep volume, 0 to 100 (saved on this device). 70 matches the old fixed loudness.
+        const volumeKey = "douqhub_chat_dings_volume";
+        function volume() {
+            try {
+                const raw = localStorage.getItem(volumeKey);
+                const value = raw === null ? NaN : Number(raw);
+                return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 70;
+            } catch (_) { return 70; }
+        }
+
         async function unlockAudio() {
             try {
                 const AudioCtor = window.AudioContext || window.webkitAudioContext;
@@ -944,8 +954,10 @@
             if (enabled()) unlockAudio();
         });
 
-        async function playDing() {
-            if (!enabled()) return;
+        async function playDing(force) {
+            if (!force && !enabled()) return;
+            const level = volume();
+            if (level <= 0) return;
             if (!audioContext || audioContext.state !== "running") {
                 const ready = await unlockAudio();
                 if (!ready) return;
@@ -955,14 +967,14 @@
             // Avoid a burst of duplicate dings if Realtime and the fallback poll
             // notice the same message at nearly the same time.
             const now = Date.now();
-            if (now - lastDingAt < 900) return;
+            if (!force && now - lastDingAt < 900) return;
             lastDingAt = now;
 
             try {
                 const ctx = audioContext;
                 const gain = ctx.createGain();
                 gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.55, ctx.currentTime + 0.025);
+                gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, level / 100 * 0.8), ctx.currentTime + 0.025);
                 gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.62);
                 gain.connect(ctx.destination);
                 [880, 1174.66].forEach((frequency, index) => {
@@ -978,6 +990,9 @@
                 console.debug("DougHub chat ding could not play:", error);
             }
         }
+
+        // Used by the Settings page: play a test beep at the saved volume.
+        window.DougHubChatSound = { test: () => playDing(true), volume, enabled };
 
         async function handleIncomingMessage(message) {
             if (!message || !message.created_at) return;

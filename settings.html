@@ -845,6 +845,7 @@ document.addEventListener("DOMContentLoaded",function(){
       <div class="settings-sidebar-label">PREFERENCES</div>
       <a class="settings-nav-link active" href="#profileSettingsSection"><span class="settings-nav-icon">◎</span><span><strong>Profile</strong><small>Public identity</small></span></a>
       <a class="settings-nav-link" href="#rewardsSettingsSection"><span class="settings-nav-icon">✧</span><span><strong>Rewards & badges</strong><small>Chat appearance</small></span></a>
+      <a class="settings-nav-link" href="#soundSettingsSection"><span class="settings-nav-icon">♪</span><span><strong>Chat sounds</strong><small>Beep volume</small></span></a>
       <a class="settings-nav-link" href="#themeSettingsSection"><span class="settings-nav-icon">◌</span><span><strong>Website appearance</strong><small>Style and color palette</small></span></a>
       <a class="settings-nav-link" href="#loginSettingsSection"><span class="settings-nav-icon">⌁</span><span><strong>Login information</strong><small>Email and password</small></span></a>
       <a class="settings-nav-link" href="#tutorialSettingsSection"><span class="settings-nav-icon">▷</span><span><strong>Tutorial</strong><small>Learn DougHub</small></span></a>
@@ -1166,6 +1167,24 @@ document.addEventListener("DOMContentLoaded",function(){
 
       </div>
 
+    </section>
+
+    <section class="settings-section" id="soundSettingsSection">
+      <h2 class="section-title">Chat sounds</h2>
+      <p class="section-description">The short beep you hear when someone sends a chat message while you are on another page. These settings are saved on this device.</p>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-label">Message beeps</div><div class="setting-help">Turn the beep on or off.</div></div>
+        <div class="setting-control"><label style="display:flex;align-items:center;gap:8px"><input id="dingEnabled" type="checkbox" style="width:18px;height:18px;accent-color:#8b5cf6"><span>Play a beep for new messages</span></label></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-label">Beep volume</div><div class="setting-help">Drag to make the beep quieter or louder. Set it to 0 to silence it.</div></div>
+        <div class="setting-control" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <input id="dingVolume" type="range" min="0" max="100" step="5" style="width:200px;accent-color:#8b5cf6" aria-label="Beep volume">
+          <output id="dingVolumeValue" for="dingVolume" style="min-width:42px;font-weight:800">70%</output>
+          <button type="button" id="dingTest" style="padding:8px 14px;border:1px solid #ffffff2e;border-radius:10px;background:#ffffff12;color:inherit;font:inherit;font-weight:800;cursor:pointer">Play test beep</button>
+        </div>
+      </div>
+      <div id="dingNote" class="reward-note" role="status" aria-live="polite"></div>
     </section>
 
     <section class="settings-section" id="signOutSettingsSection">
@@ -2686,6 +2705,46 @@ loadSettings();
     }
   },true);
   checkFlag();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var VOL = "douqhub_chat_dings_volume", ON = "douqhub_chat_dings_enabled";
+  var box = document.getElementById("dingEnabled"), range = document.getElementById("dingVolume"),
+      out = document.getElementById("dingVolumeValue"), test = document.getElementById("dingTest"), note = document.getElementById("dingNote");
+  if (!box || !range) return;
+  function readVolume() { try { var v = Number(localStorage.getItem(VOL)); return localStorage.getItem(VOL) === null || !isFinite(v) ? 70 : Math.min(100, Math.max(0, v)); } catch (_) { return 70; } }
+  function isOn() { try { return localStorage.getItem(ON) !== "false"; } catch (_) { return true; } }
+  function save(key, value) { try { localStorage.setItem(key, String(value)); } catch (_) { note.textContent = "This browser would not save the setting."; } }
+  function changed() { try { window.dispatchEvent(new Event("douqhub:chat-ding-setting-changed")); } catch (_) {} }
+  box.checked = isOn(); range.value = readVolume(); out.textContent = range.value + "%";
+  range.disabled = test.disabled = !box.checked;
+  box.addEventListener("change", function () {
+    save(ON, box.checked); range.disabled = test.disabled = !box.checked; changed();
+    note.textContent = box.checked ? "Message beeps are on." : "Message beeps are off.";
+  });
+  range.addEventListener("input", function () { out.textContent = range.value + "%"; save(VOL, range.value); });
+  range.addEventListener("change", function () { changed(); playTest(); });
+  var ctx = null;
+  function fallbackBeep() {
+    var level = readVolume(); if (level <= 0) return;
+    try {
+      var C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+      ctx = ctx || new C(); if (ctx.state === "suspended") ctx.resume();
+      var gain = ctx.createGain(); gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, level / 100 * 0.8), ctx.currentTime + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.62); gain.connect(ctx.destination);
+      [880, 1174.66].forEach(function (f, i) { var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f; o.connect(gain); var at = ctx.currentTime + i * 0.13; o.start(at); o.stop(at + 0.24); });
+    } catch (_) {}
+  }
+  function playTest() {
+    if (!box.checked) return;
+    if (readVolume() <= 0) { note.textContent = "Volume is at 0, so the beep is silent."; return; }
+    note.textContent = "";
+    if (window.DougHubChatSound && window.DougHubChatSound.test) window.DougHubChatSound.test(); else fallbackBeep();
+  }
+  test.addEventListener("click", playTest);
 })();
 </script>
 </body>
