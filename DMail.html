@@ -1128,9 +1128,9 @@ button:not(.compose-button):not(.send-button):not(.modal-send) { color:#efedff; 
 
 </style>
 <script src="auth-guard.js" data-require-auth="true"></script>
-  <script src="nav.js?v=20261104-chatnav" defer></script>
+  <script src="nav.js?v=20261105-searchguard" defer></script>
 
-<script src="search-autofill-fix.js" defer></script>
+<script src="search-autofill-fix.js?v=3" defer></script>
 
 <style id="DOUGHUB_PAGE_REDESIGN_INLINE">
 
@@ -1268,7 +1268,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
                     <div class="list-toolbar">
                         <div class="search-box">
                             <span class="search-icon">⌕</span>
-                            <input type="search" id="userSearch" placeholder="Search mail or people..." autocomplete="off" autocapitalize="off" spellcheck="false">
+                            <input type="search" id="mailFindBox" placeholder="Search mail or people..." autocomplete="off" autocapitalize="off" spellcheck="false">
                         </div>
                         <div class="list-toolbar-bottom"><span id="listCount">Contacts</span><button id="refreshMailButton" class="icon-button" type="button" title="Refresh mail" aria-label="Refresh mail">↻</button></div>
                     </div>
@@ -1559,7 +1559,7 @@ function messagesForProfile(profile){
 }
 function renderProfiles(profiles) {
     const container=document.getElementById("userList");
-    const query=(document.getElementById("userSearch")?.value||"").trim().toLowerCase();
+    const query=(document.getElementById("mailFindBox")?.value||"").trim().toLowerCase();
     let visible=profiles.filter(profile=>{
         const records=messagesForProfile(profile);
         if(mailFolder==="inbox"&&!records.some(m=>m.receiver_id===currentUser.id))return false;
@@ -1921,7 +1921,7 @@ document
 -------------------------------- */
 
 document
-    .getElementById("userSearch")
+    .getElementById("mailFindBox")
     .addEventListener(
         "input",
         event => {

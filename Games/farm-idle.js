@@ -306,7 +306,7 @@ function sceneSVG(){
 }
 function renderScene(){
   const sn=seasonIdx(); $("land").innerHTML=sceneSVG();
-  const f=$("field"); f.dataset.season=sn;
+  const f=$("field"); f.dataset.season=sn; f.dataset.night=isNight()?"1":"0";
   $("seasonTag").textContent=SEASONS[sn];
   const k=sn===0?"petal":sn===2?"leaf":sn===3?"snow":"dust"; setFx(isNight()?"glow":k);
 }
@@ -336,10 +336,10 @@ function renderCritters(){
   const sig=ANIMALS.map(a=>Math.min(4,S.ranch[a.id]||0)).join(",")+"|"+(S.decor.dog?1:0);
   if(sig===critSig) return; critSig=sig;
   for(const k in bubbles){ delete bubbles[k]; }
-  let h=""; let seed=7;
+  let h=""; let seed=7; const tot=ANIMALS.reduce((t,a)=>t+Math.min(4,S.ranch[a.id]||0),0)+(S.decor.dog?1:0); let idx=0;
   const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
   ANIMALS.forEach(a=>{ const n=Math.min(4,S.ranch[a.id]||0);
-    for(let i=0;i<n;i++){ h+=`<div class="an ${a.id==="bee"?"bee":""}" data-a="${a.id}" style="left:${(4+rnd()*72).toFixed(1)}%;bottom:${a.id==="bee"?(30+rnd()*30).toFixed(0):(3+rnd()*22).toFixed(0)}px;animation-duration:${(16+rnd()*14).toFixed(1)}s;animation-delay:-${(rnd()*20).toFixed(1)}s">${animalSVG(a.id)}</div>`; } });
+    for(let i=0;i<n;i++){ const lx=(3+((idx++*0.618+rnd()*.08)%1)*80).toFixed(1); h+=`<div class="an ${a.id==="bee"?"bee":""}" data-a="${a.id}" style="left:${lx}%;bottom:${a.id==="bee"?(34+rnd()*24).toFixed(0):(2+(idx%3)*8+rnd()*3).toFixed(0)}px;animation-duration:${(16+rnd()*14).toFixed(1)}s;animation-delay:-${(rnd()*20).toFixed(1)}s">${animalSVG(a.id)}</div>`; } });
   if(S.decor.dog) h+=`<div class="an" data-a="dog" style="left:30%;bottom:6px;animation-duration:9s">${animalSVG("dog")}</div>`;
   $("critters").innerHTML=h;
 }

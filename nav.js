@@ -5,6 +5,8 @@
   const NAV_SCRIPT_URL = document.currentScript && document.currentScript.src
     ? document.currentScript.src
     : new URL("nav.js", location.href).href;
+  // Keep search boxes from being treated as username/login fields by browsers and password managers.
+  if (!window.__dhSearchGuard) { const g = document.createElement("script"); g.src = new URL("search-autofill-fix.js?v=3", NAV_SCRIPT_URL).href; document.head.appendChild(g); }
   // Load the shared seasonal theme system on every page that uses the shared navigation.
   (function loadSeasonalExperience(){
     const root = new URL(".", NAV_SCRIPT_URL);
