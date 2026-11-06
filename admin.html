@@ -2074,7 +2074,10 @@ async function checkAdmin() {
         if (profileError) throw profileError;
 
         // staff_role is authoritative. Legacy boolean flags must never keep a demoted user in Admin.
-        const role = String(profile?.staff_role || "").trim().toLowerCase();
+        let role = String(profile?.staff_role || "").trim().toLowerCase();
+        // The database ranks Tech as Developer and an is_owner account as Owner, so the panel must too.
+        if (role === "tech") role = "developer";
+        if (profile?.is_owner === true) role = "owner";
         const hasStaffRole = ["helper", "admin", "developer", "owner"].includes(role);
 
         if (!profile || !hasStaffRole) {
