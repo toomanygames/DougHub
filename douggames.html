@@ -2325,6 +2325,12 @@ footer{font-size:12px}
 .player-fs:hover{background:rgba(255,255,255,.16)}
 .player-actions{display:flex;align-items:center}
 body.player-open{overflow:hidden}
+.player-overlay{z-index:2147483001!important}
+body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-help-overlay,body.player-open .dh-chat-toast{display:none!important}
+.player-back{height:35px;padding:0 14px;margin-right:12px;border:none;border-radius:9px;background:rgba(255,255,255,.1);color:#fff;font:800 14px inherit;cursor:pointer;white-space:nowrap}
+.player-back:hover{background:rgba(255,255,255,.2)}
+.player-header{justify-content:flex-start!important;gap:4px}
+.player-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 
@@ -2899,7 +2905,7 @@ body.player-open{overflow:hidden}
 
     <div class="player-window">
 
-        <div class="player-header">
+        <div class="player-header"><button id="backPlayer" class="player-back" type="button">&larr; Back</button>
 
             <div
                 id="playerTitle"
@@ -3968,6 +3974,9 @@ if (fsBtn) fsBtn.addEventListener("click", function () {
     if (document.fullscreenElement) document.exitFullscreen();
     else if (o.requestFullscreen) o.requestFullscreen().catch(function () {});
 });
+
+const backBtn = document.getElementById("backPlayer");
+if (backBtn) backBtn.addEventListener("click", function () { closeGame(); });
 
 const closePlayer =
     document.getElementById(
