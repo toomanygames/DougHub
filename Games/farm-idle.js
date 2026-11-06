@@ -137,7 +137,7 @@ function fresh(){
   return {v:2,coins:0,run:0,life:0,sun:0,sunEver:0,gems:0,rebirths:0,harvests:0,
     plots:[{c:-1,t:0},{c:-1,t:0},{c:-1,t:0},{c:-1,t:0}],unlocked:CROPS.map((_,i)=>i===0),
     sel:0,up:{},tree:{},ach:{},bulk:1,muted:false,last:Date.now(),played:0,
-    ranch:{},build:{},decor:{},hc:{},orders:[],orderDone:0,catches:0,farmMap:{},barn:0,seen:{}};
+    ranch:{},build:{},decor:{},hc:{},orders:[],orderDone:0,catches:0,farmMap:{},barn:0,seen:{},gold:0,goldEver:0,supers:0,legacy:{}};
 }
 let S = fresh();
 function load(){
@@ -146,7 +146,7 @@ function load(){
   if(!Array.isArray(S.unlocked)) S.unlocked=fresh().unlocked;
   while(S.unlocked.length<CROPS.length) S.unlocked.push(false);
   S.unlocked.length=CROPS.length;
-  for(const k of ["ranch","build","decor","hc","up","tree","ach","farmMap","seen"]) if(!S[k]||typeof S[k]!=="object") S[k]={};
+  for(const k of ["ranch","build","decor","hc","up","tree","ach","farmMap","seen","legacy"]) if(!S[k]||typeof S[k]!=="object") S[k]={};
   if(!Array.isArray(S.orders)) S.orders=[];
   if(FORCE_MUTE) S.muted=true;
 }
@@ -178,18 +178,20 @@ function basePlots(){ return 4 + lv(S.tree,"head"); }
 function maxPlotUp(){ return Math.max(0, MAX_PLOTS - basePlots()); }
 function achCount(){ return Object.keys(S.ach).length; }
 function decorMult(){ return (S.decor.chime?1.02:1)*(S.decor.lanterns?1.03:1)*(S.decor.rainbow?1.1:1); }
-function coinMult(){ return Math.pow(1.25,lv(S.up,"yield")) * Math.pow(1.25,lv(S.tree,"soil")) * (1+0.05*S.sunEver) * (1+0.03*achCount()) * Math.pow(1.12,lv(S.build,"market")) * decorMult() * (Date.now()<rainbowUntil?1.25:1) * farmCoinMult() * Math.pow(1.1,lv(S.tree,"savvy")); }
-function speedMult(){ return Math.pow(1.15,lv(S.up,"fert")) * Math.pow(1.1,lv(S.tree,"sprout")) * (1+0.08*lv(S.build,"greenhouse")) * (S.decor.pond?1.05:1) * (S.decor.fountain?1.1:1) * farmSpeedMult() * (Date.now()<rainUntil?2:1); }
+function coinMult(){ return Math.pow(1.25,lv(S.up,"yield")) * Math.pow(1.25,lv(S.tree,"soil")) * Math.pow(1+S.sunEver,0.5) * superMult() * (1+0.03*achCount()) * Math.pow(1.12,lv(S.build,"market")) * decorMult() * (Date.now()<rainbowUntil?1.25:1) * farmCoinMult() * Math.pow(1.1,lv(S.tree,"savvy")); }
+function speedMult(){ return Math.pow(1.2,lv(S.legacy,"chrono")) * Math.pow(1.15,lv(S.up,"fert")) * Math.pow(1.1,lv(S.tree,"sprout")) * (1+0.08*lv(S.build,"greenhouse")) * (S.decor.pond?1.05:1) * (S.decor.fountain?1.1:1) * farmSpeedMult() * (Date.now()<rainUntil?2:1); }
 function farmhandLevel(){ return lv(S.up,"hand"); }
 function handInterval(){ return 4/((1+0.25*farmhandLevel())*(1+0.1*lv(S.build,"windmill"))*(1+0.1*lv(S.tree,"master"))); }
 function handBatch(){ return 1+Math.floor(farmhandLevel()/3)+Math.floor(lv(S.tree,"master")/2); }
 function hasAuto(){ return lv(S.up,"auto")>=1; }
-function awayCapHours(){ return 1 + lv(S.up,"scare") + 2*lv(S.tree,"slumber") + 0.5*lv(S.build,"silo"); }
+function awayCapHours(){ return 1 + lv(S.up,"scare") + 2*lv(S.tree,"slumber") + 0.5*lv(S.build,"silo") + 4*lv(S.legacy,"sleepy"); }
 function boomMult(c){ return (boom && boom.c===c && Date.now()<boom.until)?3:1; }
 function seasonMult(c){ return CROPS[c].s===seasonIdx()?(1.6+0.2*lv(S.tree,"bounty")):1; }
 function cropValue(c){ return CROPS[c].v * coinMult() * boomMult(c) * seasonMult(c) * (1+0.1*masteryOf(S,c)); }
-function sunGain(){ return Math.floor(Math.sqrt(S.run/20000) * Math.pow(1.15,lv(S.tree,"compound"))); }
-function costMult(){ return Math.pow(.98,lv(S.tree,"tax")); }
+function sunGain(){ return Math.floor(Math.pow(S.run/2e7,0.4) * Math.pow(1.15,lv(S.tree,"compound")) * Math.pow(1.4,lv(S.legacy,"magnet"))); }
+function treeCost(t,L){ return Math.ceil(t.cost(L)*3*Math.pow(1.22,L)); }
+function superMult(){ return Math.pow(1+S.goldEver,0.8)*Math.pow(1.6,lv(S.legacy,"midas")); }
+function costMult(){ return Math.pow(.98,lv(S.tree,"tax"))*Math.pow(.95,lv(S.legacy,"frugal")); }
 function bcost(b,L){ return b.cost(L)*costMult(); }
 function upCost(k){ return UP[k].cost(lv(S.up,k))*costMult(); }
 function upMax(k){ return k==="plots"?maxPlotUp():(UP[k].max||1); }
@@ -419,7 +421,7 @@ function newOrder(){
   const need=Math.max(6,Math.round(S.plots.length*(1+Math.random()*1.6)));
   return {c,need,have:0,mult:2+Math.random()*1.2,gems:1+(Math.random()<.25?1:0)};
 }
-function orderReward(o){ return {coins:o.need*cropValue(o.c)*o.mult,gems:o.gems+lv(S.tree,"gemfind")+(S.decor.cat?1:0)}; }
+function orderReward(o){ return {coins:o.need*cropValue(o.c)*o.mult,gems:o.gems+lv(S.tree,"gemfind")+(S.decor.cat?1:0)+2*lv(S.legacy,"fountain")}; }
 function fillOrders(){ while(S.orders.length<orderSlots()) S.orders.push(newOrder()); }
 function claimOrder(i){
   const o=S.orders[i]; if(!o||o.have<o.need) return; const r=orderReward(o);
@@ -567,7 +569,7 @@ function card(o){
 }
 function renderPanel(){
   const body=$("body"), top=body.scrollTop; body.innerHTML=""; btnRefs=[];
-  ({up:renderUpgrades,ranch:renderRanch,build:renderBuild,farm:renderFarmTab,orders:renderOrders,fest:renderFest,ach:renderAwards})[tab](body);
+  ({up:renderUpgrades,ranch:renderRanch,build:renderBuild,farm:renderFarmTab,orders:renderOrders,fest:renderFest,legacy:renderLegacy,ach:renderAwards})[tab](body);
   refreshBtns(); body.scrollTop=top;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.tab===tab)));
 }
@@ -641,8 +643,8 @@ function renderOrders(body){
 function renderFest(body){
   const gain=sunGain();
   const f=document.createElement("div"); f.className="fest";
-  f.innerHTML=`<h3>Harvest Festival</h3><p>Hold a festival to start a new season. Your coins, plots, crops, animals, buildings and farm upgrades reset, but you earn <b>sunseeds</b>. Your My Farm layout stays. Sunseeds give a permanent +5% coins each and buy the permanent upgrades below. Gems, decorations and awards always stay.</p>
-    <div class="gain">${gain>0?"+"+fmt(gain)+" sunseeds":"Not enough yet"}</div><p>${gain>0?"This season you earned "+fmt(S.run)+" coins.":"Earn about "+fmt(20000)+" coins this season to get your first sunseed ("+fmt(S.run)+" so far)."}</p>`;
+  f.innerHTML=`<h3>Harvest Festival</h3><p>Hold a festival to start a new season. Your coins, plots, crops, animals, buildings and farm upgrades reset, but you earn <b>sunseeds</b>. Your My Farm layout stays. Sunseeds boost all your coins for good (the more you have, the bigger the boost) and buy the permanent upgrades below. Sunseeds are hard to earn: they need a very rich season. Gems, decorations and awards always stay.</p>
+    <div class="gain">${gain>0?"+"+fmt(gain)+" sunseeds":"Not enough yet"}</div><p>${gain>0?"This season you earned "+fmt(S.run)+" coins.":"Earn about "+fmt(2e7)+" coins this season to get your first sunseed ("+fmt(S.run)+" so far)."}</p>`;
   const b=document.createElement("button"); b.type="button"; b.className="big"; b.textContent="Hold the festival"; b.dataset.act="fest";
   b.style.flex="0 0 auto"; b.style.padding="10px 22px"; b.disabled=gain<1; if(gain<1) b.style.opacity=".5";
   f.appendChild(b); body.appendChild(f);
@@ -654,7 +656,7 @@ function renderFest(body){
       const t=TREE[k], L=lv(S.tree,k), maxed=L>=t.max, open=!t.req||lv(S.tree,t.req)>=1;
       const row=document.createElement("div"); row.className="tnode t"+t.tier+(open?"":" off"); row.style.setProperty("--d",String(t.tier-1));
       row.appendChild(card({icon:t.n[0],name:t.n,desc:open?t.d:"Requires "+TREE[t.req].n+" level 1.",level:`Level ${L} / ${t.max}`,locked:!open,maxed,
-        btn:maxed?"Maxed":open?`${fmt(t.cost(L))}<small>sunseeds</small>`:"Locked",act:"tree",key:k,cost:maxed?Infinity:t.cost(L),cur:"sun",can:open&&!maxed}));
+        btn:maxed?"Maxed":open?`${fmt(treeCost(t,L))}<small>sunseeds</small>`:"Locked",act:"tree",key:k,cost:maxed?Infinity:treeCost(t,L),cur:"sun",can:open&&!maxed}));
       tr.appendChild(row);
     });
   });
@@ -678,13 +680,13 @@ function renderAwards(body){
     body.appendChild(d); });
 }
 function refreshBtns(){
-  btnRefs.forEach(r=>{ const have=r.cur==="sun"?S.sun:r.cur==="gem"?S.gems:S.coins; r.b.classList.toggle("afford",r.can&&have>=r.cost); });
+  btnRefs.forEach(r=>{ const have=r.cur==="sun"?S.sun:r.cur==="gem"?S.gems:r.cur==="gold"?S.gold:S.coins; r.b.classList.toggle("afford",r.can&&have>=r.cost); });
   $("coins").textContent=fmt(S.coins);
   $("sunseeds").textContent=fmt(S.sun);
   $("gems").textContent=fmt(S.gems);
   $("sunChip").hidden=!(S.sunEver>0);
-  $("gemChip").hidden=!(S.gems>0||S.orderDone>0||S.catches>0||Object.keys(S.decor).length>0);
-  $("festDot").hidden=!(sunGain()>=1 && tab!=="fest");
+  $("goldChip").hidden=!(S.supers>0||S.gold>0); $("gold").textContent=fmt(S.gold); $("gemChip").hidden=!(S.gems>0||S.orderDone>0||S.catches>0||Object.keys(S.decor).length>0);
+  $("festDot").hidden=!(sunGain()>=1 && tab!=="fest"); $("legDot").hidden=!(superReady() && tab!=="legacy");
   $("ordDot").hidden=!(S.orders.some(o=>o.have>=o.need) && tab!=="orders");
 }
 
@@ -717,7 +719,7 @@ function buyCrop(i){
 }
 function buyTree(k){
   const t=TREE[k], L=lv(S.tree,k); if(L>=t.max) return; if(t.req && lv(S.tree,t.req)<1) return;
-  const c=t.cost(L); if(S.sun<c) return; S.sun-=c; S.tree[k]=L+1; sfx.buy(); if(k==="surveyor"&&!S.barn) S.barn=1; save(); renderPanel(); if(k==="surveyor") cutOnce("map");
+  const c=treeCost(t,L); if(S.sun<c) return; S.sun-=c; S.tree[k]=L+1; sfx.buy(); if(k==="surveyor"&&!S.barn) S.barn=1; save(); renderPanel(); if(k==="surveyor") cutOnce("map");
 }
 function festival(){
   const gain=sunGain(); if(gain<1) return;
@@ -761,7 +763,7 @@ function wire(){
     else if(a==="up") buyUp(k); else if(a==="crop") buyCrop(+k); else if(a==="tree") buyTree(k); else if(a==="fest") festival();
     else if(a==="animal") buyAnimal(k); else if(a==="build") buyBuild(k); else if(a==="decor") buyDecor(k);
     else if(a==="claim") claimOrder(+k); else if(a==="swap") swapOrder(+k);
-    else if(a==="cut") playCut(k); else if(a==="farm") openFarm();
+    else if(a==="cut") playCut(k); else if(a==="farm") openFarm(); else if(a==="ascend") ascend(); else if(a==="legacy") buyLegacy(k);
   });
   $("soundBtn").onclick=()=>{ if(FORCE_MUTE) return; S.muted=!S.muted; $("soundBtn").textContent=S.muted?"Sound off":"Sound on"; save(); };
   $("soundBtn").textContent=(S.muted||FORCE_MUTE)?"Sound off":"Sound on";
@@ -950,6 +952,11 @@ const CUTS={
   {bg:"day",ch:[["farmer",70,62,1.1],["grandpa",30,60,1.1]],who:"Grandpa",t:"That barn is looking mighty fine. Look at that new silo!"},
   {bg:"day",ch:[["farmer",70,62,1.1],["grandpa",30,60,1.1]],who:"You",t:"It took a lot of hard work, but it was worth it."},
   {bg:"dusk",ch:[["farmer",130,62,1.2]],who:"Narrator",t:"Your farm is becoming a legend of the valley."}]},
+ ascend:{title:"The Golden Era",p:[
+  {bg:"night",ch:[["farmer",60,62,1.1],["spirit",190,36,1.5]],who:"Sun Spirit",t:"You did it. Every seed, every animal, every award. There is nothing left to finish."},
+  {bg:"night",ch:[["farmer",60,62,1.1],["spirit",190,36,1.5]],who:"Sun Spirit",t:"But a farm like yours should never stop. Let me turn it all to gold and begin again."},
+  {bg:"fest",ch:[["farmer",120,62,1.2],["pig",30,112,1.3],["chicken",230,118,1.2,1],["grandpa",252,60,.9,1]],who:"Grandpa",t:"I never thought I would see a golden farm. I am so proud of you, kiddo."},
+  {bg:"day",ch:[["farmer",130,62,1.2]],who:"Narrator",t:"The Golden Era begins. Spend your golden seeds in the Legacy tab!"}]},
  spirit:{title:"The Sun Spirit's secret",p:[
   {bg:"night",ch:[["farmer",70,62,1.1],["spirit",190,40,1.4]],who:"Sun Spirit",t:"Five festivals! Not many farmers come this far."},
   {bg:"night",ch:[["farmer",70,62,1.1],["spirit",190,40,1.4]],who:"Sun Spirit",t:"Even at night, the sun is still shining somewhere. Your farm never really sleeps."},
@@ -977,6 +984,53 @@ function runCut(id){
   $("cutNext").onclick=next; $("cutSkip").onclick=finish; show(); try{ $("cutNext").focus(); }catch(_){}
 }
 
+
+/* ---------- Legacy: the super rebirth (Golden Era) ---------- */
+const LEGACY=[
+  {id:"midas",   n:"Golden Touch",     d:"All coins x1.6 per level.",                      max:20, cost:l=>1+l},
+  {id:"chrono",  n:"Time Lord",        d:"Crops grow 20% faster per level.",               max:15, cost:l=>1+l},
+  {id:"magnet",  n:"Sunseed Magnet",   d:"Festivals give 40% more sunseeds per level.",    max:10, cost:l=>2+l},
+  {id:"frugal",  n:"Frugal Farmer",    d:"Everything costs 5% less per level.",            max:10, cost:l=>2+l},
+  {id:"ancient", n:"Ancient Seeds",    d:"Start every golden era with 2 more crops unlocked per level.", max:5, cost:l=>3+2*l},
+  {id:"eternal", n:"Eternal Barn",     d:"Your barn starts 2 levels higher per level.",    max:5,  cost:l=>3+2*l},
+  {id:"fountain",n:"Gem Fountain",     d:"Orders pay 2 more gems per level.",              max:5,  cost:l=>2+l},
+  {id:"sleepy",  n:"Deep Sleep",       d:"Earn for 4 more hours while you are away per level.", max:5, cost:l=>2+l}
+];
+function superReq(){
+  const treeMax=Object.keys(TREE).every(k=>lv(S.tree,k)>=TREE[k].max), nTree=Object.keys(TREE).filter(k=>lv(S.tree,k)>=TREE[k].max).length;
+  return [
+    {n:"Max every sunseed upgrade ("+nTree+" / "+Object.keys(TREE).length+")",ok:treeMax},
+    {n:"Unlock every crop ("+S.unlocked.filter(Boolean).length+" / "+CROPS.length+")",ok:S.unlocked.every(Boolean)},
+    {n:"Earn every award ("+achCount()+" / "+ACH.length+")",ok:achCount()>=ACH.length},
+    {n:"Own every decoration ("+Object.keys(S.decor).length+" / "+DECOR.length+")",ok:DECOR.every(d=>S.decor[d.id])},
+    {n:"Max every building ("+BUILD.filter(b=>lv(S.build,b.id)>=b.max).length+" / "+BUILD.length+")",ok:BUILD.every(b=>lv(S.build,b.id)>=b.max)},
+    {n:"Max the barn (level "+S.barn+" / "+BARN_MAX+")",ok:S.barn>=BARN_MAX}
+  ];
+}
+function superReady(){ return superReq().every(r=>r.ok); }
+function superGain(){ return 3+S.supers*2; }
+function legacyCost(d){ return Math.ceil(d.cost(lv(S.legacy,d.id))*Math.pow(1.25,lv(S.legacy,d.id))); }
+function buyLegacy(id){ const d=LEGACY.find(x=>x.id===id), L=lv(S.legacy,id); if(!d||L>=d.max) return; const c=legacyCost(d); if(S.gold<c) return; S.gold-=c; S.legacy[id]=L+1; sfx.ach(); save(); renderPanel(); }
+function renderLegacy(body){
+  const f=document.createElement("div"); f.className="fest"; f.style.background="linear-gradient(180deg,#ffe9a8,#ffcf4a)";
+  f.innerHTML="<h3>Golden Era</h3><p>The ultimate rebirth. Finish everything on the list below, then ascend: you start over from nothing, even your sunseeds and sunseed upgrades, but you earn <b>golden seeds</b>. Golden seeds boost all coins forever and buy the powerful Legacy upgrades. Gems, decorations, awards, your My Farm layout and your story stay.</p><div class=\"gain\">You have "+fmt(S.gold)+" golden seeds"+(S.supers?" - "+S.supers+" golden eras":"")+"</div>";
+  body.appendChild(f);
+  secTitle(body,"To ascend, complete everything");
+  superReq().forEach(r=>{ const d=document.createElement("div"); d.className="ach"+(r.ok?" done":""); d.innerHTML="<div class=\"mk\">"+(r.ok?"&#10003;":"")+"</div><div style=\"font:700 14px var(--display)\">"+r.n+"</div>"; body.appendChild(d); });
+  const ready=superReady(), b=document.createElement("button"); b.type="button"; b.className="big"; b.dataset.act="ascend"; b.textContent=ready?"Ascend: +"+superGain()+" golden seeds":"Not ready yet"; b.disabled=!ready; b.style.flex="0 0 auto"; b.style.padding="10px 22px"; b.style.alignSelf="flex-start"; if(!ready) b.style.opacity=".5"; body.appendChild(b);
+  secTitle(body,"Legacy upgrades (permanent) - golden seeds: "+fmt(S.gold));
+  LEGACY.forEach(d=>{ const L=lv(S.legacy,d.id), maxed=L>=d.max, c=legacyCost(d);
+    btnRefsPush(card({icon:d.n[0],name:d.n,desc:d.d,level:"Level "+L+" / "+d.max,maxed,btn:maxed?"Maxed":fmt(c)+"<small>golden seeds</small>",act:"legacy",key:d.id,cost:maxed?Infinity:c,cur:"gold",can:!maxed}),body); });
+}
+function btnRefsPush(el,body){ body.appendChild(el); }
+function ascend(){
+  if(!superReady()) return; const gain=superGain();
+  ask("Begin the Golden Era?","You will earn "+gain+" golden seeds, and EVERYTHING else resets: coins, sunseeds, sunseed upgrades, crops, animals, buildings and the barn. Gems, decorations, awards and your My Farm layout stay. This is the biggest reset in the game.","Ascend",()=>{
+    S.gold+=gain; S.goldEver+=gain; S.supers++; S.coins=0; S.run=0; S.sun=0; S.sunEver=0; S.tree={}; S.up={}; S.ranch={}; S.build={}; S.orders=[];
+    S.unlocked=CROPS.map((_,i)=>i<=2*lv(S.legacy,"ancient")); S.sel=2*lv(S.legacy,"ancient"); S.barn=Math.min(BARN_MAX,1+2*lv(S.legacy,"eternal")); S.plots=[]; ensurePlots(); fillOrders(); handT=0; boom=null; critSig=""; renderCritters(); renderScene();
+    sfx.fest(); toast("The Golden Era begins! +"+gain+" golden seeds"); save(); buildPlots(); paintPlots(); paintPicker(); renderPanel(); checkAch(); cutOnce("ascend");
+  });
+}
 /* ---------- boot ---------- */
 load(); ensurePlots(); fillOrders();
 const away=(Date.now()-S.last)/1000;

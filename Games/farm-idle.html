@@ -263,6 +263,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
   <div class="wallet">
     <div class="chip" title="Coins"><span id="coins">0</span><small>coins</small></div>
     <div class="chip gem" id="gemChip" hidden title="Gems: buy permanent farm decorations"><span id="gems">0</span><small>gems</small></div>
+    <div class="chip" id="goldChip" hidden style="background:#ffe08a" title="Golden seeds: super rebirth currency"><span id="gold">0</span><small>golden seeds</small></div>
     <div class="chip sun" id="sunChip" hidden title="Sunseeds: permanent upgrade currency"><span id="sunseeds">0</span><small>sunseeds</small></div>
   </div>
   <button class="iconbtn" id="soundBtn" type="button">Sound on</button>
@@ -286,6 +287,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
       <button class="tab" role="tab" data-tab="farm" aria-selected="false">My Farm</button>
       <button class="tab" role="tab" data-tab="orders" aria-selected="false">Orders <span class="dot" id="ordDot" hidden></span></button>
       <button class="tab" role="tab" data-tab="fest" aria-selected="false">Festival <span class="dot" id="festDot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="legacy" aria-selected="false">Golden Era <span class="dot" id="legDot" hidden></span></button>
       <button class="tab" role="tab" data-tab="ach" aria-selected="false">Awards</button>
     </div>
     <div class="body" id="body"></div>
@@ -295,6 +297,6 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 <div id="modalHost"></div>
 <div id="farmHost" class="farmHost" hidden></div>
 <div id="cutHost" class="cutHost" hidden></div>
-<script src="farm-idle.js?v=3"></script>
+<script src="farm-idle.js?v=4"></script>
 </body>
 </html>
