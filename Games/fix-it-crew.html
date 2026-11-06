@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<script src="no-zoom.js"></script>
+<meta name="theme-color" content="#ffb02e">
+<title>Fix-It Crew: Builder Bo</title>
+<link rel="icon" href="art/fix-it-crew.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../display.js"></script>
+<script src="../game-analytics.js" data-game-key="builtin:fix-it-crew" data-game-title="Fix-It Crew: Builder Bo" defer></script>
+<style>
+:root{--ink:#3a2410;--cream:#fff8e6;--yellow:#ffc72c;--orange:#ff8a1f;--sky:#7ec8ff;--panel:#fff8e6ee;--display:"Fredoka","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:#7ec8ff;color:var(--ink);font:800 15px/1.4 var(--body);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#view{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:3px solid #3a5ba8;outline-offset:2px}
+.btn{padding:12px 24px;border-radius:16px;background:linear-gradient(180deg,#ffd75e,#ffa51f);color:#4a2a00;font:700 20px var(--display);box-shadow:0 5px 0 #b3690a,0 10px 24px #0004;touch-action:manipulation}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #b3690a}
+.btn.alt{background:linear-gradient(180deg,#ffffff,#e6dcc4);box-shadow:0 5px 0 #a89a78,0 10px 24px #0003}
+.btn.small{padding:7px 14px;font-size:14px;border-radius:12px;box-shadow:0 3px 0 #b3690a}
+.back{position:fixed;left:10px;top:10px;z-index:20;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#fff8e6e6;color:var(--ink);text-decoration:none;font-size:20px;box-shadow:0 3px 0 #0003}
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center;background:linear-gradient(180deg,#7ec8ffcc,#fff3c8d9)}
+.logo{font:700 clamp(40px,9vw,88px)/.95 var(--display);color:var(--yellow);text-shadow:0 4px 0 #b3690a,0 9px 0 #5a3000,0 18px 30px #0006;-webkit-text-stroke:2px #5a3000}
+.logo small{display:block;font-size:.36em;color:#fff;letter-spacing:.14em;margin-top:6px;-webkit-text-stroke:0;text-shadow:0 3px 0 #3a5ba8}
+.tag{max-width:540px;font-size:16px;color:#4a3216}
+.menu{display:flex;flex-direction:column;gap:12px;align-items:center}
+h2.h{margin:0;font:700 clamp(26px,5vw,40px) var(--display);color:#fff;text-shadow:0 3px 0 #b3690a,0 0 14px #0005;-webkit-text-stroke:1.5px #5a3000}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;width:min(980px,100%);max-height:62vh;overflow:auto;padding:4px}
+.card{padding:14px;border-radius:18px;background:var(--panel);border:3px solid #fff;box-shadow:0 5px 0 #0002;text-align:left;display:flex;flex-direction:column;gap:5px;touch-action:manipulation}
+.card:not(.locked):hover{transform:translateY(-3px);border-color:var(--yellow)}
+.card.locked{opacity:.55;filter:grayscale(.7)}
+.card .num{font:700 13px var(--display);color:#b3690a;letter-spacing:.1em}
+.card h3{margin:0;font:700 20px var(--display)}
+.card p{margin:0;font-size:13px;color:#5a4224}
+.star{color:#ffb800;font-size:20px;text-shadow:0 1px 0 #0003}.star i{color:#d8cdb0;font-style:normal}
+.dlg{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:12;width:min(640px,calc(100% - 24px));display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:20px;background:var(--panel);border:4px solid #fff;box-shadow:0 8px 30px #0005}
+.dlg .who{font:700 17px var(--display);color:#b3690a}
+.dlg .txt{font-size:16px;min-height:44px}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end}
+.hud{position:fixed;inset:0;z-index:5;pointer-events:none}
+.tasks{position:absolute;left:58px;top:10px;min-width:210px;max-width:min(330px,60vw);padding:10px 12px;border-radius:16px;background:var(--panel);box-shadow:0 4px 0 #0003;border:3px solid #fff}
+.tasks h4{margin:0 0 4px;font:700 16px var(--display)}
+.tasks ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.tasks li{display:flex;gap:6px;color:#8a7650}
+.tasks li.now{color:var(--ink);font-weight:900}.tasks li.done{color:#2f9a3a;text-decoration:line-through}
+.tasks li b{flex:0 0 18px}
+.timer{position:absolute;right:10px;top:10px;padding:6px 14px;border-radius:999px;background:var(--panel);font:700 20px var(--display);box-shadow:0 3px 0 #0003}
+.timer .st{margin-left:8px;color:#ffb800}
+.prompt{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);padding:8px 18px;border-radius:999px;background:#3a2410dd;color:#fff;font:700 16px var(--display);white-space:nowrap}
+.bar{position:absolute;left:50%;bottom:170px;transform:translateX(-50%);width:200px;height:14px;border-radius:9px;background:#0005;overflow:hidden;border:2px solid #fff}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd75e,#ff8a1f)}
+.sndbtn{position:fixed;right:10px;bottom:10px;z-index:21;height:34px;padding:0 12px;border-radius:12px;background:#fff8e6e6;font:700 13px var(--display);pointer-events:auto;box-shadow:0 3px 0 #0003}
+.touch{position:fixed;inset:auto 0 0 0;height:150px;z-index:8;pointer-events:none}
+.touch .stick{position:absolute;left:18px;bottom:18px;width:120px;height:120px;border-radius:50%;background:#fff8e688;border:3px solid #fff;pointer-events:auto;touch-action:none}
+.touch .stick i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border-radius:50%;background:#ff8a1fdd;box-shadow:0 3px 0 #0004}
+.touch .act{position:absolute;right:18px;width:78px;height:78px;border-radius:50%;pointer-events:auto;font:700 16px var(--display);background:linear-gradient(180deg,#ffd75e,#ffa51f);box-shadow:0 5px 0 #b3690a;touch-action:manipulation}
+.touch .act.a{bottom:34px}.touch .act.h{bottom:124px;width:60px;height:60px;font-size:13px;background:linear-gradient(180deg,#fff,#e6dcc4);box-shadow:0 4px 0 #a89a78}
+.big{font:700 clamp(30px,7vw,56px) var(--display);color:#fff;text-shadow:0 4px 0 #b3690a,0 0 20px #0005;-webkit-text-stroke:2px #5a3000}
+.stat{font:700 18px var(--display)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+@media (pointer:fine){.touch{display:none}}
+@media (max-width:640px){.tasks{left:56px;font-size:12px;min-width:150px}.timer{font-size:16px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="view" aria-label="3D building site"></canvas>
+<a class="back" href="../douggames.html" aria-label="Back to games">&larr;</a>
+
+<section class="screen" id="title">
+  <div class="logo">Fix-It Crew<small>BUILDER BO &amp; THE MACHINE BUDDIES</small></div>
+  <p class="tag">Carry planks, dig ponds, pour paths and raise whole buildings with Bo and the crew. Eight jobs around town!</p>
+  <div class="menu"><button class="btn" id="playBtn" type="button">Choose a job</button><button class="btn alt small" id="howBtn" type="button">How to play</button></div>
+  <p class="tag" id="howTxt" hidden>Move with WASD or the arrow keys (or the on-screen stick). Walk into piles to pick things up and walk to the glowing spots to build. Press Space to use machines, and E to hop in or out. Finish fast for 3 stars!</p>
+</section>
+
+<section class="screen" id="select" hidden>
+  <h2 class="h">Pick a job</h2>
+  <div class="cards" id="cards"></div>
+  <button class="btn alt small" id="selBack" type="button">Back</button>
+</section>
+
+<div class="dlg" id="dlg" hidden>
+  <div class="who" id="dlgWho"></div><div class="txt" id="dlgTxt"></div>
+  <div class="row"><button class="btn small alt" id="dlgSkip" type="button">Skip</button><button class="btn small" id="dlgNext" type="button">Next</button></div>
+</div>
+
+<div class="hud" id="hud" hidden>
+  <div class="tasks"><h4 id="jobName">Job</h4><ul id="taskList"></ul></div>
+  <div class="timer"><span id="time">0:00</span><span class="st" id="parStars">&#9733;&#9733;&#9733;</span></div>
+  <div class="bar" id="holdBar" hidden><i id="holdFill"></i></div>
+  <div class="prompt" id="prompt" hidden></div>
+</div>
+<div class="touch" id="touch" hidden><div class="stick" id="stick"><i id="knob"></i></div><button class="act h" id="hopBtn" type="button">Hop</button><button class="act a" id="actBtn" type="button">Use</button></div>
+<button class="sndbtn" id="sndBtn" type="button">Sound on</button>
+
+<section class="screen" id="result" hidden>
+  <div class="big" id="resTitle">Job done!</div>
+  <div class="star" id="resStars" style="font-size:52px"></div>
+  <div class="stat" id="resStats"></div>
+  <p class="tag" id="resLine"></p>
+  <div class="row"><button class="btn alt" id="resAgain" type="button">Try again</button><button class="btn" id="resNext" type="button">Next job</button><button class="btn alt small" id="resMenu" type="button">All jobs</button></div>
+</section>
+
+<script src="leaderboard.js" data-game-key="fix-it-crew" defer></script>
+<script type="module" src="fix-it-crew.js?v=1"></script>
+</body>
+</html>
