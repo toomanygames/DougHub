@@ -125,6 +125,15 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
 .preview-dialog-content .preview-wrap iframe{width:100%;height:100%;border:0;background:white;border-radius:12px}
 .preview-dialog-content .preview-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px}
 .preview-dialog-content .preview-footer{flex:0 0 auto}
+/* Game view fills the whole browser window (not browser fullscreen), so the game uses all the space. */
+.preview-dialog{width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;inset:0;border:0;border-radius:0;box-shadow:none}
+.preview-dialog[open]{display:flex;flex-direction:column}
+.preview-dialog-head{flex:0 0 auto;padding:7px 14px}
+.preview-dialog-head h2{font-size:16px;margin:1px 0 0}
+.preview-dialog-content{flex:1 1 auto;height:auto;min-height:0;padding:0;gap:0}
+.preview-dialog-content .preview-wrap{position:relative;border-radius:0!important;border:0!important}
+.preview-dialog-content .preview-wrap iframe{border-radius:0;background:#050611}
+.preview-dialog-content .preview-footer{padding:4px 14px;font-size:11px}
 @media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-direction:column;gap:8px}.studio-toolbar-controls{margin-left:0;width:100%;gap:5px}.compact-studio-toolbar .mode-switch{flex:1}.compact-studio-toolbar .mode-btn{flex:1;padding:8px 7px}.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{flex:1}.compact-studio-toolbar #status{max-width:none}.preview-dialog{height:92vh}.preview-dialog-content{padding:8px}}
 /* Blockly-powered visual coding workspace */
 .blocks-layout{grid-template-columns:minmax(0,1fr)!important}
@@ -371,6 +380,7 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <button class="dialog-close" id="closePublishDialog" type="button" aria-label="Close publish dialog">×</button>
   </div>
   <form id="publishGameForm" class="publish-dialog-body">
+    <label for="communityTarget" id="communityTargetRow">Publish as<select id="communityTarget" autocomplete="off" data-no-guard><option value="">A new game</option></select><small id="communityTargetHint">Pick one of your published games to update it instead of adding a copy.</small></label>
     <label for="communityTitle">Game title<input id="communityTitle" maxlength="80" placeholder="My awesome game" autocomplete="off" required></label>
     <label for="communityDescription">What is your game about?<textarea id="communityDescription" maxlength="500" rows="4" placeholder="Describe how to play and what makes it fun…" required></textarea><small>Up to 500 characters.</small></label>
     <div class="publish-privacy-note"><strong>Before you publish</strong><span>Your game will be public. Don't include private information or secret keys in your code.</span></div>
@@ -390,6 +400,6 @@ body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-
     <div class="community-preview-bottom"><span id="codeCommunityPreviewAuthor"></span><button class="btn" id="editCodeProjectBtn" type="button" hidden>Edit my project</button></div>
   </dialog>
 
-<script src="scripting.js?v=27"></script>
+<script src="scripting.js?v=28"></script>
 </body>
 </html>

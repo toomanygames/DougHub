@@ -84,7 +84,7 @@ function inlineProjectFiles(markup){
 }
 const STORAGE_SHIM='<script>(function(){function mem(){var d={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v)},removeItem:function(k){delete d[k]},clear:function(){d={}},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}["localStorage","sessionStorage"].forEach(function(n){try{window[n].getItem("x")}catch(e){try{Object.defineProperty(window,n,{configurable:true,value:mem()})}catch(_){}}})})()</scr'+'ipt>';
 function buildDocument(){const html=inlineProjectFiles(files.html||"");const css=files.css||"";const js=files.js||"";let assets=[];try{assets=JSON.parse(files["assets.json"]||"[]");if(!Array.isArray(assets))assets=[];}catch(_){}const bootstrap='<script>window.DougHubAssets='+JSON.stringify(assets).replace(/<\//g,"<\\/")+'</script>';return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n'+STORAGE_SHIM+'\n<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>\n<style>\n'+css+'\n</style>\n</head>\n<body>\n'+html+'\n'+bootstrap+'\n<script>\n'+js.replace(/<\/script/gi,"<\\/script")+'\n</script>\n</body>\n</html>';}
-function runPreview(){saveCurrentFile();if(currentMode==="blocks")updateGenerated(true);const isBlocks=currentMode==="blocks",isFast=currentMode==="fast";const frame=$(isBlocks?"previewDialogFrame":isFast?"fastPreviewFrame":"previewFrame");if(frame)frame.srcdoc=buildDocument();const empty=$(isBlocks?"previewDialogEmpty":isFast?"fastPreviewEmpty":"previewEmpty");const status=$(isBlocks?"previewDialogStatus":isFast?"fastPreviewStatus":"previewStatus");if(empty)empty.hidden=true;if(status)status.textContent="Preview refreshed at "+new Date().toLocaleTimeString();setStatus("Preview updated");}
+function runPreview(){saveCurrentFile();if(currentMode==="blocks")updateGenerated(true);const isBlocks=currentMode==="blocks"||$("previewDialog")?.open===true,isFast=currentMode==="fast";const frame=$(isBlocks?"previewDialogFrame":isFast?"fastPreviewFrame":"previewFrame");if(frame)frame.srcdoc=buildDocument();const empty=$(isBlocks?"previewDialogEmpty":isFast?"fastPreviewEmpty":"previewEmpty");const status=$(isBlocks?"previewDialogStatus":isFast?"fastPreviewStatus":"previewStatus");if(empty)empty.hidden=true;if(status)status.textContent="Preview refreshed at "+new Date().toLocaleTimeString();setStatus("Preview updated");}
 function setMode(mode){currentMode=mode;document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$("codeMode").hidden=mode!=="code";$("blocksMode").hidden=mode!=="blocks";$("fastMode").hidden=mode!=="fast";if(mode==="blocks"){renderLibrary();renderBlocks();if(blocklyWorkspace){requestAnimationFrame(()=>{try{Blockly.svgResize(blocklyWorkspace);}catch(e){console.warn("Blockly resize failed",e);}});}}else if(mode==="code")renderFile();else renderFastStatus();persist();}
 
 function setStudioKind(kind){
@@ -307,7 +307,8 @@ $("codeEditor").addEventListener("keydown",e=>{
  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runPreview();}
 });
 document.querySelectorAll(".mode-btn").forEach(btn=>btn.addEventListener("click",()=>setMode(btn.dataset.mode)));
-function openPreview(){saveCurrentFile();runPreview();if(currentMode==="blocks"){const d=$("previewDialog");if(d&&typeof d.showModal==="function")d.showModal();else if(d)d.setAttribute("open","");}}
+function openPreview(){saveCurrentFile();const d=$("previewDialog");if(d&&!d.open){if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","");}runPreview();}
+$("previewDialog")?.addEventListener("close",()=>{const f=$("previewDialogFrame");if(f)f.srcdoc="";const e=$("previewDialogEmpty");if(e)e.hidden=false;});
 $("previewBtn").addEventListener("click",openPreview);
 $("refreshPreviewBtn")?.addEventListener("click",runPreview);
 $("closePreviewBtn")?.addEventListener("click",()=>{const d=$("previewDialog");if(d?.close)d.close();else d?.removeAttribute("open");});
@@ -394,21 +395,65 @@ async function communityPublish(){
   const description=$("communityDescription").value.trim().slice(0,500);
   if(!title){communitySetStatus("Add a game title before publishing.",true);$("communityTitle").focus();return;}
   if(!description){communitySetStatus("Add a short game description before publishing.",true);$("communityDescription").focus();return;}
+  const targetId=$("communityTarget")?.value||"";
   const pubKey="doughub_scripting_published_v1";let published=[];try{published=JSON.parse(localStorage.getItem(pubKey)||"[]");}catch(_){}
-  if(published.includes(title.toLowerCase())&&!confirm("You already published a game called “"+title+"”.\n\nPublishing again adds a second copy to Community Games. Continue?"))return;
-  const button=$("publishProjectBtn");button.disabled=true;button.textContent="Publishing…";
+  if(!targetId&&published.includes(title.toLowerCase())&&!confirm("You already published a game called “"+title+"”.\n\nPublishing again adds a second copy to Community Games. Continue?"))return;
+  const button=$("publishProjectBtn");button.disabled=true;button.textContent=targetId?"Updating…":"Publishing…";
   try{
     const wantsOfficial=$("publishAsOfficial")?.checked===true;
     if(wantsOfficial&&!communityCanPublishOfficial){communitySetStatus("Only Admin, Developer, or Owner staff can publish official DougHub games.",true);return;}
+    if(targetId){
+      const patch={title,description,code:buildDocument()};
+      const was=communityMine.find(g=>g.id===targetId);
+      if(communityCanPublishOfficial&&was&&was.is_official!==wantsOfficial)patch.is_official=wantsOfficial;
+      const {data:upd,error:updErr}=await communityDb.from("community_games").update(patch).eq("id",targetId).eq("creator_id",communityUser.id).select("id");
+      if(updErr)throw updErr;
+      if(!upd||!upd.length)throw new Error("That game could not be updated. It may have been removed.");
+      communityRememberTarget(targetId);
+      communitySetStatus("Updated! The new version of your game is live in Doug Games → Community Games.");
+      setStatus("Game updated in Community Games");
+      communityLoadMine(targetId);
+      return;
+    }
     const payload={title,description,author:communityUsername,category:"Arcade",code:buildDocument(),creator_id:communityUser.id,is_official:wantsOfficial};
-    const {error}=await communityDb.from("community_games").insert(payload);
+    const {data:ins,error}=await communityDb.from("community_games").insert(payload).select("id").maybeSingle();
     if(error)throw error;
+    if(ins?.id){communityRememberTarget(ins.id);communityLoadMine(ins.id);}
     try{if(!published.includes(title.toLowerCase())){published.push(title.toLowerCase());localStorage.setItem(pubKey,JSON.stringify(published.slice(-100)));}}catch(_){}
     communitySetStatus(wantsOfficial?"Published as an official DougHub game! It will be marked in Doug Games → Community Games.":"Published! Your game is now in Doug Games → Community Games. It may take a refresh to appear.");
     setStatus("Game published to Community Games");
   }catch(e){console.error("Community Game publish failed:",e);communitySetStatus("Couldn't publish: "+(e.message||"check your connection and try again"),true);}
-  finally{button.disabled=false;button.textContent="Publish to Community Games";}
+  finally{button.disabled=false;communityTargetChanged();}
 }
+/* Update support: remember which published game belongs to this project and let the creator overwrite it. */
+let communityMine=[];
+const TARGET_KEY="doughub_scripting_targets_v1";
+function communityTargets(){try{return JSON.parse(localStorage.getItem(TARGET_KEY)||"{}")||{};}catch(_){return {};}}
+function communityProjectKey(){return ($("projectName")?.value||"").trim().toLowerCase()||"untitled";}
+function communityRememberTarget(id){try{const m=communityTargets();m[communityProjectKey()]=id;localStorage.setItem(TARGET_KEY,JSON.stringify(m));}catch(_){}}
+function communityTargetChanged(){
+  const sel=$("communityTarget"),btn=$("publishProjectBtn");if(!sel||!btn)return;
+  const g=communityMine.find(x=>x.id===sel.value);
+  btn.textContent=g?"Update game ↗":"Publish to Community Games ↗";
+  const hint=$("communityTargetHint");if(hint)hint.textContent=g?"This replaces the code of “"+g.title+"” with what's open now. Its title and description can be changed below.":"Pick one of your published games to update it instead of adding a copy.";
+}
+async function communityLoadMine(selectId){
+  const sel=$("communityTarget");if(!sel)return;
+  if(!communityDb||!communityUser){communityMine=[];sel.innerHTML='<option value="">A new game</option>';communityTargetChanged();return;}
+  try{
+    const {data,error}=await communityDb.from("community_games").select("id,title,description,is_official,created_at").eq("creator_id",communityUser.id).order("created_at",{ascending:false}).limit(100);
+    if(error)throw error;
+    communityMine=data||[];
+  }catch(e){console.warn("Could not load your published games",e);communityMine=[];}
+  sel.innerHTML="";const o0=document.createElement("option");o0.value="";o0.textContent="A new game";sel.appendChild(o0);
+  communityMine.forEach(g=>{const o=document.createElement("option");o.value=g.id;o.textContent="Update: "+g.title;sel.appendChild(o);});
+  const remembered=communityTargets()[communityProjectKey()];
+  const want=selectId||(communityMine.some(g=>g.id===remembered)?remembered:"");
+  if(want&&communityMine.some(g=>g.id===want)){sel.value=want;communityFillFromTarget();}
+  communityTargetChanged();
+}
+function communityFillFromTarget(){const g=communityMine.find(x=>x.id===$("communityTarget")?.value);if(!g)return;$("communityTitle").value=g.title||"";$("communityDescription").value=g.description||"";const o=$("publishAsOfficial");if(o&&communityCanPublishOfficial)o.checked=g.is_official===true;}
+$("communityTarget")?.addEventListener("change",()=>{communityFillFromTarget();communityTargetChanged();});
 const publishDialog=$("publishGameDialog");
 function openPublishDialog(){
   if(studioKind==="project"){
@@ -422,6 +467,7 @@ function openPublishDialog(){
   if(!publishDialog)return;
   const title=$("communityTitle");
   if(title&&!title.value.trim())title.value=$("projectName").value.trim().slice(0,80);
+  communityLoadMine();
   if(typeof publishDialog.showModal==="function")publishDialog.showModal();else publishDialog.setAttribute("open","");
   setTimeout(()=>title?.focus(),50);
 }
