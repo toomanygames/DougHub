@@ -27787,18 +27787,37 @@ playKeepCombatSound=function(kind){
 const dougHubEnemyDeathBefore=recordedEnemyDeath;
 recordedEnemyDeath=function(){dougHubShake(5,.2);return dougHubEnemyDeathBefore.apply(this,arguments);};
 
-// Tutorial: each step finishes when the player does it.
-const dougHubTutorialKey='shadows-of-ashmere-tutorial-v1';
-const dougHubSteps=[
-  {html:'Walk with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrow keys.',move:true},
-  {html:'Press <kbd>Enter</kbd> to talk, open doors and pick things up. With nothing nearby, it opens your bag.',keys:['enter']},
-  {html:'Press <kbd>X</kbd> to swing your sword once you have one, and <kbd>Z</kbd> to use the item you have equipped.',keys:['x','z']},
-  {html:'Hold <kbd>Shift</kbd> to raise your shield. <kbd>Q</kbd> lights your lantern and <kbd>R</kbd> opens your map.',keys:['shift','q','r']},
-  {html:'You are ready! Press <kbd>H</kbd> any time to see every control.',seconds:6}
+// Tutorial: the basics come first, in order (walk, open the chest for the slingshot,
+// fire it, use the bag, talk). Each item then gets its own lesson only once the hero
+// owns it. Lessons finish when the player does the thing they teach.
+const dougHubTutorialKey='shadows-of-ashmere-tutorial-v2';
+const dougHubBasics=6;
+const dougHubLessons=[
+  {id:'move',html:'Walk with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrow keys.',move:true},
+  {id:'chest',html:'There is a chest in your room. Walk up to it and press <kbd>Enter</kbd> to open it.',
+    unlock:()=>scene==='house',auto:()=>house.hasSlingshot},
+  {id:'slingshot',html:'You got a slingshot! Press <kbd>Z</kbd> to fire a rock.',unlock:()=>house.hasSlingshot,keys:['z']},
+  {id:'bag',html:'With nothing nearby, <kbd>Enter</kbd> opens your bag. Pick an item with <kbd>W</kbd>/<kbd>S</kbd> and press <kbd>Enter</kbd> to equip it.',
+    unlock:()=>house.hasSlingshot,auto:()=>house.inventoryOpen},
+  {id:'talk',html:'Walk up to people and press <kbd>Enter</kbd> to talk. Doors work the same way.',
+    unlock:()=>house.hasSlingshot,auto:()=>!!(alkam.dialogue||keep.dialogue)||scene!=='house'},
+  {id:'help',html:'Nice work! Press <kbd>H</kbd> any time to see every control. New items will teach you their buttons when you get them.',seconds:6},
+  {id:'sword',html:'You have a sword! Press <kbd>X</kbd> to swing it.',unlock:()=>raidQuest.hasSword,keys:['x']},
+  {id:'shield',html:'You have a shield! Hold <kbd>Shift</kbd> to block attacks.',unlock:()=>keep.shield,keys:['shift']},
+  {id:'lantern',html:'You have a lantern! Press <kbd>Q</kbd> to light it in dark places.',unlock:()=>cave.hasLantern,keys:['q']},
+  {id:'bread',html:'Bread heals you. Equip it in your bag, then press <kbd>Z</kbd> to eat it.',unlock:()=>alkam.everHadBread||alkam.bread>0,keys:['z']},
+  {id:'map',html:'You are outside! Press <kbd>R</kbd> to open your map.',unlock:()=>scene==='world'&&!keep.inside&&!keep.room,keys:['r']}
 ];
-const dougHubTutorial={step:0,moved:0,shown:0,doneFor:0,wasVisible:false};
-try{dougHubTutorial.step=Math.max(0,Math.min(dougHubSteps.length,Number(localStorage.getItem(dougHubTutorialKey))||0));}catch{}
-function dougHubSaveTutorial(){try{localStorage.setItem(dougHubTutorialKey,String(dougHubTutorial.step));}catch{}}
+const dougHubTutorial={done:new Set(),current:null,moved:0,shown:0,doneFor:0,wasVisible:false};
+try{for(const id of JSON.parse(localStorage.getItem(dougHubTutorialKey)||'[]'))dougHubTutorial.done.add(id);}catch{}
+function dougHubSaveTutorial(){try{localStorage.setItem(dougHubTutorialKey,JSON.stringify([...dougHubTutorial.done]));}catch{}}
+function dougHubUnlocked(lesson){try{return !lesson.unlock||!!lesson.unlock();}catch{return false;}}
+function dougHubAutoDone(lesson){try{return !!lesson.auto&&dougHubUnlocked(lesson)&&!!lesson.auto();}catch{return false;}}
+function dougHubNextLesson(){
+  const done=dougHubTutorial.done;
+  return dougHubLessons.find((lesson,index)=>!done.has(lesson.id)&&dougHubUnlocked(lesson)&&
+    (index<dougHubBasics?dougHubLessons.slice(0,index).every(l=>done.has(l.id)):done.has('move')))||null;
+}
 function dougHubTutorialReady(){
   try{
     return dougHubPlayScenes.includes(scene)&&nameConfirmed&&!(scene==='house'&&house.phase!=='awake')&&
@@ -27806,30 +27825,42 @@ function dougHubTutorialReady(){
       !world.mapOpen&&!house.inventoryOpen&&dougHubHelp.hidden;
   }catch{return false;}
 }
-let dougHubTipStep=-1;
+let dougHubTipLesson=null;
 function dougHubTickTutorial(dt){
   const keys=dougHubKeys.pressed.splice(0);
   const t=dougHubTutorial;
-  if(t.step>=dougHubSteps.length){dougHubTip.hidden=true;return;}
-  const step=dougHubSteps[t.step],visible=dougHubTutorialReady();
+  // Lessons the player already did on their own finish quietly.
+  for(const lesson of dougHubLessons)
+    if(lesson!==t.current&&!t.done.has(lesson.id)&&dougHubAutoDone(lesson)){t.done.add(lesson.id);dougHubSaveTutorial();}
   if(t.doneFor>0){
     t.doneFor-=dt;
-    if(t.doneFor<=0){t.step++;t.moved=0;t.shown=0;dougHubSaveTutorial();}
-  }else if(t.wasVisible){
-    const moving=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].some(k=>dougHubKeys.held.has(k));
-    if(step.move&&moving)t.moved+=dt;
-    t.shown+=dt;
-    const finished=step.move?t.moved>=.6:step.keys?keys.some(k=>step.keys.includes(k)):t.shown>=step.seconds;
-    if(finished)t.doneFor=step.seconds?.01:.7;
+    if(t.doneFor<=0){t.done.add(t.current.id);dougHubSaveTutorial();t.current=null;}
+  }
+  if(!t.current){
+    t.current=dougHubNextLesson();t.moved=0;t.shown=0;t.wasVisible=false;
+  }
+  const lesson=t.current;
+  if(!lesson){dougHubTip.hidden=true;return;}
+  const visible=dougHubTutorialReady();
+  if(t.doneFor<=0){
+    let finished=dougHubAutoDone(lesson);
+    if(!finished&&t.wasVisible){
+      if(lesson.move&&dougHubMoveHeld())t.moved+=dt;
+      t.shown+=dt;
+      finished=lesson.move?t.moved>=.6:lesson.keys?keys.some(k=>lesson.keys.includes(k)):lesson.seconds?t.shown>=lesson.seconds:false;
+    }
+    if(finished)t.doneFor=lesson.seconds?.01:.7;
   }
   t.wasVisible=visible;
-  dougHubTip.hidden=!visible||t.step>=dougHubSteps.length;
-  if(t.step<dougHubSteps.length&&dougHubTipStep!==t.step){
-    dougHubTipStep=t.step;
-    dougHubTip.innerHTML='<small>TUTORIAL '+(t.step+1)+' OF '+dougHubSteps.length+'</small>'+dougHubSteps[t.step].html;
+  dougHubTip.hidden=!visible;
+  if(dougHubTipLesson!==lesson){
+    dougHubTipLesson=lesson;
+    const index=dougHubLessons.indexOf(lesson);
+    dougHubTip.innerHTML='<small>'+(index<dougHubBasics?'TUTORIAL '+(index+1)+' OF '+dougHubBasics:'NEW ITEM')+'</small>'+lesson.html;
   }
   dougHubTip.classList.toggle('done',t.doneFor>0);
 }
+function dougHubMoveHeld(){return ['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].some(k=>dougHubKeys.held.has(k));}
 
 function dougHubTick(dt){
   dougHubFx.grace=Math.max(0,dougHubFx.grace-dt);
