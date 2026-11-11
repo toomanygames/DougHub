@@ -2337,56 +2337,59 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 .player-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 <style id="dh-gcard-style">
-#doug-games .dh-ggroup{margin:0 0 34px}
+/* Official DougHub game cards: flat, solid colors only. */
+#doug-games .dh-game-browser{background:#0f1229;border-color:#ffffff14}
+#doug-games .dh-game-genres button{background:#161a36;border-color:#ffffff14}
+#doug-games .dh-game-genres button:hover,#doug-games .dh-game-genres button.active{background:#e9e7ff;border-color:#e9e7ff;color:#14162e}
+#doug-games .dh-ggroup{margin:0 0 36px}
 #doug-games .dh-ggroup[hidden],#doug-games .dh-gc[hidden]{display:none}
 #doug-games .dh-ggroup-head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
-#doug-games .dh-ggroup-head h3{margin:0;color:#fff;font-size:20px;font-weight:850;letter-spacing:-.03em}
-#doug-games .dh-ggroup-count{padding:2px 9px;border:1px solid rgba(177,184,255,.22);border-radius:999px;background:rgba(99,102,241,.14);color:#c7d2fe;font-size:11px;font-weight:800}
+#doug-games .dh-ggroup-head h3{margin:0;color:#fff;font-size:21px;font-weight:850;letter-spacing:-.03em}
+#doug-games .dh-ggroup-count{min-width:26px;padding:3px 8px;border-radius:8px;background:#1b1f3d;color:#c7cbe6;font-size:11px;font-weight:800;text-align:center}
 #doug-games .dh-ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-#doug-games .dh-gc{--glow:color-mix(in srgb,var(--accent) 40%,transparent);position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:#0d1027;color:#f5f6ff;text-decoration:none;box-shadow:0 1px 0 rgba(255,255,255,.04) inset;transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,box-shadow .22s}
-#doug-games .dh-gc::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(140deg,color-mix(in srgb,var(--accent) 16%,transparent),transparent 45%)}
-#doug-games a.dh-gc:hover,#doug-games .dh-gc-drive:hover,#doug-games .dh-gc:focus-within{transform:translateY(-6px);border-color:color-mix(in srgb,var(--accent) 70%,transparent);box-shadow:0 18px 40px rgba(0,0,0,.5),0 0 0 1px var(--glow),0 12px 40px -8px var(--glow)}
-#doug-games a.dh-gc:focus-visible,#doug-games .dh-gc-play:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-#doug-games .dh-gc-art{position:relative;isolation:isolate;display:grid;place-items:center;height:148px;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--accent) 55%,#0d1027) 0%,#0d1027 72%)}
-#doug-games .dh-gc-art::before{content:"";position:absolute;z-index:-2;inset:-40%;background:var(--art) center/cover no-repeat;filter:blur(34px) saturate(1.6);opacity:.55}
-#doug-games .dh-gc-art::after{content:"";position:absolute;z-index:-1;inset:0;background-image:radial-gradient(rgba(255,255,255,.09) 1px,transparent 1.3px);background-size:14px 14px;mask-image:linear-gradient(180deg,#000,transparent 85%);-webkit-mask-image:linear-gradient(180deg,#000,transparent 85%)}
-#doug-games .dh-gc-art img{width:92px;height:92px;border-radius:24px;box-shadow:0 14px 30px rgba(0,0,0,.55),0 0 0 3px rgba(255,255,255,.08);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-#doug-games a.dh-gc:hover .dh-gc-art img,#doug-games .dh-gc-drive:hover .dh-gc-art img{transform:translateY(-4px) scale(1.08) rotate(-3deg)}
-#doug-games .dh-gc-genre,#doug-games .dh-gc-badge{position:absolute;top:10px;padding:4px 9px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:.03em;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-#doug-games .dh-gc-genre{left:10px;border:1px solid rgba(255,255,255,.14);background:rgba(8,10,26,.55);color:#e6e8f8}
-#doug-games .dh-gc-badge{right:10px;border:1px solid color-mix(in srgb,var(--accent) 60%,transparent);background:color-mix(in srgb,var(--accent) 28%,rgba(8,10,26,.6));color:#fff}
-#doug-games .dh-gc-body{position:relative;z-index:1;display:flex;flex:1;flex-direction:column;gap:8px;padding:14px 16px 16px}
+#doug-games .dh-gc{--tint:color-mix(in srgb,var(--accent) 24%,#11142b);--soft:color-mix(in srgb,var(--accent) 55%,#ffffff);position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #ffffff14;border-radius:18px;background:#11142b;color:#f5f6ff;text-decoration:none;transition:transform .2s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s}
+#doug-games a.dh-gc:hover,#doug-games .dh-gc-drive:hover,#doug-games .dh-gc:focus-within{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 14px 0 -6px color-mix(in srgb,var(--accent) 35%,#05060f),0 18px 30px rgba(0,0,0,.45)}
+#doug-games a.dh-gc:focus-visible,#doug-games .dh-gc-play:focus-visible{outline:2px solid var(--soft);outline-offset:3px}
+#doug-games .dh-gc-art{position:relative;display:grid;place-items:center;height:156px;border-bottom:1px solid #ffffff0f;background:var(--tint)}
+#doug-games .dh-gc-art img{width:104px;height:104px;border-radius:26px;box-shadow:0 8px 0 rgba(0,0,0,.28);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+#doug-games a.dh-gc:hover .dh-gc-art img,#doug-games .dh-gc-drive:hover .dh-gc-art img{transform:translateY(-5px) rotate(-3deg)}
+#doug-games .dh-gc-genre,#doug-games .dh-gc-badge{position:absolute;top:11px;padding:4px 9px;border-radius:8px;font-size:10.5px;font-weight:800;letter-spacing:.02em}
+#doug-games .dh-gc-genre{left:11px;background:#0b0d1fcc;color:#e6e8f8}
+#doug-games .dh-gc-badge{right:11px;background:var(--soft);color:#14162e}
+#doug-games .dh-gc-body{display:flex;flex:1;flex-direction:column;gap:8px;padding:15px 16px 16px}
 #doug-games .dh-gc-title{color:#fff;font-size:17px;font-weight:850;line-height:1.25;letter-spacing:-.02em}
 #doug-games .dh-gc-desc{display:-webkit-box;overflow:hidden;color:#a9adc9;font-size:13px;line-height:1.55;-webkit-box-orient:vertical;-webkit-line-clamp:2}
-#doug-games .dh-gc-play{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:auto;padding:10px 14px;border-radius:12px;background:linear-gradient(115deg,var(--accent),color-mix(in srgb,var(--accent) 55%,#a855f7));color:#fff;font-size:12.5px;font-weight:900;letter-spacing:.08em;text-decoration:none;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.35);box-shadow:0 6px 18px -6px var(--glow);transition:filter .2s,transform .2s}
+#doug-games .dh-gc-play{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:auto;padding:11px 14px;border-radius:12px;background:var(--soft);color:#14162e;font-size:12.5px;font-weight:900;letter-spacing:.08em;text-decoration:none;text-transform:uppercase;transition:background .2s,color .2s}
 #doug-games .dh-gc-play span{font-size:10px;transition:transform .2s}
-#doug-games a.dh-gc:hover .dh-gc-play,#doug-games .dh-gc-play:hover{filter:brightness(1.12) saturate(1.1)}
+#doug-games a.dh-gc:hover .dh-gc-play,#doug-games .dh-gc-play:hover{background:#ffffff;color:#0b0d1f}
 #doug-games a.dh-gc:hover .dh-gc-play span,#doug-games .dh-gc-play:hover span{transform:translateX(3px)}
 #doug-games .dh-gc-drive .dh-gc-status{display:flex;align-items:center;gap:6px;color:#8f93b2;font-size:11px}
+#doug-games .dh-gc-drive .drive-pig-toggle{background:#0b0d1f}
+#doug-games .dh-gc-drive .drive-pig-slider{background:color-mix(in srgb,var(--accent) 30%,#161a36);border-color:var(--accent)}
 #doug-games .dh-gc-drive .drive-pig-option{min-height:58px}
 @media (min-width:760px){
- #doug-games .dh-gc-spot{grid-column:span 2;grid-row:span 2}
- #doug-games .dh-gc-spot .dh-gc-art{flex:1;min-height:230px}
- #doug-games .dh-gc-spot .dh-gc-art img{width:150px;height:150px;border-radius:36px}
- #doug-games .dh-gc-spot .dh-gc-title{font-size:24px}
- #doug-games .dh-gc-spot .dh-gc-desc{font-size:14px;-webkit-line-clamp:3}
- #doug-games .dh-gc-spot .dh-gc-body{flex:0 0 auto;padding:18px 22px 22px}
- #doug-games .dh-gc-spot .dh-gc-play{align-self:flex-start;margin-top:6px;padding:12px 26px;font-size:13.5px}
+ #doug-games .dh-gc-spot{grid-column:span 2;flex-direction:row}
+ #doug-games .dh-gc-spot .dh-gc-art{flex:0 0 46%;height:auto;min-height:260px;border-bottom:0;border-right:1px solid #ffffff0f}
+ #doug-games .dh-gc-spot .dh-gc-art img{width:150px;height:150px;border-radius:36px;box-shadow:0 10px 0 rgba(0,0,0,.28)}
+ #doug-games .dh-gc-spot .dh-gc-body{justify-content:center;gap:12px;padding:26px 28px}
+ #doug-games .dh-gc-spot .dh-gc-title{font-size:26px}
+ #doug-games .dh-gc-spot .dh-gc-desc{font-size:14.5px;-webkit-line-clamp:4}
+ #doug-games .dh-gc-spot .dh-gc-play{align-self:flex-start;margin-top:6px;padding:13px 28px;font-size:13.5px}
 }
 @media (max-width:560px){
  #doug-games .dh-ggrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
- #doug-games .dh-gc{border-radius:16px}
- #doug-games .dh-gc-art{height:104px}
- #doug-games .dh-gc-art img{width:62px;height:62px;border-radius:17px}
+ #doug-games .dh-gc{border-radius:15px}
+ #doug-games .dh-gc-art{height:108px}
+ #doug-games .dh-gc-art img{width:68px;height:68px;border-radius:18px;box-shadow:0 5px 0 rgba(0,0,0,.28)}
  #doug-games .dh-gc-genre{top:7px;left:7px;padding:3px 7px;font-size:9.5px}
  #doug-games .dh-gc-badge{top:7px;right:7px;padding:3px 7px;font-size:9.5px}
  #doug-games .dh-gc-body{gap:6px;padding:10px 11px 12px}
  #doug-games .dh-gc-title{font-size:14px}
  #doug-games .dh-gc-desc{font-size:11.5px}
- #doug-games .dh-gc-play{padding:8px 10px;font-size:11px}
+ #doug-games .dh-gc-play{padding:9px 10px;font-size:11px}
  #doug-games .dh-gc-spot,#doug-games .dh-gc-drive{grid-column:1/-1}
- #doug-games .dh-gc-spot .dh-gc-art{height:150px}
- #doug-games .dh-gc-spot .dh-gc-art img{width:96px;height:96px;border-radius:24px}
+ #doug-games .dh-gc-spot .dh-gc-art{height:160px}
+ #doug-games .dh-gc-spot .dh-gc-art img{width:104px;height:104px;border-radius:26px}
 }
 @media (max-width:340px){#doug-games .dh-ggrid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#doug-games .dh-gc,#doug-games .dh-gc *{transition:none!important}}
@@ -2634,7 +2637,7 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
           <div class="dh-game-genres" role="group" aria-label="Filter games by genre">
             <button type="button" class="active" data-genre="all" aria-pressed="true">All games</button>
             <button type="button" data-genre="adventure" aria-pressed="false">🗺️ Adventure</button>
-            <button type="button" data-genre="sim" aria-pressed="false">🏗️ Sim</button>
+            <button type="button" data-genre="sim" aria-pressed="false">🏠 Sim</button>
             <button type="button" data-genre="clicker" aria-pressed="false">👆 Clicker</button>
             <button type="button" data-genre="arcade" aria-pressed="false">🕹️ Arcade</button>
             <button type="button" data-genre="puzzle" aria-pressed="false">🧩 Puzzle</button>
@@ -2647,7 +2650,7 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
           <div class="dh-ggroup-head"><h3>New on DougHub</h3><span class="dh-ggroup-count">7</span></div>
           <div class="dh-ggrid dh-ggrid-newest">
             <a href="Games/fix-it-crew.html" class="dh-gc dh-gc-spot" data-genre="sim" style="--accent:#ffb02e;--art:url('Games/art/fix-it-crew.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-badge">✦ Newest</span><span class="dh-gc-genre">🏗️ Sim</span><img src="Games/art/fix-it-crew.svg" alt="Fix-It Crew: Builder Bo logo" loading="lazy"></span>
+              <span class="dh-gc-art"><span class="dh-gc-badge">✦ Newest</span><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/fix-it-crew.svg" alt="Fix-It Crew: Builder Bo logo" loading="lazy"></span>
               <span class="dh-gc-body">
                 <span class="dh-gc-title">Fix-It Crew: Builder Bo</span>
                 <span class="dh-gc-desc">A 3D building game! Carry planks, dig ponds, pave paths and raise a Town Hall with Bo and the machine buddies across eight jobs.</span>
@@ -2655,7 +2658,7 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
               </span>
             </a>
             <a href="Games/bundt-bakery.html" class="dh-gc" data-genre="sim" style="--accent:#f472b6;--art:url('Games/art/bundt-bakery.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏗️ Sim</span><img src="Games/art/bundt-bakery.svg" alt="Bundt Bakery logo" loading="lazy"></span>
+              <span class="dh-gc-art"><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/bundt-bakery.svg" alt="Bundt Bakery logo" loading="lazy"></span>
               <span class="dh-gc-body">
                 <span class="dh-gc-title">Bundt Bakery</span>
                 <span class="dh-gc-desc">Run a cozy bakery! Mix, pour, bake, flip and decorate bundt cakes for animal customers, then spend your coins on new flavors, glazes and pans.</span>
@@ -2663,7 +2666,7 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
               </span>
             </a>
             <a href="Games/farm-idle.html" class="dh-gc" data-genre="sim" style="--accent:#84cc16;--art:url('Games/art/farm-idle.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏗️ Sim</span><img src="Games/art/farm-idle.svg" alt="Farm Idle logo" loading="lazy"></span>
+              <span class="dh-gc-art"><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/farm-idle.svg" alt="Farm Idle logo" loading="lazy"></span>
               <span class="dh-gc-body">
                 <span class="dh-gc-title">Farm Idle</span>
                 <span class="dh-gc-desc">Plant, harvest and automate a cheerful farm. Hire farmhands, ride out the weather, then hold a Harvest Festival for permanent sunseed upgrades.</span>
