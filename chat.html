@@ -1007,6 +1007,13 @@ main {
 @media(max-width:520px){#pollsDrawer{width:100vw;border-left:0}.polls-head{padding:15px}.polls-title{font-size:22px}#pollsList{padding:10px}.poll-card{padding:13px}#pollsLauncher{right:9px;bottom:10px}}
 </style>
 
+<style id="chat-sound-toggle-style">
+.chat-sound-toggle[aria-pressed="true"]{border-color:rgba(248,113,113,.35);background:linear-gradient(125deg,rgba(239,68,68,.16),rgba(168,85,247,.1));color:#fecaca}
+.chat-sound-toggle[aria-pressed="true"] #chatSoundIcon{color:#fca5a5}
+.chat-sound-toggle #chatSoundLabel{font-size:12px}
+@media(max-width:620px){.chat-sound-toggle{padding:7px 8px;font-size:10px}.chat-sound-toggle #chatSoundLabel{font-size:10px}}
+</style>
+
 </head>
 
 </head>
@@ -1033,6 +1040,9 @@ main {
       </a>
       <button class="chat-video-call-button chat-video-invite-button" id="chatVideoInviteButton" type="button" title="Send a group video-call invite to the current chat">
         <span aria-hidden="true">＋</span> Invite to call
+      </button>
+      <button class="chat-video-call-button chat-sound-toggle" id="chatSoundToggle" type="button" aria-pressed="false" title="Mute all DougHub chat dings on this device">
+        <span aria-hidden="true" id="chatSoundIcon">🔔</span> <span id="chatSoundLabel">Sounds on</span>
       </button>
       <span class="chat-notification-hint" title="Unread chats show a red dot; group alerts can be muted">Chat alerts are controlled per chat</span>
 
@@ -3840,6 +3850,49 @@ startCommunityChat();
   window.addEventListener("focus",()=>{if(!drawer.hidden)loadPolls(true);});
   // Keep the launcher available and poll scope fresh when users switch channels.
   window.setInterval(()=>{createToggle.hidden=!isStaffAdmin();const scope=String(activeChatGroupId??"public");if(scope!==lastScope){lastScope=scope;document.getElementById("pollsScopeLabel").textContent=(activeChatGroupId===null?"Public Chat":(activeChatGroup?.name||"Selected group"))+" · Vote and see results";loadPolls(true);}},1200);
+})();
+</script>
+
+<script id="chat-global-sound-toggle">
+(() => {
+  const KEY = "douqhub_chat_dings_enabled";
+  const button = document.getElementById("chatSoundToggle");
+  const icon = document.getElementById("chatSoundIcon");
+  const label = document.getElementById("chatSoundLabel");
+  if (!button || !icon || !label) return;
+
+  function isMuted() {
+    try { return localStorage.getItem(KEY) === "false"; }
+    catch (_) { return false; }
+  }
+
+  function render() {
+    const muted = isMuted();
+    button.setAttribute("aria-pressed", String(muted));
+    button.title = muted
+      ? "Unmute all DougHub chat dings on this device"
+      : "Mute all DougHub chat dings on this device";
+    icon.textContent = muted ? "🔕" : "🔔";
+    label.textContent = muted ? "Muted" : "Sounds on";
+  }
+
+  button.addEventListener("click", () => {
+    const muted = !isMuted();
+    try {
+      localStorage.setItem(KEY, muted ? "false" : "true");
+    } catch (error) {
+      console.warn("DougHub could not save the chat sound setting:", error);
+    }
+    render();
+    window.dispatchEvent(new Event("douqhub:chat-ding-setting-changed"));
+  });
+
+  // The storage event fires in every other DougHub tab on this same browser.
+  window.addEventListener("storage", event => {
+    if (event.key === KEY) render();
+  });
+
+  render();
 })();
 </script>
 
