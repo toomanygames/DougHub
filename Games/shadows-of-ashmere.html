@@ -27905,7 +27905,7 @@ const dougHubCredit={phase:'wait',start:0,length:4.2,holdAt:5.05};
 const dougHubClamp=x=>Math.max(0,Math.min(1,x));
 const dougHubEaseOut=x=>1-Math.pow(1-dougHubClamp(x),3);
 const dougHubBounce=x=>{x=dougHubClamp(x);const c=1.9;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2);};
-function drawDougHubCredit(t){
+function drawDougHubLogo(t){
   const w=canvas.width,h=canvas.height,cx=Math.round(w/2),cy=Math.round(h/2-40);
   ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.globalAlpha=1;
   rect(0,0,w,h,'#050611');
@@ -27966,10 +27966,72 @@ function drawDougHubCredit(t){
   ctx.globalAlpha=dougHubEaseOut((t-1.9)/.5);
   text('PRESENTS',cx-textWidth('PRESENTS',2)/2,ty+7*size2+26,2,'#a5b4fc');
   // Fade in from black and out to black.
-  ctx.globalAlpha=Math.max(1-dougHubClamp(t/.3),dougHubClamp((t-(dougHubCredit.length-.6))/.6));
+  ctx.globalAlpha=Math.max(1-dougHubClamp(t/.3),dougHubClamp((t-(4.2-.6))/.6));
   if(ctx.globalAlpha>0)rect(0,0,w,h,'#000');
   ctx.restore();
 }
+
+// Joke studio logos that go on far too long before the real credit.
+const dougHubJokeLength=1.7;
+const dougHubJokes=[
+  {bg:'#1a1424',over:'IN ASSOCIATION WITH',title:'DOUGS BASEMENT STUDIOS',color:'#ffd27a',emblem:'bulb'},
+  {bg:'#2a1020',over:'A',title:'PIG CLICKER PICTURES',color:'#ff9ccf',emblem:'coin'},
+  {bg:'#0f1f2a',over:'PRESENTED WITH HELP FROM',title:'THE GOOSE GUILD OF FILM',color:'#f4f1e6',emblem:'goose'},
+  {bg:'#0b0b10',over:'THIS IS STILL NOT THE GAME',title:'PLEASE ENJOY MORE LOGOS',color:'#a5b4fc',emblem:'dots'}
+];
+function drawDougHubJoke(joke,t){
+  const w=canvas.width,h=canvas.height,cx=Math.round(w/2),cy=Math.round(h/2-50);
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.globalAlpha=1;
+  rect(0,0,w,h,joke.bg);
+  if(joke.emblem==='bulb'){
+    const swing=Math.sin(t*3.2)*.45,bx=cx+Math.sin(swing)*46,by=cy-60+Math.cos(swing)*46;
+    for(let i=0;i<46;i+=2)rect(cx+Math.sin(swing)*i,cy-60+Math.cos(swing)*i,2,2,'#5b5468');
+    const lit=Math.sin(t*23)>-.6;
+    if(lit){ctx.globalAlpha=.18;rect(bx-34,by-26,68,64,'#ffd27a');ctx.globalAlpha=1;}
+    rect(bx-8,by-2,16,8,'#8a8496');rect(bx-12,by+6,24,22,lit?'#ffe9a3':'#6b6450');rect(bx-8,by+28,16,6,lit?'#ffd27a':'#5a5444');
+  }else if(joke.emblem==='coin'){
+    const face=Math.cos(t*5),cw=Math.max(4,Math.round(64*Math.abs(face)));
+    rect(cx-cw/2,cy-32,cw,64,'#e86aa8');rect(cx-cw/2+3,cy-29,Math.max(1,cw-6),58,'#ff9ccf');
+    if(Math.abs(face)>.45){rect(cx-12*face,cy-2,24*Math.abs(face),14,'#e86aa8');rect(cx-7*face,cy+2,4,5,'#7a1e4a');rect(cx+3*face,cy+2,4,5,'#7a1e4a');rect(cx-14*face,cy-14,5,5,'#2a1020');rect(cx+9*face,cy-14,5,5,'#2a1020');}
+  }else if(joke.emblem==='goose'){
+    const honk=(t%1)<.35,gx=cx-30,gy=cy-10;
+    rect(gx,gy+10,54,26,'#f4f1e6');rect(gx+40,gy-26,12,40,'#f4f1e6');rect(gx+38,gy-36,18,14,'#f4f1e6');
+    rect(gx+50,gy-31,4,4,'#111');rect(gx+56,gy-30,14,honk?3:6,'#f59e0b');if(honk)rect(gx+56,gy-24,12,3,'#f59e0b');
+    rect(gx+10,gy+36,4,12,'#f59e0b');rect(gx+34,gy+36,4,12,'#f59e0b');
+    if(honk)text('HONK',gx+78,gy-46,2,'#f59e0b');
+  }else{
+    for(let i=0;i<3;i++){const hop=Math.max(0,Math.sin(t*7-i*.9))*16;rect(cx-34+i*28,cy-hop,14,14,'#a5b4fc');}
+  }
+  const titleSize=Math.max(2,Math.min(4,Math.floor((w-60)/textWidth(joke.title,1))));
+  text(joke.over,cx-textWidth(joke.over,2)/2,cy+58,2,'#8f8aa3');
+  text(joke.title,cx-textWidth(joke.title,titleSize)/2+2,cy+82+2,titleSize,'#000');
+  text(joke.title,cx-textWidth(joke.title,titleSize)/2,cy+82,titleSize,joke.color);
+  // Every card fades in and out as one piece.
+  ctx.globalAlpha=Math.max(1-dougHubClamp(t/.25),dougHubClamp((t-(dougHubJokeLength-.25))/.25));
+  if(ctx.globalAlpha>0)rect(0,0,w,h,'#000');
+  ctx.restore();
+}
+function drawDougHubCredit(t){
+  const jokesEnd=dougHubJokes.length*dougHubJokeLength;
+  if(t<jokesEnd){const i=Math.floor(t/dougHubJokeLength);drawDougHubJoke(dougHubJokes[i],t-i*dougHubJokeLength);}
+  else drawDougHubLogo(t-jokesEnd);
+}
+dougHubCredit.length=dougHubJokes.length*dougHubJokeLength+4.2;
+
+// The Can-Man credit used to fade by drawing every shape see-through, so overlapping
+// parts showed through each other. Draw it solid, then fade the whole frame evenly.
+const dougHubAlphaProperty=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'globalAlpha');
+const dougHubCanManBefore=drawCanManIntro;
+drawCanManIntro=function(t){
+  let fade=null,result;
+  Object.defineProperty(ctx,'globalAlpha',{configurable:true,
+    get(){return dougHubAlphaProperty.get.call(ctx);},
+    set(value){if(fade===null)fade=Number(value);dougHubAlphaProperty.set.call(ctx,1);}});
+  try{result=dougHubCanManBefore(t);}finally{delete ctx.globalAlpha;}
+  const shown=fade===null?1:dougHubClamp(fade);
+  if(shown<1){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1-shown;rect(0,0,canvas.width,canvas.height,'#000');ctx.restore();}
+  return result;
+};
 
 const dougHubFrameBefore=frame;
 frame=function(now){
