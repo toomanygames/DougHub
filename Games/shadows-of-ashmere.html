@@ -27971,52 +27971,62 @@ function drawDougHubLogo(t){
   ctx.restore();
 }
 
-// Joke studio logos that go on far too long before the real credit.
-const dougHubJokeLength=1.7;
-const dougHubJokes=[
-  {bg:'#1a1424',over:'IN ASSOCIATION WITH',title:'DOUGS BASEMENT STUDIOS',color:'#ffd27a',emblem:'bulb'},
-  {bg:'#2a1020',over:'A',title:'PIG CLICKER PICTURES',color:'#ff9ccf',emblem:'coin'},
-  {bg:'#0f1f2a',over:'PRESENTED WITH HELP FROM',title:'THE GOOSE GUILD OF FILM',color:'#f4f1e6',emblem:'goose'},
-  {bg:'#0b0b10',over:'THIS IS STILL NOT THE GAME',title:'PLEASE ENJOY MORE LOGOS',color:'#a5b4fc',emblem:'dots'}
-];
-function drawDougHubJoke(joke,t){
-  const w=canvas.width,h=canvas.height,cx=Math.round(w/2),cy=Math.round(h/2-50);
+// Joke: an epic stormy cutscene of a king on a horse... which turns out to be a studio logo.
+const dougHubKingLength=5.4;
+function drawRidingKing(t){
+  const w=canvas.width,h=canvas.height,cx=Math.round(w/2);
   ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.globalAlpha=1;
-  rect(0,0,w,h,joke.bg);
-  if(joke.emblem==='bulb'){
-    const swing=Math.sin(t*3.2)*.45,bx=cx+Math.sin(swing)*46,by=cy-60+Math.cos(swing)*46;
-    for(let i=0;i<46;i+=2)rect(cx+Math.sin(swing)*i,cy-60+Math.cos(swing)*i,2,2,'#5b5468');
-    const lit=Math.sin(t*23)>-.6;
-    if(lit){ctx.globalAlpha=.18;rect(bx-34,by-26,68,64,'#ffd27a');ctx.globalAlpha=1;}
-    rect(bx-8,by-2,16,8,'#8a8496');rect(bx-12,by+6,24,22,lit?'#ffe9a3':'#6b6450');rect(bx-8,by+28,16,6,lit?'#ffd27a':'#5a5444');
-  }else if(joke.emblem==='coin'){
-    const face=Math.cos(t*5),cw=Math.max(4,Math.round(64*Math.abs(face)));
-    rect(cx-cw/2,cy-32,cw,64,'#e86aa8');rect(cx-cw/2+3,cy-29,Math.max(1,cw-6),58,'#ff9ccf');
-    if(Math.abs(face)>.45){rect(cx-12*face,cy-2,24*Math.abs(face),14,'#e86aa8');rect(cx-7*face,cy+2,4,5,'#7a1e4a');rect(cx+3*face,cy+2,4,5,'#7a1e4a');rect(cx-14*face,cy-14,5,5,'#2a1020');rect(cx+9*face,cy-14,5,5,'#2a1020');}
-  }else if(joke.emblem==='goose'){
-    const honk=(t%1)<.35,gx=cx-30,gy=cy-10;
-    rect(gx,gy+10,54,26,'#f4f1e6');rect(gx+40,gy-26,12,40,'#f4f1e6');rect(gx+38,gy-36,18,14,'#f4f1e6');
-    rect(gx+50,gy-31,4,4,'#111');rect(gx+56,gy-30,14,honk?3:6,'#f59e0b');if(honk)rect(gx+56,gy-24,12,3,'#f59e0b');
-    rect(gx+10,gy+36,4,12,'#f59e0b');rect(gx+34,gy+36,4,12,'#f59e0b');
-    if(honk)text('HONK',gx+78,gy-46,2,'#f59e0b');
+  if(t<3.3){
+    const bolt=(t>.85&&t<1)||(t>2.05&&t<2.2);
+    rect(0,0,w,h,bolt?'#3a4766':'#0b0f1d');
+    // Storm clouds rolling past.
+    for(let i=0;i<9;i++){const x=((i*131-t*60)%(w+160)+w+160)%(w+160)-80;rect(x,18+(i%3)*22,150,26,bolt?'#5b6a8f':'#161c30');}
+    if(bolt){const bx=120+Math.round(t*90)%380;let y=0,x=bx;while(y<h*.62){const nx=x+((y/18|0)%2?14:-10);rect(Math.min(x,nx),y,Math.abs(nx-x)+3,20,'#f4f7ff');x=nx;y+=20;}}
+    // Hills scroll under the gallop.
+    for(let i=0;i<7;i++){const x=((i*170-t*240)%(w+200)+w+200)%(w+200)-100;polygon([[x,h],[x+110,h-120-(i%2)*30],[x+230,h]],'#121a24');}
+    rect(0,h-70,w,70,'#0d141c');
+    // The horse and the king.
+    const gx=Math.round(w*.42+Math.sin(t*1.3)*20),gy=h-118,step=Math.sin(t*18),bob=Math.round(Math.abs(step)*5);
+    const body='#3b2a22',mane='#1a120e';
+    rect(gx-48,gy-bob,96,30,body);
+    polygon([[gx+34,gy-bob],[gx+50,gy-34-bob],[gx+64,gy-30-bob],[gx+56,gy+8-bob]],body);
+    rect(gx+52,gy-42-bob,30,16,body);rect(gx+50,gy-46-bob,8,10,mane);rect(gx+74,gy-36-bob,3,3,'#e8e2d0');
+    for(const [lx,ph] of [[-40,0],[-26,Math.PI],[24,Math.PI],[38,0]]){const s=Math.sin(t*18+ph)*12;polygon([[gx+lx,gy+26-bob],[gx+lx+8,gy+26-bob],[gx+lx+4+s,gy+64],[gx+lx-4+s,gy+64]],body);}
+    polygon([[gx-48,gy+4-bob],[gx-78,gy+14-bob+Math.sin(t*20)*6],[gx-70,gy+24-bob],[gx-46,gy+14-bob]],mane);
+    // King: flapping cape, purple robe, gold crown, sword raised to the storm.
+    polygon([[gx-6,gy-42-bob],[gx-70,gy-36-bob+Math.sin(t*14)*8],[gx-62,gy-8-bob+Math.sin(t*14+1)*8],[gx-4,gy-14-bob]],'#a3202c');
+    rect(gx-14,gy-48-bob,24,40,'#5b2a86');rect(gx-11,gy-64-bob,18,18,'#e2b68c');
+    rect(gx-13,gy-72-bob,22,8,'#f2c14e');rect(gx-13,gy-78-bob,4,6,'#f2c14e');rect(gx-4,gy-80-bob,4,8,'#f2c14e');rect(gx+5,gy-78-bob,4,6,'#f2c14e');
+    rect(gx+10,gy-46-bob,6,6,'#e2b68c');rect(gx+12,gy-92-bob,4,46,bolt?'#ffffff':'#c9d2e6');rect(gx+7,gy-50-bob,14,4,'#f2c14e');
+    // Rain over everything.
+    ctx.globalAlpha=.55;
+    for(let i=0;i<120;i++){const rx=((i*53+t*-260)%w+w)%w,ry=((i*97+t*900)%h+h)%h;rect(rx,ry,1,12,'#8fa3c9');}
+    ctx.globalAlpha=1;
+    // Very serious movie text.
+    const line=t<1.7?'IN A LAND TORN BY THUNDER...':'ONE KING RODE ALONE...';
+    const lt=t<1.7?t:t-1.7;ctx.globalAlpha=dougHubClamp(lt/.35)*(1-dougHubClamp((lt-1.25)/.3));
+    text(line,cx-textWidth(line,2)/2+2,h-38,2,'#000');text(line,cx-textWidth(line,2)/2,h-40,2,'#e8e2d0');
+    ctx.globalAlpha=Math.max(0,1-t/.3);if(ctx.globalAlpha>0)rect(0,0,w,h,'#000');
   }else{
-    for(let i=0;i<3;i++){const hop=Math.max(0,Math.sin(t*7-i*.9))*16;rect(cx-34+i*28,cy-hop,14,14,'#a5b4fc');}
+    // Flash... and it was only ever a logo.
+    const lt=t-3.3;
+    rect(0,0,w,h,'#000');
+    const crownY=Math.round(h/2-46);
+    rect(cx-22,crownY,44,12,'#ffffff');rect(cx-22,crownY-10,8,10,'#ffffff');rect(cx-4,crownY-14,8,14,'#ffffff');rect(cx+14,crownY-10,8,10,'#ffffff');
+    const title='RIDING KING STUDIOS';
+    text(title,cx-textWidth(title,4)/2,h/2-10,4,'#ffffff');
+    const sub='EST. LAST TUESDAY';
+    ctx.globalAlpha=dougHubClamp((lt-.6)/.4);text(sub,cx-textWidth(sub,2)/2,h/2+30,2,'#9aa0b5');
+    ctx.globalAlpha=Math.max(1-dougHubClamp(lt/.45),dougHubClamp((lt-1.75)/.35));
+    if(ctx.globalAlpha>0)rect(0,0,w,h,lt<.45?'#ffffff':'#000');
   }
-  const titleSize=Math.max(2,Math.min(4,Math.floor((w-60)/textWidth(joke.title,1))));
-  text(joke.over,cx-textWidth(joke.over,2)/2,cy+58,2,'#8f8aa3');
-  text(joke.title,cx-textWidth(joke.title,titleSize)/2+2,cy+82+2,titleSize,'#000');
-  text(joke.title,cx-textWidth(joke.title,titleSize)/2,cy+82,titleSize,joke.color);
-  // Every card fades in and out as one piece.
-  ctx.globalAlpha=Math.max(1-dougHubClamp(t/.25),dougHubClamp((t-(dougHubJokeLength-.25))/.25));
-  if(ctx.globalAlpha>0)rect(0,0,w,h,'#000');
   ctx.restore();
 }
 function drawDougHubCredit(t){
-  const jokesEnd=dougHubJokes.length*dougHubJokeLength;
-  if(t<jokesEnd){const i=Math.floor(t/dougHubJokeLength);drawDougHubJoke(dougHubJokes[i],t-i*dougHubJokeLength);}
-  else drawDougHubLogo(t-jokesEnd);
+  if(t<4.2)drawDougHubLogo(t);
+  else drawRidingKing(t-4.2);
 }
-dougHubCredit.length=dougHubJokes.length*dougHubJokeLength+4.2;
+dougHubCredit.length=4.2+dougHubKingLength;
 
 // The Can-Man credit used to fade by drawing every shape see-through, so overlapping
 // parts showed through each other. Draw it solid, then fade the whole frame evenly.
