@@ -74,6 +74,11 @@ function dougHubKey(event){
     if(event.type==='keydown'&&!event.repeat&&dougHubKeys.onHelp)dougHubKeys.onHelp();
     return;
   }
+  if(raw==='j'){
+    event.preventDefault();event.stopImmediatePropagation();
+    if(event.type==='keydown'&&!event.repeat&&dougHubKeys.onJokes)dougHubKeys.onJokes();
+    return;
+  }
   const target=dougHubKeys.alias[raw];
   if(!target)return;
   event.preventDefault();event.stopImmediatePropagation();
@@ -27727,13 +27732,16 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 #dh-skip{position:fixed;left:auto;right:16px;bottom:16px;transform:none;z-index:5;padding:9px 14px;border:2px solid #d8c98f;background:rgba(14,12,24,.9);
   box-shadow:0 0 0 2px #000;color:#f4ecd2;font:700 14px/1 "Courier New",monospace;letter-spacing:.06em;cursor:pointer}
 #dh-skip:hover,#dh-skip:focus-visible{background:#2a2438;color:#fff6d8;outline:none}
-#dh-skip[hidden]{display:none}
+#dh-skip[hidden],#dh-jokes[hidden]{display:none}
+#dh-jokes{position:fixed;left:auto;right:16px;bottom:62px;transform:none;z-index:5;padding:5px 10px;background:rgba(14,12,24,.82);
+  color:#bfae74;font:700 12px/1.3 "Courier New",monospace;pointer-events:none}
 #dh-skip kbd{margin-left:8px;padding:1px 5px;border:1px solid #8f8460;color:#bfae74;font:inherit;font-size:11px}
 </style>`);
 document.body.insertAdjacentHTML('beforeend',`<div id="dh-vignette" aria-hidden="true"></div>
 <div id="dh-flash" aria-hidden="true"></div>
 <div id="dh-tip" role="status" aria-live="polite" hidden></div>
 <button type="button" id="dh-skip" hidden>SKIP INTRO ▶▶<kbd>Esc</kbd></button>
+<div id="dh-jokes" hidden></div>
 <div id="dh-help" role="dialog" aria-modal="true" aria-label="Controls" hidden><div class="card">
 <h2>CONTROLS</h2>
 <table>
@@ -27745,6 +27753,7 @@ document.body.insertAdjacentHTML('beforeend',`<div id="dh-vignette" aria-hidden=
 <tr><td><kbd>Q</kbd></td><td>Lantern</td></tr>
 <tr><td><kbd>R</kbd></td><td>Map</td></tr>
 <tr><td><kbd>H</kbd></td><td>Show or hide this help</td></tr>
+<tr><td><kbd>J</kbd></td><td>Joke studio openings: <span id="dh-jokes-state">OFF</span></td></tr>
 </table>
 <p>Your hero saves automatically.</p>
 </div></div>`);
@@ -27895,6 +27904,7 @@ function dougHubTick(dt){
     if(dougHubFx.shake===0)dougHubFx.shakeSize=0;
   }
   dougHubSkip.hidden=scene!=='intro';
+  if(typeof dougHubJokesNote!=='undefined')dougHubJokesNote.hidden=scene!=='intro';
   const playing=dougHubPlayScenes.includes(scene);
   dougHubVignette.classList.toggle('low',playing&&house.hearts>0&&house.hearts<=1);
   dougHubTickTutorial(dt);
@@ -27960,11 +27970,11 @@ function drawDougHubLogo(t){
     text(letter,left+i*6*size2,ty+lift,size2,shades);
   });
   ctx.globalAlpha=1;
-  // Underline and PRESENTS.
+  // DISTRIBUTED BY above the logo, underline below the name.
   const line=dougHubEaseOut((t-1.55)/.45)*textWidth(word,size2);
   if(line>0)rect(cx-line/2,ty+7*size2+12,line,3,'#6366f1');
-  ctx.globalAlpha=dougHubEaseOut((t-1.9)/.5);
-  text('PRESENTS',cx-textWidth('PRESENTS',2)/2,ty+7*size2+26,2,'#a5b4fc');
+  ctx.globalAlpha=dougHubEaseOut((t-.15)/.45);
+  text('DISTRIBUTED BY',cx-textWidth('DISTRIBUTED BY',2)/2,cy-90,2,'#a5b4fc');
   // Fade in from black and out to black.
   ctx.globalAlpha=Math.max(1-dougHubClamp(t/.3),dougHubClamp((t-(4.2-.6))/.6));
   if(ctx.globalAlpha>0)rect(0,0,w,h,'#000');
@@ -28178,7 +28188,28 @@ function drawDougHubCredit(t){
   for(const [scene,len] of dougHubJokeScenes){if(s<len){scene(s,len);return;}s-=len;}
   ctx.save();ctx.setTransform(1,0,0,1,0,0);rect(0,0,canvas.width,canvas.height,'#000');ctx.restore();
 }
-dougHubCredit.length=4.2+dougHubJokeScenes.reduce((a,[,len])=>a+len,0);
+// The joke openings are kept in the game but off unless the player turns them on with J.
+const dougHubJokesKey='shadows-of-ashmere-joke-openings';
+let dougHubJokesOn=false;try{dougHubJokesOn=localStorage.getItem(dougHubJokesKey)==='on';}catch{}
+const dougHubJokesTotal=dougHubJokeScenes.reduce((a,[,len])=>a+len,0);
+Object.defineProperty(dougHubCredit,'length',{configurable:true,get(){return 4.2+(dougHubJokesOn?dougHubJokesTotal:0);}});
+const dougHubJokesNote=document.getElementById('dh-jokes'),dougHubJokesState=document.getElementById('dh-jokes-state');
+function dougHubShowJokes(){const label=dougHubJokesOn?'ON':'OFF';dougHubJokesState.textContent=label;dougHubJokesNote.textContent='J: JOKE OPENINGS '+label;}
+dougHubKeys.onJokes=()=>{
+  // Turning them off in the middle of a joke ends it right away.
+  if(dougHubJokesOn&&dougHubCredit.phase==='play'&&(performance.now()-dougHubCredit.start)/1000>4.2)dougHubCredit.start=performance.now()-dougHubCredit.length*1000-1;
+  dougHubJokesOn=!dougHubJokesOn;try{localStorage.setItem(dougHubJokesKey,dougHubJokesOn?'on':'off');}catch{}
+  dougHubShowJokes();dougHubJokesNote.hidden=false;
+};
+dougHubShowJokes();
+
+// Safety: entering the Sacred Meadow before its scene was set up (for example from an
+// older save) used to crash while drawing. Give it a finished, opened-state default.
+const dougHubMeadowBefore=drawSacredMeadow;
+drawSacredMeadow=function(){
+  if(!world.elvenCity.meadow)world.elvenCity.meadow={phase:'free',time:0,king:{x:600,y:1640},opened:!!(typeof forestTreeOpened==='function'&&forestTreeOpened()),chantBeat:-1};
+  return dougHubMeadowBefore.apply(this,arguments);
+};
 
 // The Can-Man credit used to fade by drawing every shape see-through, so overlapping
 // parts showed through each other. Draw it solid, then fade the whole frame evenly.
