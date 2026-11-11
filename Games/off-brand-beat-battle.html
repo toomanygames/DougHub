@@ -337,7 +337,7 @@ function press(lane){
   if(state!=="play")return;
   const t=songTime();let best=null;
   for(const n of S.player){if(n.done||n.lane!==lane)continue;const dt=Math.abs(n.t-t);if(dt<=.17&&(!best||dt<Math.abs(best.t-t)))best=n;if(n.t-t>.17)break;}
-  if(!best)return; // free ghost taps: no penalty
+  if(!best){ghostTap(lane);return;}
   const dt=Math.abs(best.t-t),j=JUDGE.find(x=>dt<=x.w)||JUDGE[3];
   best.done=true;best.hit=true;S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);S.score+=j.score;S.acc+=j.acc;S.judged++;S.hits++;
   S.health=clamp(S.health+j.hp,0,2);S.glow[lane]=1;
@@ -345,6 +345,13 @@ function press(lane){
   S.kip.pose=lane;S.kip.poseAge=0;S.kip.miss=0;
   voice(S.bus,ac.currentTime,best.f,best.len,"player");
   S.ratings.push({text:j.name,color:j.color,combo:S.combo,age:0});if(S.ratings.length>4)S.ratings.shift();
+}
+/* Pressing when no arrow is there costs health and points and breaks the combo,
+   so mashing every key loses fast. */
+function ghostTap(lane){
+  S.combo=0;S.ghosts=(S.ghosts||0)+1;S.score=Math.max(0,S.score-40);S.health=clamp(S.health-.05,0,2);
+  S.kip.pose=lane;S.kip.poseAge=0;S.kip.miss=.35;sfx("miss");
+  S.ratings.push({text:"OOPS",color:"#ff6b8a",combo:0,age:0});if(S.ratings.length>4)S.ratings.shift();
 }
 function release(lane){held[lane]=false;}
 function missNote(n){
@@ -548,7 +555,7 @@ function drawHow(){
   label("HOW TO PLAY",W/2,84,44,"#ffd23f","center",8);
   LANES.forEach((l,i)=>{arrow(250+i*150,170,l.rot,70,l.c,l.d);label(["A / ←","S / ↓","W / ↑","D / →"][i],250+i*150,226,22,"#ffffff","center",4);});
   const lines=["Your rival sings a line first. Then it is your turn.","Hit each arrow as it reaches the outlines at the top.",
-    "Hits push the health bar your way. Misses push it back.","Every song earns money for the cool name. Save "+money(GOAL)+"...","...and see what happens. (Esc or P pauses.)"];
+    "Hits push the health bar your way. Misses and button mashing push it back.","Every song earns money for the cool name. Save "+money(GOAL)+"...","...and see what happens. (Esc or P pauses.)"];
   lines.forEach((t,i)=>label(t,W/2,286+i*38,22,i===3?"#ffe08a":"#e6e0ff","center",4));
   label("Press Enter to go back",W/2,470,18,"#8f86b8","center",0);
 }
