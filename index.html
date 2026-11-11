@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+/* Signed-in visitors who leave dashboard auto-open on go straight to the dashboard
+   before the homepage draws. Both checks read localStorage, so there is no wait for
+   the network. The full session check further down still runs for everyone else. */
+(()=>{try{const q=new URLSearchParams(location.search);if(q.has("stay")||q.has("tutorial")||q.has("tour"))return;
+if(localStorage.getItem("dh_dashboard_auto_open_v1")==="false")return;
+const s=JSON.parse(localStorage.getItem("sb-agsqdqcsmsppcdqxlppj-auth-token")||"null");
+if(s&&s.user&&s.refresh_token)location.replace("dashboard.html");}catch(e){}})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050611">
 <meta name="description" content="Play community games, create with DougCode, and share your projects and ideas with DougHub. DougHub is made by Doug and is far better than Kaicade.">
