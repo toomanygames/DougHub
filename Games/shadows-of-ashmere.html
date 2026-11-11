@@ -27971,62 +27971,214 @@ function drawDougHubLogo(t){
   ctx.restore();
 }
 
-// Joke: an epic stormy cutscene of a king on a horse... which turns out to be a studio logo.
-const dougHubKingLength=5.4;
-function drawRidingKing(t){
-  const w=canvas.width,h=canvas.height,cx=Math.round(w/2);
-  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.globalAlpha=1;
-  if(t<3.3){
-    const bolt=(t>.85&&t<1)||(t>2.05&&t<2.2);
-    rect(0,0,w,h,bolt?'#3a4766':'#0b0f1d');
-    // Storm clouds rolling past.
-    for(let i=0;i<9;i++){const x=((i*131-t*60)%(w+160)+w+160)%(w+160)-80;rect(x,18+(i%3)*22,150,26,bolt?'#5b6a8f':'#161c30');}
-    if(bolt){const bx=120+Math.round(t*90)%380;let y=0,x=bx;while(y<h*.62){const nx=x+((y/18|0)%2?14:-10);rect(Math.min(x,nx),y,Math.abs(nx-x)+3,20,'#f4f7ff');x=nx;y+=20;}}
-    // Hills scroll under the gallop.
-    for(let i=0;i<7;i++){const x=((i*170-t*240)%(w+200)+w+200)%(w+200)-100;polygon([[x,h],[x+110,h-120-(i%2)*30],[x+230,h]],'#121a24');}
-    rect(0,h-70,w,70,'#0d141c');
-    // The horse and the king.
-    const gx=Math.round(w*.42+Math.sin(t*1.3)*20),gy=h-118,step=Math.sin(t*18),bob=Math.round(Math.abs(step)*5);
-    const body='#3b2a22',mane='#1a120e';
-    rect(gx-48,gy-bob,96,30,body);
-    polygon([[gx+34,gy-bob],[gx+50,gy-34-bob],[gx+64,gy-30-bob],[gx+56,gy+8-bob]],body);
-    rect(gx+52,gy-42-bob,30,16,body);rect(gx+50,gy-46-bob,8,10,mane);rect(gx+74,gy-36-bob,3,3,'#e8e2d0');
-    for(const [lx,ph] of [[-40,0],[-26,Math.PI],[24,Math.PI],[38,0]]){const s=Math.sin(t*18+ph)*12;polygon([[gx+lx,gy+26-bob],[gx+lx+8,gy+26-bob],[gx+lx+4+s,gy+64],[gx+lx-4+s,gy+64]],body);}
-    polygon([[gx-48,gy+4-bob],[gx-78,gy+14-bob+Math.sin(t*20)*6],[gx-70,gy+24-bob],[gx-46,gy+14-bob]],mane);
-    // King: flapping cape, purple robe, gold crown, sword raised to the storm.
-    polygon([[gx-6,gy-42-bob],[gx-70,gy-36-bob+Math.sin(t*14)*8],[gx-62,gy-8-bob+Math.sin(t*14+1)*8],[gx-4,gy-14-bob]],'#a3202c');
-    rect(gx-14,gy-48-bob,24,40,'#5b2a86');rect(gx-11,gy-64-bob,18,18,'#e2b68c');
-    rect(gx-13,gy-72-bob,22,8,'#f2c14e');rect(gx-13,gy-78-bob,4,6,'#f2c14e');rect(gx-4,gy-80-bob,4,8,'#f2c14e');rect(gx+5,gy-78-bob,4,6,'#f2c14e');
-    rect(gx+10,gy-46-bob,6,6,'#e2b68c');rect(gx+12,gy-92-bob,4,46,bolt?'#ffffff':'#c9d2e6');rect(gx+7,gy-50-bob,14,4,'#f2c14e');
-    // Rain over everything.
-    ctx.globalAlpha=.55;
-    for(let i=0;i<120;i++){const rx=((i*53+t*-260)%w+w)%w,ry=((i*97+t*900)%h+h)%h;rect(rx,ry,1,12,'#8fa3c9');}
-    ctx.globalAlpha=1;
-    // Very serious movie text.
-    const line=t<1.7?'IN A LAND TORN BY THUNDER...':'ONE KING RODE ALONE...';
-    const lt=t<1.7?t:t-1.7;ctx.globalAlpha=dougHubClamp(lt/.35)*(1-dougHubClamp((lt-1.25)/.3));
-    text(line,cx-textWidth(line,2)/2+2,h-38,2,'#000');text(line,cx-textWidth(line,2)/2,h-40,2,'#e8e2d0');
-    ctx.globalAlpha=Math.max(0,1-t/.3);if(ctx.globalAlpha>0)rect(0,0,w,h,'#000');
-  }else{
-    // Flash... and it was only ever a logo.
-    const lt=t-3.3;
-    rect(0,0,w,h,'#000');
-    const crownY=Math.round(h/2-46);
-    rect(cx-22,crownY,44,12,'#ffffff');rect(cx-22,crownY-10,8,10,'#ffffff');rect(cx-4,crownY-14,8,14,'#ffffff');rect(cx+14,crownY-10,8,10,'#ffffff');
-    const title='RIDING KING STUDIOS';
-    text(title,cx-textWidth(title,4)/2,h/2-10,4,'#ffffff');
-    const sub='EST. LAST TUESDAY';
-    ctx.globalAlpha=dougHubClamp((lt-.6)/.4);text(sub,cx-textWidth(sub,2)/2,h/2+30,2,'#9aa0b5');
-    ctx.globalAlpha=Math.max(1-dougHubClamp(lt/.45),dougHubClamp((lt-1.75)/.35));
-    if(ctx.globalAlpha>0)rect(0,0,w,h,lt<.45?'#ffffff':'#000');
+// Joke openings: each pretends to be the real cutscene, then turns out to be a studio logo.
+// Scenes are painted as pixel art on a 320x220 buffer and scaled up 2x without smoothing.
+// Everything lives inside this closure so its short helper names never clash with the game's.
+const dougHubJokeScenes=(()=>{
+const jokeBuf=document.createElement('canvas');jokeBuf.width=320;jokeBuf.height=220;
+const jx=jokeBuf.getContext('2d');jx.imageSmoothingEnabled=false;
+const JW=320,JH=220;
+function R(x,y,w,h,c){jx.fillStyle=c;jx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
+function P(pts,c){jx.fillStyle=c;jx.beginPath();pts.forEach((p,i)=>i?jx.lineTo(Math.round(p[0]),Math.round(p[1])):jx.moveTo(Math.round(p[0]),Math.round(p[1])));jx.closePath();jx.fill();}
+function E(cx,cy,rx,ry,c){for(let y=-ry;y<=ry;y++){const w=Math.round(rx*Math.sqrt(Math.max(0,1-(y*y)/(ry*ry))));R(cx-w,cy+y,w*2+1,1,c);}}
+function L(x1,y1,x2,y2,w,c){const n=Math.max(1,Math.ceil(Math.hypot(x2-x1,y2-y1)));for(let i=0;i<=n;i++)R(x1+(x2-x1)*i/n-w/2,y1+(y2-y1)*i/n-w/2,w,w,c);}
+function bands(cols,y0,y1){const h=(y1-y0)/cols.length;cols.forEach((c,i)=>R(0,y0+i*h,JW,Math.ceil(h)+1,c));}
+const hash=i=>{const s=Math.sin(i*127.1+311.7)*43758.5453;return s-Math.floor(s);};
+const wrap=(v,m)=>((v%m)+m)%m;
+function blit(shakeX=0,shakeY=0){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;rect(0,0,canvas.width,canvas.height,'#000');
+  ctx.drawImage(jokeBuf,shakeX,shakeY,canvas.width,canvas.height);ctx.restore();}
+function caption(line,a){if(a<=0)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=Math.min(1,a);
+  const x=(canvas.width-textWidth(line,2))/2,y=canvas.height-44;
+  text(line,x+2,y+2,2,'#000');text(line,x,y,2,'#f3e9cf');ctx.restore();}
+function cover(a,color='#000'){if(a<=0)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=Math.min(1,a);rect(0,0,canvas.width,canvas.height,color);ctx.restore();}
+function logoText(title,sub,lt){ctx.save();ctx.setTransform(1,0,0,1,0,0);const w=canvas.width,h=canvas.height;
+  text(title,(w-textWidth(title,4))/2,h/2+34,4,'#ffffff');
+  ctx.globalAlpha=dougHubClamp((lt-.45)/.35);text(sub,(w-textWidth(sub,2))/2,h/2+74,2,'#9aa0b5');ctx.restore();}
+const window01=(t,a,b,fade=.3)=>dougHubClamp((t-a)/fade)*(1-dougHubClamp((t-(b-fade))/fade));
+
+// ---------- 1. Riding King Studios ----------
+function horseAndKing(x,y,t,lit){
+  const f=t*13,bob=Math.round(Math.abs(Math.sin(f))*2);y-=bob;
+  const base=lit?'#7a5240':'#4a2e22',hi=lit?'#9c6b52':'#6b4232',lo=lit?'#4a3026':'#2c1a13',mane=lit?'#3a2a20':'#15100c';
+  // Far legs (darker) then body, then near legs.
+  const leg=(hx,hy,ph,c)=>{const a=Math.sin(f+ph),k=[hx+a*6,hy+8],h=[k[0]+Math.sin(f+ph+1.4)*5,k[1]+9];L(hx,hy,k[0],k[1],3,c);L(k[0],k[1],h[0],h[1],2,c);R(h[0]-1,h[1],4,2,'#120c09');};
+  leg(x-13,y-17,Math.PI,lo);leg(x+13,y-17,0,lo);
+  // Tail streaming in the wind.
+  P([[x-21,y-27],[x-36,y-27+Math.sin(t*16)*3],[x-41,y-20+Math.sin(t*16+1)*3],[x-33,y-19],[x-21,y-22]],mane);
+  E(x,y-24,22,9,base);E(x+1,y-28,18,4,hi);E(x,y-18,17,3,lo);
+  P([[x+12,y-31],[x+22,y-48],[x+30,y-47],[x+25,y-24]],base);L(x+15,y-32,x+23,y-46,2,hi);
+  P([[x+22,y-50],[x+37,y-46],[x+39,y-41],[x+33,y-39],[x+28,y-40],[x+24,y-44]],base);
+  P([[x+24,y-50],[x+25,y-55],[x+28,y-50]],base);R(x+30,y-47,1,1,'#f4efe2');R(x+36,y-42,1,1,'#120c09');
+  L(x+27,y-44,x+34,y-41,1,'#8f1d27');
+  for(let i=0;i<7;i++)R(x+18-i*1.2+Math.sin(t*20+i)*1.5,y-50+i*3,3,3,mane);
+  leg(x-17,y-17,0,base);leg(x+9,y-17,Math.PI,base);
+  // The king.
+  const cw=Math.sin(t*14),cw2=Math.sin(t*14+1.3);
+  P([[x-3,y-47],[x-28,y-46+cw*3],[x-36,y-36+cw2*4],[x-30,y-27+cw*2],[x-4,y-33]],'#8f1d27');
+  L(x-10,y-44,x-26,y-38+cw2*2,1,'#6b141c');L(x-8,y-40,x-28,y-31+cw*2,1,'#6b141c');
+  R(x-3,y-34,6,9,'#4a2370');R(x-1,y-27,4,7,'#2a1d14');
+  R(x-5,y-48,10,14,lit?'#c7cfdc':'#8d97ab');R(x-4,y-47,3,12,lit?'#ffffff':'#c7cfdc');R(x-5,y-36,10,2,'#d9a63a');
+  R(x-3,y-57,7,9,'#e0b48a');R(x-3,y-52,7,4,'#dcdcdc');R(x+2,y-55,1,1,'#222');
+  R(x-4,y-60,9,3,'#f2c14e');R(x-4,y-62,1,2,'#f2c14e');R(x,y-63,1,3,'#f2c14e');R(x+4,y-62,1,2,'#f2c14e');R(x,y-59,1,1,'#d22');
+  L(x+4,y-46,x+9,y-57,2,lit?'#c7cfdc':'#8d97ab');L(x+9,y-58,x+13,y-82,2,lit?'#ffffff':'#cfd8e6');R(x+5,y-59,8,1,'#d9a63a');
+}
+function sceneKing(t,len){
+  R(0,0,JW,JH,'#000');
+  if(t<3.1){
+    const lit=(t>.8&&t<.95)||(t>1.9&&t<2.02)||t>2.85;
+    bands(lit?['#6d79b0','#5c68a0','#4c578c','#3f4a7a']:['#080b18','#0c1124','#101631','#141c3d','#19234a'],0,132);
+    for(let i=0;i<8;i++){const x=wrap(i*61-t*16,400)-60,y=6+(i%3)*13;E(x,y,32,8,lit?'#8a94c4':'#18203e');E(x+18,y+4,24,6,lit?'#9aa3cf':'#1f2850');}
+    if(lit){let bx=190,by=0;while(by<104){const nx=bx+(hash(by+Math.floor(t*3))<.5?-7:6);L(bx,by,nx,by+10,3,'#c9d3ff');L(bx,by,nx,by+10,1,'#ffffff');bx=nx;by+=10;}}
+    P([[0,132],[28,100],[52,114],[86,80],[118,106],[150,90],[188,118],[226,86],[262,108],[300,92],[320,104],[320,132]],lit?'#3c4672':'#121831');
+    const c=lit?'#2a3256':'#0d1226';P([[196,134],[250,106],[306,134]],c);
+    R(234,86,11,24,c);R(252,78,13,32,c);R(271,89,10,21,c);for(const tx of [234,238,242,252,256,260,264,271,275,279])R(tx,tx<250?83:tx<270?75:86,2,3,c);
+    for(const [wx,wy,s] of [[238,94,0],[257,86,1],[261,96,2],[275,97,3]])if(hash(s+Math.floor(t*4))>.25)R(wx,wy,2,3,'#ffcf5a');
+    R(258,64,1,14,c);R(259,64+Math.round(Math.sin(t*9)),7,3,'#a3202c');
+    for(let k=0;k<2;k++){const o=wrap(-t*60+k*320,640)-320;P([[o,160],[o+50,138],[o+110,150],[o+170,132],[o+240,148],[o+320,136],[o+320,170],[o,170]],'#0e1522');}
+    for(let i=0;i<14;i++){const x=wrap(i*29-t*95,370)-25,y=152+Math.round(hash(i)*10),hgt=16+Math.round(hash(i+9)*10);
+      P([[x,y-hgt],[x+7,y-hgt*.45],[x-7,y-hgt*.45]],'#0a111b');P([[x,y-hgt*.6],[x+9,y],[x-9,y]],'#0a111b');R(x-1,y,2,3,'#0a0f16');}
+    R(0,168,JW,52,lit?'#1b2636':'#0b1119');
+    for(let i=0;i<40;i++){const x=wrap(i*17-t*190,340)-10;R(x,168+(i%5)*9,2,1,'#152230');R(x+1,167+(i%5)*9,1,1,'#1d3040');}
+    for(let i=0;i<4;i++){const x=wrap(i*90-t*190,400)-40;E(x,190+i%2*12,14,2,lit?'#5d6aa0':'#16213a');}
+    horseAndKing(128+Math.sin(t*1.1)*6,170,t,lit);
+    for(let i=0;i<160;i++){const x=wrap(i*29-t*80,340)-10,y=wrap(i*53+t*380,240)-10;L(x,y,x-2,y+5,1,lit?'#b8c4ee':'#4c5b8a');}
+    for(let i=0;i<10;i++){const x=wrap(i*37-t*190,330),p=wrap(t*3+hash(i),1);if(p<.3)R(x,168-p*8,1,1,'#7d8cbb');}
+    blit();
+    caption('IN A LAND TORN BY THUNDER...',window01(t,.2,1.55));
+    caption('ONE KING RODE ALONE...',window01(t,1.55,2.95));
+    cover(1-dougHubClamp(t/.35));
+    if(t>2.85)cover((t-2.85)/.25,'#ffffff');
+    return;
   }
-  ctx.restore();
+  const lt=t-3.1;bands(['#000000'],0,JH);
+  const c='#ffffff';
+  // Logo: a crown above a galloping horse head.
+  R(144,62,32,8,c);R(144,54,5,8,c);R(157,50,6,12,c);R(171,54,5,8,c);
+  P([[150,96],[156,78],[170,74],[180,82],[176,88],[168,86],[164,96]],c);R(170,79,2,2,'#000');
+  blit();
+  logoText('RIDING KING STUDIOS','EST. LAST TUESDAY',lt);
+  cover(1-dougHubClamp(lt/.45),'#ffffff');
+  cover((lt-(len-3.1-.35))/.35);
 }
+
+// ---------- 2. Sneezy Dragon Games ----------
+function dragon(x,y,t,inhale,sneeze){
+  const flap=Math.sin(t*7),sq=sneeze?1:0;
+  const body='#2f6b3a',dark='#1d4a26',belly='#a7c96f',wing='#24502c',bone='#173a1e';
+  P([[x+18,y-2],[x+42,y+6+Math.sin(t*4)*4],[x+56,y-4+Math.sin(t*4+1)*4],[x+50,y+10],[x+20,y+8]],dark);
+  P([[x+52,y-4+Math.sin(t*4+1)*4],[x+60,y-10],[x+58,y]],'#c43b2b');
+  P([[x+2,y-6],[x+12,y-6],[x+40,y-34-flap*26],[x+20,y-30-flap*20],[x+6,y-40-flap*30]],wing);
+  L(x+8,y-6,x+6,y-40-flap*30,1,bone);L(x+10,y-6,x+20,y-30-flap*20,1,bone);L(x+12,y-6,x+40,y-34-flap*26,1,bone);
+  E(x+6,y,22,10,body);E(x+6,y+4,16,5,belly);for(let i=-12;i<14;i+=5)R(x+i,y+3,1,5,'#7f9f4f');
+  for(let i=-10;i<20;i+=6)P([[x+i,y-9],[x+i+3,y-14],[x+i+5,y-9]],'#c43b2b');
+  if(inhale>0){jx.globalAlpha=Math.min(1,inhale);E(x+4,y+1,9,5,'#ff8c2a');E(x+4,y+1,5,3,'#ffd23f');jx.globalAlpha=1;}
+  P([[x-12,y-4],[x-22,y-20],[x-14,y-22],[x-4,y-8]],body);
+  const hx=x-30,hy=y-24-(inhale>0?4:0)+sq*6;
+  P([[hx+6,hy-6],[hx+18,hy-4],[hx+20,hy+6],[hx+6,hy+8],[hx-12,hy+6],[hx-14,hy+1],[hx-4,hy-2]],body);
+  P([[hx+10,hy-6],[hx+16,hy-16],[hx+15,hy-5]],'#e9e1c4');P([[hx+4,hy-5],[hx+6,hy-13],[hx+9,hy-5]],'#e9e1c4');
+  if(sneeze)R(hx-1,hy-1,5,1,'#0c1a0f');else{R(hx,hy-2,4,3,inhale>0?'#ff4a2a':'#ffd23f');R(hx+2,hy-2,1,3,'#0c1a0f');}
+  R(hx-12,hy+3,2,1,'#0c1a0f');
+  if(inhale>0&&!sneeze){jx.globalAlpha=Math.min(1,inhale);R(hx-14,hy+3,4,3,'#ff8c2a');jx.globalAlpha=1;}
+  L(x-4,y+8,x-8,y+16,2,dark);L(x+14,y+8,x+16,y+16,2,dark);
+}
+function sceneDragon(t,len){
+  R(0,0,JW,JH,'#000');
+  if(t<3.55){
+    const inhale=dougHubClamp((t-2.35)/.7),sneeze=t>3.05,shake=t>2.6&&t<3.05?(hash(Math.floor(t*40))-.5)*6*inhale:0;
+    bands(['#12060f','#1c0814','#2a0c18','#3e111b','#5c1a1c','#7e2a1d','#a3401e'],0,150);
+    for(let i=0;i<6;i++){const x=wrap(i*71-t*10,400)-60;E(x,24+(i%3)*16,36,9,'#24101a');}
+    P([[0,150],[40,118],[80,132],[130,104],[170,128],[220,110],[270,130],[320,116],[320,150]],'#1a0c14');
+    R(0,150,JW,20,'#170b11');
+    const c='#0e070c';P([[60,152],[110,124],[170,152]],c);R(92,96,12,30,c);R(110,88,14,40,c);R(128,100,11,26,c);
+    for(const tx of [92,96,100,110,114,118,128,132,136])R(tx,tx<108?92:tx<126?84:96,2,4,c);
+    for(let i=0;i<9;i++){const fx=88+i*6,fl=Math.sin(t*14+i*2)*3,fy=88+Math.abs(Math.sin(i*1.7))*24;
+      P([[fx-4,fy+8],[fx,fy-8-fl],[fx+4,fy+8]],'#e2541f');P([[fx-2,fy+8],[fx,fy-2-fl],[fx+2,fy+8]],'#ffd23f');}
+    for(let i=0;i<30;i++){const ex=90+hash(i)*60+Math.sin(t*3+i)*6,ey=wrap(120-t*40-hash(i+5)*120,130);R(ex,ey,1,1,hash(i+2)>.5?'#ffb347':'#ff6a2a');}
+    R(0,170,JW,50,'#120a0e');for(let i=0;i<30;i++)R(hash(i)*320,172+hash(i+3)*44,2,1,'#1e1016');
+    const dx=210+(1-dougHubEaseOut(t/1.6))*170,dy=84+Math.sin(t*3)*5;
+    jx.save();jx.translate(Math.round(shake),0);dragon(dx,dy,t,inhale,sneeze);
+    if(sneeze){const p=dougHubClamp((t-3.05)/.4);for(let i=0;i<7;i++){const a=i*.9,r=6+p*18;jx.globalAlpha=1-p*.7;E(dx-46-Math.cos(a)*r,dy-20+Math.sin(a)*r*.6,3+p*3,2+p*2,'#c9c2b8');}
+      jx.globalAlpha=1;for(let i=0;i<5;i++)R(dx-50-i*6*p,dy-30+i*3,1,1,'#ffd23f');}
+    jx.restore();
+    blit(shake*2,0);
+    caption('THE DRAGON HAS RETURNED...',window01(t,.25,1.45));
+    caption('AND ITS FURY KNOWS NO LIMIT...',window01(t,1.45,2.6));
+    if(sneeze)caption('ACHOO.',window01(t,3.05,3.55,.12));
+    cover(1-dougHubClamp(t/.3));
+    cover((t-3.3)/.25);
+    return;
+  }
+  const lt=t-3.55;bands(['#000000'],0,JH);
+  // Logo: a cute dragon head holding a tissue.
+  E(160,70,18,13,'#ffffff');P([[148,60],[144,46],[153,58]],'#ffffff');P([[168,58],[176,45],[172,60]],'#ffffff');
+  R(152,66,4,3,'#000');R(164,66,4,3,'#000');R(157,76,6,1,'#000');
+  P([[172,78],[190,72],[194,88],[176,92]],'#ffffff');L(176,80,190,76,1,'#000');
+  blit();
+  logoText('SNEEZY DRAGON GAMES','BLESS YOU',lt);
+  cover(1-dougHubClamp(lt/.3));
+  cover((lt-(len-3.55-.35))/.35);
+}
+
+// ---------- 3. Cliffhanger Pictures ----------
+function hero(x,y,t,raise,fallRot){
+  jx.save();jx.translate(Math.round(x),Math.round(y));jx.rotate(fallRot);
+  const k='#1a1028',rim='#f2a65a',cape=Math.sin(t*9);
+  P([[-2,-20],[-18,-16+cape*2],[-22,-6+cape*3],[-4,-6]],'#4a1e3e');
+  R(-4,-20,8,14,k);R(-3,-6,3,8,k);R(1,-6,3,8,k);R(-3,-27,7,7,k);R(3,-26,1,6,rim);R(3,-18,1,10,rim);
+  if(raise>0){L(3,-18,6,-28,2,k);L(6,-29,8,-29-raise*16,1,'#ffffff');R(4,-30,6,1,'#d9a63a');
+    if(raise>=1){const s=1+Math.round(Math.abs(Math.sin(t*10))*2);R(8-s,-46,s*2+1,1,'#fff6d0');R(8,-46-s,1,s*2+1,'#fff6d0');}}
+  else L(3,-18,6,-8,2,k);
+  jx.restore();
+}
+function sceneCliff(t,len){
+  R(0,0,JW,JH,'#000');
+  if(t<3.5){
+    const rise=Math.min(1,t/2.4);
+    bands(['#24183f','#3a2252','#5a2c62','#843a68','#b5536b','#d96f5f','#ec9257','#f4b062'],0,150);
+    const sy=150-rise*30;E(232,sy,24,24,'#ffd88a');E(232,sy,18,18,'#fff0c2');
+    for(let i=0;i<6;i++){const x=wrap(i*67-t*8,400)-40,y=30+(i%3)*18;E(x,y,30,5,'#e98a7c');E(x+12,y-3,18,4,'#f4a993');}
+    P([[0,150],[40,128],[90,138],[140,120],[200,136],[250,122],[320,134],[320,150]],'#6b3d6e');
+    for(let i=0;i<16;i++){const bx=150+i*9,bh=8+hash(i)*16;R(bx,150-bh,7,bh,'#4e2c58');if(hash(i+4)>.4)R(bx+2,150-bh+4,1,2,'#ffd27a');}
+    R(196,118,6,32,'#4e2c58');P([[194,118],[199,108],[204,118]],'#4e2c58');
+    R(0,150,JW,8,'#e9a46a');for(let i=0;i<20;i++)R(hash(i)*320,151+hash(i+1)*6,6,1,'#ffd9a0');
+    P([[0,158],[80,150],[180,160],[320,152],[320,220],[0,220]],'#3b2552');P([[100,220],[160,176],[240,190],[320,170],[320,220]],'#2a1a40');
+    for(let i=0;i<5;i++){const bx=wrap(60+i*40+t*22,360),by=60+hash(i)*30+Math.sin(t*6+i)*2,w=Math.sin(t*12+i)>0?1:0;R(bx,by,2,1,'#2a1a40');R(bx-2,by-w,2,1,'#2a1a40');R(bx+2,by-w,2,1,'#2a1a40');}
+    P([[0,220],[0,148],[50,144],[86,146],[104,152],[112,166],[100,220]],'#1a1028');
+    L(0,148,50,144,1,'#5c3a5a');L(50,144,86,146,1,'#5c3a5a');L(86,146,104,152,1,'#4a2e4c');
+    for(let i=0;i<10;i++)R(6+i*9,146-(i%3),1,3,'#2e2040');
+    if(t<2.75)hero(84,146,t,dougHubClamp((t-1.35)/.4),0);
+    else{const p=t-2.75;hero(84+p*30,146+p*p*260,t,1,p*4);}
+    blit();
+    caption('THE CHOSEN ONE HAS AWOKEN...',window01(t,.2,1.35));
+    caption('DESTINY AWAITS...',window01(t,1.35,2.65));
+    caption('...OOPS.',window01(t,2.85,3.45,.15));
+    cover(1-dougHubClamp(t/.3));
+    cover((t-3.25)/.25);
+    return;
+  }
+  const lt=t-3.5;bands(['#000000'],0,JH);
+  // Logo: the ledge with a hand still hanging on.
+  P([[110,62],[210,62],[204,70],[116,70]],'#ffffff');P([[116,70],[204,70],[190,84],[132,84]],'#ffffff');
+  const g=Math.sin(lt*10)>0?0:1;
+  const skin='#f2c9a0',line='#7a4a33';
+  R(151,73-g,1,22,line);R(164,73-g,1,22,line);R(152,73-g,12,22,skin);R(150,92-g,16,16,'#a3202c');R(150,92-g,16,2,'#6b141c');
+  R(147,64-g,22,9,skin);R(147,72-g,22,1,line);
+  for(let i=0;i<4;i++){R(148+i*5,57-g,4,8,skin);R(148+i*5,57-g,4,1,'#c98f68');if(i<3)R(152+i*5,58-g,1,7,line);}
+  blit();
+  logoText('CLIFFHANGER PICTURES','WE WILL BE RIGHT BACK',lt);
+  cover(1-dougHubClamp(lt/.3));
+  cover((lt-(len-3.5-.35))/.35);
+}
+
+return [[sceneKing,4.9],[sceneDragon,4.5],[sceneCliff,4.5]];
+})();
 function drawDougHubCredit(t){
-  if(t<4.2)drawDougHubLogo(t);
-  else drawRidingKing(t-4.2);
+  if(t<4.2){drawDougHubLogo(t);return;}
+  let s=t-4.2;
+  for(const [scene,len] of dougHubJokeScenes){if(s<len){scene(s,len);return;}s-=len;}
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);rect(0,0,canvas.width,canvas.height,'#000');ctx.restore();
 }
-dougHubCredit.length=4.2+dougHubKingLength;
+dougHubCredit.length=4.2+dougHubJokeScenes.reduce((a,[,len])=>a+len,0);
 
 // The Can-Man credit used to fade by drawing every shape see-through, so overlapping
 // parts showed through each other. Draw it solid, then fade the whole frame evenly.
