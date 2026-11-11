@@ -69,7 +69,7 @@
   const pathMap = {
     "douggames.html":"games","games/ocean-drive.html":"games","games/drive-pig.html":"games","games/dve-pig.html":"games",
     "games/pig-clicker.html":"games","games/pig-clicker-space.html":"games","games/puzzle.html":"games",
-    "games/racing.html":"games","games/rebirth-clicker.html":"games","games/honk-empire.html":"games","games/sparkroot.html":"games","games/farm-idle.html":"games","games/goose-gig.html":"games","games/bundt-bakery.html":"games","games/fix-it-crew.html":"games","games/shadows-of-ashmere.html":"games","games/dougworld.html":"games","games/smack-n-punch.html":"games",
+    "games/racing.html":"games","games/rebirth-clicker.html":"games","games/honk-empire.html":"games","games/sparkroot.html":"games","games/farm-idle.html":"games","games/goose-gig.html":"games","games/bundt-bakery.html":"games","games/fix-it-crew.html":"games","games/off-brand-beat-battle.html":"games","games/shadows-of-ashmere.html":"games","games/dougworld.html":"games","games/smack-n-punch.html":"games",
     "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","nova.html":"nova",
     "chat.html":"chat","game-creator.html":"community_games","my-games.html":"community_games",
     "dougbase.html":"dougbase","dougbase/index.html":"dougbase","dougbase/login.html":"dougbase",
