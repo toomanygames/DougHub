@@ -2366,7 +2366,11 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 #doug-games .dh-gc-drive .dh-gc-status{display:flex;align-items:center;gap:6px;color:#8f93b2;font-size:11px}
 #doug-games .dh-gc-drive .drive-pig-toggle{background:#0b0d1f}
 #doug-games .dh-gc-drive .drive-pig-slider{background:color-mix(in srgb,var(--accent) 30%,#161a36);border-color:var(--accent)}
-#doug-games .dh-gc-drive .drive-pig-option{min-height:58px}
+#doug-games .dh-gc-drive .dh-gc-desc{-webkit-line-clamp:1}
+#doug-games .dh-gc-drive .dh-gc-status{display:none}
+#doug-games .dh-gc-drive .drive-pig-option{flex-direction:row;justify-content:center;gap:7px;min-height:40px;padding:5px 4px}
+#doug-games .dh-gc-drive .drive-pig-option-icon{width:22px;height:22px;font-size:13px}
+#doug-games .dh-gc-drive .drive-pig-option small{display:none}
 @media (min-width:760px){
  #doug-games .dh-gc-spot{grid-column:span 2;flex-direction:row}
  #doug-games .dh-gc-spot .dh-gc-art{flex:0 0 46%;height:auto;min-height:260px;border-bottom:0;border-right:1px solid #ffffff0f}
@@ -2646,11 +2650,9 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
           </div>
           <p class="dh-game-results" id="dhGameResults" aria-live="polite">Browse by genre or search by name.</p>
         </div>
-        <div class="dh-ggroup" data-group="newest">
-          <div class="dh-ggroup-head"><h3>New on DougHub</h3><span class="dh-ggroup-count">7</span></div>
-          <div class="dh-ggrid dh-ggrid-newest">
-            <a href="Games/fix-it-crew.html" class="dh-gc dh-gc-spot" data-genre="sim" style="--accent:#ffb02e;--art:url('Games/art/fix-it-crew.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-badge">✦ Newest</span><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/fix-it-crew.svg" alt="Fix-It Crew: Builder Bo logo" loading="lazy"></span>
+        <div class="dh-ggrid">
+            <a href="Games/fix-it-crew.html" class="dh-gc" data-genre="sim" style="--accent:#ffb02e;--art:url('Games/art/fix-it-crew.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/fix-it-crew.svg" alt="Fix-It Crew: Builder Bo logo" loading="lazy"></span>
               <span class="dh-gc-body">
                 <span class="dh-gc-title">Fix-It Crew: Builder Bo</span>
                 <span class="dh-gc-desc">A 3D building game! Carry planks, dig ponds, pave paths and raise a Town Hall with Bo and the machine buddies across eight jobs.</span>
@@ -2705,11 +2707,6 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
                 <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
               </span>
             </a>
-          </div>
-        </div>
-        <div class="dh-ggroup" data-group="more">
-          <div class="dh-ggroup-head"><h3>All games</h3><span class="dh-ggroup-count">17</span></div>
-          <div class="dh-ggrid">
             <a href="Games/shadows-of-ashmere.html" class="dh-gc" data-genre="adventure" style="--accent:#8b5cf6;--art:url('Games/art/shadows-of-ashmere.svg')">
               <span class="dh-gc-art"><span class="dh-gc-genre">🗺️ Adventure</span><img src="Games/art/shadows-of-ashmere.svg" alt="Shadows of Ashmere logo" loading="lazy"></span>
               <span class="dh-gc-body">
@@ -2853,7 +2850,6 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
               </span>
             </a>
           </div>
-        </div>
 
     </section>
 
