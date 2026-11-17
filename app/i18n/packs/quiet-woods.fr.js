@@ -1,0 +1,1 @@
+window.DH_PACK={"lang": "fr", "exact": {}, "re": [], "sub": []};
