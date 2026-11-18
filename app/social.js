@@ -46,11 +46,11 @@
     ["mod", "Mod", "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"],
     ["me", "Account", "M20 21a8 8 0 10-16 0M12 13a4 4 0 100-8 4 4 0 000 8z"]];
   function renderTabs() {
-    $("tabs").innerHTML = TABS.filter(function (t) { return t[0] !== "mod" || rank >= 1; }).map(function (t) {
+    $("tabs").innerHTML = TABS.filter(function (t) { return t[0] !== "chat" && t[0] !== "call" && (t[0] !== "mod" || rank >= 1); }).map(function (t) {
       return '<button type="button" class="tab' + (t[0] === view ? " on" : "") + '" data-v="' + t[0] + '"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + t[2] + '"/></svg><span>' + t[1] + "</span></button>";
     }).join("");
   }
-  function go(v) { view = v; if (chatCh && v !== "chat") { try { db.removeChannel(chatCh); } catch (e) {} chatCh = null; } render(); }
+  function go(v) { if (v === "chat" || v === "call") v = "games"; view = v; if (chatCh && v !== "chat") { try { db.removeChannel(chatCh); } catch (e) {} chatCh = null; } render(); }
   $("tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-v]"); if (b) go(b.dataset.v); });
   window.__dhGo = go;
 
