@@ -67,3 +67,40 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:560px){.pill span{display:none}.pill{padding:0 12px}.langs{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- tabs, account, chat, calls, moderation ---- */
+body{background:radial-gradient(900px 500px at 15% -10%,#2a2f78 0,transparent 60%),radial-gradient(700px 480px at 100% 0,#5b2a86 0,transparent 55%),var(--bg);background-attachment:fixed}
+#app{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#0b0e20ee;backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.tab{background:none;border:0;cursor:pointer;flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;border-radius:14px;color:var(--mute);font-size:11px;font-weight:800;transition:.15s}
+.tab:hover{color:var(--text)}.tab.on{color:#fff;background:linear-gradient(135deg,#6366f166,#a855f766)}
+.panel{flex:1;width:100%;max-width:760px;margin:0 auto}
+.pad{padding:8px 0 20px;display:grid;gap:14px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:12px;box-shadow:0 10px 30px #0006}
+.card h2{margin:0;font-size:22px}.card.center{text-align:center;justify-items:center}
+.muted{color:var(--mute);margin:0;line-height:1.5}.err{color:#fb7185;margin:0;font-weight:700}
+.card label{display:grid;gap:6px;font-weight:800;font-size:13px;color:var(--mute)}
+.card input,.card textarea,.card select,.send input{width:100%;padding:12px 14px;border-radius:13px;border:1px solid var(--line);background:#0b0e20;color:var(--text);font:inherit;font-weight:600}
+.card textarea{min-height:84px;resize:vertical}
+.card input:focus,.card textarea:focus,.send input:focus,.card select:focus{outline:2px solid var(--a);border-color:transparent}
+.btn.wide{width:100%;justify-content:center}.row{display:flex;gap:10px;flex-wrap:wrap}
+.link{color:var(--c);font-weight:800;justify-self:center;padding:6px}
+.who{display:flex;gap:14px;align-items:center}.av{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:900;background:linear-gradient(135deg,var(--a),var(--b))}
+.role{color:var(--c)}.warn{border:1px solid #f59e0b88;background:#f59e0b18;border-radius:14px;padding:12px;display:grid;gap:8px}.warn p{margin:0}
+.chat{display:flex;flex-direction:column;height:calc(100dvh - 190px - env(safe-area-inset-bottom));min-height:320px}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:6px 2px}
+.msg{max-width:88%;background:var(--panel2);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:8px 12px;align-self:flex-start}
+.msg.mine{align-self:flex-end;background:linear-gradient(135deg,#4f46e5aa,#9333eaaa);border-radius:16px 16px 4px 16px;border-color:transparent}
+.mh{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--mute)}.mh b{color:var(--text)}.msg.mine .mh{color:#e0e0ff}
+.acts{margin-left:auto;opacity:0;transition:.15s;display:flex;gap:4px}.msg:hover .acts,.msg:focus-within .acts{opacity:1}
+.acts button{padding:2px 5px;border-radius:6px}.acts button:hover{background:#ffffff22}
+.mt{overflow-wrap:anywhere;margin-top:2px;line-height:1.4}
+.send{display:flex;gap:8px;padding-top:10px}
+.modal,.callov{position:fixed;inset:0;z-index:60;background:#0b0e20f2;display:grid;place-items:center;padding:16px}
+.modal .card{width:min(440px,100%)}
+.callov{display:flex;flex-direction:column;padding:0;place-items:stretch}.callov iframe{flex:1;width:100%;border:0;background:#000}
+.seg{display:flex;gap:6px;background:var(--panel);padding:5px;border-radius:15px;border:1px solid var(--line)}
+.seg button{flex:1;padding:10px;border-radius:11px;font-weight:800;color:var(--mute)}.seg .on{background:linear-gradient(135deg,var(--a),var(--b));color:#fff}
+.picks{display:flex;flex-wrap:wrap;gap:8px}.pick{padding:8px 12px;border-radius:999px;background:#ffffff14;border:1px solid var(--line);font-weight:800}.pick:hover{background:#ffffff26}
+.rep p{margin:0}.tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:#ffffff14}
+.tile{transition:transform .18s,box-shadow .18s}.tile:hover{transform:translateY(-4px);box-shadow:0 16px 36px #6366f144}

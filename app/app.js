@@ -1,7 +1,7 @@
 /* DougHub app shell: home screen, game player, languages, installing and automatic updates. */
 (function () {
   "use strict";
-  var VERSION = "2026.11.17.3";
+  var VERSION = "2026.11.17.5";
   var $ = function (id) { return document.getElementById(id); };
   var T = window.DH_T, LANGS = window.DH_LANGS;
   var GAMES = [
