@@ -1,0 +1,2 @@
+Music: "Retro Game Music Pack" by Juhani Junkala (SubspaceAudio), CC0 1.0. https://opengameart.org/content/5-chiptunes-action
+Converted to 22 kHz mono 8-bit WAV for DougHub.
