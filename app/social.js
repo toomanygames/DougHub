@@ -7,6 +7,18 @@
   function toast(m) { var e = $("toast"); if (!e) return; e.textContent = m; e.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove("show"); }, 3200); }
 
   var db = null, user = null, me = null, rank = 0, chatCh = null, view = "games";
+  var flags = { chat: false, call: false };
+  try { var fc = JSON.parse(localStorage.getItem("dh-flags") || "null"); if (fc) flags = fc; } catch (e) {}
+  function loadFlags() {
+    return fetch(URL_ + "/rest/v1/app_flags?select=flag_key,enabled", { headers: { apikey: KEY } }).then(function (r) { return r.json(); }).then(function (rows) {
+      if (!Array.isArray(rows)) return;
+      var f = { chat: false, call: false };
+      rows.forEach(function (x) { if (x.flag_key === "app_chat_visible") f.chat = !!x.enabled; if (x.flag_key === "app_calls_visible") f.call = !!x.enabled; });
+      var changed = f.chat !== flags.chat || f.call !== flags.call; flags = f;
+      try { localStorage.setItem("dh-flags", JSON.stringify(f)); } catch (e) {}
+      if (changed) { if ((view === "chat" && !flags.chat) || (view === "call" && !flags.call)) view = "games"; render(); }
+    }).catch(function () {});
+  }
   var ROLE = { helper: 1, admin: 2, developer: 3, tech: 3, owner: 4 };
 
   /* ---------- supabase (loaded only when needed) ---------- */
@@ -46,11 +58,11 @@
     ["mod", "Mod", "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"],
     ["me", "Account", "M20 21a8 8 0 10-16 0M12 13a4 4 0 100-8 4 4 0 000 8z"]];
   function renderTabs() {
-    $("tabs").innerHTML = TABS.filter(function (t) { return t[0] !== "chat" && t[0] !== "call" && (t[0] !== "mod" || rank >= 1); }).map(function (t) {
+    $("tabs").innerHTML = TABS.filter(function (t) { return (t[0] !== "chat" || flags.chat) && (t[0] !== "call" || flags.call) && (t[0] !== "mod" || rank >= 1); }).map(function (t) {
       return '<button type="button" class="tab' + (t[0] === view ? " on" : "") + '" data-v="' + t[0] + '"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + t[2] + '"/></svg><span>' + t[1] + "</span></button>";
     }).join("");
   }
-  function go(v) { if (v === "chat" || v === "call") v = "games"; view = v; if (chatCh && v !== "chat") { try { db.removeChannel(chatCh); } catch (e) {} chatCh = null; } render(); }
+  function go(v) { if ((v === "chat" && !flags.chat) || (v === "call" && !flags.call)) v = "games"; view = v; if (chatCh && v !== "chat") { try { db.removeChannel(chatCh); } catch (e) {} chatCh = null; } render(); }
   $("tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-v]"); if (b) go(b.dataset.v); });
   window.__dhGo = go;
 
@@ -81,7 +93,7 @@
       function draw() {
         p.innerHTML = '<div class="pad"><form class="card" id="authF" autocomplete="on"><h2>' + (signup ? "Create your account" : "Welcome back") + "</h2>" +
           (signup ? '<label>Username<input id="auU" name="dh_user_new" autocomplete="off" data-lpignore="true" data-1p-ignore data-bwignore="true" data-form-type="other" minlength="3" maxlength="20" required></label>' : "") +
-          '<label>Email<input id="auE" type="email" autocomplete="email" required></label>' +
+          (signup ? '<label>Email (optional)<input id="auE" type="email" autocomplete="email" placeholder="Leave empty to skip"></label><p class="muted">No email needed. Without one, a forgotten password can\'t be reset.</p>' : '<label>Username or email<input id="auE" type="text" autocomplete="username" autocapitalize="off" required></label>') +
           '<label>Password<input id="auP" type="password" autocomplete="' + (signup ? "new-password" : "current-password") + '" minlength="6" required></label>' +
           '<p class="err" id="auErr" role="alert"></p><button class="btn pri wide" type="submit">' + (signup ? "Sign up" : "Sign in") + '</button>' +
           '<button class="link" type="button" id="auSw">' + (signup ? "I already have an account" : "New here? Create an account") + "</button></form></div>";
@@ -89,6 +101,9 @@
         $("authF").onsubmit = function (ev) {
           ev.preventDefault(); var b = ev.target.querySelector("button[type=submit]"); b.disabled = true; $("auErr").textContent = "";
           var email = $("auE").value.trim(), pw = $("auP").value;
+          function fake(n) { return String(n).trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "_").replace(/^[._-]+/, "u") + "@users.doughub.invalid"; }
+          if (signup && !email) email = fake($("auU").value);
+          else if (!signup && email.indexOf("@") < 0) email = fake(email);
           var job = signup ? db.auth.signUp({ email: email, password: pw, options: { data: { username: $("auU").value.trim() }, emailRedirectTo: "https://doughub.online/" } }) : db.auth.signInWithPassword({ email: email, password: pw });
           job.then(function (r) {
             if (r.error) throw r.error;
@@ -102,7 +117,7 @@
   }
   function accountIn(p) {
     var role = rank >= 1 ? ["", "Helper", "Admin", "Developer", "Owner"][rank] : "";
-    p.innerHTML = '<div class="pad"><div class="card"><div class="who"><span class="av">' + esc((me.username || "?").charAt(0).toUpperCase()) + '</span><div><h2>@' + esc(me.username) + "</h2><p class=\"muted\">" + esc(user.email || "") + (role ? ' · <b class="role">' + role + "</b>" : "") + '</p></div></div>' +
+    p.innerHTML = '<div class="pad"><div class="card"><div class="who"><span class="av">' + esc((me.username || "?").charAt(0).toUpperCase()) + '</span><div><h2>@' + esc(me.username) + "</h2><p class=\"muted\">" + esc(/@users\.doughub\.invalid$/.test(user.email || "") ? "No email on this account" : (user.email || "")) + (role ? ' · <b class="role">' + role + "</b>" : "") + '</p></div></div>' +
       (me.is_banned ? '<p class="err">This account is restricted.' + (me.ban_reason ? " Reason: " + esc(me.ban_reason) : "") + "</p>" : "") +
       '<div id="warns"></div><div class="row"><button class="btn" id="outB" type="button">Sign out</button></div></div></div>';
     $("outB").onclick = function () { db.auth.signOut().then(function () { toast("Signed out"); render(); }); };
@@ -178,11 +193,26 @@
     if (rank < 1) { p.innerHTML = '<div class="pad"><div class="card center"><h2>Staff only</h2><p class="muted">This panel is for DougHub staff.</p></div></div>'; return; }
     var tab = "reports";
     function shell() {
-      p.innerHTML = '<div class="pad"><div class="seg"><button data-t="reports" class="' + (tab === "reports" ? "on" : "") + '">Reports</button><button data-t="warn" class="' + (tab === "warn" ? "on" : "") + '">Warn</button>' + (rank >= 2 ? '<button data-t="ban" class="' + (tab === "ban" ? "on" : "") + '">Ban</button>' : "") + '</div><div id="modBody"></div></div>';
+      p.innerHTML = '<div class="pad"><div class="seg"><button data-t="reports" class="' + (tab === "reports" ? "on" : "") + '">Reports</button><button data-t="warn" class="' + (tab === "warn" ? "on" : "") + '">Warn</button>' + (rank >= 2 ? '<button data-t="ban" class="' + (tab === "ban" ? "on" : "") + '">Ban</button>' : "") + '<button data-t="app" class="' + (tab === "app" ? "on" : "") + '">App</button></div><div id="modBody"></div></div>';
       p.querySelector(".seg").onclick = function (e) { var b = e.target.closest("[data-t]"); if (b) { tab = b.dataset.t; shell(); } };
-      ({ reports: reports, warn: warnTab, ban: banTab })[tab]($("modBody"));
+      ({ reports: reports, warn: warnTab, ban: banTab, app: appTab })[tab]($("modBody"));
     }
     shell();
+  }
+  function appTab(b) {
+    b.innerHTML = '<div class="card"><h2>Show in the app</h2><p class="muted">Turn the Chat and Calls tabs on or off for everyone using the DougHub app.</p>' +
+      '<label class="chk"><input type="checkbox" id="fgChat"' + (flags.chat ? " checked" : "") + '> Chat tab</label>' +
+      '<label class="chk"><input type="checkbox" id="fgCall"' + (flags.call ? " checked" : "") + '> Calls tab</label><p class="err" id="fgErr" role="alert"></p></div>';
+    function setFlag(key, on, box) {
+      box.disabled = true;
+      db.rpc("dh_app_set_flag", { p_key: key, p_enabled: on }).then(function (x) {
+        box.disabled = false;
+        if (x.error) { box.checked = !on; $("fgErr").textContent = x.error.message; return; }
+        $("fgErr").textContent = ""; toast("Saved"); loadFlags();
+      });
+    }
+    $("fgChat").onchange = function () { setFlag("app_chat_visible", this.checked, this); };
+    $("fgCall").onchange = function () { setFlag("app_calls_visible", this.checked, this); };
   }
   function reports(b) {
     b.innerHTML = '<div class="spin"></div>';
@@ -237,4 +267,5 @@
   /* start: if there is a saved session, learn who is signed in so the Mod tab can appear */
   renderTabs();
   try { if (Object.keys(localStorage).some(function (k) { return /^sb-.*-auth-token$/.test(k); })) client().then(refreshMe).then(renderTabs).catch(function () {}); } catch (e) {}
+loadFlags(); document.addEventListener("visibilitychange", function () { if (!document.hidden) loadFlags(); });
 })();
