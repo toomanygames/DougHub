@@ -20,7 +20,7 @@ en: {
   "blurb.off-brand-beat-battle": "Hit the arrows on the beat, beat a new rival each week and save up a million dollars. An original rhythm battle.",
   "blurb.fighting-fantasy": "A pixel-art fantasy adventure with a castle keep and dungeons, about two hours of play. Still a work in progress.",
   "blurb.quiet-woods": "Collect wood, light the campfire and upgrade your cabin through 99 bright nights.",
-  "blurb.bubble-grove": "Aim and match three or more bubbles to pop them. Anything left hanging falls too."
+  "blurb.bubble-grove": "Aim and match three or more bubbles to pop them. Anything left hanging falls too.", "blurb.getaway-road": "Outrun the police in a blocky open world of city, desert, snow, forest and sea. Steal vehicles, hunt treasure and unlock cars.", "tag.Racing": "Racing", "tag.Action": "Action"
 },
 es: {
   pick: "Elige un juego", pick_sub: "Toca un juego para jugar. No hace falta iniciar sesión.", play: "Jugar", home: "Inicio", settings: "Ajustes", language: "Idioma",
@@ -41,7 +41,7 @@ es: {
   "blurb.off-brand-beat-battle": "Pulsa las flechas al ritmo, vence a un rival nuevo cada semana y ahorra un millón de dólares. Una batalla de ritmo original.",
   "blurb.fighting-fantasy": "Una aventura de fantasía en pixel art con un castillo y mazmorras, de unas dos horas de juego. Aún en desarrollo.",
   "blurb.quiet-woods": "Recoge madera, enciende la fogata y mejora tu cabaña a lo largo de 99 noches luminosas.",
-  "blurb.bubble-grove": "Apunta y junta tres o más burbujas para explotarlas. Lo que quede colgando también cae."
+  "blurb.bubble-grove": "Apunta y junta tres o más burbujas para explotarlas. Lo que quede colgando también cae.", "blurb.getaway-road": "Huye de la policía en un mundo abierto de bloques: ciudad, desierto, nieve, bosque y mar. Roba vehículos, busca tesoros y desbloquea coches.", "tag.Racing": "Carreras", "tag.Action": "Acción"
 },
 fr: {
   pick: "Choisis un jeu", pick_sub: "Touche un jeu pour jouer. Aucune connexion nécessaire.", play: "Jouer", home: "Accueil", settings: "Réglages", language: "Langue",
@@ -62,7 +62,7 @@ fr: {
   "blurb.off-brand-beat-battle": "Appuie sur les flèches en rythme, bats un nouveau rival chaque semaine et économise un million de dollars. Un duel de rythme original.",
   "blurb.fighting-fantasy": "Une aventure fantasy en pixel art avec un donjon de château et des souterrains, environ deux heures de jeu. Encore en développement.",
   "blurb.quiet-woods": "Ramasse du bois, allume le feu de camp et améliore ta cabane pendant 99 nuits lumineuses.",
-  "blurb.bubble-grove": "Vise et assemble trois bulles ou plus pour les faire éclater. Tout ce qui reste suspendu tombe aussi."
+  "blurb.bubble-grove": "Vise et assemble trois bulles ou plus pour les faire éclater. Tout ce qui reste suspendu tombe aussi.", "blurb.getaway-road": "Sème la police dans un monde ouvert en blocs : ville, désert, neige, forêt et mer. Vole des véhicules, cherche des trésors et débloque des voitures.", "tag.Racing": "Course", "tag.Action": "Action"
 },
 de: {
   pick: "Wähle ein Spiel", pick_sub: "Tippe auf ein Spiel, um zu spielen. Keine Anmeldung nötig.", play: "Spielen", home: "Start", settings: "Einstellungen", language: "Sprache",
@@ -83,7 +83,7 @@ de: {
   "blurb.off-brand-beat-battle": "Triff die Pfeile im Takt, besiege jede Woche einen neuen Rivalen und spare eine Million Dollar. Ein originelles Rhythmusduell.",
   "blurb.fighting-fantasy": "Ein Fantasy-Abenteuer in Pixelgrafik mit Burg und Verliesen, etwa zwei Stunden Spielzeit. Noch in Arbeit.",
   "blurb.quiet-woods": "Sammle Holz, entzünde das Lagerfeuer und verbessere deine Hütte über 99 helle Nächte.",
-  "blurb.bubble-grove": "Ziele und verbinde drei oder mehr Blasen, um sie platzen zu lassen. Was oben nicht mehr hängt, fällt auch."
+  "blurb.bubble-grove": "Ziele und verbinde drei oder mehr Blasen, um sie platzen zu lassen. Was oben nicht mehr hängt, fällt auch.", "blurb.getaway-road": "Hänge die Polizei in einer offenen Blockwelt ab: Stadt, Wüste, Schnee, Wald und Meer. Klau Fahrzeuge, such Schätze und schalte Autos frei.", "tag.Racing": "Rennen", "tag.Action": "Action"
 },
 pt: {
   pick: "Escolha um jogo", pick_sub: "Toque em um jogo para jogar. Não precisa entrar numa conta.", play: "Jogar", home: "Início", settings: "Configurações", language: "Idioma",
@@ -104,7 +104,7 @@ pt: {
   "blurb.off-brand-beat-battle": "Acerte as setas no ritmo, vença um novo rival a cada semana e junte um milhão de dólares. Uma batalha de ritmo original.",
   "blurb.fighting-fantasy": "Uma aventura de fantasia em pixel art com castelo e masmorras, cerca de duas horas de jogo. Ainda em desenvolvimento.",
   "blurb.quiet-woods": "Colete madeira, acenda a fogueira e melhore sua cabana ao longo de 99 noites brilhantes.",
-  "blurb.bubble-grove": "Mire e junte três ou mais bolhas para estourá-las. O que ficar pendurado também cai."
+  "blurb.bubble-grove": "Mire e junte três ou mais bolhas para estourá-las. O que ficar pendurado também cai.", "blurb.getaway-road": "Fuja da polícia em um mundo aberto de blocos: cidade, deserto, neve, floresta e mar. Roube veículos, cace tesouros e desbloqueie carros.", "tag.Racing": "Corrida", "tag.Action": "Ação"
 },
 it: {
   pick: "Scegli un gioco", pick_sub: "Tocca un gioco per giocare. Non serve accedere.", play: "Gioca", home: "Home", settings: "Impostazioni", language: "Lingua",
@@ -125,7 +125,7 @@ it: {
   "blurb.off-brand-beat-battle": "Premi le frecce a tempo, batti un nuovo rivale ogni settimana e metti da parte un milione di dollari. Una sfida ritmica originale.",
   "blurb.fighting-fantasy": "Un'avventura fantasy in pixel art con un castello e sotterranei, circa due ore di gioco. Ancora in sviluppo.",
   "blurb.quiet-woods": "Raccogli legna, accendi il falò e migliora la tua capanna per 99 notti luminose.",
-  "blurb.bubble-grove": "Mira e unisci tre o più bolle per farle scoppiare. Anche ciò che resta appeso cade."
+  "blurb.bubble-grove": "Mira e unisci tre o più bolle per farle scoppiare. Anche ciò che resta appeso cade.", "blurb.getaway-road": "Scappa dalla polizia in un mondo aperto a blocchi: città, deserto, neve, foresta e mare. Ruba veicoli, cerca tesori e sblocca auto.", "tag.Racing": "Corse", "tag.Action": "Azione"
 },
 ja: {
   pick: "ゲームをえらぼう", pick_sub: "ゲームをタップしてあそぼう。ログインはいりません。", play: "あそぶ", home: "ホーム", settings: "せってい", language: "ことば",
@@ -146,6 +146,6 @@ ja: {
   "blurb.off-brand-beat-battle": "リズムに合わせて矢印をおし、毎週あたらしいライバルをたおして100万ドルをためよう。オリジナルのリズムバトル。",
   "blurb.fighting-fantasy": "お城とダンジョンがあるドット絵のファンタジー冒険。あそぶ時間は約2時間。まだ作っている途中です。",
   "blurb.quiet-woods": "木を集めて、たき火をつけて、99夜をかけて小屋をパワーアップしよう。",
-  "blurb.bubble-grove": "ねらって、同じ色のあわを3つ以上くっつけてわろう。ぶら下がったあわもおちるよ。"
+  "blurb.bubble-grove": "ねらって、同じ色のあわを3つ以上くっつけてわろう。ぶら下がったあわもおちるよ。", "blurb.getaway-road": "ブロックの世界の街、砂漠、雪、森、海でけいさつから逃げよう。のりものをうばい、宝をさがし、くるまをかいほう。", "tag.Racing": "レース", "tag.Action": "アクション"
 }
 };

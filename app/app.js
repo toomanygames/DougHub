@@ -1,7 +1,7 @@
 /* DougHub app shell: home screen, game player, languages, installing and automatic updates. */
 (function () {
   "use strict";
-  var VERSION = "2026.11.17.7";
+  var VERSION = "2026.11.17.10";
   var $ = function (id) { return document.getElementById(id); };
   var T = window.DH_T, LANGS = window.DH_LANGS;
   var GAMES = [
@@ -14,6 +14,7 @@
     { id: "off-brand-beat-battle", name: "Off-Brand Beat Battle", tags: ["Music", "Rhythm"], isNew: 1 },
     { id: "fighting-fantasy", name: "Fighting Fantasy V.1", tags: ["RPG", "Fantasy"], by: "Xan" },
     { id: "quiet-woods", name: "99 Nights in the Wonder Woods", tags: ["Adventure", "Cozy"] },
+    { id: "getaway-road", name: "Getaway Road", tags: ["Racing", "Action"], isNew: 1 },
     { id: "bubble-grove", name: "Bubble Grove", tags: ["Puzzle", "Arcade"] }
   ];
   var COV = {};                       // which games have translated menus, per language (i18n/coverage.json)
