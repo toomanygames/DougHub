@@ -1,7 +1,7 @@
 /* DougHub app shell: home screen, game player, languages, installing and automatic updates. */
 (function () {
   "use strict";
-  var VERSION = "2026.11.17.5";
+  var VERSION = "2026.11.17.7";
   var $ = function (id) { return document.getElementById(id); };
   var T = window.DH_T, LANGS = window.DH_LANGS;
   var GAMES = [
@@ -30,14 +30,27 @@
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
 
   /* ---------- home ---------- */
+  var WORDS = { all: { en: "All", es: "Todos", fr: "Tous", de: "Alle", pt: "Todos", it: "Tutti", ja: "すべて" },
+    feat: { en: "Featured", es: "Destacado", fr: "À la une", de: "Empfohlen", pt: "Destaque", it: "In evidenza", ja: "おすすめ" },
+    games: { en: "Games", es: "Juegos", fr: "Jeux", de: "Spiele", pt: "Jogos", it: "Giochi", ja: "ゲーム" } };
+  function w(k) { return WORDS[k][lang] || WORDS[k].en; }
+  var filter = "all";
+  function cats() { var o = []; GAMES.forEach(function (g) { g.tags.forEach(function (x) { if (o.indexOf(x) < 0) o.push(x); }); }); return o; }
+  function tileHtml(g) {
+    var tags = g.tags.map(function (x) { return '<span class="tag">' + esc(t("tag." + x)) + "</span>"; }).join("");
+    var lt = "";
+    if (lang !== "en") { var ok = COV[g.id] && COV[g.id].indexOf(lang) > -1; lt = '<span class="lang-tag' + (ok ? "" : " no") + '">' + esc(ok ? t("tr_full") : t("tr_none")) + "</span>"; }
+    return '<button class="tile" type="button" data-id="' + g.id + '"><div class="art"><img src="art/' + g.id + '.svg" alt="">' + (g.isNew ? '<span class="badge">' + esc(t("newtag")) + "</span>" : "") + '</div><div class="body"><div class="tags">' + tags + "</div><h3>" + esc(g.name) + "</h3>" +
+      (g.by ? '<div class="by">' + esc(t("madeby")) + " " + esc(g.by) + "</div>" : "") + "<p>" + esc(t("blurb." + g.id)) + '</p><div class="foot">' + lt + '<span class="go">' + esc(t("play")) + "</span></div></div></button>";
+  }
   function renderGrid() {
-    $("grid").innerHTML = GAMES.map(function (g) {
-      var tags = g.tags.map(function (x) { return '<span class="tag">' + esc(t("tag." + x)) + "</span>"; }).join("");
-      var lt = "";
-      if (lang !== "en") { var ok = COV[g.id] && COV[g.id].indexOf(lang) > -1; lt = '<span class="lang-tag' + (ok ? "" : " no") + '">' + esc(ok ? t("tr_full") : t("tr_none")) + "</span>"; }
-      return '<button class="tile" type="button" data-id="' + g.id + '"><div class="art"><img src="art/' + g.id + '.svg" alt="">' + (g.isNew ? '<span class="badge">' + esc(t("newtag")) + "</span>" : "") + '</div><div class="body"><div class="tags">' + tags + "</div><h3>" + esc(g.name) + "</h3>" +
-        (g.by ? '<div class="by">' + esc(t("madeby")) + " " + esc(g.by) + "</div>" : "") + "<p>" + esc(t("blurb." + g.id)) + '</p><div class="foot">' + lt + '<span class="go">' + esc(t("play")) + "</span></div></div></button>";
-    }).join("");
+    var chips = '<button type="button" class="chip' + (filter === "all" ? " on" : "") + '" data-f="all">' + esc(w("all")) + '</button><button type="button" class="chip' + (filter === "new" ? " on" : "") + '" data-f="new">' + esc(t("newtag")) + "</button>" +
+      cats().map(function (c) { return '<button type="button" class="chip' + (filter === c ? " on" : "") + '" data-f="' + c + '">' + esc(t("tag." + c)) + "</button>"; }).join("");
+    var list = GAMES.filter(function (g) { return filter === "all" || (filter === "new" ? g.isNew : g.tags.indexOf(filter) > -1); });
+    var f = filter === "all" ? (GAMES.filter(function (g) { return g.id === "bundt-bakery"; })[0] || GAMES[0]) : null, h = "";
+    if (f) h += '<section class="feat" data-id="' + f.id + '" role="button" tabindex="0"><div class="feat-art"><img src="art/' + f.id + '.svg" alt=""></div><div class="feat-b"><span class="eyebrow">' + esc(w("feat")) + "</span><h2>" + esc(f.name) + "</h2><p>" + esc(t("blurb." + f.id)) + '</p><span class="btn pri">' + esc(t("play")) + " &rarr;</span></div></section>";
+    h += '<div class="sect"><h2>' + esc(w("games")) + ' <span class="count">' + list.length + '</span></h2></div><div class="chips" role="tablist">' + chips + '</div><div class="cards">' + list.map(tileHtml).join("") + "</div>";
+    $("grid").className = ""; $("grid").innerHTML = h;
   }
   function renderLangs() {
     $("langList").innerHTML = LANGS.map(function (l) { return '<button class="lang' + (l[0] === lang ? " on" : "") + '" type="button" data-l="' + l[0] + '">' + esc(l[1]) + "</button>"; }).join("");
@@ -75,7 +88,8 @@
     if (!fromPop && history.state && history.state.play) { try { history.back(); } catch (e) {} }
     maybeApply();
   }
-  $("grid").addEventListener("click", function (e) { var b = e.target.closest(".tile"); if (b) openGame(b.dataset.id); });
+  $("grid").addEventListener("click", function (e) { var c = e.target.closest(".chip"); if (c) { filter = c.dataset.f; renderGrid(); return; } var b = e.target.closest(".tile,.feat"); if (b) openGame(b.dataset.id); });
+  $("grid").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("feat")) { e.preventDefault(); openGame(e.target.dataset.id); } });
   $("pBack").addEventListener("click", function () { closeGame(false); });
   window.addEventListener("popstate", function (e) { var s = e.state; if (s && s.play) openGame(s.play, true); else closeGame(true); });
   window.addEventListener("message", function (e) { if (e.data && e.data.dh === "back" && frame && e.source === frame.contentWindow) closeGame(false); });
