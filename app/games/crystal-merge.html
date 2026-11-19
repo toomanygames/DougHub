@@ -22,6 +22,13 @@ button{font:inherit;font-size:max(10px,1.9vmin);padding:1.5vmin 2.6vmin;backgrou
 button:active{transform:translateY(2px)}
 #bar{display:flex;gap:2vmin}
 #mute{position:absolute;top:6px;right:8px;padding:6px 8px;font-size:11px;background:#2d2266;box-shadow:none}
+:root{--ui:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,"Noto Sans","Hiragino Sans","Yu Gothic UI",sans-serif}
+/* readable body text: pixel font only for titles, buttons and numbers */
+.ov p,p{font-family:var(--ui)!important;font-size:max(14px,2.1vmin)!important;line-height:1.55!important;letter-spacing:0!important;color:#d3dbf5;max-width:56ch}
+.ov h1{line-height:1.3!important}
+.hud,#hud{font-size:max(10px,1.8vmin)!important}
+#mute{font-size:11px!important}
+.box{font-size:max(9px,1.5vmin)}#top h1{line-height:1.25}
 </style></head><body>
 <div id="wrap">
 <div id="top"><h1>CRYSTAL<br>MERGE</h1><div class="box">SCORE<b id="sc">0</b></div><div class="box">BEST<b id="bs">0</b></div></div>
@@ -70,8 +77,9 @@ function move(dir){/* 0 left,1 up,2 right,3 down */
   if(gain)beep(300+Math.min(500,Math.log2(gain)*60),.12);else beep(180,.04);
   spawn();render();
   var mx=0;grid.forEach(function(r){r.forEach(function(t){if(t&&t.v>mx)mx=t.v})});
-  if(mx>=2048&&!won&&!keep){won=true;setTimeout(function(){$("oT").textContent="YOU MADE 2048!";$("oM").textContent="SCORE "+score;$("keep").hidden=false;$("over").hidden=false},300)}
-  else if(!canMove()){setTimeout(function(){$("oT").textContent="GAME OVER";$("oM").textContent="SCORE "+score+" · BEST "+best;$("keep").hidden=true;$("over").hidden=false},350)}}
+  if(mx>=2048&&!won&&!keep){won=true;setTimeout(function(){report();$("oT").textContent="YOU MADE 2048!";$("oM").textContent="SCORE "+score;$("keep").hidden=false;$("over").hidden=false},300)}
+  else if(!canMove()){setTimeout(function(){report();$("oT").textContent="GAME OVER";$("oM").textContent="SCORE "+score+" · BEST "+best;$("keep").hidden=true;$("over").hidden=false},350)}}
+function report(){try{parent.postMessage({dh:"score",game:"crystal-merge",score:score},"*")}catch(e){}}
 function canMove(){if(empty().length)return true;for(var r=0;r<N;r++)for(var c=0;c<N;c++){var v=grid[r][c].v;if(c+1<N&&grid[r][c+1].v===v||r+1<N&&grid[r+1][c].v===v)return true}return false}
 function undo(){if(!hist.length)return;var s=JSON.parse(hist.pop());Object.keys(tiles).forEach(function(k){tiles[k].remove()});tiles={};grid=s.g.map(function(r){return r.map(function(t){return t&&{v:t.v,id:t.id}})});score=s.s;$("over").hidden=true;render()}
 var KD={ArrowLeft:0,KeyA:0,ArrowUp:1,KeyW:1,ArrowRight:2,KeyD:2,ArrowDown:3,KeyS:3};

@@ -730,7 +730,7 @@ function startGame(m) {
   if (mode === 'hunt') { hunt = { left: 5, time: 120, chest: null }; spawnChest(); $('arrow').hidden = false; msg('Find the 5 treasure chests!', 1800); } else { $('arrow').hidden = true; msg(mode === 'free' ? 'Free roam! Explore the world.' : 'GO! GO! GO!', 1200); }
 }
 function endGame(why) {
-  const sc = Math.floor(P.score), isNew = sc > best && mode === 'chase'; if (isNew) { best = sc; store.set('best', best); } bank += P.cash; store.set('bank', bank);
+  const sc = Math.floor(P.score); try { parent.postMessage({ dh: "score", game: "getaway-road", score: sc }, "*"); } catch (e) {} const isNew = sc > best && mode === 'chase'; if (isNew) { best = sc; store.set('best', best); } bank += P.cash; store.set('bank', bank);
   st.camel = (st.camel || 0) + P.camels; st.sheep = (st.sheep || 0) + P.sheep; st.cops = (st.cops || 0) + P.wrecked; st.score = (st.score || 0) + sc; st.cashE = (st.cashE || 0) + P.cash; st.boats = (st.boats || 0) + P.boats; st.chests = (st.chests || 0) + P.chests; st.siren = Math.max(st.siren || 0, P.maxHeat); st.bestW = Math.max(st.bestW || 0, P.wrecked); st.heli = (st.heli || 0) + P.heli; st.foot = (st.foot || 0) + P.foot; st.dist = (st.dist || 0) + Math.floor(P.dist); st.civ = (st.civ || 0) + P.civ; st.rockets = (st.rockets || 0) + P.rockets_; st.tankk = (st.tankk || 0) + P.tankk; st.boxes = (st.boxes || 0) + P.boxes;
   const got = []; for (const a of ACH) if (!achDone.includes(a.id) && (st[a.k] || 0) >= a.n) { achDone.push(a.id); bank += a.r; if (a.car && !owned.includes(a.car)) owned.push(a.car); got.push(a); }
   store.set('st', st); store.set('achDone', achDone); store.set('owned', owned); store.set('bank', bank);

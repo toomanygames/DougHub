@@ -53,6 +53,8 @@
 
   /* ---------- tabs ---------- */
   var TABS = [["games", "Games", "M6 12h4m-2-2v4m7-1h.01M15 11h.01M17.3 5H6.7a4 4 0 00-3.9 3.1l-1.5 7A3 3 0 004.2 19a3 3 0 002.3-1.1L8 16h8l1.5 1.9a3 3 0 002.3 1.1 3 3 0 002.9-3.9l-1.5-7A4 4 0 0017.3 5z"],
+    ["shop", "Shop", "M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"],
+    ["rank", "Ranks", "M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3"],
     ["chat", "Chat", "M21 12a8 8 0 01-11.6 7.1L3 21l1.9-6.4A8 8 0 1121 12z"],
     ["call", "Calls", "M15 10l5-3v10l-5-3M3 7h12v10H3z"],
     ["mod", "Mod", "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"],
@@ -74,6 +76,8 @@
     if (view === "me") return viewMe(p);
     p.innerHTML = '<div class="pad"><div class="spin"></div></div>';
     client().then(refreshMe).then(function () {
+      if (view === "shop") return viewShop(p);
+      if (view === "rank") return viewRank(p);
       if (view === "chat") return viewChat(p);
       if (view === "call") return viewCall(p);
       if (view === "mod") return viewMod(p);
@@ -267,5 +271,121 @@
   /* start: if there is a saved session, learn who is signed in so the Mod tab can appear */
   renderTabs();
   try { if (Object.keys(localStorage).some(function (k) { return /^sb-.*-auth-token$/.test(k); })) client().then(refreshMe).then(renderTabs).catch(function () {}); } catch (e) {}
+  /* ---------- shop, collection and leaderboards (same economy as doughub.online) ---------- */
+  var RAR = { common: "#9aa3c4", uncommon: "#4ade80", rare: "#60a5fa", epic: "#c084fc", legendary: "#fbbf24" };
+  var PRICE = { common: 40, uncommon: 60, rare: 90, epic: 130, legendary: 180 };
+  var CG = { headwear: "🎩", face: "😎", neck: "🧣", back: "🎒", hair: "💇", outfit: "👕", pants: "👖", shoes: "👟", effect: "✨" };
+  var credits = null, shopTab = "pets", packFilter = "all", rankKey = "collectors";
+  function art(u) { return u ? (/^https?:/.test(u) ? u : "https://doughub.online/" + String(u).replace(/^\//, "")) : ""; }
+  function pic(u, cls) { var s = art(u); return s ? '<img class="' + (cls || "pimg") + '" referrerpolicy="no-referrer" src="' + esc(s) + '" alt="">' : '<span class="pimg ph">?</span>'; }
+  function rpc(name, args) { return db.rpc(name, args || {}).then(function (r) { if (r.error) throw r.error; return r.data; }); }
+  function loadCredits() { return db.from("dh_wallets").select("credits").eq("user_id", user.id).maybeSingle().then(function (r) { credits = r.data ? r.data.credits : 0; return credits; }); }
+  function rarTag(r) { return '<span class="rar" style="--rc:' + (RAR[r] || "#aaa") + '">' + esc(r) + "</span>"; }
+
+  function viewShop(p) {
+    if (!user) return needLogin(p, "use the shop");
+    loadCredits().then(function () {
+      p.innerHTML = '<div class="pad"><div class="card wal"><div><span class="muted">Your credits</span><div class="bal" id="bal">' + credits + '</div></div><p class="muted">Play any DougHub app game once a day for +10 credits.</p></div>' +
+        '<div class="seg" id="shopSeg">' + [["pets", "Pets"], ["packs", "Packs"], ["items", "Items"], ["mine", "Mine"]].map(function (t) { return '<button data-t="' + t[0] + '" class="' + (shopTab === t[0] ? "on" : "") + '">' + t[1] + "</button>"; }).join("") + '</div><div id="shopBody"></div></div>';
+      $("shopSeg").onclick = function (e) { var b = e.target.closest("[data-t]"); if (b) { shopTab = b.dataset.t; viewShop(p); } };
+      var body = $("shopBody"); body.innerHTML = '<div class="spin"></div>';
+      ({ pets: shopPets, packs: shopPacks, items: shopItems, mine: shopMine })[shopTab](body, p);
+    }).catch(function (e) { p.innerHTML = '<div class="pad"><div class="card"><p class="err">' + esc(e.message) + "</p></div></div>"; });
+  }
+  function bal(n) { credits = n; var b = $("bal"); if (b) b.textContent = n; }
+  function shopPets(b, p) {
+    Promise.all([rpc("dh_get_character_catalog"), db.from("dh_character_inventory").select("character_id").eq("user_id", user.id)]).then(function (r) {
+      var rows = r[0] || [], own = {}; (r[1].data || []).forEach(function (x) { own[x.character_id] = 1; });
+      var packs = []; rows.forEach(function (x) { if (packs.indexOf(x.pack_type) < 0) packs.push(x.pack_type); });
+      var list = rows.filter(function (x) { return packFilter === "all" || x.pack_type === packFilter; });
+      b.innerHTML = '<div class="chips2">' + ["all"].concat(packs).map(function (k) { return '<button type="button" class="chip' + (packFilter === k ? " on" : "") + '" data-pk="' + k + '">' + esc(k) + "</button>"; }).join("") + '</div><div class="sgrid">' +
+        list.map(function (x) { var pr = PRICE[x.rarity] || 0, o = own[x.character_id], out = x.remaining_count <= 0;
+          return '<div class="pcard">' + pic(x.art_path) + '<b>' + esc(x.character_name) + "</b>" + rarTag(x.rarity) + '<span class="muted sm">' + esc(x.pack_type) + " · " + x.remaining_count + "/" + x.total_supply + ' left</span><button class="btn' + (o ? "" : " pri") + '" type="button" data-buy="' + esc(x.character_id) + '"' + (o || out ? " disabled" : "") + ">" + (o ? "Owned" : out ? "Sold out" : pr + " credits") + "</button></div>"; }).join("") + "</div>";
+      b.onclick = function (e) {
+        var pk = e.target.closest("[data-pk]"); if (pk) { packFilter = pk.dataset.pk; shopPets(b, p); return; }
+        var bt = e.target.closest("[data-buy]"); if (!bt) return; bt.disabled = true;
+        rpc("dh_buy_character", { p_character_id: bt.dataset.buy }).then(function (x) { bal(x.credits_remaining); toast("Unlocked " + x.character_name + "!"); shopPets(b, p); }).catch(function (er) { bt.disabled = false; toast(er.message); });
+      };
+    }).catch(function (e) { b.innerHTML = '<p class="err">' + esc(e.message) + "</p>"; });
+  }
+  function shopPacks(b, p) {
+    var PK = [["woodland", "Woodland", "🌲"], ["ocean", "Ocean", "🌊"], ["cosmic", "Cosmic", "🌌"]];
+    b.innerHTML = '<div class="sgrid">' + PK.map(function (k) { return '<div class="pcard pk"><span class="big">' + k[2] + "</span><b>" + k[1] + ' pack</b><span class="muted sm">One random pet. Rarer pets are harder to pull.</span><button class="btn pri" type="button" data-pack="' + k[0] + '">Open · 100 credits</button></div>'; }).join("") + '</div><div id="packRes"></div>';
+    b.onclick = function (e) { var bt = e.target.closest("[data-pack]"); if (!bt) return; bt.disabled = true;
+      rpc("dh_open_character_pack", { p_pack: bt.dataset.pack }).then(function (x) { bal(x.credits_remaining); $("packRes").innerHTML = '<div class="card center reveal">' + pic(x.art_path, "pimg big") + "<h2>" + esc(x.character_name) + "</h2>" + rarTag(x.rarity) + '<p class="muted">Added to your collection!</p></div>'; bt.disabled = false; }).catch(function (er) { bt.disabled = false; toast(er.message); }); };
+  }
+  function shopItems(b) {
+    rpc("dh_get_cosmetic_catalog").then(function (rows) {
+      b.innerHTML = '<p class="muted">Accessories for your featured pet. Stock refreshes every 30 minutes.</p><div class="sgrid">' + (rows || []).map(function (x) {
+        return '<div class="pcard"><span class="big">' + (CG[x.category] || "🎁") + "</span><b>" + esc(x.name) + "</b>" + rarTag(x.rarity) + '<span class="muted sm">' + esc(x.category) + " · " + x.stock_count + ' in stock</span><button class="btn' + (x.owned ? "" : " pri") + '" type="button" data-ci="' + esc(x.id) + '"' + (x.owned || x.stock_count <= 0 ? " disabled" : "") + ">" + (x.owned ? "Owned" : x.stock_count <= 0 ? "Sold out" : x.price + " credits") + "</button></div>"; }).join("") + "</div>";
+      b.onclick = function (e) { var bt = e.target.closest("[data-ci]"); if (!bt) return; bt.disabled = true;
+        rpc("dh_buy_cosmetic", { p_cosmetic_id: bt.dataset.ci }).then(function (x) { bal(x.credits_remaining); toast("Bought!"); shopItems(b); }).catch(function (er) { bt.disabled = false; toast(er.message); }); };
+    }).catch(function (e) { b.innerHTML = '<p class="err">' + esc(e.message) + "</p>"; });
+  }
+  function showcaseCard(d, mine) {
+    if (!d || !d.found) return '<div class="card center"><p class="muted">Player not found.</p></div>';
+    if (d.private) return '<div class="card center"><h2>@' + esc(d.username) + '</h2><p class="muted">This showcase is private.</p></div>';
+    var f = d.featured, st = d.stats || {};
+    var h = '<div class="card center show">' + (f ? pic(f.art_path, "pimg huge") + "<h2>" + esc(f.name) + "</h2>" + rarTag(f.rarity) + (f.cosmetics && f.cosmetics.length ? '<div class="eq">' + f.cosmetics.map(function (c) { return '<span class="eqi" title="' + esc(c.name) + '">' + (CG[c.category] || "🎁") + " " + esc(c.name) + "</span>"; }).join("") + "</div>" : "") : '<p class="muted">No featured pet yet.</p>') +
+      '<p class="muted">@' + esc(d.username) + " · " + (st.owned || 0) + "/" + (st.total || 0) + " pets · " + (st.points || 0) + " points</p></div>";
+    if (d.scores && d.scores.length) h += '<div class="card"><h2>Scores</h2>' + d.scores.map(function (s) { return '<div class="srow"><span>' + esc(s.title) + '</span><b>' + esc(fmtNum(s.score)) + " · #" + s.rank + "</b></div>"; }).join("") + "</div>";
+    if (d.characters && d.characters.length) h += '<div class="card"><h2>Collection</h2><div class="sgrid sm">' + d.characters.map(function (c) { return '<div class="pcard mini' + (mine ? "" : "") + '">' + pic(c.art_path) + "<b>" + esc(c.name) + "</b>" + rarTag(c.rarity) + (mine ? '<button class="btn" type="button" data-feat="' + esc(c.character_id) + '">' + (f && f.character_id === c.character_id ? "Featured" : "Feature") + "</button>" : "") + "</div>"; }).join("") + "</div></div>";
+    return h;
+  }
+  function fmtNum(n) { n = Number(n); if (!isFinite(n)) return String(n); if (Math.abs(n) >= 1e6) { var u = ["", "K", "M", "B", "T", "Qa"], i = 0; while (Math.abs(n) >= 1000 && i < u.length - 1) { n /= 1000; i++; } return n.toFixed(2).replace(/\.?0+$/, "") + u[i]; } return Math.round(n).toLocaleString(); }
+  function shopMine(b, p) {
+    Promise.all([rpc("dh_public_showcase", { p_username: me.username }), rpc("dh_get_cosmetic_catalog")]).then(function (r) {
+      var d = r[0], cat = r[1] || [], f = d.featured, owned = cat.filter(function (c) { return c.owned; }), eqIds = f && f.cosmetics ? f.cosmetics.map(function (c) { return c.id; }) : [];
+      var h = showcaseCard(d, true);
+      if (f) {
+        h += '<div class="card"><h2>Dress up ' + esc(f.name) + '</h2>' + (owned.length ? '<div class="eq">' + owned.map(function (c) { var on = eqIds.indexOf(c.id) > -1; return '<button type="button" class="eqi btnish' + (on ? " on" : "") + '" data-eq="' + esc(c.id) + '">' + (CG[c.category] || "🎁") + " " + esc(c.name) + "</button>"; }).join("") + "</div>" : '<p class="muted">Buy accessories in the Items tab, then wear them here.</p>') +
+          '<label class="chk"><input type="checkbox" id="pubChk"' + (d.showcase_public ? " checked" : "") + '> Show my pet on the leaderboards and let others view my collection</label></div>';
+      } else h += '<div class="card center"><p class="muted">Get a pet from the Pets or Packs tab, then feature it to show it off.</p></div>';
+      b.innerHTML = h;
+      b.onclick = function (e) {
+        var ft = e.target.closest("[data-feat]"); if (ft) { rpc("dh_set_showcase", { p_character_id: ft.dataset.feat, p_public: true }).then(function () { toast("Featured!"); shopMine(b, p); }).catch(function (er) { toast(er.message); }); return; }
+        var eq = e.target.closest("[data-eq]"); if (eq && f) { var id = eq.dataset.eq, ids = eqIds.indexOf(id) > -1 ? eqIds.filter(function (x) { return x !== id; }) : eqIds.concat([id]);
+          rpc("dh_save_character", { p_character_id: f.character_id, p_cosmetic_ids: ids }).then(function () { toast("Saved"); shopMine(b, p); }).catch(function (er) { toast(er.message); }); }
+      };
+      var pc = $("pubChk"); if (pc) pc.onchange = function () { rpc("dh_set_showcase", { p_character_id: f.character_id, p_public: pc.checked }).then(function () { toast(pc.checked ? "Showcase is public" : "Showcase is private"); }).catch(function (er) { toast(er.message); }); };
+    }).catch(function (e) { b.innerHTML = '<p class="err">' + esc(e.message) + "</p>"; });
+  }
+
+  function viewRank(p) {
+    if (!user) return needLogin(p, "see the leaderboards");
+    rpc("dh_game_list").then(function (games) {
+      games = games || [];
+      p.innerHTML = '<div class="pad"><div class="chips2" id="rkChips"><button type="button" class="chip' + (rankKey === "collectors" ? " on" : "") + '" data-g="collectors">🏆 Collectors</button>' + games.map(function (g) { return '<button type="button" class="chip' + (rankKey === g.game_key ? " on" : "") + '" data-g="' + esc(g.game_key) + '">' + esc(g.title) + "</button>"; }).join("") + '</div><div id="rkBody"></div></div>';
+      $("rkChips").onclick = function (e) { var b = e.target.closest("[data-g]"); if (b) { rankKey = b.dataset.g; viewRank(p); } };
+      var body = $("rkBody"); body.innerHTML = '<div class="spin"></div>';
+      body.onclick = function (e) { var u = e.target.closest("[data-u]"); if (u) openShowcase(u.dataset.u); };
+      if (rankKey === "collectors") rpc("dh_collectors", { p_limit: 25 }).then(function (rows) { board(body, rows || [], function (r) { return r.owned + " pets · " + r.points + " pts"; }, "Nobody has made their collection public yet. Be the first!"); }).catch(function (er) { body.innerHTML = '<p class="err">' + esc(er.message) + "</p>"; });
+      else rpc("dh_game_leaderboard", { p_game: rankKey, p_limit: 25 }).then(function (d) { var unit = d.game && d.game.unit || ""; board(body, d.rows || [], function (r) { return fmtNum(r.score) + " " + unit; }, "No scores yet. Play the game to claim #1!", d.me); }).catch(function (er) { body.innerHTML = '<p class="err">' + esc(er.message) + "</p>"; });
+    }).catch(function (e) { p.innerHTML = '<div class="pad"><div class="card"><p class="err">' + esc(e.message) + "</p></div></div>"; });
+  }
+  function board(b, rows, label, empty, meRow) {
+    if (!rows.length) { b.innerHTML = '<div class="card center"><p class="muted">' + empty + "</p></div>"; return; }
+    b.innerHTML = (meRow ? '<div class="card"><span class="muted">Your best</span><b class="mebest">#' + meRow.rank + " · " + esc(fmtNum(meRow.score)) + "</b></div>" : "") + '<div class="board">' + rows.map(function (r) {
+      return '<button type="button" class="brow' + (r.is_me ? " me" : "") + (r.rank <= 3 ? " top" + r.rank : "") + '" data-u="' + esc(r.username) + '"><span class="rk">' + (r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "#" + r.rank) + "</span>" + (r.art_path ? pic(r.art_path, "pimg sm") : '<span class="av sm">' + esc(String(r.username || "?").charAt(0).toUpperCase()) + "</span>") + '<span class="nm">@' + esc(r.username) + '</span><span class="sc">' + esc(label(r)) + "</span></button>"; }).join("") + "</div>";
+  }
+  function openShowcase(name) {
+    var m = document.createElement("div"); m.className = "modal"; m.innerHTML = '<div class="card shwrap"><button class="link" type="button" id="shX">Close</button><div id="shBody"><div class="spin"></div></div></div>';
+    document.body.appendChild(m); m.onclick = function (e) { if (e.target === m || e.target.id === "shX") m.remove(); };
+    rpc("dh_public_showcase", { p_username: name }).then(function (d) { $("shBody").innerHTML = showcaseCard(d, false); }).catch(function (e) { $("shBody").innerHTML = '<p class="err">' + esc(e.message) + "</p>"; });
+  }
+
+  /* scores sent by the games (inside the player) */
+  var hinted = false;
+  window.addEventListener("message", function (ev) {
+    var d = ev.data; if (!d || d.dh !== "score" || ev.origin !== location.origin || typeof d.game !== "string" || !(d.score > 0)) return;
+    client().then(refreshMe).then(function () {
+      if (!user) { if (!hinted) { hinted = true; toast("Sign in (Account tab) to save scores and earn credits."); } return; }
+      return db.rpc("dh_submit_score", { p_game: d.game, p_score: d.score }).then(function (r) {
+        if (r.data && r.data.ok && r.data.improved) toast("New best! Rank #" + r.data.rank);
+        return db.rpc("dh_app_play_reward", { p_game: d.game });
+      }).then(function (r) { if (r && r.data && r.data.claimed) toast("+10 credits for playing today!"); });
+    }).catch(function () {});
+  });
+
 loadFlags(); document.addEventListener("visibilitychange", function () { if (!document.hidden) loadFlags(); });
 })();

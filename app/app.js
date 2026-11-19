@@ -1,7 +1,7 @@
 /* DougHub app shell: home screen, game player, languages, installing and automatic updates. */
 (function () {
   "use strict";
-  var VERSION = "2026.11.18.20";
+  var VERSION = "2026.11.18.26";
   var $ = function (id) { return document.getElementById(id); };
   var T = window.DH_T, LANGS = window.DH_LANGS;
   var GAMES = [
@@ -18,16 +18,21 @@
     { id: "bubble-grove", name: "Bubble Grove", tags: ["Puzzle", "Arcade"] },
     { id: "grotto-escape", name: "Grotto Escape", tags: ["Platformer", "Retro"], isNew: 1 },
     { id: "star-salvo", name: "Star Salvo", tags: ["Shooter", "Arcade"], isNew: 1 },
-    { id: "crystal-merge", name: "Crystal Merge", tags: ["Puzzle", "Arcade"], isNew: 1 }
+    { id: "crystal-merge", name: "Crystal Merge", tags: ["Puzzle", "Arcade"], isNew: 1 },
+    { id: "coin-smash", name: "Coin Smash", tags: ["Clicker", "Idle"], isNew: 1 },
+    { id: "lantern-lake", name: "Lantern Lake", tags: ["Idle", "Cozy"], isNew: 1 },
+    { id: "beat-tiles", name: "Beat Tiles", tags: ["Music", "Rhythm"], isNew: 1 },
+    { id: "cave-quest", name: "Cave Quest", tags: ["Adventure", "RPG"], isNew: 1 },
+    { id: "block-town", name: "Block Town", tags: ["Builder", "Cozy"], isNew: 1 }
   ];
   var SECTIONS = [
     { k: "fast", ic: "⚡", col: "#f59e0b", ids: ["getaway-road", "star-salvo", "grotto-escape"], en: "Fast-paced", es: "Acción rápida", fr: "Action rapide", de: "Rasant", pt: "Ação rápida", it: "Azione veloce", ja: "スピード系" },
-    { k: "click", ic: "👆", col: "#22d3ee", ids: ["sparkroot", "honk-empire"], en: "Clicker games", es: "Juegos clicker", fr: "Jeux de clic", de: "Klicker-Spiele", pt: "Jogos clicker", it: "Giochi clicker", ja: "クリッカー" },
-    { k: "idle", ic: "🌙", col: "#a78bfa", ids: ["bundt-bakery", "farm-idle"], en: "Idle & cozy", es: "Idle y relax", fr: "Idle et cosy", de: "Idle & gemütlich", pt: "Idle e aconchegantes", it: "Idle e relax", ja: "放置・まったり" },
+    { k: "click", ic: "👆", col: "#22d3ee", ids: ["coin-smash", "sparkroot", "honk-empire"], en: "Clicker games", es: "Juegos clicker", fr: "Jeux de clic", de: "Klicker-Spiele", pt: "Jogos clicker", it: "Giochi clicker", ja: "クリッカー" },
+    { k: "idle", ic: "🌙", col: "#a78bfa", ids: ["lantern-lake", "bundt-bakery", "farm-idle"], en: "Idle & cozy", es: "Idle y relax", fr: "Idle et cosy", de: "Idle & gemütlich", pt: "Idle e aconchegantes", it: "Idle e relax", ja: "放置・まったり" },
     { k: "puzzle", ic: "🧩", col: "#34d399", ids: ["bubble-grove", "crystal-merge"], en: "Puzzle", es: "Puzles", fr: "Puzzle", de: "Rätsel", pt: "Quebra-cabeças", it: "Rompicapi", ja: "パズル" },
-    { k: "music", ic: "🎵", col: "#f472b6", ids: ["off-brand-beat-battle", "goose-gig"], en: "Music & rhythm", es: "Música y ritmo", fr: "Musique et rythme", de: "Musik & Rhythmus", pt: "Música e ritmo", it: "Musica e ritmo", ja: "音楽・リズム" },
-    { k: "adv", ic: "🗺️", col: "#60a5fa", ids: ["fighting-fantasy", "quiet-woods"], en: "Adventure & RPG", es: "Aventura y rol", fr: "Aventure et RPG", de: "Abenteuer & RPG", pt: "Aventura e RPG", it: "Avventura e GDR", ja: "ぼうけん・RPG" },
-    { k: "build", ic: "🔧", col: "#fb923c", ids: ["fix-it-crew"], en: "Builders", es: "Constructores", fr: "Constructeurs", de: "Bauen", pt: "Construção", it: "Costruzione", ja: "ものづくり" }
+    { k: "music", ic: "🎵", col: "#f472b6", ids: ["beat-tiles", "off-brand-beat-battle", "goose-gig"], en: "Music & rhythm", es: "Música y ritmo", fr: "Musique et rythme", de: "Musik & Rhythmus", pt: "Música e ritmo", it: "Musica e ritmo", ja: "音楽・リズム" },
+    { k: "adv", ic: "🗺️", col: "#60a5fa", ids: ["cave-quest", "fighting-fantasy", "quiet-woods"], en: "Adventure & RPG", es: "Aventura y rol", fr: "Aventure et RPG", de: "Abenteuer & RPG", pt: "Aventura e RPG", it: "Avventura e GDR", ja: "ぼうけん・RPG" },
+    { k: "build", ic: "🔧", col: "#fb923c", ids: ["block-town", "fix-it-crew"], en: "Builders", es: "Constructores", fr: "Constructeurs", de: "Bauen", pt: "Construção", it: "Costruzione", ja: "ものづくり" }
   ];
   var COV = {};                       // which games have translated menus, per language (i18n/coverage.json)
 
