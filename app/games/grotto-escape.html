@@ -96,7 +96,22 @@ function L4(){var l=mk(90);
   l.floor(65,78).put(68,8,"s").put(70,8,"s").put(72,8,"o").put(75,8,"^").put(76,8,"^").row(66,70,6,"g");l.plat(66,70,7);
   l.plat(79,81,7).plat(83,85,6).put(84,5,"g");
   l.floor(86,90).put(88,8,"X");return l}
-var LEVELS=[L1,L2,L3,L4];
+function L5(){var l=mk(80);
+  l.floor(0,10).put(2,8,"P").row(5,8,8,"g");
+  l.lava(10,26);l.plat(11,13,8).put(12,7,"g").plat(15,17,7).plat(19,21,6).put(20,5,"g").plat(23,26,8);
+  l.floor(26,40).put(28,8,"s").put(30,8,"^").put(31,8,"^").put(35,8,"^").put(37,8,"o").row(32,35,7,"g");
+  l.lava(40,52);l.plat(41,43,8).plat(45,47,7).put(46,5,"e").put(46,6,"g").plat(49,52,8);
+  l.floor(52,66).put(54,8,"h").put(58,8,"o").put(60,8,"^").put(62,8,"s").plat(60,64,6).row(60,64,5,"g");
+  l.lava(66,72);l.plat(67,69,8).put(68,7,"g").plat(70,72,7);
+  l.floor(72,80).put(74,8,"^").put(77,8,"X");return l}
+function L6(){var l=mk(100);
+  l.floor(0,8).put(2,8,"P").row(4,7,8,"g");l.lava(8,100);
+  var rr=[8,7,6,7,8,6,7,5];for(var i=0;i<8;i++){var x=9+i*4;l.plat(x,x+2,rr[i]).put(x,rr[i]-1,"g");if(i%3===1)l.put(x+1,rr[i]-3,"e")}
+  l.floor(42,52).put(44,8,"s").put(47,8,"o").put(49,8,"^").put(50,8,"h");
+  for(var j=0;j<6;j++){var x2=53+j*4;l.plat(x2,x2+2,[7,6,5,6,7,6][j]).put(x2+1,[7,6,5,6,7,6][j]-1,"g");if(j===2||j===4)l.put(x2,[7,6,5,6,7,6][j]-3,"e")}
+  l.floor(77,90).put(80,8,"o").put(82,8,"^").put(83,8,"^").put(85,8,"s").put(88,8,"h").plat(82,86,6).row(82,86,5,"g");
+  l.plat(90,92,7).plat(93,95,6);l.floor(96,100).put(98,8,"X");return l}
+var LEVELS=[L1,L2,L3,L4,L5,L6];
 /* ---------- game state ---------- */
 var S,lvl,cam=0,keys={},tickT=0,running=false;
 var EN={s:{r:0,spd:22,hp:1,pts:100},o:{r:1,spd:30,hp:1,pts:200},e:{r:2,spd:0,hp:1,pts:300,fly:1}};
