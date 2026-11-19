@@ -1,7 +1,7 @@
 /* DougHub app shell: home screen, game player, languages, installing and automatic updates. */
 (function () {
   "use strict";
-  var VERSION = "2026.11.18.15";
+  var VERSION = "2026.11.18.20";
   var $ = function (id) { return document.getElementById(id); };
   var T = window.DH_T, LANGS = window.DH_LANGS;
   var GAMES = [
@@ -19,6 +19,15 @@
     { id: "grotto-escape", name: "Grotto Escape", tags: ["Platformer", "Retro"], isNew: 1 },
     { id: "star-salvo", name: "Star Salvo", tags: ["Shooter", "Arcade"], isNew: 1 },
     { id: "crystal-merge", name: "Crystal Merge", tags: ["Puzzle", "Arcade"], isNew: 1 }
+  ];
+  var SECTIONS = [
+    { k: "fast", ic: "⚡", col: "#f59e0b", ids: ["getaway-road", "star-salvo", "grotto-escape"], en: "Fast-paced", es: "Acción rápida", fr: "Action rapide", de: "Rasant", pt: "Ação rápida", it: "Azione veloce", ja: "スピード系" },
+    { k: "click", ic: "👆", col: "#22d3ee", ids: ["sparkroot", "honk-empire"], en: "Clicker games", es: "Juegos clicker", fr: "Jeux de clic", de: "Klicker-Spiele", pt: "Jogos clicker", it: "Giochi clicker", ja: "クリッカー" },
+    { k: "idle", ic: "🌙", col: "#a78bfa", ids: ["bundt-bakery", "farm-idle"], en: "Idle & cozy", es: "Idle y relax", fr: "Idle et cosy", de: "Idle & gemütlich", pt: "Idle e aconchegantes", it: "Idle e relax", ja: "放置・まったり" },
+    { k: "puzzle", ic: "🧩", col: "#34d399", ids: ["bubble-grove", "crystal-merge"], en: "Puzzle", es: "Puzles", fr: "Puzzle", de: "Rätsel", pt: "Quebra-cabeças", it: "Rompicapi", ja: "パズル" },
+    { k: "music", ic: "🎵", col: "#f472b6", ids: ["off-brand-beat-battle", "goose-gig"], en: "Music & rhythm", es: "Música y ritmo", fr: "Musique et rythme", de: "Musik & Rhythmus", pt: "Música e ritmo", it: "Musica e ritmo", ja: "音楽・リズム" },
+    { k: "adv", ic: "🗺️", col: "#60a5fa", ids: ["fighting-fantasy", "quiet-woods"], en: "Adventure & RPG", es: "Aventura y rol", fr: "Aventure et RPG", de: "Abenteuer & RPG", pt: "Aventura e RPG", it: "Avventura e GDR", ja: "ぼうけん・RPG" },
+    { k: "build", ic: "🔧", col: "#fb923c", ids: ["fix-it-crew"], en: "Builders", es: "Constructores", fr: "Constructeurs", de: "Bauen", pt: "Construção", it: "Costruzione", ja: "ものづくり" }
   ];
   var COV = {};                       // which games have translated menus, per language (i18n/coverage.json)
 
@@ -44,7 +53,7 @@
     var tags = g.tags.map(function (x) { return '<span class="tag">' + esc(t("tag." + x)) + "</span>"; }).join("");
     var lt = "";
     if (lang !== "en") { var ok = COV[g.id] && COV[g.id].indexOf(lang) > -1; lt = '<span class="lang-tag' + (ok ? "" : " no") + '">' + esc(ok ? t("tr_full") : t("tr_none")) + "</span>"; }
-    return '<button class="tile" type="button" data-id="' + g.id + '"><div class="art"><img src="art/' + g.id + '.svg" alt="">' + (g.isNew ? '<span class="badge">' + esc(t("newtag")) + "</span>" : "") + '</div><div class="body"><div class="tags">' + tags + "</div><h3>" + esc(g.name) + "</h3>" +
+    return '<button class="tile" type="button" data-id="' + g.id + '"><div class="art"><img class="bg" src="art/' + g.id + '.svg" alt="" aria-hidden="true"><img class="fg" src="art/' + g.id + '.svg" alt="">' + (g.isNew ? '<span class="badge">' + esc(t("newtag")) + "</span>" : "") + '</div><div class="body"><div class="tags">' + tags + "</div><h3>" + esc(g.name) + "</h3>" +
       (g.by ? '<div class="by">' + esc(t("madeby")) + " " + esc(g.by) + "</div>" : "") + "<p>" + esc(t("blurb." + g.id)) + '</p><div class="foot">' + lt + '<span class="go">' + esc(t("play")) + "</span></div></div></button>";
   }
   function renderGrid() {
@@ -53,7 +62,16 @@
     var list = GAMES.filter(function (g) { return filter === "all" || (filter === "new" ? g.isNew : g.tags.indexOf(filter) > -1); });
     var f = filter === "all" ? (GAMES.filter(function (g) { return g.id === "bundt-bakery"; })[0] || GAMES[0]) : null, h = "";
     if (f) h += '<section class="feat" data-id="' + f.id + '" role="button" tabindex="0"><div class="feat-art"><img src="art/' + f.id + '.svg" alt=""></div><div class="feat-b"><span class="eyebrow">' + esc(w("feat")) + "</span><h2>" + esc(f.name) + "</h2><p>" + esc(t("blurb." + f.id)) + '</p><span class="btn pri">' + esc(t("play")) + " &rarr;</span></div></section>";
-    h += '<div class="sect"><h2>' + esc(w("games")) + ' <span class="count">' + list.length + '</span></h2></div><div class="chips" role="tablist">' + chips + '</div><div class="cards">' + list.map(tileHtml).join("") + "</div>";
+    h += '<div class="sect"><h2>' + esc(w("games")) + ' <span class="count">' + list.length + '</span></h2></div><div class="chips" role="tablist">' + chips + "</div>";
+    if (filter === "all") {
+      var used = {};
+      SECTIONS.forEach(function (sec) {
+        var gs = sec.ids.map(function (id) { used[id] = 1; return GAMES.filter(function (g) { return g.id === id; })[0]; }).filter(Boolean);
+        if (gs.length) h += '<section class="rail" style="--c:' + sec.col + '"><div class="sect sec"><h2><span class="sico">' + sec.ic + "</span>" + esc(sec[lang] || sec.en) + ' <span class="count">' + gs.length + '</span></h2></div><div class="cards">' + gs.map(tileHtml).join("") + "</div></section>";
+      });
+      var rest = GAMES.filter(function (g) { return !used[g.id]; });
+      if (rest.length) h += '<div class="sect sec"><h2>' + esc(w("games")) + ' <span class="count">' + rest.length + '</span></h2></div><div class="cards">' + rest.map(tileHtml).join("") + "</div>";
+    } else h += '<div class="cards">' + list.map(tileHtml).join("") + "</div>";
     $("grid").className = ""; $("grid").innerHTML = h;
   }
   function renderLangs() {
