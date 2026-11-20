@@ -1,7 +1,7 @@
 /* DougHub app shell: home screen, game player, languages, installing and automatic updates. */
 (function () {
   "use strict";
-  var VERSION = "2026.11.19.41";
+  var VERSION = "2026.11.19.44";
   var $ = function (id) { return document.getElementById(id); };
   var T = window.DH_T, LANGS = window.DH_LANGS;
   var GAMES = [
@@ -50,34 +50,47 @@
   /* ---------- home ---------- */
   var WORDS = { all: { en: "All", es: "Todos", fr: "Tous", de: "Alle", pt: "Todos", it: "Tutti", ja: "すべて" },
     feat: { en: "Featured", es: "Destacado", fr: "À la une", de: "Empfohlen", pt: "Destaque", it: "In evidenza", ja: "おすすめ" },
+    search: { en: "Search games", es: "Buscar juegos", fr: "Rechercher des jeux", de: "Spiele suchen", pt: "Buscar jogos", it: "Cerca giochi", ja: "ゲームをさがす" },
+    cont: { en: "Continue playing", es: "Seguir jugando", fr: "Reprendre", de: "Weiterspielen", pt: "Continuar jogando", it: "Continua a giocare", ja: "つづきから" },
+    none: { en: "No games found.", es: "No se encontraron juegos.", fr: "Aucun jeu trouvé.", de: "Keine Spiele gefunden.", pt: "Nenhum jogo encontrado.", it: "Nessun gioco trovato.", ja: "ゲームがみつかりません。" },
     games: { en: "Games", es: "Juegos", fr: "Jeux", de: "Spiele", pt: "Jogos", it: "Giochi", ja: "ゲーム" } };
   function w(k) { return WORDS[k][lang] || WORDS[k].en; }
-  var filter = "all";
+  var filter = "all", query = "";
   function cats() { var o = []; GAMES.forEach(function (g) { g.tags.forEach(function (x) { if (o.indexOf(x) < 0) o.push(x); }); }); return o; }
-  function tileHtml(g) {
-    var tags = g.tags.map(function (x) { return '<span class="tag">' + esc(t("tag." + x)) + "</span>"; }).join("");
-    var lt = "";
-    if (lang !== "en") { var ok = COV[g.id] && COV[g.id].indexOf(lang) > -1; lt = '<span class="lang-tag' + (ok ? "" : " no") + '">' + esc(ok ? t("tr_full") : t("tr_none")) + "</span>"; }
-    return '<button class="tile" type="button" data-id="' + g.id + '"><div class="art"><img class="bg" src="art/' + g.id + '.svg" alt="" aria-hidden="true"><img class="fg" src="art/' + g.id + '.svg" alt="">' + (g.isNew ? '<span class="badge">' + esc(t("newtag")) + "</span>" : "") + '</div><div class="body"><div class="tags">' + tags + "</div><h3>" + esc(g.name) + "</h3>" +
-      (g.by ? '<div class="by">' + esc(t("madeby")) + " " + esc(g.by) + "</div>" : "") + "<p>" + esc(t("blurb." + g.id)) + '</p><div class="foot">' + lt + '<span class="go">' + esc(t("play")) + "</span></div></div></button>";
+  function G(id) { return GAMES.filter(function (g) { return g.id === id; })[0]; }
+  function recents() { try { return JSON.parse(localStorage.getItem("dh-recent") || "[]").filter(G); } catch (e) { return []; } }
+  function pushRecent(id) { var r = recents().filter(function (x) { return x !== id; }); r.unshift(id); try { localStorage.setItem("dh-recent", JSON.stringify(r.slice(0, 8))); } catch (e) {} }
+  function secOf(id) { for (var i = 0; i < SECTIONS.length; i++) if (SECTIONS[i].ids.indexOf(id) > -1) return SECTIONS[i]; return null; }
+  function tagLine(g) { return g.tags.map(function (x) { return t("tag." + x); }).join(" · "); }
+  function rowHtml(g) {
+    var sec = secOf(g.id);
+    return '<button class="row" type="button" data-id="' + g.id + '" style="--c:' + (sec ? sec.col : "#818cf8") + '"><span class="rart"><img src="art/' + g.id + '.svg" alt="">' + (g.isNew ? '<i class="nb">' + esc(t("newtag")) + "</i>" : "") + '</span><span class="rbody"><b>' + esc(g.name) + "</b><small>" + esc(tagLine(g)) + (g.by ? " · " + esc(t("madeby")) + " " + esc(g.by) : "") + '</small><span class="rp">' + esc(t("blurb." + g.id)) + '</span></span><span class="rgo" aria-hidden="true"></span></button>';
   }
-  function renderGrid() {
-    var chips = '<button type="button" class="chip' + (filter === "all" ? " on" : "") + '" data-f="all">' + esc(w("all")) + '</button><button type="button" class="chip' + (filter === "new" ? " on" : "") + '" data-f="new">' + esc(t("newtag")) + "</button>" +
-      cats().map(function (c) { return '<button type="button" class="chip' + (filter === c ? " on" : "") + '" data-f="' + c + '">' + esc(t("tag." + c)) + "</button>"; }).join("");
-    var list = GAMES.filter(function (g) { return filter === "all" || (filter === "new" ? g.isNew : g.tags.indexOf(filter) > -1); });
-    var f = filter === "all" ? (GAMES.filter(function (g) { return g.id === "bundt-bakery"; })[0] || GAMES[0]) : null, h = "";
-    if (f) h += '<section class="feat" data-id="' + f.id + '" role="button" tabindex="0"><div class="feat-art"><img src="art/' + f.id + '.svg" alt=""></div><div class="feat-b"><span class="eyebrow">' + esc(w("feat")) + "</span><h2>" + esc(f.name) + "</h2><p>" + esc(t("blurb." + f.id)) + '</p><span class="btn pri">' + esc(t("play")) + " &rarr;</span></div></section>";
-    h += '<div class="sect"><h2>' + esc(w("games")) + ' <span class="count">' + list.length + '</span></h2></div><div class="chips" role="tablist">' + chips + "</div>";
-    if (filter === "all") {
+  function matches(g, q) { return (g.name + " " + tagLine(g) + " " + t("blurb." + g.id)).toLowerCase().indexOf(q) > -1; }
+  function renderResults() {
+    var q = query.trim().toLowerCase(), h = "";
+    if (q) { var res = GAMES.filter(function (g) { return matches(g, q); }); h = res.length ? '<div class="list">' + res.map(rowHtml).join("") + "</div>" : '<p class="empty">' + esc(w("none")) + "</p>"; }
+    else {
       var used = {};
       SECTIONS.forEach(function (sec) {
-        var gs = sec.ids.map(function (id) { used[id] = 1; return GAMES.filter(function (g) { return g.id === id; })[0]; }).filter(Boolean);
-        if (gs.length) h += '<section class="rail" style="--c:' + sec.col + '"><div class="sect sec"><h2><span class="sico">' + sec.ic + "</span>" + esc(sec[lang] || sec.en) + ' <span class="count">' + gs.length + '</span></h2></div><div class="cards">' + gs.map(tileHtml).join("") + "</div></section>";
+        var gs = sec.ids.map(function (id) { used[id] = 1; return G(id); }).filter(Boolean);
+        if (!gs.length || (filter !== "all" && filter !== sec.k)) return;
+        h += '<section class="grp" style="--c:' + sec.col + '"><h2><i></i>' + esc(sec[lang] || sec.en) + ' <span class="count">' + gs.length + '</span></h2><div class="list">' + gs.map(rowHtml).join("") + "</div></section>";
       });
       var rest = GAMES.filter(function (g) { return !used[g.id]; });
-      if (rest.length) h += '<div class="sect sec"><h2>' + esc(w("games")) + ' <span class="count">' + rest.length + '</span></h2></div><div class="cards">' + rest.map(tileHtml).join("") + "</div>";
-    } else h += '<div class="cards">' + list.map(tileHtml).join("") + "</div>";
-    $("grid").className = ""; $("grid").innerHTML = h;
+      if (rest.length && filter === "all") h += '<section class="grp"><h2><i></i>' + esc(w("games")) + ' <span class="count">' + rest.length + '</span></h2><div class="list">' + rest.map(rowHtml).join("") + "</div></section>";
+    }
+    $("results").innerHTML = h; $("grid").classList.toggle("flat", !!q || filter !== "all");
+  }
+  function renderGrid() {
+    var h = "", rc = recents(), f = G("bundt-bakery") || GAMES[0], nw = GAMES.filter(function (g) { return g.isNew && g.id !== f.id; }).slice(-2);
+    if (rc.length) h += '<section class="recent"><h3>' + esc(w("cont")) + '</h3><div class="rrow">' + rc.slice(0, 6).map(function (id) { var g = G(id); return '<button class="mini" type="button" data-id="' + id + '"><img src="art/' + id + '.svg" alt=""><b>' + esc(g.name) + "</b></button>"; }).join("") + "</div></section>";
+    h += '<div class="spot"><section class="feat" data-id="' + f.id + '" role="button" tabindex="0"><div class="feat-art"><img src="art/' + f.id + '.svg" alt=""></div><div class="feat-b"><span class="eyebrow">' + esc(w("feat")) + "</span><h2>" + esc(f.name) + "</h2><p>" + esc(t("blurb." + f.id)) + '</p><span class="btn pri">' + esc(t("play")) + ' &rarr;</span></div></section><div class="spot-side">' +
+      nw.map(function (g) { var sec = secOf(g.id); return '<button class="mini big" type="button" data-id="' + g.id + '" style="--c:' + (sec ? sec.col : "#818cf8") + '"><img src="art/' + g.id + '.svg" alt=""><span><small>' + esc(t("newtag")) + "</small><b>" + esc(g.name) + "</b></span></button>"; }).join("") + "</div></div>";
+    h += '<div class="bar2"><div class="tabs2" role="tablist"><button type="button" class="tab2' + (filter === "all" ? " on" : "") + '" data-f="all">' + esc(w("all")) + "</button>" + SECTIONS.map(function (s) { return '<button type="button" class="tab2' + (filter === s.k ? " on" : "") + '" data-f="' + s.k + '" style="--c:' + s.col + '">' + esc(s[lang] || s.en) + "</button>"; }).join("") +
+      '</div><input id="q" class="search" type="text" name="dh_find_game" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-bwignore="true" data-form-type="other" placeholder="' + esc(w("search")) + '" value="' + esc(query) + '"></div><div id="results"></div>';
+    $("grid").className = ""; $("grid").innerHTML = h; renderResults();
+    $("q").addEventListener("input", function () { query = this.value; renderResults(); });
   }
   function renderLangs() {
     $("langList").innerHTML = LANGS.map(function (l) { return '<button class="lang' + (l[0] === lang ? " on" : "") + '" type="button" data-l="' + l[0] + '">' + esc(l[1]) + "</button>"; }).join("");
@@ -105,7 +118,7 @@
   }
   function openGame(id, fromPop) {
     var g = GAMES.filter(function (x) { return x.id === id; })[0]; if (!g) return;
-    playing = id; $("pTitle").textContent = g.name; $("pLoad").classList.remove("done");
+    pushRecent(id); playing = id; $("pTitle").textContent = g.name; $("pLoad").classList.remove("done");
     mountFrame("games/" + id + ".html"); $("player").hidden = false; document.body.style.overflow = "hidden";
     if (!fromPop) { try { history.pushState({ play: id }, "", "#play-" + id); } catch (e) {} }
   }
@@ -115,7 +128,7 @@
     if (!fromPop && history.state && history.state.play) { try { history.back(); } catch (e) {} }
     maybeApply();
   }
-  $("grid").addEventListener("click", function (e) { var c = e.target.closest(".chip"); if (c) { filter = c.dataset.f; renderGrid(); return; } var b = e.target.closest(".tile,.feat"); if (b) openGame(b.dataset.id); });
+  $("grid").addEventListener("click", function (e) { var c = e.target.closest(".tab2"); if (c) { filter = c.dataset.f; query = ""; renderGrid(); window.scrollTo(0, 0); return; } var b = e.target.closest(".row,.feat,.mini"); if (b) openGame(b.dataset.id); });
   $("grid").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("feat")) { e.preventDefault(); openGame(e.target.dataset.id); } });
   $("pBack").addEventListener("click", function () { closeGame(false); });
   window.addEventListener("popstate", function (e) { var s = e.state; if (s && s.play) openGame(s.play, true); else closeGame(true); });
