@@ -271,6 +271,19 @@
   /* start: if there is a saved session, learn who is signed in so the Mod tab can appear */
   renderTabs();
   try { if (Object.keys(localStorage).some(function (k) { return /^sb-.*-auth-token$/.test(k); })) client().then(refreshMe).then(renderTabs).catch(function () {}); } catch (e) {}
+  /* once a week, the app records this device's IP address for the owner (see the Terms, section 7) */
+  (function logVisitWeekly() {
+    var WEEK = 7 * 24 * 60 * 60 * 1000, last = 0;
+    try { last = +localStorage.getItem("dh-ip-logged") || 0; } catch (e) {}
+    if (Date.now() - last < WEEK || !navigator.onLine) return;
+    var token = "";
+    try { Object.keys(localStorage).forEach(function (k) { if (/^sb-.*-auth-token$/.test(k)) { var j = JSON.parse(localStorage.getItem(k) || "null"); if (j && j.access_token) token = j.access_token; } }); } catch (e) {}
+    var h = { "Content-Type": "application/json", apikey: KEY };
+    if (token) h.Authorization = "Bearer " + token;
+    fetch(URL_ + "/functions/v1/log-visit", { method: "POST", headers: h, body: JSON.stringify({ source: "app" }) })
+      .then(function (r) { if (r.ok) { try { localStorage.setItem("dh-ip-logged", String(Date.now())); } catch (e) {} } })
+      .catch(function () {});
+  })();
   /* ---------- shop, collection and leaderboards (same economy as doughub.online) ---------- */
   var RAR = { common: "#9aa3c4", uncommon: "#4ade80", rare: "#60a5fa", epic: "#c084fc", legendary: "#fbbf24" };
   var PRICE = { common: 40, uncommon: 60, rare: 90, epic: 130, legendary: 180 };
