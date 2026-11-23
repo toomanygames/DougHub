@@ -20,7 +20,7 @@ if(s&&s.user&&s.refresh_token)location.replace("dashboard.html");}catch(e){}})()
 <link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
-<script src="nav.js?v=20261123-applook" defer></script>
+<script src="nav.js?v=20261123-nine" defer></script>
 <script src="side-conversations.js?v=20261024-view-slider" defer></script>
 <script src="search-autofill-fix.js?v=3" defer></script>
 <style>
@@ -73,24 +73,16 @@ footer{text-align:center;color:var(--mute);font-size:14px;padding:30px 16px}foot
     <div class="members"><strong id="userCount">—</strong> members <span id="heroNote"></span></div>
   </section>
 
-  <div class="section-title">START HERE</div>
+  <div class="section-title">EXPLORE</div>
   <div class="grid">
-    <a class="card tile a1" href="douggames.html"><div class="art">🎮</div><div class="txt"><h3>Games</h3><p>Play games made by the community</p></div></a>
+    <a class="card tile a1" href="douggames.html"><div class="art">🎮</div><div class="txt"><h3>Games</h3><p>Play community games</p></div></a>
     <a class="card tile a2" href="chat.html"><div class="art">💬</div><div class="txt"><h3>Chat</h3><p>Talk with everyone, in the app too</p></div></a>
-    <a class="card tile a3" href="Scripting/scripting.html"><div class="art">{ }</div><div class="txt"><h3>DougCode</h3><p>Build a project or make a game</p></div></a>
-    <a class="card tile a4" href="dougforum.html"><div class="art">📣</div><div class="txt"><h3>Forum</h3><p>Share work, ask questions, discuss</p></div></a>
-    <a class="card tile a5" href="leaderboards.html"><div class="art">🏆</div><div class="txt"><h3>Leaderboards</h3><p>See who is on top in every game</p></div></a>
-    <a class="card tile a6" href="nova.html"><div class="art">✨</div><div class="txt"><h3>Nova AI</h3><p>Your helper for ideas and code</p></div></a>
-  </div>
-
-  <div class="section-title">MORE</div>
-  <div class="grid">
+    <a class="card tile a4" href="chat-calls.html"><div class="art">📞</div><div class="txt"><h3>Calls</h3><p>Voice and video with friends</p></div></a>
     <a class="card tile a3" href="DougTube.html"><div class="art">▶️</div><div class="txt"><h3>DougTube</h3><p>Watch and share videos</p></div></a>
-    <a class="card tile a2" href="douqhub-music.html"><div class="art">🎵</div><div class="txt"><h3>Music</h3><p>Albums and tracks from DougHub</p></div></a>
-    <a class="card tile a4" href="dougdrive.html"><div class="art">☁️</div><div class="txt"><h3>DougDrive</h3><p>Store and share your files</p></div></a>
-    <a class="card tile a1" href="dougbase.html"><div class="art">🗄️</div><div class="txt"><h3>DougBase</h3><p>Databases for your projects</p></div></a>
-    <a class="card tile a5" href="DMail.html"><div class="art">✉️</div><div class="txt"><h3>DMail</h3><p>Mail for your DougHub account</p></div></a>
-    <a class="card tile a6" href="Classes/classrooms.html"><div class="art">🏫</div><div class="txt"><h3>Classrooms</h3><p>Learn and play with your class</p></div></a>
+    <a class="card tile a5" href="douqhub-music.html"><div class="art">🎵</div><div class="txt"><h3>Music</h3><p>Albums and tracks</p></div></a>
+    <a class="card tile a6" href="DMail.html"><div class="art">✉️</div><div class="txt"><h3>DMail</h3><p>Private mail for your account</p></div></a>
+    <a class="card tile a3" href="Scripting/scripting.html"><div class="art">💻</div><div class="txt"><h3>DougCode</h3><p>Build a project or make a game</p></div></a>
+    <a class="card tile a4" href="dougforum.html"><div class="art">📣</div><div class="txt"><h3>Forum</h3><p>Share work, ask, discuss</p></div></a>
   </div>
 
   <section class="card appcard" aria-label="DougHub app">
@@ -105,7 +97,7 @@ footer{text-align:center;color:var(--mute);font-size:14px;padding:30px 16px}foot
     <div class="row"><button class="button button-primary" id="feedbackButton" type="button">Send feedback ↗</button><small id="feedbackCount">0 / 2000</small><small id="feedbackStatus" role="status"></small></div>
   </section>
 </main>
-<footer><a href="about.html">About</a><a href="tos.html">Terms</a><a href="report.html">Report a problem</a></footer>
+<footer><a href="tos.html">Terms</a><a href="report.html">Report a problem</a></footer>
 
 <script>
 (function(){

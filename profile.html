@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
 <script src="auth-guard.js" data-require-auth="true"></script>
-<script src="nav.js?v=20261105-searchguard" defer></script>
+<script src="nav.js?v=20261123-nine" defer></script>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4;--accent:#818cf8;--gold:#ffd23f;
@@ -87,7 +87,6 @@ h2{margin:30px 0 6px;font-size:18px}
   <div class="top">
     <a href="douggames.html">&larr; Games</a>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a href="leaderboards.html">Leaderboards</a>
       <a href="Games/shop.html#seasonal">Seasonal shop</a>
     </div>
   </div>
@@ -164,7 +163,7 @@ function render() {
 
   h += '<h2>Leaderboard ranks</h2>';
   if (!(d.scores || []).length) h += '<p class="hint">No scores yet. Play a game with a leaderboard to get on the board.</p>';
-  else h += '<div class="rows">' + d.scores.map(s => '<a class="row" href="leaderboards.html#' + esc(s.game_key) + '"><span>' + esc(s.title) + '</span><span><span class="rk">#' + esc(s.rank) + '</span> &nbsp; ' + fmt(s.score) + ' <small style="color:#9ba4c4">' + esc(s.unit || "") + '</small></span></a>').join("") + '</div>';
+  else h += '<div class="rows">' + d.scores.map(s => '<div class="row"><span>' + esc(s.title) + '</span><span><span class="rk">#' + esc(s.rank) + '</span> &nbsp; ' + fmt(s.score) + ' <small style="color:#9ba4c4">' + esc(s.unit || "") + '</small></span></div>').join("") + '</div>';
   v.innerHTML = h;
 
   const copy = $("copyLink");

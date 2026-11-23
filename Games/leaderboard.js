@@ -119,7 +119,6 @@
         h += '<a href="../profile.html?u=' + encodeURIComponent(r.username) + '" style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:6px;border-radius:12px;text-decoration:none;color:inherit;background:' + (r.is_me ? "#4f46e544" : "#ffffff08") + '"><b style="width:26px;color:#ffd23f">#' + r.rank + '</b>' + art + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(r.username) + '</span><b>' + fmt(r.score) + '</b></a>';
       });
       if (d.me && !rows.some(function (r) { return r.is_me; })) h += '<div style="margin-top:8px;padding:8px 10px;border-radius:12px;background:#4f46e544">You: <b>#' + d.me.rank + '</b> &middot; ' + fmt(d.me.score) + '</div>';
-      h += '<a href="../leaderboards.html#' + esc(game) + '" style="display:block;margin-top:10px;text-align:center;color:#a5b4fc;font-size:13px">See all leaderboards</a>';
       body.innerHTML = h;
     }).catch(function (e) { body.textContent = "Could not load the leaderboard."; });
   }

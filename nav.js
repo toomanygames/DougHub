@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-applook", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-nine", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
@@ -75,9 +75,8 @@
     "douggames.html":"games","games/ocean-drive.html":"games","games/drive-pig.html":"games",
     "games/pig-clicker.html":"games","games/pig-clicker-space.html":"games","games/puzzle.html":"games",
     "games/racing.html":"games","games/rebirth-clicker.html":"games","games/honk-empire.html":"games","games/sparkroot.html":"games","games/farm-idle.html":"games","games/goose-gig.html":"games","games/bundt-bakery.html":"games","games/fix-it-crew.html":"games","games/off-brand-beat-battle.html":"games","games/shadows-of-ashmere.html":"games","games/dougworld.html":"games","games/smack-n-punch.html":"games",
-    "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","nova.html":"nova",
+    "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail",
     "chat.html":"chat","game-creator.html":"community_games","my-games.html":"community_games",
-    "dougbase.html":"dougbase","dougbase/index.html":"dougbase","dougbase/login.html":"dougbase",
     "dougcode.html":"dougcode","scripting/scripting.html":"scripting"
   };
   const labels = {
@@ -189,7 +188,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "nova.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
@@ -239,7 +238,7 @@
     if (!account) {
       account = document.createElement("div");
       account.className = "account-area";
-      account.innerHTML = '<button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false"><div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Loading…</span></button><div id="accountMenu" class="account-menu" aria-hidden="true"><a href="/dashboard.html">Dashboard</a><a href="/my-games.html">My Games &amp; Videos</a><a href="/profile.html">My Showcase</a><a href="/leaderboards.html">Leaderboards</a><a href="/admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="/inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><a href="/settings.html">Settings</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>';
+      account.innerHTML = '<button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false"><div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Loading…</span></button><div id="accountMenu" class="account-menu" aria-hidden="true"><a href="/dashboard.html">Dashboard</a><a href="/my-games.html">My Games &amp; Videos</a><a href="/profile.html">My Showcase</a><a href="/admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="/inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><a href="/settings.html">Settings</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>';
     }
     account.classList.add("dh-shared-account");
 
@@ -275,8 +274,13 @@
     const links = [
       ["/dashboard.html","Home"],
       ["/douggames.html","Games"],
-      ["/Scripting/scripting.html","Create"],
-      ["/chat.html","Chat"]
+      ["/chat.html","Chat"],
+      ["/chat-calls.html","Call"],
+      ["/DougTube.html","DougTube"],
+      ["/douqhub-music.html","Music"],
+      ["/DMail.html","DMail"],
+      ["/Scripting/scripting.html","DougCode"],
+      ["/dougforum.html","Forum"]
     ];
     nav.replaceChildren();
     links.forEach(([href,label]) => {
@@ -596,7 +600,7 @@
     if (pathKey() === "nova.html") return;
     document.querySelectorAll("header .nav > a[href], header nav > a[href], nav[aria-label='Main navigation'] > a[href]").forEach(a => {
       const href = (a.getAttribute("href") || "").split(/[?#]/)[0].replace(/^\.\//, "").toLowerCase();
-      if (href === "dmail.html") a.remove();
+      /* DMail is part of the main navigation again */
     });
   }
   function markActiveLinks() {
@@ -865,13 +869,11 @@
       ["Settings","/settings.html","Account preferences and site settings","Your space","⚙","settings preferences account"],
       ["Games","/douggames.html","Browse games and find Game Maker","Play & create","🎮","games play"],
       
-      ["Nova AI","/nova.html","Ask questions and explore ideas","Tools","✧","ai assistant questions"],
       ["DougCode / Game Maker","/Scripting/scripting.html","Build projects or make a game","Create","⌘","code coding editor project game maker"],
       ["Community Chat","/chat.html","Talk with the DougHub community","Community","◌","chat messages conversation"],
       ["DougForum","/dougforum.html","Browse discussions and ask questions","Community","☷","forum discussions posts"],
       ["DougHub Music","/douqhub-music.html","Listen to community music","Entertainment","♫","music songs albums audio"],
       ["DougTube","/DougTube.html","Watch and share videos","Entertainment","▶","youtube video watch"],
-      ["DougDrive","/dougdrive.html","Open your DougDrive files","Your space","▤","drive files storage"],
       ["My Games & Videos","/my-games.html","Find your saved creations","Your space","▣","uploads creations videos"],
       ["DMail","/DMail.html","Open direct messages","Community","✉","mail messages"],
       ["Help / Guided tour","#tour","Walk through the controls on this page","Help","❔","tutorial guide help how to"]
