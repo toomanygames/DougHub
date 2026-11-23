@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-nine", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-ten", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
@@ -272,13 +272,10 @@
     ensureAccountMenuLink("reportLink", "/report.html", "Report a problem").style.display = "";
 
     const links = [
-      ["/dashboard.html","Home"],
       ["/douggames.html","Games"],
       ["/chat.html","Chat"],
-      ["/chat-calls.html","Call"],
       ["/DougTube.html","DougTube"],
       ["/douqhub-music.html","Music"],
-      ["/DMail.html","DMail"],
       ["/Scripting/scripting.html","DougCode"],
       ["/dougforum.html","Forum"]
     ];
@@ -602,6 +599,21 @@
       const href = (a.getAttribute("href") || "").split(/[?#]/)[0].replace(/^\.\//, "").toLowerCase();
       /* DMail is part of the main navigation again */
     });
+  }
+  /* Chat, Calls and DMail are one "Messages" space: a small tab strip joins them so the main bar stays short. */
+  function addMessageTabs() {
+    const p = pathKey();
+    const tabs = [["chat.html", "/chat.html", "Chat"], ["chat-calls.html", "/chat-calls.html", "Calls"], ["dmail.html", "/DMail.html", "DMail"]];
+    if (!tabs.some(x => x[0] === p) || document.getElementById("dhMsgTabs")) return;
+    const bar = document.createElement("div");
+    bar.id = "dhMsgTabs"; bar.className = "dh-msgtabs"; bar.setAttribute("aria-label", "Messages");
+    tabs.forEach(([key, href, label]) => {
+      const a = document.createElement("a"); a.href = href; a.textContent = label;
+      if (key === p) a.className = "on";
+      bar.appendChild(a);
+    });
+    const header = document.querySelector("header");
+    if (header) header.insertAdjacentElement("afterend", bar);
   }
   function markActiveLinks() {
     const current = pathKey();
@@ -937,6 +949,7 @@
 installQuickFind();
     startChatNotificationWatcher();
     removeRetiredNavLinks();
+    addMessageTabs();
     markActiveLinks();
     // Feature flags are optional; never let a missing flag loader break the header.\n    if (typeof loadFlags === "function" && typeof applyFlags === "function") loadFlags().then(applyFlags).catch(() => {});
     installPageScheduleButtonGuards();

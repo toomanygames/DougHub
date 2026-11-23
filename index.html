@@ -20,7 +20,7 @@ if(s&&s.user&&s.refresh_token)location.replace("dashboard.html");}catch(e){}})()
 <link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
-<script src="nav.js?v=20261123-nine" defer></script>
+<script src="nav.js?v=20261123-ten" defer></script>
 <script src="side-conversations.js?v=20261024-view-slider" defer></script>
 <script src="search-autofill-fix.js?v=3" defer></script>
 <style>
@@ -50,11 +50,14 @@ main{width:min(1180px,calc(100% - 32px));margin:auto;padding-bottom:60px}
 .a1 .art{background:radial-gradient(circle at 30% 20%,#5b5bf0,#1b1f55)}.a2 .art{background:radial-gradient(circle at 30% 20%,#b45ff0,#34175a)}
 .a3 .art{background:radial-gradient(circle at 30% 20%,#2ec4d8,#0f3a52)}.a4 .art{background:radial-gradient(circle at 30% 20%,#34d399,#0d3a31)}
 .a5 .art{background:radial-gradient(circle at 30% 20%,#f59e0b,#4a2a08)}.a6 .art{background:radial-gradient(circle at 30% 20%,#f472b6,#4a1537)}
-.appcard{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 26px;margin-top:22px;background:linear-gradient(120deg,#6366f133,#a855f733)!important}
+.dlcard-unused{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 26px;margin-top:22px;background:linear-gradient(120deg,#6366f133,#a855f733)!important}
 .appcard h2{margin:0;font-size:22px}.appcard p{margin:4px 0 0;color:var(--mute)}.appcard .grow{flex:1;min-width:220px}
 .feedback{padding:22px 26px;margin-top:30px}.feedback h2{margin:0 0 4px}.feedback textarea{width:100%;min-height:90px;padding:12px 14px;margin-top:10px;resize:vertical}
 .feedback .row{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}.feedback small{color:var(--mute)}
 footer{text-align:center;color:var(--mute);font-size:14px;padding:30px 16px}footer a{margin:0 8px;text-decoration:underline}
+.dlcard{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:34px;padding:26px 30px;border-radius:28px;background:linear-gradient(120deg,#6366f140,#a855f740);border:1px solid #6366f180}
+.dlcard h2{margin:0;font-size:24px}.dlcard p{margin:5px 0 0;color:var(--mute);max-width:560px}.dlcard .grow{flex:1;min-width:240px}
+.hero-actions{align-items:center;gap:16px!important}
 </style>
 </head>
 <body>
@@ -64,30 +67,34 @@ footer{text-align:center;color:var(--mute);font-size:14px;padding:30px 16px}foot
 
   <section class="hero" aria-labelledby="heroTitle">
     <h1 id="heroTitle"><span class="gradient-text">Play. Create. Share.</span></h1>
-    <p>Games, chat, a shop full of characters, and tools to build your own projects. All in one place.</p>
+    <p>Games, chat, videos, music and tools to build your own things. One account, one place.</p>
     <div class="hero-actions">
-      <a class="button button-primary" id="primaryCta" href="log-in.html?redirect=dashboard.html">Get started ↗</a>
-      <a class="button" href="douggames.html">Browse games</a>
-      <a class="button" href="app/">Open the DougHub app</a>
+      <a class="btn-dl" href="download.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Download the app</a>
+      <a class="btn-line" href="douggames.html">Browse games</a>
+      <a class="btn-text" id="primaryCta" href="log-in.html?redirect=dashboard.html">Log in</a>
     </div>
-    <div class="members"><strong id="userCount">—</strong> members <span id="heroNote"></span></div>
+    <div class="members"><strong id="userCount">&mdash;</strong> members <span id="heroNote"></span></div>
   </section>
 
-  <div class="section-title">EXPLORE</div>
-  <div class="grid">
-    <a class="card tile a1" href="douggames.html"><div class="art">🎮</div><div class="txt"><h3>Games</h3><p>Play community games</p></div></a>
-    <a class="card tile a2" href="chat.html"><div class="art">💬</div><div class="txt"><h3>Chat</h3><p>Talk with everyone, in the app too</p></div></a>
-    <a class="card tile a4" href="chat-calls.html"><div class="art">📞</div><div class="txt"><h3>Calls</h3><p>Voice and video with friends</p></div></a>
-    <a class="card tile a3" href="DougTube.html"><div class="art">▶️</div><div class="txt"><h3>DougTube</h3><p>Watch and share videos</p></div></a>
-    <a class="card tile a5" href="douqhub-music.html"><div class="art">🎵</div><div class="txt"><h3>Music</h3><p>Albums and tracks</p></div></a>
-    <a class="card tile a6" href="DMail.html"><div class="art">✉️</div><div class="txt"><h3>DMail</h3><p>Private mail for your account</p></div></a>
-    <a class="card tile a3" href="Scripting/scripting.html"><div class="art">💻</div><div class="txt"><h3>DougCode</h3><p>Build a project or make a game</p></div></a>
-    <a class="card tile a4" href="dougforum.html"><div class="art">📣</div><div class="txt"><h3>Forum</h3><p>Share work, ask, discuss</p></div></a>
+  <div class="dh-title">PLAY AND TALK</div>
+  <div class="sp-grid">
+    <a class="sp big" href="douggames.html"><img src="assets/art/games.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>Games</h3><p>Play games made by the community, or make your own.</p><span class="go">Play now →</span></div></a>
+    <a class="sp big" href="chat.html"><img src="assets/art/chat.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>Chat</h3><p>Talk with everyone. The same chat works in the app.</p><span class="go">Open chat →</span></div></a>
+    <a class="sp mid" href="DougTube.html"><img src="assets/art/tube.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>DougTube</h3><p>Watch and share videos.</p><span class="go">Watch →</span></div></a>
+    <a class="sp mid" href="douqhub-music.html"><img src="assets/art/music.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>Music</h3><p>Albums and tracks made on DougHub.</p><span class="go">Listen →</span></div></a>
+    <a class="sp mid" href="Scripting/scripting.html"><img src="assets/art/code.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>DougCode</h3><p>Build a project or make a game.</p><span class="go">Start creating →</span></div></a>
+  </div>
+  <div class="dh-title">MORE TO DO</div>
+  <div class="sp-grid">
+    <a class="sp mid" href="dougforum.html"><img src="assets/art/forum.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>Forum</h3><p>Share work, ask questions, talk.</p><span class="go">Join in →</span></div></a>
+    <a class="sp mid" href="chat-calls.html"><img src="assets/art/calls.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>Calls</h3><p>Voice and video with friends.</p><span class="go">Start a call →</span></div></a>
+    <a class="sp mid" href="DMail.html"><img src="assets/art/mail.svg" alt="" loading="lazy" width="640" height="360"><div class="in"><h3>DMail</h3><p>Private mail for your account.</p><span class="go">Open mail →</span></div></a>
   </div>
 
-  <section class="card appcard" aria-label="DougHub app">
-    <div class="grow"><h2>Get the DougHub app</h2><p>Same account, same chat, same shop and leaderboards. Works on your phone, tablet and computer.</p></div>
-    <a class="dh-app-chip" href="app/">Open the app ↗</a>
+  <section class="dlcard" aria-label="DougHub app">
+    <img src="assets/logo.svg" alt="" width="84" height="84">
+    <div class="grow"><h2>Get the DougHub app</h2><p>The app has its own games, a shop with characters, leaderboards and your same account and chat. It installs on Windows in a minute.</p></div>
+    <a class="btn-dl" href="download.html">Download</a>
   </section>
 
   <section class="card feedback" aria-labelledby="fbTitle">

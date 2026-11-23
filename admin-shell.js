@@ -96,7 +96,7 @@
         '<a class="dh-brand" href="index.html" title="Back to DougHub"><b>Doug<span>Hub</span></b><small>Admin</small></a>' +
         '<nav id="dhNav"></nav>' +
         '<div class="dh-me"><div class="dh-avatar" id="dhMeAvatar">?</div><div class="dh-me-text"><strong id="dhMeName">Loading…</strong><div id="dhMeRank"></div></div></div>' +
-        '<a class="dh-back" href="app/" target="_blank" rel="noopener">📱 Open the DougHub app</a>' +
+        '<a class="dh-back" href="app/?web=1" target="_blank" rel="noopener">📱 Open the DougHub app</a>' +
         '<a class="dh-back" href="index.html">← Back to DougHub</a>' +
       "</aside>" +
       '<div id="dhScrim"></div>' +

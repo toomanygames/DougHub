@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0e20">
+<title>Get the app • DougHub</title>
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="nav.js?v=20261123-ten" defer></script>
+<script src="search-autofill-fix.js?v=3" defer></script>
+<style>
+:root{color-scheme:dark;--mute:#a3acd9}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f1f3ff}a{color:inherit;text-decoration:none}
+header{height:70px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px}
+header .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800}header .logo-icon{width:40px;height:40px;display:block}
+header .nav{display:flex;align-items:center;gap:8px}
+.wrap{width:min(1000px,calc(100% - 32px));margin:auto;padding:40px 0 70px}
+.top{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+.top h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.05;letter-spacing:-.02em}
+.top p{color:var(--mute);font-size:18px;margin:12px 0 22px}
+.shot{border-radius:28px;padding:22px;background:radial-gradient(circle at 30% 10%,#6366f166,transparent 60%),#141935;border:1px solid #2a3160;display:grid;place-items:center;box-shadow:0 30px 70px #0008}
+.shot img{width:min(220px,60%);height:auto;filter:drop-shadow(0 18px 30px #6366f188)}
+.shot .tag{margin-top:14px;font-weight:800;letter-spacing:.04em;color:#c7d2fe}
+.meta{margin-top:12px;color:var(--mute);font-size:14px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:40px}
+.step{padding:20px;border-radius:22px;background:#141935;border:1px solid #2a3160}
+.step b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);margin-bottom:10px}
+.step h3{margin:0 0 4px}.step p{margin:0;color:var(--mute);font-size:15px}
+.note{margin-top:22px;padding:16px 20px;border-radius:18px;background:#fbbf2418;border:1px solid #fbbf2455;color:#fde7a8;font-size:15px}
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:30px}
+.why div{padding:16px 18px;border-radius:18px;background:#ffffff08}.why b{display:block;margin-bottom:2px}.why span{color:var(--mute);font-size:14.5px}
+@media(max-width:760px){.top{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><a href="index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<main class="wrap">
+  <section class="top">
+    <div>
+      <h1><span class="gradient-text">Get the DougHub app</span></h1>
+      <p>The DougHub app is a Windows program with its own games, a character shop, leaderboards, chat and calls. You need to install it to use the app.</p>
+      <a class="btn-dl" id="dl" href="https://github.com/toomanygames/DougHub/releases/latest/download/DougHub-Setup.exe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Download for Windows</a>
+      <div class="meta">Version 1.2 &middot; Windows 10 and 11 &middot; about 125 MB</div>
+    </div>
+    <div class="shot"><img src="assets/logo.svg" alt="DougHub logo"><div class="tag">DougHub for Windows</div></div>
+  </section>
+
+  <section class="steps" aria-label="How to install">
+    <div class="step"><b>1</b><h3>Download</h3><p>Press the button. Your browser saves <em>DougHub-Setup.exe</em>.</p></div>
+    <div class="step"><b>2</b><h3>Install</h3><p>Open the file, pick a folder if you want, and press Install.</p></div>
+    <div class="step"><b>3</b><h3>Play</h3><p>Open DougHub from the desktop or Start menu and log in with your account.</p></div>
+  </section>
+
+  <div class="note"><strong>If Windows shows a blue warning:</strong> press <em>More info</em>, then <em>Run anyway</em>. The installer is new and not yet signed with a paid certificate, so Windows is careful with it.</div>
+
+  <section class="why" aria-label="What you get">
+    <div><b>Same account</b><span>Your website login, chat and showcase work in the app.</span></div>
+    <div><b>Everything inside</b><span>No downloading while you play. It works with a slow connection.</span></div>
+    <div><b>Made for the desktop</b><span>Its own window, no browser bars, no developer tools.</span></div>
+  </section>
+</main>
+</body>
+</html>
