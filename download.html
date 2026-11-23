@@ -4,61 +4,109 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b0e20">
-<title>Get the app • DougHub</title>
+<title>Download the DougHub app • DougHub</title>
+<meta name="description" content="Download DougHub for Windows. The app has its own games, a character shop, leaderboards, chat and calls, and uses your DougHub account.">
 <link rel="icon" href="DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
-<script src="nav.js?v=20261123-twelve" defer></script>
+<script src="nav.js?v=20261123-fourteen" defer></script>
 <script src="search-autofill-fix.js?v=3" defer></script>
 <style>
 :root{color-scheme:dark;--mute:#a3acd9}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f1f3ff}a{color:inherit;text-decoration:none}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f1f3ff}a{color:inherit}
 header{height:70px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px}
-header .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800}header .logo-icon{width:40px;height:40px;display:block}
+header .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;text-decoration:none}header .logo-icon{width:40px;height:40px;display:block}
 header .nav{display:flex;align-items:center;gap:8px}
-.wrap{width:min(1000px,calc(100% - 32px));margin:auto;padding:40px 0 70px}
-.top{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
-.top h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.05;letter-spacing:-.02em}
-.top p{color:var(--mute);font-size:18px;margin:12px 0 22px}
-.shot{border-radius:28px;padding:22px;background:radial-gradient(circle at 30% 10%,#6366f166,transparent 60%),#141935;border:1px solid #2a3160;display:grid;place-items:center;box-shadow:0 30px 70px #0008}
-.shot img{width:min(220px,60%);height:auto;filter:drop-shadow(0 18px 30px #6366f188)}
+.wrap{width:min(1040px,calc(100% - 32px));margin:auto;padding:36px 0 80px}
+.top{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
+.kick{font-size:12px;font-weight:800;letter-spacing:.14em;color:#a5b4fc}
+.top h1{margin:6px 0 0;font-size:clamp(36px,6vw,60px);line-height:1.04;letter-spacing:-.025em}
+.top p{color:var(--mute);font-size:18px;margin:14px 0 24px;max-width:520px}
+.acts{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.meta{margin-top:14px;color:var(--mute);font-size:14px}
+.shot{position:relative;border-radius:30px;padding:30px 22px 22px;background:radial-gradient(circle at 30% 10%,#6366f166,transparent 60%),#141935;border:1px solid #2a3160;display:grid;place-items:center;box-shadow:0 30px 70px #0008}
+.shot img.logo{width:min(200px,55%);height:auto;filter:drop-shadow(0 18px 30px #6366f188)}
 .shot .tag{margin-top:14px;font-weight:800;letter-spacing:.04em;color:#c7d2fe}
-.meta{margin-top:12px;color:var(--mute);font-size:14px}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:40px}
-.step{padding:20px;border-radius:22px;background:#141935;border:1px solid #2a3160}
-.step b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);margin-bottom:10px}
+.shot .mini{display:flex;gap:10px;margin-top:16px}
+.shot .mini img{width:84px;height:84px;border-radius:18px;object-fit:cover;border:2px solid #ffffff26}
+h2.sec{margin:46px 0 14px;font-size:26px;letter-spacing:-.01em}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.step{padding:20px;border-radius:24px;background:#141935;border:1px solid #2a3160}
+.step b{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7);margin-bottom:12px}
 .step h3{margin:0 0 4px}.step p{margin:0;color:var(--mute);font-size:15px}
-.note{margin-top:22px;padding:16px 20px;border-radius:18px;background:#fbbf2418;border:1px solid #fbbf2455;color:#fde7a8;font-size:15px}
-.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:30px}
-.why div{padding:16px 18px;border-radius:18px;background:#ffffff08}.why b{display:block;margin-bottom:2px}.why span{color:var(--mute);font-size:14.5px}
-@media(max-width:760px){.top{grid-template-columns:1fr}}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.feat div{padding:18px 20px;border-radius:22px;background:#ffffff08;border:1px solid #ffffff10}
+.feat b{display:block;margin-bottom:3px;font-size:17px}.feat span{color:var(--mute);font-size:14.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.box{padding:22px 24px;border-radius:24px;background:#141935;border:1px solid #2a3160}
+.box h3{margin:0 0 8px}.box p,.box li{color:var(--mute);font-size:15px;margin:0}.box ul{margin:0;padding-left:18px;display:grid;gap:6px}
+code{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background:#0b0e20;border:1px solid #2a3160;color:#c7d2fe;font-size:12.5px;word-break:break-all}
+.thanks{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:46px;padding:26px 30px;border-radius:28px;background:linear-gradient(120deg,#34d39922,#6366f126);border:1px solid #34d39966}
+.thanks .seal{width:76px;height:76px;flex:none;border-radius:22px;background:#0b0e20;display:grid;place-items:center;border:1px solid #34d39988}
+.thanks h2{margin:0 0 6px;font-size:22px}.thanks p{margin:0;color:#c9d2f5;max-width:640px}
+.thanks a{color:#86efac;font-weight:700}
+.faq details{padding:14px 18px;border-radius:18px;background:#141935;border:1px solid #2a3160;margin-bottom:10px}
+.faq summary{cursor:pointer;font-weight:700}.faq details p{margin:8px 0 0;color:var(--mute);font-size:15px}
+@media(max-width:760px){.top,.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header><a href="index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
 <main class="wrap">
+
   <section class="top">
     <div>
+      <span class="kick">DOUGHUB FOR WINDOWS</span>
       <h1><span class="gradient-text">Get the DougHub app</span></h1>
-      <p>The DougHub app is a Windows program with its own games, a character shop, leaderboards, chat and calls. You need to install it to use the app.</p>
-      <a class="btn-dl" id="dl" href="https://github.com/toomanygames/DougHub/releases/latest/download/DougHub-Setup.exe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Download for Windows</a>
-      <div class="meta">Version 1.2 &middot; Windows 10 and 11 &middot; about 125 MB</div>
+      <p>The app is a Windows program with its own games, a character shop, leaderboards, chat and calls. You need to install it to use the app. It uses your DougHub account.</p>
+      <div class="acts">
+        <a class="btn-dl" id="dl" href="https://github.com/toomanygames/DougHub/releases/latest/download/DougHub-Setup.exe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Download for Windows</a>
+        <a class="btn-text" href="#thanks">Who helped</a>
+      </div>
+      <div class="meta">Version 1.2.0 &middot; Windows 10 and 11, 64-bit &middot; about 130 MB</div>
     </div>
-    <div class="shot"><img src="assets/logo.svg" alt="DougHub logo"><div class="tag">DougHub for Windows</div></div>
+    <div class="shot">
+      <img class="logo" src="assets/logo.svg" alt="DougHub logo">
+      <div class="tag">DougHub for Windows</div>
+      <div class="mini"><img src="app/art/block-town.svg" alt=""><img src="app/art/brick-smash.svg" alt=""><img src="app/art/pond-fisher.svg" alt=""></div>
+    </div>
   </section>
 
+  <h2 class="sec">Install in three steps</h2>
   <section class="steps" aria-label="How to install">
     <div class="step"><b>1</b><h3>Download</h3><p>Press the button. Your browser saves <em>DougHub-Setup.exe</em>.</p></div>
-    <div class="step"><b>2</b><h3>Install</h3><p>Open the file, pick a folder if you want, and press Install.</p></div>
-    <div class="step"><b>3</b><h3>Play</h3><p>Open DougHub from the desktop or Start menu and log in with your account.</p></div>
+    <div class="step"><b>2</b><h3>Install</h3><p>Open the file, choose a folder if you like, and press Install.</p></div>
+    <div class="step"><b>3</b><h3>Play</h3><p>Open DougHub from the desktop or Start menu and log in.</p></div>
   </section>
 
-  <div class="note"><strong>If Windows shows a blue warning:</strong> press <em>More info</em>, then <em>Run anyway</em>. The installer is new and not yet signed with a paid certificate, so Windows is careful with it.</div>
-
-  <section class="why" aria-label="What you get">
+  <h2 class="sec">What you get</h2>
+  <section class="feat" aria-label="What you get">
     <div><b>Same account</b><span>Your website login, chat and showcase work in the app.</span></div>
-    <div><b>Everything inside</b><span>No downloading while you play. It works with a slow connection.</span></div>
-    <div><b>Made for the desktop</b><span>Its own window, no browser bars, no developer tools.</span></div>
+    <div><b>Games inside</b><span>Everything is in the installer. No downloading while you play.</span></div>
+    <div><b>Shop and ranks</b><span>Buy characters, open packs and climb the leaderboards.</span></div>
+    <div><b>A real app</b><span>Its own window, no browser bars and no developer tools.</span></div>
+  </section>
+
+  <h2 class="sec">Before you install</h2>
+  <section class="two">
+    <div class="box"><h3>Windows may show a warning</h3><p>New programs often get a blue Windows screen. If you see it, press <em>More info</em>, then <em>Run anyway</em>. You can check that your download is the real one with the fingerprint below.</p><code>SHA-256: 23F42B02B3180AF30BB4D28ECBF1682889A8389F8FFD93F17627B4C7DAC49A92</code></div>
+    <div class="box"><h3>What you need</h3><ul><li>Windows 10 or 11 (64-bit)</li><li>About 400 MB of free space</li><li>A DougHub account (you can make one in the app)</li><li>An internet connection for chat, calls and the shop</li></ul></div>
+  </section>
+
+  <section class="thanks" id="thanks" aria-labelledby="thanksTitle">
+    <div class="seal" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+    <div>
+      <h2 id="thanksTitle">Thank you, SignPath Foundation</h2>
+      <p>The <a href="https://signpath.org" target="_blank" rel="noopener noreferrer">SignPath Foundation</a> helped establish the DougHub app. The foundation supports open source software by giving projects a way to prove who published their programs. Thank you for backing DougHub.</p>
+    </div>
+  </section>
+
+  <h2 class="sec">Questions</h2>
+  <section class="faq">
+    <details><summary>Do I need the app to use DougHub?</summary><p>No. The website works in any browser. The app is a separate Windows program with its own games, shop and leaderboards, and it needs to be installed.</p></details>
+    <details><summary>Is it a different account?</summary><p>No. Use the same username or email and password you use on the website.</p></details>
+    <details><summary>I have no email. Can I still sign up?</summary><p>Yes. Choose a username and password and leave the email empty. Without an email, a forgotten password can't be reset.</p></details>
+    <details><summary>How do I update?</summary><p>Download the newest installer from this page and run it. Your account and progress stay on DougHub.</p></details>
   </section>
 </main>
 </body>

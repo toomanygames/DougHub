@@ -2120,7 +2120,7 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 
 .dh-official-game{border-color:rgba(120,220,180,.42)!important;background:linear-gradient(135deg,rgba(26,67,62,.68),rgba(13,17,39,.82))!important}.dh-official-game-badge{display:inline-flex;align-items:center;width:max-content;margin-bottom:10px;padding:5px 9px;border:1px solid #83e0ba66;border-radius:999px;background:#65d6a51c;color:#aaf0cf;font-size:9px;font-weight:950;letter-spacing:.1em}.dh-official-game .play-label{color:#9fe9c5}
 </style>
-  <script src="nav.js?v=20261123-twelve" defer></script>
+  <script src="nav.js?v=20261123-fourteen" defer></script>
 
 <script src="search-autofill-fix.js?v=3" defer></script>
 
@@ -2398,6 +2398,7 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 @media (max-width:340px){#doug-games .dh-ggrid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#doug-games .dh-gc,#doug-games .dh-gc *{transition:none!important}}
 </style>
+<link rel="stylesheet" href="dh-app-look.css?v=20261123-fourteen">
 </head>
 
 <body>
@@ -2513,39 +2514,289 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 
 <main>
 
-    <!-- BIG TOP SECTION -->
-
-    <section class="hero games-hero" aria-labelledby="gamesHeroTitle">
-  <div class="games-hero-copy">
-    <div class="games-hero-eyebrow"><span></span> DOUGHUB ARCADE</div>
-    <h1 id="gamesHeroTitle">Ready to <span>play?</span></h1>
-    <p>Discover DougHub games, try community creations, or build a game of your own.</p>
-    <div class="games-hero-actions">
-      <a href="#doug-games" class="games-hero-button primary">Browse games <span>↓</span></a>
-      <a href="Scripting/scripting.html" class="games-hero-button">＋ Make a game</a>
-      <button type="button" class="games-hero-button" id="openGameRequest">✦ Request a game</button>
+  <section class="gm-hero" aria-labelledby="gamesHeroTitle">
+    <div class="gm-copy">
+      <span class="gm-kicker">DOUGHUB GAMES</span>
+      <h1 id="gamesHeroTitle"><span class="gradient-text">Ready to play?</span></h1>
+      <p>Pick something from the arcade, try what the community made, or build a game of your own.</p>
+      <div class="gm-acts">
+        <a class="btn-solid" href="#doug-games">Browse games</a>
+        <a class="btn-line" href="Scripting/scripting.html">Make a game</a>
+        <button type="button" class="btn-text" id="openGameRequest">Request a game</button>
+      </div>
+      <div class="gm-meta"><span><strong id="userCount">&mdash;</strong> members</span><span><strong id="gameCount">12</strong> arcade games</span></div>
     </div>
-    <div class="games-hero-meta"><span><strong id="userCount">—</strong> members</span><i></i><span><strong id="gameCount">12</strong> arcade games</span></div>
-  </div>
-  <div class="games-hero-preview" aria-hidden="true">
-    <div class="games-preview-top"><span class="games-live-dot"></span> PICK YOUR NEXT GAME <span class="games-preview-count">01 / 04</span></div>
-    <div class="games-preview-feature"><div class="games-preview-art">🐷</div><div><small>FEATURED GAME</small><strong>Pig Clicker</strong><span>Click · Upgrade · Repeat</span></div><b>↗</b></div>
-    <div class="games-preview-mini">
-      <div><span>🏎️</span><small>Racing</small></div>
-      <div><span>🧩</span><small>Puzzles</small></div>
-      <div><span>✨</span><small>Community</small></div>
+    <div class="gm-collage" aria-hidden="true">
+      <img class="c1" src="Games/art/quiet-woods.svg" alt="">
+      <img class="c2" src="Games/art/pig-clicker.svg" alt="">
+      <img class="c3" src="Games/art/ocean-drive.svg" alt="">
     </div>
-  </div>
-</section>
+  </section>
+
+  <nav class="games-discovery-nav gm-jump" aria-label="Jump to a section">
+    <a class="games-discovery-link active" href="#doug-games">Arcade</a>
+    <a class="games-discovery-link" href="#daily-games">Daily games</a>
+    <a class="games-discovery-link" href="#community-games">Community</a>
+    <a class="games-discovery-link" href="#trendingSection">Trending</a>
+    <a class="games-discovery-link" href="Games/shop.html">Shop</a>
+  </nav>
+<!-- DOUG'S GAMES -->
+
+    <section class="section" id="doug-games">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    DougHub Games
+                </h2>
+
+                <p class="section-subtitle">
+                    Pick a game and play right in your browser.
+                </p>
+
+            </div>
+
+        </div>
 
 
-    <nav class="games-discovery-nav" aria-label="Browse game sections">
-      <a class="games-discovery-link active" href="#trendingSection"><span>⌁</span> Discover</a>
-      <a class="games-discovery-link" href="#trendingSection"><span>↗</span> Popular</a>
-      <a class="games-discovery-link" href="#community-games"><span>◈</span> Community Games</a>
-    </nav>
+        <div class="dh-game-browser" id="dhGameBrowser">
+          <div class="dh-game-search-wrap"><span aria-hidden="true">⌕</span><input id="dhGameSearch" type="search" placeholder="Search games..." autocomplete="off" aria-label="Search games"></div>
+          <div class="dh-game-genres" role="group" aria-label="Filter games by genre">
+            <button type="button" class="active" data-genre="all" aria-pressed="true">All games</button>
+            <button type="button" data-genre="adventure" aria-pressed="false">Adventure</button>
+            <button type="button" data-genre="sim" aria-pressed="false">Sim</button>
+            <button type="button" data-genre="clicker" aria-pressed="false">Clicker</button>
+            <button type="button" data-genre="arcade" aria-pressed="false">Arcade</button>
+            <button type="button" data-genre="puzzle" aria-pressed="false">Puzzle</button>
+            <button type="button" data-genre="driving" aria-pressed="false">Driving</button>
+            <button type="button" data-genre="survival" aria-pressed="false">Survival</button>
+          </div>
+          <p class="dh-game-results" id="dhGameResults" aria-live="polite">Browse by genre or search by name.</p>
+        </div>
+        <div class="dh-ggrid">
+          <a href="Games/off-brand-beat-battle.html" class="dh-gc" data-genre="arcade" style="--accent:#ff5ca8;--art:url('Games/art/off-brand-beat-battle.svg')">
+            <span class="dh-gc-art"><span class="dh-gc-genre">Arcade</span><img src="Games/art/off-brand-beat-battle.svg" alt="Off-Brand Beat Battle logo" loading="lazy"></span>
+            <span class="dh-gc-body">
+              <span class="dh-gc-title">Off-Brand Beat Battle</span>
+              <span class="dh-gc-desc">Out-sing a muffin, a man in a trash can, a goose and a lawyer across four weeks. Buy upgrades and save a million for a cooler name. What could go wrong?</span>
+              <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+            </span>
+          </a>
+            <a href="Games/fix-it-crew.html" class="dh-gc" data-genre="sim" style="--accent:#ffb02e;--art:url('Games/art/fix-it-crew.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Sim</span><img src="Games/art/fix-it-crew.svg" alt="Fix-It Crew: Builder Bo logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Fix-It Crew: Builder Bo</span>
+                <span class="dh-gc-desc">A 3D building game! Carry planks, dig ponds, pave paths and raise a Town Hall with Bo and the machine buddies across eight jobs.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/bundt-bakery.html" class="dh-gc" data-genre="sim" style="--accent:#f472b6;--art:url('Games/art/bundt-bakery.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Sim</span><img src="Games/art/bundt-bakery.svg" alt="Bundt Bakery logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Bundt Bakery</span>
+                <span class="dh-gc-desc">Run a cozy bakery! Mix, pour, bake, flip and decorate bundt cakes for animal customers, then spend your coins on new flavors, glazes and pans.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/farm-idle.html" class="dh-gc" data-genre="sim" style="--accent:#84cc16;--art:url('Games/art/farm-idle.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Sim</span><img src="Games/art/farm-idle.svg" alt="Farm Idle logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Farm Idle</span>
+                <span class="dh-gc-desc">Plant, harvest and automate a cheerful farm. Hire farmhands, ride out the weather, then hold a Harvest Festival for permanent sunseed upgrades.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/goose-gig.html" class="dh-gc" data-genre="adventure" style="--accent:#a855f7;--art:url('Games/art/goose-gig.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Adventure</span><img src="Games/art/goose-gig.svg" alt="Honk and Roll logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Honk &amp; Roll: The Goose Gig</span>
+                <span class="dh-gc-desc">The Honk Empire goose gets kicked out of the nest and chases a music career. 3D cutscenes, five genres and a music battle against a new rival every level.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/sparkroot.html" class="dh-gc" data-genre="clicker" style="--accent:#f97316;--art:url('Games/art/sparkroot.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Clicker</span><img src="Games/art/sparkroot.svg" alt="Sparkroot logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Sparkroot</span>
+                <span class="dh-gc-desc">Grow a glowing upgrade tree, rebirth for seeds and unlock a rebirth tree of permanent powers.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/dougworld.html" class="dh-gc" data-genre="adventure" style="--accent:#38bdf8;--art:url('Games/art/dougworld.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Adventure</span><img src="Games/art/dougworld.svg" alt="DougWorld 3D logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">DougWorld 3D</span>
+                <span class="dh-gc-desc">Play with friends in 3D: design your character, build working houses and play games.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/honk-empire.html" class="dh-gc" data-genre="clicker" style="--accent:#f43f5e;--art:url('Games/art/honk-empire.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Clicker</span><img src="Games/art/honk-empire.svg" alt="Honk Empire logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Honk Empire</span>
+                <span class="dh-gc-desc">Build a goose empire: pets, worlds, rebirths, events and a leaderboard.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/shadows-of-ashmere.html" class="dh-gc" data-genre="adventure" style="--accent:#8b5cf6;--art:url('Games/art/shadows-of-ashmere.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Adventure</span><img src="Games/art/shadows-of-ashmere.svg" alt="Shadows of Ashmere logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Shadows of Ashmere</span>
+                <span class="dh-gc-desc">A pixel-art adventure. After raiders take your village, explore the Keep, the enchanted forest, the castle and its dungeons to win Ashmere back.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/quiet-woods.html" class="dh-gc" data-genre="survival" data-official-game="true" style="--accent:#22c55e;--art:url('Games/art/quiet-woods.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-badge">✦ Featured</span><span class="dh-gc-genre">Survival</span><img src="Games/art/quiet-woods.svg" alt="Wonder Woods logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">99 Nights in the Wonder Woods</span>
+                <span class="dh-gc-desc">Explore a colorful 3D forest, make friends with animals, collect treasures, build a cozy cabin, and uncover the mystery of 99 nights.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/titlebound.html" class="dh-gc" data-genre="clicker" style="--accent:#eab308;--art:url('Games/art/titlebound.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Clicker</span><img src="Games/art/titlebound.svg" alt="TITLEBOUND logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">TITLEBOUND: Realms of Fortune</span>
+                <span class="dh-gc-desc">Roll from 650 cosmic titles, hunt nine rarity tiers, collect absurd discoveries, and grow a permanent luck upgrade tree.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/bubble-grove.html" class="dh-gc" data-genre="arcade" style="--accent:#06b6d4;--art:url('Games/art/bubble-grove.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Arcade</span><img src="Games/art/bubble-grove.svg" alt="Bubble Grove logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Bubble Grove</span>
+                <span class="dh-gc-desc">A cozy woodland bubble shooter. Aim, match 3 or more of the same color, pop clusters, and drop floating bubbles for bonus points.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/starfall-run.html" class="dh-gc" data-genre="arcade" style="--accent:#f59e0b;--art:url('Games/art/starfall-run.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Arcade</span><img src="Games/art/starfall-run.svg" alt="Starfall Run logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Starfall Run</span>
+                <span class="dh-gc-desc">Dodge the meteor storm, dash through danger, and collect glowing shards as the pace ramps up.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/crystal-breaker.html" class="dh-gc" data-genre="arcade" style="--accent:#60a5fa;--art:url('Games/art/crystal-breaker.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Arcade</span><img src="Games/art/crystal-breaker.svg" alt="Crystal Breaker logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Crystal Breaker</span>
+                <span class="dh-gc-desc">A neon brick-breaker. Keep the energy core alive, clear crystal waves, and chase a high score.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <div class="dh-gc dh-gc-drive" id="drivePigSwitcher" data-genre="driving" style="--accent:#f472b6;--art:url('Games/art/drive-pig.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-badge">2 games in 1</span><span class="dh-gc-genre">Driving</span><img id="drivePigIcon" src="Games/art/drive-pig.svg" alt="Drive Pig logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title" id="drivePigTitle">Drive Pig</span>
+                <span class="dh-gc-desc" id="drivePigDescription">Pick the classic stunt course or jump into Pig Racing3D.</span>
+                <span class="drive-pig-toggle" role="group" aria-label="Choose a Drive Pig game version">
+                  <span class="drive-pig-slider" id="drivePigSlider"></span>
+                  <button type="button" class="drive-pig-option active" data-drive-version="classic" aria-pressed="true"><span class="drive-pig-option-icon">🐷</span><span><b>Drive Pig</b><small>Classic</small></span></button>
+                  <button type="button" class="drive-pig-option" data-drive-version="racing" aria-pressed="false"><span class="drive-pig-option-icon">🏎️</span><span><b>Pig Racing3D</b><small>3D racer</small></span></button>
+                </span>
+                <span class="dh-gc-status"><span class="drive-pig-live-dot"></span><span id="drivePigStatus">Classic stunt-course adventure</span></span>
+                <a class="dh-gc-play" id="drivePigPlay" href="Games/drive-pig.html">PLAY DRIVE PIG <span>→</span></a>
+              </span>
+            </div>
+            <a href="Games/ocean-drive.html" class="dh-gc" data-genre="driving" style="--accent:#0ea5e9;--art:url('Games/art/ocean-drive.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Driving</span><img src="Games/art/ocean-drive.svg" alt="Ocean Drive logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Ocean Drive</span>
+                <span class="dh-gc-desc">Explore a detailed Miami-style beach district, walk the promenade, hop into cars, cruise with traffic, and visit the shore.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/racing.html" class="dh-gc" data-genre="driving" style="--accent:#fb923c;--art:url('Games/art/racing.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Driving</span><img src="Games/art/racing.svg" alt="Doug Racing logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Doug Racing</span>
+                <span class="dh-gc-desc">Race around the track and try to beat your best time.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/pig-clicker.html" class="dh-gc" data-genre="clicker" style="--accent:#ec4899;--art:url('Games/art/pig-clicker.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Clicker</span><img src="Games/art/pig-clicker.svg" alt="Pig Clicker logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Pig Clicker</span>
+                <span class="dh-gc-desc">Click the pig, earn points, and keep upgrading.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/rebirth-clicker.html" class="dh-gc" data-genre="clicker" style="--accent:#ef4444;--art:url('Games/art/rebirth-clicker.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Clicker</span><img src="Games/art/rebirth-clicker.svg" alt="Rebirth Clicker logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Rebirth Clicker</span>
+                <span class="dh-gc-desc">Click, upgrade, rebirth, and build your progress.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/puzzle.html" class="dh-gc" data-genre="puzzle" style="--accent:#f59e0b;--art:url('Games/art/puzzle.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Puzzle</span><img src="Games/art/puzzle.svg" alt="Doug Puzzle logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Doug Puzzle</span>
+                <span class="dh-gc-desc">Slide, merge, and plan ahead in the classic 2048 number puzzle.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/sudoku.html" class="dh-gc" data-genre="puzzle" style="--accent:#818cf8;--art:url('Games/art/sudoku.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Puzzle</span><img src="Games/art/sudoku.svg" alt="Sudoku logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">DougHub Sudoku</span>
+                <span class="dh-gc-desc">A timed 9×9 logic puzzle with touch-friendly number controls and restart.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/gem-garden.html" class="dh-gc" data-genre="puzzle" style="--accent:#10b981;--art:url('Games/art/gem-garden.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Puzzle</span><img src="Games/art/gem-garden.svg" alt="Gem Garden logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Gem Garden</span>
+                <span class="dh-gc-desc">Swap colorful gems, build matches, and clear the board before your moves run out.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/pipe-parade.html" class="dh-gc" data-genre="puzzle" style="--accent:#14b8a6;--art:url('Games/art/pipe-parade.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Puzzle</span><img src="Games/art/pipe-parade.svg" alt="Pipe Parade logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Pipe Parade</span>
+                <span class="dh-gc-desc">Rotate the pipe pieces and connect the route from start to finish.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/rune-decode.html" class="dh-gc" data-genre="puzzle" style="--accent:#a78bfa;--art:url('Games/art/rune-decode.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Puzzle</span><img src="Games/art/rune-decode.svg" alt="Rune Decoder logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Rune Decoder</span>
+                <span class="dh-gc-desc">Crack a longer rune cipher. Translate the symbols, reverse the shift, and solve the hidden word.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+            <a href="Games/brick-bounce.html" class="dh-gc" data-genre="arcade" style="--accent:#6366f1;--art:url('Games/art/brick-bounce.svg')">
+              <span class="dh-gc-art"><span class="dh-gc-genre">Arcade</span><img src="Games/art/brick-bounce.svg" alt="Brick Bounce logo" loading="lazy"></span>
+              <span class="dh-gc-body">
+                <span class="dh-gc-title">Brick Bounce</span>
+                <span class="dh-gc-desc">Keep the ball moving, steer your paddle, and clear every block.</span>
+                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
+              </span>
+            </a>
+          </div>
 
-    <!-- COMMUNITY GAMES -->
+    </section>
+
+
+
+
+    <section class="dh-daily-section" id="daily-games"><div class="dh-daily-head"><div><div class="dh-daily-kicker"><span></span> DAILY ARCADE</div><h2>Quick daily games</h2><p>Four short challenges. Earn credits and return after the daily reset.</p></div><div class="dh-daily-date"><small>DAILY RESET</small><strong id="dhDailyCountdown">--:--:--</strong><span id="dhDailyDate">SYNCING UTC</span></div></div><div class="dh-daily-quickgrid"><a class="dh-daily-quick wordle" href="Games/wordle.html"><img src="Games/art/wordle.svg" alt=""><span><strong>Wordle</strong><small>Five-letter puzzle</small></span><b>+25</b></a><a class="dh-daily-quick match" href="Games/daily-arcade.html?game=match"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt=""><span><strong>Daily Match</strong><small>Find the pairs</small></span><b>+15</b></a><a class="dh-daily-quick sequence" href="Games/daily-arcade.html?game=sequence"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt=""><span><strong>Sequence</strong><small>Remember the pattern</small></span><b>+15</b></a><a class="dh-daily-quick trivia" href="Games/daily-arcade.html?game=trivia"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt=""><span><strong>Daily Trivia</strong><small>Five quick questions</small></span><b>+15</b></a></div><div class="dh-daily-progress"><div><span id="dhChallengeCount">0 / 4 CLAIMED</span><div class="dh-daily-progress-track" id="dhChallengeProgress" role="progressbar" aria-label="Daily rewards claimed" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><i id="dhChallengeFill"></i></div></div><a href="Games/journey.html">VIEW GAME JOURNEY ↗</a></div></section>
+
+  <section class="gm-shop" aria-label="Characters and shop">
+    <img src="assets/art/games.svg" alt="" width="320" height="180">
+    <div class="gm-shop-text"><span class="gm-kicker">THE CHARACTER COLLECTION</span><h2>Collect. Customize. Show off.</h2><p>Open packs in the shop, dress up your character and put your best ones in your showcase.</p></div>
+    <div class="gm-shop-acts"><a class="btn-solid" href="Games/shop.html">Open the shop</a><a class="btn-soft" href="Games/character-editor.html">Character editor</a><a class="btn-text" href="profile.html">My showcase</a></div>
+  </section>
+<!-- COMMUNITY GAMES -->
 
     <section class="section" id="community-games" style="scroll-margin-top:90px">
 
@@ -2607,268 +2858,12 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 
     </section>
 
-<section class="dh-daily-section" id="daily-games"><div class="dh-daily-head"><div><div class="dh-daily-kicker"><span></span> DAILY ARCADE</div><h2>Quick daily games</h2><p>Four short challenges. Earn credits and return after the daily reset.</p></div><div class="dh-daily-date"><small>DAILY RESET</small><strong id="dhDailyCountdown">--:--:--</strong><span id="dhDailyDate">SYNCING UTC</span></div></div><div class="dh-daily-quickgrid"><a class="dh-daily-quick wordle" href="Games/wordle.html"><img src="Games/art/wordle.svg" alt=""><span><strong>Wordle</strong><small>Five-letter puzzle</small></span><b>+25</b></a><a class="dh-daily-quick match" href="Games/daily-arcade.html?game=match"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt=""><span><strong>Daily Match</strong><small>Find the pairs</small></span><b>+15</b></a><a class="dh-daily-quick sequence" href="Games/daily-arcade.html?game=sequence"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt=""><span><strong>Sequence</strong><small>Remember the pattern</small></span><b>+15</b></a><a class="dh-daily-quick trivia" href="Games/daily-arcade.html?game=trivia"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt=""><span><strong>Daily Trivia</strong><small>Five quick questions</small></span><b>+15</b></a></div><div class="dh-daily-progress"><div><span id="dhChallengeCount">0 / 4 CLAIMED</span><div class="dh-daily-progress-track" id="dhChallengeProgress" role="progressbar" aria-label="Daily rewards claimed" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><i id="dhChallengeFill"></i></div></div><a href="Games/journey.html">VIEW GAME JOURNEY ↗</a></div></section>
-<section class="dh-collectibles-link" style="margin:24px 0 42px;padding:22px;border:1px solid #ffffff18;border-radius:20px;background:linear-gradient(120deg,#24285a,#151a36);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"><div><small style="color:#aaa1ff;font-weight:900;letter-spacing:.15em">THE CHARACTER COLLECTION</small><h2 style="margin:8px 0 5px">Collect. Customize. Show off.</h2><p style="margin:0;color:#aeb4d4;font-size:12px">Browse animal collections in the separate shop, then build your own character.</p></div><div style="display:flex;gap:9px;flex-wrap:wrap"><a href="Games/shop.html" style="padding:11px 15px;border-radius:10px;background:linear-gradient(120deg,#7774ff,#a65ce9);font-size:11px;font-weight:900">OPEN SHOP ↗</a><a href="Games/character-editor.html" style="padding:11px 15px;border-radius:10px;background:#ffffff13;border:1px solid #ffffff20;font-size:11px;font-weight:900">CHARACTER EDITOR</a><a href="profile.html" style="padding:11px 15px;border-radius:10px;background:#ffffff13;border:1px solid #ffffff20;font-size:11px;font-weight:900">MY SHOWCASE ↗</a></div></section>
-
-
-
-    
-
-    <!-- DOUG'S GAMES -->
-
-    <section class="section" id="doug-games">
-
-        <div class="section-header">
-
-            <div>
-
-                <h2 class="section-title">
-                    DougHub Games
-                </h2>
-
-                <p class="section-subtitle">
-                    Pick a game and play right in your browser.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="dh-game-browser" id="dhGameBrowser">
-          <div class="dh-game-search-wrap"><span aria-hidden="true">⌕</span><input id="dhGameSearch" type="search" placeholder="Search games..." autocomplete="off" aria-label="Search games"></div>
-          <div class="dh-game-genres" role="group" aria-label="Filter games by genre">
-            <button type="button" class="active" data-genre="all" aria-pressed="true">All games</button>
-            <button type="button" data-genre="adventure" aria-pressed="false">🗺️ Adventure</button>
-            <button type="button" data-genre="sim" aria-pressed="false">🏠 Sim</button>
-            <button type="button" data-genre="clicker" aria-pressed="false">👆 Clicker</button>
-            <button type="button" data-genre="arcade" aria-pressed="false">🕹️ Arcade</button>
-            <button type="button" data-genre="puzzle" aria-pressed="false">🧩 Puzzle</button>
-            <button type="button" data-genre="driving" aria-pressed="false">🏎️ Driving</button>
-            <button type="button" data-genre="survival" aria-pressed="false">🌲 Survival</button>
-          </div>
-          <p class="dh-game-results" id="dhGameResults" aria-live="polite">Browse by genre or search by name.</p>
-        </div>
-        <div class="dh-ggrid">
-          <a href="Games/off-brand-beat-battle.html" class="dh-gc" data-genre="arcade" style="--accent:#ff5ca8;--art:url('Games/art/off-brand-beat-battle.svg')">
-            <span class="dh-gc-art"><span class="dh-gc-genre">🕹️ Arcade</span><img src="Games/art/off-brand-beat-battle.svg" alt="Off-Brand Beat Battle logo" loading="lazy"></span>
-            <span class="dh-gc-body">
-              <span class="dh-gc-title">Off-Brand Beat Battle</span>
-              <span class="dh-gc-desc">Out-sing a muffin, a man in a trash can, a goose and a lawyer across four weeks. Buy upgrades and save a million for a cooler name. What could go wrong?</span>
-              <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-            </span>
-          </a>
-            <a href="Games/fix-it-crew.html" class="dh-gc" data-genre="sim" style="--accent:#ffb02e;--art:url('Games/art/fix-it-crew.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/fix-it-crew.svg" alt="Fix-It Crew: Builder Bo logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Fix-It Crew: Builder Bo</span>
-                <span class="dh-gc-desc">A 3D building game! Carry planks, dig ponds, pave paths and raise a Town Hall with Bo and the machine buddies across eight jobs.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/bundt-bakery.html" class="dh-gc" data-genre="sim" style="--accent:#f472b6;--art:url('Games/art/bundt-bakery.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/bundt-bakery.svg" alt="Bundt Bakery logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Bundt Bakery</span>
-                <span class="dh-gc-desc">Run a cozy bakery! Mix, pour, bake, flip and decorate bundt cakes for animal customers, then spend your coins on new flavors, glazes and pans.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/farm-idle.html" class="dh-gc" data-genre="sim" style="--accent:#84cc16;--art:url('Games/art/farm-idle.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏠 Sim</span><img src="Games/art/farm-idle.svg" alt="Farm Idle logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Farm Idle</span>
-                <span class="dh-gc-desc">Plant, harvest and automate a cheerful farm. Hire farmhands, ride out the weather, then hold a Harvest Festival for permanent sunseed upgrades.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/goose-gig.html" class="dh-gc" data-genre="adventure" style="--accent:#a855f7;--art:url('Games/art/goose-gig.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🗺️ Adventure</span><img src="Games/art/goose-gig.svg" alt="Honk and Roll logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Honk &amp; Roll: The Goose Gig</span>
-                <span class="dh-gc-desc">The Honk Empire goose gets kicked out of the nest and chases a music career. 3D cutscenes, five genres and a music battle against a new rival every level.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/sparkroot.html" class="dh-gc" data-genre="clicker" style="--accent:#f97316;--art:url('Games/art/sparkroot.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">👆 Clicker</span><img src="Games/art/sparkroot.svg" alt="Sparkroot logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Sparkroot</span>
-                <span class="dh-gc-desc">Grow a glowing upgrade tree, rebirth for seeds and unlock a rebirth tree of permanent powers.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/dougworld.html" class="dh-gc" data-genre="adventure" style="--accent:#38bdf8;--art:url('Games/art/dougworld.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🗺️ Adventure</span><img src="Games/art/dougworld.svg" alt="DougWorld 3D logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">DougWorld 3D</span>
-                <span class="dh-gc-desc">Play with friends in 3D: design your character, build working houses and play games.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/honk-empire.html" class="dh-gc" data-genre="clicker" style="--accent:#f43f5e;--art:url('Games/art/honk-empire.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">👆 Clicker</span><img src="Games/art/honk-empire.svg" alt="Honk Empire logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Honk Empire</span>
-                <span class="dh-gc-desc">Build a goose empire: pets, worlds, rebirths, events and a leaderboard.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/shadows-of-ashmere.html" class="dh-gc" data-genre="adventure" style="--accent:#8b5cf6;--art:url('Games/art/shadows-of-ashmere.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🗺️ Adventure</span><img src="Games/art/shadows-of-ashmere.svg" alt="Shadows of Ashmere logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Shadows of Ashmere</span>
-                <span class="dh-gc-desc">A pixel-art adventure. After raiders take your village, explore the Keep, the enchanted forest, the castle and its dungeons to win Ashmere back.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/quiet-woods.html" class="dh-gc" data-genre="survival" data-official-game="true" style="--accent:#22c55e;--art:url('Games/art/quiet-woods.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-badge">✦ Featured</span><span class="dh-gc-genre">🌲 Survival</span><img src="Games/art/quiet-woods.svg" alt="Wonder Woods logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">99 Nights in the Wonder Woods</span>
-                <span class="dh-gc-desc">Explore a colorful 3D forest, make friends with animals, collect treasures, build a cozy cabin, and uncover the mystery of 99 nights.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/titlebound.html" class="dh-gc" data-genre="clicker" style="--accent:#eab308;--art:url('Games/art/titlebound.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">👆 Clicker</span><img src="Games/art/titlebound.svg" alt="TITLEBOUND logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">TITLEBOUND: Realms of Fortune</span>
-                <span class="dh-gc-desc">Roll from 650 cosmic titles, hunt nine rarity tiers, collect absurd discoveries, and grow a permanent luck upgrade tree.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/bubble-grove.html" class="dh-gc" data-genre="arcade" style="--accent:#06b6d4;--art:url('Games/art/bubble-grove.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🕹️ Arcade</span><img src="Games/art/bubble-grove.svg" alt="Bubble Grove logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Bubble Grove</span>
-                <span class="dh-gc-desc">A cozy woodland bubble shooter. Aim, match 3 or more of the same color, pop clusters, and drop floating bubbles for bonus points.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/starfall-run.html" class="dh-gc" data-genre="arcade" style="--accent:#f59e0b;--art:url('Games/art/starfall-run.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🕹️ Arcade</span><img src="Games/art/starfall-run.svg" alt="Starfall Run logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Starfall Run</span>
-                <span class="dh-gc-desc">Dodge the meteor storm, dash through danger, and collect glowing shards as the pace ramps up.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/crystal-breaker.html" class="dh-gc" data-genre="arcade" style="--accent:#60a5fa;--art:url('Games/art/crystal-breaker.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🕹️ Arcade</span><img src="Games/art/crystal-breaker.svg" alt="Crystal Breaker logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Crystal Breaker</span>
-                <span class="dh-gc-desc">A neon brick-breaker. Keep the energy core alive, clear crystal waves, and chase a high score.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <div class="dh-gc dh-gc-drive" id="drivePigSwitcher" data-genre="driving" style="--accent:#f472b6;--art:url('Games/art/drive-pig.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-badge">2 games in 1</span><span class="dh-gc-genre">🏎️ Driving</span><img id="drivePigIcon" src="Games/art/drive-pig.svg" alt="Drive Pig logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title" id="drivePigTitle">Drive Pig</span>
-                <span class="dh-gc-desc" id="drivePigDescription">Pick the classic stunt course or jump into Pig Racing3D.</span>
-                <span class="drive-pig-toggle" role="group" aria-label="Choose a Drive Pig game version">
-                  <span class="drive-pig-slider" id="drivePigSlider"></span>
-                  <button type="button" class="drive-pig-option active" data-drive-version="classic" aria-pressed="true"><span class="drive-pig-option-icon">🐷</span><span><b>Drive Pig</b><small>Classic</small></span></button>
-                  <button type="button" class="drive-pig-option" data-drive-version="racing" aria-pressed="false"><span class="drive-pig-option-icon">🏎️</span><span><b>Pig Racing3D</b><small>3D racer</small></span></button>
-                </span>
-                <span class="dh-gc-status"><span class="drive-pig-live-dot"></span><span id="drivePigStatus">Classic stunt-course adventure</span></span>
-                <a class="dh-gc-play" id="drivePigPlay" href="Games/drive-pig.html">PLAY DRIVE PIG <span>→</span></a>
-              </span>
-            </div>
-            <a href="Games/ocean-drive.html" class="dh-gc" data-genre="driving" style="--accent:#0ea5e9;--art:url('Games/art/ocean-drive.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏎️ Driving</span><img src="Games/art/ocean-drive.svg" alt="Ocean Drive logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Ocean Drive</span>
-                <span class="dh-gc-desc">Explore a detailed Miami-style beach district, walk the promenade, hop into cars, cruise with traffic, and visit the shore.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/racing.html" class="dh-gc" data-genre="driving" style="--accent:#fb923c;--art:url('Games/art/racing.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🏎️ Driving</span><img src="Games/art/racing.svg" alt="Doug Racing logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Doug Racing</span>
-                <span class="dh-gc-desc">Race around the track and try to beat your best time.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/pig-clicker.html" class="dh-gc" data-genre="clicker" style="--accent:#ec4899;--art:url('Games/art/pig-clicker.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">👆 Clicker</span><img src="Games/art/pig-clicker.svg" alt="Pig Clicker logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Pig Clicker</span>
-                <span class="dh-gc-desc">Click the pig, earn points, and keep upgrading.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/rebirth-clicker.html" class="dh-gc" data-genre="clicker" style="--accent:#ef4444;--art:url('Games/art/rebirth-clicker.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">👆 Clicker</span><img src="Games/art/rebirth-clicker.svg" alt="Rebirth Clicker logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Rebirth Clicker</span>
-                <span class="dh-gc-desc">Click, upgrade, rebirth, and build your progress.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/puzzle.html" class="dh-gc" data-genre="puzzle" style="--accent:#f59e0b;--art:url('Games/art/puzzle.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🧩 Puzzle</span><img src="Games/art/puzzle.svg" alt="Doug Puzzle logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Doug Puzzle</span>
-                <span class="dh-gc-desc">Slide, merge, and plan ahead in the classic 2048 number puzzle.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/sudoku.html" class="dh-gc" data-genre="puzzle" style="--accent:#818cf8;--art:url('Games/art/sudoku.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🧩 Puzzle</span><img src="Games/art/sudoku.svg" alt="Sudoku logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">DougHub Sudoku</span>
-                <span class="dh-gc-desc">A timed 9×9 logic puzzle with touch-friendly number controls and restart.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/gem-garden.html" class="dh-gc" data-genre="puzzle" style="--accent:#10b981;--art:url('Games/art/gem-garden.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🧩 Puzzle</span><img src="Games/art/gem-garden.svg" alt="Gem Garden logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Gem Garden</span>
-                <span class="dh-gc-desc">Swap colorful gems, build matches, and clear the board before your moves run out.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/pipe-parade.html" class="dh-gc" data-genre="puzzle" style="--accent:#14b8a6;--art:url('Games/art/pipe-parade.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🧩 Puzzle</span><img src="Games/art/pipe-parade.svg" alt="Pipe Parade logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Pipe Parade</span>
-                <span class="dh-gc-desc">Rotate the pipe pieces and connect the route from start to finish.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/rune-decode.html" class="dh-gc" data-genre="puzzle" style="--accent:#a78bfa;--art:url('Games/art/rune-decode.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🧩 Puzzle</span><img src="Games/art/rune-decode.svg" alt="Rune Decoder logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Rune Decoder</span>
-                <span class="dh-gc-desc">Crack a longer rune cipher. Translate the symbols, reverse the shift, and solve the hidden word.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-            <a href="Games/brick-bounce.html" class="dh-gc" data-genre="arcade" style="--accent:#6366f1;--art:url('Games/art/brick-bounce.svg')">
-              <span class="dh-gc-art"><span class="dh-gc-genre">🕹️ Arcade</span><img src="Games/art/brick-bounce.svg" alt="Brick Bounce logo" loading="lazy"></span>
-              <span class="dh-gc-body">
-                <span class="dh-gc-title">Brick Bounce</span>
-                <span class="dh-gc-desc">Keep the ball moving, steer your paddle, and clear every block.</span>
-                <span class="dh-gc-play">Play now <span aria-hidden="true">▶</span></span>
-              </span>
-            </a>
-          </div>
-
-    </section>
-
-
-
-
-    <!-- TRENDING GAMES -->
+<!-- TRENDING GAMES -->
 
     <section class="section" id="trendingSection">
         <div class="section-header">
             <div>
-                <h2 class="section-title">🔥 Trending Games</h2>
+                <h2 class="section-title">Trending Games</h2>
                 <p class="section-subtitle">A live leaderboard for DougHub games and community creations.</p>
             </div>
             <div class="trending-controls" role="group" aria-label="Sort trending games">

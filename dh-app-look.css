@@ -132,3 +132,63 @@ body .settings-layout>.settings-sidebar{transform:none!important;position:sticky
 
 /* the Calls tab replaces the separate "Video call" button in chat */
 .chat-top a.chat-video-call-button[href$="chat-calls.html"]{display:none!important}
+
+/* ===== Games page ===== */
+.gm-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:34px 0 18px}
+.gm-kicker{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;color:#a5b4fc}
+.gm-copy h1{margin:6px 0 0;font-size:clamp(38px,7vw,66px);line-height:1.02;letter-spacing:-.025em}
+.gm-copy p{margin:12px 0 0;color:var(--dh-mute);font-size:18px;max-width:520px}
+.gm-acts{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:22px}
+.gm-meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;color:var(--dh-mute);font-size:14px}.gm-meta strong{color:#d8b4fe;font-size:16px}
+.gm-collage{position:relative;height:300px}
+.gm-collage img{position:absolute;border-radius:28px;object-fit:cover;box-shadow:0 22px 50px #000a;border:3px solid #ffffff22}
+.gm-collage .c1{width:58%;height:78%;left:0;top:10%;transform:rotate(-5deg)}
+.gm-collage .c2{width:48%;height:62%;right:4%;top:0;transform:rotate(4deg)}
+.gm-collage .c3{width:46%;height:58%;right:10%;bottom:0;transform:rotate(-2deg)}
+.gm-jump{display:flex!important;gap:8px;flex-wrap:wrap;padding:10px 0!important;background:none!important;border:0!important;margin:6px 0 4px}
+.gm-jump a{padding:9px 18px!important;border-radius:999px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;color:#cfd5ff!important;font-weight:700;font-size:14px;text-decoration:none}
+.gm-jump a.active,.gm-jump a:hover{background:linear-gradient(135deg,var(--dh-a),var(--dh-b))!important;border-color:transparent!important;color:#fff!important}
+body:has(#dhGameBrowser) .section{margin-top:34px}
+body:has(#dhGameBrowser) .section-title{font-size:clamp(24px,4vw,34px);letter-spacing:-.015em}
+body:has(#dhGameBrowser) .section-subtitle{color:var(--dh-mute)}
+
+/* genre pills and search */
+.dh-game-browser{display:flex;flex-direction:column;gap:12px;margin:6px 0 18px}
+.dh-game-genres{display:flex;gap:8px;flex-wrap:wrap}
+.dh-game-genres button{padding:9px 18px!important;border-radius:999px!important;border:1px solid var(--dh-line)!important;background:var(--dh-panel)!important;color:#cfd5ff!important;font-weight:700;cursor:pointer}
+.dh-game-genres button.active{background:linear-gradient(135deg,var(--dh-a),var(--dh-b))!important;border-color:transparent!important;color:#fff!important}
+.dh-game-search-wrap{border-radius:16px!important;background:var(--dh-panel2)!important;border:1px solid var(--dh-line)!important}
+
+/* the game cards: big picture on top, name and text below */
+.dh-ggrid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))!important;gap:20px!important}
+.dh-gc{display:flex!important;flex-direction:column!important;padding:0!important;border-radius:26px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;overflow:hidden!important;position:relative;color:inherit;text-decoration:none;min-height:0!important;transition:transform .2s,box-shadow .2s,border-color .2s}
+.dh-gc:hover{transform:translateY(-6px);border-color:var(--accent,#8b5cf6)!important;box-shadow:0 22px 50px #0009}
+.dh-gc-art{position:relative;display:block!important;height:auto!important;aspect-ratio:16/9;overflow:hidden;background:var(--accent,#6366f1)!important}
+.dh-gc-art img{position:absolute!important;inset:0;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:0!important;box-shadow:none!important;object-position:center 40%;transition:transform .4s}
+.dh-gc:hover .dh-gc-art img{transform:scale(1.07)}
+.dh-gc-genre,.dh-gc-badge{position:absolute!important;top:12px;z-index:2;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;background:#0b0e20b8;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.dh-gc-genre{left:12px}.dh-gc-badge{right:12px;background:linear-gradient(135deg,#f59e0b,#ef4444)}
+.dh-gc-body{display:flex!important;flex-direction:column;gap:6px;padding:16px 20px 20px!important;flex:1}
+.dh-gc-title{font-size:20px!important;font-weight:800;letter-spacing:-.01em}
+.dh-gc-desc{color:var(--dh-mute);font-size:14.5px!important;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dh-gc-play{margin-top:auto;padding-top:10px;font-weight:800;color:var(--accent,#a5b4fc);font-size:14px}
+.dh-gc-drive .dh-gc-desc{-webkit-line-clamp:2}
+
+/* daily games strip */
+.dh-daily-section{margin-top:34px!important;padding:24px!important;border-radius:28px!important;background:linear-gradient(120deg,#6366f126,#a855f720)!important;border:1px solid var(--dh-line)!important}
+.dh-daily-quickgrid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;gap:14px!important}
+.dh-daily-quick{border-radius:20px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important}
+
+/* character shop banner */
+.gm-shop{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin:34px 0;padding:22px 26px;border-radius:28px;background:linear-gradient(120deg,#6366f140,#a855f740);border:1px solid #6366f180}
+.gm-shop img{width:min(240px,100%);aspect-ratio:16/9;object-fit:cover;border-radius:20px;box-shadow:0 14px 34px #0007}
+.gm-shop-text{flex:1;min-width:240px}.gm-shop-text h2{margin:6px 0 4px;font-size:26px}.gm-shop-text p{margin:0;color:var(--dh-mute)}
+.gm-shop-acts{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+/* community and trending cards built by the page script */
+.community-card,.trending-card{border-radius:22px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important}
+.trending-panel{border-radius:26px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important}
+.trending-tab{border-radius:999px!important}.trending-tab.active{background:linear-gradient(135deg,var(--dh-a),var(--dh-b))!important;color:#fff!important}
+@media (max-width:860px){.gm-hero{grid-template-columns:1fr}.gm-collage{height:220px}}
+.dh-gc[hidden],.dh-ggroup[hidden],.dh-daily-quick[hidden]{display:none!important}
+.dh-game-search-wrap{width:100%!important;max-width:none!important}
