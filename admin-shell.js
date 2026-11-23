@@ -21,7 +21,7 @@
     { key: "community", title: "Community", icon: "💬", blurb: "Reports, chat and everything members post.",
       groups: [["reports", "Reports"], ["chat", "Chat"], ["content", "Games & media"]] },
     { key: "tools", title: "Tools", icon: "🧰", blurb: "Developer tools, site settings and logs.",
-      groups: [["dev", "Developer"], ["site", "Site settings"], ["logs", "Logs"]] }
+      groups: [["app", "DougHub app"], ["dev", "Developer"], ["site", "Site settings"], ["logs", "Logs"]] }
   ];
   // [how to recognise the card, page, group, minimum rank]. Unknown cards default to Owner-only.
   const REGISTRY = [
@@ -43,6 +43,7 @@
     ["#dougHubMusicModerationCard", "community", "content", 2],
     ["h2:code projects", "community", "content", 3],
     ["#customBadgeManagerCard", "community", "content", 3],
+    ["#dhAppCard", "tools", "app", 1],
     ["#feedbackManagementCard", "tools", "dev", 3],
     ["#gameRequestsManagementCard", "tools", "dev", 3],
     ["#siteFeatureCard", "tools", "dev", 3],
@@ -95,6 +96,7 @@
         '<a class="dh-brand" href="index.html" title="Back to DougHub"><b>Doug<span>Hub</span></b><small>Admin</small></a>' +
         '<nav id="dhNav"></nav>' +
         '<div class="dh-me"><div class="dh-avatar" id="dhMeAvatar">?</div><div class="dh-me-text"><strong id="dhMeName">Loading…</strong><div id="dhMeRank"></div></div></div>' +
+        '<a class="dh-back" href="app/" target="_blank" rel="noopener">📱 Open the DougHub app</a>' +
         '<a class="dh-back" href="index.html">← Back to DougHub</a>' +
       "</aside>" +
       '<div id="dhScrim"></div>' +

@@ -11,7 +11,7 @@
 <script src="display.js"></script>
 <script src="chat-access-admin.js?v=9" defer></script>
 <link rel="stylesheet" href="admin-shell.css?v=3">
-<script src="admin-shell.js?v=4" defer></script>
+<script src="admin-shell.js?v=5" defer></script>
 
 <style>
 * {
@@ -1507,6 +1507,50 @@ body{padding:clamp(10px,1.3vw,22px)!important;background:radial-gradient(ellipse
   </form>
   <div class="staff-current-list" id="staffCurrentList"></div>
 </div>
+
+<div class="card" id="dhAppCard">
+  <h2>📱 DougHub App</h2>
+  <p class="admin-card-help">The app and this website share one account system, one chat and one database. What you change here shows up in the app straight away.</p>
+  <div class="status" id="dhAppStatus" role="status">Loading app settings...</div>
+  <div id="dhAppFlags"></div>
+  <div id="dhAppStats" style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0"></div>
+  <h3 style="margin:14px 0 6px;font-size:15px">Latest messages (same chat as the app)</h3>
+  <div id="dhAppChat" style="display:grid;gap:6px;max-height:260px;overflow:auto"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><a class="save-button" href="app/" target="_blank" rel="noopener" style="text-decoration:none">Open the app ↗</a><a class="save-button" href="chat.html" target="_blank" rel="noopener" style="text-decoration:none">Open web chat ↗</a></div>
+</div>
+
+<script>
+(function(){
+  var LABELS={app_chat_visible:["Show Chat in the app","Members see the Chat tab in the DougHub app."],app_calls_visible:["Show Calls in the app","Members see the Calls tab in the DougHub app."]};
+  var $=function(id){return document.getElementById(id);};
+  var esc=function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});};
+  function db(){return window.DougHubSupabaseClient||(typeof supabaseClient!=="undefined"&&supabaseClient)||null;}
+  function stat(label,v){return '<div style="flex:1;min-width:130px;padding:12px 14px;border-radius:14px;background:#1a2048;border:1px solid #2a3160"><div style="font-size:22px;font-weight:800">'+esc(v)+'</div><div style="color:#a3acd9;font-size:12px">'+esc(label)+'</div></div>';}
+  async function load(){
+    var c=db(),st=$("dhAppStatus");if(!c){setTimeout(load,800);return;}
+    var f=await c.from("app_flags").select("flag_key,enabled").order("flag_key");
+    if(f.error){st.textContent="Couldn't load app settings: "+f.error.message;return;}
+    st.textContent="";
+    $("dhAppFlags").innerHTML=(f.data||[]).map(function(r){var l=LABELS[r.flag_key]||[r.flag_key,""];return '<label style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #2a3160"><input type="checkbox" data-flag="'+esc(r.flag_key)+'"'+(r.enabled?" checked":"")+' style="width:20px;height:20px"><span><strong>'+esc(l[0])+'</strong><br><small style="color:#a3acd9">'+esc(l[1])+'</small></span></label>';}).join("");
+    $("dhAppFlags").querySelectorAll("input").forEach(function(i){i.addEventListener("change",async function(){var r=await c.rpc("dh_app_set_flag",{p_key:i.dataset.flag,p_enabled:i.checked});if(r.error){i.checked=!i.checked;st.textContent="Couldn't save: "+r.error.message;}else{st.textContent="Saved. The app picks it up the next time it opens.";}});});
+    var since=new Date(Date.now()-864e5).toISOString();
+    var q=await Promise.all([
+      c.from("dh_game_scores").select("user_id",{count:"exact",head:true}),
+      c.from("chat_messages").select("id",{count:"exact",head:true}).is("group_id",null).gte("created_at",since),
+      c.from("dh_game_scores").select("user_id").limit(1000)]);
+    var players=q[2].data?new Set(q[2].data.map(function(x){return x.user_id;})).size:"—";
+    $("dhAppStats").innerHTML=stat("Saved high scores",q[0].error?"—":q[0].count)+stat("Players with scores",players)+stat("Chat messages, last 24h",q[1].error?"—":q[1].count);
+    loadChat();
+  }
+  async function loadChat(){
+    var c=db();var r=await c.from("chat_messages").select("id,username,message,created_at").is("group_id",null).order("created_at",{ascending:false}).limit(12);
+    var box=$("dhAppChat");if(r.error){box.textContent="Couldn't load chat.";return;}
+    box.innerHTML=(r.data||[]).map(function(m){return '<div style="display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:#141935;border:1px solid #2a3160"><div style="flex:1;min-width:0"><strong>'+esc(m.username)+'</strong> <small style="color:#a3acd9">'+new Date(m.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+'</small><div style="overflow-wrap:anywhere">'+esc(m.message)+'</div></div><button type="button" data-del="'+esc(m.id)+'" class="save-button" style="background:#7f1d1d">Delete</button></div>';}).join("")||"<small>No messages yet.</small>";
+    box.querySelectorAll("[data-del]").forEach(function(b){b.addEventListener("click",async function(){if(!confirm("Delete this message everywhere (website and app)?"))return;var d=await c.from("chat_messages").delete().eq("id",b.dataset.del);if(d.error)$("dhAppStatus").textContent="Couldn't delete: "+d.error.message;else loadChat();});});
+  }
+  load();
+})();
+</script>
 
 <div class="card" id="siteFeatureCard">
     <h2>⚙️ Site Features</h2>

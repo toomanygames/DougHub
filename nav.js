@@ -20,6 +20,11 @@
       link.rel = "stylesheet"; link.href = new URL("seasonal-theme.css?v=20261026-custom-palette", root).href;
       link.dataset.dhSeasonalCss = "true"; document.head.appendChild(link);
     }
+    if (!document.querySelector('link[data-dh-app-look]')) {
+      const look = document.createElement("link");
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-applook", root).href;
+      look.dataset.dhAppLook = "true"; document.head.appendChild(look);
+    }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
       const script = document.createElement("script");
       script.src = new URL("seasonal-theme.js?v=20261026-custom-palette", root).href;
@@ -67,7 +72,7 @@
   const API = "https://agsqdqcsmsppcdqxlppj.supabase.co/rest/v1/site_feature_flags?select=feature_key,enabled,display_name";
   const KEY = "sb_publishable_Oq1WvEHgoHcjmCBGbEnoYQ_BqYA1p52";
   const pathMap = {
-    "douggames.html":"games","games/ocean-drive.html":"games","games/drive-pig.html":"games","games/dve-pig.html":"games",
+    "douggames.html":"games","games/ocean-drive.html":"games","games/drive-pig.html":"games",
     "games/pig-clicker.html":"games","games/pig-clicker-space.html":"games","games/puzzle.html":"games",
     "games/racing.html":"games","games/rebirth-clicker.html":"games","games/honk-empire.html":"games","games/sparkroot.html":"games","games/farm-idle.html":"games","games/goose-gig.html":"games","games/bundt-bakery.html":"games","games/fix-it-crew.html":"games","games/off-brand-beat-battle.html":"games","games/shadows-of-ashmere.html":"games","games/dougworld.html":"games","games/smack-n-punch.html":"games",
     "dougtube.html":"dougtube","douqhub-music.html":"music","dougforum.html":"forum","dmail.html":"dmail","nova.html":"nova",
