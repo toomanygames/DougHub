@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-ten", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-twelve", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
@@ -188,7 +188,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html", "tos.html", "settings.html", "report.html", "my-games.html", "download.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
@@ -612,8 +612,16 @@
       if (key === p) a.className = "on";
       bar.appendChild(a);
     });
+    const own = document.querySelector(".chat-top, .call-header, header.topbar");
+    if (own) {
+      bar.classList.add("inline");
+      const head = own.querySelector(".chat-heading");
+      if (head) head.insertAdjacentElement("afterend", bar); else own.appendChild(bar);
+      return;
+    }
     const header = document.querySelector("header");
     if (header) header.insertAdjacentElement("afterend", bar);
+    else document.body.insertAdjacentElement("afterbegin", bar);
   }
   function markActiveLinks() {
     const current = pathKey();

@@ -104,3 +104,31 @@ header .logo-icon{width:40px!important;height:40px!important}
 .sp.big img{aspect-ratio:21/9}
 @media (max-width:900px){.sp.big,.sp.mid{grid-column:span 6}.sp.sm{grid-column:span 6}}
 @media (max-width:560px){.sp.big,.sp.mid,.sp.sm{grid-column:span 12}}
+
+/* one standard page header for every page */
+header.dh-head{height:70px!important;position:sticky!important;top:0;z-index:1000;padding:0 clamp(16px,4vw,52px)!important;display:flex!important;align-items:center;justify-content:space-between!important;gap:20px;background:#0b0e20d9!important;border-bottom:1px solid var(--dh-line)!important}
+header.dh-head .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;color:#fff;text-decoration:none}
+header.dh-head .logo-icon{width:40px;height:40px;display:block}
+header.dh-head .nav{display:flex;align-items:center;gap:8px}
+
+/* page banner with an illustration, same on every page */
+.dh-pagehero{display:flex;align-items:center;gap:26px;flex-wrap:wrap;margin:26px auto 22px;padding:22px 26px;border-radius:28px;background:linear-gradient(120deg,#6366f126,#a855f720);border:1px solid var(--dh-line)}
+.dh-pagehero img{width:min(240px,100%);aspect-ratio:16/9;object-fit:cover;border-radius:20px;box-shadow:0 14px 34px #0007;flex:none}
+.dh-pagehero h1{margin:0;font-size:clamp(28px,5vw,44px);line-height:1.08;letter-spacing:-.02em;background:linear-gradient(90deg,#c7d2fe,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dh-pagehero p{margin:8px 0 0;color:var(--dh-mute);font-size:17px;max-width:620px}
+.dh-pagehero .acts{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+
+/* Messages tabs sit inside a page's own top bar when it has one (chat, calls, DMail) */
+.dh-msgtabs.inline{padding:0;background:none;border:0;margin:0 auto 0 14px;flex:none}
+.dh-msgtabs.inline a{padding:6px 14px;font-size:13px}
+
+/* forum: illustrated banner behind the intro, and a normal sticky side list instead of a panel pinned to the screen edge */
+body:has(#communityNav) .hero{background:linear-gradient(90deg,#0b0d1dfa 35%,#0b0d1dd6 65%,#0b0d1d99),url("/assets/art/forum.svg") right center/cover no-repeat!important}
+body:has(#communityNav) .hero .hero-mark{display:none!important}
+body .layout>.side{transform:none!important;position:sticky!important;top:90px!important;left:auto!important;width:auto!important;max-height:calc(100vh - 110px)!important;overflow-y:auto!important;z-index:1!important;border-radius:20px!important}
+
+/* settings: side list scrolls with the page instead of being pinned over the banner */
+body .settings-layout>.settings-sidebar{transform:none!important;position:sticky!important;top:90px!important;left:auto!important;right:auto!important;width:auto!important;max-height:calc(100vh - 110px)!important;z-index:2!important}
+
+/* the Calls tab replaces the separate "Video call" button in chat */
+.chat-top a.chat-video-call-button[href$="chat-calls.html"]{display:none!important}
