@@ -30,7 +30,7 @@ header .nav{display:flex;align-items:center;gap:8px}
     <div class="dh-avatar" id="profileAvatar">D</div>
     <div><h1><span class="gradient-text" id="welcomeTitle">Your DougHub home</span></h1><p id="profileEmail">Pick up where you left off.</p></div>
   </section>
-  <div class="btns"><a class="button button-primary" href="douggames.html">Play games</a><a class="button" href="Scripting/scripting.html">Create a project</a><a class="dh-app-chip" href="app/">Open the app</a><a class="button" href="settings.html">Settings</a><a class="button" href="profile.html">My showcase</a></div>
+  <div class="btns"><a class="button button-primary" href="douggames.html">Play games</a><a class="button" href="Scripting/scripting.html">Create a project</a><a class="dh-app-chip" href="app/">Open the app</a><span id="memberBtns"><a class="button" href="settings.html">Settings</a> <a class="button" href="profile.html">My showcase</a></span><span id="guestBtns" hidden><a class="button button-primary" href="log-in.html?redirect=dashboard.html">Log in</a> <a class="button" href="log-in.html?redirect=dashboard.html&mode=signup">Sign up</a></span></div>
 
   <div class="dh-title">YOUR SPACES</div>
   <div class="dh-grid">
@@ -53,11 +53,11 @@ header .nav{display:flex;align-items:center;gap:8px}
 
   <div class="dh-title">ACTIVITY</div>
   <div class="dh-two">
-    <section class="card dh-box"><h2>Your creations</h2><div id="myCreations"><div class="dh-empty">Loading&hellip;</div></div></section>
+    <section class="card dh-box" id="mineBox"><h2>Your creations</h2><div id="myCreations"><div class="dh-empty">Loading&hellip;</div></div></section>
     <section class="card dh-box"><h2>Latest in the forum</h2><div id="recentForumPosts"><div class="dh-empty">Loading&hellip;</div></div></section>
   </div>
-  <div class="dh-title">ACCOUNT</div>
-  <section class="card dh-box"><div style="display:flex;gap:24px;flex-wrap:wrap"><div><small style="color:var(--dh-mute)">Signed in as</small><div><b id="profileName">&mdash;</b></div></div><div><small style="color:var(--dh-mute)">Member since</small><div><b id="memberSince">&mdash;</b></div></div><div><small style="color:var(--dh-mute)">Account</small><div><b id="accountType">&mdash;</b></div></div></div></section>
+  <div class="dh-title" id="acctTitle">ACCOUNT</div>
+  <section class="card dh-box" id="acctBox"><div style="display:flex;gap:24px;flex-wrap:wrap"><div><small style="color:var(--dh-mute)">Signed in as</small><div><b id="profileName">&mdash;</b></div></div><div><small style="color:var(--dh-mute)">Member since</small><div><b id="memberSince">&mdash;</b></div></div><div><small style="color:var(--dh-mute)">Account</small><div><b id="accountType">&mdash;</b></div></div></div></section>
 </main>
 <script>
 "use strict";
@@ -73,15 +73,18 @@ function renderForum(rows,names){const h=$("recentForumPosts");if(!rows.length){
 async function load(){
  const {data:sd}=await supabaseClient.auth.getSession();
  currentUser=(sd&&sd.session&&sd.session.user)||null;
- if(!currentUser){location.replace("log-in.html?redirect=dashboard.html");return;}
+ const guest=!currentUser;
+ if(guest){["mineBox","acctTitle","acctBox","memberBtns"].forEach(i=>$(i).hidden=true);$("guestBtns").hidden=false;$("welcomeTitle").textContent="Welcome to DougHub";$("profileEmail").textContent="Play, chat and create. Log in to save your progress.";}
+ const none={data:null,error:null};
  const [pr,own,games,members,recent,forum]=await Promise.all([
-  supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle(),
-  supabaseClient.from("community_games").select("id,title,category,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false}).limit(30),
+  guest?none:supabaseClient.from("profiles").select("username,avatar_url,is_admin").eq("id",currentUser.id).maybeSingle(),
+  guest?none:supabaseClient.from("community_games").select("id,title,category,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false}).limit(30),
   supabaseClient.from("community_games").select("id",{count:"exact",head:true}),
   supabaseClient.from("profiles").select("id",{count:"exact",head:true}),
   supabaseClient.from("community_games").select("id",{count:"exact",head:true}).gte("created_at",new Date(Date.now()-7*864e5).toISOString()),
   supabaseClient.from("dougforum_posts").select("id,title,author_id,created_at,dougforum_communities(name,slug)").order("created_at",{ascending:false}).limit(4)]);
- const profile=pr.data||{},name=profile.username||(currentUser.user_metadata&&currentUser.user_metadata.username)||(currentUser.email||"").split("@")[0]||"Member";
+ const profile=pr.data||{},name=guest?"":profile.username||(currentUser.user_metadata&&currentUser.user_metadata.username)||(currentUser.email||"").split("@")[0]||"Member";
+ if(!guest){
  $("welcomeTitle").textContent="Welcome back, "+name;
  $("profileName").textContent=name;
  $("profileEmail").textContent=/@users\.doughub\.invalid$/.test(currentUser.email||"")?"Pick up where you left off.":(currentUser.email||"Signed in");
@@ -90,6 +93,7 @@ async function load(){
  $("accountType").textContent=profile.is_admin===true?"Administrator":"Member";
  $("myGameTotal").textContent=own.error?"—":Number((own.data||[]).length).toLocaleString();
  renderMine(own.error?[]:(own.data||[]));
+ }
  $("communityTotal").textContent=games.error?"—":Number(games.count||0).toLocaleString();
  $("memberTotal").textContent=members.error?"—":Number(members.count||0).toLocaleString();
  $("recentTotal").textContent=recent.error?"—":Number(recent.count||0).toLocaleString();
