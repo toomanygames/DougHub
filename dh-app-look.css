@@ -218,3 +218,49 @@ body:has(#dhGameBrowser) .section-header{margin-bottom:16px;padding-bottom:12px;
 body:has(#dhGameBrowser) .section-title::before,body:has(#dhGameBrowser) .section-title::after{display:none!important}
 body:has(#dhGameBrowser) .section-title{padding-left:0!important;border-left:0!important}
 @media (max-width:900px){.gm-spot{grid-template-columns:1fr}.gm-feature{min-height:280px}}
+
+/* ===== Chat remake ===== */
+body:has(.chat-container) .chat-top{background:#0e1228!important;border-bottom:1px solid var(--dh-line)!important;padding:10px 18px!important;gap:12px!important}
+body:has(.chat-container) .chat-heading h1{font-size:21px!important;letter-spacing:-.01em}
+body:has(.chat-container) .chat-heading span{color:var(--dh-mute)!important}
+body:has(.chat-container) .chat-status{border-radius:999px!important;background:#34d39922!important;border:1px solid #34d39966!important;color:#86efac!important;padding:5px 12px!important}
+body:has(.chat-container) .chat-video-call-button,body:has(.chat-container) .chat-back-button{border-radius:999px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important}
+body:has(.chat-container) .chat-sidebar{background:#0e1228!important;border-right:1px solid var(--dh-line)!important}
+body:has(.chat-container) .sidebar-heading{color:var(--dh-mute)!important;letter-spacing:.12em}
+body:has(.chat-container) .group-pill{border-radius:16px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;padding:10px 12px!important;transition:border-color .15s}
+body:has(.chat-container) .group-pill:hover{border-color:#8b5cf6!important}
+body:has(.chat-container) .group-pill.active{background:linear-gradient(135deg,#6366f1,#a855f7)!important;border-color:transparent!important;color:#fff!important}
+body:has(.chat-container) .group-action.primary{border-radius:16px!important;background:linear-gradient(135deg,#6366f1,#a855f7)!important;border:0!important;color:#fff!important;font-weight:800;box-shadow:0 8px 22px #6366f155}
+body:has(.chat-container) .chat-main-panel{background:transparent!important}
+body:has(.chat-container) .messages{background:transparent!important}
+body:has(.chat-container) .message-avatar{border-radius:14px!important}
+body:has(.chat-container) .message-bubble{border-radius:6px 20px 20px 20px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;box-shadow:0 6px 18px #0004}
+body:has(.chat-container) .message-username{font-weight:800}
+body:has(.chat-container) .composer{border-radius:24px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;margin:10px 14px 14px!important;box-shadow:0 14px 36px #0006}
+body:has(.chat-container) .composer button[type=submit],body:has(.chat-container) #sendButton{border-radius:999px!important;background:linear-gradient(135deg,#6366f1,#a855f7)!important;border:0!important;color:#fff!important;font-weight:800}
+
+/* ===== Music remake ===== */
+body:has(.music-hero) .music-hero{position:relative;overflow:hidden;border-radius:32px!important;border:1px solid var(--dh-line)!important;background:linear-gradient(90deg,#0b0d1df5 35%,#0b0d1d99),url("/assets/art/music.svg") right center/cover no-repeat!important;min-height:260px}
+body:has(.music-hero) .music-hero h1{font-size:clamp(36px,6vw,64px)!important;letter-spacing:-.025em;background:linear-gradient(90deg,#fde68a,#fb923c,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+body:has(.music-hero) .music-hero-disc{filter:drop-shadow(0 18px 40px #000a)}
+body:has(.music-hero) .music-section{margin-top:30px}
+body:has(.music-hero) .music-section-head h2{font-size:26px!important;letter-spacing:-.01em}
+body:has(.music-hero) .music-album-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;gap:18px!important}
+body:has(.music-hero) .music-album-grid>*{border-radius:24px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;overflow:hidden;transition:transform .18s,border-color .18s}
+body:has(.music-hero) .music-album-grid>*:hover{transform:translateY(-5px);border-color:#fb923c!important}
+body:has(.music-hero) .music-track{border-radius:18px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;margin-bottom:8px;transition:border-color .15s}
+body:has(.music-hero) .music-track:hover{border-color:#fb923c!important}
+body:has(.music-hero) .music-track-play{border-radius:50%!important;background:linear-gradient(135deg,#f59e0b,#ef4444)!important;border:0!important;color:#fff!important}
+body:has(.music-hero) .music-player{background:#0e1228ee!important;border-top:1px solid var(--dh-line)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+
+/* ===== Forum remake ===== */
+body:has(#communityNav) .post{border-radius:24px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;padding:18px 20px!important;margin-bottom:14px!important;box-shadow:0 10px 28px #0004;transition:border-color .15s,transform .15s}
+body:has(#communityNav) .post:hover{border-color:#8b5cf6!important;transform:translateY(-2px)}
+body:has(#communityNav) .vote-column{background:var(--dh-panel2)!important;border-radius:16px!important;padding:6px!important}
+body:has(#communityNav) .vote.up.active,body:has(#communityNav) .vote.active{color:#86efac!important}
+body:has(#communityNav) .community-tag{border-radius:999px!important;background:#34d39922!important;border:1px solid #34d39955!important;color:#86efac!important;padding:3px 12px!important;font-weight:800}
+body:has(#communityNav) .community-choice{border-radius:16px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;transition:border-color .15s}
+body:has(#communityNav) .community-choice:hover{border-color:#34d399!important}
+body:has(#communityNav) .community-choice.active{background:linear-gradient(135deg,#059669,#6366f1)!important;border-color:transparent!important;color:#fff!important}
+body:has(#communityNav) .post-title,body:has(#communityNav) .post-content h3{letter-spacing:-.01em}
+body:has(#communityNav) .post-actions button,body:has(#communityNav) .post-tools button{border-radius:999px!important}

@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-sixteen", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-seventeen", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {

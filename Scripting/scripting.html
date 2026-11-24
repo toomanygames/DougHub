@@ -1,405 +1,107 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DougCode • Game Creator &amp; Projects</title>
-<link rel="icon" href="../DougHub.svg" type="image/x-icon">
+<meta name="theme-color" content="#0b0e20">
+<title>DougCode • Share projects and make games</title>
+<meta name="description" content="Write code in Web, JavaScript, Python or Lua, build with blocks, share your projects and publish games to Community Games.">
+<link rel="icon" href="../DougHub.svg" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../display.js"></script>
-<!-- DougCode is usable without an account; publishing still requires sign-in. -->
-<script src="../nav.js?v=20261123-sixteen" defer></script>
-<link rel="stylesheet" href="scripting.css?v=5">
+<script src="../nav.js?v=20261123-seventeen" defer></script>
 <script src="../search-autofill-fix.js?v=3" defer></script>
-
-<style id="DOUGHUB_PAGE_REDESIGN_INLINE">
-.studio-kind-switch{display:grid;grid-template-columns:minmax(180px,.7fr) minmax(0,1.5fr);gap:16px;align-items:center;margin:10px 0 12px;padding:14px;border:1px solid var(--dh-line);border-radius:16px;background:linear-gradient(120deg,#11152bdc,#080a18ed)}
-.studio-kind-intro{display:grid;gap:5px;min-width:0}.studio-kind-intro>strong{font-size:22px;letter-spacing:-.5px}.studio-kind-intro>span:last-child{font-size:11px;line-height:1.5;color:#aeb6d1;max-width:330px}
-.studio-kind-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.studio-kind-option{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;padding:11px 12px;border:1px solid #ffffff16;border-radius:12px;background:#ffffff04;color:#e8eaff;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}.studio-kind-option:hover{border-color:#a5b4fc65;background:#a5b4fc0b}.studio-kind-option.active{border-color:#a5b4fc99;background:linear-gradient(120deg,#6366f126,#a855f71b);box-shadow:inset 0 0 0 1px #a5b4fc12}.studio-kind-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid #a5b4fc28;border-radius:10px;background:#6366f120;color:#c4b5fd;font-size:13px;font-weight:900}.studio-kind-option>span:last-child{display:grid;gap:4px;min-width:0}.studio-kind-option strong{font-size:12px}.studio-kind-option small{font-size:10px;color:#9ba5c2;line-height:1.4}
-#codeCommunityProjects[hidden]{display:none!important}
-@media(max-width:760px){.studio-kind-switch{grid-template-columns:1fr;gap:10px}.studio-kind-options{grid-template-columns:1fr 1fr}.studio-kind-option{padding:9px}.studio-kind-icon{flex-basis:30px;width:30px;height:30px}}
-@media(max-width:480px){.studio-kind-options{grid-template-columns:1fr}.studio-kind-intro>strong{font-size:20px}}
-
-
-/* Individual inline visual refresh using DougHub's index palette */
-:root{color-scheme:dark;--dh-line:rgba(177,184,255,.16);--dh-indigo:#6366f1;--dh-purple:#a855f7}
-body{color:#f5f6ff;-webkit-font-smoothing:antialiased}
-button,input,textarea,select{font:inherit}
-input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{color:#f5f6ff;background:#070918;border:1px solid var(--dh-line);border-radius:11px}
-input::placeholder,textarea::placeholder{color:#858cab}
-input:focus,textarea:focus,select:focus{outline:none;border-color:#818cf1;box-shadow:0 0 0 3px #6366f126}
-button:focus-visible,a:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
-
-
-body{background:radial-gradient(circle at 10% 0,#17133b,transparent 34%),radial-gradient(circle at 90% 5%,#25104b,transparent 30%),#02040a}
-.topbar{background:rgba(4,5,15,.84);border-bottom:1px solid var(--dh-line);backdrop-filter:blur(20px)}
-.brand-mark{background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 8px 24px #6366f133}
-.wrap{max-width:1500px}
-.page-heading{padding:22px 0}
-.eyebrow{color:#c4b5fd;letter-spacing:.16em}
-.editor-layout{gap:18px}
-.panel{background:linear-gradient(145deg,rgba(17,22,49,.94),rgba(8,10,25,.91));border:1px solid var(--dh-line);border-radius:22px;box-shadow:0 18px 48px #0004;overflow:hidden}
-.panel-head{background:#ffffff04;border-bottom:1px solid var(--dh-line)}
-.file-tabs,.mode-switch{background:#070918;border:1px solid var(--dh-line);border-radius:12px}
-.file-tab,.mode-btn{border-radius:9px;color:#a4a7c4}
-.file-tab.active,.mode-btn.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white}
-.btn.primary{background:linear-gradient(135deg,#6366f1,#a855f7);border:1px solid #c4b5fd55;color:white;box-shadow:0 8px 24px #6366f133}
-.preview-wrap,.preview-empty{background:#070918;border-color:var(--dh-line);border-radius:15px}
-.file-add-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:9px 0 2px}.file-add-hint{font-size:11px;color:#858cab}
-.file-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:7px}.file-tab{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.file-tab .remove-file{margin-left:7px;color:#fca5a5;border:0;background:transparent;padding:0 2px;cursor:pointer;font-weight:900}
-.add-file-dialog{width:min(460px,calc(100% - 28px));padding:0;border:1px solid #a5b4fc44;border-radius:20px;background:#0b0e22;color:#f5f6ff;box-shadow:0 30px 100px #000b}.add-file-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}.add-file-head{padding:20px 22px;background:linear-gradient(130deg,#6366f128,#a855f71c);border-bottom:1px solid var(--dh-line)}.add-file-head h3{margin:0 0 5px;font-size:21px}.add-file-body{padding:20px 22px;display:grid;gap:14px}.add-file-body label{display:grid;gap:7px;font-size:12px;font-weight:800;color:#c7cbea}.add-file-body input,.add-file-body select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--dh-line);background:#070918;color:#fff}.add-file-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.brand-name{font-weight:900;letter-spacing:-.025em;color:#f5f6ff}
-.separation-warning{display:flex;align-items:flex-start;gap:10px;margin:0 0 18px;padding:13px 15px;border:1px solid #fbbf244d;border-radius:14px;background:linear-gradient(120deg,#f59e0b12,#f9731610);color:#fde8b0;line-height:1.55;font-size:13px}
-.separation-warning strong{display:block;color:#fff0c2;margin-bottom:2px}
-.separation-warning .warning-icon{flex:0 0 auto;font-size:17px;line-height:1.4}
-
-
-/* DougCode gets its own creator-studio identity */
-.dougcode-hero{position:relative;isolation:isolate;display:flex;align-items:center;gap:28px;padding:clamp(24px,4vw,48px);margin:18px 0 22px;border:1px solid rgba(167,139,250,.25);border-radius:28px;overflow:hidden;background:radial-gradient(ellipse at 0% 0%,rgba(99,102,241,.3),transparent 48%),radial-gradient(ellipse at 100% 100%,rgba(168,85,247,.2),transparent 45%),linear-gradient(135deg,#11142e,#090b19 72%);box-shadow:0 22px 70px #0005}
-.dougcode-hero:after{content:"</>";position:absolute;z-index:-1;right:27%;top:-36px;font:900 clamp(110px,17vw,220px)/1 Consolas,monospace;color:#a5b4fc08;transform:rotate(-9deg);pointer-events:none}
-.hero-copy{flex:1;min-width:0}.dougcode-hero .eyebrow{font-size:11px;color:#c4b5fd}.dougcode-hero h1{font-size:clamp(34px,5vw,58px);line-height:1.05;letter-spacing:-2px;margin:12px 0}.dougcode-hero h1 span{background:linear-gradient(100deg,#a5b4fc,#e9d5ff,#c084fc);background-clip:text;-webkit-background-clip:text;color:transparent}.dougcode-hero p{max-width:680px;color:#b8bfd9;font-size:15px;line-height:1.75;margin:0}.creator-capabilities{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.creator-capabilities span{padding:7px 10px;border:1px solid #a5b4fc24;background:#ffffff08;border-radius:999px;color:#d5d8f5;font-size:11px;font-weight:750}
-.project-name-card{position:relative;z-index:1;flex:0 0 min(280px,32%);padding:18px;border:1px solid #c4b5fd2c;border-radius:18px;background:#060817a8;box-shadow:0 12px 35px #0002}.project-name-card label{color:#c4b5fd;font-size:10px;letter-spacing:1.4px;font-weight:900}.project-name-card input{margin-top:9px}.project-name-card small{display:block;color:#8993b2;font-size:11px;margin-top:9px}
-.toolbar{padding:10px;border:1px solid var(--dh-line);border-radius:16px;background:#080a18b8;margin-bottom:16px}.editor-layout,.blocks-layout{margin-bottom:20px}
-.publish-launch-card{display:flex;align-items:center;gap:20px;padding:clamp(20px,3vw,32px);margin:30px 0 10px;border:1px solid #a78bfa3d;border-radius:24px;background:radial-gradient(circle at 100% 0%,#8b5cf627,transparent 48%),linear-gradient(115deg,#12152d,#090b19);box-shadow:0 18px 55px #0003}.publish-launch-icon{width:56px;height:56px;display:grid;place-items:center;flex:0 0 auto;border-radius:17px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:27px;color:white;box-shadow:0 9px 28px #8b5cf644}.publish-launch-copy{flex:1;min-width:0}.publish-launch-copy .eyebrow{font-size:10px}.publish-launch-copy h2{font-size:clamp(22px,3vw,30px);margin:7px 0}.publish-launch-copy p{margin:0;color:#aeb6d1;font-size:13px;line-height:1.6;max-width:620px}.publish-launch-button{padding:13px 19px;white-space:nowrap;font-size:13px}.publish-launch-button span{margin-left:8px}.publish-footnote{margin:0 0 34px;color:#828ba8;font-size:11px;line-height:1.6}
-.publish-game-dialog{width:min(760px,calc(100% - 28px));max-height:min(90vh,900px);padding:0;border:1px solid #a5b4fc4a;border-radius:25px;background:radial-gradient(circle at 100% 0,#30205a66,transparent 42%),#0b0e20;color:#f5f6ff;box-shadow:0 35px 120px #000c;overflow:auto}
-.publish-game-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(9px)}
-.publish-dialog-header{display:flex;align-items:flex-start;gap:16px;padding:clamp(20px,4vw,32px);border-bottom:1px solid var(--dh-line);background:linear-gradient(130deg,#6366f11a,#a855f714)}
-.publish-dialog-symbol{width:48px;height:48px;display:grid;place-items:center;flex:0 0 auto;border-radius:15px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:24px}.publish-dialog-header>div:nth-child(2){flex:1;min-width:0}.publish-dialog-header .eyebrow{font-size:10px}.publish-dialog-header h2{font-size:clamp(24px,4vw,32px);margin:6px 0}.publish-dialog-header p{color:#aeb6d1;font-size:13px;line-height:1.6;margin:0;max-width:560px}.dialog-close{border:1px solid #ffffff1a;background:#ffffff08;color:#dfe2fa;border-radius:11px;width:38px;height:38px;font-size:25px;cursor:pointer;flex:0 0 auto}
-.publish-dialog-body{display:grid;gap:18px;padding:clamp(20px,4vw,32px)}.publish-dialog-body>label{display:grid;gap:9px;color:#e0e4fa;font-size:13px;font-weight:800}.publish-dialog-body input,.publish-dialog-body textarea{width:100%;padding:13px 14px;border:1px solid #353958;border-radius:12px;background:#070918;color:#f5f6ff;outline:none;font-size:14px}.publish-dialog-body textarea{resize:vertical;min-height:120px;line-height:1.6}.publish-dialog-body input:focus,.publish-dialog-body textarea:focus{border-color:#8b7cf6;box-shadow:0 0 0 3px #6366f126}.publish-dialog-body label small{font-size:11px;color:#818ba8;font-weight:500}.publish-privacy-note{display:grid;gap:5px;padding:13px 15px;border:1px solid #fbbf2438;border-radius:12px;background:#f59e0b0b;color:#cbd1e8;font-size:12px;line-height:1.6}.publish-privacy-note strong{color:#fde68a}.official-game-option{display:grid;gap:7px;padding:14px 15px;border:1px solid #a78bfa55;border-radius:12px;background:linear-gradient(120deg,#6366f117,#a855f710);color:#e8eaff;font-size:12px}.official-game-option[hidden]{display:none}.official-game-option-title{display:flex;align-items:center;gap:10px;font-weight:850}.official-game-option-title input{width:17px;height:17px;accent-color:#8b5cf6;flex:0 0 auto}.official-game-option small{padding-left:27px;color:#aab2d0;font-size:11px;font-weight:500;line-height:1.5}.publish-dialog-status{padding:12px 14px;border-radius:11px;background:#ffffff08;border:1px solid #ffffff10;color:#b9c1dd;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.publish-dialog-status.error{background:#ef444412;border-color:#ef444433;color:#fecaca}.publish-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;padding-top:3px}.publish-dialog-actions .btn{padding:12px 16px}.publish-dialog-actions .btn.primary{min-width:220px}
-@media(max-width:760px){.dougcode-hero{align-items:stretch;flex-direction:column;padding:22px;border-radius:20px}.project-name-card{flex:auto;width:100%}.dougcode-hero h1{letter-spacing:-1.2px}.publish-launch-card{align-items:flex-start;flex-wrap:wrap;gap:14px;border-radius:18px}.publish-launch-copy{flex-basis:calc(100% - 75px)}.publish-launch-button{width:100%}.publish-dialog-header{gap:11px}.publish-dialog-symbol{width:40px;height:40px}.publish-dialog-actions{flex-direction:column-reverse}.publish-dialog-actions .btn,.publish-dialog-actions .btn.primary{width:100%;min-width:0}}
-
-
-/* Compact creator workspace */
-.wrap{margin-top:12px;margin-bottom:24px}.dougcode-hero{padding:18px 22px;margin:8px 0 12px;gap:16px;border-radius:18px}.dougcode-hero h1{font-size:clamp(27px,3vw,38px);margin:5px 0}.dougcode-hero p{font-size:12px;line-height:1.5}.creator-capabilities{margin-top:10px}.creator-capabilities span{padding:5px 8px}.project-name-card{padding:12px;flex-basis:min(240px,30%)}.project-name-card input{padding:8px 10px;margin-top:5px}.project-name-card small{font-size:10px;margin-top:5px}.toolbar{margin-bottom:10px;padding:8px}.editor-layout,.blocks-layout{gap:10px;margin-bottom:12px}.panel{border-radius:15px}.panel-head{padding:11px 13px}#codeEditor{height:350px;padding:12px;font-size:12px;line-height:1.5}.preview-wrap{height:350px}.block-library{max-height:330px}.block-workspace{min-height:210px;max-height:330px;padding:12px}.workspace-panel{min-height:0}.generated-code{max-height:140px}.bottom-grid{margin-top:10px}.publish-launch-card{margin:14px 0 8px;padding:18px;border-radius:17px}.publish-launch-icon{width:42px;height:42px;border-radius:12px;font-size:21px}.publish-launch-copy h2{font-size:22px;margin:4px 0}.publish-launch-copy p{font-size:12px}.publish-footnote{margin-bottom:18px}
-#myProjectsDialog{width:min(760px,calc(100% - 24px));max-height:85vh;overflow:auto;padding:0;border:1px solid #a5b4fc55;border-radius:20px;background:#0b0e20;color:#f5f6ff;box-shadow:0 28px 90px #000b}#myProjectsDialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}.my-projects-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-bottom:1px solid var(--dh-line);background:linear-gradient(130deg,#6366f11b,#a855f715)}.my-projects-head h2{margin:3px 0;font-size:23px}.my-projects-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px}.my-project-card{min-width:0;padding:13px;border:1px solid #a5b4fc24;border-radius:13px;background:#ffffff06}.my-project-card h3{margin:0 0 5px;font-size:14px;overflow-wrap:anywhere}.my-project-card p{margin:0 0 12px;color:#929bb8;font-size:11px;line-height:1.5}.my-project-actions{display:flex;gap:7px;flex-wrap:wrap}.my-project-empty{padding:30px 18px;text-align:center;color:#9aa4c0;grid-column:1/-1}
-.scene-builder{grid-column:1/-1;margin:0 0 12px;padding:13px;border:1px solid #a5b4fc35;border-radius:15px;background:linear-gradient(135deg,#171638aa,#0b1022)}.scene-builder-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.scene-builder-head h3{font-size:15px;margin:0}.scene-builder-head p{font-size:11px;color:#9aa4c0;margin:4px 0 0}.scene-builder-grid{display:grid;grid-template-columns:minmax(190px,.8fr) minmax(0,1.2fr);gap:12px;align-items:start}.scene-controls{display:grid;gap:8px}.scene-controls label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;font-weight:800;color:#cbd1e8}.scene-controls input[type=text]{width:105px;min-width:0;padding:7px}.scene-controls input[type=color]{width:48px;height:32px;padding:2px;border:1px solid #ffffff20;border-radius:8px;background:#080a18}.scene-sprite-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.scene-sprite-row input{min-width:0;width:90px;padding:7px}.scene-stage{position:relative;min-height:155px;overflow:hidden;border:1px solid #ffffff25;border-radius:12px;background-color:#172554;background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);background-size:20px 20px}.scene-stage-label{position:absolute;left:9px;top:7px;color:#ffffffa8;font-size:9px;text-transform:uppercase;letter-spacing:1px;pointer-events:none}.scene-sprite{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:3px;border:1px solid #ffffff35;border-radius:10px;background:#0002;color:white;cursor:grab;text-shadow:0 2px 5px #000;user-select:none}.scene-sprite span{font-size:25px;line-height:1.1}.scene-sprite small{font-size:9px;max-width:85px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.scene-sprite-remove{position:absolute;right:-5px;top:-6px;width:18px;height:18px;border:0;border-radius:50%;background:#ef4444;color:white;font-size:12px;line-height:1}.scene-builder-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}.scene-builder-status{font-size:10px;color:#a5b4fc}
-@media(max-width:760px){.my-projects-list{grid-template-columns:1fr}.scene-builder-grid{grid-template-columns:1fr}.scene-stage{min-height:140px}.dougcode-hero{padding:16px}.project-name-card{flex:auto;width:100%}#codeEditor{height:300px}.preview-wrap{height:300px}}
-
-
-.bottom-grid,.publish-launch-card,.publish-footnote,.dougcode-hero{display:none!important}
-.project-name-inline{display:flex;align-items:center;gap:8px;min-width:220px;max-width:300px}
-.project-name-inline label{font-size:11px;color:#c4b5fd;font-weight:800;white-space:nowrap}
-.project-name-inline input{width:100%;min-width:0;padding:8px 10px;font-size:12px}
-.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.publish-top-btn{white-space:nowrap}
-.scene-builder{padding:0!important;overflow:hidden}
-.scene-builder-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border:0;border-radius:0;background:linear-gradient(110deg,#11152d,#0a0c1b);color:#f5f6ff;text-align:left;cursor:pointer}
-.scene-builder-toggle:hover{background:linear-gradient(110deg,#191d3d,#101329)}
-.scene-builder-toggle-copy{display:flex;flex-direction:column;gap:4px;min-width:0}
-.scene-builder-toggle-title{font-size:14px;font-weight:850}
-.scene-builder-toggle-help{font-size:11px;font-weight:500;color:#a5aecb;line-height:1.45}
-.scene-builder-chevron{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid #a5b4fc35;border-radius:10px;background:#ffffff08;color:#c4b5fd;font-size:23px;transition:transform .18s ease}
-.scene-builder-toggle[aria-expanded="true"] .scene-builder-chevron{transform:rotate(90deg)}
-.scene-builder-content{padding:14px;border-top:1px solid var(--dh-line)}
-.scene-builder-content[hidden]{display:none!important}
-@media(max-width:600px){.project-name-inline{max-width:none;width:100%}.toolbar-actions{width:100%}.toolbar-actions .publish-top-btn{flex:1}}
-.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.publish-top-btn{white-space:nowrap}
-.workspace-zoom-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 13px;border-bottom:1px solid var(--dh-line);background:#080a18a8}
-.workspace-zoom-controls label{display:flex;align-items:center;gap:7px;font-size:12px;color:#cbd1e8;font-weight:750}
-.workspace-zoom-controls label strong{color:#c4b5fd;min-width:40px}
-.workspace-zoom-controls input[type=range]{width:min(220px,38vw);accent-color:#8b5cf6}
-#blockWorkspace{min-height:480px;max-height:720px;overflow:auto;padding:18px}
-#blockWorkspace .code-block{transform-origin:top left}
-@media(max-width:600px){.toolbar-actions{width:100%}.toolbar-actions .publish-top-btn{flex:1}.workspace-zoom-controls{gap:8px}#blockWorkspace{min-height:400px;max-height:620px}}
-.mode-switch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-#myProjectsBtn{white-space:nowrap}
-
-
-/* Compact toolbar and modal preview */
-.compact-studio-toolbar{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(8,10,24,.9);border:1px solid var(--dh-line);border-radius:15px}
-.studio-toolbar-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
-.compact-studio-toolbar .mode-switch{padding:3px;gap:3px;flex-wrap:nowrap}
-.compact-studio-toolbar .mode-btn{padding:8px 11px;font-size:12px;white-space:nowrap}
-.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn,.compact-studio-toolbar .publish-top-btn{white-space:nowrap}
-.compact-studio-toolbar #status{font-size:10px;color:#a5b4fc;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.preview-dialog{width:min(1200px,calc(100% - 24px));height:min(88vh,900px);max-height:92vh;padding:0;border:1px solid #a5b4fc55;border-radius:20px;background:#080a18;color:#f5f6ff;box-shadow:0 30px 100px #000b;overflow:hidden}
-.preview-dialog::backdrop{background:#02030bd9;backdrop-filter:blur(8px)}
-.preview-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 17px;border-bottom:1px solid var(--dh-line);background:linear-gradient(130deg,#6366f11b,#a855f715)}
-.preview-dialog-head h2{font-size:19px;margin:3px 0 0}
-.preview-dialog-actions{display:flex;align-items:center;gap:7px}
-.preview-dialog-content{height:calc(100% - 61px);display:flex;flex-direction:column;padding:12px;gap:8px}
-.preview-dialog-content .preview-wrap{flex:1;min-height:0;height:auto!important}
-.preview-dialog-content .preview-wrap iframe{width:100%;height:100%;border:0;background:white;border-radius:12px}
-.preview-dialog-content .preview-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px}
-.preview-dialog-content .preview-footer{flex:0 0 auto}
-/* Game view fills the whole browser window (not browser fullscreen), so the game uses all the space. */
-.preview-dialog{width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;inset:0;border:0;border-radius:0;box-shadow:none}
-.preview-dialog[open]{display:flex;flex-direction:column}
-.preview-dialog-head{flex:0 0 auto;padding:7px 14px}
-.preview-dialog-head h2{font-size:16px;margin:1px 0 0}
-.preview-dialog-content{flex:1 1 auto;height:auto;min-height:0;padding:0;gap:0}
-.preview-dialog-content .preview-wrap{position:relative;border-radius:0!important;border:0!important}
-.preview-dialog-content .preview-wrap iframe{border-radius:0;background:#050611}
-.preview-dialog-content .preview-footer{padding:4px 14px;font-size:11px}
-@media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-direction:column;gap:8px}.studio-toolbar-controls{margin-left:0;width:100%;gap:5px}.compact-studio-toolbar .mode-switch{flex:1}.compact-studio-toolbar .mode-btn{flex:1;padding:8px 7px}.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{flex:1}.compact-studio-toolbar #status{max-width:none}.preview-dialog{height:92vh}.preview-dialog-content{padding:8px}}
-/* Blockly-powered visual coding workspace */
-.blocks-layout{grid-template-columns:minmax(0,1fr)!important}
-.toolbox-panel{display:none!important}
-.workspace-panel{min-width:0}
-#blockWorkspace{position:relative;width:100%;height:clamp(460px,65vh,760px);min-height:460px;max-height:none!important;padding:0!important;overflow:hidden;zoom:1!important;background:#080a18;border-radius:0 0 15px 15px}
-#blockWorkspace .blocklySvg{background:transparent!important}
-#blockWorkspace .blocklyMainBackground{stroke:#ffffff12!important}
-#blockWorkspace .blocklyToolboxDiv{background:#0b0e20!important;border-right:1px solid var(--dh-line)!important;color:#e8eaff!important}
-#blockWorkspace .blocklyTreeRow{height:38px!important;margin:4px 6px!important;border-radius:9px!important}
-#blockWorkspace .blocklyTreeLabel{font:700 12px system-ui,sans-serif!important}
-#blockWorkspace .blocklyFlyoutBackground{fill:#10142a!important;fill-opacity:.98!important}
-#blockWorkspace .blocklyText{font-family:system-ui,sans-serif!important}
-#blockWorkspace .blocklyZoom{opacity:.85}
-#blockWorkspace .blocklyTrash{opacity:.85}
-#blockWorkspace .blocklyScrollbarHandle{fill:#8b5cf6!important}
-#blockWorkspace .blocklyWidgetDiv .goog-menu{background:#10142a!important;color:#fff!important}
-@media(max-width:600px){#blockWorkspace{height:62vh;min-height:390px}.workspace-hint{font-size:11px}}
-
-/* Restored original code/visual-blocks workflow */
-#codeMode{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important}
-#codeMode .preview-panel{display:flex!important;flex-direction:column;min-width:0}
-#codeMode .preview-wrap{flex:1;min-height:260px}
-#codeMode .preview-wrap iframe{width:100%;height:100%;min-height:260px;border:0;background:#fff;border-radius:12px}
-#blocksMode{grid-template-columns:minmax(235px,.34fr) minmax(0,1fr)!important;align-items:start}
-#blocksMode .toolbox-panel{min-width:0}
-#blocksMode .workspace-panel{min-width:0}
-#blockWorkspace{height:clamp(330px,52vh,600px);min-height:330px;max-height:none!important;overflow:auto!important;padding:14px!important;zoom:1!important;border-radius:0 0 15px 15px;background:#080a18}
-#blockWorkspace .code-block{transform-origin:top left}
-.mode-switch{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--dh-line);border-radius:12px;background:#070918}
-.compact-studio-toolbar .mode-btn{border:0;padding:9px 13px;border-radius:9px;background:transparent;color:#a4a7c4;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}
-.compact-studio-toolbar .mode-btn.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
-.studio-toolbar-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
-.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{white-space:nowrap}
-@media(max-width:900px){#codeMode{grid-template-columns:1fr!important}#codeMode .preview-wrap{min-height:260px}#blocksMode{grid-template-columns:1fr!important}}
-@media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-direction:column;gap:8px}.studio-toolbar-controls{margin-left:0;width:100%;gap:5px}.compact-studio-toolbar .mode-switch{flex:1}.compact-studio-toolbar .mode-btn{flex:1;padding:8px 7px}.compact-studio-toolbar #myProjectsBtn,.compact-studio-toolbar #previewBtn{flex:1}.compact-studio-toolbar #status{max-width:none}}
-
-/* Visual blocks repair: full-size Blockly canvas and a visible built-in toolbox */
-#blocksMode{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:12px;align-items:stretch}
-#blocksMode .toolbox-panel{display:none!important}
-#blocksMode .workspace-panel{width:100%;min-width:0;min-height:0}
-#blocksMode .panel-head{flex-wrap:wrap}
-#blocksMode .workspace-hint{line-height:1.5}
-#blockWorkspace{position:relative!important;width:100%!important;height:clamp(560px,72vh,900px)!important;min-height:560px!important;max-height:none!important;overflow:hidden!important;padding:0!important;zoom:1!important;background:#0b1020!important;border-radius:0 0 15px 15px}
-#blockWorkspace .blocklySvg{width:100%!important;height:100%!important;background:#0b1020!important}
-#blockWorkspace .blocklyToolboxDiv{display:block!important;visibility:visible!important;background:#10142a!important;border-right:1px solid #343958!important;color:#f5f6ff!important;min-width:150px}
-#blockWorkspace .blocklyTreeRow{height:38px!important;margin:4px 6px!important;border-radius:9px!important}
-#blockWorkspace .blocklyTreeLabel{font:700 12px system-ui,sans-serif!important;color:#eef0ff!important}
-#blockWorkspace .blocklyFlyout{filter:drop-shadow(0 8px 20px #0005)}
-#blockWorkspace .blocklyFlyoutBackground{fill:#171d38!important;fill-opacity:1!important}
-#blockWorkspace .blocklyMainBackground{stroke:#ffffff18!important}
-#blockWorkspace .blocklyText{font-family:system-ui,sans-serif!important}
-#blockWorkspace .blocklyScrollbarHandle{fill:#8b5cf6!important}
-#blockWorkspace .blocklyZoom,#blockWorkspace .blocklyTrash{opacity:.95}
-#blockWorkspace .blocklyWidgetDiv .goog-menu{background:#10142a!important;color:#fff!important}
-#blockWorkspace .blocklyToolboxDiv .blocklyTreeRow[aria-selected="true"]{background:#343064!important}
-.workspace-zoom-controls input[type=range]{accent-color:#8b5cf6}
-@media(max-width:700px){
- #blockWorkspace{height:68vh!important;min-height:480px!important}
- #blockWorkspace .blocklyToolboxDiv{min-width:112px}
- #blockWorkspace .blocklyTreeLabel{font-size:11px!important}
-}
-
-/* Mode panels must respect the hidden attribute even when they have display styles. */
-#codeMode[hidden],#blocksMode[hidden],#fastMode[hidden]{display:none!important}
-/* Fast Mode: quick game starters, live play area, and community chat drawer */
-.fast-mode-layout{display:grid;gap:16px;margin-top:12px}
-.fast-welcome{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:clamp(20px,3vw,32px);border:1px solid #a5b4fc25;border-radius:22px;background:radial-gradient(ellipse at 8% 0%,#6366f128,transparent 48%),linear-gradient(135deg,#11152d,#090b19);box-shadow:0 18px 50px #0003}
-.fast-welcome h1{margin:8px 0;font-size:clamp(24px,3vw,36px);letter-spacing:-1.1px}.fast-welcome p{max-width:620px;margin:0;color:#a9afce;line-height:1.6;font-size:13px}
-.fast-content-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:14px;align-items:stretch}
-.fast-games-panel,.fast-play-panel{min-width:0}
-.fast-template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px}
-.fast-template-card{position:relative;display:flex;min-height:165px;flex-direction:column;align-items:flex-start;gap:8px;padding:15px;text-align:left;color:#f6f5ff;border:1px solid #a5b4fc22;border-radius:15px;background:linear-gradient(145deg,#171b38,#0a0c1c);cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
-.fast-template-card:hover{transform:translateY(-3px);border-color:#8b5cf6aa;box-shadow:0 12px 30px #0004}
-.fast-template-card.featured{background:radial-gradient(ellipse at 100% 0%,#a855f725,transparent 60%),linear-gradient(145deg,#1b1c42,#0a0c1c);border-color:#8b5cf64d}
-.fast-template-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:19px;font-weight:900}
-.fast-template-tag{position:absolute;right:12px;top:13px;color:#a5b4fc;font-size:9px;letter-spacing:1px;font-weight:900}
-.fast-template-card strong{font-size:14px}.fast-template-card small{color:#a1a7c4;font-size:11px;line-height:1.5}.fast-template-cta{margin-top:auto;padding-top:3px;color:#c4b5fd;font-size:11px;font-weight:800}
-.fast-tools-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 14px 14px;padding:13px;border:1px solid #ffffff10;border-radius:13px;background:#ffffff04}
-.fast-tools-row>div:first-child{display:grid;gap:4px}.fast-tools-row strong{font-size:12px}.fast-tools-row small{font-size:10px;color:#939ab9}.fast-tools-row>div:last-child{display:flex;gap:6px;flex-wrap:wrap}
-.fast-preview-wrap{position:relative;min-height:360px;height:calc(100% - 78px);margin:12px;overflow:hidden;border:1px solid #a5b4fc22;border-radius:15px;background:#070918}
-.fast-preview-wrap iframe{display:block;width:100%;height:100%;min-height:360px;border:0;background:#fff}
-.fast-preview-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;text-align:center;background:radial-gradient(ellipse at center,#17153c,#070918 72%);color:#f7f6ff}
-.fast-preview-empty[hidden]{display:none}.fast-preview-empty span{color:#969dbd;font-size:12px}
-.fast-preview-orb{display:grid;place-items:center;width:58px;height:58px;border:1px solid #a5b4fc45;border-radius:18px;background:linear-gradient(135deg,#6366f1,#a855f7);box-shadow:0 0 40px #8b5cf644;font-size:22px}
-.fast-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px 14px;color:#9ca3c4;font-size:11px}
-.fast-chat-backdrop{position:fixed;inset:0;z-index:1500;background:#02030bc4;backdrop-filter:blur(3px)}
-.fast-chat-drawer{position:fixed;inset:0 0 0 auto;z-index:1501;display:flex;flex-direction:column;width:min(520px,96vw);height:100dvh;background:#080a18;border-left:1px solid #a5b4fc30;box-shadow:-24px 0 70px #0008;transform:translateX(105%);visibility:hidden;transition:transform .25s ease,visibility .25s}
-.fast-chat-drawer.open{transform:translateX(0);visibility:visible}
-.fast-chat-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:19px;border-bottom:1px solid #ffffff12;background:radial-gradient(ellipse at 0 0,#6366f125,transparent 70%)}
-.fast-chat-head h2{margin:4px 0;font-size:22px}.fast-chat-head p{margin:0;color:#9ca3bf;font-size:11px}.fast-chat-drawer iframe{flex:1;min-height:0;width:100%;border:0;background:#050611}
-.fast-chat-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid #ffffff12;color:#9097b8;font-size:11px}.fast-chat-foot a{color:#c4b5fd;text-decoration:none;font-weight:800}
-@media(max-width:960px){.fast-content-grid{grid-template-columns:1fr}.fast-preview-wrap{height:420px}.fast-preview-wrap iframe{height:100%}}
-@media(max-width:760px){.compact-studio-toolbar{align-items:stretch;flex-wrap:wrap}.studio-toolbar-controls{width:100%;margin-left:0;justify-content:flex-start}.compact-studio-toolbar #status{max-width:none;flex:1}.compact-studio-toolbar .publish-top-btn{margin-left:auto}}@media(max-width:600px){.fast-welcome{align-items:stretch;flex-direction:column}.fast-welcome #fastChatBtn{align-self:flex-start}.fast-template-grid{grid-template-columns:1fr}.fast-template-card{min-height:145px}.fast-tools-row{align-items:flex-start;flex-direction:column}.fast-preview-wrap{height:360px;min-height:360px}.fast-preview-wrap iframe{min-height:360px}}
+<style>
+:root{color-scheme:dark;--mute:#a3acd9;--panel:#141935;--panel2:#1a2048;--line:#2a3160}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f1f3ff}a{color:inherit;text-decoration:none}
+header{height:70px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px}
+header .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800}header .logo-icon{width:40px;height:40px;display:block}
+header .nav{display:flex;align-items:center;gap:8px}
+main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:6px 0 80px}
+.tabs{display:flex;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
+.tab{padding:10px 22px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:#cfd5ff;font-weight:800;cursor:pointer;font:inherit;font-weight:800}
+.tab.on{background:linear-gradient(135deg,#6366f1,#a855f7);border-color:transparent;color:#fff}
+.view[hidden]{display:none}
+.bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.bar input[type=search]{flex:1;min-width:220px;padding:12px 16px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);color:#fff;font:inherit}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:#cfd5ff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.chip.on{background:#6366f1;border-color:transparent;color:#fff}
+h2.sec{margin:26px 0 12px;font-size:22px;display:flex;align-items:center;gap:12px}h2.sec small{color:var(--mute);font-weight:600;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.pc{display:flex;flex-direction:column;gap:8px;padding:18px 20px;border-radius:24px;background:var(--panel);border:1px solid var(--line);color:inherit;transition:transform .18s,border-color .18s,box-shadow .18s;min-height:150px}
+.pc:hover{transform:translateY(-4px);border-color:#8b5cf6;box-shadow:0 18px 40px #0008}
+.pc .top{display:flex;align-items:center;gap:8px}
+.pc h3{margin:0;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc p{margin:0;color:var(--mute);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.pc .meta{display:flex;gap:10px;align-items:center;color:var(--mute);font-size:13px}
+.lb{padding:3px 11px;border-radius:999px;font-size:12px;font-weight:800;color:#0b0e20;flex:none}
+.st{padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#ffffff14;color:#cfd5ff;flex:none}
+.st.live{background:#34d39922;color:#86efac}
+.empty{padding:26px;border-radius:22px;border:1px dashed var(--line);color:var(--mute);text-align:center}
+.lead{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin-bottom:8px}
+.how{padding:22px 24px;border-radius:26px;background:var(--panel);border:1px solid var(--line)}
+.how h3{margin:0 0 8px}.how ol{margin:0;padding-left:20px;display:grid;gap:6px;color:#c9d2f5}
+.how.hi{background:linear-gradient(120deg,#6366f126,#a855f726)}
+dialog{border:1px solid var(--line);border-radius:24px;background:var(--panel);color:#f1f3ff;padding:24px 26px;width:min(620px,94vw)}
+dialog::backdrop{background:#000b}
+dialog h2{margin:0 0 4px}
+dialog label.l{display:block;margin:14px 0 6px;font-size:13px;color:var(--mute);font-weight:700}
+dialog input[type=text]{width:100%;padding:11px 14px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);color:#fff;font:inherit}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:12px;border-radius:16px;border:1px solid var(--line);background:var(--panel2);color:#cfd5ff;font:inherit;font-weight:800;cursor:pointer}
+.seg button.on{background:linear-gradient(135deg,#6366f1,#a855f7);border-color:transparent;color:#fff}
+.langs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.lg{padding:14px;border-radius:18px;border:2px solid var(--line);background:var(--panel2);color:#e6e9ff;text-align:left;cursor:pointer;font:inherit}
+.lg b{display:block;font-size:17px}.lg span{font-size:12.5px;color:var(--mute)}
+.lg.on{border-color:#8b5cf6;background:#6366f126}
+.lg:disabled{opacity:.4;cursor:not-allowed}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.local-note{margin-top:8px;color:var(--mute);font-size:14px}
+@media(max-width:800px){.lead{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="../index.html" aria-label="DougHub home"><span class="brand-mark">D</span><span class="brand-name">DougCode</span></a>
-  <div class="top-actions"><button class="btn" id="saveBtn">Save project</button><button class="btn" id="downloadBtn">Export HTML</button></div>
-</header>
-<main class="wrap">
-  <section class="studio-kind-switch" aria-label="Choose a creator workspace">
-    <div class="studio-kind-intro"><span class="panel-kicker">DOUGCODE STUDIO</span><strong id="studioKindHeading">Game Creator</strong><span id="studioKindDescription">Build playable games with code, visual blocks, templates, previews, and Community Games publishing.</span></div>
-    <div class="studio-kind-options" role="group" aria-label="Creator type">
-      <button type="button" class="studio-kind-option active" data-studio-kind="game" aria-pressed="true"><span class="studio-kind-icon" aria-hidden="true">▶</span><span><strong>Game Creator</strong><small>Make games and interactive experiences</small></span></button>
-      <button type="button" class="studio-kind-option" data-studio-kind="project" aria-pressed="false"><span class="studio-kind-icon" aria-hidden="true">&lt;/&gt;</span><span><strong>Projects</strong><small>Build websites, apps, tools, and code projects</small></span></button>
-    </div>
-  </section>
-  <section class="toolbar compact-studio-toolbar">
-    <div class="project-name-inline"><label for="projectName">Project</label><input id="projectName" value="My Coding Project" maxlength="80" autocomplete="off"></div>
-    <div class="studio-toolbar-controls">
-      <div class="mode-switch" role="group" aria-label="Editor mode"><button class="mode-btn active" data-mode="code" type="button">⌘ Code</button><button class="mode-btn" data-mode="blocks" type="button">🧩 Blocks</button><button class="mode-btn" data-mode="fast" type="button">⚡ Fast mode</button></div>
-      <button class="btn small" id="myProjectsBtn" type="button">My Projects</button>
-      <button class="btn primary small" id="previewBtn" type="button">Preview</button>
-      <button class="btn primary small publish-top-btn" id="openPublishDialog" type="button">Publish game ↗</button>
-    </div>
-    <span id="status" role="status">Ready</span>
-  </section>
-  <section id="fastMode" class="fast-mode-layout" hidden>
-  <div class="fast-welcome">
-    <div><span class="panel-kicker">DOUGCODE · QUICK START</span><h1>Make something fun. Fast.</h1><p>Pick a starter, customize it, and play instantly. You can switch to Code or Visual Blocks any time.</p></div>
-    <button class="btn" id="fastChatBtn" type="button"><span aria-hidden="true">▤</span> Open community chat</button>
-  </div>
-  <div class="fast-content-grid">
-    <section class="panel fast-games-panel">
-      <div class="panel-head"><div><span class="panel-kicker">START WITH A TEMPLATE</span><h2>Games & projects</h2></div><span class="live-dot">One click to start</span></div>
-      <div class="fast-template-grid">
-        <button class="fast-template-card featured" type="button" data-fast-template="clicker"><span class="fast-template-icon">✦</span><span class="fast-template-tag">EASY</span><strong>Clicker game</strong><small>Tap to score, buy upgrades, beat your best.</small><span class="fast-template-cta">Create game ↗</span></button>
-        <button class="fast-template-card" type="button" data-fast-template="dodge"><span class="fast-template-icon">⬡</span><span class="fast-template-tag">ARCADE</span><strong>Dodge the blocks</strong><small>Move left and right to survive and score.</small><span class="fast-template-cta">Create game ↗</span></button>
-        <button class="fast-template-card" type="button" data-fast-template="quiz"><span class="fast-template-icon">?</span><span class="fast-template-tag">TRIVIA</span><strong>Quiz challenge</strong><small>Answer questions and track your score.</small><span class="fast-template-cta">Create project ↗</span></button>
-        <button class="fast-template-card" type="button" data-fast-template="landing"><span class="fast-template-icon">◈</span><span class="fast-template-tag">WEB</span><strong>Cool web page</strong><small>A polished page with buttons and animations.</small><span class="fast-template-cta">Create page ↗</span></button>
-        <button class="fast-template-card" type="button" data-fast-template="blank"><span class="fast-template-icon">＋</span><span class="fast-template-tag">STARTER</span><strong>Blank project</strong><small>Start fresh with a clean working setup.</small><span class="fast-template-cta">Start building ↗</span></button>
-      </div>
-      <div class="fast-tools-row"><div><strong>Want more control?</strong><small>Switch to the full editor whenever you're ready.</small></div><div><button class="btn small" type="button" data-go-mode="code">Open Code</button><button class="btn small" type="button" data-go-mode="blocks">Open Visual Blocks</button></div></div>
-    </section>
-    <section class="panel fast-play-panel">
-      <div class="panel-head"><div><span class="panel-kicker">PLAY & TEST</span><h2>Live preview</h2></div><button class="btn primary small" id="fastRunBtn" type="button">Run ↗</button></div>
-      <div class="fast-preview-wrap"><iframe id="fastPreviewFrame" title="Fast mode game preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="fast-preview-empty" id="fastPreviewEmpty"><div class="fast-preview-orb">▶</div><strong>Your next idea starts here</strong><span>Choose a template to make it playable.</span></div></div>
-      <div class="fast-preview-footer"><span id="fastPreviewStatus">Choose a template to begin</span><button class="text-btn" type="button" data-go-mode="code">Edit code →</button></div>
-    </section>
-  </div>
-</section>
-<section id="codeMode" class="editor-layout">
-    <div class="panel code-panel">
-      <div class="panel-head"><div><span class="panel-kicker">SOURCE FILES</span><h2>Code</h2></div><span class="live-dot">Autosaves in this browser · no account needed</span></div>
-      <div class="file-tabs" id="fileTabs" role="tablist" aria-label="Project files"><button class="file-tab active" data-file="html">index.html</button><button class="file-tab" data-file="css">style.css</button><button class="file-tab" data-file="js">main.js</button></div>
-      <div class="file-add-row"><button class="btn small" id="addFileBtn" type="button">＋ Add file</button><label class="btn small primary" id="importGameAssetBtn" style="position:relative;overflow:hidden;display:inline-flex;align-items:center;cursor:pointer">＋ Import Pack Folder<input id="gameAssetInput" type="file" webkitdirectory directory multiple aria-label="Choose asset pack folder" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label><span class="file-add-hint">Add source files or import a 3D asset pack</span></div><div id="gameAssetStatus" class="file-add-hint" aria-live="polite">Choose a folder to import its models and textures into this project.</div><div id="gameAssetList" hidden></div><div class="editor-caption"><span id="activeFileLabel">index.html</span><span id="lineCount">1 line</span></div>
-      <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Source code" wrap="off"></textarea>
-      <div class="editor-footer"><span>Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span><button class="text-btn" id="copyCodeBtn">Copy current file</button></div>
-    </div>
+<header class="dh-head"><a href="../index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<main>
+  <section class="dh-pagehero"><img src="../assets/art/code.svg" alt="" width="480" height="270"><div><h1>DougCode</h1><p>Write code in Web, JavaScript, Python or Lua, or snap blocks together. Share what you make, and turn games into Community Games.</p><div class="acts" style="justify-content:flex-start"><button id="newProj" class="btn-solid" type="button">New project</button><button id="newGame" class="btn-line" type="button">Make a game</button></div></div></section>
 
-    <div class="panel preview-panel">
-      <div class="panel-head"><div><span class="panel-kicker">LIVE OUTPUT</span><h2>Preview</h2></div><span class="live-dot">Preview updates when you press Preview</span></div>
-      <div class="preview-wrap"><iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Write some code, then press Run preview.</span></div></div>
-      <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewStatus">Preview hasn't run yet</span></div>
+  <div class="tabs" role="tablist"><button class="tab on" id="tabProjects" role="tab" type="button">Projects</button><button class="tab" id="tabGames" role="tab" type="button">Game studio</button></div>
+
+  <!-- PROJECTS: share and explore like a code hosting site -->
+  <section class="view" id="viewProjects">
+    <div id="mineBox"></div>
+    <h2 class="sec">Explore projects <small id="exploreCount"></small></h2>
+    <div class="bar">
+      <input type="search" id="projSearch" name="dh_find_projects" placeholder="Search projects..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" aria-label="Search projects" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+      <div class="chips" id="langChips" role="group" aria-label="Filter by language"></div>
     </div>
-  </section>
-  <section id="blocksMode" class="blocks-layout" hidden>
-    <aside class="panel toolbox-panel">
-      <div class="panel-head"><div><span class="panel-kicker">VISUAL PROGRAMMING</span><h2>Block library</h2></div></div>
-      <input id="blockSearch" class="search-input" placeholder="Search coding blocks…" autocomplete="off">
-      <div class="category-list" id="blockCategories">
-        <button class="category active" data-category="all">✦ All blocks</button>
-        <button class="category" data-category="events">🟨 Events</button>
-        <button class="category" data-category="output">🟪 Output</button>
-        <button class="category" data-category="variables">🟧 Variables</button>
-        <button class="category" data-category="logic">🟦 Logic</button>
-        <button class="category" data-category="loops">🟠 Loops</button>
-        <button class="category" data-category="web">🟩 Web page</button>
-        <button class="category" data-category="functions">⬜ Functions</button>
-      </div>
-      <div id="blockLibrary" class="block-library"></div>
-      <p class="toolbox-hint">Click a block or drag it into your script. Edit its white fields to change the generated code.</p>
-    </aside>
-    <section class="panel workspace-panel">
-      <div class="panel-head"><div><span class="panel-kicker">YOUR PROGRAM</span><h2>Block workspace</h2></div><div class="workspace-actions"><button class="btn small" id="generateBtn">Generate JS ↻</button><button class="btn small danger" id="clearBlocksBtn">Clear blocks</button></div></div>
-      <div class="workspace-hint">Blocks run from top to bottom. Add blocks from the library on the left.</div><div class="workspace-zoom-controls"><label for="blockZoom">Block size <strong id="blockZoomValue">100%</strong></label><input id="blockZoom" type="range" min="75" max="160" step="5" value="100" aria-label="Block size"><button class="btn small" id="resetBlockZoom" type="button">Reset size</button></div>
-      <div id="blockWorkspace" class="block-workspace" aria-label="Blockly visual coding workspace"><div class="workspace-empty" id="workspaceEmpty"><span>🧩</span><b>Your script starts here</b><p>Drag blocks from the toolbox to build your game logic.</p></div></div>
-      <div class="generated-bar"><span><b>Generated JavaScript</b><small>Automatically sent to main.js</small></span><button class="btn small" id="viewGeneratedBtn">Open in code editor →</button></div>
-      <pre id="generatedCode" class="generated-code">// Your generated JavaScript will appear here.</pre>
-    </section>
+    <div class="grid" id="exploreGrid"><div class="empty">Loading projects...</div></div>
   </section>
 
-
-
-<section class="community-projects-section" id="codeCommunityProjects" hidden>
-    <div class="community-heading">
-      <div>
-        <div class="eyebrow">MADE BY THE COMMUNITY</div>
-        <h2>DougHub Code Projects</h2>
-        <p>Browse community-made code projects, preview them safely, and copy or download source when the creator allows it.</p>
-      </div>
-      <button class="btn" id="refreshCodeProjectsBtn" type="button">↻ Refresh projects</button>
+  <!-- GAME STUDIO: make a game and publish it -->
+  <section class="view" id="viewGames" hidden>
+    <div class="lead">
+      <div class="how hi"><h3>Make a game, then publish it</h3><ol><li>Press <strong>Make a game</strong> and pick Web or JavaScript.</li><li>Edit the starter game, or build it with blocks.</li><li>Press <strong>Test</strong> to play it right in the editor.</li><li>Press <strong>Publish game</strong>. It shows up under Community Games on the Games page.</li></ol></div>
+      <div class="how"><h3>Good to know</h3><ol><li>Games run in the browser, so they use Web or JavaScript.</li><li>Python and Lua are great for projects you share here.</li><li>You can update a published game any time. Players get the new version.</li></ol><div class="acts" style="justify-content:flex-start"><a class="btn-line" href="../douggames.html#community-games">Community Games</a></div></div>
     </div>
-    <section class="publish-panel">
-      <div class="publish-title"><span class="publish-icon">↗</span><div><h3>Share your project</h3><p>Publish the code currently open in your editor for other DougHub users to preview.</p></div></div>
-      <div class="publish-fields">
-        <label>Project title<input id="codeCommunityTitle" maxlength="80" placeholder="My awesome project" autocomplete="off"></label>
-        <label>Short description<textarea id="codeCommunityDescription" maxlength="500" rows="2" placeholder="What does your project do?"></textarea></label>
-      </div>
-      <div class="permission-options">
-        <label class="permission-option"><input id="codeCommunityAllowCopy" type="checkbox"><span><b>Allow code copying</b><small>Visitors can copy the source code.</small></span></label>
-        <label class="permission-option"><input id="codeCommunityAllowDownload" type="checkbox"><span><b>Allow downloading</b><small>Visitors can download a standalone HTML version.</small></span></label>
-      </div>
-      <div class="publish-footer"><span id="codeCommunityPublishStatus" role="status">Your project stays private to your browser until you publish it here.</span><button class="btn primary" id="publishCodeProjectBtn" type="button">Publish Code Project</button></div>
-    </section>
-    <div class="community-browser-tools"><label class="community-search"><span>⌕</span><input id="codeCommunitySearch" type="search" placeholder="Search community projects…" autocomplete="off" autocorrect="off" spellcheck="false"></label><span id="codeCommunityProjectCount" class="community-count">Loading projects…</span></div>
-    <div class="community-slider-wrap">
-      <button class="community-arrow left" id="codeCommunityPrev" type="button" aria-label="Scroll projects left">‹</button>
-      <div class="community-project-slider" id="codeCommunityProjectSlider" aria-live="polite"><div class="community-loading">Loading community projects…</div></div>
-      <button class="community-arrow right" id="codeCommunityNext" type="button" aria-label="Scroll projects right">›</button>
-    </div>
-    <div class="community-footnote">Creators control the Copy Code and Download options. Previewing runs the project in an isolated frame.</div>
+    <h2 class="sec">Your games</h2>
+    <div class="grid" id="myGames"><div class="empty">Loading...</div></div>
+    <h2 class="sec">Newest Community Games <small>made by members</small></h2>
+    <div class="grid" id="commGames"><div class="empty">Loading...</div></div>
   </section>
 </main>
-<div class="fast-chat-backdrop" id="fastChatBackdrop" hidden></div>
-<aside class="fast-chat-drawer" id="fastChatDrawer" aria-label="DougHub community chat" aria-hidden="true">
-  <div class="fast-chat-head"><div><span class="panel-kicker">DOUGHUB COMMUNITY</span><h2>Chat</h2><p>Talk with the community while you build.</p></div><button class="dialog-close" id="fastChatClose" type="button" aria-label="Close chat">×</button></div>
-  <iframe id="fastChatFrame" title="DougHub community chat" data-src="../chat.html"></iframe>
-  <div class="fast-chat-foot"><span>Chat opens in a side panel.</span><a href="../chat.html" target="_blank" rel="noopener">Open full chat ↗</a></div>
-</aside>
-<dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewDialogTitle">
-  <div class="preview-dialog-head"><div><span class="panel-kicker">LIVE OUTPUT</span><h2 id="previewDialogTitle">Preview</h2></div><div class="preview-dialog-actions"><button class="btn small" id="refreshPreviewBtn" type="button">Refresh</button><button class="btn small" id="closePreviewBtn" type="button">Close ✕</button></div></div>
-  <div class="preview-dialog-content">
-    <div class="preview-wrap"><iframe id="previewDialogFrame" title="Visual blocks project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe><div class="preview-empty" id="previewDialogEmpty"><div class="preview-icon">⌘</div><b>Your preview will appear here</b><span>Click Preview to run your project.</span></div></div>
-    <div class="preview-footer"><span class="preview-status-dot"></span><span id="previewDialogStatus">Preview hasn't run yet</span></div>
-  </div>
-</dialog>
-<dialog id="addFileDialog" class="add-file-dialog" aria-labelledby="addFileDialogTitle">
-<div class="add-file-head"><h3 id="addFileDialogTitle">Add a project file</h3><div class="muted">Choose a file type, then give it a name.</div></div>
-<form id="addFileForm" class="add-file-body">
-<label for="newFileType">File type<select id="newFileType" required>
-<option value=".html">.html — Web page</option><option value=".css">.css — Stylesheet</option><option value=".js">.js — JavaScript</option><option value=".ts">.ts — TypeScript</option><option value=".json">.json — Data / settings</option><option value=".py">.py — Python source</option><option value=".java">.java — Java source</option><option value=".c">.c — C source</option><option value=".cpp">.cpp — C++ source</option><option value=".cs">.cs — C# source</option><option value=".php">.php — PHP source</option><option value=".sql">.sql — SQL script</option><option value=".sh">.sh — Shell script</option><option value=".lua">.lua — Lua source</option><option value=".xml">.xml — XML document</option><option value=".svg">.svg — Vector image</option><option value=".md">.md — Markdown notes</option><option value=".txt">.txt — Text file</option><option value=".csv">.csv — Table data</option><option value=".yaml">.yaml — YAML config</option><option value=".toml">.toml — TOML config</option>
-</select></label>
-<label for="newFileName">File name<input id="newFileName" maxlength="60" placeholder="example" autocomplete="off" required></label>
-<div class="small">Python, Java, C/C++, and other non-browser files can be edited and saved here, but the live game preview runs HTML, CSS, and JavaScript.</div>
-<div class="add-file-actions"><button class="btn" type="button" id="cancelAddFile">Cancel</button><button class="btn primary" type="submit">Create file</button></div>
-</form></dialog>
-<dialog id="publishGameDialog" class="publish-game-dialog" aria-labelledby="publishDialogTitle">
-  <div class="publish-dialog-header">
-    <div class="publish-dialog-symbol" aria-hidden="true">↗</div>
-    <div><div class="eyebrow">DOUG GAMES · COMMUNITY</div><h2 id="publishDialogTitle">Publish your game</h2><p>Give your game a name and a short description. It will be public and playable by other DougHub users.</p></div>
-    <button class="dialog-close" id="closePublishDialog" type="button" aria-label="Close publish dialog">×</button>
-  </div>
-  <form id="publishGameForm" class="publish-dialog-body">
-    <label for="communityTarget" id="communityTargetRow">Publish as<select id="communityTarget" autocomplete="off" data-no-guard><option value="">A new game</option></select><small id="communityTargetHint">Pick one of your published games to update it instead of adding a copy.</small></label>
-    <label for="communityTitle">Game title<input id="communityTitle" maxlength="80" placeholder="My awesome game" autocomplete="off" required></label>
-    <label for="communityDescription">What is your game about?<textarea id="communityDescription" maxlength="500" rows="4" placeholder="Describe how to play and what makes it fun…" required></textarea><small>Up to 500 characters.</small></label>
-    <div class="publish-privacy-note"><strong>Before you publish</strong><span>Your game will be public. Don't include private information or secret keys in your code.</span></div>
-    <label id="officialGameOption" class="official-game-option" hidden><span class="official-game-option-title"><input id="publishAsOfficial" type="checkbox"> Publish as an official DougHub game</span><small>Official games are marked as DougHub games. Use this only for games approved as official.</small></label>
-    <div class="publish-dialog-status" id="communityPublishStatus" role="status" aria-live="polite">Checking your account…</div>
-    <div class="publish-dialog-actions"><button class="btn" id="cancelPublishDialog" type="button">Cancel</button><button class="btn primary" id="publishProjectBtn" type="submit">Publish to Community Games ↗</button></div>
-  </form>
-</dialog>
-<!-- Blockly core + standard block definitions (required for the visual toolbox) -->
-<script src="https://unpkg.com/blockly@11.2.2/blockly_compressed.js"></script>
-<script src="https://unpkg.com/blockly@11.2.2/blocks_compressed.js"></script>
-<script src="https://unpkg.com/blockly@11.2.2/msg/en.js"></script>
-<dialog id="codeCommunityPreviewDialog" class="community-preview-dialog">
-    <div class="community-preview-head"><div><span class="panel-kicker">COMMUNITY PREVIEW</span><h3 id="codeCommunityPreviewTitle">Project preview</h3><p id="codeCommunityPreviewDescription"></p></div><button class="btn" id="closeCodeProjectPreview" type="button" aria-label="Close preview">✕</button></div>
-    <div class="community-preview-toolbar"><span id="codeCommunityPreviewPermissions"></span><div class="community-preview-actions"><button class="btn" id="codeCommunityCopyCodeBtn" type="button">Copy code</button><button class="btn" id="codeCommunityDownloadBtn" type="button">Download HTML</button></div></div>
-    <iframe id="codeCommunityPreviewFrame" title="Community project preview" sandbox="allow-scripts allow-forms allow-modals" referrerpolicy="no-referrer"></iframe>
-    <div class="community-preview-bottom"><span id="codeCommunityPreviewAuthor"></span><button class="btn" id="editCodeProjectBtn" type="button" hidden>Edit my project</button></div>
-  </dialog>
 
-<script src="scripting.js?v=28"></script>
+<dialog id="dlgNew">
+  <h2 id="dnTitle">New project</h2>
+  <div class="seg" role="group" aria-label="What are you making"><button type="button" data-kind="project" class="on">Project</button><button type="button" data-kind="game">Game</button></div>
+  <label class="l" for="dnName">Name</label><input id="dnName" type="text" maxlength="80" placeholder="My project" autocomplete="off">
+  <label class="l">Language</label>
+  <div class="langs" id="dnLangs"></div>
+  <div class="acts"><button class="btn-soft" type="button" id="dnCancel">Cancel</button><button class="btn-solid" type="button" id="dnGo">Create</button></div>
+</dialog>
+
+<script src="dc.js?v=1"></script>
+<script src="home.js?v=1"></script>
 </body>
 </html>

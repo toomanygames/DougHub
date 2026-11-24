@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0e20">
+<title>Editor • DougCode</title>
+<link rel="icon" href="../DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.css">
+<link rel="stylesheet" href="../dh-app-look.css?v=20261123-seventeen">
+<style>
+:root{color-scheme:dark;--bg:#0b0e20;--panel:#141935;--panel2:#1a2048;--line:#2a3160;--mute:#a3acd9;--a:#6366f1;--b:#a855f7}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:#f1f3ff;font:15px/1.45 "Segoe UI",system-ui,Arial,sans-serif;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit}
+.top{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#0b0e20;border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap}
+.back{display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-weight:800}
+.back img{width:30px;height:30px}
+.title{background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:#fff;padding:8px 12px;font-weight:700;min-width:140px;width:240px;max-width:40vw}
+.badge{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#0b0e20}
+.kind{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;background:#ffffff14;color:#cfd5ff}
+.grow{flex:1}
+.save-state{color:var(--mute);font-size:13px}
+.top .btn-solid,.top .btn-line,.top .btn-soft{padding:8px 16px;font-size:14px;border-radius:12px}
+.body{flex:1;min-height:0;display:flex;position:relative}
+.files{width:210px;flex:none;border-right:1px solid var(--line);background:#0e1228;display:flex;flex-direction:column;min-height:0}
+.files h3{margin:0;padding:12px 14px 6px;font-size:12px;letter-spacing:.12em;color:var(--mute)}
+.flist{flex:1;overflow:auto;padding:4px 8px}
+.file{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;color:#cfd5ff;cursor:pointer;border:1px solid transparent}
+.file:hover{background:#ffffff0a}
+.file.on{background:#6366f126;border-color:#6366f166;color:#fff}
+.file .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.file .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.file .x{opacity:0;border:0;background:none;color:#fca5a5;padding:0 4px;font-size:16px}
+.file:hover .x{opacity:1}
+.file .run{font-size:10px;font-weight:800;color:#86efac;border:1px solid #86efac66;border-radius:6px;padding:0 5px}
+.files .add{margin:8px;padding:9px;border-radius:12px;border:1px dashed var(--line);background:none;color:#a5b4fc;font-weight:700}
+.files .add:hover{border-color:var(--a)}
+.entry{padding:8px 12px 12px;font-size:12px;color:var(--mute)}
+.entry select{width:100%;margin-top:4px;background:var(--panel2);border:1px solid var(--line);color:#fff;border-radius:10px;padding:6px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;transition:margin-right .28s ease}
+.body.test-open .main{margin-right:min(460px,92vw)}
+.tabs{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);flex:none;align-items:center}
+.tab{padding:7px 18px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:#cfd5ff;font-weight:700}
+.tab.on{background:linear-gradient(135deg,var(--a),var(--b));border-color:transparent;color:#fff}
+.tabs .note{margin-left:10px;color:var(--mute);font-size:13px}
+.pane{flex:1;min-height:0;position:relative}
+.pane[hidden]{display:none}
+#cmHost{position:absolute;inset:0}
+#cmHost .CodeMirror{height:100%;font:14px/1.55 Consolas,"Cascadia Code",monospace;background:#0b0e20}
+#blocksHost{position:absolute;inset:0}
+.banner{position:absolute;left:176px;right:12px;top:10px;z-index:5;padding:9px 14px;border-radius:12px;background:#fbbf2420;border:1px solid #fbbf2466;color:#fde7a8;font-size:13px;display:flex;gap:10px;align-items:center}
+.banner button{margin-left:auto;border:0;background:#ffffff18;border-radius:8px;padding:2px 10px}
+.test{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);transform:translateX(100%);transition:transform .28s ease;background:#10142b;border-left:1px solid var(--line);display:flex;flex-direction:column;z-index:20}
+.body.test-open .test{transform:none}
+.handle{position:absolute;left:-38px;top:50%;transform:translateY(-50%);width:38px;height:104px;border-radius:14px 0 0 14px;border:1px solid var(--line);border-right:0;background:linear-gradient(180deg,var(--a),var(--b));color:#fff;font-weight:800;writing-mode:vertical-rl;letter-spacing:.08em;font-size:13px}
+.thead{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.thead strong{margin-right:auto}
+.thead .btn-solid,.thead .btn-soft{padding:7px 14px;font-size:13px;border-radius:10px}
+.tstate{padding:6px 14px;font-size:12px;color:var(--mute);border-bottom:1px solid var(--line)}
+.tframe{flex:1;min-height:120px;border:0;background:#fff;width:100%}
+.tframe.hide{position:absolute;width:0;height:0;min-height:0;flex:none;visibility:hidden}
+.tconsole{flex:0 0 38%;min-height:90px;overflow:auto;background:#070a18;border-top:1px solid var(--line);font:13px/1.5 Consolas,monospace;padding:8px 12px}
+.tconsole.full{flex:1}
+.ln{white-space:pre-wrap;word-break:break-word;padding:1px 0}
+.ln.error{color:#fca5a5}.ln.warn{color:#fde68a}.ln.sys{color:#7dd3fc}
+.empty{color:#5d668f}
+dialog{border:1px solid var(--line);border-radius:22px;background:var(--panel);color:#f1f3ff;padding:22px 24px;width:min(480px,92vw)}
+dialog::backdrop{background:#000a}
+dialog h2{margin:0 0 6px}
+dialog label{display:block;margin:12px 0 4px;font-size:13px;color:var(--mute);font-weight:700}
+dialog input[type=text],dialog textarea,dialog select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px 12px}
+dialog textarea{min-height:80px;resize:vertical}
+.row{display:flex;gap:10px;align-items:center;margin-top:10px}
+.row label{margin:0;flex:1}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.msg{min-height:20px;margin-top:10px;font-size:14px;color:#fca5a5}.msg.ok{color:#86efac}
+.menu{position:absolute;right:14px;top:52px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:40;min-width:190px;box-shadow:0 18px 40px #000a}
+.menu[hidden]{display:none}
+.menu button,.menu a{display:block;width:100%;text-align:left;padding:9px 12px;border:0;background:none;border-radius:10px;color:#e6e9ff;text-decoration:none;font-size:14px}
+.menu button:hover,.menu a:hover{background:#ffffff12}
+@media (max-width:760px){.files{width:150px}.title{width:150px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="scripting.html"><img src="../assets/logo.svg" alt=""><span>DougCode</span></a>
+  <input id="title" class="title" maxlength="80" aria-label="Project name" autocomplete="off">
+  <span id="langBadge" class="badge"></span><span id="kindBadge" class="kind"></span>
+  <span class="grow"></span>
+  <span id="saveState" class="save-state" role="status"></span>
+  <button id="btnTest" class="btn-soft" type="button">Test</button>
+  <button id="btnSave" class="btn-solid" type="button">Save</button>
+  <button id="btnShare" class="btn-line" type="button">Share</button>
+  <button id="btnGame" class="btn-line" type="button">Publish game</button>
+  <button id="btnMore" class="btn-soft" type="button" aria-label="More">More</button>
+  <div id="menu" class="menu" hidden>
+    <button id="mDownload" type="button">Download files</button>
+    <a id="mPage" href="#" target="_blank" rel="noopener">Open project page</a>
+    <button id="mDelete" type="button">Delete project</button>
+  </div>
+</header>
+
+<div id="body" class="body">
+  <aside class="files" aria-label="Files">
+    <h3>FILES</h3>
+    <div id="flist" class="flist"></div>
+    <button id="addFile" class="add" type="button">+ New file</button>
+    <div class="entry" id="entryBox"><label for="entrySel">Runs first</label><select id="entrySel"></select></div>
+  </aside>
+
+  <section class="main">
+    <div class="tabs" role="tablist">
+      <button id="tabCode" class="tab on" type="button" role="tab">Code</button>
+      <button id="tabBlocks" class="tab" type="button" role="tab">Blocks</button>
+      <span id="tabNote" class="note"></span>
+    </div>
+    <div class="pane" id="paneCode"><div id="cmHost"></div></div>
+    <div class="pane" id="paneBlocks" hidden>
+      <div id="blocksBanner" class="banner"><span id="blocksBannerText"></span><button id="blocksBannerX" type="button" aria-label="Hide">x</button></div>
+      <div id="blocksHost"></div>
+    </div>
+  </section>
+
+  <aside id="test" class="test" aria-label="Test panel">
+    <button id="handle" class="handle" type="button" aria-expanded="false">TEST</button>
+    <div class="thead"><strong>Test</strong><button id="tRun" class="btn-solid" type="button">Run</button><button id="tStop" class="btn-soft" type="button">Stop</button><button id="tClear" class="btn-soft" type="button">Clear</button><button id="tClose" class="btn-soft" type="button" aria-label="Close">Close</button></div>
+    <div id="tState" class="tstate">Press Run to try your code.</div>
+    <iframe id="tFrame" class="tframe" title="Preview"></iframe>
+    <div id="tConsole" class="tconsole" aria-live="polite"><div class="empty">Output will show here.</div></div>
+  </aside>
+</div>
+
+<dialog id="dlgNew"><h2>New file</h2><label for="newName">File name</label><input id="newName" type="text" autocomplete="off" spellcheck="false"><div id="newMsg" class="msg"></div><div class="acts"><button class="btn-soft" type="button" data-close>Cancel</button><button id="newOk" class="btn-solid" type="button">Create</button></div></dialog>
+
+<dialog id="dlgShare"><h2>Share project</h2><p style="margin:0;color:var(--mute)">Public projects show up on the DougCode home page for everyone.</p>
+  <label for="shDesc">Description</label><textarea id="shDesc" maxlength="500" placeholder="What does it do?"></textarea>
+  <div class="row"><label for="shPublic">Public (anyone can see it)</label><input id="shPublic" type="checkbox"></div>
+  <div class="row"><label for="shCopy">Let others fork it</label><input id="shCopy" type="checkbox"></div>
+  <div class="row"><label for="shDl">Let others download it</label><input id="shDl" type="checkbox"></div>
+  <div id="shMsg" class="msg"></div>
+  <div class="acts"><a id="shLink" class="btn-text" href="#" target="_blank" rel="noopener" hidden>Open project page</a><button class="btn-soft" type="button" data-close>Close</button><button id="shOk" class="btn-solid" type="button">Save sharing</button></div></dialog>
+
+<dialog id="dlgGame"><h2>Publish as a game</h2><p style="margin:0;color:var(--mute)">Your game appears under Community Games on the Games page, and anyone can play it.</p>
+  <label for="gTitle">Game title</label><input id="gTitle" type="text" maxlength="80">
+  <label for="gDesc">Short description</label><textarea id="gDesc" maxlength="500" placeholder="How do you play?"></textarea>
+  <label for="gCat">Category</label><select id="gCat"><option>Arcade</option><option>Puzzle</option><option>Adventure</option><option>Action</option><option>Other</option></select>
+  <div id="gMsg" class="msg"></div>
+  <div class="acts"><a id="gLink" class="btn-text" href="../douggames.html#community-games" target="_blank" rel="noopener" hidden>See it on the Games page</a><button id="gUn" class="btn-soft" type="button" hidden>Remove from games</button><button class="btn-soft" type="button" data-close>Close</button><button id="gOk" class="btn-solid" type="button">Publish</button></div></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/css/css.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/matchbrackets.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/blockly_compressed.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/blocks_compressed.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/javascript_compressed.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/python_compressed.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/lua_compressed.js"></script>
+<script src="https://unpkg.com/blockly@11.2.2/msg/en.js"></script>
+<script src="dc.js?v=1"></script>
+<script src="dc-blocks.js?v=2"></script>
+<script src="editor.js?v=1"></script>
+</body>
+</html>

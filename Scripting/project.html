@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0e20">
+<title>Project • DougCode</title>
+<link rel="icon" href="../DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.css">
+<script src="../display.js"></script>
+<script src="../nav.js?v=20261123-seventeen" defer></script>
+<style>
+:root{color-scheme:dark;--mute:#a3acd9;--panel:#141935;--panel2:#1a2048;--line:#2a3160}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f1f3ff}a{color:inherit;text-decoration:none}
+header{height:70px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px}
+header .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800}header .logo-icon{width:40px;height:40px;display:block}
+header .nav{display:flex;align-items:center;gap:8px}
+main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:10px 0 80px}
+.crumb{color:var(--mute);font-size:14px;margin:6px 0 12px}.crumb a{color:#a5b4fc}
+.head{padding:24px 28px;border-radius:28px;background:linear-gradient(120deg,#6366f126,#a855f720);border:1px solid var(--line)}
+.head h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);letter-spacing:-.02em}
+.head p{margin:0 0 14px;color:#c9d2f5;max-width:720px}
+.meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--mute);font-size:14px;margin-bottom:14px}
+.lb{padding:3px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#0b0e20}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.acts .btn-solid,.acts .btn-line,.acts .btn-soft{padding:10px 20px;font-size:15px;border-radius:14px}
+.msg{min-height:20px;margin-top:10px;font-size:14px;color:#fca5a5}.msg.ok{color:#86efac}
+.cols{display:grid;grid-template-columns:230px 1fr;gap:16px;margin-top:18px}
+.tree{padding:12px;border-radius:22px;background:var(--panel);border:1px solid var(--line);align-self:start}
+.tree h3{margin:4px 8px 8px;font-size:12px;letter-spacing:.12em;color:var(--mute)}
+.tf{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;cursor:pointer;color:#cfd5ff;font-size:14px}
+.tf:hover{background:#ffffff0a}.tf.on{background:#6366f126;color:#fff}
+.viewer{border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#0b0e20}
+.vh{padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);font-size:14px;color:#cfd5ff;display:flex;gap:10px}
+.viewer .CodeMirror{height:auto;max-height:560px;min-height:200px;font:13.5px/1.55 Consolas,monospace;background:#0b0e20}
+.viewer .CodeMirror-scroll{max-height:560px}
+.run{margin-top:18px;border-radius:22px;border:1px solid var(--line);background:var(--panel);overflow:hidden}
+.run[hidden]{display:none}
+.run .rh{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.run .rh strong{margin-right:auto}
+.run iframe{width:100%;height:380px;border:0;background:#fff;display:block}
+.run iframe.hide{height:0;visibility:hidden}
+.run .con{max-height:220px;overflow:auto;background:#070a18;padding:10px 14px;font:13px/1.5 Consolas,monospace;min-height:60px}
+.ln{white-space:pre-wrap;word-break:break-word}.ln.error{color:#fca5a5}.ln.sys{color:#7dd3fc}.ln.warn{color:#fde68a}
+.empty{color:#5d668f}
+.note{padding:40px;text-align:center;color:var(--mute)}
+@media(max-width:780px){.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="dh-head"><a href="../index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<main id="app"><div class="note">Loading project...</div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/css/css.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
+<script src="dc.js?v=1"></script>
+<script>
+(function () {
+  "use strict";
+  var DC = window.DC, esc = DC.esc, app = document.getElementById("app");
+  var id = new URLSearchParams(location.search).get("id"), p = null, cm = null, stop = null, me = null, active = null;
+  function msg(t, ok) { var m = document.getElementById("msg"); if (m) { m.textContent = t; m.className = "msg" + (ok ? " ok" : ""); } }
+  function show(name) {
+    active = name; var f = DC.getFile(p.files, name); if (!f) return;
+    cm.setOption("mode", DC.modeFor(name)); cm.setValue(f.content); document.getElementById("vname").textContent = name;
+    document.querySelectorAll(".tf").forEach(function (e) { e.classList.toggle("on", e.dataset.n === name); });
+    setTimeout(function () { cm.refresh(); }, 0);
+  }
+  function line(k, t) { var c = document.getElementById("con"); var e = c.querySelector(".empty"); if (e) e.remove(); var d = document.createElement("div"); d.className = "ln " + k; d.textContent = t; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+  function runIt() {
+    var box = document.getElementById("run"); box.hidden = false;
+    if (stop) { stop(); stop = null; }
+    var page = DC.LANGS[p.runtime].runs === "page";
+    var old = document.getElementById("rf"), fr = old.cloneNode(false); old.parentNode.replaceChild(fr, old); fr.classList.toggle("hide", !page);
+    document.getElementById("con").innerHTML = '<div class="empty">Output will show here.</div>';
+    stop = DC.run(p, fr, function (m) { if (m.kind === "done") { line("sys", "Finished."); return; } if (m.kind === "sys") { line("sys", m.text); return; } if (m.text !== "") line(m.kind, m.text); });
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  function render(owner) {
+    var L = DC.LANGS[p.runtime], mine = me && p.owner_id === me.id, files = DC.visibleFiles(p.files);
+    var canFork = !!me && (mine || p.allow_copy), canDl = mine || p.allow_download;
+    document.title = p.title + " • DougCode";
+    app.innerHTML = '<div class="crumb"><a href="scripting.html">DougCode</a> / ' + esc(owner) + " / " + esc(p.title) + "</div>" +
+      '<section class="head"><h1>' + esc(p.title) + '</h1><p>' + esc(p.description || "No description yet.") + '</p><div class="meta"><span class="lb" style="background:' + L.color + '">' + esc(L.short) + "</span><span>by " + esc(owner) + "</span><span>updated " + esc(DC.ago(p.updated_at)) + "</span><span>" + files.length + " file" + (files.length === 1 ? "" : "s") + "</span>" + (p.visibility === "public" ? "" : "<span>Private</span>") + '</div><div class="acts"><button id="bRun" class="btn-solid" type="button">Run it</button>' +
+      (mine ? '<a class="btn-line" href="editor.html?id=' + encodeURIComponent(p.id) + '">Open in editor</a>' : "") +
+      (canFork ? '<button id="bFork" class="btn-line" type="button">Fork</button>' : (me ? "" : '<a class="btn-line" href="../log-in.html?redirect=Scripting/project.html">Log in to fork</a>')) +
+      (canDl ? '<button id="bDl" class="btn-soft" type="button">Download</button>' : "") + '</div><div id="msg" class="msg"></div></section>' +
+      '<div class="cols"><aside class="tree"><h3>FILES</h3>' + files.map(function (f) { return '<div class="tf" data-n="' + esc(f.name) + '">' + esc(f.name) + "</div>"; }).join("") + '</aside><div class="viewer"><div class="vh"><span id="vname"></span></div><div id="cmh"></div></div></div>' +
+      '<section class="run" id="run" hidden><div class="rh"><strong>Running</strong><button id="rStop" class="btn-soft" type="button" style="padding:7px 14px;font-size:13px;border-radius:10px">Stop</button><button id="rAgain" class="btn-solid" type="button" style="padding:7px 14px;font-size:13px;border-radius:10px">Run again</button></div><iframe id="rf" title="Preview"></iframe><div id="con" class="con"><div class="empty">Output will show here.</div></div></section>';
+    cm = CodeMirror(document.getElementById("cmh"), { value: "", theme: "material-darker", readOnly: true, lineNumbers: true, viewportMargin: Infinity });
+    document.querySelectorAll(".tf").forEach(function (e) { e.onclick = function () { show(e.dataset.n); }; });
+    var first = DC.getFile(files, p.entry) ? p.entry : (files[0] || {}).name; if (first) show(first);
+    document.getElementById("bRun").onclick = runIt; document.getElementById("rAgain").onclick = runIt;
+    document.getElementById("rStop").onclick = function () { if (stop) { stop(); stop = null; } line("sys", "Stopped."); };
+    var fk = document.getElementById("bFork"); if (fk) fk.onclick = function () { fk.disabled = true; msg("Forking..."); DC.fork(p).then(function (c) { location.href = "editor.html?id=" + encodeURIComponent(c.id); }).catch(function (e) { fk.disabled = false; msg(e.message || String(e)); }); };
+    var dl = document.getElementById("bDl"); if (dl) dl.onclick = function () { DC.download(p).catch(function () { msg("Could not make the download."); }); };
+  }
+  DC.getUser().then(function (u) {
+    me = u;
+    if (!id) throw new Error("No project chosen.");
+    return DC.getProject(id);
+  }).then(function (proj) {
+    if (!proj) throw new Error("This project is private or does not exist.");
+    p = proj;
+    return DC.ownerNames([{ owner_id: p.owner_id }]).then(function (n) { render(n[p.owner_id] || "member"); });
+  }).catch(function (e) { app.innerHTML = '<div class="note">' + esc(e.message || e) + ' <a class="btn-text" href="scripting.html">Back to DougCode</a></div>'; });
+})();
+</script>
+</body>
+</html>
