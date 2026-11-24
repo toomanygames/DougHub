@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-fourteen", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-fifteen", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
@@ -188,7 +188,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html", "tos.html", "settings.html", "report.html", "my-games.html", "download.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html", "tos.html", "settings.html", "report.html", "my-games.html", "download.html", "privacy.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
