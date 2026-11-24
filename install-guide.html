@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0e20">
+<title>How to install the DougHub app with SmartScreen on • DougHub</title>
+<meta name="description" content="Step by step: download and install the DougHub app on Windows while SmartScreen stays turned on.">
+<link rel="icon" href="DougHub.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="display.js"></script>
+<script src="nav.js?v=20261123-sixteen" defer></script>
+<script src="search-autofill-fix.js?v=3" defer></script>
+<style>
+:root{color-scheme:dark;--mute:#a3acd9}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f1f3ff}a{color:#a5b4fc}
+header{height:70px;position:sticky;top:0;z-index:1000;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px}
+header .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;text-decoration:none;color:#fff}header .logo-icon{width:40px;height:40px;display:block}
+header .nav{display:flex;align-items:center;gap:8px}
+main{width:min(980px,calc(100% - 28px));margin:0 auto;padding:10px 0 80px}
+.lead{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:0 0 22px}
+.note{padding:16px 20px;border-radius:20px;background:linear-gradient(120deg,#34d39922,#6366f126);border:1px solid #34d39966;color:#d7e0ff;margin-bottom:26px}
+.note b{color:#86efac}
+.toc{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.toc a{padding:8px 16px;border-radius:999px;background:#141935;border:1px solid #2a3160;color:#cfd5ff;text-decoration:none;font-weight:700;font-size:14px}
+.toc a:hover{border-color:#8b5cf6}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:26px;align-items:center;padding:26px;border-radius:28px;background:#141935;border:1px solid #2a3160;margin-bottom:20px}
+.step:nth-of-type(even){grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.step:nth-of-type(even) .shot{order:-1}
+.num{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#a855f7);font-weight:800;font-size:20px;margin-bottom:10px}
+.step h2{margin:0 0 8px;font-size:24px;letter-spacing:-.01em}
+.step p{margin:0 0 10px;color:#c9d2f5;line-height:1.6}
+.step .tip{padding:10px 14px;border-radius:14px;background:#6366f11f;color:#c7d2fe;font-size:14.5px}
+.shot svg{width:100%;height:auto;display:block;border-radius:18px;box-shadow:0 18px 44px #0008}
+code,.cmd{display:block;margin:10px 0;padding:12px 14px;border-radius:12px;background:#0b0e20;border:1px solid #2a3160;color:#c7d2fe;font:13px/1.5 Consolas,monospace;word-break:break-all}
+.warn{padding:16px 20px;border-radius:20px;background:#fbbf2418;border:1px solid #fbbf2455;color:#fde7a8;margin:26px 0 0}
+.faq details{padding:14px 18px;border-radius:18px;background:#141935;border:1px solid #2a3160;margin-bottom:10px}
+.faq summary{cursor:pointer;font-weight:700}.faq details p{margin:8px 0 0;color:var(--mute);font-size:15px;line-height:1.55}
+h2.sec{margin:38px 0 14px;font-size:26px}
+@media(max-width:800px){.step,.step:nth-of-type(even){grid-template-columns:1fr}.step:nth-of-type(even) .shot{order:0}}
+</style>
+</head>
+<body>
+<header class="dh-head"><a href="index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
+<main>
+  <section class="dh-pagehero"><img src="assets/art/settings.svg" alt="" width="480" height="270"><div><h1>Install the app with SmartScreen on</h1><p>You do not need to turn anything off. SmartScreen asks you to confirm new programs, and this guide shows each screen and which button to press.</p><div class="acts"><a class="btn-dl" href="https://github.com/toomanygames/DougHub/releases/latest/download/DougHub-Setup.exe">Download for Windows</a><a class="btn-text" href="download.html">Back to the app page</a></div></div></section>
+
+  <div class="note"><b>Keep SmartScreen on.</b> It is a safety feature, and you can leave it on for the whole install. The installer is new, so Windows has not seen many people run it yet, and that is why it asks. Only continue if you got the file from this page.</div>
+
+  <nav class="toc" aria-label="Steps"><a href="#s1">1 Download</a><a href="#s2">2 Keep the file</a><a href="#s3">3 Check it</a><a href="#s4">4 Open it</a><a href="#s5">5 SmartScreen</a><a href="#s6">6 Install</a><a href="#help">Help</a></nav>
+
+  <section class="step" id="s1">
+    <div><span class="num">1</span><h2>Download the installer</h2><p>Press <strong>Download for Windows</strong> on this page or on the app page. Your browser saves a file called <em>DougHub-Setup.exe</em>, usually in your Downloads folder.</p><div class="tip">It is about 130 MB, so give it a minute on a slow connection.</div></div>
+    <div class="shot"><svg viewBox="0 0 520 300" role="img" aria-label="Illustration: the Download for Windows button"><rect width="520" height="300" rx="18" fill="#0b0e20"/><rect x="0" y="0" width="520" height="34" fill="#1a2048"/><circle cx="18" cy="17" r="5" fill="#ff5d73"/><circle cx="36" cy="17" r="5" fill="#fbbf24"/><circle cx="54" cy="17" r="5" fill="#4ade80"/><rect x="80" y="9" width="300" height="16" rx="8" fill="#0b0e20"/><text x="94" y="21" fill="#a3acd9" font-size="11" font-family="Segoe UI,Arial">doughub.online/download</text><text x="40" y="100" fill="#fff" font-size="26" font-weight="700" font-family="Segoe UI,Arial">Get the DougHub app</text><rect x="40" y="124" width="250" height="52" rx="26" fill="#67e8f9"/><path d="M62 144v14m0 0l-6-6m6 6l6-6" stroke="#0b0e20" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="157" fill="#0b0e20" font-size="16" font-weight="700" font-family="Segoe UI,Arial">Download for Windows</text><path d="M268 190l10 26 6-9 9 9 4-4-9-9 10-4z" fill="#fff" stroke="#0b0e20"/><text x="40" y="214" fill="#a3acd9" font-size="12" font-family="Segoe UI,Arial">Version 1.2.0 · Windows 10 and 11 · about 130 MB</text></svg></div>
+  </section>
+
+  <section class="step" id="s2">
+    <div><span class="num">2</span><h2>Keep the file if your browser asks</h2><p>Edge and Chrome sometimes say a file <em>"isn't commonly downloaded"</em>. That is the same reason: it is new. Open the downloads list, press the <strong>…</strong> menu next to the file, choose <strong>Keep</strong>, then <strong>Show more</strong> and <strong>Keep anyway</strong>.</p><div class="tip">Chrome: press the arrow beside the warning and choose Keep.</div></div>
+    <div class="shot"><svg viewBox="0 0 520 300" role="img" aria-label="Illustration: the browser downloads panel with Keep and Keep anyway"><rect width="520" height="300" rx="18" fill="#0b0e20"/><rect x="190" y="26" width="310" height="232" rx="14" fill="#1f2547" stroke="#3a4290"/><text x="206" y="54" fill="#fff" font-size="14" font-weight="700" font-family="Segoe UI,Arial">Downloads</text><rect x="204" y="68" width="282" height="86" rx="10" fill="#141935"/><rect x="216" y="82" width="30" height="30" rx="8" fill="#6366f1"/><text x="256" y="92" fill="#fff" font-size="13" font-weight="700" font-family="Segoe UI,Arial">DougHub-Setup.exe</text><text x="256" y="110" fill="#fca5a5" font-size="11" font-family="Segoe UI,Arial">isn't commonly downloaded</text><rect x="216" y="122" width="74" height="24" rx="12" fill="#6366f1"/><text x="236" y="138" fill="#fff" font-size="12" font-weight="700" font-family="Segoe UI,Arial">Keep</text><rect x="300" y="122" width="106" height="24" rx="12" fill="#67e8f9"/><text x="314" y="138" fill="#0b0e20" font-size="12" font-weight="700" font-family="Segoe UI,Arial">Keep anyway</text><text x="206" y="184" fill="#a3acd9" font-size="12" font-family="Segoe UI,Arial">1  Press the … menu, then Keep</text><text x="206" y="204" fill="#a3acd9" font-size="12" font-family="Segoe UI,Arial">2  Press Show more</text><text x="206" y="224" fill="#a3acd9" font-size="12" font-family="Segoe UI,Arial">3  Press Keep anyway</text><circle cx="64" cy="132" r="34" fill="#141935" stroke="#3a4290"/><text x="46" y="146" fill="#fff" font-size="36" font-weight="700" font-family="Segoe UI,Arial">…</text></svg></div>
+  </section>
+
+  <section class="step" id="s3">
+    <div><span class="num">3</span><h2>Check that it is the real file (optional)</h2><p>Open <strong>PowerShell</strong> and run this line. It prints the file's fingerprint. It should match the one on the app page exactly.</p><span class="cmd">Get-FileHash "$env:USERPROFILE\Downloads\DougHub-Setup.exe" -Algorithm SHA256</span><p>Expected fingerprint:</p><code>23F42B02B3180AF30BB4D28ECBF1682889A8389F8FFD93F17627B4C7DAC49A92</code><div class="tip">If the letters and numbers are different, delete the file and download it again from this site.</div></div>
+    <div class="shot"><svg viewBox="0 0 520 300" role="img" aria-label="Illustration: a PowerShell window printing a SHA-256 fingerprint"><rect width="520" height="300" rx="18" fill="#012456"/><rect width="520" height="30" rx="18" fill="#0b1a3a"/><text x="14" y="20" fill="#fff" font-size="12" font-family="Segoe UI,Arial">PowerShell</text><g font-family="Consolas,monospace" font-size="13" fill="#e6edf7"><text x="16" y="62">PS C:\Users\you&gt; Get-FileHash ...\DougHub-Setup.exe</text><text x="16" y="84">-Algorithm SHA256</text><text x="16" y="124" fill="#9fb3d9">Algorithm       Hash</text><text x="16" y="142" fill="#9fb3d9">---------       ----</text><text x="16" y="164">SHA256          23F42B02B318...C49A92</text></g><rect x="130" y="148" width="372" height="22" rx="6" fill="none" stroke="#67e8f9" stroke-width="2"/><text x="16" y="212" fill="#86efac" font-family="Segoe UI,Arial" font-size="14" font-weight="700">The start and end must match the page.</text></svg></div>
+  </section>
+
+  <section class="step" id="s4">
+    <div><span class="num">4</span><h2>Open the installer</h2><p>Open your <strong>Downloads</strong> folder and double-click <em>DougHub-Setup.exe</em>. Windows may take a few seconds to scan it before anything appears.</p></div>
+    <div class="shot"><svg viewBox="0 0 520 300" role="img" aria-label="Illustration: the file DougHub-Setup.exe in the Downloads folder"><rect width="520" height="300" rx="18" fill="#161b33"/><rect width="520" height="36" fill="#1f2547"/><text x="16" y="23" fill="#fff" font-size="13" font-family="Segoe UI,Arial">Downloads</text><rect x="30" y="64" width="150" height="150" rx="16" fill="#25305e" stroke="#6366f1" stroke-width="2"/><rect x="72" y="84" width="66" height="66" rx="16" fill="#6366f1"/><text x="90" y="130" fill="#fff" font-size="42" font-weight="800" font-family="Arial">D</text><text x="42" y="178" fill="#fff" font-size="13" font-weight="600" font-family="Segoe UI,Arial">DougHub-Setup.exe</text><text x="42" y="196" fill="#a3acd9" font-size="11" font-family="Segoe UI,Arial">Application · 130 MB</text><text x="214" y="124" fill="#c7d2fe" font-size="16" font-weight="700" font-family="Segoe UI,Arial">Double-click this file</text><path d="M200 120h-14" stroke="#c7d2fe" stroke-width="3" stroke-linecap="round"/><path d="M193 113l-8 7 8 7" stroke="#c7d2fe" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </section>
+
+  <section class="step" id="s5">
+    <div><span class="num">5</span><h2>Pass SmartScreen</h2><p>A blue window says <strong>"Windows protected your PC"</strong>. This is SmartScreen asking you to confirm. Do these two things:</p><p><strong>1.</strong> Press <strong>More info</strong>, the small link under the message.<br><strong>2.</strong> Press <strong>Run anyway</strong>, the button that appears.</p><div class="tip">The publisher shows as "Unknown publisher" because the installer is not signed yet. Press Don't run if you did not download it from this page.</div></div>
+    <div class="shot"><svg viewBox="0 0 520 300" role="img" aria-label="Illustration: the SmartScreen window after pressing More info, with Run anyway"><rect width="520" height="300" rx="18" fill="#10131f"/><rect x="60" y="22" width="400" height="256" rx="6" fill="#1b4f9c"/><text x="86" y="62" fill="#fff" font-size="21" font-weight="700" font-family="Segoe UI,Arial">Windows protected your PC</text><text x="86" y="88" fill="#dbe8ff" font-size="12" font-family="Segoe UI,Arial">Microsoft Defender SmartScreen prevented an unrecognized app</text><text x="86" y="104" fill="#dbe8ff" font-size="12" font-family="Segoe UI,Arial">from starting. Running this app might put your PC at risk.</text><text x="86" y="132" fill="#fff" font-size="12" font-family="Segoe UI,Arial">App:  DougHub-Setup.exe</text><text x="86" y="150" fill="#fff" font-size="12" font-family="Segoe UI,Arial">Publisher:  Unknown publisher</text><rect x="224" y="226" width="110" height="34" fill="#fff"/><text x="244" y="248" fill="#10131f" font-size="13" font-weight="700" font-family="Segoe UI,Arial">Run anyway</text><rect x="344" y="226" width="96" height="34" fill="none" stroke="#fff"/><text x="358" y="248" fill="#fff" font-size="13" font-family="Segoe UI,Arial">Don't run</text><text x="86" y="190" fill="#fff" font-size="12" text-decoration="underline" font-family="Segoe UI,Arial">More info</text><rect x="214" y="216" width="130" height="54" rx="8" fill="none" stroke="#67e8f9" stroke-width="3"/></svg></div>
+  </section>
+
+  <section class="step" id="s6">
+    <div><span class="num">6</span><h2>Install and open DougHub</h2><p>Windows may ask <em>"Do you want to allow this app to make changes?"</em> Choose <strong>Yes</strong>. In the installer pick a folder or keep the default, press <strong>Install</strong>, then <strong>Finish</strong>. Open <strong>DougHub</strong> from the desktop or the Start menu, and log in with your normal account.</p><div class="tip">No account yet? You can make one inside the app. An email is optional.</div></div>
+    <div class="shot"><svg viewBox="0 0 520 300" role="img" aria-label="Illustration: the DougHub installer finishing"><rect width="520" height="300" rx="18" fill="#0b0e20"/><rect x="70" y="26" width="380" height="248" rx="16" fill="#141935" stroke="#2a3160"/><rect x="214" y="48" width="92" height="92" rx="24" fill="#6366f1"/><text x="238" y="116" fill="#fff" font-size="62" font-weight="800" font-family="Arial">D</text><text x="260" y="170" text-anchor="middle" fill="#fff" font-size="22" font-weight="700" font-family="Segoe UI,Arial">DougHub is installed</text><rect x="196" y="196" width="128" height="40" rx="12" fill="#6366f1"/><text x="260" y="222" text-anchor="middle" fill="#fff" font-size="15" font-weight="700" font-family="Segoe UI,Arial">Open DougHub</text><circle cx="378" cy="64" r="15" fill="#34d399"/><path d="M371 64l5 5 9-10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </section>
+
+  <div class="warn"><strong>Only run files you downloaded from doughub.online.</strong> If a different website or a message from someone else offers you "DougHub", do not run it. SmartScreen is there to protect you.</div>
+
+  <h2 class="sec" id="help">If something goes wrong</h2>
+  <section class="faq">
+    <details><summary>I do not see a "Run anyway" button</summary><p>Press the small <strong>More info</strong> link first. The button only appears after that. If there is still no button, your PC may be set by a school or work admin to block unknown programs. Ask them for help.</p></details>
+    <details><summary>The browser deleted the file</summary><p>Open the browser's downloads list, find the file and press <strong>Keep</strong>. If it is gone, press the download button again.</p></details>
+    <details><summary>Windows says the file is blocked</summary><p>Right-click the file, choose <strong>Properties</strong>, tick <strong>Unblock</strong> at the bottom if it is there, press <strong>OK</strong> and open it again.</p></details>
+    <details><summary>The fingerprint is different</summary><p>Delete the file and download it again from this site. If it still does not match, tell us on the <a href="report.html">Report a problem</a> page and do not run it.</p></details>
+    <details><summary>Why does Windows not trust it yet?</summary><p>SmartScreen trusts programs that many people have already run, or that carry a publisher certificate. DougHub's installer is new, so it asks you first. The app is made by DougHub, and the <a href="privacy.html">Privacy Policy</a> explains what it collects.</p></details>
+  </section>
+</main>
+</body>
+</html>
