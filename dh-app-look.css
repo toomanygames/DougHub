@@ -320,3 +320,65 @@ body:has(.chat-container) .chat-top{background:var(--dh-panel2,#1a2048)!importan
 body:has(.chat-container) .chat-heading h1{font-size:18px!important}
 @media(max-width:820px){body:has(.chat-container) .chat-hero{display:none}body:has(.chat-container) .chat-container{width:100%!important;margin:0!important;height:calc(100vh - 70px)!important;border-radius:0!important}}
 body:has(.chat-container) .chat-hero img{width:170px;height:auto;align-self:center;aspect-ratio:16/9}
+
+/* ===== Remake: DMail, Calls, Inbox, Showcase, Shop, Character, Daily Arcade ===== */
+.dh-pagehero-s{width:min(1180px,calc(100% - 32px));margin:18px auto 14px;padding:14px 22px}
+.dh-pagehero-s img{width:170px;height:auto;aspect-ratio:16/9;align-self:center}
+.dh-pagehero-s h1{font-size:clamp(26px,4vw,36px)}
+.dh-pagehero-s p{font-size:15px;margin-top:4px}
+.dh-subtabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center;width:min(1180px,calc(100% - 32px));margin:18px auto 14px}
+.dh-subtabs a{padding:9px 20px;border-radius:999px;border:1px solid var(--dh-line);background:var(--dh-panel);color:#cfd5ff;font-weight:800;font-size:14px;text-decoration:none;transition:border-color .15s}
+.dh-subtabs a:hover{border-color:var(--dh-a)}
+.dh-subtabs a.on{background:linear-gradient(135deg,var(--dh-a),var(--dh-b));border-color:transparent;color:#fff}
+.dh-wallet{margin-left:auto;padding:8px 18px;border-radius:999px;background:var(--dh-panel);border:1px solid var(--dh-line)}
+.dh-wallet small{display:block;font-size:10px;letter-spacing:.12em;color:var(--dh-mute)}
+.dh-wallet strong{font-size:18px;color:#fde68a}
+.dh-subtabs:has(.dh-wallet){}
+body>.dh-wallet{width:auto}
+
+/* DMail */
+body:has(.app>.topbar) .app{height:auto!important;overflow:visible!important;width:min(1180px,calc(100% - 32px));margin:0 auto 24px}
+body:has(.app>.topbar) .topbar{height:auto!important;padding:12px 20px!important;background:var(--dh-panel2)!important;border:1px solid var(--dh-line)!important;border-radius:28px 28px 0 0;gap:12px}
+body:has(.app>.topbar) .topbar .logo{font-size:18px;margin-right:auto}
+body:has(.app>.topbar) .main{height:calc(100vh - 330px)!important;min-height:520px;padding:12px!important;gap:12px!important;background:var(--dh-panel)!important;border:1px solid var(--dh-line);border-top:0;border-radius:0 0 28px 28px}
+body:has(.app>.topbar) .sidebar,body:has(.app>.topbar) .content{border-radius:20px!important;background:#0e1228!important;border:1px solid var(--dh-line)!important;backdrop-filter:none!important}
+body:has(.app>.topbar) .compose-button{border-radius:999px!important;background:linear-gradient(135deg,var(--dh-a),var(--dh-b))!important}
+body:has(.app>.topbar) .nav-button{border-radius:14px!important}
+body:has(.app>.topbar) .nav-button.active{background:#6366f133!important;box-shadow:inset 3px 0 0 #a78bfa}
+body:has(.app>.topbar) .content-title{font-size:20px}
+@media(max-width:820px){.dh-pagehero-s{display:none}body:has(.app>.topbar) .app{width:100%}body:has(.app>.topbar) .main{height:calc(100vh - 150px)!important;border-radius:0}}
+
+/* Calls */
+body:has(.call-layout) main{width:min(1180px,calc(100% - 32px));max-width:none!important;margin:0 auto!important;padding:0 0 30px!important}
+body:has(.call-layout) .call-header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--dh-panel2)!important;border:1px solid var(--dh-line)!important;border-radius:28px 28px 0 0;position:static!important;height:auto!important}
+body:has(.call-layout) .call-brand{margin-right:auto;font-weight:800;font-size:18px;color:#fff;text-decoration:none}
+body:has(.call-layout) .call-layout{border:1px solid var(--dh-line);border-top:0;border-radius:0 0 28px 28px;padding:12px;background:var(--dh-panel);margin-top:0!important}
+body:has(.call-layout) .call-stage{border-radius:20px!important;background:#0e1228!important;border:1px solid var(--dh-line)!important}
+body:has(.call-layout) .call-btn{border-radius:999px!important}
+body:has(.call-layout) .call-btn.primary{background:linear-gradient(135deg,var(--dh-a),var(--dh-b))!important;border-color:transparent!important;color:#fff!important}
+
+/* Inbox (staff) */
+body:has(.workspace) .container{width:min(1180px,calc(100% - 32px));max-width:none!important;margin:0 auto!important;padding:0 0 40px!important}
+body:has(.workspace) .workspace{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+body:has(.workspace) .card{border-radius:24px!important;padding:20px 22px!important}
+body:has(.workspace) .card h2{margin:0 0 4px}
+body:has(.workspace) #loading,body:has(.workspace) #error{padding:26px;border-radius:22px;border:1px dashed var(--dh-line);text-align:center}
+
+/* Showcase */
+body:has(#view .note) main,body:has(#view) main{width:min(1180px,calc(100% - 32px));max-width:none!important;margin:0 auto!important;padding-bottom:50px}
+
+/* Shop, Character editor, Daily Arcade */
+body:has(.dh-subtabs) main{width:min(1180px,calc(100% - 32px));max-width:none!important;margin:0 auto!important;padding-bottom:50px}
+.dh-subtabs+.dh-wallet{margin:-48px 0 14px auto;position:relative;right:max(16px,calc((100% - 1180px)/2));width:max-content;float:right}
+body:has(.dh-head) .wrap{width:min(1180px,calc(100% - 32px));max-width:none!important;margin:0 auto!important}
+body:has(.dh-head) .wrap .top{margin:18px 0 12px}
+body:has(.dh-head) .wrap>header.head{position:static!important;background:linear-gradient(120deg,#6366f126,#a855f720)!important;border:1px solid var(--dh-line)!important;border-radius:28px!important;padding:22px 26px!important;backdrop-filter:none!important}
+body:has(.dh-head) .wrap{display:block!important;padding:0 0 50px!important}
+body:has(.dh-head) .wrap .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+body:has(.dh-head) .wrap>.head{display:block}
+body:has(.dh-head) .wrap .head h1{font-size:clamp(28px,4.5vw,42px)!important;margin:6px 0}
+body:has(.dh-head) .wrap .head .artline{margin-top:12px}
+body:has(.layout) main>.heading{padding:20px 26px;border-radius:28px;background:linear-gradient(120deg,#6366f126,#a855f720);border:1px solid var(--dh-line);margin-bottom:16px}
+body:has(.layout) main>.heading h1{margin:4px 0;font-size:clamp(28px,4.5vw,42px)}
+body:has(.dh-head):has(main.wrap){display:block!important;padding:0!important}
+body:has(.dh-head) main.wrap{width:min(860px,calc(100% - 32px))!important}

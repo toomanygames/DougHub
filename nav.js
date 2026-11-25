@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-seventeen", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-twenty", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
@@ -188,7 +188,7 @@
     `;
     document.head.appendChild(style);
   }
-  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html", "tos.html", "settings.html", "report.html", "my-games.html", "download.html", "privacy.html", "install-guide.html"]);
+  const MAIN_NAV_PAGES = new Set(["index.html", "dashboard.html", "douggames.html", "dougtube.html", "douqhub-music.html", "dougforum.html", "chat.html", "scripting/scripting.html", "tos.html", "settings.html", "report.html", "my-games.html", "download.html", "privacy.html", "install-guide.html", "dmail.html", "chat-calls.html", "inbox.html", "profile.html", "games/shop.html", "games/character-editor.html", "games/daily-arcade.html"]);
 
   function normalizePrimaryNav() {
     const current = pathKey();
@@ -612,7 +612,7 @@
       if (key === p) a.className = "on";
       bar.appendChild(a);
     });
-    const own = document.querySelector(".chat-top, .call-header, header.topbar");
+    const own = document.querySelector(".chat-top, .call-header, .topbar");
     if (own) {
       bar.classList.add("inline");
       const head = own.querySelector(".chat-heading");

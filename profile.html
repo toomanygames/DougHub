@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
 <script src="auth-guard.js" data-require-auth="true"></script>
-<script src="nav.js?v=20261123-nineteen" defer></script>
+<script src="nav.js?v=20261123-twenty" defer></script>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4;--accent:#818cf8;--gold:#ffd23f;
@@ -83,13 +83,9 @@ h2{margin:30px 0 6px;font-size:18px}
 </style>
 </head>
 <body>
+<header class="dh-head"><a href="/index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
 <main>
-  <div class="top">
-    <a href="douggames.html">&larr; Games</a>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a href="Games/shop.html#seasonal">Seasonal shop</a>
-    </div>
-  </div>
+  <div class="dh-subtabs"><a href="douggames.html">Games</a><a class="on" href="profile.html">Showcase</a><a href="Games/shop.html#seasonal">Seasonal shop</a></div>
   <div id="view"><div class="note">Loading showcase...</div></div>
 </main>
 <script>

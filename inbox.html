@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="display.js"></script>
 <script src="auth-guard.js" data-require-auth="true"></script>
-<script src="nav.js?v=20261123-nineteen" defer></script>
+<script src="nav.js?v=20261123-twenty" defer></script>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:dark;--line:rgba(177,184,255,.16);--muted:#9ba4c4}
@@ -39,11 +39,9 @@ button:disabled{opacity:.5;cursor:wait}
 </style>
 </head>
 <body>
+<header class="dh-head"><a href="/index.html" class="logo"><span class="logo-icon"></span><span>DougHub</span></a><nav class="nav" aria-label="Main navigation"></nav></header>
 <div class="container">
-<header>
-  <div><div class="logo">Doug<span>Hub</span> Inbox</div><div class="subtitle">Community feedback and game ideas, kept in separate queues</div></div>
-  <a class="back" href="admin.html">← Admin panel</a>
-</header>
+<section class="dh-pagehero dh-pagehero-s"><img src="/assets/art/report.svg" alt="" width="480" height="270"><div><h1>Inbox</h1><p>Community feedback and game ideas, kept in separate queues.</p><div class="acts"><a class="btn-line" href="admin.html">Back to the admin panel</a></div></div></section>
 <div id="loading">Checking staff permissions…</div>
 <div id="error">Access denied. Developer+ staff access is required.</div>
 <main id="inboxContent" class="workspace" style="display:none">
