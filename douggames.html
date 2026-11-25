@@ -2120,7 +2120,7 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 
 .dh-official-game{border-color:rgba(120,220,180,.42)!important;background:linear-gradient(135deg,rgba(26,67,62,.68),rgba(13,17,39,.82))!important}.dh-official-game-badge{display:inline-flex;align-items:center;width:max-content;margin-bottom:10px;padding:5px 9px;border:1px solid #83e0ba66;border-radius:999px;background:#65d6a51c;color:#aaf0cf;font-size:9px;font-weight:950;letter-spacing:.1em}.dh-official-game .play-label{color:#9fe9c5}
 </style>
-  <script src="nav.js?v=20261123-twentytwo" defer></script>
+  <script src="nav.js?v=20261123-twentythree" defer></script>
 
 <script src="search-autofill-fix.js?v=3" defer></script>
 
@@ -2356,14 +2356,14 @@ main{width:min(1180px,calc(100% - 32px))!important}
 #communityGames.community-games{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px!important;overflow:visible!important;padding:0!important}
 #communityGames .community-card{flex:none!important;width:auto!important;min-height:0!important;padding:0!important;border-radius:22px!important;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;transition:transform .18s,border-color .18s,box-shadow .18s}
 #communityGames .community-card:hover{transform:translateY(-4px);border-color:#8b5cf6!important;box-shadow:0 18px 40px #0008}
-#communityGames .community-card::after{display:none!important}
-#communityGames .community-card::before{content:"F3AE"!important;display:grid!important;place-items:center;position:static!important;inset:auto!important;height:78px;margin:0!important;font-size:34px;background:linear-gradient(135deg,#6366f1,#a855f7)!important;opacity:1!important;pointer-events:none;width:auto!important}
-#communityGames .community-card:nth-child(4n+2)::before{background:linear-gradient(135deg,#0ea5e9,#6366f1)!important}
-#communityGames .community-card:nth-child(4n+3)::before{background:linear-gradient(135deg,#f97316,#ec4899)!important}
-#communityGames .community-card:nth-child(4n+4)::before{background:linear-gradient(135deg,#10b981,#0ea5e9)!important}
-#communityGames .community-card>*:not(.community-favorite):not(:first-child){margin-left:18px;margin-right:18px}
-#communityGames .community-card .community-favorite{top:8px!important;right:8px!important;left:auto!important}
-#communityGames .community-card .community-card-badges{margin-top:16px}
+#communityGames .community-card::before,#communityGames .community-card::after{display:none!important}
+#communityGames .community-card{padding-top:18px!important}
+#communityGames .community-card:has(.community-cover){padding-top:0!important}
+#communityGames .community-cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin:0!important;background:#0b0e20}
+#communityGames .community-card>*:not(.community-favorite):not(.community-cover){margin-left:18px;margin-right:18px}
+#communityGames .community-card .community-favorite{position:absolute!important;top:10px!important;right:10px!important;left:auto!important;z-index:3;background:#0b0e20aa!important;backdrop-filter:blur(6px)}
+#communityGames .community-card{position:relative!important}
+#communityGames .community-card .community-card-badges{margin-top:14px}
 #communityGames .community-card h3{font-size:19px!important;margin:6px 18px 6px}
 #communityGames .community-card p{flex:1;font-size:14px!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 #communityGames .community-card .community-author,#communityGames .community-card .community-popularity{padding-bottom:14px}
@@ -2443,7 +2443,7 @@ main{width:min(1180px,calc(100% - 32px))!important}
 @media (max-width:340px){#doug-games .dh-ggrid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#doug-games .dh-gc,#doug-games .dh-gc *{transition:none!important}}
 </style>
-<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentytwo">
+<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentythree">
 </head>
 
 <body>
@@ -3808,7 +3808,7 @@ async function loadCommunityGames() {
         await supabaseClient
             .from("community_games")
             .select(
-                "id, title, description, author, category, code, created_at, creator_id, is_official"
+                "id, title, description, author, category, code, created_at, creator_id, is_official, cover"
             )
             .order(
                 "created_at",
@@ -3932,6 +3932,7 @@ function renderCommunityGames() {
                             data-game-id="${escapeHtml(game.id)}"
                         >
 
+                            ${/^data:image\//.test(game.cover || "") ? '<img class="community-cover" alt="" loading="lazy" src="' + escapeHtml(game.cover) + '">' : ""}
                             <button type="button" class="community-favorite ${getFavoriteGameIds().includes(String(game.id)) ? "is-favorite" : ""}" aria-label="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}" aria-pressed="${getFavoriteGameIds().includes(String(game.id))}" title="${getFavoriteGameIds().includes(String(game.id)) ? "Remove from favorites" : "Add to favorites"}">${getFavoriteGameIds().includes(String(game.id)) ? "★" : "☆"}</button>
 
                             <div class="community-card-badges">

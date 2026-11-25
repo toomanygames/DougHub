@@ -193,7 +193,21 @@
     m.textContent = "Saving..."; m.className = "msg";
     save().then(function () { m.textContent = proj.visibility === "public" ? "Shared. Everyone can find it on the DougCode home page." : "Saved. Only you can see this project."; m.className = "msg ok"; $("shLink").hidden = false; $("shLink").href = "project.html?id=" + proj.id; }).catch(function (e) { m.textContent = e.message || String(e); m.className = "msg"; });
   }
+  var coverData;   /* undefined = leave as is, null = remove, string = new picture */
+  function setCover(url) { coverData = url; $("gCoverImg").hidden = !url; if (url) $("gCoverImg").src = url; $("gCoverX").hidden = url === undefined ? true : !url; }
+  function pickCover(file) {
+    if (!file) return; var m = $("gMsg");
+    var img = new Image(); var u = URL.createObjectURL(file);
+    img.onload = function () {
+      var W = 640, H = 360, c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
+      var r = Math.max(W / img.width, H / img.height), w = img.width * r, h = img.height * r; x.fillStyle = "#0b0e20"; x.fillRect(0, 0, W, H); x.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+      URL.revokeObjectURL(u); setCover(c.toDataURL("image/jpeg", .8)); m.textContent = "";
+    };
+    img.onerror = function () { URL.revokeObjectURL(u); m.textContent = "Could not read that picture."; };
+    img.src = u;
+  }
   function openGame() {
+    setCover(undefined); $("gCover").value = "";
     var m = $("gMsg"); m.textContent = ""; m.className = "msg";
     $("gTitle").value = proj.title; $("gDesc").value = proj.description || "";
     var meta = DC.getMeta(proj.files); $("gOk").textContent = meta.gameId ? "Update game" : "Publish"; $("gUn").hidden = !meta.gameId; $("gLink").hidden = !meta.gameId;
@@ -205,7 +219,7 @@
     if (!d) { m.textContent = "Add a short description."; m.className = "msg"; return; }
     if (mode === "blocks" && ws) onBlocksChanged();
     $("gOk").disabled = true; m.textContent = "Publishing..."; m.className = "msg";
-    DC.publishGame(proj, { title: t, description: d, category: $("gCat").value }).then(function (r) {
+    DC.publishGame(proj, { title: t, description: d, category: $("gCat").value, cover: coverData }).then(function (r) {
       proj.description = proj.description || d; return save().then(function () { m.textContent = r.updated ? "Updated! The new version is live on the Games page." : "Published! Your game is on the Games page under Community Games."; m.className = "msg ok"; $("gOk").textContent = "Update game"; $("gUn").hidden = false; $("gLink").hidden = false; });
     }).catch(function (e) { m.textContent = e.message || String(e); m.className = "msg"; }).then(function () { $("gOk").disabled = false; });
   }
@@ -227,6 +241,7 @@
     $("tClear").onclick = function () { $("tConsole").innerHTML = '<div class="empty">Output will show here.</div>'; };
     $("btnSave").onclick = function () { save(false).catch(function () {}); };
     $("btnShare").onclick = openShare; $("shOk").onclick = saveShare;
+    $("gCover").onchange = function () { pickCover(this.files && this.files[0]); }; $("gCoverX").onclick = function () { $("gCover").value = ""; setCover(null); $("gCoverImg").hidden = true; $("gCoverX").hidden = true; };
     $("btnGame").onclick = openGame; $("gOk").onclick = doPublish; $("gUn").onclick = doUnpublish;
     document.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", function () { b.closest("dialog").close(); }); });
     $("btnMore").onclick = function (e) { e.stopPropagation(); var m = $("menu"); m.hidden = !m.hidden; $("mPage").style.display = proj.id ? "" : "none"; if (proj.id) $("mPage").href = "project.html?id=" + proj.id; };

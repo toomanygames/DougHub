@@ -394,6 +394,7 @@ var FIT = '<style id="dc-fit">html,body{margin:0;height:100%;background:#05060f;
     if (!LANGS[p.runtime].game) return Promise.reject(new Error("This language cannot be published as a game."));
     var meta = getMeta(p.files), code = gameDocument(p);
     var row = { title: String(opts.title || p.title).slice(0, 80), description: String(opts.description || p.description || "").slice(0, 500), code: code };
+    if (opts.cover === null) row.cover = null; else if (typeof opts.cover === "string" && /^data:image\//.test(opts.cover)) row.cover = opts.cover;
     if (meta.gameId) {
       return db.from("community_games").update(row).eq("id", meta.gameId).eq("creator_id", user.id).select("id").then(function (r) {
         if (r.error) throw r.error;
