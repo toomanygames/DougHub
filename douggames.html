@@ -2120,7 +2120,7 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 
 .dh-official-game{border-color:rgba(120,220,180,.42)!important;background:linear-gradient(135deg,rgba(26,67,62,.68),rgba(13,17,39,.82))!important}.dh-official-game-badge{display:inline-flex;align-items:center;width:max-content;margin-bottom:10px;padding:5px 9px;border:1px solid #83e0ba66;border-radius:999px;background:#65d6a51c;color:#aaf0cf;font-size:9px;font-weight:950;letter-spacing:.1em}.dh-official-game .play-label{color:#9fe9c5}
 </style>
-  <script src="nav.js?v=20261123-twentythree" defer></script>
+  <script src="nav.js?v=20261123-twentyfour" defer></script>
 
 <script src="search-autofill-fix.js?v=3" defer></script>
 
@@ -2371,6 +2371,10 @@ main{width:min(1180px,calc(100% - 32px))!important}
 #communityGames .community-card::marker{content:""}
 #communityGames .empty{grid-column:1/-1}
 @media(max-width:700px){.gm-jump{border-radius:18px}}
+#community-games{padding:18px 20px 8px;border-radius:28px;background:linear-gradient(120deg,#6366f126,#a855f71f);border:1px solid var(--dh-line)}
+#communityGames.collapsed{max-height:700px!important;overflow:hidden!important;-webkit-mask-image:linear-gradient(#000 78%,transparent);mask-image:linear-gradient(#000 78%,transparent)}
+.community-more{display:flex;justify-content:center;padding:6px 0 14px}.community-more[hidden]{display:none}
+#community-games .section-title::after{content:"NEW";margin-left:10px;padding:3px 10px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:11px;letter-spacing:.1em;vertical-align:middle}
 </style>
 <style id="dh-player-clean">
 /* Community games: full screen, no bar, just a back button */
@@ -2443,7 +2447,7 @@ main{width:min(1180px,calc(100% - 32px))!important}
 @media (max-width:340px){#doug-games .dh-ggrid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#doug-games .dh-gc,#doug-games .dh-gc *{transition:none!important}}
 </style>
-<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentythree">
+<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentyfour">
 </head>
 
 <body>
@@ -2566,6 +2570,7 @@ main{width:min(1180px,calc(100% - 32px))!important}
       <p>Pick something from the arcade, try what the community made, or build a game of your own.</p>
       <div class="gm-acts">
         <a class="btn-solid" href="#doug-games">Browse games</a>
+        <a class="btn-line" href="#community-games">Community games</a>
         <a class="btn-line" href="Scripting/scripting.html">Make a game</a>
         <button type="button" class="btn-text" id="openGameRequest">Request a game</button>
       </div>
@@ -2599,12 +2604,75 @@ main{width:min(1180px,calc(100% - 32px))!important}
   </section>
 
   <nav class="games-discovery-nav gm-jump" aria-label="Jump to a section">
-    <a class="games-discovery-link active" href="#doug-games">Arcade</a>
+    <a class="games-discovery-link active" href="#community-games">Community</a>
+    <a class="games-discovery-link" href="#doug-games">Arcade</a>
     <a class="games-discovery-link" href="#daily-games">Daily games</a>
-    <a class="games-discovery-link" href="#community-games">Community</a>
     <a class="games-discovery-link" href="#trendingSection">Trending</a>
     <a class="games-discovery-link" href="Games/shop.html">Shop</a>
   </nav>
+<!-- COMMUNITY GAMES -->
+
+    <section class="section" id="community-games" style="scroll-margin-top:90px">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Community Games
+                </h2>
+
+                <p class="section-subtitle">
+                    Games created with the DougHub Creator.
+                </p>
+
+            </div>
+
+            <div class="game-search-controls">
+              <input
+                type="search"
+                id="gameSearch"
+                class="search-box"
+                name="dh_find_community"
+                 placeholder="Search community games..."
+                 autocomplete="off"
+                 data-search-input
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                inputmode="search"
+                aria-label="Search community games"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+              >
+              <select id="gameFilter" aria-label="Filter community games">
+                <option value="all">All games</option>
+                <option value="favorites">★ Favorites</option>
+                <option value="new">New games</option>
+              </select>
+            </div>
+
+        </div>
+
+        <div class="community-slider-shell">
+            <button class="community-slider-arrow left" type="button" aria-label="Previous community games">‹</button>
+            <div
+                id="communityGames"
+                class="community-games"
+            >
+
+            <div class="empty">
+                Loading community games...
+            </div>
+
+            </div>
+            <button class="community-slider-arrow right" type="button" aria-label="Next community games">›</button>
+        </div>
+        <div class="community-more"><button type="button" id="communityMore" class="btn-soft">Show all community games</button></div>
+
+    </section>
+
 <!-- DOUG'S GAMES -->
 
     <section class="section" id="doug-games">
@@ -2952,67 +3020,6 @@ main{width:min(1180px,calc(100% - 32px))!important}
 
     <section class="dh-daily-section" id="daily-games"><div class="dh-daily-head"><div><div class="dh-daily-kicker"><span></span> DAILY ARCADE</div><h2>Quick daily games</h2><p>Four short challenges. Earn credits and return after the daily reset.</p></div><div class="dh-daily-date"><small>DAILY RESET</small><strong id="dhDailyCountdown">--:--:--</strong><span id="dhDailyDate">SYNCING UTC</span></div></div><div class="dh-daily-quickgrid"><a class="dh-daily-quick wordle" href="Games/wordle.html"><img src="Games/art/wordle.svg" alt=""><span><strong>Wordle</strong><small>Five-letter puzzle</small></span><b>+25</b></a><a class="dh-daily-quick match" href="Games/daily-arcade.html?game=match"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt=""><span><strong>Daily Match</strong><small>Find the pairs</small></span><b>+15</b></a><a class="dh-daily-quick sequence" href="Games/daily-arcade.html?game=sequence"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt=""><span><strong>Sequence</strong><small>Remember the pattern</small></span><b>+15</b></a><a class="dh-daily-quick trivia" href="Games/daily-arcade.html?game=trivia"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt=""><span><strong>Daily Trivia</strong><small>Five quick questions</small></span><b>+15</b></a></div><div class="dh-daily-progress"><div><span id="dhChallengeCount">0 / 4 CLAIMED</span><div class="dh-daily-progress-track" id="dhChallengeProgress" role="progressbar" aria-label="Daily rewards claimed" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><i id="dhChallengeFill"></i></div></div><a href="Games/journey.html">VIEW GAME JOURNEY ↗</a></div></section>
 
-<!-- COMMUNITY GAMES -->
-
-    <section class="section" id="community-games" style="scroll-margin-top:90px">
-
-        <div class="section-header">
-
-            <div>
-
-                <h2 class="section-title">
-                    Community Games
-                </h2>
-
-                <p class="section-subtitle">
-                    Games created with the DougHub Creator.
-                </p>
-
-            </div>
-
-            <div class="game-search-controls">
-              <input
-                type="search"
-                id="gameSearch"
-                class="search-box"
-                name="dh_find_community"
-                 placeholder="Search community games..."
-                 autocomplete="off"
-                 data-search-input
-                autocorrect="off"
-                autocapitalize="off"
-                spellcheck="false"
-                inputmode="search"
-                aria-label="Search community games"
-                data-form-type="other"
-                data-lpignore="true"
-                data-1p-ignore="true"
-              >
-              <select id="gameFilter" aria-label="Filter community games">
-                <option value="all">All games</option>
-                <option value="favorites">★ Favorites</option>
-                <option value="new">New games</option>
-              </select>
-            </div>
-
-        </div>
-
-        <div class="community-slider-shell">
-            <button class="community-slider-arrow left" type="button" aria-label="Previous community games">‹</button>
-            <div
-                id="communityGames"
-                class="community-games"
-            >
-
-            <div class="empty">
-                Loading community games...
-            </div>
-
-            </div>
-            <button class="community-slider-arrow right" type="button" aria-label="Next community games">›</button>
-        </div>
-
-    </section>
 
 <!-- TRENDING GAMES -->
 
@@ -4666,6 +4673,13 @@ updateFeedbackCount();
       submit.disabled=false;submit.textContent="Send request";
     }
   });
+})();
+</script>
+<script>
+(function(){var g=document.getElementById("communityGames"),b=document.getElementById("communityMore");if(!g||!b)return;g.classList.add("collapsed");
+function sync(){var many=g.scrollHeight>720;b.parentNode.hidden=!many&&g.classList.contains("collapsed");}
+b.addEventListener("click",function(){var c=g.classList.toggle("collapsed");b.textContent=c?"Show all community games":"Show fewer";});
+new MutationObserver(sync).observe(g,{childList:true});setTimeout(sync,1500);setTimeout(sync,4000);
 })();
 </script>
 </body>
