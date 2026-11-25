@@ -2120,7 +2120,7 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 
 .dh-official-game{border-color:rgba(120,220,180,.42)!important;background:linear-gradient(135deg,rgba(26,67,62,.68),rgba(13,17,39,.82))!important}.dh-official-game-badge{display:inline-flex;align-items:center;width:max-content;margin-bottom:10px;padding:5px 9px;border:1px solid #83e0ba66;border-radius:999px;background:#65d6a51c;color:#aaf0cf;font-size:9px;font-weight:950;letter-spacing:.1em}.dh-official-game .play-label{color:#9fe9c5}
 </style>
-  <script src="nav.js?v=20261123-twentyfour" defer></script>
+  <script src="nav.js?v=20261123-twentyfive" defer></script>
 
 <script src="search-autofill-fix.js?v=3" defer></script>
 
@@ -2376,6 +2376,46 @@ main{width:min(1180px,calc(100% - 32px))!important}
 .community-more{display:flex;justify-content:center;padding:6px 0 14px}.community-more[hidden]{display:none}
 #community-games .section-title::after{content:"NEW";margin-left:10px;padding:3px 10px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#a855f7);font-size:11px;letter-spacing:.1em;vertical-align:middle}
 </style>
+<style id="dh-community-compact">
+/* smaller community section */
+#community-games{padding:12px 14px 4px!important;border-radius:22px!important;margin-top:16px!important}
+#community-games .section-header{margin-bottom:10px!important;padding-bottom:8px!important}
+#community-games .section-title{font-size:22px!important}
+#community-games .section-subtitle{font-size:12px!important;margin-top:2px}
+#community-games .section-title::after{font-size:9px!important;padding:2px 8px!important}
+#communityGames.community-games{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important;gap:10px!important}
+#communityGames.collapsed{max-height:430px!important}
+#communityGames .community-card{border-radius:16px!important}
+#communityGames .community-card{padding-top:12px!important}
+#communityGames .community-card:has(.community-cover){padding-top:0!important}
+#communityGames .community-cover{aspect-ratio:16/8!important}
+#communityGames .community-card>*:not(.community-favorite):not(.community-cover){margin-left:12px!important;margin-right:12px!important}
+#communityGames .community-card .community-card-badges{margin-top:8px!important;margin-bottom:4px!important}
+#communityGames .community-card h3{font-size:15px!important;margin:3px 12px 3px!important}
+#communityGames .community-card p{font-size:12px!important;-webkit-line-clamp:2!important;line-height:1.4}
+#communityGames .community-card .community-popularity{font-size:11px!important;margin-top:6px!important}
+#communityGames .community-card .community-author{font-size:10px!important;padding-bottom:10px!important}
+#communityGames .community-card .community-category{font-size:10px!important;padding:2px 8px!important}
+#communityGames .community-card .community-favorite{width:26px!important;height:26px!important;top:7px!important;right:7px!important}
+/* slimmer top of the page so Community Games is near the top */
+.gm-hero{padding:6px 0 2px!important}
+.gm-hero .gm-copy{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px}
+.gm-hero .gm-kicker{width:100%}
+.gm-hero h1{font-size:clamp(26px,4vw,38px)!important;margin:0!important}
+.gm-hero p{display:none!important}
+.gm-hero .gm-acts{margin:0!important}
+.gm-hero .gm-meta{margin:0 0 0 auto!important}
+.gm-shop-top{padding:8px 14px!important;margin:6px 0 10px!important}
+.gm-spot{grid-template-columns:1.6fr 1fr!important;gap:12px!important;margin-bottom:10px!important}
+.gm-feature{min-height:0!important;height:210px!important}
+.gm-feature .gm-feature-text{display:none!important}
+.gm-feature strong{font-size:22px!important}
+.gm-picks{padding:10px 12px!important;gap:6px!important}
+.gm-pick:nth-of-type(n+4){display:none!important}
+.gm-pick{padding:6px 8px!important}
+.gm-pick img{width:34px!important;height:34px!important}
+.gm-jump{margin-bottom:10px!important}
+</style>
 <style id="dh-player-clean">
 /* Community games: full screen, no bar, just a back button */
 .player-window{position:relative;display:flex;flex-direction:column;background:#05060f!important}
@@ -2447,7 +2487,7 @@ main{width:min(1180px,calc(100% - 32px))!important}
 @media (max-width:340px){#doug-games .dh-ggrid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#doug-games .dh-gc,#doug-games .dh-gc *{transition:none!important}}
 </style>
-<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentyfour">
+<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentyfive">
 </head>
 
 <body>
