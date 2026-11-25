@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.css">
-<link rel="stylesheet" href="../dh-app-look.css?v=20261123-twentyone">
+<link rel="stylesheet" href="../dh-app-look.css?v=20261123-twentytwo">
 <style>
 :root{color-scheme:dark;--bg:#0b0e20;--panel:#141935;--panel2:#1a2048;--line:#2a3160;--mute:#a3acd9;--a:#6366f1;--b:#a855f7}
 *{box-sizing:border-box}
@@ -84,6 +84,7 @@ dialog textarea{min-height:80px;resize:vertical}
 .menu button,.menu a{display:block;width:100%;text-align:left;padding:9px 12px;border:0;background:none;border-radius:10px;color:#e6e9ff;text-decoration:none;font-size:14px}
 .menu button:hover,.menu a:hover{background:#ffffff12}
 @media (max-width:760px){.files{width:150px}.title{width:150px}}
+.tframe{background:#05060f}.body.is-game.test-open .main{margin-right:min(640px,94vw)}.body.is-game .test{width:min(640px,94vw)}.body.is-game .tframe{flex:3;min-height:240px}.body.is-game .tconsole{max-height:130px}.tframe:fullscreen{background:#05060f}
 </style>
 </head>
 <body>
@@ -128,7 +129,7 @@ dialog textarea{min-height:80px;resize:vertical}
 
   <aside id="test" class="test" aria-label="Test panel">
     <button id="handle" class="handle" type="button" aria-expanded="false">TEST</button>
-    <div class="thead"><strong>Test</strong><button id="tRun" class="btn-solid" type="button">Run</button><button id="tStop" class="btn-soft" type="button">Stop</button><button id="tClear" class="btn-soft" type="button">Clear</button><button id="tClose" class="btn-soft" type="button" aria-label="Close">Close</button></div>
+    <div class="thead"><strong>Test</strong><button id="tRun" class="btn-solid" type="button">Run</button><button id="tStop" class="btn-soft" type="button">Stop</button><button id="tClear" class="btn-soft" type="button">Clear</button><button id="tFull" class="btn-soft" type="button" title="Play full screen">Full screen</button><button id="tClose" class="btn-soft" type="button" aria-label="Close">Close</button></div>
     <div id="tState" class="tstate">Press Run to try your code.</div>
     <iframe id="tFrame" class="tframe" title="Preview"></iframe>
     <div id="tConsole" class="tconsole" aria-live="polite"><div class="empty">Output will show here.</div></div>
@@ -167,8 +168,8 @@ dialog textarea{min-height:80px;resize:vertical}
 <script src="https://unpkg.com/blockly@11.2.2/python_compressed.js"></script>
 <script src="https://unpkg.com/blockly@11.2.2/lua_compressed.js"></script>
 <script src="https://unpkg.com/blockly@11.2.2/msg/en.js"></script>
-<script src="dc.js?v=1"></script>
+<script src="dc.js?v=2"></script>
 <script src="dc-blocks.js?v=2"></script>
-<script src="editor.js?v=1"></script>
+<script src="editor.js?v=2"></script>
 </body>
 </html>

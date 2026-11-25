@@ -22,7 +22,7 @@
     }
     if (!document.querySelector('link[data-dh-app-look]')) {
       const look = document.createElement("link");
-      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-twentyone", root).href;
+      look.rel = "stylesheet"; look.href = new URL("dh-app-look.css?v=20261123-twentytwo", root).href;
       look.dataset.dhAppLook = "true"; document.head.appendChild(look);
     }
     if (!document.querySelector('script[data-dh-seasonal-js]')) {
@@ -168,6 +168,18 @@
       .dh-shared-account .account-menu a:hover,.dh-shared-account .account-menu button:hover {
         background:rgba(255,255,255,.07);color:white;
       }
+      /* compact two-column menu: pages that belong together share a row */
+      .dh-shared-account .account-menu { display:grid;grid-template-columns:1fr 1fr;gap:4px;width:232px;padding:8px; }
+      .dh-shared-account .account-menu a,.dh-shared-account .account-menu button { padding:8px 10px;font-size:13px;font-weight:700;text-align:center;background:rgba(255,255,255,.045); }
+      .dh-shared-account .account-menu a[href$="dashboard.html"] { order:1;grid-column:span 2;text-align:left; }
+      .dh-shared-account .account-menu a[href$="my-games.html"] { order:2;grid-column:span 2;text-align:left; }
+      .dh-shared-account .account-menu a[href$="profile.html"] { display:none; }
+      .dh-shared-account .account-menu a[href$="settings.html"] { order:3; }
+      .dh-shared-account .account-menu a[href$="report.html"] { order:4; }
+      .dh-shared-account .account-menu #adminLink { order:5; }
+      .dh-shared-account .account-menu #feedbackInboxLink { order:6; }
+      .dh-shared-account .account-menu #adminLink:has(+ #feedbackInboxLink[style*="none"]) { grid-column:span 2; }
+      .dh-shared-account .account-menu .logout { order:7;grid-column:span 2;background:transparent;margin-top:2px;padding:6px 10px;font-size:12px; }
       .dh-shared-account .logout { color:#ff7777 !important; }
       @media(max-width:900px) {
         header { align-items:flex-start; }
@@ -238,7 +250,7 @@
     if (!account) {
       account = document.createElement("div");
       account.className = "account-area";
-      account.innerHTML = '<button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false"><div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Loading…</span></button><div id="accountMenu" class="account-menu" aria-hidden="true"><a href="/dashboard.html">Dashboard</a><a href="/my-games.html">My Games &amp; Videos</a><a href="/profile.html">My Showcase</a><a href="/admin.html" id="adminLink" style="display:none">Admin Panel</a><a href="/inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><a href="/settings.html">Settings</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>';
+      account.innerHTML = '<button id="accountButton" class="account-btn" type="button" aria-haspopup="true" aria-expanded="false"><div id="accountAvatar" class="account-avatar">?</div><span id="accountName">Loading…</span></button><div id="accountMenu" class="account-menu" aria-hidden="true"><a href="/dashboard.html">Dashboard</a><a href="/my-games.html">My stuff</a><a href="/profile.html">My Showcase</a><a href="/admin.html" id="adminLink" style="display:none">Admin</a><a href="/inbox.html" id="feedbackInboxLink" style="display:none">Feedback</a><a href="/settings.html">Settings</a><button id="logoutButton" class="logout" type="button">Log Out</button></div>';
     }
     account.classList.add("dh-shared-account");
 
@@ -266,10 +278,10 @@
       link.style.display = "none";
       return link;
     }
-    ensureAccountMenuLink("adminLink", "/admin.html", "Admin Panel");
-    ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback Inbox");
+    ensureAccountMenuLink("adminLink", "/admin.html", "Admin");
+    ensureAccountMenuLink("feedbackInboxLink", "/admin.html#feedbackManagementCard", "Feedback");
     // Every signed-in member can report a person or a problem to staff.
-    ensureAccountMenuLink("reportLink", "/report.html", "Report a problem").style.display = "";
+    ensureAccountMenuLink("reportLink", "/report.html", "Report").style.display = "";
 
     const links = [
       ["/douggames.html","Games"],
@@ -452,7 +464,7 @@
       if (adminLink) {
         adminLink.style.display = staffRank >= 1 ? "" : "none";
         adminLink.href = "/admin.html";
-        adminLink.textContent = "Admin Panel";
+        adminLink.textContent = "Admin";
       }
       const chatLink = document.getElementById("communityChatLink");
       const adminPlus = staffRank >= 2 || profile?.is_admin === true || profile?.is_developer === true || profile?.is_owner === true;
@@ -468,7 +480,7 @@
       if (feedbackLink) {
         feedbackLink.style.display = staffRank >= 3 ? "" : "none";
         feedbackLink.href = "/admin.html#feedbackManagementCard";
-        feedbackLink.textContent = "Feedback Inbox";
+        feedbackLink.textContent = "Feedback";
       }
       try {
         sessionStorage.setItem("dh-account-display-v1", JSON.stringify({

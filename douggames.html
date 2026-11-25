@@ -2120,7 +2120,7 @@ footer{padding:22px 0 32px;color:#747792;font-size:11px}
 
 .dh-official-game{border-color:rgba(120,220,180,.42)!important;background:linear-gradient(135deg,rgba(26,67,62,.68),rgba(13,17,39,.82))!important}.dh-official-game-badge{display:inline-flex;align-items:center;width:max-content;margin-bottom:10px;padding:5px 9px;border:1px solid #83e0ba66;border-radius:999px;background:#65d6a51c;color:#aaf0cf;font-size:9px;font-weight:950;letter-spacing:.1em}.dh-official-game .play-label{color:#9fe9c5}
 </style>
-  <script src="nav.js?v=20261123-twentyone" defer></script>
+  <script src="nav.js?v=20261123-twentytwo" defer></script>
 
 <script src="search-autofill-fix.js?v=3" defer></script>
 
@@ -2336,6 +2336,51 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 .player-header{justify-content:flex-start!important;gap:4px}
 .player-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
+<style id="dh-games-remake">
+main{width:min(1180px,calc(100% - 32px))!important}
+.gm-hero{padding:18px 0 8px!important}
+.gm-hero h1{font-size:clamp(30px,5vw,46px)!important;margin:2px 0 6px}
+.gm-hero p{font-size:16px;margin:0 0 12px}
+.gm-shop-top{display:flex!important;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:6px 0 16px!important;padding:12px 18px!important;border-radius:22px;background:linear-gradient(120deg,#6366f126,#a855f720);border:1px solid var(--dh-line)}
+.gm-shop-top img{display:none}
+.gm-shop-top .gm-shop-text{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.gm-shop-top .gm-shop-text strong{font-size:17px}
+.gm-shop-top .gm-shop-acts{display:flex;gap:8px;flex-wrap:wrap}
+.gm-shop-top .gm-shop-acts a{padding:9px 16px;font-size:14px}
+.gm-spot{margin-bottom:14px}
+.gm-jump{position:sticky;top:64px;z-index:20;margin:0 0 18px!important;padding:8px 10px;border-radius:999px;background:#0e1228ee;border:1px solid var(--dh-line);backdrop-filter:blur(10px);width:max-content;max-width:100%;overflow-x:auto}
+.section{margin-top:26px!important}
+/* community games: a tidy grid of cards instead of a slider */
+.community-slider-arrow{display:none!important}
+.community-slider-shell{display:block!important}
+#communityGames.community-games{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px!important;overflow:visible!important;padding:0!important}
+#communityGames .community-card{flex:none!important;width:auto!important;min-height:0!important;padding:0!important;border-radius:22px!important;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;background:var(--dh-panel)!important;border:1px solid var(--dh-line)!important;transition:transform .18s,border-color .18s,box-shadow .18s}
+#communityGames .community-card:hover{transform:translateY(-4px);border-color:#8b5cf6!important;box-shadow:0 18px 40px #0008}
+#communityGames .community-card::after{display:none!important}
+#communityGames .community-card::before{content:"F3AE"!important;display:grid!important;place-items:center;position:static!important;inset:auto!important;height:78px;margin:0!important;font-size:34px;background:linear-gradient(135deg,#6366f1,#a855f7)!important;opacity:1!important;pointer-events:none;width:auto!important}
+#communityGames .community-card:nth-child(4n+2)::before{background:linear-gradient(135deg,#0ea5e9,#6366f1)!important}
+#communityGames .community-card:nth-child(4n+3)::before{background:linear-gradient(135deg,#f97316,#ec4899)!important}
+#communityGames .community-card:nth-child(4n+4)::before{background:linear-gradient(135deg,#10b981,#0ea5e9)!important}
+#communityGames .community-card>*:not(.community-favorite):not(:first-child){margin-left:18px;margin-right:18px}
+#communityGames .community-card .community-favorite{top:8px!important;right:8px!important;left:auto!important}
+#communityGames .community-card .community-card-badges{margin-top:16px}
+#communityGames .community-card h3{font-size:19px!important;margin:6px 18px 6px}
+#communityGames .community-card p{flex:1;font-size:14px!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#communityGames .community-card .community-author,#communityGames .community-card .community-popularity{padding-bottom:14px}
+#communityGames .community-card button.play,#communityGames .community-card .community-play,#communityGames .community-card [class*=play]{border-radius:999px}
+#communityGames .community-card::marker{content:""}
+#communityGames .empty{grid-column:1/-1}
+@media(max-width:700px){.gm-jump{border-radius:18px}}
+</style>
+<style id="dh-player-clean">
+/* Community games: full screen, no bar, just a back button */
+.player-window{position:relative;display:flex;flex-direction:column;background:#05060f!important}
+.player-header{position:absolute!important;top:12px;left:12px;z-index:10;height:auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;width:auto!important}
+.player-header #playerTitle,.player-header .player-actions{display:none!important}
+.player-back{margin:0!important;height:38px;padding:0 16px;border-radius:999px;background:rgba(10,12,28,.62)!important;border:1px solid rgba(255,255,255,.22)!important;backdrop-filter:blur(10px);color:#fff;font:800 14px system-ui,sans-serif;cursor:pointer;opacity:.55;transition:opacity .15s,transform .15s}
+.player-back:hover,.player-back:focus-visible{opacity:1;transform:translateX(-2px)}
+#gameFrame{width:100%;height:100%!important;flex:1 1 auto;border:0!important;background:#05060f}
+</style>
 <style id="dh-gcard-style">
 /* Official DougHub game cards: flat, solid colors only. */
 #doug-games .dh-game-browser{background:#0f1229;border-color:#ffffff14}
@@ -2398,7 +2443,7 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 @media (max-width:340px){#doug-games .dh-ggrid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#doug-games .dh-gc,#doug-games .dh-gc *{transition:none!important}}
 </style>
-<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentyone">
+<link rel="stylesheet" href="dh-app-look.css?v=20261123-twentytwo">
 </head>
 
 <body>
@@ -2528,7 +2573,12 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
     </div>
 </section>
 
-    <section class="gm-spot" aria-label="Featured game">
+  <section class="gm-shop gm-shop-top" aria-label="Characters and shop">
+    <div class="gm-shop-text"><span class="gm-kicker">CHARACTERS</span><strong>Collect, customize, show off</strong></div>
+    <div class="gm-shop-acts"><a class="btn-solid" href="Games/shop.html">Shop</a><a class="btn-soft" href="Games/character-editor.html">Character editor</a><a class="btn-soft" href="profile.html">My showcase</a><a class="btn-soft" href="#daily-games">Daily games</a></div>
+  </section>
+
+<section class="gm-spot" aria-label="Featured game">
     <a class="gm-feature" href="Games/quiet-woods.html" style="--accent:#22c55e">
       <img src="Games/art/quiet-woods.svg" alt="" width="640" height="640">
       <span class="gm-feature-shade"></span>
@@ -2806,11 +2856,6 @@ body.player-open #dh-global-help,body.player-open #dhLbBtn,body.player-open #dh-
 
     <section class="dh-daily-section" id="daily-games"><div class="dh-daily-head"><div><div class="dh-daily-kicker"><span></span> DAILY ARCADE</div><h2>Quick daily games</h2><p>Four short challenges. Earn credits and return after the daily reset.</p></div><div class="dh-daily-date"><small>DAILY RESET</small><strong id="dhDailyCountdown">--:--:--</strong><span id="dhDailyDate">SYNCING UTC</span></div></div><div class="dh-daily-quickgrid"><a class="dh-daily-quick wordle" href="Games/wordle.html"><img src="Games/art/wordle.svg" alt=""><span><strong>Wordle</strong><small>Five-letter puzzle</small></span><b>+25</b></a><a class="dh-daily-quick match" href="Games/daily-arcade.html?game=match"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/bear.png" alt=""><span><strong>Daily Match</strong><small>Find the pairs</small></span><b>+15</b></a><a class="dh-daily-quick sequence" href="Games/daily-arcade.html?game=sequence"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/panda.png" alt=""><span><strong>Sequence</strong><small>Remember the pattern</small></span><b>+15</b></a><a class="dh-daily-quick trivia" href="Games/daily-arcade.html?game=trivia"><img src="https://raw.githubusercontent.com/shorepine/kenney/main/2d/Animal%20Pack%20Remastered/Round%20%28outline%29/whale.png" alt=""><span><strong>Daily Trivia</strong><small>Five quick questions</small></span><b>+15</b></a></div><div class="dh-daily-progress"><div><span id="dhChallengeCount">0 / 4 CLAIMED</span><div class="dh-daily-progress-track" id="dhChallengeProgress" role="progressbar" aria-label="Daily rewards claimed" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><i id="dhChallengeFill"></i></div></div><a href="Games/journey.html">VIEW GAME JOURNEY ↗</a></div></section>
 
-  <section class="gm-shop" aria-label="Characters and shop">
-    <img src="assets/art/games.svg" alt="" width="320" height="180">
-    <div class="gm-shop-text"><span class="gm-kicker">THE CHARACTER COLLECTION</span><h2>Collect. Customize. Show off.</h2><p>Open packs in the shop, dress up your character and put your best ones in your showcase.</p></div>
-    <div class="gm-shop-acts"><a class="btn-solid" href="Games/shop.html">Open the shop</a><a class="btn-soft" href="Games/character-editor.html">Character editor</a><a class="btn-text" href="profile.html">My showcase</a></div>
-  </section>
 <!-- COMMUNITY GAMES -->
 
     <section class="section" id="community-games" style="scroll-margin-top:90px">
@@ -3963,6 +4008,7 @@ async function openCommunityGame(
         );
 
     document.body.classList.add("player-open");
+    try { const po = document.getElementById("playerOverlay"); if (po.requestFullscreen && !document.fullscreenElement) po.requestFullscreen().catch(function () {}); } catch (_) {}
     try { document.getElementById("gameFrame").focus(); } catch (_) {}
     await startPlaySession(
         game.id

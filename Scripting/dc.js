@@ -50,6 +50,169 @@
     '}',
     'tick();'
   ].join("\n");
+
+  /* Helper modules for Python and Lua games: a canvas, keys, mouse and a game loop. */
+  var PY_HELPER = [
+    'from js import document, window',
+    'from pyodide.ffi import create_proxy',
+    'import sys, traceback',
+    'canvas = document.getElementById("game")',
+    'ctx = canvas.getContext("2d")',
+    'width = canvas.width',
+    'height = canvas.height',
+    'keys = set()',
+    'mouse = {"x": 0, "y": 0, "down": False}',
+    'def _kd(e):',
+    '    keys.add(str(e.key))',
+    '    if str(e.key).startswith("Arrow") or str(e.key) == " ":',
+    '        e.preventDefault()',
+    'def _ku(e):',
+    '    keys.discard(str(e.key))',
+    'def _mm(e):',
+    '    r = canvas.getBoundingClientRect()',
+    '    mouse["x"] = (e.clientX - r.left) * width / r.width',
+    '    mouse["y"] = (e.clientY - r.top) * height / r.height',
+    'def _md(e):',
+    '    mouse["down"] = True',
+    'def _mu(e):',
+    '    mouse["down"] = False',
+    'window.addEventListener("keydown", create_proxy(_kd))',
+    'window.addEventListener("keyup", create_proxy(_ku))',
+    'canvas.addEventListener("mousemove", create_proxy(_mm))',
+    'canvas.addEventListener("mousedown", create_proxy(_md))',
+    'window.addEventListener("mouseup", create_proxy(_mu))',
+    'def size(w, h):',
+    '    global width, height',
+    '    canvas.width = w',
+    '    canvas.height = h',
+    '    width = w',
+    '    height = h',
+    'def clear(color="#0b0e20"):',
+    '    ctx.fillStyle = color',
+    '    ctx.fillRect(0, 0, width, height)',
+    'def rect(x, y, w, h, color="white"):',
+    '    ctx.fillStyle = color',
+    '    ctx.fillRect(x, y, w, h)',
+    'def circle(x, y, r, color="white"):',
+    '    ctx.fillStyle = color',
+    '    ctx.beginPath()',
+    '    ctx.arc(x, y, r, 0, 6.2832)',
+    '    ctx.fill()',
+    'def text(s, x, y, color="white", px=18):',
+    '    ctx.fillStyle = color',
+    '    ctx.font = str(px) + "px sans-serif"',
+    '    ctx.fillText(str(s), x, y)',
+    'def loop(fn):',
+    '    def step(t):',
+    '        try:',
+    '            fn()',
+    '        except Exception:',
+    '            print(traceback.format_exc(), file=sys.stderr)',
+    '            return',
+    '        window.requestAnimationFrame(proxy)',
+    '    proxy = create_proxy(step)',
+    '    window.requestAnimationFrame(proxy)'
+  ].join("\n");
+  var LUA_HELPER = [
+    'local js = require("js")',
+    'local window = js.global',
+    'local document = window.document',
+    'local canvas = document:getElementById("game")',
+    'local ctx = canvas:getContext("2d")',
+    'local M = { width = canvas.width, height = canvas.height, keys = {}, mouse = { x = 0, y = 0, down = false } }',
+    'window:addEventListener("keydown", function(_, e)',
+    '  M.keys[e.key] = true',
+    '  if string.sub(e.key, 1, 5) == "Arrow" or e.key == " " then e:preventDefault() end',
+    'end)',
+    'window:addEventListener("keyup", function(_, e) M.keys[e.key] = nil end)',
+    'canvas:addEventListener("mousemove", function(_, e)',
+    '  local r = canvas:getBoundingClientRect()',
+    '  M.mouse.x = (e.clientX - r.left) * M.width / r.width',
+    '  M.mouse.y = (e.clientY - r.top) * M.height / r.height',
+    'end)',
+    'canvas:addEventListener("mousedown", function() M.mouse.down = true end)',
+    'window:addEventListener("mouseup", function() M.mouse.down = false end)',
+    'function M.size(w, h) canvas.width = w; canvas.height = h; M.width = w; M.height = h end',
+    'function M.clear(c) ctx.fillStyle = c or "#0b0e20"; ctx:fillRect(0, 0, M.width, M.height) end',
+    'function M.rect(x, y, w, h, c) ctx.fillStyle = c or "white"; ctx:fillRect(x, y, w, h) end',
+    'function M.circle(x, y, r, c) ctx.fillStyle = c or "white"; ctx:beginPath(); ctx:arc(x, y, r, 0, 6.2832); ctx:fill() end',
+    'function M.text(s, x, y, c, px) ctx.fillStyle = c or "white"; ctx.font = (px or 18) .. "px sans-serif"; ctx:fillText(tostring(s), x, y) end',
+    'function M.loop(fn)',
+    '  local step',
+    '  step = function()',
+    '    local ok, err = pcall(fn)',
+    '    if not ok then js.global.console:error(tostring(err)); return end',
+    '    window:requestAnimationFrame(step)',
+    '  end',
+    '  window:requestAnimationFrame(step)',
+    'end',
+    'return M'
+  ].join("\n");
+  var PY_GAME = [
+    '# Catch the falling stars with the left and right arrow keys.',
+    '# "dougame" is a small helper that gives you a canvas, keys and a loop.',
+    'import random',
+    'import dougame as g',
+    '',
+    'player = {"x": 210, "w": 60}',
+    'stars = []',
+    'score = 0',
+    '',
+    'def update():',
+    '    global score',
+    '    if "ArrowLeft" in g.keys:',
+    '        player["x"] -= 6',
+    '    if "ArrowRight" in g.keys:',
+    '        player["x"] += 6',
+    '    player["x"] = max(0, min(g.width - player["w"], player["x"]))',
+    '    if random.random() < 0.04:',
+    '        stars.append({"x": random.random() * (g.width - 16), "y": -10})',
+    '    for s in stars:',
+    '        s["y"] += 3',
+    '    for s in stars[:]:',
+    '        if s["y"] > 278 and player["x"] - 12 < s["x"] < player["x"] + player["w"]:',
+    '            stars.remove(s)',
+    '            score += 1',
+    '        elif s["y"] > g.height:',
+    '            stars.remove(s)',
+    '    g.clear("#0b0e20")',
+    '    g.rect(player["x"], 290, player["w"], 14, "#67e8f9")',
+    '    for s in stars:',
+    '        g.circle(s["x"] + 6, s["y"], 7, "#fde047")',
+    '    g.text("Score: " + str(score), 12, 26)',
+    '',
+    'g.loop(update)'
+  ].join("\n");
+  var LUA_GAME = [
+    '-- Catch the falling stars with the left and right arrow keys.',
+    '-- "dougame" is a small helper that gives you a canvas, keys and a loop.',
+    'local g = require("dougame")',
+    '',
+    'local player = { x = 210, w = 60 }',
+    'local stars = {}',
+    'local score = 0',
+    '',
+    'g.loop(function()',
+    '  if g.keys["ArrowLeft"] then player.x = player.x - 6 end',
+    '  if g.keys["ArrowRight"] then player.x = player.x + 6 end',
+    '  player.x = math.max(0, math.min(g.width - player.w, player.x))',
+    '  if math.random() < 0.04 then table.insert(stars, { x = math.random() * (g.width - 16), y = -10 }) end',
+    '  for i = #stars, 1, -1 do',
+    '    local s = stars[i]',
+    '    s.y = s.y + 3',
+    '    if s.y > 278 and s.x > player.x - 12 and s.x < player.x + player.w then',
+    '      table.remove(stars, i)',
+    '      score = score + 1',
+    '    elseif s.y > g.height then',
+    '      table.remove(stars, i)',
+    '    end',
+    '  end',
+    '  g.clear("#0b0e20")',
+    '  g.rect(player.x, 290, player.w, 14, "#67e8f9")',
+    '  for _, s in ipairs(stars) do g.circle(s.x + 6, s.y, 7, "#fde047") end',
+    '  g.text("Score: " .. score, 12, 26)',
+    'end)'
+  ].join("\n");
   var LANGS = {
     web: {
       label: "Web (HTML, CSS and JavaScript)", short: "Web", color: "#f97316", entry: "index.html", ext: ["html", "css", "js"], runs: "page", game: true,
@@ -74,23 +237,23 @@
       }
     },
     python: {
-      label: "Python", short: "Python", color: "#3b82f6", entry: "main.py", ext: ["py"], runs: "console", game: false,
+      label: "Python", short: "Python", color: "#3b82f6", entry: "main.py", ext: ["py"], runs: "console", game: true,
       starter: {
         project: [
           { name: "main.py", content: 'from helpers import greet\n\nfor name in ["Doug", "Ada", "Linus"]:\n    print(greet(name))\n\ntotal = sum(range(1, 11))\nprint("1 + 2 + ... + 10 =", total)' },
           { name: "helpers.py", content: 'def greet(name):\n    return "Hello, " + name + "!"' }
         ],
-        game: [{ name: "main.py", content: '# A number guessing game that plays itself.\nimport random\n\nsecret = random.randint(1, 20)\nlow, high = 1, 20\ntries = 0\nwhile True:\n    guess = (low + high) // 2\n    tries += 1\n    print("Guess", tries, ":", guess)\n    if guess == secret:\n        print("Found", secret, "in", tries, "tries!")\n        break\n    if guess < secret:\n        low = guess + 1\n    else:\n        high = guess - 1' }]
+        game: [{ name: "main.py", content: PY_GAME }]
       }
     },
     lua: {
-      label: "Lua", short: "Lua", color: "#6366f1", entry: "main.lua", ext: ["lua"], runs: "console", game: false,
+      label: "Lua", short: "Lua", color: "#6366f1", entry: "main.lua", ext: ["lua"], runs: "console", game: true,
       starter: {
         project: [
           { name: "main.lua", content: 'local helpers = require("helpers")\n\nfor _, name in ipairs({"Doug", "Ada", "Linus"}) do\n  print(helpers.greet(name))\nend\n\nlocal total = 0\nfor i = 1, 10 do total = total + i end\nprint("1 + 2 + ... + 10 =", total)' },
           { name: "helpers.lua", content: 'local M = {}\nfunction M.greet(name)\n  return "Hello, " .. name .. "!"\nend\nreturn M' }
         ],
-        game: [{ name: "main.lua", content: '-- A number guessing game that plays itself.\nmath.randomseed(os.time())\nlocal secret = math.random(1, 20)\nlocal low, high, tries = 1, 20, 0\nwhile true do\n  local guess = (low + high) // 2\n  tries = tries + 1\n  print("Guess " .. tries .. ": " .. guess)\n  if guess == secret then\n    print("Found " .. secret .. " in " .. tries .. " tries!")\n    break\n  end\n  if guess < secret then low = guess + 1 else high = guess - 1 end\nend' }]
+        game: [{ name: "main.lua", content: LUA_GAME }]
       }
     }
   };
@@ -99,6 +262,8 @@
   function visibleFiles(files) { return (files || []).filter(function (f) { return f.name !== META && f.name !== BLOCKS; }); }
   function getFile(files, name) { for (var i = 0; i < files.length; i++) if (files[i].name === name) return files[i]; return null; }
   function setFile(files, name, content) { var f = getFile(files, name); if (f) f.content = content; else files.push({ name: name, type: extOf(name), content: content }); }
+  function isGame(p) { return getMeta(p.files).kind === "game"; }
+  function runsPage(p) { return LANGS[p.runtime].runs === "page" || (isGame(p) && !!LANGS[p.runtime].game); }
   function getMeta(files) { var f = getFile(files, META); try { return f ? JSON.parse(f.content) || {} : {}; } catch (e) { return {}; } }
   function setMeta(files, meta) { setFile(files, META, JSON.stringify(meta)); }
 
@@ -184,24 +349,28 @@
     html = html.replace(/<script([^>]*)src=["']([^"']+\.js)["']([^>]*)>\s*<\/script>/gi, function (m, a, h, b) { var f = getFile(files, h.replace(/^\.?\//, "")); return f ? "<script" + a + b + ">" + safeScript(f.content) + "<\/script>" : m; });
     return html;
   }
+var FIT = '<style id="dc-fit">html,body{margin:0;height:100%;background:#05060f;overflow:hidden}body{display:grid;place-items:center}canvas{max-width:100vw;max-height:100vh;display:block}#dcload{position:fixed;inset:0;display:grid;place-items:center;color:#a5b4fc;font:700 16px system-ui,sans-serif;background:#05060f;z-index:5}</style>';
   function buildDoc(p, withHook) {
     var files = visibleFiles(p.files), h = withHook ? HOOK : "";
     if (p.runtime === "web") {
-      var html = inlineWeb(files, p.entry);
-      if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, function (m) { return m + h; });
-      if (/<html[^>]*>/i.test(html)) return html.replace(/<html[^>]*>/i, function (m) { return m + "<head>" + h + "</head>"; });
-      return "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" + h + "</head><body>" + html + "</body></html>";
+      var html = inlineWeb(files, p.entry), hf = h + (isGame(p) ? FIT : "");
+      if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, function (m) { return m + hf; });
+      if (/<html[^>]*>/i.test(html)) return html.replace(/<html[^>]*>/i, function (m) { return m + "<head>" + hf + "</head>"; });
+      return "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" + hf + "</head><body>" + html + "</body></html>";
     }
     if (p.runtime === "javascript") {
       var js = files.filter(function (f) { return extOf(f.name) === "js" && f.name !== p.entry; }).concat(files.filter(function (f) { return f.name === p.entry; })).map(function (f) { return "<script>" + safeScript(f.content) + "<\/script>"; }).join("\n");
-      return "<!doctype html><html><head><meta charset=\"utf-8\">" + h + "<style>body{font-family:system-ui,sans-serif;color:#e8ebff;background:#0b0e20;margin:0}</style></head><body>" + js + "</body></html>";
+      return "<!doctype html><html><head><meta charset=\"utf-8\">" + h + "<style>body{font-family:system-ui,sans-serif;color:#e8ebff;background:#0b0e20;margin:0}</style>" + (isGame(p) ? FIT : "") + "</head><body>" + js + "</body></html>";
     }
-    var payload = JSON.stringify({ files: files.map(function (f) { return { name: f.name, content: f.content }; }), entry: p.entry }).replace(/</g, "\\u003c");
+    var gm = isGame(p), extra = gm ? (p.runtime === "python" ? [{ name: "dougame.py", content: PY_HELPER }] : [{ name: "dougame.lua", content: LUA_HELPER }]) : [];
+    var body = gm ? '<canvas id="game" width="480" height="320"></canvas><div id="dcload">Loading ' + (p.runtime === "python" ? "Python, about 10 MB the first time" : "Lua") + '...</div>' : "";
+    var fitcss = gm ? FIT : "";
+    var payload = JSON.stringify({ files: files.concat(extra).map(function (f) { return { name: f.name, content: f.content }; }), entry: p.entry }).replace(/</g, "\\u003c");
     if (p.runtime === "python") {
-      return "<!doctype html><html><head><meta charset=\"utf-8\">" + h + "<script src=\"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js\"><\/script></head><body><script>(function(){var P=" + payload + ";function post(k,t){parent.postMessage({dc:'out',kind:k,text:t},'*')}(async function(){try{post('sys','Starting Python. The first run downloads about 10 MB.');var py=await loadPyodide();py.setStdout({batched:function(s){post('log',s)}});py.setStderr({batched:function(s){post('error',s)}});P.files.forEach(function(f){if(/\\.py$/.test(f.name))py.FS.writeFile(f.name,f.content)});var e=P.files.filter(function(f){return f.name===P.entry})[0];await py.runPythonAsync(e?e.content:'');}catch(err){var m=String(err&&err.message||err).split('\\n').filter(function(l){return l.trim()}).slice(-4).join('\\n');post('error',m)}post('done','')})()})();<\/script></body></html>";
+      return "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" + h + fitcss + "<script src=\"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js\"><\/script></head><body>" + body + "<script>(function(){var P=" + payload + ";function post(k,t){parent.postMessage({dc:'out',kind:k,text:t},'*')}(async function(){try{post('sys','Starting Python. The first run downloads about 10 MB.');var py=await loadPyodide();var dl=document.getElementById('dcload');if(dl)dl.remove();py.setStdout({batched:function(s){post('log',s)}});py.setStderr({batched:function(s){post('error',s)}});P.files.forEach(function(f){if(/\\.py$/.test(f.name))py.FS.writeFile(f.name,f.content)});var e=P.files.filter(function(f){return f.name===P.entry})[0];await py.runPythonAsync(e?e.content:'');}catch(err){var m=String(err&&err.message||err).split('\\n').filter(function(l){return l.trim()}).slice(-4).join('\\n');post('error',m)}post('done','')})()})();<\/script></body></html>";
     }
     if (p.runtime === "lua") {
-      return "<!doctype html><html><head><meta charset=\"utf-8\">" + h + "<script src=\"https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js\"><\/script></head><body><script>(function(){var P=" + payload + ";function post(k,t){parent.postMessage({dc:'out',kind:k,text:t},'*')}function lvl(s){var n=0;while(s.indexOf(']'+'='.repeat(n)+']')>=0)n++;return n}function long(s){var e='='.repeat(lvl(s));return '['+e+'['+s+']'+e+']'}try{fengari.load(\"local js=require('js') print=function(...) local t={} for i=1,select('#',...) do t[#t+1]=tostring((select(i,...))) end js.global.console:log(table.concat(t,'\\\\t')) end\")();P.files.forEach(function(f){if(/\\.lua$/.test(f.name)&&f.name!==P.entry){var mod=f.name.replace(/\\.lua$/,'');fengari.load('package.preload['+JSON.stringify(mod)+']=load('+long(f.content)+','+JSON.stringify('='+mod)+')')()}});var e=P.files.filter(function(f){return f.name===P.entry})[0];fengari.load(e?e.content:'','='+P.entry)()}catch(err){post('error',String(err&&err.message||err))}post('done','')})();<\/script></body></html>";
+      return "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" + h + fitcss + "<script src=\"https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js\"><\/script></head><body>" + body + "<script>(function(){var P=" + payload + ";function post(k,t){parent.postMessage({dc:'out',kind:k,text:t},'*')}function lvl(s){var n=0;while(s.indexOf(']'+'='.repeat(n)+']')>=0)n++;return n}function long(s){var e='='.repeat(lvl(s));return '['+e+'['+s+']'+e+']'}try{var dl=document.getElementById('dcload');if(dl)dl.remove();fengari.load(\"local js=require('js') print=function(...) local t={} for i=1,select('#',...) do t[#t+1]=tostring((select(i,...))) end js.global.console:log(table.concat(t,'\\\\t')) end\")();P.files.forEach(function(f){if(/\\.lua$/.test(f.name)&&f.name!==P.entry){var mod=f.name.replace(/\\.lua$/,'');fengari.load('package.preload['+JSON.stringify(mod)+']=load('+long(f.content)+','+JSON.stringify('='+mod)+')')()}});var e=P.files.filter(function(f){return f.name===P.entry})[0];fengari.load(e?e.content:'','='+P.entry)()}catch(err){post('error',String(err&&err.message||err))}post('done','')})();<\/script></body></html>";
     }
     return "";
   }
@@ -222,7 +391,7 @@
   }
   function publishGame(p, opts) {
     if (!user) return Promise.reject(new Error("Log in to publish."));
-    if (!LANGS[p.runtime].game) return Promise.reject(new Error("Games on the Games page run in the browser. Choose Web or JavaScript for a game."));
+    if (!LANGS[p.runtime].game) return Promise.reject(new Error("This language cannot be published as a game."));
     var meta = getMeta(p.files), code = gameDocument(p);
     var row = { title: String(opts.title || p.title).slice(0, 80), description: String(opts.description || p.description || "").slice(0, 500), code: code };
     if (meta.gameId) {
@@ -254,5 +423,5 @@
 
   window.DC = { db: db, esc: esc, ago: ago, LANGS: LANGS, META: META, BLOCKS: BLOCKS, extOf: extOf, modeFor: modeFor, visibleFiles: visibleFiles, getFile: getFile, setFile: setFile, getMeta: getMeta, setMeta: setMeta,
     normalise: normalise, getUser: getUser, user: function () { return user; }, profile: function () { return profile; }, ownerNames: ownerNames, listPublic: listPublic, listMine: listMine, getProject: getProject, saveProject: saveProject, deleteProject: deleteProject, fork: fork,
-    localSave: localSave, localGet: localGet, localList: localList, localDelete: localDelete, newProject: newProject, buildDoc: buildDoc, run: run, publishGame: publishGame, unpublishGame: unpublishGame, download: download, loadScript: loadScript };
+    localSave: localSave, localGet: localGet, localList: localList, localDelete: localDelete, newProject: newProject, buildDoc: buildDoc, isGame: isGame, runsPage: runsPage, run: run, publishGame: publishGame, unpublishGame: unpublishGame, download: download, loadScript: loadScript };
 })();

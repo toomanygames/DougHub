@@ -64,14 +64,14 @@
   }
 
   /* ---------- new project dialog ---------- */
-  var BLURB = { web: "Pages, styles and scripts. Runs in the browser.", javascript: "Plain JavaScript with a console.", python: "Python with a console. Works with blocks.", lua: "Small and fast. Works with blocks." };
+  var BLURB = { web: "Pages, styles and scripts. Runs in the browser.", javascript: "Plain JavaScript with a console.", python: "Python with a console, or a game on a canvas. Works with blocks.", lua: "Small and fast, great for games. Works with blocks." };
   function drawDialog() {
     $("dnTitle").textContent = dKind === "game" ? "Make a game" : "New project";
     document.querySelectorAll("#dlgNew .seg button").forEach(function (b) { b.classList.toggle("on", b.dataset.kind === dKind); });
     if (dKind === "game" && !L[dLang].game) dLang = "web";
     $("dnLangs").innerHTML = Object.keys(L).map(function (k) {
-      var off = dKind === "game" && !L[k].game;
-      return '<button type="button" class="lg' + (dLang === k ? " on" : "") + '" data-l="' + k + '"' + (off ? " disabled" : "") + '><b style="color:' + L[k].color + '">' + esc(L[k].short) + "</b><span>" + esc(off ? "Games run in the browser" : BLURB[k]) + "</span></button>";
+      var off = false;
+      return '<button type="button" class="lg' + (dLang === k ? " on" : "") + '" data-l="' + k + '"' + (off ? " disabled" : "") + '><b style="color:' + L[k].color + '">' + esc(L[k].short) + "</b><span>" + esc(BLURB[k]) + "</span></button>";
     }).join("");
     $("dnLangs").querySelectorAll(".lg").forEach(function (b) { b.onclick = function () { dLang = b.dataset.l; drawDialog(); }; });
     $("dnName").placeholder = dKind === "game" ? "My game" : "My project";

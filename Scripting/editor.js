@@ -167,7 +167,7 @@
   function runIt() {
     if (stopRun) { stopRun(); stopRun = null; }
     if (mode === "blocks" && ws) onBlocksChanged();
-    var showFrame = L[proj.runtime].runs === "page";
+    var showFrame = DC.runsPage(proj); document.body.classList.toggle("is-game", DC.isGame(proj));
     $("tFrame").classList.toggle("hide", !showFrame); $("tConsole").classList.toggle("full", !showFrame);
     $("tConsole").innerHTML = ""; $("tState").textContent = "Running " + proj.entry + "...";
     var framed = $("tFrame"); var fresh = framed.cloneNode(false); framed.parentNode.replaceChild(fresh, framed);
@@ -223,6 +223,7 @@
     $("entrySel").onchange = function () { proj.entry = this.value; renderFiles(); touched(); };
     $("title").addEventListener("input", function () { touched(); });
     $("btnTest").onclick = toggleTest; $("handle").onclick = toggleTest; $("tClose").onclick = closeTest; $("tRun").onclick = runIt; $("tStop").onclick = stopIt;
+    $("tFull").onclick = function () { if (!document.fullscreenElement) { if (!stopRun) runIt(); var f = $("tFrame"); if (f.requestFullscreen) f.requestFullscreen().then(function () { try { f.contentWindow.focus(); } catch (e) {} }).catch(function () { $("tState").textContent = "Your browser blocked full screen."; }); } else document.exitFullscreen(); };
     $("tClear").onclick = function () { $("tConsole").innerHTML = '<div class="empty">Output will show here.</div>'; };
     $("btnSave").onclick = function () { save(false).catch(function () {}); };
     $("btnShare").onclick = openShare; $("shOk").onclick = saveShare;
