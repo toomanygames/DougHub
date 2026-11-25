@@ -1,0 +1,10 @@
+Fix-It Crew open-source assets
+
+3D models (buildings, roads, trees, fountain, trucks, coins, clouds, flag, bricks): Kenney (https://kenney.nl).
+Taken from the Kenney starter kits on GitHub: Starter-Kit-City-Builder, Starter-Kit-Racing and Starter-Kit-3D-Platformer (MIT licence, see LICENSE-Kenney.md; Kenney's art is CC0 1.0).
+
+Sound effects (placement, removal, rotate, toggle, ambience): Kenney, Starter-Kit-City-Builder, MIT licence / CC0.
+
+Music: "JRPG Pack 4 Calm" by Juhani Junkala (SubspaceAudio), CC0 1.0, https://opengameart.org/content/jrpg-pack-4-calm
+       "Retro Game Music Pack" by Juhani Junkala, CC0 1.0, https://opengameart.org/content/5-chiptunes-action
+       The tracks are the ones in /app/assets/music.

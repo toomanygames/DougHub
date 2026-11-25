@@ -61,6 +61,21 @@ h2.h{margin:0;font:700 clamp(26px,5vw,40px) var(--display);color:#fff;text-shado
 .touch .stick i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border-radius:50%;background:#ff8a1fdd;box-shadow:0 3px 0 #0004}
 .touch .act{position:absolute;right:18px;width:78px;height:78px;border-radius:50%;pointer-events:auto;font:700 16px var(--display);background:linear-gradient(180deg,#ffd75e,#ffa51f);box-shadow:0 5px 0 #b3690a;touch-action:manipulation}
 .touch .act.a{bottom:34px}.touch .act.h{bottom:124px;width:60px;height:60px;font-size:13px;background:linear-gradient(180deg,#fff,#e6dcc4);box-shadow:0 4px 0 #a89a78}
+.pill{padding:6px 14px;border-radius:999px;background:var(--panel);font:700 16px var(--display);box-shadow:0 3px 0 #0003;color:#b3690a}
+.snd{position:fixed;right:10px;bottom:10px;z-index:21;display:flex;align-items:center;gap:8px}.snd .sndbtn{position:static}
+.snd input[type=range]{width:90px;accent-color:#ff8a1f}
+.toast{max-width:94vw;text-align:center;position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:40;padding:10px 20px;border-radius:999px;background:#3a2410ee;color:#fff;font:700 17px var(--display);box-shadow:0 6px 20px #0006}
+.screen.side{inset:0 0 0 auto;width:min(430px,100%);justify-content:flex-start;overflow:auto;background:linear-gradient(180deg,#fff3c8f0,#ffe9a8f0)}
+.hats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%}
+.hat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:14px;background:var(--panel);border:3px solid #fff;text-align:left;box-shadow:0 4px 0 #0002}
+.hat.on{border-color:#ffb800;background:#fff3c0}.hat b{font:700 15px var(--display)}.hat small{color:#8a6a30}
+.hat .sw{width:100%;height:16px;border-radius:8px;margin-bottom:4px;border:2px solid #0002}
+.sub{margin:6px 0 0;font:700 18px var(--display);color:#b3690a;align-self:flex-start}
+.ach{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%;text-align:left}
+.ach li{display:flex;gap:8px;padding:6px 8px;border-radius:10px;background:#fff8e6aa;color:#8a7650;font-size:13px}.ach li.got{background:#fff;color:var(--ink)}.ach li b{color:#ffb800}.ach small{display:block;font-weight:700;color:#8a7650}
+.screen.town{background:none;pointer-events:none;justify-content:flex-start}
+.townbar{pointer-events:auto;margin-top:6px;padding:12px 18px;border-radius:20px;background:#fff8e6e6;box-shadow:0 6px 24px #0004;display:flex;flex-direction:column;align-items:center;gap:6px;max-width:min(560px,100%)}
+.townbar .h{font-size:30px}
 .big{font:700 clamp(30px,7vw,56px) var(--display);color:#fff;text-shadow:0 4px 0 #b3690a,0 0 20px #0005;-webkit-text-stroke:2px #5a3000}
 .stat{font:700 18px var(--display)}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
@@ -75,15 +90,15 @@ h2.h{margin:0;font:700 clamp(26px,5vw,40px) var(--display);color:#fff;text-shado
 
 <section class="screen" id="title">
   <div class="logo">Fix-It Crew<small>BUILDER BO &amp; THE MACHINE BUDDIES</small></div>
-  <p class="tag">Carry planks, dig ponds, pour paths and raise whole buildings with Bo and the crew. Eight jobs around town!</p>
-  <div class="menu"><button class="btn" id="playBtn" type="button">Choose a job</button><button class="btn alt small" id="howBtn" type="button">How to play</button></div>
-  <p class="tag" id="howTxt" hidden>Move with WASD or the arrow keys (or the on-screen stick). Walk into piles to pick things up and walk to the glowing spots to build. Press Space to use machines, and E to hop in or out. Finish fast for 3 stars!</p>
+  <p class="tag">Carry planks, dig ponds, pour paths and raise whole buildings with Bo and the crew. Sixteen jobs, a coin shop full of hats and a town that grows as you build!</p>
+  <div class="menu"><button class="btn" id="playBtn" type="button">Choose a job</button><button class="btn alt small" id="howBtn" type="button">How to play</button><a class="btn alt small" href="fixit/LICENSES.txt" target="_blank" rel="noopener" style="text-decoration:none">Credits &amp; licenses</a></div>
+  <p class="tag" id="howTxt" hidden>Move with WASD or the arrow keys (or the on-screen stick). Walk into piles to pick things up and walk to the glowing spots to build. Press Space to use machines, and E to hop in or out. Q and R turn the camera and the mouse wheel zooms. Finish fast for 3 stars, earn coins and build up My Town!</p>
 </section>
 
 <section class="screen" id="select" hidden>
   <h2 class="h">Pick a job</h2>
   <div class="cards" id="cards"></div>
-  <button class="btn alt small" id="selBack" type="button">Back</button>
+  <div class="row"><button class="btn alt small" id="selBack" type="button">Back</button><button class="btn small" id="selShop" type="button">Crew shop</button><button class="btn small" id="selTown" type="button">My Town</button><span class="pill" id="selCoins">0 coins</span></div>
 </section>
 
 <div class="dlg" id="dlg" hidden>
@@ -98,17 +113,31 @@ h2.h{margin:0;font:700 clamp(26px,5vw,40px) var(--display);color:#fff;text-shado
   <div class="prompt" id="prompt" hidden></div>
 </div>
 <div class="touch" id="touch" hidden><div class="stick" id="stick"><i id="knob"></i></div><button class="act h" id="hopBtn" type="button">Hop</button><button class="act a" id="actBtn" type="button">Use</button></div>
-<button class="sndbtn" id="sndBtn" type="button">Sound on</button>
+<div class="snd"><input type="range" id="vol" min="0" max="100" aria-label="Music volume"><button class="sndbtn" id="sndBtn" type="button">Sound on</button></div>
+<div class="toast" id="toast" hidden></div>
+
+<section class="screen side" id="shop" hidden>
+  <h2 class="h">Crew shop</h2>
+  <div class="pill" id="shopCoins">0 coins</div>
+  <div class="hats" id="hatGrid"></div>
+  <h3 class="sub">Badges</h3>
+  <ul class="ach" id="achList"></ul>
+  <button class="btn alt small" id="shopBack" type="button">Back to jobs</button>
+</section>
+
+<section class="screen town" id="town" hidden>
+  <div class="townbar"><h2 class="h" id="townTitle">My Town</h2><p class="tag" id="townSub"></p><button class="btn small" id="townBack" type="button">Back to jobs</button></div>
+</section>
 
 <section class="screen" id="result" hidden>
   <div class="big" id="resTitle">Job done!</div>
-  <div class="star" id="resStars" style="font-size:52px"></div>
+  <div class="star" id="resStars" style="font-size:52px"></div><div class="pill" id="resCoins">0 coins</div>
   <div class="stat" id="resStats"></div>
   <p class="tag" id="resLine"></p>
   <div class="row"><button class="btn alt" id="resAgain" type="button">Try again</button><button class="btn" id="resNext" type="button">Next job</button><button class="btn alt small" id="resMenu" type="button">All jobs</button></div>
 </section>
 
 <script src="leaderboard.js" data-game-key="fix-it-crew" defer></script>
-<script type="module" src="fix-it-crew.js?v=1"></script>
+<script type="module" src="fix-it-crew.js?v=3"></script>
 </body>
 </html>
