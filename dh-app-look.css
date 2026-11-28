@@ -412,3 +412,25 @@ body:has(#postList) .post-content h3{font-size:20px;margin:6px 0}
 body:has(#postList) .community-tag{padding:3px 10px;border-radius:999px;background:#6366f126;color:#c7d2fe;font-weight:800;font-size:12px}
 body:has(#postList) .post-body{color:#d6dbff;line-height:1.55}
 @media(max-width:860px){body:has(#postList) .layout{grid-template-columns:1fr!important}body:has(#postList) .side{position:static!important}body:has(#postList) .community-nav{display:flex;gap:6px;overflow-x:auto}body:has(#postList) .forum-hero img{display:none}}
+
+/* chat: no banner, the panel fills the space under the site header */
+body:has(.chat-container) .chat-hero{display:none!important}
+body:has(.chat-container) .chat-container{height:calc(100vh - 92px)!important;height:calc(100dvh - 92px)!important;margin:10px auto 12px!important;min-height:420px}
+
+/* every screen size: nothing may push the page sideways, media scales down */
+html{overflow-x:clip;-webkit-text-size-adjust:100%}
+body{max-width:100vw;overflow-x:clip}
+img,video,canvas,svg,iframe{max-width:100%}
+@media(max-width:700px){
+  header.dh-head{height:auto!important;min-height:56px;flex-wrap:wrap;padding:8px 12px!important;gap:6px!important}
+  header.dh-head .nav{width:100%;overflow-x:auto;flex-wrap:nowrap;gap:6px;scrollbar-width:none}
+  header.dh-head .nav::-webkit-scrollbar{display:none}
+  header.dh-head .nav>a,header.dh-head .nav .account-area{flex:none}
+  .dh-pagehero{padding:14px!important;gap:12px!important}
+  .dh-pagehero h1{font-size:28px!important}
+  .dh-subtabs,.dh-pagehero-s{width:calc(100% - 24px)!important}
+}
+@media(min-width:1800px){
+  .dh-wrap,main{max-width:1500px}
+  body:has(.dh-head) main{width:min(1500px,calc(100% - 64px))}
+}
